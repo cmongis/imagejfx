@@ -1,19 +1,19 @@
 # ImageJFX Project
 
-The ImageJ FX Project aims to offer a new user interface for the popular scientific software ImageJ2. ImageJFX is based on the ImageJ2 API and on JavaFX : a new UI library proposed in Java.
+The ImageJ FX Project aims to offer a new user interface for the popular scientific software ImageJ2. ImageJFX is based on the ImageJ2 API and on JavaFX.
 
 ## New fetures
-* clearer interface
-* personal database (still experimental)
+* Clearer interface
+* Personal database (still experimental)
 * Action history
 * Mini workflows
-* Batch Processing (only on elements from the personal database
+* Batch Processing (only on entries from the personal database)
 
 ## Missing important features
-*	ImageJ1 Plugin support and installation
-*	3D support
-
-
+* 	ImageJ1 Plugin support and installation
+*  3D support
+*  Decent script edition
+*  Many other features
 
 ## Download
 
@@ -22,7 +22,7 @@ To get a hand on the last binaries, I invite you to register on the [official we
 ## Getting started
 
 
-For now, please refer to the [Getting started](./GETTING_STARTED.md) document.
+Please refer to the [Getting started](./GETTING_STARTED.md) document.
 
 
 ## Developer
