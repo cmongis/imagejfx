@@ -34,20 +34,20 @@ public void onClick() {
 ~~~
 The previous code will trigger the display of all widgets linked to the *image-open* and *8-bit-image* UiContext. As you can see, eases the creation of button that should always appear when a 8-bits image is edited. The programmer doesn't have to care about hiding or showing.
 
-#### Create a Widget
+#### Create a UiPlugin
 
-A Widget returns a JavaFX node and is caracterized by 4 attributes :
+A UiPlugin returns a JavaFX node and is caracterized by 4 attributes :
 
-* **id** : important, allows the Context Manager to find the widget
+* **id** : important, allows the Context Manager to find the UiPlugin
 * **localization** : tells the User interface where the 
 * **context** : list of contexts is associated to
 * **order** : order inside its localization [Optional]
 
-Here is a boiler plate widget
+Here is a boiler plate UiPlugin
 
 ~~~java
 
-@Plugin(type = FxWidgetPlugin.class)
+@Plugin(type = UiPlugin.class)
 @Widget(id = "context-switch-button", localization = Localization.BOTTOM_RIGHT, context="always")
 public class ContextSwitchButton {
 	
@@ -67,14 +67,14 @@ public class ContextSwitchButton {
 	
 	
 	// method ran after injection of the service
-	public FxWidgetPlugin init() {
+	public UiPlugin init() {
 		// you can now uses the services
 		
 		return this;
 	}
 	
 	// should return the node displayed in the interface
-	public Node getWidget() {
+	public Node getUiElement() {
 		return button;
 	}
 	
@@ -97,7 +97,7 @@ As you can see, a UiContext doesn't need to be pre-existent. You can create as m
 
 In this way, one could imagine creating an set of widgets and plugins linked to "Super-resolution" processes.
 
-However, Widgets should only be used to provide an nice UI elements. The logic of your UiContext should be inside a SciJava Service and the image process should operate through ImageJ Modules.
+However, UiPlugins should only be used to provide an nice UI elements. The logic of your UiContext should be inside a SciJava Service and the image operations be done through ImageJ Modules or Commands.
 
 ## ImageJ FX Programming Guide lines
 
@@ -206,7 +206,7 @@ public class DefaultFavoriteFileService extends AbstractService implements Favor
 }
 ~~~
 
-Now if we want to listen for such events in our Widget or in (any other Context injected object), you can just add the following method to your class :
+Now if we want to listen for such events in our UiPlugin or in (any other Context injected object), you can just add the following method to your class :
 
 ~~~java
 
@@ -240,14 +240,14 @@ This class allows you to create easily a button that will appear in a certain co
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.ui.main.Localization;
 import org.scijava.plugin.Plugin;
-import ijfx.service.widget.Widget;
+import ijfx.ui.UiPlugin;
 import javafx.event.ActionEvent;
 import net.imagej.plugins.commands.typechange.TypeChanger;
 import net.imagej.types.DataTypeService;
 import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 
-@Plugin(type = FxWidgetPlugin.class)
+@Plugin(type = UiPlugin.class)
 @Widget(id = "float-image-button", context = "image-open", localization = Localization.LEFT)
 public class FloatTheImage extends AbstractContextButton {
 
@@ -258,7 +258,7 @@ public class FloatTheImage extends AbstractContextButton {
     DataTypeService dataTypeService;
 
     public FloatTheImage() {
-        // defines an icon of the button
+        // defines the icon of the button
         super(FontAwesomeIcon.LEAF);
     }
 

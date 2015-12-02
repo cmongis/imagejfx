@@ -1,6 +1,6 @@
 # Contribute to ImageJ/ImageJFX
 
-This is a guide of our to develop ImageJ Plugins with ImageJFX. This example will use Netbeans but you could use an other IDe
+This is a guide of our to develop ImageJ Plugins with ImageJFX. This example will use Netbeans but you could use an other IDEs.
 
 ## Getting started with Netbeans.
 
@@ -9,8 +9,4 @@ This is a guide of our to develop ImageJ Plugins with ImageJFX. This example wil
 2. Create Maven project
 3. Edit the pom.xml file
 
-
-
-~~~java
-	
-~~~	
+Coming soon...
