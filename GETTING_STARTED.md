@@ -1,4 +1,4 @@
-# ImageJ FX Getting Started
+# ImageJ FX - Getting Started
 
 Before installing ImageJ FX, you should have installed the lastest version of Oracle Java (8u45+).
 

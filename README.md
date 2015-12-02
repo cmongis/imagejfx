@@ -21,20 +21,19 @@ To get a hand on the last binaries, I invite you to register on the [official we
 
 ## Getting started
 
-Just run **start-ijfx.jar** and it should download the last version of ImageJ FX and run automatically
 
-## Developing Plugins for ImageJFX
+For now, please refer to the [Getting started](./GETTING_STARTED.md) document.
 
-Developing plugins for ImageJFX is the same as developing plugins for ImageJ2. However, a little tutorial for developing plugins using ImageJFX will be soon proposed.
 
 ## Developer
 
-If you would like to help develop ImageJ FX or get to know more about the software architecture, please refer to the [developer manual](./DEVELOPER).
+If you would like to help developing ImageJ FX or get to know more about the software architecture, please refer to the [developer manual](./DEVELOPER.md).
+
+You can also check the [roadmap on the official website](http://www.imagejfx.net/doc/roadmap/).
 
 ## Contributor
 
-If you would like to create plugins for ImageJ using ImageJFX, I wrote a little tutorial covering from the installation of your environment to plugin design.
-
+A tutorial explaning how to develop plugins for ImageJ using ImageJFX will be soon proposed.
 
 ## License
 ImageJ FX is a user interface running on top of ImageJ and written in Java using the JavaFX technology. 
