@@ -1,0 +1,31 @@
+<br>
+<br> Search :
+<input type="text" ng-model="test" placeholder="Enter input to search" />
+<div class="divider"></div>
+<h2>Data table</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Class Name / Label</th>
+            <th>Title</th>
+            <th>Priority</th>
+            <th>Input Number</th>
+            <th>Tags</th>
+            <th>More</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="opt in dataArray| orderBy: 'className' | filter : test">
+            <td>{{opt | customFilter | limitTo:15}}</td>
+            <td>{{opt.title | limitTo:15}}</td>
+            <td>{{opt.priority}}</td>
+            <td>{{opt.inputs.length}}</td>
+            <td>
+                <button class="button success" ng-if="opt.isEnabled === true">Enabled</button>
+                <button class="button success" ng-if="opt.isValid === true">Valid</button>
+            </td>
+            <td><a class="button primary small" href='#/module/{{opt.className}}'>More</a>
+            </td>
+        </tr>
+    </tbody>
+</table>

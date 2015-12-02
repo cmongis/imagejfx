@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="960.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mercuryangular.TestAppController">
+<center><WebView fx:id="webView" prefHeight="-1.0" prefWidth="-1.0" BorderPane.alignment="CENTER" />
+</center>
+<right><WebView fx:id="docView" minWidth="200.0" prefHeight="-1.0" prefWidth="300.0" BorderPane.alignment="CENTER" />
+</right>
+<top><HBox spacing="10.0" BorderPane.alignment="CENTER">
+<children><Button fx:id="reloadButton" mnemonicParsing="false" onAction="#reload" text="Reload">
+<HBox.margin>
+<Insets />
+</HBox.margin></Button>
+</children>
+<padding>
+<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+</padding></HBox>
+</top></BorderPane>

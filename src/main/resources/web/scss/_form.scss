@@ -1,0 +1,100 @@
+input[type=text],
+input[type=email],
+input[type=password],textarea {
+	background: lighten($background, 90%);
+	border: solid 2px lighten($background, 90%);
+	padding: 0.5em 0 0.5em 0.5em;
+	font-size: 1em;
+	color: $background;
+	transition: all 0.2s linear;
+	border-radius: 2px;
+	
+	
+	&:focus {
+		border-color: $primary;
+	}
+	
+	
+	&[disabled] {
+		background:lighten($background,5%);
+		border-color:lighten($background,5%);
+		color:lighten($background,30%)
+	}
+	
+
+
+}
+
+input,textarea{
+	&.ng-invalid:not(:focus) {
+		color: darken($danger, 40%);
+		background: lighten($danger, 5%);
+		border-color: lighten($danger, 5%);
+	}
+	&.ng-invalid:focus {
+		border-color: darken($danger, 20%);
+	}
+	
+	
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+label {
+	padding: 0.4em;
+	font-size: 1.1em;
+}
+
+.form-horizontal {
+	label {
+		text-align: right;
+		display: inline-block;
+	}
+	label,
+	input {
+		margin-bottom: 0.5em;
+		margin-left: 0em;
+		margin-right: 0;
+	}
+}
+
+.form-vertical {
+	.form-input {
+		label {
+			display: block;
+			font-size: 0.8em;
+			text-align: left;
+		}
+		input,textarea {
+			
+			width: 100%;
+		}
+		margin-bottom:0.5em;
+	}
+	
+	&.big-input {
+		font-size:1.3em;
+	}
+}
+
+.login-form {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 400px;
+	padding: 2em;
+	background: $background;
+}
+
+
+input[type=checkbox] { display:none; } /* to hide the checkbox itself */
+input[type=checkbox] + label:before {
+  font-family: "FontAwesome";
+  display: inline-block;
+}
+
+input[type=checkbox] + label:before { content: "\f096"; } /* unchecked icon */
+input[type=checkbox] + label:before { letter-spacing: 10px; } /* space between checkbox and label */
+
+input[type=checkbox]:checked + label:before { content: "\f046"; } /* checked icon */
+input[type=checkbox]:checked + label:before { letter-spacing: 5px; } /* allow space for check mark */

@@ -1,0 +1,26 @@
+<br>
+<br> Search:
+<input type="text" ng-model="filterText" placeholder="Enter search keywords" />
+<div class='divider'></div>
+<h4 class='explainer'>Widget Table</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="opt in widgetList | filter: filterText">
+            <td>{{opt.id}}</td>
+            <td>{{opt.name}}</td>
+            <td>{{opt.description}}</td>
+            <td>
+                <a class="button primary small" href="#widgetList/{{opt.id}}">More Widget
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>

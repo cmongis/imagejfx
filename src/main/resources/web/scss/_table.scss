@@ -1,0 +1,39 @@
+
+
+
+/* TABLE */
+
+.table,table {
+	width:100%;
+	border-spacing: 0;
+	border-collapse: collapse;
+	text-align:left;
+	th {
+		
+		background: darken($background,10%);
+		color:white;
+	}
+	th,td{
+		//border-bottom:2px darken($background, 10%) solid;
+		padding:12px 12px;
+		width:auto;
+		line-height: 1.2em;
+		
+	}
+	td{
+		//border-bottom:1px lighten($background, 2%) solid;
+	}
+	tr {
+		background-color: darken($background, 2%);
+	}
+	 tr:nth-child(2n) {
+	  background-color: darken($background, 4%);
+		
+	}
+	&.table-bordered{
+		border:1px  solid;
+		td,th{
+			border:1px lighten($background,4%) solid;
+		}
+	}
+}

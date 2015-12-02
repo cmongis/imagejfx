@@ -1,0 +1,1434 @@
+.root {
+    -fx-text-base-color: #ffffff;
+    -fx-text-fill: -fx-text-base-color;
+
+    -dark: #383f50; 
+    
+    -fx-background-color: -dark;
+
+    -bg-normal:-dark;
+    -bg-dark:derive(-dark,-10%);
+    -bg-light:derive(-dark,20%);
+    
+    -txt-normal:derive(-dark,110%);
+    -txt-highlight:white;
+        
+    -window-background:white;
+
+  
+    -fx-font-size: 16.0px;
+   
+    -fx-font-family:'FontAwesome';
+    -fx-disabled-opacity: 0.6; 
+
+    -flatter-red: rgb(237.0, 68.0, 37.0);
+    -flatter-blue: #5F90B0; 
+    -flatter-green:rgb(48,138,80);
+    -flatter-margin:16px;
+
+    -flatter-danger:-flatter-red;
+
+    -flatter-primary:-flatter-blue;
+    
+    -flatter-primary-bg:derive(-flatter-green,40%);
+    -flatter-danger-bg:derive(-flatter-red,40%);
+    -flatter-warning-bg:derive(-flatter-blue,40%);
+    -flatter-success:-flatter-green;
+    
+    
+    
+    
+}
+
+
+
+.mnemonic-underline {
+    -fx-stroke: transparent;
+}
+
+.text {
+    -fx-font-smoothing-type: lcd;
+}
+
+.emoji-text {
+    -fx-fill: -fx-text-base-color;
+}
+
+/**** size variants **********************************************************/
+.size-variant-touch {
+    -fx-font-size: 9.0;
+}
+
+.size-variant-desktop {
+    -fx-font-size: 16.0;
+}
+
+
+.hbox {
+    -fx-spacing:16px;
+    -fx-background:black;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Label                                                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+.label, .text-field.editable-label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.label:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.label:show-mnemonics > .mnemonic-underline {
+   -fx-stroke: -fx-text-base-color;
+} 
+
+.text {
+    -fx-font-family:'Open Sans';
+    /*-fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); */
+}
+
+.hbox > .label {
+    
+    -fx-padding:0.5em;
+    
+}
+.h1 {
+    -fx-font-size:2.5em;
+}
+.h2 {
+    -fx-font-size:2em;
+}
+.h3 {
+    -fx-font-size:1.5em;
+}
+.h4 {
+    -fx-font-size:1.3em;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Button & ToggleButton                                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+.toggle-button, .button{
+    -fx-background-color: -flatter-primary;
+    -fx-background-insets:  0.0;
+    -fx-background-radius: 2.0;
+    -fx-border-width: 0.0;
+    -fx-padding: .4em;
+    -fx-margin: 1em;
+
+    -fx-text-fill: -fx-text-base-color;
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
+}
+
+.button:hover, .toggle-button:hover, .combo-box:hover {
+    -fx-background-color:derive(-flatter-primary,-10%);
+   
+     -fx-stroke-width:3px;
+    -fx-stroke:white;
+}
+
+.toggle-button:focused,
+.button:focused,
+.button:default:focused {
+    -fx-background-color: derive(-flatter-primary, 30.0%);
+   
+}
+
+.toggle-button:focused:selected {
+    -fx-background-color: derive(-flatter-primary, 50.0%), derive(-flatter-primary, -20.0%);
+    -fx-background-insets: 0.0, 0.2em;
+}
+
+.toggle-button:armed,
+.toggle-button:selected,
+.button:armed,
+.button:default:armed {
+    -fx-background-color: derive(-flatter-primary, -20.0%);
+}
+
+.button.danger {
+     -fx-background-color:-flatter-danger;
+}
+.toggle-button.danger:focused,
+.button.danger:focused,
+.button.danger:default:focused {
+    -fx-background-color: derive(-flatter-danger, 30.0%);
+   
+}
+
+.toggle-button.danger:focused:selected {
+    -fx-background-color: derive(-flatter-danger, 50.0%), derive(-flatter-danger, -20.0%);
+    -fx-background-insets: 0.0, 0.2em;
+}
+
+.toggle-button.danger:armed,
+.toggle-button.danger:selected,
+.button.danger:armed,
+.button.danger:default:armed {
+    -fx-background-color: derive(-flatter-danger, -20.0%);
+}
+.button.danger:hover, .toggle-button.danger:hover {
+    -fx-background-color: derive(-flatter-danger,10%);   
+}
+
+.button.success {
+     -fx-background-color:-flatter-success;
+}
+.button.success:default:focused {
+     -fx-background-color: derive(-flatter-success, 30.0%);
+}
+.button.success:hover {
+    -fx-background-color: derive(-flatter-success,10%);   
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * TextField & TextArea                                                        *
+ *                                                                             *
+ ******************************************************************************/
+
+.text-area , .text-field, .text-field:focused, .text-area:focused{
+    -fx-background-color: white;
+    -fx-background-insets:  0.0;
+    -fx-background-radius: 2.0;
+    -fx-padding: 7px 7px 8px 7px;
+    -fx-border-width: 0.0;
+    -fx-prompt-text-fill: derive(-dark, 50.0%);
+    -fx-highlight-fill: rgb(94.0, 203.0, 234.0);
+    -fx-text-fill:-dark;
+    
+}
+
+.line-separator {
+    -fx-stroke-fill:white;
+}
+
+.text-area .text, .text-field > * > .text {
+    /*-fx-effect: null; */
+    -fx-fill: -dark;
+}
+.text-field.editable-label {
+    -fx-background-color:transparent;
+    -fx-border:0;
+}
+.text-field.editable-label {
+    -fx-text-fill:white;
+}
+.text-field.editable-label {
+    -fx-padding: 0;
+}
+.text-field.editable-label:hover {
+    -fx-background-color:-bg-light;
+}
+
+
+
+.text-area {
+    -fx-padding: 0.15em;
+     -fx-background-color: white;
+}
+
+.text-area .content {
+    -fx-padding: 0.4em;
+    -fx-border-width: 0.0;
+}
+
+.text-area:focused  .content {
+    -fx-background-color: transparent;
+}
+
+.text-area:focused, .text-field:focused {
+    -fx-background-color: -flatter-blue, derive(rgb(94.0, 203.0, 234.0), 80.0%);
+    -fx-background-insets: 0.0, 0.2em;
+    -fx-background-radius: 2.0;
+}
+
+.scroll-bar:vertical > .track-background,
+.scroll-bar:horizontal > .track-background{
+    -fx-background-color: derive(rgb(94.0, 203.0, 234.0), 50.0%);
+    -fx-background-insets: 0.0;
+}
+
+.scroll-bar:vertical > .thumb,
+.scroll-bar:horizontal > .thumb {
+    -fx-background-color: -flatter-blue;
+    -fx-background-insets: 0.0;
+    -fx-background-radius: 0.0;
+}
+
+.scroll-bar > .increment-button, 
+.scroll-bar > .decrement-button,
+.scroll-bar:hover > .increment-button, 
+.scroll-bar:hover > .decrement-button {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar > .increment-button > .increment-arrow,
+.scroll-bar > .decrement-button > .decrement-arrow {
+    -fx-background-color: white;
+}
+
+.scroll-bar > .track-background{
+    -fx-background-color:transparent;
+}
+.scroll-pane, scroll-pane:focused, .flow-pane {
+    -fx-background-color:transparent;
+}
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ComboBox                                                                    *
+ *                                                                             *
+ ******************************************************************************/
+.combo-box-base {
+   /*-fx-skin: "com.guigarage.flatterfx.skin.FlatterComboBoxSkin";*/
+}
+
+.popup-overlay {
+    -fx-background-color: -flatter-primary;
+    -fx-border-color: -flatter-primary, rgb(255.0, 255.0, 255.0, 0.6);
+    -fx-border-width: 8.0;
+    -fx-background-radius:20.0;
+    -fx-border-radius:15.5, 15.5;
+}
+
+.title-bar {
+    -fx-padding: 10;
+}
+
+.title-bar .icon {
+    -fx-alignment: center-left;
+    -fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); 
+}
+
+.title-bar .title-label {
+    -fx-padding: 0 10 0 10;
+    -fx-alignment: center;
+    -fx-font-size: 36;
+    -fx-font-weight: bolder;
+}
+
+.content-area {
+    -fx-background-color: -dark;
+}
+
+
+.content-background {
+    -fx-background-color: -flatter-primary;
+    -fx-background-radius:0.0 0.0 11.0 11.0;
+    -fx-padding: 0 10 10 10;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ChoiceBox                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+.combo-box-base,
+.choice-box {
+    -fx-background-color: -flatter-primary;
+    -fx-background-insets:  0.0;
+    -fx-background-radius: 2.0;
+    -fx-border-width: 0.0;
+}
+
+.combo-box-base > .label,
+.choice-box > .label {
+    -fx-padding:0.4em 1.4em 0.2em 0.4em;
+}
+
+.combo-box-base > .arrow-button, 
+.choice-box > .open-button {
+    -fx-padding: 1em 0.5em 1em 0.5em;
+    -fx-background-radius: 0.0 2.0 2.0 0.0;
+}
+
+.combo-box-base:focused,
+.choice-box:focused{
+    -fx-background-color: derive(-flatter-primary, 50.0%); 
+}
+
+.combo-box-base > .arrow-button > .arrow,
+.choice-box > .open-button > .arrow {
+    -fx-background-color: white;
+    -fx-padding: 0.2em;
+    -fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); 
+}
+.combo-box-base .list-view {
+    -fx-background:-dark;
+    -fx-background-color:-dark;
+}
+
+.menu-bar {
+    -fx-background-color:transparent;
+    -fx-padding:0;
+}
+.menu-bar .menu-button {
+    -fx-background-color:transparent;
+}
+.menu-bar .menu-button > .arrow-button .arrow{
+    -fx-border-color:transparent;
+    -fx-fill-color:transparent;
+    -fx-mark-color:transparent;
+    -fx-background-color: transparent;
+}
+.menu-bar .menu-button:hover {
+    -fx-background-color:-bg-light;
+}
+
+.menu-bar > .context-menu {
+    -fx-background-color:transparent;
+}
+
+.context-menu {
+    -fx-background-color:-bg-light;
+    -fx-padding:0;
+    
+    
+}
+
+.context-menu .label {
+    -fx-text-fill: -txt-normal;
+}
+.context-menu .menu-item:focused {
+    -fx-text-fill:white;
+}
+
+
+
+.menu-item {
+    -fx-background-color:transparent;
+    -fx-padding: 0em 0.5em 0.5em 2em;
+    -fx-text-fill:-txt-normal;
+}
+.menu-button .arrow {
+    -fx-background-color:-txt-normal;
+}
+.menu-item:focused{
+    -fx-background-color: -flatter-primary;
+}
+.menu-item:focused .label {
+    -fx-fill:white;
+    -fx-text-fill:white;
+}
+.menu-item .glyph-icon{
+    -fx-stroke-fill:-txt-highlight;  
+}
+
+.ij1-command {
+    -fx-background-color: rgb(70,55,65);
+}
+
+.context-menu .separator *.line {
+   -fx-background-color:-bg-normal;
+   -fx-border-width:0;
+   -fx-padding:1px;
+   
+}
+.separator .line {
+    -fx-fill:-dark;
+    -fx-stroke-fill:-dark;
+    -fx-stroke-width:10;
+    -fx-border-color:transparent;
+}
+
+.radio-menu-item:checked > .left-container > .radio, 
+.check-menu-item:checked > .left-container > .check {
+    -fx-background-color: transparent;
+    -fx-shape: "m 269.9,233.66286 c 0.15,-0.12 1.97,1.7 2.54,3.1 2.3,-7.33 4.09,-9.1 6.79,-12.1 1.5,-0.25 2.4,-0.27 4.36,0.11 -7.1,5.8 -8.8,16.7 -9.9,17.8 l -0.75,0.02 c 0,0 -2.36,-5.24 -5.6,-7.38 -0.27,-0.17 0.02,-1.5 -0.2,-1.6 z";
+    -fx-padding: 0.68em 0.5em 0.0em 0.0em;
+    -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); 
+}
+
+.radio-menu-item > .left-container > .radio, 
+.check-menu-item > .left-container > .check {
+    -fx-background-color: transparent;
+    -fx-shape: "m 269.9,233.66286 c 0.15,-0.12 1.97,1.7 2.54,3.1 2.3,-7.33 4.09,-9.1 6.79,-12.1 1.5,-0.25 2.4,-0.27 4.36,0.11 -7.1,5.8 -8.8,16.7 -9.9,17.8 l -0.75,0.02 c 0,0 -2.36,-5.24 -5.6,-7.38 -0.27,-0.17 0.02,-1.5 -0.2,-1.6 z";
+    -fx-padding: 0.68em 0.68em 0.0em 0.0em;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * CheckBox                                                                    *
+ *                                                                             *
+ ******************************************************************************/
+
+.check-box {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.check-box > .box,
+.check-box > .box.unfocused,
+.check-box:disabled > .box,
+.check-box:selected > .box,
+.check-box:indeterminate > .box {
+    -fx-background-radius: 2.0;
+    -fx-background-color: -fx-text-base-color;
+}
+
+.check-box:focused > .box {
+    -fx-background-color: -flatter-blue, derive(rgb(94.0, 203.0, 234.0), 80.0%);
+    -fx-background-insets: 0.0, 0.15em;
+}
+
+.check-box:focused:armed > .box {
+    -fx-background-color: -flatter-blue, derive(-fx-text-base-color, 80.0%);
+    -fx-background-insets: 0.0, 0.15em;
+}
+
+.check-box:selected > .box > .mark,
+.check-box:indeterminate > .box > .mark {
+    -fx-background-color: -dark;
+}
+
+.check-box:indeterminate > .box > .mark {
+    -fx-background-insets: -0.06em -0.17em -0.07em -0.17em;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * RadioButton                                                                 *
+ *                                                                             *
+ ******************************************************************************/
+
+.radio-button {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.radio-button > .radio,
+.radio-button > .radio.unfocused,
+.radio-button:disabled > .radio,
+.radio-button:selected > .radio {
+    -fx-background-color: -fx-text-base-color;
+    -fx-padding: 0.4em;
+}
+
+.radio-button:focused > .radio {
+    -fx-background-color: -flatter-blue, derive(rgb(94.0, 203.0, 234.0), 80.0%);
+    -fx-background-insets: 0.0, 0.15em;
+    -fx-padding: 0.4em;
+}
+
+.radio-button:focused:armed > .radio {
+    -fx-background-color: -flatter-blue, derive(-fx-text-base-color, 80.0%);
+    -fx-background-insets: 0.0, 0.15em;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -dark;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ProgressBar                                                                 *
+ *                                                                             *
+ ******************************************************************************/
+
+.progress-bar > .track {
+    -fx-background-color: -fx-text-base-color;
+    -fx-background-radius: 2.0;
+    -fx-padding: 0.0;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -flatter-blue;
+    -fx-background-radius: 2.0;
+    -fx-background-insets: 0.0;
+    -fx-border-width: 0.0;
+    -fx-effect: null;
+}
+
+.progress-bar:indeterminate > .bar {
+    -fx-background-color: derive(-flatter-blue, 50.0%);
+    -fx-background-radius: 2.0;
+    -fx-background-insets: 0.0;
+    -fx-border-width: 0.0;
+    -fx-effect: null;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * ProgressIndicator                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.progress-indicator > .determinate-indicator > .indicator {
+    -fx-background-color: rgb(255.0, 255.0, 255.0, 0.5);
+    -fx-padding: 0.0;
+}
+
+.progress-indicator > .determinate-indicator > .progress {
+    -fx-background-color:  -flatter-blue,  derive(-flatter-blue, 50.0%);
+    -fx-background-insets: 0.0, 0.4em;
+    -fx-padding: 1.0em;
+}
+
+.progress-indicator > .determinate-indicator > .percentage {
+    -fx-fill: white;
+    -fx-translate-y: -2.4em;
+    -fx-padding: 0.0;
+}
+
+.progress-indicator > .indeterminate-indicator > .segment {
+    -fx-background-color: rgb(0.0, 183.0, 221.0); 
+    -fx-scale-x: 0.05em;
+    -fx-scale-y: 0.05em;
+}
+
+.primary {
+    -fx-background-color: -flatter-blue;
+}
+
+.success {
+    -fx-background-color: -flatter-green;
+}
+.danger {
+    -fx-background-color: -flatter-red;
+}
+
+.tool-bar {
+    -fx-background-color:-bg-dark;
+}
+
+.dark-background {
+    -fx-background:-dark;
+    -fx-background-color: -dark;
+}
+.with-spacing {
+    -fx-margin: 10px;
+}
+
+#leftVBox {
+    -fx-padding:10px;
+    -fx-spacing:10px;
+}
+#leftVBox:empty,#rightVBox:empty {
+    -fx-padding:0px;
+    -fx-spacing:0px;
+}
+
+#rightVBox {
+    -fx-padding:10px;
+    -fx-spacing:10px;
+}
+
+.dark-fill {
+    -fx-fill:-dark;
+}
+
+.loading-icon {
+    -fx-text-fill: -fx-primary;
+
+}
+
+.text-field.danger {
+    -fx-background-color: derive(-flatter-danger,50%);
+    -fx-stroke-fill:-flatter-danger;
+
+
+}
+
+.hbox {
+    -fx-stroke-width: 0.2em;
+    -fx-stroke: white;
+    
+}
+
+/*
+*
+* Tab 
+*
+*/
+
+.tab-header-background {
+    -fx-background:-bg-normal;
+    -fx-border-bottom: solid 1px derive(-bg-normal,120%);
+}
+@font-face {
+    font-familly: 'fontAwesome';
+    /*src: url('ijfx/ui/res/fontawesome-webfont.ttf');*/
+}
+
+/*
+*       List
+*/
+
+
+.list-view, .tree-view {
+    -fx-stroke:null;
+   -fx-padding:0;
+    -fx-background-color:transparent;
+    
+}
+
+
+list-cell:filled:selected:focused, .list-cell:filled:selected{
+    /*-fx-background-color: derive(-dark,20%);*/
+    
+   
+}
+.list-cell, .tree-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0.2em 0 0.2em 0;
+    -fx-margin:0;
+    -fx-text-fill:derive(-dark,120%);
+}
+.list-cell:even{ /* <=== changed to even */
+    
+    -fx-background-color: transparent;
+}
+
+.list-cell:filled:hover{
+/*    -fx-background-color: derive(-dark,20%);
+    -fx-text-fill: white;*/
+    -fx-text-fill:#ffffff;
+    -fx-stroke: derive(-dark,20%);
+    -fx-stroke-width:5;
+}
+
+.combo-box .list-cell {
+    -fx-padding:8 12 8 12px;
+    -fx-font-size:16px;
+}
+.combo-box-base  {
+    -fx-background-color:-flatter-primary;
+   /*-fx-skin: "com.sun.javafx.scene.control.skin.ComboBoxBaseSkin";*/
+}
+
+.combo-box,.menu-button {
+    -fx-background-color: -flatter-primary
+         -flatter-primary
+          -flatter-primary
+           -flatter-primary;
+}
+.arrow {
+    -fx-border-color:-txt-highlight;
+    -fx-fill-color:-txt-highlight;
+    -fx-mark-color:-txt-highlight;
+    -fx-background-color:-txt-highlight;
+    
+}
+
+.icon-button {
+    -fx-font-family:"fontAwesome";
+    -fx-padding: 0 0 0 0;
+    -fx-background-color: transparent; 
+}
+.button.icon, .toggle-button.icon {
+    -fx-padding:9px;
+    -fx-background:red;
+}
+.tool-bar-button {
+    -fx-font-size: 18px;
+}
+
+
+.image-window-titlebar {
+    -fx-font-weight:400;
+    -fx-font-size:14px;
+    -fx-alignment: center;
+    -fx-padding: 5px;
+}
+
+.image-window {
+    -fx-stroke-width: 4px;
+    -fx-stroke-fill:derive(-dark,70%);
+    -fx-fill: derive(-dark,70%);
+}
+.info-label {
+    -fx-padding:10px;
+    -fx-background-color:-bg-light;
+}
+
+.button .label {
+    -fx-padding-left: 1em;
+}
+.glyph-icon {
+    -fx-fill: white;
+    -fx-width:2em;
+}
+
+
+
+/*
+.progress-indicator:indeterminate .segment {
+    -fx-shape:"M 71.079865,1.4240656 A 12.821762,12.821762 0 0 1 58.258103,14.245828 l -10e-7,-12.8217624 z";
+    -fx-scale-shape: false;
+}
+
+.progress-indicator:indeterminate .segment0 {
+     -fx-translate-x: -0.7em;
+     -fx-translate-y: -0.03em;
+}
+
+.progress-indicator:indeterminate .segment1 {
+    -fx-rotate: 90;
+    -fx-translate-x: 0.177em;
+    -fx-translate-y: -1.333em;
+    
+}
+
+.progress-indicator:indeterminate .segment2 {
+    -fx-rotate: 180;
+    -fx-translate-x: 1.5em;
+    -fx-translate-y: -0.5em;
+}
+
+.progress-indicator:indeterminate .segment3 {
+    -fx-rotate: 270;
+    -fx-translate-x: 0.67em;
+    -fx-translate-y: 0.8em;
+     
+}
+.progress-indicator:indeterminate .segment4 {-fx-shape:null;}
+.progress-indicator:indeterminate .segment5 {-fx-shape:null;}
+.progress-indicator:indeterminate .segment6 {-fx-shape:null;}
+.progress-indicator:indeterminate .segment7 {-fx-shape:null;} */
+
+
+.arc-item-shape {
+    -fx-fill:-flatter-blue;
+}
+
+.arc-item-icon {
+    -fx-text-fill:white;
+}
+.arc-item-hover .arc-item-shape {
+    -fx-fill:-flatter-red;
+}
+
+.arc-item-choice-box {
+    -fx-fill:null;
+    -fx-stroke: white;
+    -fx-stroke-width: 4;
+}
+
+.arc-item-choice-box-hover {
+    -fx-stroke: -flatter-blue;
+}
+
+.arc-group .label {
+    -fx-fill:white;
+    -fx-text-fill:white;
+}
+
+.titled-pane {
+    -fx-animated:true;
+}
+.titled-pane > *.content {
+    -fx-background-insets:0 0 0 0;
+    -fx-padding:0 0 0 0;
+}
+.titled-pane > .title {
+    -fx-background-color:-bg-light;
+   
+
+}
+.titled-pane > .content {
+    -fx-background-color:transparent;
+    -fx-border-color:transparent;
+    
+}
+.titled-pane > .title > .arrow-button .arrow {
+    -fx-background-color:-txt-highlight;
+}
+
+.range-slider .thumb {
+    -fx-background-color:-dark;
+}
+.popover {
+    -fx-background-color:-bg-light;
+}
+.popover .border {
+   -fx-fill:-bg-light!important;
+   -fx-stroke:derive(-bg-light,20%)!important;
+   -fx-stroke-width:2;
+}
+.popover .content {
+    -fx-background-color:-bg-light;
+    -fx-padding:10;
+}
+
+
+.range-slider .low-thumb, .range-slider .high-thumb, .slider .thumb {
+    -fx-background-color:-flatter-primary;
+}
+.slider .track, .range-slider .track {
+    -fx-background-color:-bg-dark;
+}
+.range-slider .axis {
+    -fx-tick-label-fill: -bg-light;
+}
+.vbox {
+    -fx-spacing:10;
+}
+
+#imagej-container {
+    -fx-padding: 0 10 0 0;
+}
+
+.imagej-container-top {
+    -fx-spacing: 10;
+    -fx-padding: 0 10 0 10;
+    -fx-alignment: baseline-center;
+    -fx-padding:5;
+}
+.imagej-container-top .button {
+    -fx-background-color:red;
+}
+
+.tool {
+    -fx-background-color: black;
+}
+
+.imagej-container-top {
+    
+}
+#imagej-toolbar  {
+    -fx-spacing:10;
+}
+#imagej-toolbar .toggle-button {
+    -fx-background-color:-flatter-primary;
+}
+#imagej-toolbar .toggle-button:selected {
+    -fx-background-color:-flatter-success;
+}
+.module-search-textfield:focus {
+    -fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); 
+
+}
+
+.list-view, .tree-view {
+    -fx-stroke:null;
+   -fx-padding:0;
+    -fx-background-color:null;
+    
+}
+
+
+list-cell:filled:selected:focused, .list-cell:filled:selected{
+    /*-fx-background-color: derive(-dark,20%);*/
+    
+   
+}
+.list-cell, .tree-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0.2em 0 0.2em 0;
+    -fx-margin:0;
+    -fx-text-fill:derive(-dark,120%);
+}
+.list-cell:even{ /* <=== changed to even */
+    
+    -fx-background-color: transparent;
+}
+
+.list-cell:filled:hover{
+/*    -fx-background-color: derive(-dark,20%);
+    -fx-text-fill: white;*/
+    -fx-text-fill:#ffffff;
+    -fx-stroke: derive(-dark,20%);
+    -fx-stroke-width:5;
+}
+.anchor-pane {
+    -fx-background-color:-dark;
+    -fx-background-insets:0;
+}
+
+.tree-view, .tree-view:focused {
+   
+    -fx-background:white;
+    -fx-background-insets:0, 0, 0;
+    -fx-padding:10;
+    -fx-background-radius:1.4, 0, 0;
+}
+
+.tree-cell:filled:hover, .tree-cell:focused{
+    -fx-text-fill:black;
+    -fx-background-color:derive(-dark,110%);
+}
+
+.tree-cell:selected {
+    -fx-text-fill:black;
+    -fx-background-color:derive(-dark,110%);
+}
+
+.split-pane {
+    -fx-background-color:-dark, -dark, -dark;
+    -fx-background-insets:0;
+    
+
+}
+
+.split-menu-button {
+    
+    -fx-background-fill:white;
+}
+
+.split-pane-divider {
+    -fx-background-color:derive(-dark,-10%);
+    -fx-width:3px;
+}
+
+.split-pane-divider:hover {
+    -fx-background-color:derive(-dark,-30%);
+}
+
+
+
+
+.workflow-step {
+    -fx-min-width:240px;
+    -fx-padding:0px 10px 10px 0px;
+}
+
+.workflow-step #titleLabel {
+    -fx-font-size:20px;
+    -fx-alignement:left;
+    -fx-cursor:hand;
+    -fx-min-width:220px;
+}
+
+.workflow-step .subtitle-label{
+    -fx-font-size:12px;
+    -fx-text-fill: derive(-dark,80%);
+    -fx-max-width:220px;
+    -fx-pref-width:100%;
+    
+}
+.workfow-step .line {
+    -fx-stroke-fill:white;
+}
+
+.workflow-step .hbox {
+    -fx-spacing:0;
+}
+.workflow-step .vbox {
+    -fx-spacing:0;
+}
+
+.workflow-step .button, .workflow-step .menu-button {
+    -fx-font-size:13px;
+     -fx-background-color: transparent; 
+    -fx-background-insets:  0 0 0 0;
+    -fx-background-radius: 2.0;
+    -fx-border-width: 0.0;
+  
+
+    -fx-text-fill: -fx-text-base-color;
+    -fx-alignment: CENTER;
+    
+    -fx-content-display: LEFT;   
+}
+
+.workflow-step .glyph-icon  {
+  -fx-cursor:hand;
+ 
+}
+
+.workflow-step .button:hover, .workflow-step .menu-button:hover {
+    -fx-background-color: derive(-dark,70%);
+}
+
+
+
+.workflow-step #leftVBox{
+    -fx-padding: 5px 10px 0 10px;
+    -fx-spacing:20px;
+    -fx-background-color:transparent;
+}
+
+.workflow-step #buttonHBox {
+    -fx-spacing:20px;
+}
+
+.workflow-step #buttonHBox .menu-button {
+    -fx-padding:0em;
+}
+
+.workflow-step #buttonHBox .button {
+   
+    -fx-padding: 0.34em;
+}
+
+.workflow-editor {
+    -fx-padding:0;
+    -fx-background:white;
+}
+
+.workflow-editor .content > * {
+    -fx-padding: 0;
+}
+
+.workflow-editor .hbox {
+    -fx-padding:0.4em 0 0 0;
+}
+.workflow-editor #buttonVBox {
+    -fx-padding:0;
+}
+
+.workflow-editor .list-view, .workfow-editor .content, workfow-editor {
+    -fx-margin:0;
+    -fx-padding:0;
+}
+
+
+
+
+.workflow-editor{
+    -fx-spacing:10;
+}
+.workflow-editor .grid-pane .label {
+    -fx-text-align:right;
+}
+.workfow-editor .input .label {
+    -fx-font-size:13px;
+}
+.workflow-editor .editable-label {
+    -fx-margin : 0px 20px 0px 0px;
+}
+
+.workflow-editor .tool-bar .button {
+    -fx-font-size:12px;
+   
+}
+
+.module-config-pane {
+    -fx-padding:15px 15px 15px 15px;
+}
+
+.module-config-pane .title {
+    -fx-padding: 10px;
+    
+    -fx-background-color:-bg-dark;
+}
+.module-config-pane .editable-label {
+    -fx-margin:10px;
+}
+
+/*
+.module-config-pane .grid-pane {
+   -fx-vgap:10px;
+   -fx-hgap:30px;
+}
+
+.module-config-pane
+.grid-pane
+.text-field,
+.module-config-pane
+.grid-pane
+.button,
+.module-config-pane
+.grid-pane
+.combo-box {
+    -fx-min-width:40px;
+}*/
+
+
+.module-config-pane .title{
+    -fx-font-size:1.2em;
+}
+.module-config-pane-message .label {
+    -fx-alignment:left;
+    -fx-text-fill:-flatter-primary;
+}
+.open-workflow-button {
+ 
+    -glyph-name:"FOLDER_OPEN";
+    
+    
+}
+
+.save-workflow-button {
+    -glyph-name:"SAVE";
+}
+
+.font-awesome-view {
+    -fx-text-fill:red;
+}
+
+
+.tab-pane > .tab-header-area > .headers-region > .tab:top {  
+    -fx-border-color: -dark;  
+    -fx-border-radius: 5 5 0 0;  
+    -fx-background-color: -dark;  
+    -fx-pref-height: 40px;    
+    -fx-background-insets: 0;  
+}  
+  
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:top {  
+     -fx-border-color: derive(-dark,30%);
+    -fx-border-width: 2;
+    -fx-border-radius: 5 5 0 0;  
+    -fx-background-color: derive(-dark,30%);  
+    -fx-pref-height: 40px;    
+    -fx-background-insets: 0;  
+}  
+  
+  
+.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {  
+    -fx-alignment: CENTER;  
+    -fx-text-fill: derive(-dark,110%);  
+    -fx-font-weight: bold;  
+}  
+  
+  
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {  
+    -fx-alignment: CENTER;  
+    -fx-text-fill: #2381E9;  
+    -fx-font-weight: bold;  
+}  
+  
+  
+.tab-pane > .tab-header-area > .tab-header-background {  
+    -fx-background-color:-dark;  
+    -fx-border-color: -dark; 
+    -fx-border-width: 0 0 1 0;  
+    -fx-background-insets: 0;  
+    -fx-pref-height: 45px;    
+} 
+
+
+
+.list-cell .type-log {
+    -fx-background-color: -flatter-primary-bg;
+    -fx-padding:5px;
+}
+.list-cell .type-error {
+    -fx-background-color: -flatter-danger-bg;
+    -fx-padding:5px;
+}
+
+.list-cell .type-warning {
+    -fx-background-color: -flatter-warning-bg;
+    -fx-padding:5px;
+}
+
+
+.line-separator {
+    -fx-margin:10px;
+    -fx-stroke:white;
+    -fx-stroke-width:1px;
+}
+.grid-pane {
+    -fx-hgap:10px;
+    -fx-vgap:20px;
+    -fx-padding: 20px 20px 20px 20px;
+}
+.add-icon {
+    -glyph-name: "PLUS";
+    -glyph-color: blue;
+}
+.remove-icon {
+    -glyph-name: "REMOVE";
+    -glyph-color: red;
+}
+.validate-icon {
+    -glyph-name: "CHECK";
+}
+.edit-icon {
+    -glyph-name: "PENCIL";
+}
+.medium-icon {
+    -glyph-size: 25px;
+}
+.big-icon {
+    -glyph-size: 40px;
+}
+.small-icon {
+    -glyph-size: 15px;
+}
+
+.panel-sub-container {
+    -fx-margin:0;
+    -fx-padding:0;
+}
+
+.loading-screen .progress-bar  .track{
+    -fx-background:-bg-normal;
+}
+.loading-screen .progress-bar  .bar {
+    -fx-background:-txt-normal;
+}
+.folder-icon {
+   -fx-font-size: 70.0px; 
+}
+
+.query-bar, .query-bar .scroll-pane{
+   
+   -fx-pref-height:4em;
+   -fx-min-width:12em;
+}
+.query-bar .scroll-bar:horizontal *{
+     -fx-background-color:red;
+     -fx-visibility:hidden;
+     -fx-opacity:0;
+     
+}
+
+#browser-query-bar {
+    -fx-padding: 0em 0em 0em 2em;
+}
+
+#browser-query-bar .label{
+    -fx-translate-y: .6em;
+    
+}
+#browser-query-bar .check-box {
+    -fx-padding: 0em 0.5em 0em 0.5em;
+}
+#browser-query-bar .text-field {
+    -fx-translate-y :0.2em;
+    -fx-pref-width:70px;
+}
+#browser-query-bar .button {
+    -fx-translate-y:0.15em;
+}
+
+
+.browser-folder-view {
+    
+}
+.scoll-pane .corner{
+    -fx-background-color:transparent;
+}
+.browser-icon-view > * {
+    -fx-background-color:transparent;
+}
+.browser-item {
+    -fx-background-color:transparent;
+    -fx-padding: 1em;
+    
+}
+.browser-item:hover {
+    -fx-background-color:derive(-dark,10%);
+}
+
+.browser-title {
+    -fx-padding: 0 0em 0em 2em;
+    -fx-font-size:1.5em;
+}
+
+/* 
+    Batch processing
+*/
+
+.batch-workflow-step {
+    -fx-background-color:-bg-dark;
+    -fx-padding:0.5em;
+}
+
+.label.header {
+    -fx-font-size:2em;
+    -fx-padding: 1em 1em 1em 1em;
+    -fx-pref-width:infinity;
+    -fx-background-color:-bg-dark;
+}
+
+.tag-suggestions .list-cell {
+    -fx-padding:0 0.4em 0 0;
+}
+.tag-suggestions .text {
+    -fx-underline:true;
+    -fx-cursor:hand;
+}
+
+.auto-complete-popup .list-view {
+    -fx-background-color:-bg-light;
+    -fx-border:0;   
+}
+
+.auto-complete-popup .list-cell {
+    -fx-background-color:-bg-light;
+}
+.auto-complete-popup .list-cell:filled:focused
+,.auto-complete-popup .list-cell:filled:hover
+{
+    -fx-text-fill:-txt-highlight!important;
+    -fx-background-color:-flatter-primary!important;
+    -fx-underline:false;
+}
+
+
+/**
+       Notification
+
+
+*/
+
+
+
+.notification-bar > .pane {
+    -fx-background-color: -bg-light;
+    -fx-padding:20;
+    
+}
+
+.notification-bar > .pane .label {
+    -fx-text-fill:-txt-normal;
+}
+.notification-bar > .pane .title {
+    -fx-text-fill:-txt-highlight;
+    -fx-padding: 0 0 10 0;
+}
+.notification-bar .close-button {
+    -fx-background-color:-flatter-primary;
+}
+
+.dragover {
+   -fx-background-color:-bg-light;
+   
+}
+
+#sideMenu {
+    -fx-background-color:-bg-light;
+
+    
+}
+#sideMenu .menu-title {
+    -fx-padding:20px;
+    -fx-background-color:-bg-dark;
+    -fx-font-size:18px;
+    -fx-font-color:-flatter-success;
+}
+
+.side-menu-button {
+    
+    -fx-padding:20px;
+    -fx-background-color:-dark;
+   -fx-background-radius:0;
+    
+}
+.side-menu-button{
+     -fx-text-alignment:left;
+     -fx-alignment:center-left;
+     -fx-label-padding: 0px 0px 0px 0px;
+     -fx-graphic-text-gap:20px;
+     
+}
+.side-menu-button .content {
+    -fx-margin: 0px 0px 20px 0px;
+    -fx-background:red;
+}
+.side-menu-icon {
+    -fx-font-size:20px;
+    -fx-padding: 0px 0px 0px 20px;
+    -fx-background-color:red;
+    -fx-padding: 0px 0px 0px 20px;
+}

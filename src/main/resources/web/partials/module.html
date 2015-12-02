@@ -1,0 +1,60 @@
+
+
+
+<ul class="collection">
+	<li ng-repeat="m in methods" class="collection-item">
+
+
+		<h5>
+			{{m.name}} ({{m.inputDescription}})
+			<small>
+			<a  href="" ng-click="testMethod(m)">Test</a> | 
+			<a href="" ng-click="testMethod(m);launchTest();">Quick test</a>
+			</small>
+		</h5>
+
+
+
+		<p class="text-red" ng-if="m.sync">Sync</p>
+		<p class="method-description">{{m.description}}</p>
+		<p class="method-example">{{m.outputExample}}</p>
+		<br>
+	</li>
+</ul>
+
+<div class="card tester" ng-hide="currentMethod == undefined">
+	
+	
+	<h4>Test : {{currentMethod.name}}</h4>
+	<div class="card-content">
+		
+		<p>
+			<label for="input">Enter the input parameters :</label>
+			<input type="text" ng-model="testInput" id="input" />
+		</p>
+		<p>{{serviceName}}.{{currentMethod.sync ? "sync()." : ""}}{{currentMethod.name}}({{testInput}});</p>
+
+	
+		<br><br>
+
+		<label for="input">Method response : </label>
+		<p>
+			<pre>{{testOutput || hightlightJson}}</pre>
+		</p>
+
+	</div>
+
+	<div class="card-content lighten-5" ng-class="msgColor" ng-show="msg != ''">
+		<p ng-class="test-response">
+			{{msg}}
+		</p>
+
+	</div>
+	<div class="card-action">
+		<a href="" ng-click="launchTest()">Launch test</a>
+		<a href="" ng-click="currentMethod = undefined">Close</a>
+	</div>
+</div>
+
+<br>
+<a href="#/" class="button primary small">Back</a>

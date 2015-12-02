@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="AngularMercury">
+
+<head>
+    <title>Widget Context</title>
+    <meta char-set="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="angular.min.js"></script>
+	<script src="js/angular-route.js"></script>
+    <script src="context-manager/context-manager.js"></script>
+    <script src="context-manager/fake-context-service.js"></script>
+   
+    <link rel="stylesheet" href="css/bijou.min.css">
+    <style type='text/css'>
+        body {
+            margin-top: 50px;
+        }
+        
+        .table {
+            margin-bottom: 35px;
+        }
+        
+        .divider {
+            width: 100%;
+            background: #CCC;
+            height: 1px;
+            margin: 25px 0;
+        }
+        
+        .explainer {
+            font-weight: 200;
+            color: #AAA;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+	
+	<div class='navbar fixed'>
+		<div class='container'>
+			<h4 class='pull-left'>Context Manager</h4>
+			<ul class='pull-right'>
+				<li><a href='#/widgetList'>Widget</a>
+				</li>
+				<li><a href='#/contextList'>Context</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	
+   
+    <div class='container'>
+        <div ng-view></div>
+    </div>
+</body>
+
+</html>

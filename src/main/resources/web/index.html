@@ -1,0 +1,81 @@
+<html lang='en'>
+
+<head>
+	<title>Settings</title>
+	<meta name="description" content="A beautiful CSS framework in under 2 KiB">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="css/bijou.min.css">
+	
+	<script src="angular.min.js"></script>
+	<script src="/js/angular-route.js"></script>
+	<script src="js/index-ctrl.js"></script>
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+</head>
+
+<body ng-app="IndexApp">
+	<style>
+		
+		
+	
+	</style>
+	<div class='navbar fixed'>
+		<div class='container'>
+			<h4 class='pull-left'>Settings</h4>
+			<ul class='pull-right'>
+				<li>
+					<a href='#'>Back to ImageJ</a>
+				</li>
+				
+				
+			</ul>
+		</div>
+	</div>
+	<div class='container' ng-controller="MainCtrl">
+		
+		<div class="grid">
+			<div class="grid__item desk-1-3 bullet" ng-click="launchApp('context-manager')">
+				<h3>Context Settings</h3>
+				<div class="bullet-icon">
+				<i class="fa fa-street-view"></i>
+				</div>
+				<div class="bullet-description">Edit in which context the widgets appear</div>
+				
+			</div>
+			<div class="grid__item desk-1-3 bullet" ng-click="launchApp('modules')">
+				<h3>ImageJ Modules</h3>
+				<div class="bullet-icon">
+					<i class="fa fa-list"></i>
+				</div>
+				<div class="bullet-description">
+					List all ImageJ Commands
+				</div>
+			</div>
+			<div class="grid__item desk-1-3 bullet" ng-click="launchApp('documentation')">
+				<h3>Documentation</h3>
+				<div class="bullet-icon">
+					<i class="fa fa-book"></i>
+				</div>
+				<div class="bullet-description">
+					Available Web Services and their functions.
+				</div>
+			</div>
+			
+			<div class="grid__item desk-1-3 bullet" ng-click="launchApp('project-creator')">
+				<h3>Project Wizard</h3>
+				<div class="bullet-icon">
+					<i class="fa fa-book"></i>
+				</div>
+				<div class="bullet-description">
+					Launch the wizard in order to import images and metadata
+				</div>
+			</div>
+			
+			
+		</div>
+		
+		
+
+	</div>
+</body>
+
+</html>

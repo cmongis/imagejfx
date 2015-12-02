@@ -1,0 +1,87 @@
+/* VARIABLES */
+/* Colors */
+/* Widths */
+/* line 2, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.dropshadow, .title {
+  text-shadow: 1px 1px 0px black; }
+
+/* line 5, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.title {
+  margin-top: 2em; }
+
+/* line 9, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.subtitle {
+  color: #b9bfce;
+  margin-top: 2em;
+  text-align: center; }
+
+/* line 15, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.start-button {
+  margin-top: 2em; }
+
+/* line 18, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.center-block {
+  margin-left: auto;
+  margin-right: auto;
+  display: block; }
+
+/* line 25, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.screen {
+  min-height: 1024px;
+  margin-left: 2em;
+  margin-right: 2em;
+  margin-bottom: 2em; }
+
+/* line 31, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+h2 {
+  text-align: center;
+  display: block;
+  margin: 0;
+  padding: 0;
+  clear: both; }
+
+/* line 44, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+center {
+  margin-top: 2em;
+  margin-bottom: 2em; }
+
+/* line 49, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+body {
+  overflow: hidden; }
+
+/* line 53, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.tour {
+  overflow: auto; }
+
+/* line 56, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.bigbox {
+  margin: 0.5em;
+  margin-top: 2em;
+  display: inline-block;
+  float: center;
+  text-align: center;
+  vertical-align: top; }
+  /* line 67, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+  .bigbox .bigbox-title {
+    height: 1em;
+    font-size: 2em;
+    padding: 1em; }
+  /* line 73, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+  .bigbox .bigbox-content {
+    display: block;
+    width: 100%;
+    font-size: 1.2em; }
+    /* line 77, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+    .bigbox .bigbox-content li {
+      width: 100%;
+      list-style-type: none;
+      text-align: center;
+      margin-top: 0.5em; }
+
+/* line 91, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/css/intro.scss */
+.fixed-button {
+  position: fixed;
+  top: 2em;
+  left: 2em; }
+
+/*# sourceMappingURL=intro.css.map */

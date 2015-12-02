@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.input.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root fx:id="menuBar" type="MenuBar" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <menus>
+      <Menu fx:id="fileMenu" mnemonicParsing="false" text="%project">
+         <items>
+            <MenuItem mnemonicParsing="false" onAction="#newProject" text="New Project" />
+            <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open Project">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#saveProject" text="%saveProject">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#saveProjectAs" text="%saveProjectAs">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+               </accelerator>
+            </MenuItem>
+         </items>
+      </Menu>
+      <Menu fx:id="editMenu" mnemonicParsing="false" text="%edit">
+         <items>
+            <MenuItem fx:id="undoMenuItem" mnemonicParsing="false" onAction="#undo" text="Undo">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="Z" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator>
+            </MenuItem>
+            <MenuItem fx:id="redoMenuItem" mnemonicParsing="false" onAction="#redo" text="Redo">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="Z" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+               </accelerator>
+            </MenuItem>
+         </items>
+      </Menu>
+      <Menu mnemonicParsing="false" text="%images">
+         <items>
+            <MenuItem mnemonicParsing="false" onAction="#addImagesFromFiles" text="%addImage" />
+            <MenuItem mnemonicParsing="false" onAction="#addImagesFromFolder" text="%addImagesFromFolder" />
+            <MenuItem fx:id="annotationRulesMenuItem" mnemonicParsing="false" text="%annotationRules" />
+            <MenuItem fx:id="checkFileReferenceMenuItem" mnemonicParsing="false" text="%checkFileReference" />
+         </items>
+      </Menu>
+      <Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
+         <items>
+            <MenuItem mnemonicParsing="false" text="About" />
+         </items>
+      </Menu>
+      <Menu fx:id="viewMenu" mnemonicParsing="false" text="%view">
+         <items>
+            <MenuItem mnemonicParsing="false" text="Gallery view" />
+            <MenuItem mnemonicParsing="false" text="Single Image view" />
+         </items>
+      </Menu>
+      <Menu fx:id="selectionMenu" mnemonicParsing="false" text="%selection">
+         <items>
+            <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" text="Select all" />
+            <MenuItem fx:id="deselectAllMenuItem" mnemonicParsing="false" text="Unselect all" />
+         </items>
+      </Menu>
+   </menus>
+</fx:root>

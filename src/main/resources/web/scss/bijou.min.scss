@@ -1,0 +1,323 @@
+/* BIJOU CSS */
+
+//@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700);
+@import "variables";
+@import "grid";
+@import "normalize";
+@import "links";
+@import "csswizardry-grids";
+@import "typography";
+@import "table";
+@import "buttons";
+@import "navbar";
+@import "alerts";
+@import "responsive";
+@import "animation";
+@import "form";
+@import "specific";
+ 
+body {
+	background: $background;
+	color: $text;
+	table { 
+		
+		small {
+			display:inline-block;
+			font-size:0.8em;
+		}
+	} 
+	margin-top:70px;
+	letter-spacing: 0.04em;
+}
+
+
+p {
+	margin-top:0.5em;
+	margin-bottom:0.5em;
+}
+
+.navbar a {
+	color: white;
+}
+
+.navbar, .footer-bar,.dark-bg {
+	background: darken($background, 10%);
+}
+
+.footer.bar {
+	background:darken($background, 10%);
+	&.fixed {
+		position:fixed;
+		bottom:0;
+		width:100%;
+		min-height: 3em;
+		z-index:4;
+	}
+} 
+.with-shadow {
+	box-shadow: 3px 3px 10px $background-dark;
+}
+
+  
+.collection {
+	> .collection-item {
+		display: block;
+		padding: 0.5em;
+	}
+	> a.collection-item:hover {
+		color: lighten($primary, 30%);
+		background: lighten($background, 5%);
+		cursor: pointer;
+	}
+}
+
+
+
+.success-text {
+	color: $success;
+}
+
+.primary-bg {
+	background: $primary;
+}
+
+.success-bg {
+	background: $success;
+}
+
+.danger-bg {
+	background: $danger;
+}
+
+.grid {}
+
+.bullet {
+	
+	@extend .grid__item;
+		
+	padding-top: 1em;
+	padding-bottom: 1em;
+	cursor: pointer;
+	padding-left: 0em;
+	padding-right: 0em;
+	text-align: center;
+	margin:0;
+	width:323px;
+}
+
+.bullet h3 {
+	margin-bottom: 1em;
+}
+
+.bullet-icon {
+	font-size: 4em;
+	text-align: center;
+	margin-bottom: 0.5em;
+}
+
+.bullet-description {
+	text-align: center;
+	
+	min-height: 2em;
+}
+
+
+$featuremargin:4em;
+.feature {
+	margin-top:$featuremargin;
+	margin-bottom:$featuremargin;
+	
+	h2 {
+		margin-bottom:$featuremargin / 2;
+		color:$success;
+		text-align:center;
+	}
+	.feature-description {
+		font-size:1.5em;
+		line-height: 1.2em;
+	}
+	
+	.feature-graphic {
+		font-size:9em;
+		text-align: center;
+	}
+	
+	p {
+		font-size:1.2em;
+		line-height: 1.4em;
+	}
+	
+	.feature-explanation {
+		margin-top:$featuremargin;
+		margin-bottom:$featuremargin;
+	}
+	
+	.feature-bullets {
+		margin-top:2em;
+		margin-bottom:2em;
+	}
+	
+	.bullet h3 {
+		@extend .dropshadow;
+		color:$success;
+	}
+	
+	.bullet-description {
+		font-size:1.2em;
+	}
+	
+}
+
+.abstract {
+	margin-top:1em;
+	margin-bottom: 1em;
+	font-size:1.2em;
+	line-height: 1.2em;
+	
+}
+ 
+.bullet:hover {
+	background: rgba(0, 0, 0, 0.3);
+}
+
+.dropshadow {
+	text-shadow: 1px 1px 0px darken($background,30%);
+}
+
+.logo {
+	@extend .dropshadow;
+	sup {
+		color:$success;
+	}
+}
+
+.title {
+	@extend .dropshadow;
+	sup {
+		color:$success;
+	}
+}
+.subtitle {
+	color:lighten($background,50%);
+	margin-top: 2em;
+	text-align: center;
+}
+
+.highlight {
+	color:$success;
+}
+.space-1-2em,space {
+	display:block;
+	height:0.5em;
+}
+.space-2em {
+	height:2em;
+}
+.space-4em {
+	height:4em;
+}
+.space-6em {
+	height:6em;
+}
+$margin:40px;
+.jumbo {
+	float:none;
+	margin: 6em auto 6em auto;
+	@extend .desk-3-5;
+	text-align: center;
+	
+	p {
+		margin: $margin 0 $margin 0;
+		font-size:1.4em;
+	}
+	width:80%;
+	
+}
+.primary:not(.button) {
+	color:$primary;
+}
+
+.success:not(.button) {
+	color:$success;
+}
+.danger:not(.button) {
+	color:$danger;
+}
+.warning:not(.button) {
+	color:$warning;
+}
+
+.fade {
+	transition:opacity 0.4s linear;
+	opacity: 1;
+	&.ng-hide {
+		display:block;
+		opacity: 0;
+	}
+}
+.fade-inline {
+	transition: opacity 0.4s linear;
+	opacity: 1;
+	&.ng-hide {
+		display:inline-block!important;
+		opacity: 0;
+	}
+
+}
+
+.light-background {
+	background-color:$background-light;
+}
+.push-right {
+	float:right;
+}
+
+.fa.fa-large {
+
+	font-size:5em;
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+	width:5em;
+	
+	margin-top: 1em;
+	margin-bottom:1em;
+	
+}
+.fade-transition {
+	
+	opacity: 1;
+	top:0;
+	
+	
+		-webkit-transition: all 0.4s ease;
+		transition: all 0.4s ease;
+		position:relative;
+		
+		
+	
+	&.ng-enter {
+		opacity: 1.0;
+		top:0.0;
+		
+		
+	}
+	
+	&.ng-enter-active {
+		opacity: 0;
+		top:100px;
+	}
+	
+	&.ng-leave {
+		opacity:1.0;
+		top:0px;
+	}
+	
+	&.ng-leave-active {
+		opacity:0;
+		top:100px;
+	}
+	
+	
+	 
+}

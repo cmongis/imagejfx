@@ -1,0 +1,64 @@
+<a href="#/module" class="button primary small">Back</a>
+<br><br>
+<h3>Class Name: {{ classNameId }}</h3>
+<br>
+<br>
+<div class="divider"></div>Input Table</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Label</th>
+            <th>Class Type</th>
+            <th>Tags</th>
+            <th>Choices</th>
+        </tr>
+    </thead>
+    <tbody ng-repeat="opt in dataArray | filter : {className : classNameId}">
+        <tr ng-repeat="input in opt.inputs">
+            <td>{{input.name}}</td>
+            <td>{{input.label}}</td>
+            <td>{{input.classType}}</td>
+            <td>
+                <button class="button success" ng-if="input.isInput === true">Input</button>
+                <button class="button success" ng-if="input.isOutput === true">Output</button>
+                <button class="button success" ng-if="input.isAutoFill === true">AutoFill</button>
+                <button class="button success" ng-if="input.isRequired === true">Required</button>
+            </td>
+            <td>{{input.choices}}</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+
+<hr>
+<br>
+<br>
+<div class="divider"></div>Output Table</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Label</th>
+            <th>Class Type</th>
+            <th>Tags</th>
+            <th>Choices</th>
+        </tr>
+    </thead>
+    <tbody ng-repeat="opt in dataArray | filter : {className : classNameId}">
+        <tr ng-repeat="output in opt.outputs">
+            <td>{{output.name}}</td>
+            <td>{{output.label}}</td>
+            <td>{{output.classType}}</td>
+            <td>
+                <button class="button success" ng-if="output.isInput === true">Input</button>
+                <button class="button success" ng-if="output.isOutput === true">Output</button>
+                <button class="button success" ng-if="output.isAutoFill === true">AutoFill</button>
+                <button class="button success " ng-if="output.isRequired === true">Required</button>
+            </td>
+            <td>{{output.choices}}</a>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="116.0" prefWidth="198.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+            <FontAwesomeIconView glyphName="FOLDER" layoutX="27.0" layoutY="83.0" size="70" styleClass="folder-icon" text="" wrappingWidth="46.42856979370117" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="70.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <CheckBox fx:id="checkBox" layoutX="16.0" layoutY="14.0" mnemonicParsing="false" AnchorPane.leftAnchor="50.0" />
+          <Label fx:id="label" alignment="CENTER" layoutX="3.0" layoutY="63.0" prefHeight="46.0" prefWidth="190.0" />
+    </children>
+</fx:root>

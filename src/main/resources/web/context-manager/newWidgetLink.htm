@@ -1,0 +1,28 @@
+<br>
+<br>
+<h4>Widget: {{widgetId}}</h4>
+<div class='divider'></div>
+<h4 class='explainer'>LinkList Table</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Context</th>
+            <th>linkType</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="opt in contextList">
+            <td>
+                {{opt.id}}
+            </td>
+            <td>
+                <button class='button success small' ng-if="!exists(widgetId, opt.id, 'show')" ng-click="link(widgetId,opt.id,'show')">Show</button>
+                <button class='button success small' ng-if="!exists(widgetId, opt.id, 'enable')" ng-click="link(widgetId,opt.id,'enable')">Enable</button>
+            </td>
+            <td>
+                <button class='button success small' ng-click="delete($index)">Delete</button>
+            </td>
+        </tr>
+    </tbody>
+</table>

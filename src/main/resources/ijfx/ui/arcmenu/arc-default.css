@@ -1,0 +1,70 @@
+/*
+Copyright (C) 2015 cyril
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* 
+    Created on : Apr 14, 2015, 3:42:32 PM
+    Author     : cyril
+*/
+
+
+
+.root {
+    -fx-text-base-color: rgb(252.0, 240.0, 237.0);
+    -fx-text-fill: -fx-text-base-color;
+
+    -dark: #383f50; 
+    -fx-background-color: -dark;
+
+    /*default font */
+    -fx-font-family: 'Helvetica Neue';
+    -fx-font-size: 16.0px;
+    -fx-font-weight: 600;
+    -fx-disabled-opacity: 0.6; 
+
+    -flatter-red: rgb(237.0, 68.0, 37.0);
+    -flatter-blue: rgb(0.0, 184.0, 222.0);
+    -flatter-green:rgb(48,138,80);
+    -flatter-margin:16px;
+
+
+
+}
+
+.arc-item-shape {
+    -fx-fill:-flatter-blue;
+}
+
+.arc-item-icon {
+    -fx-text-fill:white;
+}
+.arc-item-hover .arc-item-shape {
+    -fx-fill:-flatter-red;
+}
+
+.arc-item-choice-box {
+    -fx-fill:null;
+    -fx-stroke: white;
+    -fx-stroke-width: 4;
+}
+
+.arc-item-choice-box-hover {
+    -fx-stroke: -flatter-blue;
+}
+
+.arc-group .label {
+    -fx-fill:white;
+    -fx-text-fill:white;
+}

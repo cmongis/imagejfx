@@ -1,0 +1,130 @@
+<html lang='en' ng-app="ProjectCreator">
+
+<head>
+	<title>Project Wizard</title>
+	<meta name="description" content="A beautiful CSS framework in under 2 KiB">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="../scss/bijou.min.css">
+	<link rel="stylesheet" href="../css/font-awesome.min.css" />
+	<link rel="stylesheet" href="scss/rrg.css" />
+	<script src="../angular.min.js"></script>
+	<script src="../js/string.format.js"></script>
+	<script src="../js/angular-animate.min.js"></script>
+	<script src="../js/angular-route.js"></script>
+	<script src="js/file-extractor-ctrl.js"></script>
+	<script src="js/regen-model.js"></script>
+	<script src="js/regen-controllers.js"></script>
+	<script src="js/regen-directive.js"></script>
+	<script src="../js/ng-json-table.js"></script>
+	<script src="../js/jquery-2.1.3.min.js"></script>
+	<script src="../js/angular-drag-and-drop-lists.min.js"></script>
+	<script src="controller.js"></script>
+
+</head>
+
+<body ng-controller="MainCtrl">
+
+
+
+	<style>
+		.slide-right {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+		}
+		
+		
+		
+		.slide-right.ng-enter {
+			left: 100%;
+		}
+		
+		.slide-right.ng-enter-active {
+			left: 0;
+		}
+		
+		.slide-right.ng-leave {
+			left: 0;
+		}
+		
+		.slide-right.ng-leave-active {
+			left: -100%;
+		}
+		/* slide left animation */
+		
+		.slide-left {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+		}
+		
+		.slide-left.ng-enter,
+		.slide-left.ng-leave,
+		.slide-right.ng-enter,
+		.slide-right.ng-leave {
+			-webkit-transition: left 0.5s ease-out;
+			transition: left 0.5s ease-out;
+		}
+		
+		.slide-left.ng-enter {
+			left: -100%;
+		}
+		
+		.slide-left.ng-enter-active {
+			left: 0%;
+		}
+		
+		.slide-left.ng-leave {
+			left: 0;
+		}
+		
+		.slide-left.ng-leave-active {
+			left: 100%;
+		}
+		
+		.screen {
+			position: relative;
+		
+			
+			min-width: 100%;
+			min-height:100%;
+			overflow-x: hidden;
+			
+		}
+	</style>
+
+	<div class="space-3em"></div>
+
+	<div class="container">
+		<div class="screen">
+			<div ng-view class="container {{animation}}">
+
+
+
+			</div>
+		</div>
+	</div>
+
+
+	<div class="navbar fixed">
+		<div class="container">
+
+			<button class="button primary small" style="float:left" ng-show="isBeginning() == false" ng-click="goToPreviousPage()">
+				<i class="fa fa-arrow-left"></i> Back to {{getPreviousPage().title}}
+			</button>
+
+			<button class="button primary small" style="float:right" ng-show="(isEnd() == false || isBeginning() == true)" ng-click="goToNextPage()">
+				{{getNextPage().title}}
+				<i class="fa fa-arrow-right"></i>
+			</button>
+		</div>
+	</div>
+
+
+</body>
+
+</html>

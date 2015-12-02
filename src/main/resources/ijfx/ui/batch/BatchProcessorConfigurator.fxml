@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="600.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <GridPane fx:id="gridPane" hgap="15.0" maxWidth="1.7976931348623157E308" vgap="15.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.0" minWidth="10.0" prefWidth="170.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="312.0" minWidth="10.0" prefWidth="296.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="69.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="157.0" minWidth="10.0" prefWidth="83.0" />
+            <ColumnConstraints />
+            <ColumnConstraints />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="19.0" minHeight="10.0" prefHeight="19.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="29.0" minHeight="10.0" prefHeight="23.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Image selected :" />
+            <Label fx:id="selectedCountLabel" text="144" GridPane.columnIndex="1" />
+            <Label text="Type the step name :" GridPane.rowIndex="1" />
+            <ListView fx:id="stepListView" maxWidth="1.7976931348623157E308" prefHeight="200.0" GridPane.columnSpan="5" GridPane.rowIndex="2" />
+            <Label text="Save in : " GridPane.rowIndex="3" />
+            <Button fx:id="saveFolderButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeSaveFolder" text="Choose a directory..." GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+            <CheckBox mnemonicParsing="false" text="Replace entries in DB" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+            <TextField fx:id="moduleSearchTextField" promptText="e.g. Gaussian Blur..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Button fx:id="addButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Add" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <MenuButton fx:id="menuButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Menu" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <Button fx:id="startButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startBatchProcessing" styleClass="success" text="Start processing" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <ProgressBar fx:id="progressBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <Label fx:id="progressLabel" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-alignment: center; -fx-alignment: center;" text="Waiting for task to start..." textAlignment="CENTER" wrapText="true" GridPane.columnSpan="4" GridPane.rowIndex="8" />
+            <Label text="Other settings : " GridPane.rowIndex="4" />
+            <Label fx:id="saveFolderLabel" text="(Please set a saving directory !)" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveWorkflow" text="Save workflow" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </GridPane>
+   </left>
+   <top>
+      <Label styleClass="h1" text="Processing settings" BorderPane.alignment="TOP_LEFT">
+         <font>
+            <Font size="31.0" />
+         </font>
+      </Label>
+   </top>
+</fx:root>

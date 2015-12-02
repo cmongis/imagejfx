@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.* ?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="workflow-step" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <VBox fx:id="titleVBox" BorderPane.alignment="CENTER">
+            <children>
+                <BorderPane>
+                    <center>
+                        <Label fx:id="titleLabel" text="Title" BorderPane.alignment="CENTER" />
+                    </center>
+                    <right>
+                        <FontAwesomeIconView fx:id="editIcon" glyphName="EDIT" onMouseClicked="#edit" size="16" BorderPane.alignment="CENTER">
+                            <styleClass>
+                                <String fx:value="workflow-step-edit-button" />
+                                <String fx:value="icon" />
+                            </styleClass>
+                        </FontAwesomeIconView>
+                    </right>
+                </BorderPane>
+                <Label fx:id="subtitleLabel" text="Subtitle">
+                    <styleClass>
+                        <String fx:value="label" />
+                        <String fx:value="subtitle-label" />
+                    </styleClass>
+                </Label>
+                <HBox fx:id="buttonHBox" styleClass="hbox">
+                    <children>
+                        <Button fx:id="playButton" mnemonicParsing="false" onAction="#execute">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="REPEAT" text="" />
+                            </graphic>
+                        </Button>
+                        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#delete">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="TRASH" size="16" styleClass="icon" />
+                            </graphic>
+                        </Button>
+                        <MenuButton fx:id="menuButton" mnemonicParsing="false">
+                            <items>
+                                <MenuItem fx:id="duplicateMenuItem" mnemonicParsing="false" onAction="#duplicate" text="Duplicate">
+                                    <graphic>
+                                        <FontAwesomeIconView />
+                                    </graphic>
+                                </MenuItem>
+                                <MenuItem fx:id="executeMenuItem" mnemonicParsing="false" onAction="#execute" text="Re-execute">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="REPEAT" />
+                                    </graphic>
+                                </MenuItem>
+                                <MenuItem fx:id="executeAsNewMenutItem" mnemonicParsing="false" onAction="#executeModule" text="Execute with new parameters">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="PLAY" />
+                                    </graphic>
+                                </MenuItem>
+                                <MenuItem fx:id="favoriteButton" mnemonicParsing="false" onAction="#addToFavorites" text="Unspecified Action">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="STAR" />
+                                    </graphic>
+                                </MenuItem>
+                                <MenuItem fx:id="playUntilMenuItem" mnemonicParsing="false" onAction="#playUntil" text="Execute all until this" />
+                                <MenuItem fx:id="playFromMenuItem" mnemonicParsing="false" onAction="#playFrom" text="Execute all beggining from this" />
+                                <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" onAction="#delete" text="Delete" />
+                            </items>
+                            <graphic>
+                                <FontAwesomeIconView glyphName="BARS" text="" />
+                            </graphic>
+                        </MenuButton>
+                    </children>
+                </HBox>
+            </children>
+            <styleClass>
+                <String fx:value="vbox" />
+                <String fx:value="titleVBox" />
+            </styleClass>
+        </VBox>
+    </center>
+</fx:root>

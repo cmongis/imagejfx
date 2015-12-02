@@ -1,0 +1,2305 @@
+@charset "UTF-8";
+/* BIJOU CSS */
+/* VARIABLES */
+/* Colors */
+/* Widths */
+/* GRID */
+/* line 7, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Lucida", sans-serif; }
+
+/* line 13, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+.container {
+  max-width: 980px;
+  margin: 0 auto; }
+  /* line 17, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+  .container.small {
+    max-width: 490px; }
+
+/* line 23, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+.pull-left {
+  float: left; }
+
+/* line 27, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+.pull-right {
+  float: right; }
+
+/* line 31, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+.container.with-padding {
+  padding-top: 2em;
+  padding-bottom: 2em; }
+
+/* line 36, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+.grid__item.with-padding, .with-padding.bullet {
+  padding-right: 1em;
+  padding-left: 1em;
+  padding-top: 2em;
+  padding-bottom: 2em; }
+
+/* line 43, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+.grid__item.with-padding:first-child, .with-padding.bullet:first-child {
+  padding-left: 0em; }
+
+/* line 47, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_grid.scss */
+.grid__item.with-padding:last-child, .with-padding.bullet:last-child {
+  padding-right: 0em; }
+
+/*
+.row{
+	min-height: 2em;
+	line-height:2em;
+	width:100%;
+}
+
+.span{
+	float:left;
+	display:inline;
+	min-height:1em;
+	margin:0 2% 20px 2%;
+	&:first-child{
+		margin-left:0;
+	}
+	&:last-child{
+		margin-right:0;
+	}
+}
+
+.one{
+	width:8%;
+	
+}
+
+.two{
+	width:16%;
+}
+
+.three{
+	width:24%;
+}
+
+.four{
+	width:32%;
+}
+
+.five{
+	width:40%;
+}
+
+.six{
+	width:48%;
+}
+
+.seven{
+	width:56%;
+}
+
+.eight{
+	width:64%;
+}
+
+.nine{
+	width:72%;
+}
+
+.ten{
+	width:80%;
+}
+
+.eleven{
+	width:88%;
+}
+
+.twelve{
+	width:100%
+}
+
+.container:after {
+	content: "\0020";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+.row:before,.row:after {
+	content: '\0020';
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+
+.row:after {
+	clear: both;
+}
+
+.row {
+	zoom: 1;
+}*/
+/* ==========================================================================
+   Normalize.scss settings
+   ========================================================================== */
+/**
+ * Includes legacy browser support IE6/7
+ *
+ * Set to false if you want to drop support for IE6 and IE7
+ */
+/* Base
+   ========================================================================== */
+/**
+ * 1. Set default font family to sans-serif.
+ * 2. Prevent iOS text size adjust after orientation change, without disabling
+ *  user zoom.
+ * 3. Corrects text resizing oddly in IE 6/7 when body `font-size` is set using
+ *  `em` units.
+ */
+/* line 23, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+html {
+  font-family: sans-serif;
+  /* 1 */
+  -ms-text-size-adjust: 100%;
+  /* 2 */
+  -webkit-text-size-adjust: 100%;
+  /* 2 */ }
+
+/**
+ * Remove default margin.
+ */
+/* line 36, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+body {
+  margin: 0; }
+
+/* HTML5 display definitions
+   ========================================================================== */
+/**
+ * Correct `block` display not defined for any HTML5 element in IE 8/9.
+ * Correct `block` display not defined for `details` or `summary` in IE 10/11
+ * and Firefox.
+ * Correct `block` display not defined for `main` in IE 11.
+ */
+/* line 62, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block; }
+
+/**
+ * 1. Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
+ * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
+ */
+/* line 74, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+audio, canvas, progress, video {
+  display: inline-block;
+  /* 1 */
+  vertical-align: baseline;
+  /* 2 */ }
+
+/**
+ * Prevents modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+/* line 88, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+audio:not([controls]) {
+  display: none;
+  height: 0; }
+
+/**
+ * Address `[hidden]` styling not present in IE 8/9/10.
+ * Hide the `template` element in IE 8/9/11, Safari, and Firefox < 22.
+ */
+/* line 99, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+[hidden], template {
+  display: none; }
+
+/* Links
+   ========================================================================== */
+/**
+ * Remove the gray background color from active links in IE 10.
+ */
+/* line 110, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+a {
+  background-color: transparent; }
+
+/**
+ * Improve readability when focused and also mouse hovered in all browsers.
+ */
+/* line 119, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+a:active, a:hover {
+  outline: 0; }
+
+/* Text-level semantics
+   ========================================================================== */
+/**
+ * Address styling not present in IE 8/9/10/11, Safari, and Chrome.
+ */
+/* line 131, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+abbr[title] {
+  border-bottom: 1px dotted; }
+
+/**
+ * Address style set to `bolder` in Firefox 4+, Safari, and Chrome.
+ */
+/* line 140, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+b, strong {
+  font-weight: bold; }
+
+/**
+ * Address styling not present in Safari and Chrome.
+ */
+/* line 154, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+dfn {
+  font-style: italic; }
+
+/**
+ * Address variable `h1` font-size and margin within `section` and `article`
+ * contexts in Firefox 4+, Safari, and Chrome.
+ */
+/* line 163, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0; }
+
+/**
+ * Addresses styling not present in IE 8/9.
+ */
+/* line 199, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+mark {
+  background: #ff0;
+  color: #000; }
+
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+/* line 238, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+small {
+  font-size: 80%; }
+
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+/* line 247, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline; }
+
+/* line 254, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+sup {
+  top: -0.5em; }
+
+/* line 258, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+sub {
+  bottom: -0.25em; }
+
+/* Embedded content
+   ========================================================================== */
+/**
+ * 1. Remove border when inside `a` element in IE 8/9/10.
+ * 2. Improves image quality when scaled in IE 7.
+ */
+/* line 313, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+img {
+  border: 0; }
+
+/**
+ * Correct overflow not hidden in IE 9/10/11.
+ */
+/* line 324, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+svg:not(:root) {
+  overflow: hidden; }
+
+/* Grouping content
+   ========================================================================== */
+/**
+ * Address margin not present in IE 8/9 and Safari.
+ */
+/* line 335, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+figure {
+  margin: 1em 40px; }
+
+/**
+ * Address differences between Firefox and other browsers.
+ */
+/* line 343, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0; }
+
+/**
+ * Contain overflow in all browsers.
+ */
+/* line 353, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+pre {
+  overflow: auto; }
+
+/**
+ * Address odd `em`-unit font size rendering in all browsers.
+ * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
+ */
+/* line 365, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+code, kbd, pre, samp {
+  font-family: monospace, monospace;
+  font-size: 1em; }
+
+/* Forms
+   ========================================================================== */
+/**
+ * Known limitation: by default, Chrome and Safari on OS X allow very limited
+ * styling of `select`, unless a `border` property is set.
+ */
+/**
+ * 1. Correct color not being inherited.
+ *  Known issue: affects color of disabled elements.
+ * 2. Correct font properties not being inherited.
+ * 3. Address margins set differently in Firefox 4+, Safari, and Chrome.
+ * 4. Improves appearance and consistency in all browsers.
+ */
+/* line 393, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+button, input, optgroup, select, textarea {
+  color: inherit;
+  /* 1 */
+  font: inherit;
+  /* 2 */
+  margin: 0;
+  /* 3 */ }
+
+/**
+ * Address `overflow` set to `hidden` in IE 8/9/10/11.
+ */
+/* line 407, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+button {
+  overflow: visible; }
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Firefox, IE 8/9/10/11, and Opera.
+ * Correct `select` style inheritance in Firefox.
+ */
+/* line 419, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+button, select {
+  text-transform: none; }
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *  and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *  `input` and others.
+ * 4. Removes inner spacing in IE 7 without affecting normal text inputs.
+ *  Known issue: inner spacing remains in IE 6.
+ */
+/* line 436, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+  -webkit-appearance: button;
+  /* 2 */
+  cursor: pointer;
+  /* 3 */ }
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+/* line 449, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+button[disabled], html input[disabled] {
+  cursor: default; }
+
+/**
+ * Remove inner padding and border in Firefox 4+.
+ */
+/* line 458, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  padding: 0; }
+
+/**
+ * Address Firefox 4+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+/* line 468, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+input {
+  line-height: normal; }
+
+/**
+ * 1. Address box sizing set to `content-box` in IE 8/9/10.
+ * 2. Remove excess padding in IE 8/9/10.
+ *  Known issue: excess padding remains in IE 6.
+ */
+/* line 479, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+input[type="checkbox"], input[type="radio"] {
+  box-sizing: border-box;
+  /* 1 */
+  padding: 0;
+  /* 2 */ }
+
+/**
+ * Fix the cursor style for Chrome's increment/decrement buttons. For certain
+ * `font-size` values of the `input`, it causes the cursor style of the
+ * decrement button to change from `default` to `text`.
+ */
+/* line 495, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button {
+  height: auto; }
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari and Chrome
+ *  (include `-moz` to future-proof).
+ */
+/* line 505, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+input[type="search"] {
+  -webkit-appearance: textfield;
+  /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  /* 2 */
+  box-sizing: content-box; }
+
+/**
+ * Remove inner padding and search cancel button in Safari and Chrome on OS X.
+ * Safari (but not Chrome) clips the cancel button when the search input has
+ * padding (and `textfield` appearance).
+ */
+/* line 519, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none; }
+
+/**
+ * Define consistent border, margin, and padding.
+ */
+/* line 527, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em; }
+
+/**
+ * 1. Correct `color` not being inherited in IE 8/9/10/11.
+ * 2. Remove padding so people aren't caught out if they zero out fieldsets.
+ * 3. Corrects text not wrapping in Firefox 3.
+ * 4. Corrects alignment displayed oddly in IE 6/7.
+ */
+/* line 540, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+legend {
+  border: 0;
+  /* 1 */
+  padding: 0;
+  /* 2 */ }
+
+/**
+ * Remove default vertical scrollbar in IE 8/9/10/11.
+ */
+/* line 553, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+textarea {
+  overflow: auto; }
+
+/**
+ * Don't inherit the `font-weight` (applied by a rule above).
+ * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
+ */
+/* line 562, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+optgroup {
+  font-weight: bold; }
+
+/* Tables
+   ========================================================================== */
+/**
+ * Remove most spacing between table cells.
+ */
+/* line 573, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* line 579, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_normalize.scss */
+td, th {
+  padding: 0; }
+
+/* LINKS */
+/* line 5, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_links.scss */
+a {
+  font-size: .95em;
+  text-decoration: none;
+  color: #5F90B0; }
+  /* line 9, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_links.scss */
+  a:hover {
+    color: #406882; }
+
+/*------------------------------------*\
+    $CSSWIZARDRY-GRIDS
+\*------------------------------------*/
+/**
+ * CONTENTS
+ * INTRODUCTION.........How the grid system works.
+ * VARIABLES............Your settings.
+ * MIXINS...............Library mixins.
+ * GRID SETUP...........Build the grid structure.
+ * WIDTHS...............Build our responsive widths around our breakpoints.
+ * PUSH.................Push classes.
+ * PULL.................Pull classes.
+ */
+/*------------------------------------*\
+    $INTRODUCTION
+\*------------------------------------*/
+/**
+ * csswizardry grids provides you with widths to suit a number of breakpoints
+ * designed around devices of a size you specify. Out of the box, csswizardry
+ * grids caters to the following types of device:
+ *
+ * palm     --  palm-based devices, like phones and small tablets
+ * lap      --  lap-based devices, like iPads or laptops
+ * portable --  all of the above
+ * desk     --  stationary devices, like desktop computers
+ * regular  --  any/all types of device
+ *
+ * These namespaces are then used in the library to give you the ability to
+ * manipulate your layouts based around them, for example:
+ *
+   <div class="grid__item  1-whole  lap--1-2 desk--1-3">
+ *
+ * This would give you a grid item which is 100% width unless it is on a lap
+ * device, at which point it become 50% wide, or it is on a desktop device, at
+ * which point it becomes 33.333% width.
+ *
+ * csswizardry grids also has push and pull classes which allow you to nudge
+ * grid items left and right by a defined amount. These follow the same naming
+ * convention as above, but are prepended by either `push--` or `pull--`, for
+ * example:
+ *
+   `class="grid__item  1-2 push--1-2"`
+ *
+ * This would give you a grid item which is 50% width and pushed over to the
+ * right by 50%.
+ *
+ * All classes in csswizardry grids follow this patten, so you should fairly
+ * quickly be able to piece together any combinations you can imagine, for
+ * example:
+ *
+   `class="grid__item  1-whole  lap--1-2 desk--1-3  push--desk--1-3"`
+ *
+   `class="grid__item  1-4  palm--1-2 push--palm--1-2"`
+ *
+   `class="grid__item  palm--1-3  desk--5-12"`
+ */
+/*------------------------------------*\
+    $VARIABLES
+\*------------------------------------*/
+/**
+ * If you are building a non-responsive site but would still like to use
+ * csswizardry-grids, set this to ‘false’:
+ */
+/**
+ * Is this build mobile first? Setting to ‘true’ means that all grids will be
+ * 100% width if you do not apply a more specific class to them.
+ */
+/**
+ * Set the spacing between your grid items.
+ */
+/**
+ * Would you like Sass’ silent classes, or regular CSS classes?
+ */
+/**
+ * Would you like push and pull classes enabled?
+ */
+/**
+ * Using `inline-block` means that the grid items need their whitespace removing
+ * in order for them to work correctly. Set the following to true if you are
+ * going to achieve this by manually removing/commenting out any whitespace in
+ * your HTML yourself.
+ *
+ * Setting this to false invokes a hack which cannot always be guaranteed,
+ * please see the following for more detail:
+ *
+ * github.com/csswizardry/csswizardry-grids/commit/744d4b23c9d2b77d605b5991e54a397df72e0688
+ * github.com/csswizardry/inuit.css/issues/170#issuecomment-14859371
+ */
+/**
+ * Define your breakpoints. The first value is the prefix that shall be used for
+ * your classes (e.g. `.palm--1-2`), the second value is the media query
+ * that the breakpoint fires at.
+ */
+/**
+ * Define which namespaced breakpoints you would like to generate for each of
+ * widths, push and pull. This is handy if you only need pull on, say, desk, or
+ * you only need a new width breakpoint at mobile sizes. It allows you to only
+ * compile as much CSS as you need. All are turned on by default, but you can
+ * add and remove breakpoints at will.
+ *
+ * Push and pull shall only be used if `$push` and/or `$pull` and `$responsive`
+ * have been set to ‘true’.
+ */
+/**
+ * You do not need to edit anything from this line onward; csswizardry-grids is
+ * good to go. Happy griddin’!
+ */
+/*------------------------------------*\
+    $MIXINS
+\*------------------------------------*/
+/**
+ * These mixins are for the library to use only, you should not need to modify
+ * them at all.
+ *
+ * Enclose a block of code with a media query as named in `$breakpoints`.
+ */
+/**
+ * Drop relative positioning into silent classes which can’t take advantage of
+ * the `[class*="push--"]` and `[class*="pull--"]` selectors.
+ */
+/*------------------------------------*\
+    $GRID SETUP
+\*------------------------------------*/
+/**
+ * 1. Allow the grid system to be used on lists.
+ * 2. Remove any margins and paddings that might affect the grid system.
+ * 3. Apply a negative `margin-left` to negate the columns’ gutters.
+ */
+/* line 208, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid {
+  list-style: none;
+  /* [1] */
+  margin: 0;
+  /* [2] */
+  padding: 0;
+  /* [2] */
+  margin-left: 0px;
+  /* [3] */ }
+
+/**
+     * 1. Cause columns to stack side-by-side.
+     * 2. Space columns apart.
+     * 3. Align columns to the tops of each other.
+     * 4. Full-width unless told to behave otherwise.
+     * 5. Required to combine fluid widths and fixed gutters.
+     */
+/* line 233, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid__item, .bullet {
+  display: inline-block;
+  /* [1] */
+  padding-left: 0px;
+  /* [2] */
+  vertical-align: top;
+  /* [3] */
+  -webkit-box-sizing: border-box;
+  /* [5] */
+  -moz-box-sizing: border-box;
+  /* [5] */
+  box-sizing: border-box;
+  /* [5] */ }
+
+/**
+ * Reversed grids allow you to structure your source in the opposite order to
+ * how your rendered layout will appear. Extends `.grid`.
+ */
+/* line 254, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--rev {
+  direction: rtl;
+  text-align: left; }
+  /* line 258, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .grid--rev > .grid__item, .grid--rev > .bullet {
+    direction: ltr;
+    text-align: left; }
+
+/**
+ * Gutterless grids have all the properties of regular grids, minus any spacing.
+ * Extends `.grid`.
+ */
+/* line 269, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--full {
+  margin-left: 0; }
+  /* line 272, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .grid--full > .grid__item, .grid--full > .bullet {
+    padding-left: 0; }
+
+/**
+ * Align the entire grid to the right. Extends `.grid`.
+ */
+/* line 281, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--right {
+  text-align: right; }
+  /* line 284, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .grid--right > .grid__item, .grid--right > .bullet {
+    text-align: left; }
+
+/**
+ * Centered grids align grid items centrally without needing to use push or pull
+ * classes. Extends `.grid`.
+ */
+/* line 294, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--center {
+  text-align: center; }
+  /* line 297, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .grid--center > .grid__item, .grid--center > .bullet {
+    text-align: left; }
+
+/**
+ * Align grid cells vertically (`.grid--middle` or `.grid--bottom`). Extends
+ * `.grid`.
+ */
+/* line 309, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--middle > .grid__item, .grid--middle > .bullet {
+  vertical-align: middle; }
+
+/* line 316, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--bottom > .grid__item, .grid--bottom > .bullet {
+  vertical-align: bottom; }
+
+/**
+ * Create grids with narrower gutters. Extends `.grid`.
+ */
+/* line 325, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--narrow {
+  margin-left: 0px; }
+  /* line 328, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .grid--narrow > .grid__item, .grid--narrow > .bullet {
+    padding-left: 0px; }
+
+/**
+ * Create grids with wider gutters. Extends `.grid`.
+ */
+/* line 337, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.grid--wide {
+  margin-left: 0px; }
+  /* line 340, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .grid--wide > .grid__item, .grid--wide > .bullet {
+    padding-left: 0px; }
+
+/*------------------------------------*\
+    $WIDTHS
+\*------------------------------------*/
+/**
+ * Create our width classes, prefixed by the specified namespace.
+ */
+/**
+ * Our regular, non-responsive width classes.
+ */
+/**
+     * Whole
+     */
+/* line 361, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-whole {
+  width: 100%; }
+
+/**
+     * Halves
+     */
+/* line 367, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-2, .col-2-4, .col-3-6, .col-4-8, .col-5-10, .col-6-12 {
+  width: 48%; }
+
+/**
+     * Thirds
+     */
+/* line 373, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-3, .col-2-6, .col-4-12 {
+  width: 32%; }
+
+/* line 374, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-2-3, .col-4-6, .col-8-12 {
+  width: 66%; }
+
+/**
+     * Quarters
+     */
+/* line 380, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-4, .col-2-8, .col-3-12 {
+  width: 24%; }
+
+/* line 382, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-3-4, .col-6-8, .col-9-12 {
+  width: 74%; }
+
+/**
+     * Fifths
+     */
+/* line 388, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-5, .col-2-10 {
+  width: 19%; }
+
+/* line 389, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-2-5, .col-4-10 {
+  width: 39%; }
+
+/* line 390, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-3-5, .col-6-10 {
+  width: 59%; }
+
+/* line 391, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-4-5, .col-8-10 {
+  width: 79%; }
+
+/**
+     * Sixths
+     */
+/* line 397, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-6, .col-2-12 {
+  width: 16%; }
+
+/* line 401, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-5-6, .col-10-12 {
+  width: 83%; }
+
+/**
+     * Eighths
+     */
+/* line 407, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-8 {
+  width: 12%; }
+
+/* line 409, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-3-8 {
+  width: 37%; }
+
+/* line 411, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-5-8 {
+  width: 62%; }
+
+/* line 413, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-7-8 {
+  width: 87%; }
+
+/**
+     * Tenths
+     */
+/* line 419, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-10 {
+  width: 9%; }
+
+/* line 421, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-3-10 {
+  width: 29%; }
+
+/* line 425, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-7-10 {
+  width: 69%; }
+
+/* line 427, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-9-10 {
+  width: 89%; }
+
+/**
+     * Twelfths
+     */
+/* line 433, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-1-12 {
+  width: 8%; }
+
+/* line 437, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-5-12 {
+  width: 41%; }
+
+/* line 439, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-7-12 {
+  width: 58%; }
+
+/* line 443, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.col-11-12 {
+  width: 91%; }
+
+/**
+ * Our responsive classes, if we have enabled them.
+ */
+@media screen and (max-width: 767px) {
+  /**
+     * Whole
+     */
+  /* line 361, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-whole {
+    width: 100%; }
+  /**
+     * Halves
+     */
+  /* line 367, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-2, .lap-2-4, .lap-3-6, .lap-4-8, .lap-5-10, .lap-6-12 {
+    width: 48%; }
+  /**
+     * Thirds
+     */
+  /* line 373, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-3, .lap-2-6, .lap-4-12 {
+    width: 32%; }
+  /* line 374, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-2-3, .lap-4-6, .lap-8-12 {
+    width: 66%; }
+  /**
+     * Quarters
+     */
+  /* line 380, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-4, .lap-2-8, .lap-3-12 {
+    width: 24%; }
+  /* line 382, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-3-4, .lap-6-8, .lap-9-12 {
+    width: 74%; }
+  /**
+     * Fifths
+     */
+  /* line 388, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-5, .lap-2-10 {
+    width: 19%; }
+  /* line 389, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-2-5, .lap-4-10 {
+    width: 39%; }
+  /* line 390, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-3-5, .lap-6-10 {
+    width: 59%; }
+  /* line 391, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-4-5, .lap-8-10 {
+    width: 79%; }
+  /**
+     * Sixths
+     */
+  /* line 397, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-6, .lap-2-12 {
+    width: 16%; }
+  /* line 401, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-5-6, .lap-10-12 {
+    width: 83%; }
+  /**
+     * Eighths
+     */
+  /* line 407, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-8 {
+    width: 12%; }
+  /* line 409, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-3-8 {
+    width: 37%; }
+  /* line 411, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-5-8 {
+    width: 62%; }
+  /* line 413, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-7-8 {
+    width: 87%; }
+  /**
+     * Tenths
+     */
+  /* line 419, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-10 {
+    width: 9%; }
+  /* line 421, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-3-10 {
+    width: 29%; }
+  /* line 425, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-7-10 {
+    width: 69%; }
+  /* line 427, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-9-10 {
+    width: 89%; }
+  /**
+     * Twelfths
+     */
+  /* line 433, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-1-12 {
+    width: 8%; }
+  /* line 437, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-5-12 {
+    width: 41%; }
+  /* line 439, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-7-12 {
+    width: 58%; }
+  /* line 443, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .lap-11-12 {
+    width: 91%; } }
+
+@media screen and (min-width: 768px) {
+  /**
+     * Whole
+     */
+  /* line 361, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-whole {
+    width: 100%; }
+  /**
+     * Halves
+     */
+  /* line 367, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-2, .desk-2-4, .desk-3-6, .desk-4-8, .desk-5-10, .desk-6-12 {
+    width: 48%; }
+  /**
+     * Thirds
+     */
+  /* line 373, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-3, .desk-2-6, .desk-4-12 {
+    width: 32%; }
+  /* line 374, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-2-3, .desk-4-6, .desk-8-12 {
+    width: 66%; }
+  /**
+     * Quarters
+     */
+  /* line 380, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-4, .desk-2-8, .desk-3-12 {
+    width: 24%; }
+  /* line 382, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-3-4, .desk-6-8, .desk-9-12 {
+    width: 74%; }
+  /**
+     * Fifths
+     */
+  /* line 388, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-5, .desk-2-10 {
+    width: 19%; }
+  /* line 389, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-2-5, .desk-4-10 {
+    width: 39%; }
+  /* line 390, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-3-5, .desk-6-10, .jumbo {
+    width: 59%; }
+  /* line 391, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-4-5, .desk-8-10 {
+    width: 79%; }
+  /**
+     * Sixths
+     */
+  /* line 397, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-6, .desk-2-12 {
+    width: 16%; }
+  /* line 401, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-5-6, .desk-10-12 {
+    width: 83%; }
+  /**
+     * Eighths
+     */
+  /* line 407, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-8 {
+    width: 12%; }
+  /* line 409, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-3-8 {
+    width: 37%; }
+  /* line 411, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-5-8 {
+    width: 62%; }
+  /* line 413, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-7-8 {
+    width: 87%; }
+  /**
+     * Tenths
+     */
+  /* line 419, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-10 {
+    width: 9%; }
+  /* line 421, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-3-10 {
+    width: 29%; }
+  /* line 425, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-7-10 {
+    width: 69%; }
+  /* line 427, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-9-10 {
+    width: 89%; }
+  /**
+     * Twelfths
+     */
+  /* line 433, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-1-12 {
+    width: 8%; }
+  /* line 437, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-5-12 {
+    width: 41%; }
+  /* line 439, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-7-12 {
+    width: 58%; }
+  /* line 443, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .desk-11-12 {
+    width: 91%; } }
+
+/*------------------------------------*\
+    $PUSH
+\*------------------------------------*/
+/**
+ * Push classes, to move grid items over to the right by certain amounts.
+ */
+/**
+     * Not a particularly great selector, but the DRYest way to do things.
+     */
+/* line 572, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+[class*="push-"] {
+  position: relative; }
+
+/**
+     * Whole
+     */
+/* line 482, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-whole {
+  left: 100%; }
+
+/**
+     * Halves
+     */
+/* line 488, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-2, .push-2-4, .push-3-6, .push-4-8, .push-5-10, .push-6-12 {
+  left: 49%; }
+
+/**
+     * Thirds
+     */
+/* line 494, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-3, .push-2-6, .push-4-12 {
+  left: 33%; }
+
+/* line 495, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-2-3, .push-4-6, .push-8-12 {
+  left: 66%; }
+
+/**
+     * Quarters
+     */
+/* line 501, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-4, .push-2-8, .push-3-12 {
+  left: 24%; }
+
+/* line 503, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-3-4, .push-6-8, .push-9-12 {
+  left: 74%; }
+
+/**
+     * Fifths
+     */
+/* line 509, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-5, .push-2-10 {
+  left: 19%; }
+
+/* line 510, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-2-5, .push-4-10 {
+  left: 39%; }
+
+/* line 511, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-3-5, .push-6-10 {
+  left: 59%; }
+
+/* line 512, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-4-5, .push-8-10 {
+  left: 79%; }
+
+/**
+     * Sixths
+     */
+/* line 518, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-6, .push-2-12 {
+  left: 16; }
+
+/* line 522, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-5-6, .push-10-12 {
+  left: 83%; }
+
+/**
+     * Eighths
+     */
+/* line 528, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-8 {
+  left: 12%; }
+
+/* line 530, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-3-8 {
+  left: 37%; }
+
+/* line 532, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-5-8 {
+  left: 62%; }
+
+/* line 534, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-7-8 {
+  left: 87%; }
+
+/**
+     * Tenths
+     */
+/* line 540, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-10 {
+  left: 9.5%; }
+
+/* line 542, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-3-10 {
+  left: 29%; }
+
+/* line 546, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-7-10 {
+  left: 69%; }
+
+/* line 548, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-9-10 {
+  left: 89%; }
+
+/**
+     * Twelfths
+     */
+/* line 554, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-1-12 {
+  left: 8; }
+
+/* line 558, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-5-12 {
+  left: 41%; }
+
+/* line 560, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-7-12 {
+  left: 58%; }
+
+/* line 564, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+.push-11-12 {
+  left: 91%; }
+
+@media screen and (max-width: 767px) {
+  /**
+     * Whole
+     */
+  /* line 482, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-whole {
+    left: 100%; }
+  /**
+     * Halves
+     */
+  /* line 488, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-2, .push-lap-2-4, .push-lap-3-6, .push-lap-4-8, .push-lap-5-10, .push-lap-6-12 {
+    left: 49%; }
+  /**
+     * Thirds
+     */
+  /* line 494, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-3, .push-lap-2-6, .push-lap-4-12 {
+    left: 33%; }
+  /* line 495, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-2-3, .push-lap-4-6, .push-lap-8-12 {
+    left: 66%; }
+  /**
+     * Quarters
+     */
+  /* line 501, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-4, .push-lap-2-8, .push-lap-3-12 {
+    left: 24%; }
+  /* line 503, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-3-4, .push-lap-6-8, .push-lap-9-12 {
+    left: 74%; }
+  /**
+     * Fifths
+     */
+  /* line 509, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-5, .push-lap-2-10 {
+    left: 19%; }
+  /* line 510, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-2-5, .push-lap-4-10 {
+    left: 39%; }
+  /* line 511, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-3-5, .push-lap-6-10 {
+    left: 59%; }
+  /* line 512, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-4-5, .push-lap-8-10 {
+    left: 79%; }
+  /**
+     * Sixths
+     */
+  /* line 518, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-6, .push-lap-2-12 {
+    left: 16; }
+  /* line 522, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-5-6, .push-lap-10-12 {
+    left: 83%; }
+  /**
+     * Eighths
+     */
+  /* line 528, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-8 {
+    left: 12%; }
+  /* line 530, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-3-8 {
+    left: 37%; }
+  /* line 532, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-5-8 {
+    left: 62%; }
+  /* line 534, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-7-8 {
+    left: 87%; }
+  /**
+     * Tenths
+     */
+  /* line 540, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-10 {
+    left: 9.5%; }
+  /* line 542, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-3-10 {
+    left: 29%; }
+  /* line 546, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-7-10 {
+    left: 69%; }
+  /* line 548, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-9-10 {
+    left: 89%; }
+  /**
+     * Twelfths
+     */
+  /* line 554, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-1-12 {
+    left: 8; }
+  /* line 558, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-5-12 {
+    left: 41%; }
+  /* line 560, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-7-12 {
+    left: 58%; }
+  /* line 564, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-lap-11-12 {
+    left: 91%; } }
+
+@media screen and (min-width: 768px) {
+  /**
+     * Whole
+     */
+  /* line 482, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-whole {
+    left: 100%; }
+  /**
+     * Halves
+     */
+  /* line 488, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-2, .push-desk-2-4, .push-desk-3-6, .push-desk-4-8, .push-desk-5-10, .push-desk-6-12 {
+    left: 49%; }
+  /**
+     * Thirds
+     */
+  /* line 494, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-3, .push-desk-2-6, .push-desk-4-12 {
+    left: 33%; }
+  /* line 495, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-2-3, .push-desk-4-6, .push-desk-8-12 {
+    left: 66%; }
+  /**
+     * Quarters
+     */
+  /* line 501, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-4, .push-desk-2-8, .push-desk-3-12 {
+    left: 24%; }
+  /* line 503, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-3-4, .push-desk-6-8, .push-desk-9-12 {
+    left: 74%; }
+  /**
+     * Fifths
+     */
+  /* line 509, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-5, .push-desk-2-10 {
+    left: 19%; }
+  /* line 510, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-2-5, .push-desk-4-10 {
+    left: 39%; }
+  /* line 511, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-3-5, .push-desk-6-10 {
+    left: 59%; }
+  /* line 512, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-4-5, .push-desk-8-10 {
+    left: 79%; }
+  /**
+     * Sixths
+     */
+  /* line 518, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-6, .push-desk-2-12 {
+    left: 16; }
+  /* line 522, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-5-6, .push-desk-10-12 {
+    left: 83%; }
+  /**
+     * Eighths
+     */
+  /* line 528, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-8 {
+    left: 12%; }
+  /* line 530, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-3-8 {
+    left: 37%; }
+  /* line 532, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-5-8 {
+    left: 62%; }
+  /* line 534, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-7-8 {
+    left: 87%; }
+  /**
+     * Tenths
+     */
+  /* line 540, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-10 {
+    left: 9.5%; }
+  /* line 542, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-3-10 {
+    left: 29%; }
+  /* line 546, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-7-10 {
+    left: 69%; }
+  /* line 548, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-9-10 {
+    left: 89%; }
+  /**
+     * Twelfths
+     */
+  /* line 554, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-1-12 {
+    left: 8; }
+  /* line 558, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-5-12 {
+    left: 41%; }
+  /* line 560, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-7-12 {
+    left: 58%; }
+  /* line 564, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_csswizardry-grids.scss */
+  .push-desk-11-12 {
+    left: 91%; } }
+
+/*------------------------------------*\
+    $PULL
+\*------------------------------------*/
+/**
+ * Pull classes, to move grid items back to the left by certain amounts.
+ */
+/* TYPOGRAPHY */
+/* line 6, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  line-height: 1.5em;
+  color: white; }
+  /* line 10, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+  h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
+    display: inline-block;
+    font-size: 0.5em;
+    color: #d7dbe3; }
+
+/* line 18, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+h1 {
+  font-size: 3.5em; }
+
+/* line 22, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+h2 {
+  font-size: 2.5em; }
+
+/* line 26, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+h3 {
+  font-size: 2em; }
+
+/* line 30, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+h4 {
+  font-size: 1.5em; }
+
+/* line 34, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+h5 {
+  font-size: 1em; }
+
+/* line 38, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+h6 {
+  font-size: .8em; }
+
+/* line 42, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+.text-primary {
+  color: #5F90B0; }
+
+/* line 45, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+.text-danger {
+  color: #E6623C; }
+
+/* line 48, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+.text-success {
+  color: #4DAF7C; }
+
+/* line 52, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+ul.features li {
+  margin-top: 1em;
+  margin-left: 2em;
+  margin-right: 2em;
+  margin-bottom: 1em;
+  font-size: 1.1em;
+  padding-left: 0.7em;
+  line-height: 1.5em; }
+
+/* line 62, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+.fa {
+  margin-right: 0.5em; }
+
+/* line 68, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+.content {
+  color: #c8cdd9; }
+  /* line 73, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+  .content h1, .content h2, .content h3, .content h4, .content h5 {
+    margin-top: 1.2em;
+    margin-bottom: 0.7em; }
+  /* line 79, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_typography.scss */
+  .content h1 {
+    margin-top: 3em; }
+
+/* TABLE */
+/* line 6, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_table.scss */
+.table, table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  text-align: left; }
+  /* line 11, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_table.scss */
+  .table th, table th {
+    background: #232732;
+    color: white; }
+  /* line 16, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_table.scss */
+  .table th, .table td, table th, table td {
+    padding: 12px 12px;
+    width: auto;
+    line-height: 1.2em; }
+  /* line 26, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_table.scss */
+  .table tr, table tr {
+    background-color: #343a4a; }
+  /* line 29, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_table.scss */
+  .table tr:nth-child(2n), table tr:nth-child(2n) {
+    background-color: #303644; }
+  /* line 33, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_table.scss */
+  .table.table-bordered, table.table-bordered {
+    border: 1px solid; }
+    /* line 35, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_table.scss */
+    .table.table-bordered td, .table.table-bordered th, table.table-bordered td, table.table-bordered th {
+      border: 1px #40485c solid; }
+
+/* BUTTONS */
+/* line 6, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+.button {
+  border: 0;
+  border-radius: 2px;
+  outline: 0;
+  cursor: pointer;
+  color: white; }
+  /* line 12, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.small {
+    padding: 7px 20px;
+    font-size: .95em; }
+  /* line 16, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.medium {
+    padding: 10px 30px; }
+  /* line 19, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.large {
+    padding: 15px 45px;
+    font-size: 1.1em; }
+  /* line 23, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.primary {
+    color: #FFF;
+    background: #5F90B0; }
+    /* line 26, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+    .button.primary:hover {
+      background: #5589ab; }
+    /* line 30, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+    .button.primary[disabled] {
+      color: #a3bfd2; }
+  /* line 35, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.fit {
+    font-size: 0.5em;
+    padding: 0.5em 0.5em;
+    position: relative;
+    top: -0.2em; }
+  /* line 44, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.whole-space {
+    width: 100%;
+    display: block; }
+  /* line 48, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.success {
+    background: #4DAF7C; }
+    /* line 51, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+    .button.success:hover {
+      background: #48a474; }
+  /* line 55, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.danger {
+    background: #E6623C; }
+    /* line 58, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+    .button.danger:hover {
+      background: #e4572e; }
+  /* line 62, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button.transparent {
+    border: solid 0.2em white;
+    background: none; }
+    /* line 66, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+    .button.transparent:hover {
+      border: solid 0.2em #4DAF7C;
+      color: #4DAF7C; }
+  /* line 71, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+  .button .fa {
+    margin-right: 0.5em; }
+
+/* line 78, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+a.button {
+  text-decoration: none; }
+
+/* line 81, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_buttons.scss */
+a.button:hover {
+  color: white; }
+
+/* NAVBAR */
+/* line 3, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+.navbar {
+  background: #7d88a4;
+  padding: 0.8em;
+  margin-bottom: 10px;
+  border-bottom: 1px #232732 solid;
+  z-index: 10; }
+  /* line 9, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+  .navbar h4 {
+    color: #f5f6f8;
+    font-weight: 200; }
+  /* line 13, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+  .navbar div > ul {
+    display: inline-block;
+    vertical-align: top; }
+  /* line 17, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+  .navbar div > ul > li {
+    transition: margin-right 0.2s ease-out;
+    display: inline-block;
+    float: left;
+    padding-left: 1.7em;
+    padding-right: 1.7em;
+    padding-top: 0.3em;
+    color: white;
+    top: 0;
+    position: relative; }
+    /* line 25, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+    .navbar div > ul > li:last-child {
+      padding-right: 0; }
+    /* line 30, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+    .navbar div > ul > li a {
+      font-weight: 400;
+      font-size: 1em; }
+    /* line 34, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+    .navbar div > ul > li ul {
+      margin-top: 0.5em; }
+    /* line 37, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+    .navbar div > ul > li ul li {
+      display: block;
+      padding-top: 0.7em;
+      color: #c8cdd8;
+      height: auto; }
+      /* line 41, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+      .navbar div > ul > li ul li .fa {
+        margin-right: 0.6em; }
+      /* line 44, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+      .navbar div > ul > li ul li a {
+        color: #c8cdd8; }
+        /* line 46, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+        .navbar div > ul > li ul li a:hover {
+          color: #4DAF7C; }
+  /* line 53, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+  .navbar.fixed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0; }
+  /* line 59, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+  .navbar.expendable {
+    overflow-y: hidden;
+    height: 1.2em;
+    transition: height 0.3s ease-out; }
+    /* line 63, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_navbar.scss */
+    .navbar.expendable:hover {
+      height: 10em; }
+
+/* ALERTS */
+/* line 6, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_alerts.scss */
+.alert {
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 3px; }
+  /* line 10, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_alerts.scss */
+  .alert.primary {
+    background: #709cb8;
+    border: 1px #273f4f solid; }
+  /* line 14, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_alerts.scss */
+  .alert.success {
+    background: #5eb889;
+    border: 1px #1e4531 solid; }
+  /* line 18, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_alerts.scss */
+  .alert.danger {
+    background: #e97453;
+    border: 0px #a73615 solid; }
+
+/* RESPONSIVE */
+@media only screen and (min-width: 768px) and (max-width: 999px) {
+  /* line 5, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_responsive.scss */
+  .container {
+    width: 768px; } }
+
+@media only screen and (max-width: 767px) {
+  /* line 11, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_responsive.scss */
+  .container {
+    width: 300px; }
+    /* line 13, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_responsive.scss */
+    .container .table {
+      width: 100%;
+      display: block;
+      overflow: auto; } }
+
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+  /* line 22, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_responsive.scss */
+  .container {
+    width: 420px; }
+    /* line 24, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_responsive.scss */
+    .container .table {
+      display: table; } }
+
+/* line 4, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.right.ng-enter, .slide.right.ng-leave {
+  -webkit-transition: all 1s ease;
+  transition: all 1s ease; }
+/* line 8, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.right.ng-enter {
+  left: 100%; }
+/* line 11, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.right.ng-enter-active {
+  left: 0; }
+/* line 14, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.right.ng-leave {
+  left: 0; }
+/* line 17, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.right.ng-leave-active {
+  left: -100%; }
+/* line 22, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.left.ng-enter, .slide.left.ng-leave {
+  -webkit-transition: all 1s ease;
+  transition: all 1s ease; }
+/* line 26, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.left.ng-enter {
+  left: -100%; }
+/* line 29, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.left.ng-enter-active {
+  left: 0; }
+/* line 32, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.left.ng-leave {
+  left: 0; }
+/* line 35, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.slide.left.ng-leave-active {
+  left: 100%; }
+
+/* line 41, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.fade {
+  /*
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;*/
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  transition-delay: 0s; }
+  /* line 52, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+  .fade.ng-hide {
+    opacity: 0; }
+    /* line 54, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+    .fade.ng-hide.ng-hide-add {
+      opacity: 1; }
+    /* line 57, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+    .fade.ng-hide.ng-hide-remove {
+      opacity: 0; }
+
+/* line 66, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.fade.ng-enter, .fade.ng-leave {
+  -webkit-transition: all 1s ease;
+  transition: all 1s ease; }
+
+/* line 71, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.fade.ng-enter {
+  opacity: 0; }
+
+/* line 75, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.fade.ng-enter-active {
+  opacity: 1; }
+
+/* line 79, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.fade.ng-leave {
+  opacity: 1; }
+
+/* line 83, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_animation.scss */
+.fade.ng-leave-active {
+  opacity: 0; }
+
+/* line 3, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input[type=text], input[type=email], input[type=password], textarea {
+  background: white;
+  border: solid 2px white;
+  padding: 0.5em 0 0.5em 0.5em;
+  font-size: 1em;
+  color: #383f50;
+  transition: all 0.2s linear;
+  border-radius: 2px; }
+  /* line 13, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+  input[type=text]:focus, input[type=email]:focus, input[type=password]:focus, textarea:focus {
+    border-color: #5F90B0; }
+  /* line 18, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+  input[type=text][disabled], input[type=email][disabled], input[type=password][disabled], textarea[disabled] {
+    background: #424b5f;
+    border-color: #424b5f;
+    color: #7d88a4; }
+
+/* line 28, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input, textarea {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+  /* line 29, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+  input.ng-invalid:not(:focus), textarea.ng-invalid:not(:focus) {
+    color: #4c190a;
+    background: #e97453;
+    border-color: #e97453; }
+  /* line 34, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+  input.ng-invalid:focus, textarea.ng-invalid:focus {
+    border-color: #a73615; }
+
+/* line 44, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+label {
+  padding: 0.4em;
+  font-size: 1.1em; }
+
+/* line 50, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+.form-horizontal label {
+  text-align: right;
+  display: inline-block; }
+/* line 55, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+.form-horizontal label, .form-horizontal input {
+  margin-bottom: 0.5em;
+  margin-left: 0em;
+  margin-right: 0; }
+
+/* line 63, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+.form-vertical .form-input {
+  margin-bottom: 0.5em; }
+  /* line 64, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+  .form-vertical .form-input label {
+    display: block;
+    font-size: 0.8em;
+    text-align: left; }
+  /* line 69, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+  .form-vertical .form-input input, .form-vertical .form-input textarea {
+    width: 100%; }
+/* line 76, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+.form-vertical.big-input {
+  font-size: 1.3em; }
+
+/* line 81, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+.login-form {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 400px;
+  padding: 2em;
+  background: #383f50; }
+
+/* line 90, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input[type=checkbox] {
+  display: none; }
+
+/* to hide the checkbox itself */
+/* line 91, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input[type=checkbox] + label:before {
+  font-family: "FontAwesome";
+  display: inline-block; }
+
+/* line 96, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input[type=checkbox] + label:before {
+  content: "\f096"; }
+
+/* unchecked icon */
+/* line 97, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input[type=checkbox] + label:before {
+  letter-spacing: 10px; }
+
+/* space between checkbox and label */
+/* line 99, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input[type=checkbox]:checked + label:before {
+  content: "\f046"; }
+
+/* checked icon */
+/* line 100, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_form.scss */
+input[type=checkbox]:checked + label:before {
+  letter-spacing: 5px; }
+
+/* allow space for check mark */
+/* line 2, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.features h3 {
+  color: #4DAF7C;
+  margin-bottom: 1em; }
+/* line 7, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.features p {
+  font-size: 1.2em;
+  line-height: 1.4em; }
+
+/* line 17, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.aboutus .grid__item, .aboutus .bullet {
+  text-align: center; }
+/* line 21, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.aboutus img {
+  border-radius: 50%; }
+/* line 25, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.aboutus small {
+  margin-bottom: 1em; }
+/* line 28, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.aboutus h4 {
+  margin-top: 1em; }
+/* line 31, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.aboutus p {
+  font-size: 0.95;
+  line-height: 1.4em;
+  margin-bottom: 4em; }
+
+/* line 43, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.content h4 {
+  margin-bottom: 1em; }
+/* line 46, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.content p {
+  margin-bottom: 2em;
+  line-height: 1.4em; }
+/* line 51, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.content.light p {
+  font-weight: 100; }
+/* line 56, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.content a:not(.button) {
+  color: #4DAF7C;
+  text-decoration: underline; }
+  /* line 59, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .content a:not(.button):visited, .content a:not(.button):hover {
+    color: #3d8c63; }
+
+/* line 66, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.faq h2 {
+  margin-bottom: 1em; }
+/* line 71, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.faq h4 {
+  font-style: italic;
+  margin-bottom: 1em; }
+  /* line 74, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .faq h4:before {
+    content: " - "; }
+/* line 78, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.faq p {
+  color: #f5f6f8;
+  line-height: 1.4em;
+  margin-bottom: 4em; }
+
+/* line 89, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.grid__item.with-more-padding, .with-more-padding.bullet {
+  padding-right: 6em; }
+
+/* line 97, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.proposal {
+  margin-top: 2em; }
+  /* line 99, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .proposal .header {
+    padding: 1em;
+    background: #232732; }
+  /* line 106, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .proposal .description {
+    padding: 1em; }
+  /* line 110, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .proposal .footer {
+    padding: 1em; }
+    /* line 113, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+    .proposal .footer .author.enthusiast {
+      color: #4DAF7C; }
+  /* line 119, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .proposal .status {
+    float: right;
+    text-transform: capitalize; }
+    /* line 121, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+    .proposal .status.waiting {
+      color: #5F90B0; }
+
+/* line 128, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.fa.big {
+  font-size: 6em; }
+
+/* line 133, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.proposal .header {
+  font-size: 1.2em;
+  font-weight: bold; }
+/* line 137, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.proposal .footer span {
+  margin-right: 2em; }
+/* line 141, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.proposal .votes {
+  color: darkorange; }
+/* line 144, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.proposal .author {
+  color: #4DAF7C; }
+
+/* line 150, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.loading-screen {
+  position: relative;
+  text-align: center;
+  height: 15em;
+  opacity: 1; }
+  /* line 163, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .loading-screen.ng-hide {
+    height: 0;
+    opacity: 0;
+    display: block !important; }
+  /* line 169, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .loading-screen .fa {
+    font-size: 4em;
+    margin-top: 3em; }
+
+/* line 176, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+.loading-spinner {
+  font-size: 2em;
+  transition: opacity 0.5s linear;
+  opacity: 1;
+  margin-left: 1em; }
+  /* line 182, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/_specific.scss */
+  .loading-spinner.ng-hide {
+    opacity: 0;
+    display: block !important; }
+
+/* line 19, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+body {
+  background: #383f50;
+  color: #f5f6f8;
+  margin-top: 70px;
+  letter-spacing: 0.04em; }
+  /* line 24, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  body table small {
+    display: inline-block;
+    font-size: 0.8em; }
+
+/* line 34, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em; }
+
+/* line 39, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.navbar a {
+  color: white; }
+
+/* line 43, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.navbar, .footer-bar, .dark-bg {
+  background: #232732; }
+
+/* line 47, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.footer.bar {
+  background: #232732; }
+  /* line 49, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .footer.bar.fixed {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    min-height: 3em;
+    z-index: 4; }
+
+/* line 57, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.with-shadow {
+  box-shadow: 3px 3px 10px #232732; }
+
+/* line 63, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.collection > .collection-item {
+  display: block;
+  padding: 0.5em; }
+/* line 67, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.collection > a.collection-item:hover {
+  color: #c5d7e3;
+  background: #424b5f;
+  cursor: pointer; }
+
+/* line 76, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.success-text {
+  color: #4DAF7C; }
+
+/* line 80, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.primary-bg {
+  background: #5F90B0; }
+
+/* line 84, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.success-bg {
+  background: #4DAF7C; }
+
+/* line 88, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.danger-bg {
+  background: #E6623C; }
+
+/* line 94, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.bullet {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  cursor: pointer;
+  padding-left: 0em;
+  padding-right: 0em;
+  text-align: center;
+  margin: 0;
+  width: 323px; }
+
+/* line 108, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.bullet h3 {
+  margin-bottom: 1em; }
+
+/* line 112, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.bullet-icon {
+  font-size: 4em;
+  text-align: center;
+  margin-bottom: 0.5em; }
+
+/* line 118, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.bullet-description {
+  text-align: center;
+  min-height: 2em; }
+
+/* line 126, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.feature {
+  margin-top: 4em;
+  margin-bottom: 4em; }
+  /* line 130, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature h2 {
+    margin-bottom: 2em;
+    color: #4DAF7C;
+    text-align: center; }
+  /* line 135, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature .feature-description {
+    font-size: 1.5em;
+    line-height: 1.2em; }
+  /* line 140, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature .feature-graphic {
+    font-size: 9em;
+    text-align: center; }
+  /* line 145, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature p {
+    font-size: 1.2em;
+    line-height: 1.4em; }
+  /* line 150, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature .feature-explanation {
+    margin-top: 4em;
+    margin-bottom: 4em; }
+  /* line 155, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature .feature-bullets {
+    margin-top: 2em;
+    margin-bottom: 2em; }
+  /* line 160, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature .bullet h3 {
+    color: #4DAF7C; }
+  /* line 165, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .feature .bullet-description {
+    font-size: 1.2em; }
+
+/* line 171, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.abstract {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-size: 1.2em;
+  line-height: 1.2em; }
+
+/* line 179, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.bullet:hover {
+  background: rgba(0, 0, 0, 0.3); }
+
+/* line 183, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.dropshadow, .feature .bullet h3, .logo, .title {
+  text-shadow: 1px 1px 0px black; }
+
+/* line 189, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.logo sup {
+  color: #4DAF7C; }
+
+/* line 196, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.title sup {
+  color: #4DAF7C; }
+
+/* line 200, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.subtitle {
+  color: #b9bfce;
+  margin-top: 2em;
+  text-align: center; }
+
+/* line 206, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.highlight {
+  color: #4DAF7C; }
+
+/* line 209, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.space-1-2em, space {
+  display: block;
+  height: 0.5em; }
+
+/* line 213, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.space-2em {
+  height: 2em; }
+
+/* line 216, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.space-4em {
+  height: 4em; }
+
+/* line 219, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.space-6em {
+  height: 6em; }
+
+/* line 223, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.jumbo {
+  float: none;
+  margin: 6em auto 6em auto;
+  text-align: center;
+  width: 80%; }
+  /* line 229, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .jumbo p {
+    margin: 40px 0 40px 0;
+    font-size: 1.4em; }
+
+/* line 236, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.primary:not(.button) {
+  color: #5F90B0; }
+
+/* line 240, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.success:not(.button) {
+  color: #4DAF7C; }
+
+/* line 243, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.danger:not(.button) {
+  color: #E6623C; }
+
+/* line 246, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.warning:not(.button) {
+  color: #e6d23c; }
+
+/* line 250, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.fade {
+  transition: opacity 0.4s linear;
+  opacity: 1; }
+  /* line 253, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .fade.ng-hide {
+    display: block;
+    opacity: 0; }
+
+/* line 258, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.fade-inline {
+  transition: opacity 0.4s linear;
+  opacity: 1; }
+  /* line 261, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .fade-inline.ng-hide {
+    display: inline-block !important;
+    opacity: 0; }
+
+/* line 268, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.light-background {
+  background-color: #4d576e; }
+
+/* line 271, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.push-right {
+  float: right; }
+
+/* line 275, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.fa.fa-large {
+  font-size: 5em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 5em;
+  margin-top: 1em;
+  margin-bottom: 1em; }
+
+/* line 287, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+.fade-transition {
+  opacity: 1;
+  top: 0;
+  -webkit-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  position: relative; }
+  /* line 299, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .fade-transition.ng-enter {
+    opacity: 1.0;
+    top: 0.0; }
+  /* line 306, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .fade-transition.ng-enter-active {
+    opacity: 0;
+    top: 100px; }
+  /* line 311, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .fade-transition.ng-leave {
+    opacity: 1.0;
+    top: 0px; }
+  /* line 316, /Users/cyril/Copy/Work/ijfx/ijfx-server/public/scss/bijou.min.scss */
+  .fade-transition.ng-leave-active {
+    opacity: 0;
+    top: 100px; }
+
+/*# sourceMappingURL=bijou.min.css.map */

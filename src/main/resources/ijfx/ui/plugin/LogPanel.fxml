@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root styleClass="log-panel" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <ListView fx:id="listView" prefWidth="500.0" BorderPane.alignment="CENTER" />
+    </center>
+    <bottom>
+        <ToolBar nodeOrientation="RIGHT_TO_LEFT" BorderPane.alignment="CENTER">
+            <items>
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closePanel" text="Close" />
+                <Button mnemonicParsing="false" onAction="#dismissAll" text="Dismiss all" />
+                <Button mnemonicParsing="false" onAction="#sendToDevelopers" styleClass="button-warning" text="Report" />
+                <Label fx:id="itemCountLabel" />
+            </items>
+        </ToolBar>
+    </bottom>
+</fx:root>

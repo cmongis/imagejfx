@@ -1,0 +1,10 @@
+<div class="word">
+	
+	
+	
+	<letter ng-repeat="letter in rrgEntry.letters" ng-class="letter.region.class"
+			rrg-model="letter" rrg-entry="rrgEntry" callback="callback">
+		{{letter.char}}
+	</letter>
+</div>
+

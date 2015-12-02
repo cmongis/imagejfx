@@ -1,0 +1,21 @@
+<br>
+<br> Search:
+<input type="text" ng-model="filterTest" placeholder="Enter search keywords" />
+<div class='divider'></div>
+<h4 class='explainer'>Context Table</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="opt in contextList | filter: filterTest">
+            <td>{{opt.id}}</td>
+            <td>
+                <a class="button primary small" href="#contextList/{{opt.id}}">More</a>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="476.0" prefWidth="625.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <right>
+        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="466.0" prefWidth="296.0" BorderPane.alignment="CENTER">
+            <children>
+                <TableView fx:id="metaDataTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
+                    <children>
+                        <TextField fx:id="addKeyTextField" />
+                        <TextField fx:id="addValueTextField" />
+                        <Button fx:id="addMetaDataButton" mnemonicParsing="false" styleClass="icon-button">
+                            <graphic>
+                                <FontAwesomeIconView>
+                                    <styleClass>
+                                        <String fx:value="add-icon" />
+                                        <String fx:value="medium-icon" />
+                                    </styleClass>
+                                </FontAwesomeIconView>
+                            </graphic>
+                        </Button>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+                    </VBox.margin>
+                </HBox>
+            </children>
+            <BorderPane.margin>
+                <Insets top="10.0" />
+            </BorderPane.margin>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+        </VBox>
+   </right>
+   <center>
+      <VBox prefHeight="476.0" prefWidth="286.0" BorderPane.alignment="CENTER">
+         <children>
+              <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="102.0" prefWidth="406.0">
+                  <children>
+                    <Pane fx:id="imagePane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="336.0" prefWidth="282.0" />
+                      <HBox alignment="CENTER_LEFT" spacing="10.0">
+                          <children>
+                        <FontAwesomeIconView glyphName="TAG" size="14" />
+                              <TextField fx:id="newTagTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                              <Button fx:id="addTagButton" mnemonicParsing="false" onAction="#addTagAction" styleClass="icon-button">
+                                  <graphic>
+                                      <FontAwesomeIconView>
+                                          <styleClass>
+                                              <String fx:value="big-icon" />
+                                              <String fx:value="add-icon" />
+                                          </styleClass>
+                                      </FontAwesomeIconView>
+                                  </graphic>
+                              </Button>
+                          </children>
+                          <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                          </padding>
+                      </HBox>
+                      <ListView fx:id="tagsListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="65.0" prefWidth="406.0" />
+                  </children>
+              </VBox>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" top="15.0" />
+         </padding>
+      </VBox>
+   </center>
+</fx:root>

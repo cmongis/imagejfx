@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.net.*?>
+<?import javafx.scene.shape.*?>
+<?import de.jensd.fx.glyphs.*?>
+<?import javafx.scene.canvas.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="386.0" prefWidth="354.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+    <bottom>
+        <HBox nodeOrientation="RIGHT_TO_LEFT" prefHeight="30.0" prefWidth="153.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="setChangeButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="%setChange" />
+                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="%cancel" />
+            </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
+        </HBox>
+    </bottom>
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+         <content>
+            <VBox alignment="TOP_CENTER" styleClass="dark-background">
+               <children>
+                      <VBox fx:id="vbox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="10.0" />
+                     </padding>
+                  </VBox>
+                    <Button fx:id="addButton" mnemonicParsing="false" text="Add level">
+                        <graphic>
+                            <FontAwesomeIconView glyphName="" size="12" textAlignment="CENTER">
+                                <styleClass>
+                                    <String fx:value="add-icon" />
+                                    <String fx:value="big-icon" />
+                                </styleClass>
+                            </FontAwesomeIconView>
+                        </graphic>
+                    </Button>
+               </children>
+            </VBox>
+         </content>
+        </ScrollPane>
+    </center>
+</fx:root>

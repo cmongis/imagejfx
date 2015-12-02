@@ -1,0 +1,154 @@
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.materialize-red {
+  background-color: #e51c23 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.red {
+  background-color: #F44336 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.pink {
+  background-color: #e91e63 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.purple {
+  background-color: #9c27b0 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.deep-purple {
+  background-color: #673ab7 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.indigo {
+  background-color: #3f51b5 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.blue {
+  background-color: #2196F3 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.light-blue {
+  background-color: #03a9f4 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.cyan {
+  background-color: #00bcd4 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.teal {
+  background-color: #009688 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.green {
+  background-color: #4CAF50 !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.light-green {
+  background-color: #8bc34a !important; }
+
+/* line 371, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.lime {
+  background-color: #cddc39 !important; }
+
+/* line 391, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.black {
+  background-color: #000000 !important; }
+
+/* line 391, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/_color.scss */
+.white {
+  background-color: #FFFFFF !important; }
+
+/* line 15, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-red {
+  background-color: #B71C1C !important;
+  background: #B71C1C !important; }
+
+/* line 15, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-blue {
+  background-color: #0D47A1 !important;
+  background: #0D47A1 !important; }
+
+/* line 15, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-purple {
+  background-color: #311b92 !important;
+  background: #311b92 !important; }
+
+/* line 15, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-pink {
+  background-color: #880e4f !important;
+  background: #880e4f !important; }
+
+/* line 15, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-green {
+  background-color: #1B5E20 !important;
+  background: #1B5E20 !important; }
+
+/* line 15, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-yellow {
+  background-color: #f57f17 !important;
+  background: #f57f17 !important; }
+
+/* line 15, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-cyan {
+  background-color: #006064 !important;
+  background: #006064 !important; }
+
+/* line 21, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.noselect, letter {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+/* line 30, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+letter {
+  font-weight: medium;
+  font-size: 1.3em;
+  min-width: 1.3em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  margin: 0;
+  border-bottom: solid 0.05em white; }
+
+/* line 42, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+.rrg-question {
+  text-align: left; }
+  /* line 44, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+  .rrg-question h4 {
+    font-size: 1.2em;
+    margin-bottom: 0.5em; }
+  /* line 48, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+  .rrg-question li {
+    display: block;
+    text-align: left;
+    transition: height 0.2s linear; }
+    /* line 49, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+    .rrg-question li input[type="checkbox"] {
+      margin-right: 0.3em;
+      margin-bottom: 0.5em; }
+    /* line 55, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+    .rrg-question li ul li {
+      height: 1.7em; }
+    /* line 61, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+    .rrg-question li input[type="text"] {
+      background: white;
+      color: black;
+      display: inline-block;
+      width: 2em;
+      height: 1em;
+      padding: 0.2em;
+      top: -0.1em;
+      position: relative;
+      border: 0; }
+  /* line 78, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+  .rrg-question > li {
+    margin-bottom: 2em; }
+  /* line 83, /Users/cyril/Code/ijfx/src/main/resources/web/intro2/scss/rrg.scss */
+  .rrg-question li.ng-hide {
+    display: block !important;
+    overflow: hidden;
+    height: 0; }
+
+/*# sourceMappingURL=rrg.css.map */

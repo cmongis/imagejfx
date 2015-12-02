@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Group fx:id="group" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <StackPane>
+         <children>
+            <Circle fx:id="circle" fill="#1f93ff00" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
+            <FontAwesomeIconView fx:id="icon" glyphName="CIRCLE_ALT_NOTCH" size="16" />
+         </children>
+      </StackPane>
+   </children>
+</Group>

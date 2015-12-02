@@ -1,0 +1,87 @@
+
+
+
+/* TYPOGRAPHY */
+
+h1,h2,h3,h4,h5,h6{
+	font-weight:500;
+	line-height: 1.5em;
+	color:white;
+	small {
+		display:inline-block;
+		font-size:0.5em;
+		color: darken($text, 10%);
+		//color:red;
+	}
+}
+
+h1{
+	font-size:3.5em;	
+}
+
+h2{
+	font-size:2.5em;
+}
+
+h3{
+	font-size:2em;
+}
+
+h4{
+	font-size:1.5em;
+}
+
+h5{
+	font-size:1em;
+}
+
+h6{
+	font-size:.8em;
+}
+
+.text-primary {
+	color:$primary;
+}
+.text-danger {
+	color:$danger;
+}
+.text-success {
+	color:$success;
+}
+
+ul.features li {
+	margin-top:1em;
+	margin-left:2em;
+	margin-right:2em;
+	margin-bottom:1em;
+	font-size:1.1em;
+	padding-left:0.7em;
+	line-height:1.5em;
+}
+
+.fa {
+	margin-right:0.5em;
+}
+
+
+
+.content {
+	color:lighten($background,55%);
+	
+	
+	
+	h1,h2,h3,h4,h5 {
+		margin-top:1.2em;
+		margin-bottom: 0.7em;
+	
+	}
+	
+	h1 {
+		margin-top: 3em;
+	}
+	h2 {
+			
+	}
+
+}
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <VBox styleClass="log-entry" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="titleLabel" styleClass="title" text="Title" />
+                <Label fx:id="descriptionLabel" styleClass="description" text="Subtitle" />
+            </children>
+        </VBox>
+    </center>
+    <right>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="infoButton" alignment="CENTER" mnemonicParsing="false" onDragEntered="#showMore">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="INFO" />
+                    </graphic>
+                </Button>
+            </children>
+        </VBox>
+    </right>
+</fx:root>

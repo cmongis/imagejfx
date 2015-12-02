@@ -1,0 +1,10 @@
+
+.metadata {
+    -fx-fill: blue;
+}
+.tag {
+    -fx-fill: red;
+}
+.logical-operator {
+    -fx-fill: green;
+}

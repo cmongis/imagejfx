@@ -1,0 +1,95 @@
+@import "../scss/variables";
+.dropshadow {
+	text-shadow: 1px 1px 0px darken($background,30%);
+}
+.title {
+	@extend .dropshadow;
+	margin-top:2em;
+}
+.subtitle {
+	color:lighten($background,50%);
+	margin-top: 2em;
+	text-align: center;
+}
+
+.start-button {
+	margin-top: 2em;
+}
+.center-block {
+	margin-left:auto;
+	margin-right:auto;
+	display:block;
+
+}
+
+.screen {
+	min-height:1024px;
+	margin-left:2em;
+	margin-right:2em;
+	margin-bottom: 2em;
+}
+h2 {
+	text-align: center;
+	display:block;
+	margin:0;
+	padding:0;
+	clear:both;
+}
+
+body {
+	
+	
+}
+
+center {
+	margin-top:2em;
+	margin-bottom:2em;
+}
+
+body {
+	
+	overflow:hidden;
+}
+.tour {
+	overflow:auto;
+}
+.bigbox {
+	
+	margin:0.5em;
+	margin-top:2em;
+	display:inline-block;
+	float:center;
+	text-align: center;
+	
+	
+	vertical-align: top;
+	
+	.bigbox-title {
+		height:1em;
+		font-size: 2em;
+		padding:1em;
+	}
+	
+	.bigbox-content {
+		
+		display:block;
+		width:100%;
+		li {
+			width:100%;
+			list-style-type: none;
+			text-align: center;
+			
+			margin-top:0.5em;
+			
+			
+		}
+		font-size:1.2em;
+	}
+	
+}
+
+.fixed-button {
+	position:fixed;
+	top:2em;
+	left:2em;
+}

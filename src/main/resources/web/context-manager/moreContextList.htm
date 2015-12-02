@@ -1,0 +1,25 @@
+<br>
+<br>
+<h4>Context: {{contextId}}
+<a href="#newContextLink/{{contextId}}"><button class='button success small'>+</button></a>
+</h4>
+<div class='divider'></div>
+<h4 class='explainer'>LinkList Table</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>widget</th>
+            <th>linkType</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="opt in linkList| filter: {context : contextId}">
+            <td>{{opt.widget}}</td>
+            <td>{{opt.linkType}}</td>
+            <td>
+                <button class='button success small' ng-click="unlink(opt.widget, contextId, opt.linkType)">Remove Link</button>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,88 @@
+@import "color";
+$default-shade:"darken-4";
+$toimport: (
+	"red":map-get($red,$default-shade)
+	,"blue":map-get($blue,$default-shade),
+"purple":map-get($deep-purple,$default-shade),
+"pink":map-get($pink,$default-shade),
+"green":map-get($green,$default-shade),
+"yellow":map-get($yellow,$default-shade),
+"cyan":map-get($cyan,$default-shade)
+);
+$font-color:white;
+// generates the colors
+@each $color_name, $color in $toimport {
+	.rrg-#{$color_name}{
+		background-color: $color!important;
+		background: $color!important;
+	}
+}
+
+.noselect {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+letter {
+	@extend .noselect;
+	font-weight: medium;
+	font-size: 1.3em;
+	min-width: 1.3em;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	margin: 0;
+	@extend .noselect;
+	border-bottom: solid 0.05em $font-color;
+}
+
+.rrg-question {
+	text-align: left;
+	h4 {
+		font-size:1.2em;
+		margin-bottom: 0.5em;
+	}
+	li {
+		input[type="checkbox"] {
+			margin-right: 0.3em;
+			margin-bottom: 0.5em;
+		}
+		display:block;
+		text-align: left;
+		ul li {
+			
+			height:1.7em;
+		}
+		transition: height 0.2s linear;
+		
+		input[type="text"] {
+			background:white;
+			color:black;
+			display:inline-block;
+			
+			width:2em;
+			height:1em;
+			padding:0.2em;
+			top:-0.1em;
+			position:relative;
+			border:0;
+			
+		}
+		
+		
+		
+	}
+	> li {
+		margin-bottom: 2em;
+		
+	}
+	
+	li.ng-hide {
+		display: block!important;
+		overflow: hidden;
+		height: 0;
+	}
+}

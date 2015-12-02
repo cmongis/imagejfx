@@ -1,0 +1,66 @@
+<div>
+	
+	
+	<style>
+		.header .bigger {
+			font-size:1.4em;
+			position:relative;
+			top:0.1em;
+			margin-right: 1em;
+		}
+		.header .button {
+			margin-right: 0.3em;
+		
+		}
+		
+		.table {
+			position:relative;
+			top:-1em;
+		
+		}
+		
+	</style>
+
+
+<h2>Import images</h2>
+
+<div class="space-2em"></div>
+
+	<div class="navbar header">
+	
+		<span class="bigger">Import from images from : </span>
+
+		<button class="button medium success" ng-click="importFolder()">
+			<i class="fa fa-folder-open"></i> Folder
+		</button>
+		<button class="button medium success" ng-click="importImages()">
+			<i class="fa fa-file-image-o"></i> Single images
+		</button>
+		
+		
+		
+		<i class="fa fa-circle-o-notch fa-spin fade-inline" style="font-size:0.8em" ng-show="loading"></i>
+		
+		</div>
+
+<table class="table">
+	<tr>
+		<th ng-repeat="field in fields track by $index" ng-click="setOrderBy(field)">
+			{{field}}
+
+			<i class="fa fa-sort"></i>
+		</th>
+		<th>Action</th>
+	</tr>
+	<tr ng-repeat="img in data | orderBy:predicate:rev">
+		<td ng-repeat="field in fields">
+			{{img[field]}}
+		</td>
+		<td>
+			<button class="button danger small" ng-click="deleteImage(img['File path'])">Delete</button>
+		</td>
+	</tr>
+</table>
+<br>
+<br>
+<div class="space-3em"></div>

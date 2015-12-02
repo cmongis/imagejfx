@@ -1,0 +1,22 @@
+
+/* VARIABLES */
+
+$font: "Lucida", sans-serif;
+
+
+/* Colors */
+
+$black: #b7b7b7;
+$primary: #5F90B0;
+$success: #4DAF7C;
+$danger: #E6623C;
+$warning: #e6d23c;
+$background:#383f50;
+$background-light:lighten($background,10%);
+$background-dark:darken($background,10%);
+$text:lighten($background,70%);
+
+
+/* Widths */
+
+$container-width: 980px;

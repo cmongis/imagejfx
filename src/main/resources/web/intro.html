@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html ng-app="Intro">
+
+<head>
+	<title>Intro page</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="js/jquery-2.1.3.min.js"></script>
+	<script src="angular.min.js"></script>
+	<script src="intro/intro.controller.js"></script>
+	<script src="js/angular-smooth-scroll.min.js"></script>
+
+	<link rel="stylesheet" href="css/bijou.min.css" />
+	<link rel="stylesheet" href="css/intro.css" />
+
+</head>
+
+<body ng-controller="MainCtrl">
+
+	<div class="tour" step="currentStep">
+
+
+		<button class="button success small fixed-button" scroll-to="home">Home</button>
+		<div class="screen">
+			<h1 align="center" class="title" id="home">ImageJ <span class="success-text"><sup>FX</sup></em></span></h1>
+
+			<h2 class="subtitle">What is it ?</h2>
+
+			<button class="button primary large center-block start-button" scroll-to="composition">Start the tour</button> <button class="button primary small" onclick="mercury.onerror('','','')">Test</button>
+
+		</div>
+
+
+		<br>
+		<div class="screen" id="composition">
+
+			<h2>
+			Composition
+		</h2>
+			<br>
+			<center class="row">
+				<div class="bigbox three">
+					<p class="bigbox-title primary-bg">
+						JAVA<sup>FX</sup> UI
+					</p>
+					<ul class="bigbox-content">
+						<li>Rich / Modern</li>
+						<li>Animated</li>
+						<li>Context-based</li>
+					</ul>
+				</div>
+				<div class="bigbox three">
+					<p class="bigbox-title success-bg">
+						ImageJ
+					</p>
+					<ul class="bigbox-content">
+						<li>Image processing</li>
+						<li>Plugin library</li>
+						<li>File compatibility</li>
+					</ul>
+				</div>
+				<div class="bigbox three">
+					<p class="bigbox-title danger-bg">
+						HTML5
+					</p>
+					<ul class="bigbox-content">
+						<li>Information browsing</li>
+						<li>Configuration screens</li>
+						<li>Something else</li>
+					</ul>
+				</div>
+			</center>
+			<center>
+
+				<button class="button large success" scroll-to="context">
+					Continue
+				</button>
+			</center>
+
+		</div>
+
+		<div class="screen">
+			<h2 id="context">Context Based UI</h2>
+			<center class="row">
+				<div class="bigbox three">
+					<p class="bigbox-title">
+						It adapts
+					</p>
+					<p class="bigbox-content">
+						The UI changes depending on the situation. The user directly sees what he can do. What he can't is either hidden or desactived.
+					</p>
+				</div>
+				<div class="bigbox three">
+					<p class="bigbox-title">
+						It's animated
+					</p>
+					<p class="bigbox-content">
+						The animations allows the user to follow the changes made to the interface.
+					</p>
+
+
+
+				</div>
+				<div class="bigbox three">
+					<p class="bigbox-title">
+						Usefullness ?
+					</p>
+					<p class="bigbox-content">
+					Removing useless plugins from the view helps the user focus on what can be done.
+					</p>
+				</div>
+
+			</center>
+			<center>
+				<button class="button large primary" ng-click="enterMainContext()" scroll-to="context-2">Show me</button>
+			</center>
+
+		</div>
+	
+		<div class="screen" >
+			<h2 id="context-2">Context Manager</h2>
+			
+			<center class="row">
+				<div class="bigbox four">
+					<p class="bigbox-title">Knows everyone</p>
+					<p class="bigbox-content">
+						Knows every widgets.<br>
+						Knows every possible context.<br>
+						Knows link between context and widget<br>
+					</p>
+				</div>
+				<div class="bigbox four">
+					
+					<p class="bigbox-title">
+						 Easy Dev :-)
+					</p>
+					<p class="bigbox-content">
+						 Specify the current context.<br>
+						 The CM takes care of the rest.<br>
+						 Less code <br>
+						Dynamic testing
+					</p>	
+				</div>
+				
+			</center>
+			<center>
+				<button class="button large danger" ng-click="goBackIntroContext()" scroll-to="context-2">
+					Ctx: intro</button>
+				<button class="button large danger" ng-click="enterMainContext()">Ctx: main</button>
+				<button class="button large primary" scroll-to="mercury">
+				Next
+				</button>
+			</center>
+		</div>
+		<div class="screen">
+			<h2 id="mercury">Java Bridge made better</h2>
+			<center class="row">
+				<div class="bigbox three">
+					<p class="bigbox-title">Improvements</p>
+					<p class="bigbox-content">
+						Better for code reuse<br>
+						Easier linking<br>
+						Live documentation<br>
+					</p>
+				</div>
+			
+			</center>
+			<center class="row">
+				<button class="button large primary" scroll-to="arcmenu">
+				Next
+				</button>
+			</center>
+		</div>
+	
+		<div class="screen">
+			<h2 id="arcmenu">The Arc Menu</h2>
+			<center>
+				<img src="img/arcreactor.jpg" width=400 style="display:block"/>
+			</center>
+		</div>
+
+	</div>
+
+
+</body>
+
+</html>

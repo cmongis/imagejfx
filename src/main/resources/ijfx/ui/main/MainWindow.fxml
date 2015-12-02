@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
+
+<AnchorPane fx:id="mainAnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ijfx.ui.main.MainWindowController">
+   <children>
+   
+   <BorderPane fx:id="mainBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+       <bottom>
+           <BorderPane fx:id="bottomBorderPane" BorderPane.alignment="CENTER">
+               <left>
+                   <HBox fx:id="bottomLeftHBox" spacing="10.0" styleClass="hbox" BorderPane.alignment="CENTER" />
+               </left>
+               <padding>
+                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <right>
+                   <HBox fx:id="bottomRightHBox" styleClass="hbox" BorderPane.alignment="CENTER" />
+               </right>
+               <center>
+                   <HBox fx:id="bottomCenterHBox" styleClass="hbox" BorderPane.alignment="CENTER" />
+               </center>
+           </BorderPane>
+       </bottom>
+       <top>
+           <BorderPane fx:id="topBorderBane" BorderPane.alignment="CENTER">
+               <left>
+                   <HBox fx:id="topLeftHBox" spacing="10.0" BorderPane.alignment="CENTER">
+                       <BorderPane.margin>
+                           <Insets />
+                       </BorderPane.margin>
+                       <padding>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                       </padding>
+                   </HBox>
+               </left>
+               <right>
+                   <HBox fx:id="topRightHBox" spacing="10.0" BorderPane.alignment="CENTER">
+                       <padding>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                       </padding>
+                   </HBox>
+               </right>
+               <center>
+                   <HBox fx:id="topCenterHBox" spacing="10.0" BorderPane.alignment="CENTER">
+                       <padding>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                       </padding>
+                   </HBox>
+               </center>
+           </BorderPane>
+       </top>
+       <center>
+           <StackPane fx:id="centerStackPane" BorderPane.alignment="CENTER">
+               <children>
+                   <WebView fx:id="centralWebView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+               </children>
+           </StackPane>
+       </center>
+       <left>
+           <VBox fx:id="leftVBox" BorderPane.alignment="CENTER" />
+       </left>
+       <right>
+           <VBox fx:id="rightVBox" BorderPane.alignment="CENTER" />
+       </right>
+   </BorderPane>
+      <BorderPane fx:id="sideMenu" maxHeight="1.7976931348623157E308" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" styleClass="menu-title" text="Menu" />
+                  <VBox fx:id="sideMenuMainTopVBox" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="30.0" />
+                  <VBox fx:id="sideMenuTopVBox" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="0.0" />
+               </children>
+            </VBox>
+         </top>
+         <bottom>
+            <VBox fx:id="sideMenuBottomVBox" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>

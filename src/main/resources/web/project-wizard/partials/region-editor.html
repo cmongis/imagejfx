@@ -1,0 +1,69 @@
+<!--<h4>{{region.part()}} -> {{region.compile() | noBrackets}}</h4>-->
+<ul class="rrg-question input-field">
+
+
+	<li><h4>Concerning the size of this selection</h4>
+
+		<ul>
+			<li>
+				<input type="checkbox" , ng-model="region.TRF_VARIABLE_SIZE" ng-change="entry.compile()" id="q2" />
+				<label for="q2" ng-click="whenChanged">This part doesn't always have the same size...</label>
+			</li>
+			<li ng-show="region.TRF_VARIABLE_SIZE" class="ng-hide">
+				<input id="q8" type="checkbox" ng-model="region.TRF_CUSTOM_SIZE" ng-change="entry.compile()">
+				<label for="q8">... but should be between
+					<input type="text" ng-model="region.CUSTOM_SIZE_MIN" class="small-input" /> and
+					<input type="text" ng-model="region.CUSTOM_SIZE_MAX" />
+				</label>
+			</li>
+			<li ng-show="region.TRF_VARIABLE_SIZE" class="ng-hide">
+				<input id="q3" type="checkbox" , ng-model="region.TRF_CAN_BE_EMPTY" ng-change="entry.compile()" />
+				<label for="q3">... and can also be empty.</label>
+			</li>
+
+		</ul>
+
+	</li>
+
+	<li>
+		<h4>Concerning the composition of this selection : </h4>
+		<ul>
+			
+				<li>
+				<input type="checkbox" ng-model="region.TRF_MIX_CHARACTERS" ng-change="entry.compile()" id="q1" ng-hide="region.isCompositionUnique()" />
+				<label for="q1">Numbers and Letters can appear in different order.</label>
+			</li>
+			
+			
+			<li ng-show="region.noSpace() && region.TRF_MIX_CHARACTERS" class="field-input">
+				<input id="q4" type="checkbox" ng-model="region.TRF_ADD_SPACES" ng-change="entry.compile()" ng-show="region.noSpace()" />
+				<label for="q4">Could contain spaces</label>
+			</li>
+			<li ng-show="region.noWord() && region.TRF_MIX_CHARACTERS">
+				<input id="q5" type="checkbox" ng-model="region.TRF_ADD_LETTERS" />
+				<label for="q5">Could contain letters</label>
+			</li>
+			<li ng-show="region.noNumber() && region.TRF_MIX_CHARACTERS">
+				<input id="q6" type="checkbox" ng-model="region.TRF_ADD_NUMBERS" />
+				<label for="q6">Could contain numbers</label>
+			</li>
+			
+			<li ng-show="region.TRF_CAN_BE_ANYTHING == false && region.TRF_MIX_CHARACTERS">
+				<input type="checkbox" id="q9">
+				<label for="q9">Could also contain these special chars : <input type="text" ng-model="region.TRF_ADDITIONAL_CHARS" ng-change="region.compile()"/></label>
+				
+			</li>
+			
+			<li>
+				<input id="q7" type="checkbox" , ng-model="region.TRF_CAN_BE_ANYTHING" ng-change="entry.compile()" />
+				<label for="q7">Or could contain any characters.</label>
+			</li>
+
+		</ul>
+
+
+	</li>
+
+
+
+</ul>

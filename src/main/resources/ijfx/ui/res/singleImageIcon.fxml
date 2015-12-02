@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <FontAwesomeIconView glyphName="STOP" size="7" textAlignment="CENTER" />
+        <FontAwesomeIconView glyphName="SQUARE_ALT" size="15" strokeLineCap="BUTT" textAlignment="JUSTIFY" />
+    </children>
+</StackPane>

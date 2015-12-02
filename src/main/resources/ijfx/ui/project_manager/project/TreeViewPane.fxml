@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="489.0" prefWidth="238.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox fx:id="treeViewVbox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+         <children>
+            <TitledPane animated="false" text="Navigation">
+               <content>
+                    <TreeView fx:id="mainTreeView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+               </content>
+            </TitledPane>
+            <TitledPane text="Selection">
+               <content>
+                  <TreeView fx:id="selectionTreeView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+               </content>
+            </TitledPane>
+         </children>
+      </VBox>
+   </center>
+   <top>
+      <TitledPane text="Image Organisation" BorderPane.alignment="CENTER">
+         <content>
+              <HBox fx:id="topHbox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" spacing="10.0">
+                  <children>
+                      <Button fx:id="setHierarchyButton" mnemonicParsing="false">
+                          <graphic>
+                              <FontAwesomeIconView glyphName="GEAR" size="16" />
+                          </graphic>
+                      </Button>
+                  </children>
+              </HBox>
+         </content>
+      </TitledPane>
+   </top>
+</fx:root>

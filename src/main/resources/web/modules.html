@@ -1,0 +1,30 @@
+<html lang='en' ng-app="interfaceApp">
+
+<head>
+    <title>ImageJ</title>
+    <meta name="description" content="A beautiful CSS framework in under 2 KiB">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="angular.min.js"></script>
+	<script src="js/angular-route.js"></script>
+    <script src="modules/app.js"></script>
+    <link rel="stylesheet" href="css/bijou.min.css">
+   
+</head>
+
+<body>
+    <div class='navbar fixed'>
+        <div class='container'>
+            <h4 class='pull-left'>Module List</h4>
+            <ul class='pull-right'>
+                <li>
+                    <a href='#/module'>List</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class='container'>
+        <div ng-view></div>
+    </div>
+</body>
+
+</html>

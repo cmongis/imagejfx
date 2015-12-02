@@ -1,0 +1,184 @@
+<style>
+	.file {
+		display: block;
+		margin-bottom: 0.5em;
+		cursor: pointer;
+		border-left: solid 1px white;
+		padding-left:0.5em;
+		margin-left:0.5em;
+		
+	}
+	
+	.file:hover {}
+	
+	.region-editor-container {
+		padding: 2.1em 2em 2em 2em;
+		margin-top: 0.2em;
+		transition: background-color 0.2s linear;
+	}
+	
+	letter {
+		display: inline-block;
+		padding-left: 0.1em;
+		padding-right: 0.1em;
+		padding-top: 0.5em;
+		padding-bottom: 0.5em;
+		margin-bottom: 0em;
+	}
+	
+	region-display .part,
+	.region-part {
+		padding: 0.6em 0.5em 0.5em 0.5em;
+		margin: 1em 0em 1em 0em;
+		background: rgba(255, 255, 255, 0.1);
+		display: inline-block;
+	}
+	
+	.matcher li {
+		margin-top: 1em;
+		margin-bottom: 2em;
+		list-style-type: none;
+		font-size: 1.2em;
+	}
+	
+	.fa.ng-hide {
+		display: inline-block!important;
+		opacity: 0;
+		transition: opacity 0.3s linear;
+	}
+	
+	.fa {
+		opacity: 1;
+	}
+	
+	teardown {
+		padding: 0.3em;
+	}
+	
+	.fade-on-show.ng-hide {
+		display: block!important;
+		opacity: 0;
+		transition: opacity 0.3s linear;
+	}
+	
+	.fade-on-show.inline {
+		display: inline-block!important;
+	}
+	
+	.fade-on-show.ng-hide.inline {
+		display: inline-block!important;
+	}
+	
+	.fade-on-show {
+		opacity: 1;
+	}
+	
+	.footer region-display {
+		font-size: 1.2em;
+	}
+	
+	.appears-down {
+		bottom: 0;
+		display: block!important;
+		bottom: all 0.3s ease-out;
+	}
+	
+	.appears-down.ng-hide {
+		display: block!important;
+		bottom: 10em;
+	}
+</style>
+<div class="container">
+	<div class="grid">
+		<div class="grid__item desk-4-6">
+			<h2>1. Select informations to extract</h2>
+
+			</h2>
+			<p>It's possible to extract informations from file name : Select a typical file name among the list and select with your mouse the part that you want to extract :</p>
+			<div class="space-2em"></div>
+			<h4>Name example : 
+					<i class="fa fa-circle-o-notch fa-spin fade-inline" style="font-size:0.8em" ng-show="waitForUpdate">
+					</i>
+				</h4>
+			<div class="space-2em"></div>
+			<p>
+				<region-selection rrg-entry="selectedEntry" callback="onRegionCreated"></region-selection>
+			</p>
+
+			<div ng-class="selectedRegion.class" class="region-editor-container fade" ng-show="selectedRegion != undefined">
+				<p align="right" style="text-decoration:underline" ng-click="removeRegion()">Delete</p>
+				<p>
+					<label for="region-name">1. Give a name to the metadata : </label>
+					<input type="text" id="region-name" ng-model="selectedRegion.name" />
+				</p>
+
+				<region-editor entry="selectedEntry" region="selectedRegion" ng-show="selectedRegion.name != ''" class="fade">
+				</region-editor>
+			</div>
+			<div class="space-2em"></div>
+		</div>
+		<div class="grid__item desk-2-6">
+
+			<h4>File name examples</h4>
+		    <br>
+			<span style="" class="file" ng-repeat="teardown in teardowns track by $index" ng-click="selectEntryById($index+filePagination.start)">
+					<i ng-show="entryExists($index+filePagination.start)" class="fa fa-edit"></i>
+					<i class="fa fa-arrow-right" ng-show="selectedEntry.text == fileList[$index+filePagination.start]"></i>
+					<u><teardown data="teardown"></teardown></u>
+					
+				</span>
+			<br>
+			<center><button class="button small primary" ng-click="moreFiles()">More files</button></center>
+		</div>
+	</div>
+
+
+
+	<div class="container">
+		<h2>
+		2. Check pattern
+
+	</h2>
+		<center>
+			<region-display part-list="selectedEntry.decomposition">
+
+			</region-display>
+
+			<!--
+			<i class="fa fa-arrow-right"></i>
+			<span ng-repeat="region in selectedEntry.variableRegions">
+				<span class="region-part {{region.class}}" >
+				
+				{{region.name != "" ? region.name : 'Give a name'}}
+					</span>
+			</span>
+	-->
+		</center>
+		<center>
+
+			<div class="space-2em"></div>
+		</center>
+	</div>
+	<h2>
+		3. Add rule
+	</h2>
+	<button class="button large fade-on-show inline {{selectedEntryValid ? 'success' : 'danger'}} " ng-click="executeCallback()" style="position:relative;top:1em;" ng-show="selectedEntry.text != ''">
+		<i class="fa {{selectedEntryValid ? 'fa-check' : 'fa-warning'}}"></i> {{selectedEntryValid == true ? 'Add rule' : selectedEntryStatus}}
+		<i class="fa fa-circle-o-notch fa-spin fade-inline" style="font-size:0.8em" ng-show="waitForUpdate"></i>
+
+	</button>
+	<div class="space-6em"></div>
+	<h2>
+		4. Examples
+	</h2>
+	<p>Only the names maching your pattern will be shown</p>
+	<json-table data="metadata">
+
+
+	</json-table>
+
+
+</div>
+
+<div class="space-6em"></div>
+<div class="space-6em"></div>

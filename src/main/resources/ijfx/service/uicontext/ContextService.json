@@ -1,0 +1,16 @@
+[
+    {
+        "name": "imagej",
+        "incompatibleWith": ["webapp", "image-browser"]
+    }
+    ,{
+        "name":"project-manager"
+        ,"incompatibleWith":["webapp","imagej","project-batch-processing"]
+        
+    }
+    ,{
+        "name":"project-batch-processing"
+        ,"incompatibleWith":["webapp","imagej","project-manager"]
+    }
+
+]

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root styleClass="batch-workflow-step" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <Label fx:id="titleLabel" styleClass="h3" text="Label" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="21.0" />
+         </font>
+      </Label>
+   </left>
+   <right>
+      <HBox styleClass="hbox" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="configButton" mnemonicParsing="false" onAction="#toggleConfigPane">
+               <graphic>
+                  <FontAwesomeIconView glyphName="GEAR" />
+               </graphic>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#remove">
+               <graphic>
+                  <FontAwesomeIconView glyphName="REMOVE" />
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
+   </right>
+</fx:root>

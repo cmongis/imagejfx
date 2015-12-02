@@ -1,0 +1,114 @@
+
+<style>
+		.metadata,
+		.possibilities .dndPlaceholder {
+			display: inline-block;
+			list-style-type: none;
+			margin-left: 0.4em;
+			min-width: 5em;
+			text-align: center;
+			background: black;
+			min-height: 1em;
+			margin-bottom: 0.4em;
+		}
+		
+		.possibilities .dndPlaceholder {
+			padding: 2.0em;
+		}
+		
+		.hierarchy {
+			margin-left: 0;
+			margin-bottom: 1em;
+			list-style-type: none;
+		}
+		
+		.hierarchy-node {
+			border-bottom: solid 1px white;
+			border-left: solid 1px white;
+			height: 1em;
+			margin-right: 1em;
+			width: 2.5em;
+			display: inline-block;
+		}
+		
+		.hierarchy-container .dndPlaceholder {
+			list-style-type: none;
+			height: 3em;
+			display: block;
+			width: inherit;
+			background: black;
+			margin-bottom: 1em;
+		}
+	</style>
+
+<div class="grid">
+	<div class="grid__item desk-1-2">
+		<h3>
+			Edit your data organization
+</h3>
+	</div>
+	<div class="grid__item desk-1-2">
+		
+	</div>
+</div>
+
+<p>
+	Here you can customize the organization of your images and planes. This organization will represent your dataset. You can use any metadata as part of the hierarchy.
+</p>
+<div class="space-2em"></div>
+
+<p dnd-list="possibilities">
+
+	
+	<p>
+	</p>
+
+	<div class="grid">
+		<div class="grid__item desk-1-2">
+			<center>
+		Search metadata :
+			
+		<input type="text" ng-model="query">
+				</center>
+			<br>
+			<ul dnd-list="possibilities" dnd-horizontal-list="true" class="possibilities">
+				<li ng-repeat="metadata in possibilities | filter:query" class="button success metadata small" dnd-moved="" dnd-draggable="metadata" dnd-effect-allowed="move" ng-click="hierarchy.push(metadata)">
+					<i class="fa fa-plus"></i> {{metadata}}
+				</li>
+			</ul>
+		</div>
+		<div class="grid__item desk-1-2">
+			<h4 align=center>Organization</h4>
+			<br>
+			<ul dnd-list="hierarchy" class="hierarchy-container">
+				<li ng-repeat="metadata in hierarchy track by $index" dnd-draggable="metadata" dnd-dragstart="hierarchy.splice($index,1)" dnd-effect-allowed="move" class="button primary large hierarchy">
+
+					<i class="fa fa-remove" ng-click="hierarchy.splice($index,1)"></i>
+
+					<span ng-if="$index > 0" class="hierarchy-node" style="margin-left:{{$index * 1.5}}em"></span> {{metadata}}
+				</li>
+
+			</ul>
+		<center><br>
+		<button class="button success large" ng-click="save()">
+			<i class="fa fa-save"></i>
+			Save and open my database
+		</button>
+		<br><br>
+		
+			<button class="button danger large" ng-click="quit()">
+			<i class="fa fa-remove"></i>
+			Discard changes
+		</button>
+			
+			</center>
+		</div>
+	</div>
+
+
+	<p align=center>
+
+		
+
+
+	</p>

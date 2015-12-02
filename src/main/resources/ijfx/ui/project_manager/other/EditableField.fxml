@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root alignment="CENTER" spacing="5.0" type="HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField fx:id="textField" />
+      <VBox alignment="CENTER" spacing="3.0">
+         <children>
+            <StackPane>
+               <children>
+                  <Button fx:id="modifyButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0" styleClass="icon-button">
+                     <graphic>
+                        <FontAwesomeIconView>
+                           <styleClass>
+                              <String fx:value="edit-icon" />
+                              <String fx:value="small-icon" />
+                           </styleClass>
+                        </FontAwesomeIconView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="validateButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0" styleClass="icon-button">
+                     <graphic>
+                        <FontAwesomeIconView>
+                           <styleClass>
+                              <String fx:value="validate-icon" />
+                              <String fx:value="small-icon" />
+                           </styleClass>
+                        </FontAwesomeIconView>
+                     </graphic>
+                  </Button>
+               </children>
+            </StackPane>
+            <StackPane>
+               <children>
+                  <Button fx:id="removeButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0">
+                     <graphic>
+                        <FontAwesomeIconView>
+                           <styleClass>
+                              <String fx:value="remove-icon" />
+                              <String fx:value="small-icon" />
+                           </styleClass>
+                        </FontAwesomeIconView>
+                     </graphic>
+                  </Button>
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets left="5.0" right="5.0" />
+   </padding>
+</fx:root>

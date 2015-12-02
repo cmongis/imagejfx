@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root prefHeight="515.0" prefWidth="829.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0" BorderPane.alignment="CENTER">
+         <children>
+            <TextArea fx:id="messageTextArea" prefHeight="200.0" prefWidth="200.0" />
+            <TextArea fx:id="detailTextArea" prefHeight="200.0" prefWidth="200.0" />
+            <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="53.0" prefWidth="507.0" spacing="10.0">
+               <children>
+                  <Button fx:id="selectDirectoryButton" mnemonicParsing="false" onAction="#specifyDirectoryAction" prefHeight="25.0" prefWidth="212.0" text="%specifyFolder" />
+                  <VBox spacing="5.0">
+                     <children>
+                        <Button fx:id="validateButton" mnemonicParsing="false" onAction="#searchImageAction" text="%startSearching" visible="false" />
+                        <CheckBox fx:id="applyOnOtherCheckBox" mnemonicParsing="false" visible="false" />
+                        <CheckBox fx:id="searchRecursivelyCheckBox" mnemonicParsing="false" text="%searchRecursively" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="110.0" prefWidth="264.0" spacing="5.0">
+                     <children>
+                        <Label fx:id="statusLabel" prefHeight="15.0" prefWidth="218.0" />
+                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="143.0" spacing="10.0">
+                           <children>
+                              <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="172.0" progress="0.0" />
+                              <Button fx:id="stopButton" mnemonicParsing="false" onAction="#onStopSearching" text="%stop" visible="false" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER">
+                     <children>
+                        <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                           <children>
+                              <Button fx:id="skipButton" mnemonicParsing="false" onAction="#skipAction" text="%skip" />
+                              <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#closeAction" text="%neverMind" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
+   </center>
+</fx:root>

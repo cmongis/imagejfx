@@ -1,0 +1,5 @@
+log-*.txt
+log-*.txt.lck
+*.log
+*.gz
+target/*

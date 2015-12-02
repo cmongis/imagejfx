@@ -1,0 +1,54 @@
+<html lang='en' ng-app="Test">
+
+<head ng-app="TestCtrl">
+	<title>Bijou CSS Framework</title>
+	<meta name="description" content="A beautiful CSS framework in under 2 KiB">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="../scss/bijou.min.css">
+	<link rel="stylesheet" href="../css/font-awesome.min.css" />
+	<script src="../angular.min.js"></script>
+	<script src="../js/angular-animate.min.js"></script>
+	<script src="../js/angular-route.js"></script>
+
+	<script src="js/regen-controllers.js"></script>
+	<script src="js/regen-model.js"></script>
+	<script src="js/regen-directive.js"></script>
+	<script src="js/file-extractor-ctrl.js"></script>
+	<script src="../js/jquery-2.1.3.min.js"></script>
+	<script src="../js/ng-json-table.js"></script>
+	<link rel="stylesheet" href="scss/rrg.css" />
+
+</head>
+
+<body ng-controller="TestCtrl">
+	<div class="container">
+		<button ng-click="letsee()" class="button primary small">Push somethings</button>
+	
+	</div>
+	
+	<script>
+	angular.module("Test",["MetadataExtractor"])
+	.controller("TestCtrl",function($scope) {
+		$scope.files = ["Well01__jfdsklaj_jfkldajfkds9134_jfkdajdfklsa_jkfda___jfkldsa.tif","Well04__fdsafjsk=fkdsjfklddfkljas=fldjsa_.tifklfjdslajfsd"];
+		
+		$scope.letsee = function() {
+			console.log("it's pushing");
+			$scope.files.push("It even works like this");
+		
+		}
+		
+		$scope.show = function(entry) {
+			console.log(entry);
+		}
+	});
+	
+	
+	</script>
+	<div metadata-extractor file-list="files" callback="show">
+	</div>
+	
+	
+
+</body>
+
+</html>

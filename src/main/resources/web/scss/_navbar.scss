@@ -1,0 +1,68 @@
+/* NAVBAR */
+
+.navbar {
+	background: lighten($background, 30%);
+	padding: 0.8em;
+	margin-bottom: 10px;
+	border-bottom: 1px darken($background, 10%) solid;
+	z-index: 10;
+	h4 {
+		color: lighten($background, 70%);
+		font-weight: 200;
+	}
+	div > ul {
+		display: inline-block;
+		vertical-align: top;
+	}
+	div > ul > li {
+		transition: margin-right 0.2s ease-out;
+		display: inline-block;
+		float: left;
+		padding-left: 1.7em;
+		padding-right: 1.7em;
+		padding-top: 0.3em;
+		color: white;
+		&:last-child {
+			padding-right: 0;
+		}
+		top:0;
+		position:relative;
+		a {
+			font-weight: 400;
+			font-size: 1em;
+		}
+		ul {
+			margin-top: 0.5em;
+		}
+		ul li {
+			display: block;
+			padding-top: 0.7em;
+			color: darken($text, 15%);
+			.fa {
+				margin-right: 0.6em;
+			}
+			a {
+				color: darken($text, 15%);
+				&:hover {
+					color: $success;
+				}
+			}
+			height:auto;
+		}
+	}
+	&.fixed {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+	}
+	&.expendable {
+		overflow-y: hidden;
+		height: 1.2em;
+		transition: height 0.3s ease-out;
+		&:hover {
+			height: 10em;
+			div > ul > li {}
+		}
+	}
+}

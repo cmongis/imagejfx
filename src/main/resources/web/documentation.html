@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+	<title>TODO supply a title</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/bijou.min.css" />
+	<script src="angular.min.js"></script>
+	<script src="js/angular-route.js"></script>
+
+	<script src="js/module-test.js"></script>
+
+
+</head>
+
+<body ng-app="Kn.DocNavigation">
+
+
+	<nav class="navbar">
+		<h4 class="pull-left">Mercury Documentation 2.0</h4>
+		
+	</nav>
+	<style>
+		.content {
+			padding: 1em;
+			
+		}
+		
+		.body {
+			overflow-x: hidden;
+		}
+		
+		/*
+		
+		.card.tester {
+			position: absolute;
+			transition: right,left 0.3s ease-out;
+			-webkit-transition: right,left 0.3s ease-out;
+			top: 5em;
+			right: 1em;
+			left: 1em;
+		}
+		
+		.card.tester.ng-hide {
+			display: block!important;
+			right: -100%;
+			left:100%;
+		}*/
+		
+		.method-description {
+			color: #aaa;
+		}
+		
+		pre {
+			outline: 1px solid #ccc;
+			padding: 5px;
+			margin: 5px;
+			height:200px;
+		}
+		
+		.string {
+			color: green;
+		}
+		
+		.number {
+			color: darkorange;
+		}
+		
+		.boolean {
+			color: blue;
+		}
+		
+		.null {
+			color: magenta;
+		}
+		
+		.key {
+			color: red;
+		}
+	</style>
+
+	<div class="content">
+		<ng-view>
+		</ng-view>
+	</div>
+	<button class="button primary small" onclick="lg('success')">Test</button>
+</body>
+
+</html>
