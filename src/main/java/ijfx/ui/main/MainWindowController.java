@@ -96,28 +96,7 @@ public class MainWindowController implements Initializable {
      * Initializes the controller class.
      */
     
-    /*
-    @FXML
-    private BorderPane mainBorderPane;
-
-    @FXML
-    private HBox topHBox;
-
-    @FXML
-    private HBox loginBox;
-
-    @FXML
-    private BorderPane bottomBorderPane;
-
-    @FXML
-    private Button openButton;
-
-    @FXML
-    private Button processingButton;
-    
-    @FXML
-    private BorderPane topBorderPane;
-    */
+   
     @FXML
     private HBox topLeftHBox;
 
@@ -243,7 +222,7 @@ public class MainWindowController implements Initializable {
         loadingScreen.setDefaultPane(centerStackPane);
 
         initMenuAction();
-        hideSideMenu();
+        Platform.runLater(()->hideSideMenu());
         
         // the first stack loads ImageJ
         final Task task1 = imageJStarter;

@@ -39,19 +39,24 @@ public class ModuleItemSerializer extends JsonSerializer<ModuleItem> {
         jg.writeStartObject();
         jg.writeStringField("name", t.getName());
         jg.writeStringField("label", t.getLabel());
-        jg.writeObjectField("minValue", t.getMinimumValue());
-        jg.writeObjectField("maxValue", t.getMaximumValue());
-        jg.writeObjectField("classType", t.getType());
-        jg.writeObjectField("description", t.getDescription());
-        jg.writeObjectField("ioType", t.getIOType());
-        jg.writeObjectField("isInput", t.isInput());
-        jg.writeObjectField("isOutput", t.isOutput());
-        jg.writeObjectField("isAutoFill", t.isAutoFill());
-        jg.writeObjectField("isRequired", t.isRequired());
-        jg.writeObjectField("visibility", t.getVisibility());
-        jg.writeObjectField("columnCount", t.getColumnCount());
-        jg.writeObjectField("choices", t.getChoices());
 
+        try {
+            jg.writeObjectField("minValue", t.getMinimumValue());
+            jg.writeObjectField("maxValue", t.getMaximumValue());
+            jg.writeObjectField("classType", t.getType());
+
+            jg.writeObjectField("description", t.getDescription());
+            jg.writeObjectField("ioType", t.getIOType());
+            jg.writeObjectField("isInput", t.isInput());
+            jg.writeObjectField("isOutput", t.isOutput());
+            jg.writeObjectField("isAutoFill", t.isAutoFill());
+            jg.writeObjectField("isRequired", t.isRequired());
+            jg.writeObjectField("visibility", t.getVisibility());
+            jg.writeObjectField("columnCount", t.getColumnCount());
+            jg.writeObjectField("choices", t.getChoices());
+        } catch (Exception e) {
+
+        }
         jg.writeEndObject();
 
     }
