@@ -33,12 +33,10 @@
 	
 
     // Define a filter to test whehter label of the object is present or not
-    app.filter('customFilter', function () {
+    app.filter('className', function () {
         return function (item) {
-            if (item.label == "") {
-                return item.className.split(".").pop();
-            } else
-                return item.label;
+            var className = item.className.split(".");
+			return className[className.length-1];
         }
     });
 
