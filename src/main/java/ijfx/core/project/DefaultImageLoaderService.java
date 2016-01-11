@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.concurrent.Task;
+import mongis.utils.TextFileUtils;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.CanReadFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -58,7 +59,7 @@ public class DefaultImageLoaderService extends AbstractService implements ImageL
     @Parameter
     private HashService hashService;
 
-    private static String FORMAT_FILE_NAME = "supportedFormats.txt";
+    private final static String FORMAT_FILE_NAME = "supportedFormats.txt";
     public List<String> formats = new ArrayList<>();
 
     public IOFileFilter getIOFileFilter() {
@@ -95,13 +96,16 @@ public class DefaultImageLoaderService extends AbstractService implements ImageL
     private void loadFormats() {
         try {
             formats.clear();
-            String formatsFromFile = DefaultProjectManagerService.readFile(new File(getClass().getResource(FORMAT_FILE_NAME).getPath()));
+            String formatsFromFile = TextFileUtils.readFileFromJar(this, FORMAT_FILE_NAME);
+            // Old code deleted after bug submission. Waiting for bug correction confirmation.
+            // -- DefaultProjectManagerService.readFile(new File(getClass().getResource(FORMAT_FILE_NAME).getPath()));
+            
             String[] lines = formatsFromFile.split("\n");
             for (String ext : lines) {
                 formats.add("*" + ext);
             }
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+            ImageJFX.getLogger().log(Level.SEVERE, "Error when loading the file containing all the possible formats.", ex);
         }
     }
 

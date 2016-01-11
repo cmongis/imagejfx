@@ -20,7 +20,6 @@
  */
 package ijfx.ui.main;
 
-import de.jensd.fx.glyphs.GlyphsDude;
 import ijfx.ui.context.animated.AnimatedPaneContextualView;
 import ijfx.ui.context.animated.Animation;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -33,7 +32,6 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.service.log.LogService;
 import ijfx.service.uiplugin.UiPluginReloadedEvent;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -49,13 +47,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-import javafx.util.Pair;
-import mercury.core.AngularMethod;
 import net.imagej.ImageJ;
 import org.controlsfx.control.Notifications;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
-import ijfx.ui.context.UiContextManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleListProperty;
 import javafx.css.PseudoClass;
@@ -72,15 +67,20 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.animation.Transition;
 import javafx.event.ActionEvent;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import org.controlsfx.glyphfont.FontAwesome;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 /**
  * FXML Controller class
@@ -448,14 +448,21 @@ public class MainWindowController implements Initializable {
 
     @EventHandler
     public void handleEvent(DebugEvent event) {
-        if(event.is("sideMenu")) {
+        
+        Platform.runLater(()->showHelpSequence(""));
+    }
+    @EventHandler
+    public void handleEvent(ToggleSideMenuEvent event) {
+        
+       
+        if(event.is(ToggleSideMenuEvent.SIDE_MENU)) {
 
             if(sideMenu.getTranslateX() >= 0.0)
                 hideSideMenu();
             else
                 showSideMenu();
         }
-        if(event.is("reloadSideMenu")) {
+        if(event.is(ToggleSideMenuEvent.RELOAD_SIDE_MENU)) {
             
             Platform.runLater(()-> {
             resetMenuAction();
@@ -543,6 +550,44 @@ public class MainWindowController implements Initializable {
     
     
     
+    public void showHelpSequence(String selector) {
+        
+        
+         Node node = mainAnchorPane.getScene().lookup("#rightBorderPane");
+        
+        Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
+         
+        Rectangle rectangle = new Rectangle(nodeBounds.getMinX(),nodeBounds.getMinY(),nodeBounds.getWidth(),nodeBounds.getHeight());
+        Rectangle bigOne = new Rectangle(0,0,mainAnchorPane.getScene().getWidth(),mainAnchorPane.getScene().getHeight());
+        
+        
+        
+        Shape highligther = Path.subtract(bigOne,rectangle);
+        highligther.setFill(Paint.valueOf("black"));
+        highligther.setOpacity(0.7);
+        
+        mainAnchorPane.getChildren().add(highligther);
+        Label label = new Label("Select a bunch of file or add a folder. Use the table to mark the file you want to process.");
+        label.setPadding(new Insets(30));
+        label.getStyleClass().add("help-label");
+        label.setMaxWidth(200);
+        label.setWrapText(true);
+        label.setPrefWidth(200);
+        if(nodeBounds.getMinX() < 200) {
+            label.setTranslateX(nodeBounds.getMinX()+nodeBounds.getWidth()+30);
+            
+        }
+        else {
+            label.setTranslateX(nodeBounds.getMinX()-200-30);
+        }
+        label.setTranslateY(nodeBounds.getMinY());
+        
+        highligther.setOnMouseClicked(event->mainAnchorPane.getChildren().removeAll(highligther,label));
+        mainAnchorPane.getChildren().add(label);
+        System.out.println(highligther.getLayoutBounds().getHeight());
+        
+    }
+    
     /**
      * 
      *    Side Menu Actions
@@ -556,7 +601,7 @@ public class MainWindowController implements Initializable {
                 new SideMenuButton("Create database",WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC)
                 ,new SideMenuButton("Visualize", UiContexts.IMAGEJ,"browser image-browser webapp").setIcon(FontAwesomeIcon.PHOTO)
                
-                
+                ,new SideMenuButton("Batch Processing",UiContexts.FILE_BATCH_PROCESSING,UiContexts.and(UiContexts.PROJECT_MANAGER,UiContexts.IMAGEJ)).setIcon(FontAwesomeIcon.TASKS)
                 ,new SideMenuButton("Personal Database",UiContexts.PROJECT_MANAGER,"").setIcon(FontAwesomeIcon.DATABASE)
                 ,new Separator(Orientation.HORIZONTAL)
                 ,new SideMenuButton("Setting","index").setIcon(FontAwesomeIcon.GEAR)

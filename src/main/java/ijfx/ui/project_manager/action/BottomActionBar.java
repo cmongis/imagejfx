@@ -55,7 +55,7 @@ import ijfx.ui.UiConfiguration;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "browser-bottom-action-bar", localization = Localization.BOTTOM_CENTER, context = "image-browser+plane-selected")
+@UiConfiguration(id = "browser-bottom-action-bar", localization = Localization.BOTTOM_CENTER, context = "project-manager+plane-selected")
 public class BottomActionBar extends BorderPane implements UiPlugin {
 
     @FXML

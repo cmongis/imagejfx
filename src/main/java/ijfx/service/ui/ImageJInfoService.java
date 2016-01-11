@@ -22,12 +22,15 @@ package ijfx.service.ui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import ijfx.ui.module.json.ModuleItemSerializer;
 import ijfx.ui.module.json.ModuleSerializer;
 import ijfx.ui.main.ImageJFX;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +52,7 @@ import netscape.javascript.JSObject;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = Service.class)
-public class ImageJInfoService extends AbstractService implements ImageJService{
+public class ImageJInfoService extends AbstractService implements ImageJService {
 
     @Parameter
     AppService appService;
@@ -58,26 +61,37 @@ public class ImageJInfoService extends AbstractService implements ImageJService{
     ModuleService moduleService;
 
     Logger logger = ImageJFX.getLogger();
-    
+
     @AngularMethod(sync = true, description = "Return the list of all widgets", inputDescription = "No input")
     public JSObject getModuleList() {
-        ObjectMapper mapper = new ObjectMapper();
-        logger.fine("Getting module list");
-        SimpleModule simpleModule = new SimpleModule("ModuleSerializer");
-        // simpleModule.addSerializer(ModuleItem<?>.class,new ModuleItemSerializer());
-        simpleModule.addSerializer(ModuleInfo.class, new ModuleSerializer());
-        simpleModule.addSerializer(ModuleItem.class, new ModuleItemSerializer());
-        mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.registerModule(simpleModule);
-
         try {
-            String json = mapper.writeValueAsString(moduleService.getModules());
+            ObjectMapper mapper = new ObjectMapper();
+            logger.fine("Getting module list");
+            SimpleModule simpleModule = new SimpleModule("ModuleSerializer");
+            // simpleModule.addSerializer(ModuleItem<?>.class,new ModuleItemSerializer());
+            simpleModule.addSerializer(ModuleInfo.class, new ModuleSerializer());
+            simpleModule.addSerializer(ModuleItem.class, new ModuleItemSerializer());
+            mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper.registerModule(simpleModule);
+           
+            ArrayNode arrayNode = mapper.createArrayNode();
+            
+            moduleService.getModules().forEach(module->{
+                
+                    //System.out.println("Adding "+module.getName());
+                    arrayNode.add(mapper.convertValue(module,JsonNode.class));
+                
+            });
+            
+            //String json = mapper.writeValueAsString(moduleService.getModules());
             logger.fine("JSON done !");
-            return JSONUtils.parseToJSON(appService.getCurrentWebEngine(), json);
+            
+            return JSONUtils.parseToJSON(appService.getCurrentWebEngine(), arrayNode.toString());
+            //return JSONUtils.parseToJSON(appService.getCurrentWebEngine(), json);
 
-        } catch (JsonProcessingException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
         logger.warning("Returning null");
         return null;

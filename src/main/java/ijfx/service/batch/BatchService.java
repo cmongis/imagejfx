@@ -108,7 +108,13 @@ public class BatchService extends AbstractService implements ImageJService {
                     logger.info("Running...");
                     synchronized (lock) {
                         logger.info("Loading input...");
-                        input.load();
+                        try {
+                            getContext().inject(input);
+                            input.load();
+                        }
+                        catch(Exception e) {
+                            logger.log(Level.SEVERE,"Couldn't load input",e);
+                        }
                         logger.info("Input loaded");
                     }
                     
@@ -177,7 +183,7 @@ public class BatchService extends AbstractService implements ImageJService {
         
         logger.info("Running module");
         
-        Future<Module> run = moduleService.run(module, true);
+        Future<Module> run = moduleService.run(module, false);
         logger.info(String.format("[%s] module started", moduleName));
 
         try {
@@ -206,9 +212,15 @@ public class BatchService extends AbstractService implements ImageJService {
         if (item != null) {
             logger.info("Dataset input found !");
             Dataset dataset = input.getDataset();
-            module.setInput(item.getName(), input.getDataset());
-            logger.info("Injection done.");
+            
+            if(dataset == null) {
+                logger.info("The Dataset for was null for "+input.getName());
+            }
+            else {
+            module.setInput(item.getName(), dataset);
+            logger.info("Injection done for "+item.getName() + " with "+dataset.toString());
             return true;
+            }
         }
         
         // testing if it takes a Display as input

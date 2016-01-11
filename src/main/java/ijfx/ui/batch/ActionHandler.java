@@ -26,6 +26,6 @@ package ijfx.ui.batch;
  */
 
 @FunctionalInterface
-public interface DeleteHandler<T> {
-     public void delete(T t);
+public interface ActionHandler<T> {
+     public void execute(T t);
 }

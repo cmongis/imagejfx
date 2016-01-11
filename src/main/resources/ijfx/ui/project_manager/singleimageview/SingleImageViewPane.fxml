@@ -39,6 +39,11 @@
                         <Label text="=" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openSinglePlane" text="Open single plane">
+                     <VBox.margin>
+                        <Insets top="30.0" />
+                     </VBox.margin>
+                  </Button>
                </children>
                <BorderPane.margin>
                   <Insets top="10.0" />

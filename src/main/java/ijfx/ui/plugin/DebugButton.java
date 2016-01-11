@@ -38,6 +38,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
+import ijfx.ui.batch.FileBatchProcessorPanel;
 import ijfx.ui.plugin.panel.LUTPanel;
 import org.scijava.event.EventService;
 
@@ -121,7 +122,7 @@ public class DebugButton extends MenuButton implements UiPlugin{
     public void reloadAnOther(ActionEvent event) {
          //  widgetService.reload(FXMLBrowserController.class);
        
-        widgetService.reload(SwitchContextButton.class);
+        widgetService.reload(FileBatchProcessorPanel.class);
         //notificationService.publish(new DefaultNotification("It works !","perfectly !").addAction("Tell him",()->System.out.println("Yeah")));
         
     }

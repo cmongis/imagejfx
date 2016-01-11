@@ -31,6 +31,7 @@ public final class UiContexts {
             ,IMAGE_OPEN = "image-open"
             ,DEBUG = "debug"
             ,PROJECT_BATCH_PROCESSING = "project-batch-processing"
+            ,FILE_BATCH_PROCESSING = "file-batch-processing"
             ;
     
     public static String or(String... contextList) {

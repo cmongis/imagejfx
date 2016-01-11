@@ -85,8 +85,6 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
     @Parameter
     ScriptService scriptService;
 
-    
-
     private final static Logger logger = ImageJFX.getLogger();
 
     public Dataset convert(Project project, TreeItem root) {
@@ -95,10 +93,20 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
 
         // getting the deepest level
         int deepest = TreeItemUtils.getDeepestLevel(root, 0);
-
+        logger.info("Deepest tree level :  " + deepest);
         // the number of dimensions is equivalent to the number of level
         // in the tree + 2 for the X and Y axis
-        long[] dims = new long[deepest + 1];
+        long[] dims;
+
+        // if it's a leaf directly selected, there two dimensions
+        if (deepest == 0) {
+            dims = new long[2];
+        } // if the selected part of the tree is not a leaf,
+        // the number of dimensions equals the 2 + the number
+        // of node levels (we don't count the leaves level)
+        else {
+            dims = new long[deepest + 2 - 1];
+        }
 
         // axes
         AxisType[] axes = new AxisType[dims.length];
@@ -119,78 +127,89 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         final int pixelType = FormatTools.UINT16;
 
         // feeling the other dimensions size
-        for (int i = 0; i != deepest - 1; i++) {
-            dims[i + 2] = TreeItemUtils.getBrotherLevelMaxChildrenNumber(root, i);
-            final int index = i;
-            TreeItemUtils.goThroughLevel(root, i + 1, metadataItem -> {
+        if (deepest != 0) {
+            for (int i = 0; i != deepest - 1; i++) {
+                dims[i + 2] = TreeItemUtils.getBrotherLevelMaxChildrenNumber(root, i);
+                final int index = i;
+                TreeItemUtils.goThroughLevel(root, i + 1, metadataItem -> {
 
-                if (axes[index + 2] != null) {
-                    return;
-                }
-                MetaData metadata = (MetaData) metadataItem.getValue();
-                
-                if (metadata.getName().toLowerCase().contains("channel")) {
-                    axes[index + 2] = Axes.CHANNEL;
-                } else {
-                    axes[index + 2] = new DefaultAxisType(metadata.getName());
-                }
+                    if (axes[index + 2] != null) {
+                        return;
+                    }
+                    MetaData metadata = (MetaData) metadataItem.getValue();
 
-            });
-            //axes[i + 2] = new DefaultAxisType("Awesome",false);
+                    if (metadata.getName().toLowerCase().contains("channel")) {
+                        axes[index + 2] = Axes.CHANNEL;
+                    } else {
+                        axes[index + 2] = new DefaultAxisType(metadata.getName());
+                    }
 
+                });
+                //axes[i + 2] = new DefaultAxisType("Awesome",false);
+
+            }
         }
- 
+
         for (int i = 0; i != dims.length; i++) {
-            logger.fine(String.format("Dimesion %d : %d", i, dims[i]));
+            logger.info(String.format("Dimesion %d : %d", i, dims[i]));
         }
 
         // creating the dataset that will hold the newly formed image
         Dataset dataset = createDataset(pixelType, dims, axes);
 
-       
-
         // going through the deepest level (-1) that hold the
         // last metadata and should contain only one plane
         final SimplerCounter counter = new SimplerCounter();
+        
+        // if it's not a single plane
+        if (deepest > 0) {
+            TreeItemUtils.goThroughLevel(root, deepest - 1, child -> {
+                if (child.getChildren().size() == 1) {
 
-        TreeItemUtils.goThroughLevel(root, deepest - 1, child -> {
-            if (child.getChildren().size() == 1) {
-                try {
+                    // caculating the dimensions indexes of the child
                     List<Long> indexes = getLeafValues(root, child);
+
+                    // transforming the list into an array of long
                     Long[] indexesAsLong = new Long[indexes.size()];
                     indexes.toArray(indexesAsLong);
 
-                    PlaneDB planeDB = (PlaneDB) ((TreeItem<TreeItem>) child.getChildren().get(0)).getValue();
-
-                    Plane plane = getPlane(planeDB.getFile(), planeDB.getPlaneIndex());
-                    ImageMetadata metadata = plane.getImageMetadata();
+                    // getting the plane index using a simpler counter
                     int planeIndex = counter.getCount();
 
+                    // inserting the plane
+                    insertPlaneIntoDataset((TreeItem<PlaneDB>) child.getChildren().get(0), dataset, planeIndex, pixelType);
 
+                    // incrementing the counter
                     counter.increment();
-
-                    dataset.setPlane(planeIndex, getConvertedArray(pixelType, plane.getBytes()));
-                  
-                   //Object[] pixelsSource = (Object[]) getConvertedArray(pixelType, plane.getBytes()).array();
-
-                    //System.out.println(String.format("Sizes : %d / %d",pixels.length,pixelsSource.length));
-                } catch (IOException ex) {
-                    ImageJFX.getLogger();
-                } catch (FormatException ex) {
-                    ImageJFX.getLogger();
                 }
+            });
+        } else {
 
-            }
-        });
+            insertPlaneIntoDataset((TreeItem<PlaneDB>) root, dataset, 0, pixelType);
+
+        }
 
         datasetService.getContext().getService(UIService.class).show(dataset);
         datasetService.getContext().getService(UiContextService.class).leave("image-browser").enter("imagej").update();
+        return dataset;
+    }
 
-        if (true) {
-            return null;
+    private void insertPlaneIntoDataset(TreeItem<PlaneDB> childItem, Dataset dataset, int planeIndex, int pixelType) {
+        PlaneDB planeDB = childItem.getValue();
+        try {
+
+            Plane plane = getPlane(planeDB.getFile(), planeDB.getPlaneIndex());
+            dataset.setPlane(planeIndex, getConvertedArray(pixelType, plane.getBytes()));
+
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, String.format("Couldn't extract plane %d from %s", planeIndex, planeDB.getFile().getName()));
+
+        } catch (FormatException fe) {
+            logger.log(Level.SEVERE, String.format("Couldn't find the right format for plane %d from %s", planeIndex, planeDB.getFile().getName()));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, String.format("Error when inserting plane %s from %s into dataset", planeIndex, planeDB.getFile().getName()));
         }
 
-        return null;
     }
 
     private long[] getPlanePosition(TreeItem root, TreeItem leaf) {
@@ -257,114 +276,107 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         return scifio;
     }
 
-   
-
-   
-
     private Reader reader = null;
 
-     private synchronized Plane getPlane(File file, long planeIndex) throws IOException, io.scif.FormatException {
+    private synchronized Plane getPlane(File file, long planeIndex) throws IOException, io.scif.FormatException {
 
-        
         Reader r = getReader(file);
-        
-        if(r != null) {
+
+        if (r != null) {
             logger.info("Opening plane 0");
             Plane plane = r.openPlane(0, planeIndex);
             logger.info("Plane opened. Returning plane");
             return plane;
         }
-        
+
         return null;
-        
-       
+
     }
-    
+
     private Reader getReader(File file) {
 
-        
-        
-            // if the reader is already reading the file
-            if (reader != null) {
-                logger.info("Reader already created");
-                if (new File(reader.getCurrentFile()).equals(file)) {
-                    logger.info("Reader set on the same file. Returning the pre-existing reader");
-                    return reader;
-                }
-                else {
-                    reader = null;
-                }
+        // if the reader is already reading the file
+        if (reader != null) {
+            logger.info("Reader already created");
+            if (new File(reader.getCurrentFile()).equals(file)) {
+                logger.info("Reader set on the same file. Returning the pre-existing reader");
+                return reader;
+            } else {
+                reader = null;
             }
-            
-            logger.info("Creating a new Reader");
-            // trying creating a reader with scifio
+        }
+
+        logger.info("Creating a new Reader");
+        // trying creating a reader with scifio
+        try {
+            reader = scifio().initializer().initializeReader(file.getAbsolutePath());
+            logger.info("Reader created with SCIFIO");
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, null, ex);
+            reader = null;
+        }
+
+        // but sometimes, it does work for DV files for examples, so we call the Bioformat Reader directlry
+        if (reader == null) {
+
             try {
-                reader = scifio().initializer().initializeReader(file.getAbsolutePath());
-                logger.info("Reader created with SCIFIO");
-            } catch (Exception ex) {
+
+                Format format = new BioFormatsFormat();
+                getContext().inject(format);
+
+                reader = format.createReader();
+                logger.info("Reader created with BioFormat.");
+
+            } catch (FormatException ex) {
+                logger.severe("Couldn't get a Reader for the image " + file.getName());
+                logger.log(Level.SEVERE, null, ex);
+
+            }
+        }
+
+        if (reader != null) {
+
+            try {
+                logger.info("Setting source file");
+                reader.setSource(file.getAbsolutePath());
+                logger.info("Source file set :-)");
+                return reader;
+            } catch (IOException ex) {
+                logger.severe("Couldn't set the image as source of the reader" + file.getName());
                 logger.log(Level.SEVERE, null, ex);
                 reader = null;
             }
 
-            // but sometimes, it does work for DV files for examples, so we call the Bioformat Reader directlry
-            if (reader == null) {
+        }
 
-                try {
-                    
-                    Format format = new BioFormatsFormat();
-                    getContext().inject(format);
-
-                    reader = format.createReader();
-                    logger.info("Reader created with BioFormat.");
-
-                } catch (FormatException ex) {
-                    logger.severe("Couldn't get a Reader for the image " + file.getName());
-                    logger.log(Level.SEVERE, null, ex);
-
-                }
-            }
-            
-            if (reader != null) {
-
-                try {
-                    logger.info("Setting source file");
-                    reader.setSource(file.getAbsolutePath());
-                    logger.info("Source file set :-)");
-                    return reader;
-                } catch (IOException ex) {
-                    logger.severe("Couldn't set the image as source of the reader" + file.getName());
-                    logger.log(Level.SEVERE, null, ex);
-                    reader = null;
-                }
-
-            }
-        
         return reader;
     }
-    
-     public SCIFIO scifio() {
+
+    public SCIFIO scifio() {
         if (scifio == null) {
             scifio = new SCIFIO(getContext());
         }
         return scifio;
     }
 
-     public synchronized Dataset getDataset(File file, int planeIndex) throws IOException, FormatException {
-         
-            Plane plane = getPlane(file,planeIndex);
-            if(plane == null) return null;
-            logger.info("Creating Dataset from plane");
-            Dataset dataset = createDataset(plane);
-            logger.info("Dataset Created");
-            int pixelType = plane.getImageMetadata().getPixelType();
-            logger.info("Pixel type : "+pixelType);
-            dataset.setPlane(0,getConvertedArray(pixelType,plane.getBytes()));
-            return dataset;
-        
-     }
-     
+    public synchronized Dataset getDataset(File file, int planeIndex) throws IOException, FormatException {
+
+        Plane plane = getPlane(file, planeIndex);
+        if (plane == null) {
+            return null;
+        }
+        logger.info("Creating Dataset from plane");
+        Dataset dataset = createDataset(plane);
+        logger.info("Dataset Created");
+        int pixelType = plane.getImageMetadata().getPixelType();
+        logger.info("Pixel type : " + pixelType);
+        dataset.setPlane(0, getConvertedArray(pixelType, plane.getBytes()));
+        return dataset;
+
+    }
+
     public Dataset getDataset(PlaneDB planedb) throws IOException, FormatException {
-        return getDataset(planedb.getFile(),(int)planedb.getPlaneIndex());
+        return getDataset(planedb.getFile(), (int) planedb.getPlaneIndex());
     }
 
     private Dataset createDataset(Plane plane) {
@@ -372,7 +384,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         long[] dims = new long[2];
         dims[0] = plane.getImageMetadata().getAxisLength(Axes.X);
         dims[1] = plane.getImageMetadata().getAxisLength(Axes.Y);
-        logger.info(String.format("Dimensions : %d x %d",dims[0],dims[1]));
+        logger.info(String.format("Dimensions : %d x %d", dims[0], dims[1]));
         AxisType[] axes = new AxisType[]{Axes.X, Axes.Y};
         return createDataset(plane, dims, axes);
     }

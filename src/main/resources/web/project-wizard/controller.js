@@ -163,7 +163,7 @@ angular.module("ProjectCreator", ["MercuryAngular", "ngRoute", "ngAnimate", "Met
 
 
 	})
-	.controller("MetadataExtractor.OverCtrl", function ($scope, ProjectService) {
+	.controller("MetadataExtractor.OverCtrl", function ($scope, ProjectService,$rootScope) {
 		$scope.fileList = ["we will", "see"];
 
 		ProjectService.getFileList().then(function (files) {
@@ -197,7 +197,7 @@ angular.module("ProjectCreator", ["MercuryAngular", "ngRoute", "ngAnimate", "Met
 				.then(function () {
 					console.log("finish");
 
-					$scope.$broadcast("$nextPage");
+					$rootScope.$broadcast("$nextPage");
 
 				});
 
@@ -218,7 +218,7 @@ angular.module("ProjectCreator", ["MercuryAngular", "ngRoute", "ngAnimate", "Met
 		};
 
 		$scope.quit = function() {
-			ContextService.enter("image-browser")
+			ContextService.enter("project-manager")
 				.leave("webapp")
 				.update();
 			

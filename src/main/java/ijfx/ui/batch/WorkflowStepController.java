@@ -65,13 +65,13 @@ public class WorkflowStepController extends BorderPane implements ListCellContro
 
     }
 
-    DeleteHandler<WorkflowStep> deleteHandler;
+    ActionHandler<WorkflowStep> deleteHandler;
 
-    public DeleteHandler getDeleteHandler() {
+    public ActionHandler getDeleteHandler() {
         return deleteHandler;
     }
 
-    public void setDeleteHandler(DeleteHandler<WorkflowStep> deleteHandler) {
+    public void setDeleteHandler(ActionHandler<WorkflowStep> deleteHandler) {
         this.deleteHandler = deleteHandler;
     }
 
@@ -108,7 +108,7 @@ public class WorkflowStepController extends BorderPane implements ListCellContro
 
     @FXML
     public void remove() {
-        deleteHandler.delete(step);
+        deleteHandler.execute(step);
     }
 
 }

@@ -119,7 +119,7 @@ public class TaskButtonBinding {
         return this;
     }
     
-    public void onClick(ActionEvent event) {
+    protected void onClick(ActionEvent event) {
        
         
         

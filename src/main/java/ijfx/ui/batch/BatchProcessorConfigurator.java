@@ -97,7 +97,7 @@ import ijfx.ui.UiContexts;
  */
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "batch-processor-configurator", context = UiContexts.PROJECT_BATCH_PROCESSING, localization = Localization.CENTER)
-public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, DeleteHandler<WorkflowStep> {
+public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, ActionHandler<WorkflowStep> {
 
     /*
      Services
@@ -281,7 +281,7 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     public UiPlugin init() {
        
 
-        stepListView.setCellFactory(newCell -> new DraggableStepCell(s -> delete(s)));
+        stepListView.setCellFactory(newCell -> new DraggableStepCell(context, s -> execute(s)));
 
         stepListView.setItems(steps);
 
@@ -305,7 +305,7 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
             isModuleNameValidProperty.setValue(modules.containsKey(newValue));
         });
 
-        menuService.createMenus(new ChoicBoxMenuCreator(), menuButton);
+        menuService.createMenus(new ChoiceBoxMenuCreator(this::onAddMenuButtonClicked), menuButton);
 
          projectService.currentProjectProperty().addListener(this::onProjectChanged);
         
@@ -318,6 +318,11 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
         return this;
     }
 
+    
+    public void onAddMenuButtonClicked(ShadowMenu shadowMenu) {
+        addStep(shadowMenu.getModuleInfo());
+    }
+    
     public void onSaveFolderChange(Observable obs, File oldValue, File newValue) {
 
         saveFolderLabel.setText(newValue.getParentFile().getName() + " / " + newValue.getName());
@@ -341,49 +346,12 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     }
 
     @Override
-    public void delete(WorkflowStep t) {
+    public void execute(WorkflowStep t) {
 
         stepListView.getItems().remove(t);
 
     }
 
-    public class DraggableStepCell extends DraggableListCell<WorkflowStep> {
-
-        WorkflowStepController ctrl = new WorkflowStepController();
-
-        DeleteHandler<WorkflowStep> deleteHandler;
-
-        public DraggableStepCell(DeleteHandler<WorkflowStep> deleteHandler) {
-            super();
-
-            // functionnal interface that call the delete function of this object
-            ctrl.setDeleteHandler(deleteHandler);
-            this.deleteHandler = deleteHandler;
-            
-            context.inject(ctrl);
-            
-        }
-
-        @Override
-        public void updateItem(WorkflowStep step, boolean isEmpty) {
-            super.updateItem(step, isEmpty);
-            if (isEmpty) {
-                setGraphic(null);
-            }
-
-            if (step == null) {
-
-                setGraphic(null);
-                return;
-            } else {
-                if (ctrl.getItem() != step) {
-                    ctrl.setItem(step);
-                }
-                setGraphic(ctrl);
-            }
-        }
-
-    }
 
     public void addStep(ModuleInfo moduleInfo) {
 
@@ -432,7 +400,7 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
 
     }
 
-    public void registerAction(ShadowMenu menu) {
+    private void registerAction(ShadowMenu menu) {
         if (menu.isLeaf()) {
             modules.put(menu.getName(), () -> {
                 addStep(menu.getModuleInfo());
@@ -442,51 +410,6 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
         }
     }
 
-    private class ChoicBoxMenuCreator extends AbstractMenuCreator<MenuButton, Menu> {
-
-        @Override
-        protected void addLeafToMenu(ShadowMenu sm, Menu m) {
-            MenuItem item = new MenuItem(sm.getName());
-
-            item.setOnAction(event -> {
-                addStep(sm.getModuleInfo());
-            });
-            m.getItems().add(item);
-        }
-
-        @Override
-        protected void addLeafToTop(ShadowMenu sm, MenuButton t) {
-            t.getItems().add(new Menu(sm.getName()));
-        }
-
-        @Override
-        protected Menu addNonLeafToMenu(ShadowMenu sm, Menu m) {
-            Menu newMenu = new Menu(sm.getName());
-            m.getItems().add(newMenu);
-            return newMenu;
-
-        }
-
-        @Override
-        protected Menu addNonLeafToTop(ShadowMenu sm, MenuButton t) {
-
-            Menu newMenu = new Menu(sm.getName());
-            t.getItems().add(newMenu);
-            return newMenu;
-
-        }
-
-        @Override
-        protected void addSeparatorToMenu(Menu m) {
-            m.getItems().add(new SeparatorMenuItem());
-        }
-
-        @Override
-        protected void addSeparatorToTop(MenuButton t) {
-            t.getItems().add(new SeparatorMenuItem());
-            ImageJFX.getLogger();
-        }
-    }
 
     @FXML
     public void saveWorkflow() {

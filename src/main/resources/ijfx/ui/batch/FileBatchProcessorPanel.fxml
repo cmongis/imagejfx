@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root dividerPositions="0.5024509803921569" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="600.0" type="SplitPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <items>
+      <BorderPane fx:id="leftBorderPane" prefHeight="200.0" prefWidth="200.0">
+         <center>
+            <TableView fx:id="fileTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" styleClass="with-top-padding" BorderPane.alignment="CENTER">
+              <columns>
+                  <TableColumn fx:id="markedColumn" maxWidth="100.0" minWidth="30.0" prefWidth="100.0" text="Process" />
+                <TableColumn fx:id="nameColumn" prefWidth="118.0" text="Name" />
+                <TableColumn fx:id="folderColumn" prefWidth="75.0" text="Folder" />
+                  <TableColumn fx:id="pathColumn" prefWidth="75.0" text="Path" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </center>
+         <top>
+            <GridPane styleClass="grid-pane" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addFiles" text="Add files" GridPane.rowIndex="1" />
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addFolder" text="Add folder" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="filterTextField" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+                  <Label fx:id="fileLabel" text="0 files added" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Label maxWidth="1.7976931348623157E308" styleClass="h3" text="1. Add and select files to process" GridPane.columnSpan="4" />
+               </children>
+            </GridPane>
+         </top>
+         <bottom>
+            <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                <Button fx:id="markButton" mnemonicParsing="false" onAction="#markSelection" text="Mark" />
+                  <Button fx:id="unmarkButton" mnemonicParsing="false" onAction="#unmarkSelection" text="Unmark" />
+                  <Button mnemonicParsing="false" onAction="#deleteAll" styleClass="danger" text="Delete all" />
+                  <Label fx:id="markedLabel" text="0 files marked for processing">
+                     <padding>
+                        <Insets left="30.0" />
+                     </padding></Label>
+              </items>
+            </ToolBar>
+         </bottom>
+         <styleClass>
+            <String fx:value="with-spacing" />
+            <String fx:value="with-padding" />
+         </styleClass>
+      </BorderPane>
+      <BorderPane fx:id="rightBorderPane" styleClass="with-padding">
+         <top>
+            <Label maxWidth="1.7976931348623157E308" prefWidth="200.0" styleClass="h3" text="2. Add and configure processing steps" BorderPane.alignment="CENTER" />
+         </top>
+         <bottom>
+            <GridPane styleClass="grid-pane" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label styleClass="h3" text="3. Configure and start processing" GridPane.columnSpan="2" />
+                  <Label text="Select save directory" GridPane.rowIndex="1" />
+                  <Button fx:id="saveDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Button fx:id="startProcessingButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Start batch processing" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+               </children>
+            </GridPane>
+         </bottom>
+      </BorderPane>
+  </items>
+</fx:root>

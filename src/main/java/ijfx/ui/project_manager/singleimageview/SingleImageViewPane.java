@@ -25,6 +25,7 @@ import ijfx.core.metadata.MetaData;
 import ijfx.core.project.PlaneDBModifierService;
 import ijfx.core.project.Project;
 import ijfx.core.project.ProjectManagerService;
+import ijfx.core.project.ProjectToImageJService;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.service.thumb.ThumbService;
 import mongis.utils.FXUtilities;
@@ -119,7 +120,8 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
     @Parameter
     PlaneDBModifierService planeModifierService;
 
-    
+    @Parameter
+            ProjectToImageJService projectToImageJService;
     
     
     
@@ -193,8 +195,8 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
 
         canvas.widthProperty().bind(imageStackPane.widthProperty());
         canvas.heightProperty().bind(imageStackPane.heightProperty());
-        canvas.maxWidth(Double.MAX_VALUE);
-        canvas.maxHeight(Double.MAX_VALUE);
+        //canvas.maxWidth(Double.MAX_VALUE);
+        //canvas.maxHeight(Double.MAX_VALUE);
         imageStackPane.getChildren().add(canvas);
         centerBorderPane.widthProperty().addListener((obs, o, n) -> {
 
@@ -293,6 +295,11 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
         viewModel.previousImage();
     }
 
+     @FXML
+    public void openSinglePlane() {
+        projectToImageJService.convert(projectService.getCurrentProject(), viewModel.nodeProperty().getValue());
+    }
+    
     public void addMetaData() {
         planeModifierService.addMetaData(projectService.getCurrentProject(), currentPlane, new GenericMetaData(addKeyTextField.getText(), addValueTextField.getText()));
         addValueTextField.setText("");
@@ -312,5 +319,8 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
         suggestionsListView.getItems().addAll(tags);
         
     }
+    
+    
+   
 
 }

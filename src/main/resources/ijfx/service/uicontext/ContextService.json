@@ -12,5 +12,9 @@
         "name":"project-batch-processing"
         ,"incompatibleWith":["webapp","imagej","project-manager"]
     }
+    ,{
+        "name":"file-batch-processing"
+        ,"incompatibleWith":["webapp","imagej","project-manager","project-batch-processing"]
+    }
 
 ]

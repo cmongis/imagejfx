@@ -71,7 +71,7 @@ public class AddTagPanel extends GridPane {
         this.context = context;
         context.inject(this);
         try {
-            FXUtilities.injectFXML(this, "/ijfx/ui/browser/search/SearchByTagPanel.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/project_manager/search/SearchByTagPanel.fxml");
             
             
             titleLabel.setText("Add tag(s)");

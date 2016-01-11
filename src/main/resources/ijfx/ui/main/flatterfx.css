@@ -8,6 +8,8 @@
 
     -bg-normal:-dark;
     -bg-dark:derive(-dark,-10%);
+    
+    -bg-darker:derive(-dark,-20%);
     -bg-light:derive(-dark,20%);
     
     -txt-normal:derive(-dark,110%);
@@ -607,13 +609,36 @@
     -fx-background-color:-bg-dark;
 }
 
-.dark-background {
-    -fx-background:-dark;
+/*
+    Helper classes
+*/
+
+
+.dark-background, .with-dark-background {
+    -fx-background:-bg-dark;
     -fx-background-color: -dark;
+}
+.with-light-background {
+    -fx-background-color:-bg-light;
 }
 .with-spacing {
     -fx-margin: 10px;
 }
+
+.with-spacing {
+    
+    -fx-gap:10px;
+    -fx-hgap:10px;
+    -fx-vgap:10px;
+    
+}
+.with-padding {
+    -fx-padding: 20px 20px 20px 20px;
+}
+.with-top-padding {
+    -fx-padding: 20px 0px 0px 0px;
+}
+
 
 #leftVBox {
     -fx-padding:10px;
@@ -653,7 +678,7 @@
 
 /*
 *
-* Tab 
+* Tab & Tables
 *
 */
 
@@ -664,6 +689,75 @@
 @font-face {
     font-familly: 'fontAwesome';
     /*src: url('ijfx/ui/res/fontawesome-webfont.ttf');*/
+}
+
+.table-view {
+    -fx-background-color:transparent;
+}
+
+.table-view > .column-header-background {
+    /* StackPane */
+    -fx-background-color:-bg-light;
+}
+
+.table-view > .column-header-background > .filler {
+    /* Region - area of header not taken by column headers */
+    -fx-background-color:transparent;
+}
+
+.table-view > .column-header-background > .column-drag-header {
+    /* StackPane */
+    -fx-background-color:transparent;
+  
+}
+
+.table-view > .column-header-background > .column-drag-header > .label {
+    /* Label */
+    -fx-background-color:transparent;
+    
+}
+
+.table-view > .column-header-background > .column-drag-header > .label > .text {
+    /* Text */
+  -fx-background-color:transparent;
+}
+
+.table-view > .column-header-background > .nested-column-header {
+    /* Region */
+    -fx-background-color:-bg-light;
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header.table-column {
+    /* Region */
+    -fx-background-color:-bg-dark;
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header.table-column > .label {
+    /* Label */
+    -fx-background-color:-bg-dark;
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header.table-column > .label > .text {
+    /* Text */
+    
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header.table-column > Grid {
+    /* Grid */
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header.table-column > Grid > .arrow {
+    /* Region */
+}
+
+.table-view > .column-header-background > .nested-column-header > Rectangle {
+    /* Rectangle - separates column headers. Resize icon on :hover */
+}
+
+.table-view  .check-box > .box {
+    -fx-background-color: -flatter-blue, derive(-fx-text-base-color, 80.0%);
+    -fx-background-insets: 0.0, 0.15em;
+    
 }
 
 /*
@@ -1229,7 +1323,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .grid-pane {
     -fx-hgap:10px;
     -fx-vgap:20px;
-    -fx-padding: 20px 20px 20px 20px;
+    -fx-padding: 0;
 }
 .add-icon {
     -glyph-name: "PLUS";
@@ -1431,4 +1525,17 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-padding: 0px 0px 0px 20px;
     -fx-background-color:red;
     -fx-padding: 0px 0px 0px 20px;
+}
+
+
+
+/* 
+        Help label
+
+*/
+
+.help-label {
+    -fx-background-color:-bg-darker;
+    -fx-text-size: 1.2em;
+    
 }

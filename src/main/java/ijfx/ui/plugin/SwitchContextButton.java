@@ -26,9 +26,11 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.main.Localization;
+import ijfx.ui.main.ToggleSideMenuEvent;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -63,7 +65,7 @@ public class SwitchContextButton extends Button implements UiPlugin{
         return this;
     }
     public void onAction(ActionEvent event) {
-        eventService.publish(new DebugEvent("sideMenu"));
+        eventService.publish(new ToggleSideMenuEvent());
     }
 
     @Override

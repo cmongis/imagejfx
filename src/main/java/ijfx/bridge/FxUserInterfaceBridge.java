@@ -174,7 +174,7 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     @Override
     public void show(final Display<?> dspl) {
         logger.info("Showing display");
-
+        
         if (dspl instanceof ImageDisplay) {
 
             displayService.setActiveDisplay(dspl);
