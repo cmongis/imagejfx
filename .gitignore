@@ -2,4 +2,5 @@ log-*.txt
 log-*.txt.lck
 *.log
 *.gz
+package.sh
 target/*
