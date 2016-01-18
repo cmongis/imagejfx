@@ -26,11 +26,13 @@
     -flatter-red: rgb(237.0, 68.0, 37.0);
     -flatter-blue: #5F90B0; 
     -flatter-green:rgb(48,138,80);
+    -flatter-orange:#F0AD4E;
     -flatter-margin:16px;
 
     -flatter-danger:-flatter-red;
 
     -flatter-primary:-flatter-blue;
+    -flatter-warning:-flatter-orange;
     
     -flatter-primary-bg:derive(-flatter-green,40%);
     -flatter-danger-bg:derive(-flatter-red,40%);
@@ -174,6 +176,7 @@
 
 .toggle-button.danger:armed,
 .toggle-button.danger:selected,
+
 .button.danger:armed,
 .button.danger:default:armed {
     -fx-background-color: derive(-flatter-danger, -20.0%);
@@ -190,6 +193,16 @@
 }
 .button.success:hover {
     -fx-background-color: derive(-flatter-success,10%);   
+}
+
+.button.warning {
+     -fx-background-color:-flatter-warning;
+}
+.button.warning:default:focused {
+     -fx-background-color: derive(-flatter-warning, 30.0%);
+}
+.button.warning:hover {
+    -fx-background-color: derive(-flatter-warning,10%);   
 }
 
 
@@ -1536,6 +1549,6 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 .help-label {
     -fx-background-color:-bg-darker;
-    -fx-text-size: 1.2em;
+    -fx-font-size: 1.2em;
     
 }

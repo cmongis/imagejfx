@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
@@ -72,14 +73,31 @@
          <top>
             <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                <children>
-                  <Label maxWidth="1.7976931348623157E308" styleClass="menu-title" text="Menu" />
+                  <BorderPane styleClass="menu-title">
+                     <center>
+                        <Label maxWidth="1.7976931348623157E308" text="Menu" BorderPane.alignment="CENTER" />
+                     </center>
+                     <right>
+                        <Button mnemonicParsing="false" onAction="#hideSideMenu" styleClass="icon" BorderPane.alignment="CENTER">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="CLOSE" />
+                           </graphic>
+                        </Button>
+                     </right>
+                  </BorderPane>
                   <VBox fx:id="sideMenuMainTopVBox" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="30.0" />
                   <VBox fx:id="sideMenuTopVBox" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="0.0" />
                </children>
             </VBox>
          </top>
          <bottom>
-            <VBox fx:id="sideMenuBottomVBox" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <VBox fx:id="sideMenuBottomVBox" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" />
+                  <ProgressBar fx:id="memoryProgressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
+                  <Label fx:id="memoryLabel" maxWidth="1.7976931348623157E308" text="Label" />
+               </children>
+            </VBox>
          </bottom>
       </BorderPane>
    </children>

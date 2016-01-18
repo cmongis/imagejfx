@@ -1,0 +1,14 @@
+
+[
+    {
+        "target": "#debug-button"
+        ,"text": "Use the Debug Button to reload the web apps."
+    }
+    
+    ,
+    {
+        "target":"#lutPanel"
+        ,"text":"This panel helps you to modify the LUT and and Color Settings"
+    }
+]
+

@@ -1,0 +1,6 @@
+[
+    {
+        "target":"#switch-context-button"
+        ,"text":"Use this button to switch between the different ImageJ Context or to access the settings."
+    }
+]

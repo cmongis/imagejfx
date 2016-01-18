@@ -1,0 +1,18 @@
+[
+    {
+        "target":"#lutPanel"
+        ,"text":"This panel helps you changing the color settings of your image."
+    }
+    ,{
+        "target":"#minMaxButton"
+        ,"text":"Adjust the minimum and maximum values of the LUT here."
+    }
+    ,{
+        "target":"#autoRangeButton"
+        ,"text":"Click here if you want to adjust automatically the min/max value."
+    }
+    ,{
+        "target":"#lut-panel-lut-combox"
+        ,"text":"Change the LUT by using this Combobox."
+    }
+]

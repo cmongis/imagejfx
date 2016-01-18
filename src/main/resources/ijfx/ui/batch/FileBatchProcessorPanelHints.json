@@ -1,0 +1,34 @@
+[
+    {
+        "target":"#leftBorderPane"
+        ,"text":"Add files or folder to the list and mark them for procesing."
+    }
+    ,
+    {
+        "target":"#addFilesButton"
+        ,"text":"Click here to add individual files."
+    }
+    ,{
+        "target":"#addFolderButton"
+        ,"text":"Add a folder and all the images contained in the folder and it sub folder will be added."
+    }
+    ,{
+        "target":"#filterTextField"
+        ,"text":"Filter images by text search."
+        
+    }
+    ,{
+        "target":"#markButton"
+        ,"text":"Mark all the displayed images or filtered images for processing."
+    }
+    ,{
+        "target":"#rightBorderPane"
+        ,"text":"Create your mini-workflow by adding ImageJ operations."
+    }
+    ,{
+        "target":"#configurationGridPane"
+        ,"text":"Select a folder and start the batch processing"
+    }
+    
+    
+]

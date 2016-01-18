@@ -37,8 +37,8 @@
                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addFiles" text="Add files" GridPane.rowIndex="1" />
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addFolder" text="Add folder" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Button fx:id="addFilesButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addFiles" text="Add files" GridPane.rowIndex="1" />
+                  <Button fx:id="addFolderButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addFolder" text="Add folder" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <TextField fx:id="filterTextField" GridPane.columnSpan="4" GridPane.rowIndex="2" />
                   <Label fx:id="fileLabel" text="0 files added" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                   <Label maxWidth="1.7976931348623157E308" styleClass="h3" text="1. Add and select files to process" GridPane.columnSpan="4" />
@@ -68,7 +68,7 @@
             <Label maxWidth="1.7976931348623157E308" prefWidth="200.0" styleClass="h3" text="2. Add and configure processing steps" BorderPane.alignment="CENTER" />
          </top>
          <bottom>
-            <GridPane styleClass="grid-pane" BorderPane.alignment="CENTER">
+            <GridPane fx:id="configurationGridPane" styleClass="grid-pane" BorderPane.alignment="CENTER">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -77,12 +77,15 @@
                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label styleClass="h3" text="3. Configure and start processing" GridPane.columnSpan="2" />
-                  <Label text="Select save directory" GridPane.rowIndex="1" />
-                  <Button fx:id="saveDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Button fx:id="saveDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                   <Button fx:id="startProcessingButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Start batch processing" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                  <Label fx:id="progressLabel" maxWidth="1.7976931348623157E308" text="Waiting for batch to start." GridPane.columnSpan="2" GridPane.rowIndex="4" />
                </children>
             </GridPane>
          </bottom>
