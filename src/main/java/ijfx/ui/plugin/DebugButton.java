@@ -28,6 +28,7 @@ import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.notification.NotificationService;
 import ijfx.service.ui.AppService;
+import ijfx.service.ui.HintService;
 import java.io.File;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -63,6 +64,9 @@ public class DebugButton extends MenuButton implements UiPlugin{
     @Parameter
     AppService appService;
     
+    @Parameter
+    HintService hintService;
+    
     public DebugButton() {
         super("D",GlyphsDude.createIcon(FontAwesomeIcon.BUG));
         
@@ -71,6 +75,7 @@ public class DebugButton extends MenuButton implements UiPlugin{
         addItem("Reload App Browser",event->appService.reloadCurrentView());
         addItem("Reload Batch Processing Screen",event->widgetService.reload(BatchProcessorConfigurator.class));
         addItem("Reload an other",this::reloadAnOther);
+        addItem("Test hints",this::testHints);
         addItem("Show/Hide sideMenu",this::triggerDebugEvent);
         
     }
@@ -125,6 +130,10 @@ public class DebugButton extends MenuButton implements UiPlugin{
         widgetService.reload(FileBatchProcessorPanel.class);
         //notificationService.publish(new DefaultNotification("It works !","perfectly !").addAction("Tell him",()->System.out.println("Yeah")));
         
+    }
+    
+    public void testHints(ActionEvent event) {
+        hintService.displayHints(FileBatchProcessorPanel.class, true);
     }
     
 }

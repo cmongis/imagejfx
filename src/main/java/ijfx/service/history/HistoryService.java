@@ -71,6 +71,8 @@ public class HistoryService extends AbstractService implements ImageJService{
     @Parameter
     Context context;
 
+    boolean enabled;
+    
     public HistoryService() {
         super();
 
@@ -185,4 +187,14 @@ public class HistoryService extends AbstractService implements ImageJService{
     public void repeatAll() {
         new Thread(() -> workflowService.executeWorkflow(currentWorkflow)).start();
     }
+    
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+    
+    
+    public boolean isEnabled() {
+        return enabled;
+    }
+    
 }

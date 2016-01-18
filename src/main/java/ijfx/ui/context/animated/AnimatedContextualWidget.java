@@ -30,7 +30,7 @@ import javafx.scene.Node;
  *
  * @author Cyril MONGIS, 2015
  */
-public class AnimatedContextualWidget implements ContextualWidget {
+public class AnimatedContextualWidget implements ContextualWidget<Node> {
 
     String name;
     Node component;
@@ -179,6 +179,11 @@ public class AnimatedContextualWidget implements ContextualWidget {
      */
     public void setOrder(double order) {
         this.order = order;
+    }
+
+    @Override
+    public Node getObject() {
+        return component;
     }
 
 }

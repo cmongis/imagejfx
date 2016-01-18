@@ -22,7 +22,6 @@ package ijfx.service.batch;
 
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.Workflow;
-import ijfx.service.workflow.WorkflowService;
 import ijfx.service.workflow.WorkflowStep;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +29,13 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleItem;
@@ -44,7 +44,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
-
 
 /**
  *
@@ -64,6 +63,11 @@ public class BatchService extends AbstractService implements ImageJService {
     @Parameter
     private DisplayService displayService;
 
+   
+
+    boolean running = false;
+    
+    
     // applies a single modules to multiple inputs and save them
     public Task<Boolean> applyModule(List<BatchSingleInput> inputs, final Module module, HashMap<String, Object> parameters) {
 
@@ -103,51 +107,85 @@ public class BatchService extends AbstractService implements ImageJService {
             protected Boolean call() throws Exception {
                 int totalOps = inputs.size() * workflow.getStepList().size();
                 int count = 0;
+                
+               
+                
                 updateMessage("Starting batch processing...");
-                for (BatchSingleInput input : inputs) {
+
+                boolean success = true;
+                BooleanProperty successProperty = new SimpleBooleanProperty();
+                Exception error = null;
+                setRunning(true);
+
+               for (BatchSingleInput input : inputs) {
+               //inputs.parallelStream().forEach(input->{
                     logger.info("Running...");
+
+                    if (isCancelled()) {
+                        updateMessage("Batch Processing cancelled");
+                        success = false;
+                        //return;
+                        break;
+
+                    }
+
                     synchronized (lock) {
                         logger.info("Loading input...");
                         try {
                             getContext().inject(input);
                             input.load();
-                        }
-                        catch(Exception e) {
-                            logger.log(Level.SEVERE,"Couldn't load input",e);
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Couldn't load input", e);
+                            error = e;
+                            continue;
+
                         }
                         logger.info("Input loaded");
                     }
-                    
-                    
+
                     for (WorkflowStep step : workflow.getStepList()) {
-                        logger.info("Executing step : "+step.getId());
+                        logger.info("Executing step : " + step.getId());
                         updateMessage(String.format("Processing %s with %s", input.getName(), step.getModule().getInfo().getTitle()));
 
-                       
-                       
                         updateProgress(count++, totalOps);
-                       
+
                         final Module module = moduleService.createModule(step.getModule().getInfo());
-                        logger.info("Module created : "+module.getDelegateObject().getClass().getSimpleName());
+                        logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
                         if (!executeModule(input, module, step.getParameters())) {
-                            
+
                             updateMessage("Error :-(");
-                            updateProgress(0,1);
-                            
-                            return false;
+                            updateProgress(0, 1);
+                            success = false;
+                            break;
                         };
 
+                    }
+
+                    if (success == false) {
+                        break;
                     }
 
                     synchronized (lock) {
                         input.save();
                     }
+                    input.dispose();
                 }
-                updateMessage("Batch processing completed.");
-                updateProgress(1, 1);
-                
 
-                return true;
+                if (success) {
+
+                    updateMessage("Batch processing completed.");
+                    updateProgress(1, 1);
+
+                } else if (isCancelled()) {
+                    updateMessage("Batch processing cancelled");
+                } else {
+
+                    updateMessage("An error happend during the process.");
+                    updateProgress(1, 1);
+                }
+                
+                setRunning(false);
+                return success;
             }
         };
 
@@ -157,33 +195,36 @@ public class BatchService extends AbstractService implements ImageJService {
     // execute a module (with all the side parameters injected)
     public boolean executeModule(BatchSingleInput input, Module module, Map<String, Object> parameters) {
 
-        logger.info("Executing module "+module.getDelegateObject().getClass().getSimpleName());
+        logger.info("Executing module " + module.getDelegateObject().getClass().getSimpleName());
         logger.info("Injecting input");
         boolean inputInjectionSuccess = injectInput(input, module);
-        
-        if(!inputInjectionSuccess) {
+
+        if (!inputInjectionSuccess) {
             logger.warning("Error when injecting input.");
             return false;
         }
-        
+
         logger.info("Injecting parameters");
         parameters.forEach((key, value) -> {
-            if(value == null) return;
-            logger.info(String.format("Parameter : %s = %s",key,value.toString()));
+            if (value == null) {
+                return;
+            }
+            logger.info(String.format("Parameter : %s = %s", key, value.toString()));
             module.setInput(key, value);
             module.setResolved(key, true);
         });
-        
-        module.getInputs().forEach((key,value)->{
-            module.setResolved(key,true);
+
+        module.getInputs().forEach((key, value) -> {
+            module.setResolved(key, true);
         });
-        
+
         String moduleName = module.getInfo().getDelegateClassName();
         logger.info(String.format("[%s] starting module", moduleName));
-        
+
         logger.info("Running module");
-        
-        Future<Module> run = moduleService.run(module, false);
+
+        Future<Module> run = moduleService.run(module, true);
+
         logger.info(String.format("[%s] module started", moduleName));
 
         try {
@@ -204,25 +245,22 @@ public class BatchService extends AbstractService implements ImageJService {
     private boolean injectInput(BatchSingleInput input, Module module) {
 
         ModuleItem item;
-        logger.info("Injecting inputs into module : "+module.getDelegateObject().getClass().getSimpleName());
-         item = moduleService.getSingleInput(module, Dataset.class);
-         
-         
-         
+        logger.info("Injecting inputs into module : " + module.getDelegateObject().getClass().getSimpleName());
+        item = moduleService.getSingleInput(module, Dataset.class);
+
         if (item != null) {
             logger.info("Dataset input found !");
             Dataset dataset = input.getDataset();
-            
-            if(dataset == null) {
-                logger.info("The Dataset for was null for "+input.getName());
-            }
-            else {
-            module.setInput(item.getName(), dataset);
-            logger.info("Injection done for "+item.getName() + " with "+dataset.toString());
-            return true;
+
+            if (dataset == null) {
+                logger.info("The Dataset for was null for " + input.getName());
+            } else {
+                module.setInput(item.getName(), dataset);
+                logger.info("Injection done for " + item.getName() + " with " + dataset.toString());
+                return true;
             }
         }
-        
+
         // testing if it takes a Display as input
         item = moduleService.getSingleInput(module, ImageDisplay.class);
         if (item != null) {
@@ -230,13 +268,11 @@ public class BatchService extends AbstractService implements ImageJService {
             // if yes, injecting the display
             module.setInput(item.getName(), input.getDisplay());
             return true;
-        }
-        else {
+        } else {
             logger.info("Error when injecting input !");
             return false;
         }
 
- 
     }
 
     // extract the input from an executed module
@@ -259,5 +295,16 @@ public class BatchService extends AbstractService implements ImageJService {
 
         return false;
     }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+    
+    
+    
 
 }

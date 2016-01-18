@@ -132,6 +132,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     Label minLabel = new Label();
     Label maxLabel = new Label();
 
+    public static final String LUT_COMBOBOX_CSS_ID = "lut-panel-lut-combobox";
+    
+    
     protected DoubleProperty minValue = new SimpleDoubleProperty(0);
     protected DoubleProperty maxValue = new SimpleDoubleProperty(255);
 
@@ -196,6 +199,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             PopoverToggleButton.bind(minMaxButton, vboxp, PopOver.ArrowLocation.RIGHT_TOP);
             
             
+            
+            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -209,6 +214,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         lutComboBox.setOnAction(event -> {
             applyLUT(lutComboBox.getSelectionModel().getSelectedItem().getColorTable());
         });*/
+        
+        lutComboBox.setId("lutPanel");
         
         lutComboBox.getSelectionModel().selectedItemProperty().addListener(this::onComboBoxChanged);
        

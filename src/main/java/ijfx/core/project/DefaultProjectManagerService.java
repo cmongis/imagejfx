@@ -20,7 +20,6 @@
  */
 package ijfx.core.project;
 
-
 import ijfx.core.project.event.PossibleMetaDataKeysChangeEvent;
 import ijfx.core.project.event.PossibleTagListChangeEvent;
 import ijfx.ui.main.ImageJFX;
@@ -53,33 +52,29 @@ import org.scijava.service.Service;
 public class DefaultProjectManagerService extends AbstractService implements ProjectManagerService {
 
     private final ReadOnlyListWrapper<Project> projects = new ReadOnlyListWrapper<>(this, "projects", FXCollections.observableArrayList());
-    private final ReadOnlyObjectWrapper<Project> currentProject = new ReadOnlyObjectWrapper<>(this, "currentProject",null);
+    private final ReadOnlyObjectWrapper<Project> currentProject = new ReadOnlyObjectWrapper<>(this, "currentProject", null);
 
-    
     Logger logger = ImageJFX.getLogger();
-    
+
     @Parameter
     EventService eventService;
-    
-    
+
     @Parameter
     ProjectContextCalculatorService projectContextService;
-    
-    
-    
+
     public static String readFile(File file) throws IOException {
         byte[] encoded = Files.readAllBytes(file.toPath());
         return new String(encoded, StandardCharsets.UTF_8);
     }
 
     public DefaultProjectManagerService() {
-        projects.addListener(this::changeCurrentProject);
+        //projects.addListener(this::changeCurrentProject);
         currentProject.addListener(this::onCurrentProjectChange);
     }
 
     @Override
     public boolean hasProject() {
-        return (currentProject != null);
+        return (currentProject.getValue() != null);
     }
 
     @Override
@@ -94,6 +89,12 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
     @Override
     public void removeProject(Project project) {
         projects.remove(project);
+        if(projects.size() == 0) {
+            setCurrentProject(null);
+        }
+        
+        
+        
     }
 
     /**
@@ -103,28 +104,31 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
      */
     @Override
     public void setCurrentProject(Project project) {
-        
 
-            currentProject.setValue(project);
-        
+        currentProject.setValue(project);
+
     }
-    
+
     private void onCurrentProjectChange(Observable obs, Project oldValue, Project project) {
-        
+
         // if it's a new project
-        if(oldValue != project) {
-        
-          logger.info("Setting new project "+project.toString());
-            
+        if (oldValue != project) {
+
+            if (project != null) {
+                logger.info("Setting new project " + project.toString());
+            } else {
+                logger.info("There is no project open anymore");
+            }
             if (!projects.contains(project)) {
                 projects.add(project); // currentProject will be automatically updated
             }
-        
-         projectContextService.updateContext(project);
-            notifyPossibleTagChange(project);
-            notifyMetaDataKeyChange(project);
-        }
             
+                projectContextService.updateContext(project);
+                notifyPossibleTagChange(project);
+                notifyMetaDataKeyChange(project);
+            
+        }
+
     }
 
     private void changeCurrentProject(ListChangeListener.Change<? extends Project> c) {
@@ -164,7 +168,7 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
         logger.info("Notifying new tag possibilities");
         eventService.publish(new PossibleTagListChangeEvent(getAllPossibleTag(project)));
     }
-    
+
     private void notifyMetaDataKeyChange(Project project) {
         logger.info("Notifying new metadata possibilities");
         eventService.publish(new PossibleMetaDataKeysChangeEvent(getAllPossibleMetadataKeys(project)));
@@ -172,23 +176,27 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
 
     @Override
     public Set<String> getAllPossibleTag(Project project) {
-        
-         Set<String> tags = new HashSet<>();
-         project.getImages().stream().parallel().forEach(image->{
-            image.getTags().forEach(tag->{
-                if(!tags.contains(tag)) tags.add(tag);
+
+        Set<String> tags = new HashSet<>();
+        project.getImages().stream().parallel().forEach(image -> {
+            image.getTags().forEach(tag -> {
+                if (!tags.contains(tag)) {
+                    tags.add(tag);
+                }
             });
         });
         return tags;
     }
-    
+
     @Override
     public Set<String> getAllPossibleMetadataKeys(Project project) {
-        
-         Set<String> keys = new HashSet<>();
-         project.getImages().stream().parallel().forEach(image->{
-            image.getMetaDataSet().keySet().forEach(key->{
-                if(!keys.contains(key)) keys.add(key);
+
+        Set<String> keys = new HashSet<>();
+        project.getImages().stream().parallel().forEach(image -> {
+            image.getMetaDataSet().keySet().forEach(key -> {
+                if (!keys.contains(key)) {
+                    keys.add(key);
+                }
             });
         });
         return keys;
@@ -196,15 +204,12 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
 
     @Override
     public void notifyProjectChange(Project project) {
-        
-        if(project == getCurrentProject()) {
+
+        if (project == getCurrentProject()) {
             notifyMetaDataKeyChange(project);
             notifyPossibleTagChange(project);
         }
-        
+
     }
-    
-    
-    
-    
+
 }

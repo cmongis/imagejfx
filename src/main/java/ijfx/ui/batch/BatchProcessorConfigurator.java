@@ -341,6 +341,7 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     }
     
     public void onProjectChanged(Observable observable, Project oldProject, Project newProject) {
+        if(newProject == null) return;
         selectedImageCountProperty.unbind();
         selectedImageCountProperty.bind(newProject.getSelection());
     }

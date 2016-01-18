@@ -53,6 +53,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableCell;
@@ -129,6 +130,12 @@ public class FileBatchProcessorPanel extends SplitPane implements UiPlugin {
     @FXML
     private Label markedLabel;
 
+    @FXML
+    private Label progressLabel;
+    
+    @FXML
+    private ProgressBar progressBar;
+    
     private ObjectProperty<File> saveFolderProperty;
 
     private WorkflowPanel workflowPanel;
@@ -386,8 +393,12 @@ public class FileBatchProcessorPanel extends SplitPane implements UiPlugin {
     }
 
     public Task getBatchProcessingTask(TaskButtonBinding binding) {
-
-        return batchService.applyWorkflow(prepareInputs(), new DefaultWorkflow(workflowPanel.stepListProperty()));
+        Task task = batchService.applyWorkflow(prepareInputs(), new DefaultWorkflow(workflowPanel.stepListProperty()));
+        
+        progressBar.progressProperty().bind(task.progressProperty());
+        progressLabel.textProperty().bind(task.messageProperty());
+        
+        return task;
 
         // return new FakeTask(5000);
     }

@@ -33,4 +33,7 @@ package ijfx.ui;
 public class IjfxCss {
     public static final String ICON_BUTTON = "icon";
     public static final String ICON_WITH_SPACING = "with-spacing";
+    public static final String PRIMARY = "primary";
+    public static final String WARNING = "warning";
+    public static final String DANGER = "danger";
 }

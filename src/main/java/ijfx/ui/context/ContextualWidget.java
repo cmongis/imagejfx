@@ -24,7 +24,7 @@ package ijfx.ui.context;
  *
  * @author Cyril MONGIS, 2015
  */
-public interface ContextualWidget {
+public interface ContextualWidget<T> {
 
     /**
      *
@@ -104,5 +104,7 @@ public interface ContextualWidget {
      *
      */
     public void hide();
+    
+    public T getObject();
 
 }

@@ -20,7 +20,8 @@
  */
 package ijfx.ui.context.animated;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -29,13 +30,30 @@ import javafx.event.EventHandler;
  *
  */
 public class TransitionQueue {
-    ArrayList<Transition> queue = new ArrayList<>();
+    //ArrayList<Transition> queue = new ArrayList<>();
+
+    Queue<Transition> queue = new LinkedList<>();
+
     /**
      *
      * @param transition
      */
     public void queue(Transition transition) {
-        
+
+        final EventHandler handler = transition.getOnFinished();
+        transition.setOnFinished(event -> {
+            if (handler != null) {
+                handler.handle(event);
+
+            }
+            playNext();
+
+        });
+
+        queue.add(transition);
+        playNext();
+
+        /*
         final EventHandler handler = transition.getOnFinished();
         transition.setOnFinished(event->{
             if(handler !=null)
@@ -45,41 +63,41 @@ public class TransitionQueue {
         });
         
         queue.add(transition);
-        if(queue.size() == 1) playNext();
+        if(queue.size() == 1) playNext();*/
     }
 
     public void pop() {
         queue.remove(0);
     }
-    
-    
+
     /**
      *
      */
     private void playNext() {
         if (queue.size() > 0) {
-            final Transition toPlay = queue.get(0);
-                Platform.runLater(()-> {toPlay.play();});
-           pop();
+            final Transition toPlay = queue.poll();
+            Platform.runLater(() -> {
+                toPlay.play();
+            });
+            //pop();
         }
-        
-         
+
     }
-    
+
     public void emptyQueue() {
         queue.clear();
     }
-    
+
     public void remove(Transition tr) {
         queue.remove(tr);
     }
-    
+
     public boolean contains(Transition tr) {
         return queue.contains(tr);
     }
-    
-   public int size() {
-       return queue.size();
-   }
-    
+
+    public int size() {
+        return queue.size();
+    }
+
 }

@@ -41,6 +41,8 @@ public interface BatchSingleInput {
 
     public void save();
     
+    public void dispose();
+    
     public String getName();
     
 }

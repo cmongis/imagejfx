@@ -143,4 +143,10 @@ public class ImagePlaneBatchInput implements BatchSingleInput {
         
     }
     
+    public void dispose() {
+        dataset = null;
+        display.close();
+        display = null;
+    }
+    
 }

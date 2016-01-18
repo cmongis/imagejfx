@@ -26,7 +26,7 @@ import javafx.scene.Node;
  *
  * @author Cyril MONGIS, 2015
  */
-public class NodeContextualWidget implements ContextualWidget {
+public class NodeContextualWidget implements ContextualWidget<Node>{
 
     /**
      *
@@ -146,6 +146,11 @@ public class NodeContextualWidget implements ContextualWidget {
      */
     public void setOrder(double order) {
         this.order = order;
+    }
+
+    @Override
+    public Node getObject() {
+        return node;
     }
 
 }

@@ -125,6 +125,11 @@ public class BrowserUIService extends AbstractService implements ImageJService {
         List<File> files = fileChooser.showOpenMultipleDialog(null);
         if (files != null) {
             try {
+                
+                if(projectManager.getCurrentProject() == null) {
+                    newProject();
+                }
+                
                 Task task = imageLoader.loadImageFromFile(files, projectManager.currentProjectProperty().get());
                 runLoadingImageTask(task);
             } catch (IOException ex) {

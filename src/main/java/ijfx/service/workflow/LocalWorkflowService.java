@@ -62,6 +62,7 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
     @Parameter
     LoadingScreenService loadingScreenService;
     
+   
     
     @Override
     public void initialize() {

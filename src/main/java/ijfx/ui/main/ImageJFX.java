@@ -22,12 +22,10 @@ package ijfx.ui.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -81,7 +79,7 @@ public class ImageJFX extends Application {
 
     public static final String VBOX_CLASS = "vbox";
 
-    public static final String IJFX_FOLDER_NAME = ".ijfx";
+    public static final String IJFX_FOLDER_NAME = ".imagejfx";
     public static final String FILE_FAVORITES = "favorites.json";
 
     public static final String CSS_SMALL_BUTTON = "small";

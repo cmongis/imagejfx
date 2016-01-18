@@ -22,6 +22,8 @@ package ijfx.ui.plugin;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.service.ui.HintService;
+import ijfx.service.ui.hint.HintEvent;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
@@ -30,7 +32,6 @@ import ijfx.ui.main.ToggleSideMenuEvent;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -51,6 +52,9 @@ public class SwitchContextButton extends Button implements UiPlugin{
     @Parameter
     EventService eventService;
     
+    @Parameter
+    HintService hintService;
+    
     public SwitchContextButton() {
     
         super(null,GlyphsDude.createIcon(FontAwesomeIcon.BARS));
@@ -58,6 +62,8 @@ public class SwitchContextButton extends Button implements UiPlugin{
         setOnAction(this::onAction);
         
        getStyleClass().add("icon");
+       
+       addEventHandler(HintEvent.HINT_REQESTED,event->hintService.displayHints(SwitchContextButton.class, false));
         
     
     }
@@ -72,6 +78,8 @@ public class SwitchContextButton extends Button implements UiPlugin{
     public Node getUiElement() {
         return this;
     }
+    
+    
 
    
     

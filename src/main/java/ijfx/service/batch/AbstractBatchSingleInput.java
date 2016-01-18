@@ -51,6 +51,7 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
     public void setDisplay(ImageDisplay display) {
         this.display = display;
         dataset = imageDisplayService.getActiveDataset(display);
+        
     }
 
     @Override
@@ -62,8 +63,25 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
 
     @Override
     public ImageDisplay getDisplay() {
+        displayService.setActiveDisplay(display);
+      
         return display;
     }
+    
+    
+    @Override
+    public void dispose() {
+        dataset = null;
+        displayService.getDisplays().remove(display);
+        imageDisplayService.getImageDisplays().remove(display);
+        display.close();
+        display = null;
+        System.gc();
+     
+        
+    }
+    
+   
             
             
             

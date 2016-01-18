@@ -26,17 +26,18 @@ import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.context.NodeContextualWidget;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
+
 import java.util.logging.Logger;
 import javafx.animation.SequentialTransition;
 import javafx.animation.Transition;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
+import mongis.utils.Handler;
 
 /**
  *
@@ -61,15 +62,19 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
     Lock transitionLock = new ReentrantLock();
 
     UiPluginSorter<Node> pluginSorter;
+
     
+    Handler<ContextualWidget<Node>> onUiPluginDisplayed;
+     
     
     /**
      *
-     * @param sorter Sorter used to sort the nodes after adding or deleting new ones
+     * @param sorter Sorter used to sort the nodes after adding or deleting new
+     * ones
      * @param name
      * @param node
      */
-    public AnimatedPaneContextualView(UiPluginSorter sorter,String name, Pane node) {
+    public AnimatedPaneContextualView(UiPluginSorter sorter, String name, Pane node) {
         setName(name);
         setPane(node);
         pluginSorter = sorter;
@@ -171,7 +176,7 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
             getPane().getChildren().remove(get(id).getNode());
             get(id).setNode(node);
             getPane().getChildren().add(node);
-            
+
         } else {
             put(id, new NodeContextualWidget(id, node));
         }
@@ -238,18 +243,16 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
     @Override
     public ContextualView onContextChanged(List<? extends ContextualWidget> toShow, List<? extends ContextualWidget> toHide) {
 
-      
-
-        if (toShow == null || toShow.size() > 0) {
+        if (toShow != null && toShow.size() > 0) {
             logger.info(msg("Must show %d items : ", toShow.size()));
         }
-        toShow.forEach(widget -> logger.info(" - " + widget.getName()));
+        toShow.forEach(widget -> logger.info("Must show : " + widget.getName()));
 
         // logging the items to hide
-        if (toHide.size() > 0) {
+        if (toHide != null && toHide.size() > 0) {
             logger.info("must hide " + toShow.size() + " items : ");
         }
-        toHide.forEach(widget -> logger.info(" - " + widget.getName()));
+        toHide.forEach(widget -> logger.info("Must hide " + widget.getName()));
 
         // if nothing must be done, nothing happens
         if (toShow.size() + toHide.size() == 0) {
@@ -267,8 +270,20 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
             updateContainer(castedList(toShow), castedList(toHide));
 
         });
-        appearance.onFinishedProperty().addListener((ch, o, n) -> {
-
+       sequence.setOnFinished(event->{
+                toShow.forEach(ctxWidget -> {
+                    
+                    System.out.println("Animation finished");
+                    
+                    Node node = (Node)ctxWidget.getObject();
+                    node.fireEvent(new UiContextEvent(UiContextEvent.NODE_DISPLAYED));
+                   
+                    if(onUiPluginDisplayed != null) {
+                        System.out.println("handling "+ctxWidget);
+                        onUiPluginDisplayed.handle(ctxWidget);
+                    }
+                });
+            
         });
         // start the sequence by adding it to the animation queue
         log("Start disapearce !");
@@ -285,10 +300,10 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
      */
     public void updateContainer(List<NodeContextualWidget> toShow, List<NodeContextualWidget> toHide) {
 
-        Pane pane =  getPane();
+        Pane pane = getPane();
         pane.setVisible(false);
         List<Node> sortedChildren = new ArrayList<>(pane.getChildren());
-        
+
         toHide.forEach(widget -> {
             Node node = widget.getNode();
             logger.info("Removing  " + widget);
@@ -300,16 +315,16 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
 
             widget.show();
             logger.info("Adding  " + widget + " to " + pane.getId());
-            if(pane.getChildren().contains(node) == false)
+            if (pane.getChildren().contains(node) == false) {
                 sortedChildren.add(node);
+            }
         });
-        
-       
+
         //Collection<Node> sortedChilden = pluginSorter.getSortedList(pane.getChildren()); 
         pluginSorter.sort(sortedChildren);
         pane.getChildren().clear();
         pane.getChildren().addAll(sortedChildren);
-         pane.setVisible(true);
+        pane.setVisible(true);
     }
 
     /**
@@ -345,4 +360,19 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
         return newList;
     }
 
+    public AnimatedPaneContextualView setOnUiPluginDisplayed(Handler<ContextualWidget<Node>> onUiPluginDisplayed) {
+        this.onUiPluginDisplayed = onUiPluginDisplayed;
+        return this;
+                
+    }
+
+    
+   
+    
+    
+    
+   
+    
+
+    
 }

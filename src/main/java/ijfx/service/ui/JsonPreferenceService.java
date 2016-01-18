@@ -24,8 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.imagej.ImageJService;
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
@@ -47,7 +50,15 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
     
     
     public <T> void savePreference(T toSaveAsJson, String filename) {
-        
+        try {
+            
+            
+            
+            
+            mapper.writeValue(new File(configDirectory,addExtension(filename)), toSaveAsJson);
+        } catch (IOException ex) {
+             ImageJFX.getLogger().log(Level.SEVERE,"Error when saving the configuration file"+filename,ex);
+        }
     }
     
     public <K extends Object> K loadFromJson(String filename, K defaultPreference) {
@@ -55,7 +66,7 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
         try {
             return mapper.readValue(new File(configDirectory,addExtension(filename)), (Class<K>) defaultPreference.getClass());
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when reading the configuration file"+filename,ex);
         }
         
         return (K) defaultPreference;
@@ -68,6 +79,33 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
         }
         return filename;
     }
+    
+    public <K extends Object> List<K> loadListFromJson(String filename, Class<K> clazz) {
+        
+        try {
+            return mapper.readValue(new File(configDirectory,addExtension(filename)),mapper.getTypeFactory().constructCollectionType(List.class,clazz));
+        }
+        catch(Exception e) {
+             ImageJFX.getLogger().log(Level.SEVERE,"Error when reading the configuration file"+filename,e);
+            return new ArrayList<K>();
+        }
+        
+        
+    }
+    
+    public <K extends Object> Set<K> loadSetFromJson(String filename, Class<K> clazz) {
+        
+         try {
+            return mapper.readValue(new File(configDirectory,addExtension(filename)),mapper.getTypeFactory().constructCollectionType(Set.class,clazz));
+        }
+        catch(Exception e) {
+             ImageJFX.getLogger().log(Level.SEVERE,"Error when reading the configuration file"+filename,e);
+            return new HashSet<K>();
+        }
+        
+    }
+    
+    
     
     
 }

@@ -30,6 +30,10 @@ import ijfx.service.ui.AppService;
 import ijfx.service.uiplugin.DefaultUiPluginService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.log.LogService;
+import ijfx.service.ui.HintService;
+import ijfx.service.ui.hint.DefaultHint;
+import ijfx.service.ui.hint.Hint;
+import ijfx.service.ui.hint.HintRequestEvent;
 import ijfx.service.uiplugin.UiPluginReloadedEvent;
 import java.net.URL;
 import java.util.HashMap;
@@ -59,20 +63,26 @@ import mongis.utils.BindingsUtils;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
+import ijfx.ui.IjfxCss;
 import ijfx.ui.UiContexts;
 import ijfx.ui.UiPluginSorter;
 import ijfx.ui.WebApps;
+import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.plugin.DebugEvent;
+import java.util.LinkedList;
+import java.util.Queue;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.animation.Transition;
 import javafx.event.ActionEvent;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -81,22 +91,22 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import mongis.utils.MemoryUtils;
 
 /**
  * FXML Controller class
  *
  * @author Cyril MONGIS, 2015
  */
-
 public class MainWindowController implements Initializable {
 
     public static int ANIMATION_DURATION = 300;
 
+    private static final int MEMORY_REFRESH_RATE = 1000;
     /**
      * Initializes the controller class.
      */
-    
-   
+
     @FXML
     private HBox topLeftHBox;
 
@@ -122,24 +132,29 @@ public class MainWindowController implements Initializable {
     private HBox bottomCenterHBox;
 
     @FXML
-    AnchorPane  mainAnchorPane;
-    
+    AnchorPane mainAnchorPane;
+
     @FXML
     private StackPane centerStackPane;
 
     @FXML
     private BorderPane sideMenu;
-   
-    
+
     @FXML
     private VBox sideMenuMainTopVBox;
-    
+
     @FXML
     private VBox sideMenuTopVBox;
-    
+
     @FXML
     private VBox sideMenuBottomVBox;
-    
+
+    @FXML
+    private ProgressBar memoryProgressBar;
+
+    @FXML
+    private Label memoryLabel;
+
     protected final LoadingScreen loadingScreen = LoadingScreen.getInstance();
 
     protected ImageJ imageJ;
@@ -161,6 +176,26 @@ public class MainWindowController implements Initializable {
 
     @Parameter
     LogService logErrorService;
+
+    @Parameter
+    HintService hintService;
+
+    Queue<Hint> hintQueue = new LinkedList<>();
+
+    boolean isHintListNew = true;
+
+    private Thread memoryThread = new Thread(() -> {
+
+        while (true) {
+
+            Platform.runLater(() -> updateMemoryUsage());
+            try {
+                Thread.sleep(MEMORY_REFRESH_RATE);
+            } catch (Exception e) {
+            }
+        }
+
+    });
 
     Task<Void> imageJStarter = new Task<Void>() {
 
@@ -196,34 +231,28 @@ public class MainWindowController implements Initializable {
 
         thisController = this;
 
-        
-        
         // binding the sides to the pseudo class empty
         final PseudoClass empty = PseudoClass.getPseudoClass("empty");
-        
-        
+
         BindingsUtils.bindNodeToPseudoClass(empty, leftVBox, new SimpleListProperty<Node>(leftVBox.getChildren()).emptyProperty());
         BindingsUtils.bindNodeToPseudoClass(empty, rightVBox, new SimpleListProperty<Node>(rightVBox.getChildren()).emptyProperty());
-        
+
         /*
         BooleanBinding binding = Bindings.isEmpty(leftVBox.getChildren()).addListener((obs,oldValue,newValue)->{
 
             leftVBox.pseudoClassStateChanged(empty, newValue);
         });*/
-        
         leftVBox.pseudoClassStateChanged(empty, true);
-        
-        Bindings.isEmpty(rightVBox.getChildren()).addListener((obs,oldValue,newValue)->{
+
+        Bindings.isEmpty(rightVBox.getChildren()).addListener((obs, oldValue, newValue) -> {
             rightVBox.pseudoClassStateChanged(empty, newValue);
         });
-        
-        
-        
+
         loadingScreen.setDefaultPane(centerStackPane);
 
         initMenuAction();
-        Platform.runLater(()->hideSideMenu());
-        
+        Platform.runLater(() -> hideSideMenu());
+
         // the first stack loads ImageJ
         final Task task1 = imageJStarter;
 
@@ -276,7 +305,7 @@ public class MainWindowController implements Initializable {
         task3.setOnSucceeded(result -> {
 
             // entering the right context
-            uiContextService.enter(UiContexts.list(UiContexts.WEB_APPLICATION,UiContexts.DEBUG));
+            uiContextService.enter(UiContexts.list(UiContexts.WEB_APPLICATION, UiContexts.DEBUG));
 
             // showing the intro app
             appService.showApp(WebApps.PROJECT_WIZARD);
@@ -287,31 +316,24 @@ public class MainWindowController implements Initializable {
             // sequence over
             logger.info("Start over");
 
-            
-
         });
 
         // starting the first task
         ImageJFX.getThreadPool().submit(task1);
 
-        
-        
         sideMenu.setTranslateZ(0);
-        
-        
-        mainAnchorPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event->{
-        
-                if(event.getButton() == MouseButton.PRIMARY && event.getSceneX() >= sideMenu.getWidth() && sideMenu.getTranslateX() > -1 * sideMenu.getWidth()) {
-                    hideSideMenu();
-                }
-        
+
+        mainAnchorPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+
+            if (event.getButton() == MouseButton.PRIMARY && event.getSceneX() >= sideMenu.getWidth() && sideMenu.getTranslateX() > -1 * sideMenu.getWidth()) {
+                hideSideMenu();
+            }
+
         });
-        
-        
-        
-        
+
+        memoryThread.start();
+
     }
-    
 
     public void startContextManager() {
 
@@ -319,7 +341,7 @@ public class MainWindowController implements Initializable {
         // uiPluginService.getUiPluginList().forEach(widgetPlugin -> {
         for (UiPlugin uiPlugin : uiPluginService.getUiPluginList()) {
             UiConfiguration infos = uiPluginService.getInfos(uiPlugin);
-          
+
             if (infos == null) {
                 logger.warning("No informations for " + uiPlugin.getClass().getName());
                 return;
@@ -327,7 +349,6 @@ public class MainWindowController implements Initializable {
 
             uiContextService.link(infos.id(), infos.context());
         }
- 
 
         logger.info("Widget laoading done.");
 
@@ -392,21 +413,36 @@ public class MainWindowController implements Initializable {
     }
 
     public AnimatedPaneContextualView registerPaneCtrl(Pane node) {
-       
+
         // The UI plugin service implements the interface used to sort nodes inside the contextual containers
         UiPluginSorter sorter = uiPluginService;
-       
-        AnimatedPaneContextualView ctrl = new AnimatedPaneContextualView(sorter,node);
-        //    System.out.println(ctrl.getUiPluginList().size());
+
+        AnimatedPaneContextualView ctrl = new AnimatedPaneContextualView(sorter, node)
+                .setOnUiPluginDisplayed(this::onUiPluginDisplaed);
+
         uiContextService.addContextualView(ctrl);
         uiPluginCtrl.put(node.getId(), ctrl);
         return ctrl;
 
     }
 
-   
+    public void updateMemoryUsage() {
 
-   
+        if (memoryLabel == null) {
+            return;
+        }
+
+        int free = (int) MemoryUtils.getAvailableMemory();
+        int max = (int) MemoryUtils.getTotalMemory();
+        int used = (max - free);
+
+        double progress = 1.0 * (used) / max;
+
+        // System.out.println(progress);
+        memoryProgressBar.setProgress(progress);
+        memoryLabel.setText(String.format("%d / %d MB", used, max));
+
+    }
 
     public void bindWidgetsToControllers() {
 
@@ -424,7 +460,6 @@ public class MainWindowController implements Initializable {
 
         // getting the localization from the Localization Plugin (which gets
         // it from the annotation
-       
         String localization
                 = uiPluginService.getLocalization(uiPlugin);
 
@@ -448,228 +483,296 @@ public class MainWindowController implements Initializable {
 
     @EventHandler
     public void handleEvent(DebugEvent event) {
-        
-        Platform.runLater(()->showHelpSequence(""));
+
+        Platform.runLater(() -> showHelpSequence(new DefaultHint().setTarget("#debug-button").setText("This is a very long text which doesn't really matter !")));
     }
+
     @EventHandler
     public void handleEvent(ToggleSideMenuEvent event) {
-        
-       
-        if(event.is(ToggleSideMenuEvent.SIDE_MENU)) {
 
-            if(sideMenu.getTranslateX() >= 0.0)
+        if (event.is(ToggleSideMenuEvent.SIDE_MENU)) {
+
+            if (sideMenu.getTranslateX() >= 0.0) {
                 hideSideMenu();
-            else
+            } else {
                 showSideMenu();
+            }
         }
-        if(event.is(ToggleSideMenuEvent.RELOAD_SIDE_MENU)) {
-            
-            Platform.runLater(()-> {
-            resetMenuAction();
-            showSideMenu();
-            
+        if (event.is(ToggleSideMenuEvent.RELOAD_SIDE_MENU)) {
+
+            Platform.runLater(() -> {
+                resetMenuAction();
+                showSideMenu();
+
             });
         }
     }
-    
+
     @EventHandler
     public void handleEvent(NotificationEvent event) {
 
         showNotification(event.getNotification());
     }
 
+    @EventHandler
+    public void onHintRequested(HintRequestEvent event) {
+
+        event.getHintList().forEach(hint -> {
+
+            logger.info(String.format("Displayint hint %s", hint.getId()));
+
+            if (hintQueue.parallelStream().filter(hint2 -> hint2.equals(hint)).count() == 0) {
+                if (hintQueue.size() == 0) {
+                    isHintListNew = true;
+                }
+                hintQueue.add(hint);
+            }
+        });
+
+        //hintQueue.addAll(event.getHintList());
+        Platform.runLater(() -> nextHint());
+    }
+
     private void showNotification(Notification notification) {
-        
-        
-        
-        
-        
+
         Platform.runLater(() -> {
             Notifications ns = Notifications
                     .create()
                     .title(notification.getTitle())
                     .text(notification.getText());
-            
-            
-            /*
-            for(NotificationAction action : notification.getActions()) {
-                ns.action(new Action(action.getTitle(), event->ns.create().text("new one").show()));
-            }*/
-           
-            
+
             //ns.hideCloseButton();
             ns.position(Pos.TOP_RIGHT);
             //ns.showConfirm();
-             ns.hideAfter(Duration.hours(24));
+            ns.hideAfter(Duration.hours(24));
             ns.show();
-           
-  
-                    
-                    
 
         });
     }
-    
-    
+
     /**
-     * 
-     *   Side Menu 
-     * 
+     *
+     * Side Menu
+     *
      */
-    
-    
-    
-     // Debugging convenient method
+    // Debugging convenient method
     private void resetMenuAction() {
         sideMenuMainTopVBox.getChildren().clear();
         initMenuAction();
     }
 
-   
     // animating the appearance of the Menu
     public void showSideMenu() {
-       
+
         final Timeline timeline = new Timeline();
-       
+
         KeyValue kv = new KeyValue(sideMenu.translateXProperty(), 0, Interpolator.LINEAR);
-        KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(),kv);
+        KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
-       
+
     }
-    
+
     // animating the disapearance of the menu
+    @FXML
     public void hideSideMenu() {
         final Timeline timeline = new Timeline();
-       
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1*sideMenu.getWidth(), Interpolator.LINEAR);
-        KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(),kv);
+
+        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * sideMenu.getWidth(), Interpolator.LINEAR);
+        KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
     }
-    
-    
-    
-    public void showHelpSequence(String selector) {
-        
-        
-         Node node = mainAnchorPane.getScene().lookup("#rightBorderPane");
-        
+
+    public void onUiPluginDisplaed(ContextualWidget<Node> uiPlugin) {
+
+        hintService.displayHints(uiPlugin.getObject().getClass(), false);
+
+    }
+
+    public void nextHint() {
+        showHelpSequence(hintQueue.poll());
+        isHintListNew = false;
+    }
+
+    public void showHelpSequence(Hint hint) {
+
+        if (hint == null) {
+            return;
+        }
+
+        Node node = mainAnchorPane.getScene().lookup(hint.getTarget());
+        if (node == null) {
+            logger.warning("Couldn't find node " + hint.getTarget());
+            return;
+        }
+
+        double hintWidth = 200;
+        double hintMargin = 20;
+
         Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
-         
-        Rectangle rectangle = new Rectangle(nodeBounds.getMinX(),nodeBounds.getMinY(),nodeBounds.getWidth(),nodeBounds.getHeight());
-        Rectangle bigOne = new Rectangle(0,0,mainAnchorPane.getScene().getWidth(),mainAnchorPane.getScene().getHeight());
-        
-        
-        
-        Shape highligther = Path.subtract(bigOne,rectangle);
+
+        Rectangle rectangle = new Rectangle(nodeBounds.getMinX(), nodeBounds.getMinY(), nodeBounds.getWidth(), nodeBounds.getHeight());
+        Rectangle bigOne = new Rectangle(0, 0, mainAnchorPane.getScene().getWidth(), mainAnchorPane.getScene().getHeight());
+
+        Shape highligther = Path.subtract(bigOne, rectangle);
         highligther.setFill(Paint.valueOf("black"));
         highligther.setOpacity(0.7);
-        
+
         mainAnchorPane.getChildren().add(highligther);
-        Label label = new Label("Select a bunch of file or add a folder. Use the table to mark the file you want to process.");
-        label.setPadding(new Insets(30));
+        Label label = new Label(hint.getText());
+        label.setPadding(new Insets(hintMargin));
         label.getStyleClass().add("help-label");
-        label.setMaxWidth(200);
+        label.setMaxWidth(hintWidth);
         label.setWrapText(true);
-        label.setPrefWidth(200);
-        if(nodeBounds.getMinX() < 200) {
-            label.setTranslateX(nodeBounds.getMinX()+nodeBounds.getWidth()+30);
+        label.setPrefWidth(hintWidth);
+        
+        
+        label.translateXProperty().bind(Bindings.createDoubleBinding(()->{
+        if (nodeBounds.getMinX() < hintWidth + hintMargin) {
+           return nodeBounds.getMaxX() + hintMargin + highligther.getTranslateX();
+
+        } else {
+            return nodeBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
+        }
+        }, highligther.translateXProperty()));
+        
+
+        label.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
+            if (nodeBounds.getMinY() + label.getHeight() > node.getScene().getHeight()) {
+                return nodeBounds.getMaxY() - label.getHeight();
+            } else {
+                return nodeBounds.getMinY();
+            }
+        }, label.heightProperty()));
+
+        //label.setTranslateY(nodeBounds.getMinY());
+        Button gotItButton = new Button("Got it !");
+        
+
+        gotItButton.translateXProperty().bind(label.translateXProperty());
+        
+        gotItButton.setPrefWidth(hintWidth);
+        
+        gotItButton.getStyleClass().add(IjfxCss.WARNING);
+        
+        gotItButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK));
+        
+        // when clicking on the anywhere on the screen
+        highligther.setOnMouseClicked(event -> {
+
+            // creating a transition
+            Transition transition = Animation.DISAPPEARS_RIGHT.configure(highligther, ImageJFX.getAnimationDurationAsDouble());
             
-        }
-        else {
-            label.setTranslateX(nodeBounds.getMinX()-200-30);
-        }
-        label.setTranslateY(nodeBounds.getMinY());
+            // and when the transition if finished
+            transition
+                    .setOnFinished(event2
+                            -> { 
+                        //deleting the elements fromthe main panel
+                        mainAnchorPane.getChildren().removeAll(highligther, label, gotItButton);});
+            
+                        // displaying the next hint
+                         nextHint();
+            transition.play();
+
+        });
+        mainAnchorPane.getChildren().addAll(label, gotItButton);
+
         
-        highligther.setOnMouseClicked(event->mainAnchorPane.getChildren().removeAll(highligther,label));
-        mainAnchorPane.getChildren().add(label);
+        gotItButton.translateYProperty().bind(
+                Bindings.createDoubleBinding(
+                        () -> {
+                            return label.translateYProperty().getValue() + label.heightProperty().getValue() + hintMargin / 2;
+                        }, label.translateYProperty(), label.heightProperty()));
+
+        gotItButton.setOnAction(event -> {
+            highligther.getOnMouseClicked().handle(null);
+            hint.setRead();
+           
+
+            //if(hintQueue.size() ==0 ) {
+            //}
+        });
+
+        //if(isHintListNew) {
+        
+        Animation.APPEARS_LEFT.configure(highligther, ImageJFX.getAnimationDurationAsDouble()).play();
+        //}
+
+        // gotItButton.setTranslateY(label.getTranslateY()+label.getBoundsInLocal().getHeight()+hintWidth/2);
         System.out.println(highligther.getLayoutBounds().getHeight());
-        
+
     }
-    
+
     /**
-     * 
-     *    Side Menu Actions
-     * 
+     *
+     * Side Menu Actions
+     *
      */
-    
-    
     public void initMenuAction() {
-        
+
         sideMenuMainTopVBox.getChildren().addAll(
-                new SideMenuButton("Create database",WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC)
-                ,new SideMenuButton("Visualize", UiContexts.IMAGEJ,"browser image-browser webapp").setIcon(FontAwesomeIcon.PHOTO)
-               
-                ,new SideMenuButton("Batch Processing",UiContexts.FILE_BATCH_PROCESSING,UiContexts.and(UiContexts.PROJECT_MANAGER,UiContexts.IMAGEJ)).setIcon(FontAwesomeIcon.TASKS)
-                ,new SideMenuButton("Personal Database",UiContexts.PROJECT_MANAGER,"").setIcon(FontAwesomeIcon.DATABASE)
-                ,new Separator(Orientation.HORIZONTAL)
-                ,new SideMenuButton("Setting","index").setIcon(FontAwesomeIcon.GEAR)
+                new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", UiContexts.IMAGEJ, "browser image-browser webapp").setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", UiContexts.FILE_BATCH_PROCESSING, UiContexts.and(UiContexts.PROJECT_MANAGER, UiContexts.IMAGEJ)).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", UiContexts.PROJECT_MANAGER, "").setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR)
         );
-        
-        
-        
+
     }
-    
-    
+
     private class SideMenuButton extends Button {
+
         String contextToEnter;
         String contextToLeave;
-        
-        
+
         String appToOpen;
-        
-        
+
         public SideMenuButton() {
-            
+
             super();
-            
+
             getStyleClass().add("side-menu-button");
             setMaxWidth(Double.MAX_VALUE);
         }
-        
-        public SideMenuButton(String name,String appToOpen) {
+
+        public SideMenuButton(String name, String appToOpen) {
             this();
             setText(name);
             this.appToOpen = appToOpen;
             setOnAction(this::onAction);
         }
-        
-        public SideMenuButton(String name,String contextToEnter, String contextToLeave) {
+
+        public SideMenuButton(String name, String contextToEnter, String contextToLeave) {
             this();
             setText(name);
             this.contextToEnter = contextToEnter;
             this.contextToLeave = contextToLeave;
-            
+
             setOnAction(this::onAction);
         }
-        
-        
-        public  SideMenuButton setIcon(FontAwesomeIcon icon) {
+
+        public SideMenuButton setIcon(FontAwesomeIcon icon) {
             Node iconNode = new FontAwesomeIconView(icon); //GlyphsDude.createIcon(icon);
             iconNode.getStyleClass().add("side-menu-icon");
-            if(icon != null) setGraphic(iconNode);
+            if (icon != null) {
+                setGraphic(iconNode);
+            }
             return this;
         }
-        
+
         public void onAction(ActionEvent event) {
-            
-            
-            if(appToOpen != null) {
+
+            if (appToOpen != null) {
 
                 appService.showApp(appToOpen);
                 uiContextService.enter("webapp");
                 uiContextService.update();
-                
-            }
-            else {
+
+            } else {
                 uiContextService.leave(contextToLeave);
                 uiContextService.enter(contextToEnter);
                 uiContextService.update();
             }
-            
+
             hideSideMenu();
-        } 
+        }
     }
 
 }

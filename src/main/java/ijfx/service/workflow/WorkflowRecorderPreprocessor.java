@@ -20,6 +20,7 @@
  */
 package ijfx.service.workflow;
 
+import ijfx.service.batch.BatchService;
 import ijfx.service.history.HistoryService;
 import ijfx.ui.main.ImageJFX;
 import java.util.logging.Logger;
@@ -49,13 +50,18 @@ public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin{
     @Parameter
     WorkflowService workflowService;
 
+    
+    @Parameter
+    BatchService batchService;
+    
+    
     private final Logger logger = ImageJFX.getLogger();
     
     @Override
     public void process(Module module) {
 
         
-        if(workflowService.isRunning()) return;
+        if(workflowService.isRunning() || batchService.isRunning()) return;
         
         
         DefaultWorkflowStep step = new DefaultWorkflowStep(module);

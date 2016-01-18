@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.main;
+package ijfx.service.ui.hint;
 
 import org.scijava.event.SciJavaEvent;
 
@@ -25,31 +25,12 @@ import org.scijava.event.SciJavaEvent;
  *
  * @author cyril
  */
-public class ToggleSideMenuEvent extends SciJavaEvent{
+public interface Hint {
     
-    public static final String SIDE_MENU = "sideMenu";
-    public static final String RELOAD_SIDE_MENU = "reloadSideMenu";
-    
-    
-    final private String eventName;
-    
-    public ToggleSideMenuEvent() {
-        this(SIDE_MENU);
-    }
-    
-    
-    
-    public ToggleSideMenuEvent(String eventName) {
-       this.eventName = eventName;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-    
-    public boolean is(String event) {
-        return event.equals(eventName);
-    }
-    
+    public String getTarget();    
+    public String getId();
+    public String getText();
+    public boolean isRead();
+    public void setRead();
     
 }

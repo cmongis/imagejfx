@@ -43,6 +43,7 @@ import static ijfx.core.project.imageDBService.PlaneDB.PLANE_INDEX_STRING;
 import static ijfx.core.project.imageDBService.PlaneDB.TAG_STRING;
 import ijfx.core.project.imageDBService.PlaneDBInMemory;
 import ijfx.core.project.imageDBService.PlaneDBLoaderService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.LoadingScreen;
 
@@ -79,6 +80,8 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
     @Parameter
     private PlaneDBLoaderService planeDBLoaderService;
     
+    @Parameter
+    LoadingScreenService loadingService;
     
 
     @Override
@@ -182,7 +185,7 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
             }
         };
         
-        LoadingScreen.getInstance().submitTask(task, false);
+      // LoadingScreen.getInstance().submitTask(task, false);
         ImageJFX.getThreadPool().submit(task);
         
     }

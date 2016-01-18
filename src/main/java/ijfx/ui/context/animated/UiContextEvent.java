@@ -17,39 +17,21 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.main;
+package ijfx.ui.context.animated;
 
-import org.scijava.event.SciJavaEvent;
+import javafx.event.Event;
+import javafx.event.EventType;
 
 /**
  *
  * @author cyril
  */
-public class ToggleSideMenuEvent extends SciJavaEvent{
+public class UiContextEvent extends Event{
     
-    public static final String SIDE_MENU = "sideMenu";
-    public static final String RELOAD_SIDE_MENU = "reloadSideMenu";
+    public static final EventType<UiContextEvent> NODE_DISPLAYED = new EventType<>("NODE_DISPLAYED");
     
-    
-    final private String eventName;
-    
-    public ToggleSideMenuEvent() {
-        this(SIDE_MENU);
+    public UiContextEvent(EventType<? extends Event> eventType) {
+        super(eventType);
     }
-    
-    
-    
-    public ToggleSideMenuEvent(String eventName) {
-       this.eventName = eventName;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-    
-    public boolean is(String event) {
-        return event.equals(eventName);
-    }
-    
     
 }

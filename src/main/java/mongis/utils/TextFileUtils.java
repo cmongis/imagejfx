@@ -32,7 +32,17 @@ public class TextFileUtils {
         return Resources.toString(TextFileUtils.class.getResource(url), Charset.forName("UTF-8"));
     }
     
+    public static String readFileFromJar(Class<?> clazz, String url) throws IOException {
+        return readFileFromJar(url, clazz);
+    }
+    
+    public static String readFileFromJar(String url, Class<?> clazz) throws IOException {
+        System.out.println(url);
+        return Resources.toString(clazz.getResource(url), Charset.forName("UTF-8"));
+    }
+    
+    /*
     public static String readFileFromJar(Object parent, String url) throws IOException {
         return Resources.toString(parent.getClass().getResource(url), Charset.forName("UTF-8"));
-    }
+    }*/
 }

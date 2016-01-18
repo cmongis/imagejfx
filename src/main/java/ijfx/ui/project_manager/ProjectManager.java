@@ -76,15 +76,12 @@ import ijfx.ui.UiContexts;
 @UiConfiguration(id = UiContexts.PROJECT_MANAGER, context = UiContexts.PROJECT_MANAGER, localization = Localization.CENTER)
 public class ProjectManager extends BorderPane implements Initializable, UiPlugin {
 
-  
-
     @FXML
     private TabPane projectViewTabPane;
 
     @FXML
     private ToolBar toolBar;
 
-   
     @FXML
     private Button openProjectButton;
     @FXML
@@ -97,9 +94,6 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
     private Button undoButton;
     @FXML
     private Button redoButton;
-   
-
-  
 
     Logger logger = ImageJFX.getLogger();
 
@@ -129,53 +123,41 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
 
     private final ResourceBundle rb;
 
-    
-    
     //*********set of services*****************
-    
-    
     @Parameter
     private ProjectManagerService projectManager;
-
-   
 
     @Parameter
     BrowserUIService browserUiService;
 
-    
     @Parameter
     Context context;
 
     @Parameter
     UiContextService contextService;
-    
+
     SearchBar queryBar;
 
     BooleanProperty isProjectOpen = new SimpleBooleanProperty(false);
 
-    
-    
     public ProjectManager() {
 
-       
-        
         // get the resource bundle for string propoerties
         rb = FXUtilities.getResourceBundle();
-        
+
         // Creating the properties
         undoMessageProperty = new SimpleStringProperty();
         redoMessageProperty = new SimpleStringProperty();
         undoDisableProperty = new SimpleBooleanProperty(true);
         redoDisableProperty = new SimpleBooleanProperty(true);
-        
-        
+
         undoCmdNameListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             setUndoCmdName(newValue);
         };
         redoCmdNameListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             setRedoCmdName(newValue);
         };
-       
+
         try {
             // injecting the FXML
             //FXUtilities.loadView(getClass().getResource("ProjectManager.fxml"), this, true);
@@ -192,15 +174,15 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
 
     @Override
     public UiPlugin init() {
-        
+
         // listen for changes in the list of opened projects
         projectManager.getProjects().addListener(this::handleProjectListChange);
-        
+
         // listen for change of the current project
         projectManager.currentProjectProperty().addListener(this::handleCurrentProjectChange);
 
         // create the query bar
-       // queryBar = new QueryBar(context);
+        // queryBar = new QueryBar(context);
         queryBar = new SearchBar(context);
         // add the query bar to the 
         toolBar.getItems().add(queryBar);
@@ -211,22 +193,36 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         projectManager.getProjects().forEach(project -> {
             createProjectTab(project);
         });
-        
+
         // change the value of isProjectOpen to true if projects are already opened
         isProjectOpen.setValue(projectManager.hasProject());
 
-        
+        // toolBar.visibleProperty().bind(projectManager.currentProjectProperty().isNotNull());
+        for (Node node : new Node[]{
+            queryBar, addImagesButton, addImagesFromFolderButton, undoButton, redoButton
+        }) {
+            node.visibleProperty().bind(projectManager.currentProjectProperty().isNotNull());
+        }
+
+        queryBar.visibleProperty().addListener((obs, oldVaue, newValue) -> {
+
+            if (newValue) {
+                Animation.QUICK_EXPAND
+                        .configure(queryBar, ImageJFX.getAnimationDurationAsDouble())
+                        .play();
+            }
+        });
+
         return this;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
-        
+
         // adding events to undo and redo buttons
         undoButton.disableProperty().bind(undoDisableProperty);
         redoButton.disableProperty().bind(redoDisableProperty);
-        
+
         // should be done through FXML I guess...
         undoButton.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -242,7 +238,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
                 redo();
             }
         });
-      
+
         // Creating a tooltips and bind to the message
         // for the undo and redo buttons so a tooltip
         // appears explaining what will be the action
@@ -253,8 +249,6 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         toolTip.textProperty().bind(redoMessageProperty);
         redoButton.setTooltip(toolTip);
 
-          
-       
         // ???
         projectSelectionModel = projectViewTabPane.getSelectionModel();
         projectSelectionModel.selectedItemProperty().addListener(new ChangeListener<Tab>() {
@@ -264,13 +258,13 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
                 if (newValue != null && newValue.getUserData() != null && newValue.getUserData() instanceof Project) {
                     //listeners won't be notify if the current project is 
                     //already equal to the one corresponding to the tab. 
-                    if(projectManager != null) projectManager.setCurrentProject((Project) newValue.getUserData());
+                    if (projectManager != null) {
+                        projectManager.setCurrentProject((Project) newValue.getUserData());
+                    }
                 }
             }
         });
 
-        
-        
         // when the button are enabled, a animation is triggered
         undoButton.disableProperty().addListener((obs, old, newValue) -> {
             if (newValue == false) {
@@ -290,8 +284,10 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         addImagesButton.setTooltip(new Tooltip(rb.getString("addImages")));
         newProjectButton.setTooltip(new Tooltip(rb.getString("createNewProject")));
         openProjectButton.setTooltip(new Tooltip(rb.getString("openAnExistingProject")));
-       
-        if(projectManager != null) isProjectOpen.setValue(projectManager.hasProject());
+
+        if (projectManager != null) {
+            isProjectOpen.setValue(projectManager.hasProject());
+        }
     }
 
     private void showItemsOnlyWhenAProjectIsOpen(Node... nodes) {
@@ -299,7 +295,6 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
             n.visibleProperty().bind(isProjectOpen);
         }
     }
-
 
     @FXML
     public void undo() {
@@ -357,8 +352,6 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         redoMessageProperty.set(name == null ? "" : rb.getString("redo") + " " + name);
     }
 
-
-
     private void removeProjectTab(Project removedProject) {
         Tab tab = tabMap.get(removedProject);
         if (tab != null) {
@@ -380,6 +373,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
             projectSelectionModel.select(tab);
         });
     }
+
     private MainProjectController getController(Tab tab) {
         if (tab.getContent() instanceof MainProjectController) {
             return (MainProjectController) tab.getContent();
@@ -391,6 +385,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         while (c.next()) {
             if (c.wasAdded()) {
                 for (Project newProject : c.getAddedSubList()) {
+                    if(newProject != null)
                     createProjectTab(newProject);
                 }
                 //the list was empty before
@@ -409,11 +404,16 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
     }
 
     private void handleCurrentProjectChange(ObservableValue<? extends Project> observable, Project oldValue, Project newValue) {
+
+        if (newValue == null) {
+            undoDisableProperty.unbind();
+            redoDisableProperty.unbind();
+            return;
+        };
         projectSelectionModel.select(tabMap.get(newValue));
 
         undoDisableProperty.bind(newValue.getInvoker().undoDisableProperty());
         redoDisableProperty.bind(newValue.getInvoker().redoDisableProperty());
-
 
         Animation.QUICK_EXPAND.configure(undoButton, 500).play();
 

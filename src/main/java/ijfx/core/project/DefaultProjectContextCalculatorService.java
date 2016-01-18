@@ -53,6 +53,9 @@ public class DefaultProjectContextCalculatorService extends AbstractService impl
     @Override
     public ProjectContextCalculatorService updateContext(Project project) {
 
+        
+        if(project == null) return this;
+        
         // check if project are open
        contextService.toggleContext(PROJECT_OPEN, getProjectService().getProjects().size() > 0);
        

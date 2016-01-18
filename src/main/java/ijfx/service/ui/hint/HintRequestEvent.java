@@ -17,39 +17,27 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.main;
+package ijfx.service.ui.hint;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.scijava.event.SciJavaEvent;
 
 /**
  *
  * @author cyril
  */
-public class ToggleSideMenuEvent extends SciJavaEvent{
-    
-    public static final String SIDE_MENU = "sideMenu";
-    public static final String RELOAD_SIDE_MENU = "reloadSideMenu";
-    
-    
-    final private String eventName;
-    
-    public ToggleSideMenuEvent() {
-        this(SIDE_MENU);
-    }
-    
-    
-    
-    public ToggleSideMenuEvent(String eventName) {
-       this.eventName = eventName;
+public class HintRequestEvent extends SciJavaEvent{
+    private final List<? extends Hint> hintList;
+
+    public HintRequestEvent(List<? extends Hint> hintList) {
+        this.hintList = hintList;
     }
 
-    public String getEventName() {
-        return eventName;
+    public List<? extends Hint> getHintList() {
+        return hintList;
     }
     
-    public boolean is(String event) {
-        return event.equals(eventName);
-    }
     
     
 }

@@ -20,6 +20,7 @@
  */
 package ijfx.bridge;
 
+import ijfx.service.batch.BatchService;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
 import ijfx.ui.datadisplay.image.ImageWindow;
 import ijfx.ui.main.ImageJFX;
@@ -67,6 +68,9 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     @Parameter
     private UIService uiService;
 
+    @Parameter
+    private BatchService batchService;
+    
     private static final Logger logger = ImageJFX.getLogger();
 
     private boolean injection = false;
@@ -121,8 +125,8 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Override
     public File chooseFile(File file, String string) {
-
-        logger.info("Choosing file..." + file.getAbsolutePath() + " " +string);
+        
+        logger.info("Choosing file..." + (file != null ? file.getAbsolutePath() : "(no file)") + " " +string);
         
         // starting a file chooser
         final FileChooser chooser = new FileChooser();
@@ -173,6 +177,12 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Override
     public void show(final Display<?> dspl) {
+        
+        if(batchService.isRunning()) {
+            logger.info("BatchService is running... skipping display");
+            return;
+        }
+        
         logger.info("Showing display");
         
         if (dspl instanceof ImageDisplay) {
