@@ -49,6 +49,11 @@ import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
+import ijfx.ui.UiContexts;
+import ijfx.ui.main.ImageJFX;
+import ijfx.ui.notification.NotificationService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -88,23 +93,25 @@ public class BottomActionBar extends BorderPane implements UiPlugin {
     @Parameter
     Context context;
 
+    @Parameter
+    NotificationService notificationService;
+
     String lastTag;
 
     ObservableSet<String> possibleTags = FXCollections.observableSet();
 
     AddTagPanel addTagPanel;
-    
+
     AddMetaDataPanel addMetaDataPanel;
-    
-    
+
+    Logger logger = ImageJFX.getLogger();
+
     public BottomActionBar() throws IOException {
         super();
 
         FXUtilities.injectFXML(this);
 
     }
-
-   
 
     @Override
     public Node getUiElement() {
@@ -121,15 +128,15 @@ public class BottomActionBar extends BorderPane implements UiPlugin {
         projectManager.currentProjectProperty().addListener(this::onCurrentProjectChanged);
 
         addTagPanel = new AddTagPanel(context);
-       
+
         addMetaDataPanel = new AddMetaDataPanel(context);
-        
+
         PopoverToggleButton.bind(addTagButton, addTagPanel, PopOver.ArrowLocation.BOTTOM_CENTER);
         PopoverToggleButton.bind(addMetaDataButton, addMetaDataPanel, PopOver.ArrowLocation.BOTTOM_CENTER);
-        
+
         addTagPanel.setAction(this::onTagAction);
         addMetaDataPanel.setAction(this::onMetaDataAction);
-        
+
         return this;
     }
 
@@ -145,28 +152,35 @@ public class BottomActionBar extends BorderPane implements UiPlugin {
 
     @FXML
     public void processSelection() {
-        contextService.leave("image-browser");
-        contextService.enter("batch");
+        contextService.leave(UiContexts.PROJECT_MANAGER, UiContexts.IMAGEJ);
+        contextService.enter(UiContexts.PROJECT_BATCH_PROCESSING);
         contextService.update();
     }
-    
-    
-     public Void onTagAction(String tags) {
-         
-        
-        planeModifierService.addTag(getCurrentProject(), getCurrentProject().getSelection(), Arrays.asList(tags.split(",")));
 
-        return null;
+    public Boolean onTagAction(String tags) {
+
+        try {
+            planeModifierService.addTag(getCurrentProject(), getCurrentProject().getSelection(), Arrays.asList(tags.split(",")));
+            return true;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when adding tag", e);
+            return false;
+        }
 
     }
-     
-     public Void onMetaDataAction(Pair<String,String> keyValue) {
-         
-         String key = keyValue.getKey();
-         String value = keyValue.getValue();
-         
-         planeModifierService.addMetaData(getCurrentProject(), getCurrentProject().getSelection(), new GenericMetaData(key, value));
-         
-         return null;
-     }
+
+    public Boolean onMetaDataAction(Pair<String, String> keyValue) {
+
+        try {
+            String key = keyValue.getKey();
+            String value = keyValue.getValue();
+
+            planeModifierService.addMetaData(getCurrentProject(), getCurrentProject().getSelection(), new GenericMetaData(key, value));
+            return true;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when adding metadata", e);
+            return false;
+        }
+      
+    }
 }

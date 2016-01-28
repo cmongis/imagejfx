@@ -23,6 +23,7 @@ package mercury.core;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ijfx.ui.main.ImageJFX;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import netscape.javascript.JSException;
@@ -170,8 +171,8 @@ public class Deferred {
         try {
             return (JSObject) getJSONInstance().call(JSON_PARSE, jsonString);
         } catch (JSException exception) {
-            ImageJFX.getLogger();
-            throw exception;
+            ImageJFX.getLogger().log(Level.SEVERE,"Couldn't parse some JSON String",exception);
+            return null;
         }
         catch(Exception any) {
             any.printStackTrace();

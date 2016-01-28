@@ -20,7 +20,7 @@
  */
 package ijfx.core.project;
 
-import ijfx.core.listenableSystem.Listenable;
+import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.project.command.Invoker;
 import ijfx.core.project.imageDBService.PlaneDB;
 import java.io.File;
@@ -53,6 +53,8 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
      * value: {@value}
      */
 
+    public static final String SETTINGS_STRING = "settings";
+    
     public static final String MODIFY_DATABASE_STRING = "modifyDataBase";
     
     public static final String PLANE_ADDED_EVENT = "planeAddedEvent";
@@ -101,6 +103,6 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
 
     List<String> getMetaDataKeys();
 
-
+    public MetaDataSet getSettings();
    
 }

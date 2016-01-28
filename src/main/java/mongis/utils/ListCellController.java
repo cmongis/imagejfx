@@ -20,6 +20,8 @@
  */
 package mongis.utils;
 
+import javafx.scene.Node;
+
 /**
  *
  * @author Cyril MONGIS, 2015
@@ -27,7 +29,7 @@ package mongis.utils;
 public interface ListCellController<T> {
 
     
-  
+   
     
     public void setItem(T t);
 

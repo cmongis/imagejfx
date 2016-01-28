@@ -71,11 +71,13 @@ import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.plugin.DebugEvent;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Level;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -163,6 +165,9 @@ public class MainWindowController implements Initializable {
 
     HashMap<String, AnimatedPaneContextualView> uiPluginCtrl = new HashMap<>();
 
+    protected BooleanBinding isSideMenuHidden;
+    
+    
     @Parameter
     UiPluginService uiPluginService;
 
@@ -182,7 +187,7 @@ public class MainWindowController implements Initializable {
 
     Queue<Hint> hintQueue = new LinkedList<>();
 
-    boolean isHintListNew = true;
+    boolean isHintDisplaying = false;
 
     private Thread memoryThread = new Thread(() -> {
 
@@ -233,10 +238,14 @@ public class MainWindowController implements Initializable {
 
         // binding the sides to the pseudo class empty
         final PseudoClass empty = PseudoClass.getPseudoClass("empty");
-
+        final PseudoClass hidden = PseudoClass.getPseudoClass("hidden");
+        
         BindingsUtils.bindNodeToPseudoClass(empty, leftVBox, new SimpleListProperty<Node>(leftVBox.getChildren()).emptyProperty());
         BindingsUtils.bindNodeToPseudoClass(empty, rightVBox, new SimpleListProperty<Node>(rightVBox.getChildren()).emptyProperty());
-
+        BindingsUtils.bindNodeToPseudoClass(hidden, sideMenu, Bindings.createBooleanBinding(()->sideMenu.getTranslateX() <= -1.0 * sideMenu.getWidth()+2,sideMenu.translateXProperty()));
+        
+       
+        
         /*
         BooleanBinding binding = Bindings.isEmpty(leftVBox.getChildren()).addListener((obs,oldValue,newValue)->{
 
@@ -515,16 +524,13 @@ public class MainWindowController implements Initializable {
     }
 
     @EventHandler
-    public void onHintRequested(HintRequestEvent event) {
+    public synchronized void onHintRequested(HintRequestEvent event) {
 
         event.getHintList().forEach(hint -> {
 
             logger.info(String.format("Displayint hint %s", hint.getId()));
 
             if (hintQueue.parallelStream().filter(hint2 -> hint2.equals(hint)).count() == 0) {
-                if (hintQueue.size() == 0) {
-                    isHintListNew = true;
-                }
                 hintQueue.add(hint);
             }
         });
@@ -582,6 +588,9 @@ public class MainWindowController implements Initializable {
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
+        
+       
+        
     }
 
     public void onUiPluginDisplaed(ContextualWidget<Node> uiPlugin) {
@@ -590,9 +599,12 @@ public class MainWindowController implements Initializable {
 
     }
 
-    public void nextHint() {
+    public synchronized void nextHint() {
+        
+        if(isHintDisplaying) return;
+        
         showHelpSequence(hintQueue.poll());
-        isHintListNew = false;
+        
     }
 
     public void showHelpSequence(Hint hint) {
@@ -607,6 +619,8 @@ public class MainWindowController implements Initializable {
             return;
         }
 
+        try {
+        isHintDisplaying = true;
         double hintWidth = 200;
         double hintMargin = 20;
 
@@ -671,6 +685,9 @@ public class MainWindowController implements Initializable {
                         //deleting the elements fromthe main panel
                         mainAnchorPane.getChildren().removeAll(highligther, label, gotItButton);});
             
+                        // set that the hint is not displayed again
+                        isHintDisplaying = false;
+            
                         // displaying the next hint
                          nextHint();
             transition.play();
@@ -694,14 +711,20 @@ public class MainWindowController implements Initializable {
             //}
         });
 
-        //if(isHintListNew) {
+        //if(isHintDisplaying) {
         
         Animation.APPEARS_LEFT.configure(highligther, ImageJFX.getAnimationDurationAsDouble()).play();
         //}
 
         // gotItButton.setTranslateY(label.getTranslateY()+label.getBoundsInLocal().getHeight()+hintWidth/2);
         System.out.println(highligther.getLayoutBounds().getHeight());
-
+        }catch(Exception e) {
+            
+            isHintDisplaying = false;
+            nextHint();
+            logger.log(Level.SEVERE,"Error when showing hint.",e);
+        }
+             
     }
 
     /**

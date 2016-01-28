@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ijfx.core.metadata.GenericMetaData;
 import ijfx.core.metadata.MetaData;
 import static ijfx.core.metadata.MetaData.metaDataSetToMap;
 import static ijfx.core.project.Project.HIERARCHY_STRING;
@@ -45,7 +46,6 @@ import ijfx.core.project.imageDBService.PlaneDBInMemory;
 import ijfx.core.project.imageDBService.PlaneDBLoaderService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.main.LoadingScreen;
 
 
 import java.io.File;
@@ -64,6 +64,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import static ijfx.core.project.Project.SETTINGS_STRING;
 
 /**
  *
@@ -99,6 +100,7 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         Project project = new DefaultProject();
         JsonNode rootNode = getRootNode(file);
         JsonNode imagesNode = rootNode.get(IMAGE_STRING);
+        JsonNode settingsNode = rootNode.get(SETTINGS_STRING);
         
         timer.elapsed("json creation");
         
@@ -144,9 +146,20 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         
         timer.elapsed("project.setFile()");
         
+        System.out.println(settingsNode.toString());
+        settingsNode.fields().forEachRemaining((str)->{
+            
+           project.getSettings().put(new GenericMetaData(str.getKey(),str.getValue().asText()));
+        });
+        
+        System.out.println(project.getSettings());
+        
         addProject(project);
         
         timer.elapsed("adding the project");
+        
+        
+        
     }
     private JsonNode getRootNode(File projectFile) throws IOException {
         String json = DefaultProjectManagerService.readFile(projectFile);
@@ -244,6 +257,13 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         ArrayNode arrayNodeHierarchy = mapper.valueToTree(hierarchyList);
         root.putArray(Project.HIERARCHY_STRING).addAll(arrayNodeHierarchy);
 
+        
+        // creates an object node with the settings
+        ObjectNode settingsNode = root.putObject(SETTINGS_STRING);
+        project.getSettings().forEach((str,metadata)->{
+            settingsNode.put(str, metadata.getStringValue());
+        });
+
         //save the project
         if (!FilenameUtils.getExtension(file.getName()).equals(fileExtension)) {
             String path = FilenameUtils.removeExtension(file.getAbsolutePath());
@@ -251,6 +271,11 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
             file = new File(path);
         }
         mapper.writeValue(file, root);
+        
+        
+        
+        
+        
         project.setChanged(false);
         project.setFile(file);
     }

@@ -20,17 +20,25 @@
  */
 package ijfx.core.project;
 
+import ijfx.core.hash.HashService;
 import ijfx.core.project.command.AddPlaneCommand;
 import ijfx.core.project.command.Command;
 import ijfx.core.project.command.Invoker;
 import ijfx.core.project.command.SelectImageCommand;
 import ijfx.core.project.command.SetHierarchyCommand;
 import ijfx.core.project.hierarchy.MetaDataHierarchy;
+import ijfx.core.project.imageDBService.ImageReferenceImpl;
 import ijfx.core.project.imageDBService.PlaneDB;
+import ijfx.ui.main.ImageJFX;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.control.TreeItem;
+import static jdk.nashorn.internal.runtime.Debug.id;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -45,8 +53,16 @@ import org.scijava.service.Service;
 public class DefaultProjectModifierService extends AbstractService implements HierarchySetter, ProjectModifierService {
 
     
+    Logger logger = ImageJFX.getLogger();
+    
     @Parameter
     ProjectContextCalculatorService projectContextService;
+    
+    @Parameter
+    HashService hashService;
+    
+    
+    
     
     @Override
     public List<String> getPossibleNewHierarchyKey(Project project) {
@@ -187,5 +203,18 @@ public class DefaultProjectModifierService extends AbstractService implements Hi
      private void updateContext(Project project) {
          projectContextService.updateContext(project);
      }
+
+    @Override
+    public void updatePlaneSource(Project project, PlaneDB plane, File file, long planeIndex) {
+        try {
+            String hash = hashService.getHash(file);
+            plane.setImageReference(new ImageReferenceImpl(hash, file.getAbsolutePath()));
+            plane.setPlaneIndex(planeIndex);
+            
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Error when calculating hash for "+file.getName(), ex);
+        }
+        
+    }
      
 }

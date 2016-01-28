@@ -17,22 +17,27 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectview;
+package ijfx.core.project.event;
 
+import ijfx.core.project.Project;
 import org.scijava.event.SciJavaEvent;
 
 /**
  *
  * @author cyril
  */
-public class ProjectDisplayCreatedEvent extends SciJavaEvent{
-     private final ProjectDisplay projectDisplay;
+public class ProjectCreatedEvent extends SciJavaEvent{
+    
+    private final Project project;
 
-    public ProjectDisplayCreatedEvent(ProjectDisplay projectDisplay) {
-        this.projectDisplay = projectDisplay;
+    public ProjectCreatedEvent(Project project) {
+        this.project = project;
     }
 
-    public ProjectDisplay getProjectDisplay() {
-        return projectDisplay;
+    public Project getProject() {
+        return project;
     }
+    
+    
+    
 }

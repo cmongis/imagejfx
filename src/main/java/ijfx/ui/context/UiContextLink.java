@@ -149,6 +149,15 @@ public class UiContextLink implements Comparable<UiContextLink> {
         }
         return currentContextList.contains(contextName);
     }
+    
+    public boolean negate(Collection<String> currentContextList) {
+        if(contextName.startsWith("-") && currentContextList.contains(contextName.substring(1))) {
+              return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     @Override
     public String toString() {

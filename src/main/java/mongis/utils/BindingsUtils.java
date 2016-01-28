@@ -20,6 +20,7 @@
  */
 package mongis.utils;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
@@ -39,5 +40,14 @@ public class BindingsUtils {
         booleanProperty.addListener((obs,oldValue,newValue)->{
             node.pseudoClassStateChanged(pseudoClass, newValue);
         });
+    }
+    
+    public static void bindNodeToPseudoClass(PseudoClass pseudoClass, Node node, BooleanBinding booleanBinding) {
+        node.pseudoClassStateChanged(pseudoClass, booleanBinding.getValue());
+        
+        booleanBinding.addListener((obs,oldValue,newValue)->{
+            node.pseudoClassStateChanged(pseudoClass, newValue);
+        });
+        
     }
 }

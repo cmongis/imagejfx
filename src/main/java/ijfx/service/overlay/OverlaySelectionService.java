@@ -25,6 +25,7 @@ import java.util.List;
 import net.imagej.ImageJService;
 import net.imagej.display.DataView;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.display.OverlayView;
 import net.imagej.overlay.Overlay;
@@ -47,7 +48,13 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
     @Parameter
     EventService eventService;
 
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
     public void selectOnlyOneOverlay(ImageDisplay imageDisplay, Overlay overlay) {
+        
+        System.out.println(overlay);
+        
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView) {
                 OverlayView overlayView = (OverlayView) view;
@@ -112,12 +119,14 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
 
     public void setOverlaySelection(ImageDisplay imageDisplay, Overlay selectedOverlay, boolean selected) {
         for (DataView view : imageDisplay) {
+            
             if (view instanceof OverlayView && view.getData() == selectedOverlay) {
                 OverlayView overlayView = (OverlayView) view;
                 overlayView.setSelected(selected);
                 if (selected) {
-                    
-                    eventService.publish(new OverlaySelectedEvent(imageDisplay, selectedOverlay));
+                   
+                   
+                    eventService.publishLater(new OverlaySelectedEvent(imageDisplay, selectedOverlay));
                 }
                 return;
             }

@@ -17,15 +17,37 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectview;
+package ijfx.ui.plugin.panel;
 
-import ijfx.core.project.Project;
-import java.util.List;
+import javafx.scene.control.Label;
+import mongis.utils.ListCellController;
+import net.imagej.overlay.Overlay;
 
 /**
  *
  * @author cyril
  */
-public interface ProjectDisplay extends List<PlaneSet>{
-    Project getProject();    
+public class OverlayListCellController extends Label implements ListCellController<Overlay> {
+    
+    Overlay overlay;
+
+    public OverlayListCellController() {
+        super();
+    }
+
+    public OverlayListCellController(Overlay overlay) {
+        this();
+        this.overlay = overlay;
+    }
+
+    @Override
+    public void setItem(Overlay t) {
+        overlay = t;
+    }
+
+    @Override
+    public Overlay getItem() {
+        return overlay;
+    }
+    
 }

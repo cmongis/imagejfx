@@ -55,7 +55,7 @@ public class AddMetaDataPanel extends GridPane{
 
     ObservableList<String> existingKeys = FXCollections.observableArrayList();
     
-    Callback<Pair<String,String>,Void> action;
+    Callback<Pair<String,String>,Boolean> action;
     
     
     public AddMetaDataPanel(Context ctx) {
@@ -73,7 +73,7 @@ public class AddMetaDataPanel extends GridPane{
             
     }
 
-    public void setAction(Callback<Pair<String, String>, Void> action) {
+    public void setAction(Callback<Pair<String, String>, Boolean> action) {
         this.action = action;
     }
     
@@ -90,7 +90,10 @@ public class AddMetaDataPanel extends GridPane{
         
         if(value.trim().equals("")) return;
         
-        action.call(new Pair<String,String>(key,value));
+        if(action.call(new Pair<String,String>(key,value))) {
+            keyTextField.setText("");
+            valueTextField.setText("");
+        }
     }
     
     @EventHandler

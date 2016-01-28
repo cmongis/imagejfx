@@ -56,7 +56,7 @@ import mongis.utils.FXUtilities;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "workflowEditor", localization = Localization.RIGHT, context = "imagej", order = 2)
+@UiConfiguration(id = "workflowEditor", localization = Localization.RIGHT, context = "imagej -overlay-selected", order = 2)
 public class WorkflowEditor extends TitledPane implements UiPlugin {
 
     @FXML

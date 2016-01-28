@@ -41,6 +41,8 @@ import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.batch.FileBatchProcessorPanel;
 import ijfx.ui.plugin.panel.LUTPanel;
+import ijfx.ui.plugin.panel.OverlayManagerPanel;
+import ijfx.ui.plugin.panel.OverlayPanel;
 import org.scijava.event.EventService;
 
 /**
@@ -127,7 +129,8 @@ public class DebugButton extends MenuButton implements UiPlugin{
     public void reloadAnOther(ActionEvent event) {
          //  widgetService.reload(FXMLBrowserController.class);
        
-        widgetService.reload(FileBatchProcessorPanel.class);
+        widgetService.reload(OverlayManagerPanel.class);
+        widgetService.reload(OverlayPanel.class);
         //notificationService.publish(new DefaultNotification("It works !","perfectly !").addAction("Tell him",()->System.out.println("Yeah")));
         
     }

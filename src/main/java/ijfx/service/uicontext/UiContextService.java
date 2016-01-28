@@ -200,6 +200,12 @@ public class UiContextService extends AbstractService implements UiContextManage
     public boolean shouldShow(ContextualWidget widget) {
 
         ConditionList isPresentInAContext = new ConditionList();
+        
+        ConditionList isNegatedByAContext = new ConditionList();
+        
+        
+        
+        
         /*
          //check for each actual context token if the widget is linked to it
          for (String contextName : currentContextList) {
@@ -215,6 +221,13 @@ public class UiContextService extends AbstractService implements UiContextManage
         linkSet.parallelStream().filter(link -> link.getWidgetName().equals(widget.getName())).forEach(link -> {
             isPresentInAContext.add(link.fullFill(currentContextList));
         });
+        
+        linkSet.parallelStream().filter(link -> link.getWidgetName().equals(widget.getName())).forEach(link -> {
+            isNegatedByAContext.add(link.negate(currentContextList));
+        });
+        
+        // the widget should be hidden if one of the link negates it appearance.
+        if(isNegatedByAContext.isOneTrue()) return false;
 
         // if the widget is at least linked to one context, then it should be shown
         return isPresentInAContext.isOneTrue();

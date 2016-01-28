@@ -21,6 +21,7 @@
 package ijfx.core.project;
 
 import ijfx.core.project.imageDBService.PlaneDB;
+import java.io.File;
 import java.util.List;
 import javafx.scene.control.TreeItem;
 import net.imagej.ImageJService;
@@ -37,6 +38,8 @@ public interface ProjectModifierService extends ImageJService {
 
     void selectPlane(Project project, List<PlaneDB> planesToUnselect, List<PlaneDB> planesToSelect);
 
+    void updatePlaneSource(Project project, PlaneDB plane, File file, long planeIndex);
+    
     void removePlaneFromProject(Project project, PlaneDB plane);
 
     void removePlaneFromProject(Project project, List<PlaneDB> planes);

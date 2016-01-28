@@ -22,6 +22,8 @@ package ijfx.core.project;
 
 import ijfx.core.project.event.PossibleMetaDataKeysChangeEvent;
 import ijfx.core.project.event.PossibleTagListChangeEvent;
+import ijfx.core.project.event.ProjectCloseEvent;
+import ijfx.core.project.event.ProjectCreatedEvent;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +64,8 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
     @Parameter
     ProjectContextCalculatorService projectContextService;
 
+    
+    
     public static String readFile(File file) throws IOException {
         byte[] encoded = Files.readAllBytes(file.toPath());
         return new String(encoded, StandardCharsets.UTF_8);
@@ -81,9 +85,11 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
     public void addProject(Project project) {
         if (!projects.contains(project)) {
             projects.add(project);
-            setCurrentProject(project);
         }
 
+         if(project!=null) setCurrentProject(project);
+         
+         eventService.publish(new ProjectCreatedEvent(project));
     }
 
     @Override
@@ -93,7 +99,7 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
             setCurrentProject(null);
         }
         
-        
+        eventService.publish(new ProjectCloseEvent(project));
         
     }
 
@@ -176,8 +182,9 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
 
     @Override
     public Set<String> getAllPossibleTag(Project project) {
-
+       
         Set<String> tags = new HashSet<>();
+         if(project == null) return tags;
         project.getImages().stream().parallel().forEach(image -> {
             image.getTags().forEach(tag -> {
                 if (!tags.contains(tag)) {

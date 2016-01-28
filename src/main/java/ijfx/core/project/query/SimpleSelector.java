@@ -82,8 +82,12 @@ public class SimpleSelector implements Selector{
                 
               String keyName = keyString == null ? m.group(1) : keyString;
               String valueName = valueString == null ? m.group(2) : valueString;
-              String metadataValue = planeDB.getMetaDataSetProperty(metadataSetName).get(keyName).getStringValue();
               
+              try {
+                String metadataValue = planeDB.getMetaDataSetProperty(metadataSetName).get(keyName).getStringValue();
+              } catch(NullPointerException e) {
+                  return false;
+              }
               
               Pattern p = Pattern.compile(valueName);
               try {

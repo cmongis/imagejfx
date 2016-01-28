@@ -30,9 +30,9 @@ import org.scijava.event.SciJavaEvent;
  */
 public class OverlaySelectionEvent extends SciJavaEvent{
     
-    ImageDisplay display;
+    private ImageDisplay display;
     
-    Overlay overlay;
+    private Overlay overlay;
 
     
     public OverlaySelectionEvent(ImageDisplay display, Overlay overlay) {

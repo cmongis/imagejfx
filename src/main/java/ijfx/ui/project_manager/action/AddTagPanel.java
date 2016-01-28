@@ -22,6 +22,7 @@ package ijfx.ui.project_manager.action;
 
 import ijfx.core.project.event.PossibleTagListChangeEvent;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.notification.NotificationService;
 import java.io.IOException;
 import java.util.Set;
 import java.util.logging.Level;
@@ -60,12 +61,15 @@ public class AddTagPanel extends GridPane {
     @FXML
     Label titleLabel;
     
+    @FXML
+    NotificationService notificationService;
+    
     private static final Logger logger = ImageJFX.getLogger();
 
     
     private ObservableList<String> possibleTags = FXCollections.observableArrayList();
     
-    private Callback<String,Void> action;
+    private Callback<String,Boolean> action;
     
     public AddTagPanel(Context context) {
         this.context = context;
@@ -90,12 +94,12 @@ public class AddTagPanel extends GridPane {
 
     @FXML
     public void search() {
-        action.call(tagTextField.getText());
+        if(action.call(tagTextField.getText()))
         tagTextField.setText("");
         
     }
 
-    public void setAction(Callback<String,Void> action) {
+    public void setAction(Callback<String,Boolean> action) {
         this.action = action;
     }
 

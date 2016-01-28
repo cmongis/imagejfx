@@ -20,7 +20,6 @@
  */
 package ijfx.ui.plugin.panel;
 
-import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.service.overlay.OverlaySelectionService;
@@ -52,13 +51,18 @@ import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
+import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import net.imagej.overlay.Overlay;
+import org.scijava.display.event.DisplayActivatedEvent;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id="overlayPanel",localization = Localization.RIGHT,context="image-open+overlay-selected")
+@UiConfiguration(id="overlayPanel",localization = Localization.RIGHT,context="imagej+image-open+overlay-selected")
 public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -98,6 +102,9 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     
     private final static String EMPTY_FIELD = "Name your overlay here :-)";
     
+    ObjectProperty<Overlay> overlayProperty = new SimpleObjectProperty<>();
+    
+    
     public OverlayPanel() throws IOException {
         super();
 
@@ -111,12 +118,17 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         entries.add(new MyEntry("nothing",0d));
         
         overlayNameField.setPromptText(EMPTY_FIELD);
-        overlayNameField.textProperty().addListener((obs,oldValue,newValue)->onOverlayNameChanged(newValue));
+        overlayNameField.textProperty().addListener(this::onOverlayNameChanged);
+        
+        overlayProperty.addListener(this::onOverlaySelectionChanged);
         
     }
 
     ImageDisplay imageDisplay;
 
+    
+   
+    
     public void onOverlaySelectionChanged() {
 
         if (imageDisplay == null) {
@@ -139,6 +151,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     public void handleEvent(OverlaySelectedEvent event) {
 
         
+        if(event.getOverlay() == null) return;
+        
         // task calculating the stats in a new thread
         Task<HashMap<String, Double>> task = new Task<HashMap<String, Double>>() {
             @Override
@@ -157,11 +171,16 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
                 
             }
         };
+        overlayProperty.setValue(event.getOverlay());
         
-        overlayNameField.setText(overlaySelectionService.getSelectedOverlays(currentDisplay()).get(0).getName());
         
        ImageJFX.getThreadPool().submit(task);
 
+    }
+    
+    @EventHandler
+    public void onActiveDisplayChanged(DisplayActivatedEvent event) {
+        onOverlaySelectionChanged();
     }
     
     @FXML
@@ -216,13 +235,19 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     }
     
     
+     public void onOverlaySelectionChanged(Observable obs, Overlay oldValue, Overlay newValue) {
+        
+        overlayNameField.setText(newValue.getName());
+        
+    }
     
-    public void onOverlayNameChanged(String text) {
-        if (!overlaySelectionService.isMultipleSelection(currentDisplay())) {
-            
-            overlaySelectionService.getSelectedOverlays(currentDisplay()).get(0).setName(text);
+    public void onOverlayNameChanged(Observable obs, String oldText, String newText) {
+        if(overlayProperty.getValue() != null) {
+            overlayProperty.getValue().setName(newText);
         }
     }
+    
+    
     
   
     

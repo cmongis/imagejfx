@@ -56,6 +56,9 @@ public class DefaultProject implements Project {
 
     private String currentMetaDataDB = PlaneDB.MODIFIED_METADATASET_STRING;
     
+    private MetaDataSet settings;
+    
+    
     private boolean changed;
     /**
      * A list of all image object.
@@ -284,6 +287,14 @@ public class DefaultProject implements Project {
     @Override
     public void removeSelectedPlane(PlaneDB plane) {
         selectedPlanes.remove(plane);
+    }
+
+    @Override
+    public MetaDataSet getSettings() {
+        if(settings == null) {
+            settings = new MetaDataSet();
+        }
+        return settings;
     }
 
   

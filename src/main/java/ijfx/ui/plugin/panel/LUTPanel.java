@@ -75,7 +75,7 @@ import mongis.utils.FXUtilities;
  *
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "lutPanel", context = "imagej+image-open", localization = Localization.RIGHT, order = 0)
+@UiConfiguration(id = "lutPanel", context = "imagej+image-open -overlay-selected", localization = Localization.RIGHT, order = 0)
 public class LUTPanel extends TitledPane implements UiPlugin {
 
     LUTComboBox lutComboBox;

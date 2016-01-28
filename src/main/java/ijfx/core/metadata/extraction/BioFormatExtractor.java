@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import ijfx.core.metadata.extraction.completor.FromNameCompletor;
 import loci.formats.ImageReader;
+import loci.formats.UnknownFormatException;
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -47,7 +48,7 @@ import org.scijava.service.Service;
 public class BioFormatExtractor extends AbstractService implements MetaDataExtractorService {
 
    
-    
+    Logger logger = ImageJFX.getLogger();
     
     @Override
     public PlaneList extract(File file) {
@@ -68,8 +69,10 @@ public class BioFormatExtractor extends AbstractService implements MetaDataExtra
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
             return planes;
         } catch (loci.formats.FormatException ex) {
-            Logger.getLogger(BioFormatExtractor.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
+            return planes;
         }
+        
 
         int width = r.getSizeX();
         int height = r.getSizeY();

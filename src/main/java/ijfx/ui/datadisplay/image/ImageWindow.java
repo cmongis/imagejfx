@@ -27,6 +27,7 @@ import ijfx.ui.tool.ToolChangeEvent;
 import ijfx.ui.tool.DefaultFxToolService;
 import ijfx.service.uicontext.UiContextCalculatorService;
 import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.PixelDrawer;
 import ijfx.ui.main.ImageJFX;
@@ -36,6 +37,8 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
@@ -68,6 +71,7 @@ import org.scijava.Context;
 
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
+import org.scijava.display.event.DisplayActivatedEvent;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -233,11 +237,20 @@ public class ImageWindow extends Window {
 
         setCurrentTool(toolService.getCurrentTool());
 
-        onMouseClickedProperty().addListener(this::putInFront);
+        
+        
+        for(EventType<? extends MouseEvent> t : new EventType[] { MouseEvent.MOUSE_CLICKED, MouseEvent.DRAG_DETECTED, MouseEvent.MOUSE_PRESSED }) {
+            addEventHandler(t, this::putInFront);
+            getContentPane().addEventHandler(t, this::putInFront);
+        }
+        
+      
 
+        
+        
         focusedProperty().addListener(this::onFocus);
 
-        getContentPane().onMousePressedProperty().addListener(this::putInFront);
+       
 
         translateXProperty().addListener(event -> putInFront());
 
@@ -249,15 +262,15 @@ public class ImageWindow extends Window {
         }
     }
 
-    public void putInFront(Observable event) {
+    public void putInFront(MouseEvent event) {
         putInFront();
     }
 
     public void putInFront() {
         //  System.out.println("putting display to front");
-
+        logger.info("Putting in front "+imageDisplay);
         displayService.setActiveDisplay(imageDisplay);
-
+        setMoveToFront(true);
     }
 
     /*
@@ -428,7 +441,12 @@ public class ImageWindow extends Window {
 
             SwingFXUtils.toFXImage(bf, writableImage);
             getOverlays().forEach(o -> {
-                if (overlayService.getActiveOverlay(imageDisplay) == o) {
+                
+                logger.info("Drawing overlay "+o.toString());
+                
+                //if (overlayService.getActiveOverlay(imageDisplay) == o) {
+                if(overlaySelectionService.getSelectedOverlays(imageDisplay).contains(o)) {
+                System.out.println(o + " is selected !");
                     drawer.setColor(selectedOverlayColor);
                 } else {
                     drawer.setColor(overlayColor);
@@ -492,9 +510,9 @@ public class ImageWindow extends Window {
         if (currentTool != null) {
             currentTool.unsubscribe(canvas);
         }
+        if(tool!= null)
         tool.subscribe(canvas);
         currentTool = tool;
-
     }
 
     /*
@@ -646,6 +664,29 @@ public class ImageWindow extends Window {
     @EventHandler
     protected void onEvent(ToolChangeEvent event) {
         setCurrentTool(event.getTool());
+    }
+    
+    
+    
+    
+    @EventHandler
+    protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
+        System.out.println("selection changed");
+        System.out.println(event.getOverlay());
+        refreshSourceImage();
+    }
+    
+    @EventHandler
+    protected void onActiveDisplayChanged(DisplayActivatedEvent event) {
+        if(event.getDisplay() == imageDisplay) {
+            System.out.println("I'm activaed !" + imageDisplay.getName());
+            setFocused(true);
+            setCurrentTool(toolService.getCurrentTool());
+        }
+        else {
+            setFocused(false);
+            setCurrentTool(null);
+        }
     }
 
     protected boolean isWindowConcernedByModule(Module module) {

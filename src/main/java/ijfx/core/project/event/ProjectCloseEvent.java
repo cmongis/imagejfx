@@ -17,28 +17,25 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectview;
+package ijfx.core.project.event;
 
 import ijfx.core.project.Project;
-import java.util.ArrayList;
+import org.scijava.event.SciJavaEvent;
 
 /**
  *
  * @author cyril
  */
-public class DefaultProjectDisplay extends ArrayList<PlaneSet> implements ProjectDisplay {
+public class ProjectCloseEvent extends SciJavaEvent{
+    private final Project project;
 
-    final private Project project;
-
-    public DefaultProjectDisplay(Project project) {
+    public ProjectCloseEvent(Project project) {
         this.project = project;
     }
-    
-    
-    
-    @Override
+
     public Project getProject() {
         return project;
     }
+    
     
 }
