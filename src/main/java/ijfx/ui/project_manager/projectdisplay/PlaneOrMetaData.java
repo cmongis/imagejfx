@@ -78,6 +78,9 @@ public class PlaneOrMetaData {
         }
     }
     
+    public void setPlane(PlaneDB planeDB) {
+        this.planeDB = planeDB;
+    }
     
     
     

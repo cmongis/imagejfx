@@ -22,6 +22,7 @@ package ijfx.ui.project_manager.projectdisplay;
 import ijfx.core.metadata.GenericMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.imageDBService.PlaneDB;
+import ijfx.ui.project_manager.project.TreeItemUtils;
 import java.util.List;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TreeItem;
@@ -32,7 +33,7 @@ import javafx.scene.control.TreeItem;
  */
 public class ImageTreeService {
 
-    public static void placeImage(PlaneDB planeDB, ProjectTreeItem root, List<String> hierarchy) {
+    public static void placePlane(PlaneDB planeDB, ProjectTreeItem root, List<String> hierarchy) {
 
         // we progressively go down the tree to find the node corresponding to
         // the hierarchy
@@ -56,13 +57,39 @@ public class ImageTreeService {
         currentNode.getChildren().add(new ProjectTreeItem(planeDB));
     }
 
-    public static void planePlaneList(List<PlaneDB> planeList, ProjectTreeItem root, List<String> hieararchy) {
+    public static void placePlanes(List<PlaneDB> planeList, ProjectTreeItem root, List<String> hieararchy) {
         
         for( PlaneDB plane : planeList) {
-            placeImage(plane, root, hieararchy);
+            placePlane(plane, root, hieararchy);
         }
         
         
+    }
+    
+    public static void removePlane(PlaneDB plane, ProjectTreeItem root) {
+        TreeItemUtils.goThrough(root, treeItem->{    
+            TreeItem parentNode = treeItem.getParent();
+            if(parentNode == null) return;
+            if(treeItem.getValue().isPlane() && treeItem.getValue().getPlaneDB() == plane) {
+               parentNode.getChildren().remove(treeItem);
+            }
+        });
+    }
+    
+    public static void removePlanes(List<? extends PlaneDB> planeList, ProjectTreeItem root) {
+        for(PlaneDB plane : planeList) {
+            removePlane(plane,root);
+        }
+    }
+    
+    public static void deleteEmptyNodes(ProjectTreeItem root) {
+        if(true) return;
+        TreeItemUtils.goThrough(root, treeItem->{    
+            TreeItem parentNode = treeItem.getParent();
+            if(treeItem.getChildren().size() == 0) {
+               parentNode.getChildren().remove(treeItem);
+            }
+        });
     }
     
     public static ProjectTreeItem findNode(MetaData metadata, ProjectTreeItem root) {

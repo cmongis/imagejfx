@@ -15,30 +15,14 @@
     along with ImageJ FX.  If not, see <http://www.gnu.org/licenses/>. 
     
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
-	
- */
-package ijfx.ui.project_manager.projectdisplay;
+        
+*//* 
+   Created on : Feb 1, 2016, 10:35:12 AM
+   Author     : cyril
+*/
 
-import ijfx.core.project.Project;
-import javafx.beans.property.Property;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
 
-/**
- *
- * @author cyril
- */
-public interface ProjectDisplay {
-    
-    
-    public static String ALL_IMAGES = "All images";
-    public static String SELECTED_IMAGES = "Selected";
-    
-    Project getProject();    
-    ObservableList<PlaneSet> getPlaneSetList();
-    Property<PlaneSet> currentPlaneSetProperty();
-    PlaneSet getCurrentPlaneSet();
-    PlaneSet getPlaneSet(String id);
-    void setCurrentPlaneSet(PlaneSet planeSet);
-    
+#planeSetHBox {
+    -fx-padding-left: 30px;
 }
+

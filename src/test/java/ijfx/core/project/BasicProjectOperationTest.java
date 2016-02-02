@@ -17,28 +17,51 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectdisplay;
+package ijfx.core.project;
 
-import ijfx.core.project.Project;
-import javafx.beans.property.Property;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
+import net.imagej.ImageJ;
+import org.junit.Test;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
-public interface ProjectDisplay {
+
+
+public class BasicProjectOperationTest {
     
     
-    public static String ALL_IMAGES = "All images";
-    public static String SELECTED_IMAGES = "Selected";
+    public static ImageJ imagej;
     
-    Project getProject();    
-    ObservableList<PlaneSet> getPlaneSetList();
-    Property<PlaneSet> currentPlaneSetProperty();
-    PlaneSet getCurrentPlaneSet();
-    PlaneSet getPlaneSet(String id);
-    void setCurrentPlaneSet(PlaneSet planeSet);
+    
+    @Parameter
+    ProjectManagerService projectService;
+    
+    @Parameter
+    ProjectIoService projectIOService;
+    
+    public static ImageJ getImageJ() {
+        if(imagej == null) {
+            imagej = new ImageJ();
+        }
+        return imagej;
+    }
+    
+    
+    public void init() {
+        getImageJ().getContext().inject(this);
+    }
+    
+    @Test
+    public void testProjectSettings() {
+        
+        //init();
+        
+        System.out.println(projectService);
+        
+        
+    }
+    
     
 }

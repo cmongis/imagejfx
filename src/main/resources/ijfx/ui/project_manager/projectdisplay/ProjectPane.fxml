@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <BorderPane maxWidth="1.7976931348623157E308" minWidth="200.0" BorderPane.alignment="CENTER">
+         <right>
+            <HBox fx:id="viewHBox" styleClass="hbox" BorderPane.alignment="CENTER" />
+         </right>
+         <styleClass>
+            <String fx:value="toolbar" />
+            <String fx:value="tool-bar" />
+            <String fx:value="hbox" />
+         </styleClass>
+         <left>
+            <HBox styleClass="hbox" BorderPane.alignment="CENTER">
+               <children>
+                <Button mnemonicParsing="false" text="Hierarchy" />
+                  <Button mnemonicParsing="false" onAction="#levelUp" styleClass="icon">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="LEVEL_UP" />
+                     </graphic>
+                  </Button>
+               </children>
+            </HBox>
+         </left>
+         <center>
+            <HBox fx:id="planeSetHBox" maxHeight="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </top>
+</fx:root>

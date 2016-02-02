@@ -64,12 +64,10 @@ public class DefaultQueryService extends AbstractService implements QueryService
 
     @Parameter
     private ProjectModifierService projectModifier;
-    
-     @Parameter
+
+    @Parameter
     EventService eventService;
-    
-   
-    
+
     private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
     private String defaultMetaSetName = PlaneDB.MODIFIED_METADATASET_STRING;
     private final ResourceBundle rb;
@@ -77,7 +75,6 @@ public class DefaultQueryService extends AbstractService implements QueryService
 
     Logger logger = ImageJFX.getLogger();
 
-    
     SelectorFactory selectorFactory = new DefaultSelectorFactory();
 
     public DefaultQueryService() {
@@ -190,9 +187,6 @@ public class DefaultQueryService extends AbstractService implements QueryService
         return cmdList;
     }
 
-    
-    
-    
     private ScriptEngine getEngine() {
         return scriptEngineManager.getEngineByName("nashorn");
     }
@@ -200,40 +194,8 @@ public class DefaultQueryService extends AbstractService implements QueryService
     @Override
     public boolean query(PlaneDB plane, Selector selector, String metaDataSetName) {
 
-        
-        return selector.matches(plane,metaDataSetName);
-        
-        /*
-        ScriptEngine scriptEngine = getEngine();
-        boolean queryResult = false;
-        boolean validSyntax = false;
-        Object response = new Object();
-        ReadOnlyMapProperty<String, MetaData> set = metaDataSetName != null ? plane.getMetaDataSetProperty(metaDataSetName) : plane.getMetaDataSet();
-        QueryService.putVariableInScriptEngine(scriptEngine, plane.getTags().get(), set.get());
-        try {
-            logger().info("Executing the following script : "+selector.getParsedSelector());
-            response = scriptEngine.eval(selector.getParsedSelector());
-            if (response == null) {
-                ImageJFX.getLogger();
-                queryResult = false;
-            } else {
-                validSyntax = true;
-                queryResult = (Boolean) response;
-            }
-        } catch (ScriptException ex) {
-            ImageJFX.getLogger()
-                    .log(Level.WARNING, "script exception");
-            //ex.printStackTrace();
-            validSyntax = false;
-        } catch (ClassCastException ex) {
-            ImageJFX.getLogger()
-                    .log(Level.WARNING, "javascript response is not a boolean");
-            validSyntax = false;
+        return selector.matches(plane, metaDataSetName);
 
-        }
-        selector.setValidSyntax(validSyntax);
-
-        return queryResult;*/
     }
 
     @Override
@@ -253,44 +215,39 @@ public class DefaultQueryService extends AbstractService implements QueryService
         List<PlaneDB> deselectPlane = new ArrayList<>();
         List<Command> cmds = new ArrayList<>();
 
-        
-                project.getImages().stream().parallel().forEach(plane -> {
-                
-                    
-                
-                if (!onSelection || onSelection && plane.selectedProperty().get()) {
-                    boolean queryResult = query(plane, selector, metaDataSetName);
-                   
-                    if (queryResult) {
-                        queryResultList.add(plane);
-                    }
-                    if (queryResult != plane.selectedProperty().get()) {
-                        if (plane.selectedProperty().get()) {
-                            deselectPlane.add(plane);
-                        } else {
-                            selectPlane.add(plane);
-                        }
-                    }
+        project.getImages().stream().parallel().forEach(plane -> {
 
+            if (!onSelection || onSelection && plane.selectedProperty().get()) {
+                boolean queryResult = query(plane, selector, metaDataSetName);
+
+                if (queryResult) {
+                    queryResultList.add(plane);
                 }
-                });
-           
+                if (queryResult != plane.selectedProperty().get()) {
+                    if (plane.selectedProperty().get()) {
+                        deselectPlane.add(plane);
+                    } else {
+                        selectPlane.add(plane);
+                    }
+                }
+
+            }
+        });
 
         projectModifier.selectPlane(project, deselectPlane, selectPlane);
         timer.elapsed("query");
         eventService.publish(new QueryStop());
-        if(queryResultList.size() > 0) {
-            
+        if (queryResultList.size() > 0) {
+
         }
         return queryResultList;
 
     }
 
-    
     public Logger logger() {
         return ImageJFX.getLogger();
     }
-    
+
     public class QueryStart extends SciJavaEvent {
 
     }
@@ -325,7 +282,7 @@ public class DefaultQueryService extends AbstractService implements QueryService
                 cmds.add(new RemoveMetaDataCommand(plane, metaDataSet.get(key)));
             }
         }
-        for (String key: request.getRemoveKey()) {
+        for (String key : request.getRemoveKey()) {
             if (plane.getMetaDataSet().get(key) != null) {
                 cmds.add(new RemoveMetaDataCommand(plane, key));
             }
@@ -386,18 +343,10 @@ public class DefaultQueryService extends AbstractService implements QueryService
         }
     }
 
-    /*
-    @Override
-    public void modifyQueryObject(Project project, Selector query, String nonParsedNewVal) {
-        project.getInvoker().executeCommand(new ModifyQueryCommand(query, nonParsedNewVal));
-    }*/
-
+    
     @Override
     public int getNbOfAnnotatedPlane() {
         return nbAutamaticallyAnnotatedPlane;
     }
 
-    
-    
-    
 }

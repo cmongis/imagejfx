@@ -20,25 +20,14 @@
 package ijfx.ui.project_manager.projectdisplay;
 
 import ijfx.core.project.Project;
-import javafx.beans.property.Property;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
+import net.imagej.ImageJService;
 
 /**
  *
  * @author cyril
  */
-public interface ProjectDisplay {
-    
-    
-    public static String ALL_IMAGES = "All images";
-    public static String SELECTED_IMAGES = "Selected";
-    
-    Project getProject();    
-    ObservableList<PlaneSet> getPlaneSetList();
-    Property<PlaneSet> currentPlaneSetProperty();
-    PlaneSet getCurrentPlaneSet();
-    PlaneSet getPlaneSet(String id);
-    void setCurrentPlaneSet(PlaneSet planeSet);
+public interface ProjectDisplayService extends ImageJService {
+
+    ProjectDisplay getProjectDisplay(Project project);
     
 }

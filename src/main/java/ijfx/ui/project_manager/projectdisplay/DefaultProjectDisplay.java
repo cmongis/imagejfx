@@ -20,7 +20,14 @@
 package ijfx.ui.project_manager.projectdisplay;
 
 import ijfx.core.project.Project;
+import ijfx.core.project.imageDBService.PlaneDB;
 import java.util.ArrayList;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
 /**
  *
@@ -30,8 +37,16 @@ public class DefaultProjectDisplay extends ArrayList<PlaneSet> implements Projec
 
     final private Project project;
 
+    final private ObservableList<PlaneSet> planeSetList = FXCollections.observableArrayList();
+    
+     private TreeItem<PlaneOrMetaData> currentItem;
+    
+     private final Property<PlaneSet> currentPlaneSetProperty = new SimpleObjectProperty<>();
+     
     public DefaultProjectDisplay(Project project) {
         this.project = project;
+        planeSetList.add(new DefaultPlaneSet(project));
+        currentPlaneSetProperty.setValue(planeSetList.get(0));
     }
     
     
@@ -40,5 +55,45 @@ public class DefaultProjectDisplay extends ArrayList<PlaneSet> implements Projec
     public Project getProject() {
         return project;
     }
+
+    @Override
+    public ObservableList<PlaneSet> getPlaneSetList() {
+        return planeSetList;
+    }
+
+    @Override
+    public Property<PlaneSet> currentPlaneSetProperty() {
+        return currentPlaneSetProperty;
+    }
+
+    @Override
+    public PlaneSet getCurrentPlaneSet() {
+        return currentPlaneSetProperty.getValue();
+    }
+
+    @Override
+    public void setCurrentPlaneSet(PlaneSet planeSet) {
+        currentPlaneSetProperty.setValue(planeSet);
+    }
+    
+    
+    
+    public void onHierarchyChange(ListChangeListener.Change<? extends String> change) {
+        
+    }
+
+    
+    
+    @Override
+    public PlaneSet getPlaneSet(String id) {
+        return planeSetList
+                .stream()
+                .filter(planeSet->planeSet.getName().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    
+    
     
 }

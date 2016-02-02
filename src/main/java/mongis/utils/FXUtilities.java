@@ -22,6 +22,7 @@ package mongis.utils;
 
 import ijfx.core.listenableSystem.Listening;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.project_manager.project.IconItem;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -32,7 +33,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -45,7 +49,7 @@ import javafx.stage.Stage;
  *
  * @author Cyril MONGIS
  */
-public  class FXUtilities   {
+public class FXUtilities {
 
     public static Node loadView(URL url, Object controller, boolean setRoot) {
         FXMLLoader loader = setLoaderController(createLoader(), controller);
@@ -55,7 +59,6 @@ public  class FXUtilities   {
         }
         return loadController(loader);
     }
-    
 
     public static Pane loadView(URL url) {
         try {
@@ -65,6 +68,7 @@ public  class FXUtilities   {
         }
         return null;
     }
+
     public static ResourceBundle getResourceBundle() {
         return ImageJFX.getResourceBundle();
     }
@@ -83,7 +87,6 @@ public  class FXUtilities   {
         loader.setResources(getResourceBundle());
         return loader;
     }
-    
 
     private static Node loadController(FXMLLoader loader) {
         try {
@@ -110,6 +113,7 @@ public  class FXUtilities   {
         pane.getChildren().clear();
 
     }
+
     public static void modifyUiThreadSafe(Runnable r) {
         if (Platform.isFxApplicationThread()) {
             r.run();
@@ -117,25 +121,22 @@ public  class FXUtilities   {
             Platform.runLater(r);
         }
     }
+
     public static void close(Pane pane) {
         Stage stage = (Stage) pane.getScene().getWindow();
         stage.close();
     }
-   
-    
-     /**
+
+    /**
      * Simple helper class.
      *
      * @author hendrikebbers
      *
      */
-    
-    
-   public static final String BUTTON_PRIMARY_CLASS = "primary";
-   public static final String BUTTON_SUCCESS_CLASS = "success";
-   public static final String BUTTON_DANGER_CLASS = "danger";
-    
-    
+    public static final String BUTTON_PRIMARY_CLASS = "primary";
+    public static final String BUTTON_SUCCESS_CLASS = "success";
+    public static final String BUTTON_DANGER_CLASS = "danger";
+
     private static class ThrowableWrapper {
 
         Throwable t;
@@ -193,17 +194,15 @@ public  class FXUtilities   {
     }
 
     public static void injectFXML(Object rootAndController) throws IOException {
-        
-        
+
         String fileName = rootAndController.getClass().getSimpleName() + ".fxml";
-        
+
         //System.out.println(rootAndController.getClass().getResource(fileName));
-        
         injectFXML(rootAndController, fileName);
     }
 
     private static FXMLLoader loader = new FXMLLoader();
-    
+
     public static void injectFXML(Object rootController, String location) throws IOException {
         //FXMLLoader loader = new FXMLLoader(rootController.getClass().getResource(location));
 
@@ -212,7 +211,38 @@ public  class FXUtilities   {
         loader.setResources(ImageJFX.getResourceBundle());
         loader.setLocation(rootController.getClass().getResource(location));
         loader.setClassLoader(rootController.getClass().getClassLoader());
+        
         loader.load();
+
+        URL css
+                = rootController.getClass().getResource(rootController.getClass().getSimpleName() + ".css");
+
+        try {
+            if (css != null) {
+                
+                // gets the root of the loader
+                Node root = loader.getRoot();
+                
+                // get the url of the css
+                String url = css.toExternalForm();
+                
+                // going through the list to check if there is an existing URL
+                String existingURL = root.getScene()
+                        .getStylesheets()
+                        .stream()
+                        .filter(str->str.equals(url))
+                        .findFirst().orElse(null);
+                
+                // if there is, it's deleted from the list to update the Scene with
+                // possible modification
+                if(existingURL != null) {
+                    root.getScene().getStylesheets().remove(existingURL);
+                }
+                root.getScene().getStylesheets().add(css.toExternalForm());
+            }
+        } catch (Exception e) {
+            Logger.getGlobal().log(Level.WARNING, "Couldn't load CSS", e);
+        }
 
     }
 
@@ -304,7 +334,6 @@ public  class FXUtilities   {
                 }
                 files = fileChooser.showOpenMultipleDialog(null);
 
-
                 return files;
             }
         };
@@ -321,8 +350,7 @@ public  class FXUtilities   {
 
         return null;
     }
-    
-    
+
     public static File openFolder(String title, String defaultFolder) {
         Task<File> task = new Task<File>() {
             public File call() {
@@ -333,9 +361,9 @@ public  class FXUtilities   {
                 if (defaultFolder != null) {
                     fileChooser.setInitialDirectory(new File(defaultFolder));
                 }
-                
+
                 file = fileChooser.showDialog(null);
-                
+
                 return file;
             }
         };
@@ -345,10 +373,10 @@ public  class FXUtilities   {
 
             return task.get();
         } catch (Exception ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);
-        } 
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+        }
         return null;
-    
+
     }
 
     public static File saveFile(String title, String defaultFolder, String extensionTitle, String... extensions) {
@@ -382,28 +410,43 @@ public  class FXUtilities   {
 
         return null;
     }
-    
-    
+
     public static void toggleCssStyle(Node node, String styleClass) {
-       
-        toggleCssStyle(node,styleClass,node.getStyleClass().contains(styleClass));
-        
-    }
-    
-    public static void toggleCssStyle(Node node,String styleClass,boolean toggle) {
-        
-        if(toggle) {
-            if(node.getStyleClass().contains(styleClass) == false)
-            node.getStyleClass().add(styleClass);
-        }
-        else {
-            while(node.getStyleClass().contains(styleClass))
-            node.getStyleClass().remove(styleClass);
-        }
-        
-        
+
+        toggleCssStyle(node, styleClass, node.getStyleClass().contains(styleClass));
+
     }
 
-   
+    public static void toggleCssStyle(Node node, String styleClass, boolean toggle) {
 
+        if (toggle) {
+            if (node.getStyleClass().contains(styleClass) == false) {
+                node.getStyleClass().add(styleClass);
+            }
+        } else {
+            while (node.getStyleClass().contains(styleClass)) {
+                node.getStyleClass().remove(styleClass);
+            }
+        }
+
+    }
+
+    public static <T> void bindList(final ObservableList<T> listToUpdate, final ObservableList<? extends T> changingList) {
+
+        changingList.addListener((ListChangeListener.Change<? extends T> c) -> {
+
+
+            while (c.next()) {
+
+
+
+                listToUpdate.removeAll(c.getRemoved());
+                listToUpdate.addAll(c.getAddedSubList());
+                
+                
+
+            }
+        });
+
+    }
 }

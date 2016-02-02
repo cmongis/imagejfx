@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root animated="false" text="Overlay manager" type="TitledPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+   <content>
+      <BorderPane>
+         <bottom>
+            <ToolBar BorderPane.alignment="CENTER">
+              <items>
+                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#updateList" text="Delete" />
+              </items>
+            </ToolBar>
+         </bottom>
+         <center>
+            <ListView fx:id="overlayListView" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </content>
+</fx:root>

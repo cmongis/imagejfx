@@ -20,25 +20,31 @@
 package ijfx.ui.project_manager.projectdisplay;
 
 import ijfx.core.project.Project;
-import javafx.beans.property.Property;
-import javafx.collections.ObservableList;
+import ijfx.core.project.imageDBService.PlaneDB;
+import java.util.List;
 import javafx.scene.control.TreeItem;
+import net.imagej.ImageJService;
 
 /**
  *
  * @author cyril
  */
-public interface ProjectDisplay {
+public interface PlaneSelectionService extends ImageJService{
     
     
-    public static String ALL_IMAGES = "All images";
-    public static String SELECTED_IMAGES = "Selected";
     
-    Project getProject();    
-    ObservableList<PlaneSet> getPlaneSetList();
-    Property<PlaneSet> currentPlaneSetProperty();
-    PlaneSet getCurrentPlaneSet();
-    PlaneSet getPlaneSet(String id);
-    void setCurrentPlaneSet(PlaneSet planeSet);
+    public void selectPlane(Project project, PlaneDB planeDB);
+    
+    public void selectPlanes(Project project,List<PlaneDB> planeDB);
+    
+    public void setPlaneSelection(Project project, PlaneDB planeDB, boolean selected);
+    
+    public void setPlaneSelection(Project project, List<PlaneDB> planeList, boolean selected);
+    
+    public void setPlaneSelection(Project project, TreeItem<PlaneOrMetaData> planeList, boolean selected);
+    
+    public List<PlaneDB> getSelectedPlane(Project project);
+    
+    
     
 }

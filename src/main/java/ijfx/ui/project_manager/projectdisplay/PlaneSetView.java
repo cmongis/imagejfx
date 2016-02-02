@@ -19,26 +19,33 @@
  */
 package ijfx.ui.project_manager.projectdisplay;
 
-import ijfx.core.project.Project;
+import java.util.List;
 import javafx.beans.property.Property;
-import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 
 /**
  *
  * @author cyril
  */
-public interface ProjectDisplay {
+public interface PlaneSetView {
+    
+    public void setCurrentItem(TreeItem<PlaneOrMetaData> item);
+    
+    public TreeItem<PlaneOrMetaData> getCurrentItem();
+    
+    public void setCurrentPlaneSet(PlaneSet planeSet);
+    
+    public PlaneSet getCurrentPlaneSet();
     
     
-    public static String ALL_IMAGES = "All images";
-    public static String SELECTED_IMAGES = "Selected";
+    public void setHirarchy(List<String> hierarchy);
     
-    Project getProject();    
-    ObservableList<PlaneSet> getPlaneSetList();
-    Property<PlaneSet> currentPlaneSetProperty();
-    PlaneSet getCurrentPlaneSet();
-    PlaneSet getPlaneSet(String id);
-    void setCurrentPlaneSet(PlaneSet planeSet);
+   
+    
+    public Node getIcon();
+    
+    public Node getNode();
+    
     
 }

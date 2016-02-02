@@ -35,7 +35,7 @@ import org.scijava.service.AbstractService;
  * @author cyril
  */
 @Plugin(type = ImageJService.class)
-public class DefaultProjectViewService extends AbstractService implements ImageJService{
+public class DefaultProjectDisplayService extends AbstractService implements ProjectDisplayService{
     
     HashMap<Project,ProjectDisplay> projectDisplayMap = new HashMap<>();
     
@@ -43,7 +43,7 @@ public class DefaultProjectViewService extends AbstractService implements ImageJ
     @Parameter
     EventService eventService;
     
-    public ProjectDisplay addProject(Project project) {
+    private ProjectDisplay addProject(Project project) {
         
         ProjectDisplay projectDisplay = new DefaultProjectDisplay(project);
         projectDisplayMap.put(project, projectDisplay);
@@ -53,6 +53,7 @@ public class DefaultProjectViewService extends AbstractService implements ImageJ
         return projectDisplay;
     }
     
+    @Override
     public ProjectDisplay getProjectDisplay(Project project) {
         if(projectDisplayMap.containsKey(project) == false) {
             return addProject(project);
@@ -64,16 +65,18 @@ public class DefaultProjectViewService extends AbstractService implements ImageJ
     
     
     @EventHandler
-    public void onProjectCreated(ProjectCreatedEvent event) {
+    private void onProjectCreated(ProjectCreatedEvent event) {
         addProject(event.getProject());
         
-        getProjectDisplay(event.getProject()).add(new  DefaultPlaneSet(event.getProject()));
+       
         
     }
     
     @EventHandler
-    public void onProjectClosed(ProjectCloseEvent event) {
-        projectDisplayMap.remove(event.getProject());
+    private void onProjectClosed(ProjectCloseEvent event) {
+        ProjectDisplay projectDisplay = getProjectDisplay(event.getProject());
+        projectDisplayMap.remove(projectDisplay);
+        eventService.publishLater(new ProjectDisplayClosedEvent(projectDisplay));
     }
     
    

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <TextField fx:id="filterTextField" BorderPane.alignment="CENTER" />
+   </top>
+   <center>
+      <TableView fx:id="tableView" BorderPane.alignment="CENTER" />
+   </center>
+</fx:root>

@@ -20,9 +20,7 @@
  */
 package ijfx.ui.project_manager.project;
 
-import ijfx.core.metadata.MetaData;
-import ijfx.core.project.imageDBService.PlaneDB;
-import javafx.scene.control.CheckBoxTreeItem;
+import java.util.function.Consumer;
 import javafx.scene.control.TreeItem;
 
 /**
@@ -31,17 +29,17 @@ import javafx.scene.control.TreeItem;
  */
 public class TreeItemUtils {
     // go through the whole tree and execute the handler
-    public static void goThrough(TreeItem<TreeItem> root, Handler<TreeItem> handler) {
-        handler.handle(root);
-        root.getChildren().forEach(child->{
+     public static <T> void goThrough(TreeItem<? extends T> root, Consumer<TreeItem<? extends T>> handler) {
+        handler.accept(root);
+        for(TreeItem<? extends T> child : root.getChildren()) {
             goThrough(child, handler);
-        });
+        };
     }
     
     // go through all the leaves
-    public static void goThroughLeaves(TreeItem<TreeItem> root, Handler<TreeItem> handler) {
+    public static <T> void goThroughLeaves(TreeItem<? extends T> root, Consumer<TreeItem<? extends T>> handler) {
         goThrough(root,child->{
-           if(child.isLeaf()) handler.handle(child);
+           if(child.isLeaf()) handler.accept(child);
         });
     }
     

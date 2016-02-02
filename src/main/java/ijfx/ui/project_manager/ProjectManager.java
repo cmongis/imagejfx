@@ -24,7 +24,6 @@ import mongis.utils.FXUtilities;
 import ijfx.core.project.Project;
 import ijfx.core.project.ProjectManagerService;
 import ijfx.ui.project_manager.project.BrowserUIService;
-import ijfx.ui.project_manager.project.ProjectMainPane;
 import ijfx.ui.project_manager.project.MainProjectController;
 import ijfx.ui.project_manager.search.SearchBar;
 import ijfx.ui.context.animated.Animation;
@@ -64,6 +63,8 @@ import org.scijava.plugin.Plugin;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayCreatedEvent;
+import ijfx.ui.project_manager.projectdisplay.ProjectPane;
 
 /**
  * ProjectManager class. This is the main controller of the browser UI.
@@ -176,7 +177,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
     public UiPlugin init() {
 
         // listen for changes in the list of opened projects
-        projectManager.getProjects().addListener(this::handleProjectListChange);
+        //projectManager.getProjects().addListener(this::handleProjectListChange);
 
         // listen for change of the current project
         projectManager.currentProjectProperty().addListener(this::handleCurrentProjectChange);
@@ -326,24 +327,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         browserUiService.newProject();
     }
 
-    /*
-     private void updateListenedProject(Project oldVal, Project newVal) {
-     if (oldVal != null) {
-     undoDisableProperty.unbind();
-     redoDisableProperty.unbind();
-     Invoker invoker = oldVal.getInvoker();
-     invoker.undoNameProperty().removeListener(undoCmdNameListener);
-     invoker.redoNameProperty().removeListener(redoCmdNameListener);
-     }
-     if (newVal != null) {
-     Invoker invoker = newVal.getInvoker();
-     undoDisableProperty.bind(invoker.undoDisableProperty());
-     redoDisableProperty.bind(invoker.redoDisableProperty());
-     invoker.undoNameProperty().addListener(undoCmdNameListener);
-     invoker.redoNameProperty().addListener(redoCmdNameListener);
-     }
-     }
-     */
+    
     private void setUndoCmdName(String name) {
         undoMessageProperty.set(name == null ? "" : rb.getString("undo") + " " + name);
     }
@@ -361,10 +345,16 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         }
     }
 
+    @org.scijava.event.EventHandler
+    private void onProjectDisplayCreated(ProjectDisplayCreatedEvent event) {
+        createProjectTab(event.getProjectDisplay().getProject());
+    }
+    
+    
     private void createProjectTab(Project project) {
 
         Tab tab = new Tab(project.toString());
-        tab.setContent(new ProjectMainPane(project, context));
+        tab.setContent(new ProjectPane(context,project));
         tab.setUserData(project);
         tab.setGraphic(new ProjectTabController(project, context));
         tabMap.put(project, tab);

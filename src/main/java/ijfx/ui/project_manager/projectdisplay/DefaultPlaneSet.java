@@ -21,9 +21,12 @@ package ijfx.ui.project_manager.projectdisplay;
 
 import ijfx.core.project.Project;
 import ijfx.core.project.imageDBService.PlaneDB;
+import ijfx.ui.main.ImageJFX;
 import java.util.List;
+import java.util.logging.Logger;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import mercury.core.MercuryTimer;
@@ -34,22 +37,36 @@ import mercury.core.MercuryTimer;
  */
 public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
     
-    private Property<String> nameProperty = new SimpleObjectProperty<>();
+    private final Property<String> nameProperty = new SimpleObjectProperty<>();
     
-    private Property<ProjectTreeItem> currentItemProperty =  new SimpleObjectProperty<>();
+    private final Property<ProjectTreeItem> currentItemProperty =  new SimpleObjectProperty<>();
     
     private final Property<ProjectTreeItem> rootProperty = new SimpleObjectProperty<>();
     
-    private ObservableList<PlaneDB> planeList;
+    private final ObservableList<PlaneDB> planeList;
     
     private final Project project;
 
+    Logger logger = ImageJFX.getLogger();
+    
     public DefaultPlaneSet(Project project) {
-        this.project = project;
-        setName("All images");
-        planeList = project.getImages();
-        planeList.addListener(this::onListChanged);
-        updateTree();
+        
+        this("All images",project,project.getImages());
+    }
+    
+    public DefaultPlaneSet(Project project, String name) {
+        this(name,project,FXCollections.observableArrayList());
+    }
+    
+    public DefaultPlaneSet(String name, Project project, ObservableList<PlaneDB> planes) {
+       this.project = project;
+       setName(name);
+       planeList = planes;
+       logger.info(String.format("Creating PlaneSet %s that contains %d images.",name,planeList.size()));
+        
+       planeList.addListener(this::onListChanged);
+       updateTree();
+       setCurrentItem(getRoot());
         
     }
 
@@ -57,9 +74,14 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
         
         // placing all the add planes into the tree
         
-        while(change.next())
+        while(change.next()) {
         
-        change.getAddedSubList().forEach(plane->ImageTreeService.placeImage(plane, getRoot(), project.getHierarchy()));
+             change.getAddedSubList().forEach(plane->ImageTreeService.placePlane(plane, getRoot(), project.getHierarchy()));
+             
+             ImageTreeService.removePlanes(change.getRemoved(), getRoot());
+             
+             ImageTreeService.deleteEmptyNodes(getRoot());
+        }
         
     }
     
@@ -69,8 +91,10 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
         
         setRoot(new ProjectTreeItem());
         t.start();
-        ImageTreeService.planePlaneList(planeList, rootProperty.getValue(), project.getHierarchy());
+        ImageTreeService.placePlanes(planeList, rootProperty.getValue(), project.getHierarchy());
         t.elapsed("Tree placement");
+        
+        setCurrentItem(getRoot());
     }
     
     
@@ -108,6 +132,7 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
 
     @Override
     public ProjectTreeItem getCurrentItem() {
+        
         return currentItemProperty.getValue();
     }
 
@@ -126,7 +151,7 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
     }
     
     private void addImage(PlaneDB planeDB,List<String> hierarchy) {
-        ImageTreeService.placeImage(planeDB, rootProperty.getValue(), hierarchy);
+        ImageTreeService.placePlane(planeDB, rootProperty.getValue(), hierarchy);
     }
 
     @Override
