@@ -22,7 +22,7 @@ package ijfx.core.project.query;
 
 import ijfx.core.project.imageDBService.PlaneDB;
 import java.util.Arrays;
-import java.util.StringJoiner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import mongis.utils.ConditionList;
@@ -39,11 +39,12 @@ public class SimpleTagSelector implements Selector{
     
     private String[] tags;
     
-    final static private String separator = ",";   
-    final static private Pattern validPattern = Pattern.compile("tagged with:([^=]+,)*(.*)");
+    final static  public String TAG_SEPARATOR = ",";   
+    final static  public Pattern TAG_QUERY_PATTERN = Pattern.compile("tagged with:(.*)");
     
     
     final private String PHRASE = "tagged with *%s*";
+    
     final private String PHRASE_DELIMITER = "*, *";
     
     
@@ -60,13 +61,17 @@ public class SimpleTagSelector implements Selector{
     @Override
     public void parse(String queryString) {
         
-        tags = queryString.split(separator);
         this.queryString = queryString;
+        Matcher m = TAG_QUERY_PATTERN.matcher(queryString);
+        if(m.matches()) {
+            tags = queryString.split(m.group(1));
+        }
+      
     }
 
     @Override
     public String getQueryString() {
-        return String.join(separator, tags);
+        return String.join(TAG_SEPARATOR, tags);
     }
 
     @Override
@@ -97,7 +102,7 @@ public class SimpleTagSelector implements Selector{
     }
     
     public boolean canParse(String unparsedQuery) {
-        return validPattern.matcher(unparsedQuery).matches();
+        return TAG_QUERY_PATTERN.matcher(unparsedQuery).matches();
     }
 
     @Override
