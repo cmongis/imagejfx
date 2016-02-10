@@ -28,7 +28,7 @@ import org.scijava.plugin.SciJavaPlugin;
  *
  * @author Cyril Quinton
  */
-public interface Selector extends SciJavaPlugin {
+public interface Selector extends SciJavaPlugin, Phrasable{
     public static String SELECTOR_STRING = "selector";
    
     

@@ -48,6 +48,9 @@ public class MetaDataSelector implements Selector {
 
     String valueString;
 
+    private static final String PHRASE = "contains the metadata *%s* with the exact value *%s*";
+    
+    
     public MetaDataSelector() {
 
     }
@@ -89,10 +92,14 @@ public class MetaDataSelector implements Selector {
 
             String keyName = keyString == null ? m.group(1) : keyString;
             String valueName = valueString == null ? m.group(2) : valueString;
-
+            
             // finds the right key even ignoring the case 
             keyName = findKey(metadataSet, keyName.trim());
+            
+            keyString = keyName;
+            
             valueName = valueName.trim();
+            valueString = valueName;
             try {
                 String metadataValue = planeDB.getMetaDataSetProperty(metadataSetName).get(keyName).getStringValue();
 
@@ -111,5 +118,17 @@ public class MetaDataSelector implements Selector {
 
         return metadata.keySet().stream().filter(mapKey -> mapKey.toLowerCase().equals(key.toLowerCase())).findFirst().orElse(key);
 
+    }
+
+    @Override
+    public String phraseMe() {
+        
+         Matcher m = SIMPLE_QUERY_PATTERN.matcher(queryString);
+         if(m.matches()) {
+             return String.format(PHRASE,m.group(1).trim(),m.group(2).trim());
+         }
+        
+        return "??";
+        
     }
 }

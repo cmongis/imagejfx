@@ -37,6 +37,8 @@ public class UniversalSelector implements Selector {
 
     String queryString;
 
+    private static final String PHRASE = "contains the word \"%s\" in one of metadata";
+    
     @Override
     public void parse(String queryString) {
         this.queryString = queryString;
@@ -75,6 +77,11 @@ public class UniversalSelector implements Selector {
 
         return metadata.keySet().stream().filter(mapKey -> mapKey.toLowerCase().equals(key.toLowerCase())).findFirst().orElse(null);
 
+    }
+
+    @Override
+    public String phraseMe() {
+        return String.format(PHRASE.format(PHRASE, queryString));
     }
 
 }
