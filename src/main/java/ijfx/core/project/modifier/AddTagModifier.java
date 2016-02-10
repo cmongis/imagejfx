@@ -19,13 +19,17 @@
  */
 package ijfx.core.project.modifier;
 
-import ijfx.core.metadata.GenericMetaData;
-import ijfx.core.project.command.AddMetaDataCommand;
 import ijfx.core.project.command.Command;
+import ijfx.core.project.command.CommandList;
 import ijfx.core.project.imageDBService.PlaneDB;
-import ijfx.ui.main.ImageJFX;
+import ijfx.core.project.imageDBService.command.AddTagCommand;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import mongis.utils.ConditionList;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -33,23 +37,20 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = ModifierPlugin.class)
-public class MetaDataModifier implements ModifierPlugin{
+public class AddTagModifier implements ModifierPlugin {
 
+    List<String> tags;
     
-    String keyName;
-    String value;
-    
-    public static final Pattern PARSER =  Pattern.compile("add metadata:(.*)=(.*)");
-    public static final String PHRASE = "Adds the metadata %s = %s";
-    
+    public static final Pattern TAG_MODIFIER_PATTERN = Pattern.compile("add tags:(.*)");
+    public static final String TAG_SEPARATOR = ",";
+    public static final String PHRASE = "adds the tags %s";
     @Override
     public boolean configure(String query) {
         
-        Matcher m = PARSER.matcher(query);
+        Matcher m = TAG_MODIFIER_PATTERN.matcher(query);
         
         if(m.matches()) {
-            keyName = m.group(1).trim();
-            value = m.group(2).trim();
+            tags = Arrays.asList(m.group(1).split(TAG_SEPARATOR)).stream().map(s->s.trim()).collect(Collectors.toList());
             return true;
         }
         else {
@@ -59,23 +60,24 @@ public class MetaDataModifier implements ModifierPlugin{
 
     @Override
     public Command getModifyingCommand(PlaneDB planeDB) {
-        if(keyName == null) {
-            ImageJFX.getLogger().warning("No key name for the Modifier");
-            return null;
-        }
-        return new AddMetaDataCommand(planeDB, new GenericMetaData(keyName, value));
-        
+        List<Command> commands = new ArrayList<>(tags.size());
+        tags
+                .forEach(tag->commands.add(new AddTagCommand(planeDB,tag)));
+        return new CommandList(commands);
     }
 
     @Override
     public boolean wasApplied(PlaneDB planeDB) {
-        if(keyName == null) return false;
-        return planeDB.getMetaDataSet().get(keyName).getStringValue().equals(value);
+        
+        
+        return planeDB.getTags().containsAll(tags);
+        
+        
     }
 
     @Override
     public String phraseMe() {
-        return String.format(PHRASE,keyName,value);
+       return String.format(PHRASE,String.join(TAG_SEPARATOR, tags));
     }
     
 }
