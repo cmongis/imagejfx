@@ -28,6 +28,12 @@
                     ,"version":"1.0"
                     ,"url":"project-wizard/index.html"
                 }
+                ,{
+                    "id":"hierarchy-editor"
+                    ,"name":"Project Hierarchy Editor"
+                    ,"description":"Modify the metadata hierarchy of your project."
+                    ,"url":"project-wizard/index.html#/hierarchy-editor"
+                }
                 
                 
 		,{

@@ -648,18 +648,22 @@
     -fx-margin: 10px;
 }
 
-.with-spacing {
+.with-spacing, .border-pane {
     
     -fx-gap:10px;
     -fx-hgap:10px;
-    -fx-vgap:10px;
-    
+    -fx-vgap:10px; 
 }
 .with-padding {
     -fx-padding: 20px 20px 20px 20px;
 }
+
+
 .with-top-padding {
     -fx-padding: 20px 0px 0px 0px;
+}
+.with-margin {
+    -fx-margin: 10px 20px 10px 20px;
 }
 
 
@@ -1577,7 +1581,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-font-size: 1.2em;
     
 }
-#viewHBox .toggle-button:selected, #planeSetHBox .toggle-button:selected {
+.project-pane .toggle-button:selected {
     -fx-background-color:-flatter-warning;
 }
 #planeSetHBox {
@@ -1589,4 +1593,29 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
    
     -fx-scale-x:1.1;
     -fx-scale-y:1.1;
+}
+
+.project-card-container {
+    -fx-hgap:30px;
+    -fx-vgap:30px;
+    -fx-padding:10px;
+}
+
+.project-card {
+    -fx-padding:20px;
+    -fx-background-color:-bg-light;
+    -fx-effect:-flatter-shadow;
+    
+    -fx-pref-width:500px;
+    -fx-pref-height:300px;
+    -fx-margin:30px;
+    
+}
+.project-card-title {
+    -fx-padding: 0px 0px 30px 20px;
+    
+}
+.project-card-icon, .project-card-title{
+    -fx-text-fill:derive(-flatter-warning,30%);
+    -fx-fill:derive(-flatter-warning,30%);
 }
