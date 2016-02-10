@@ -42,7 +42,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -63,7 +62,10 @@ import org.scijava.plugin.Plugin;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayActived;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayClosedEvent;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayCreatedEvent;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
 import ijfx.ui.project_manager.projectdisplay.ProjectPane;
 
 /**
@@ -129,6 +131,9 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
     private ProjectManagerService projectManager;
 
     @Parameter
+    private ProjectDisplayService projectDisplayService;
+
+    @Parameter
     BrowserUIService browserUiService;
 
     @Parameter
@@ -178,12 +183,9 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
 
         // listen for changes in the list of opened projects
         //projectManager.getProjects().addListener(this::handleProjectListChange);
-
         // listen for change of the current project
-        projectManager.currentProjectProperty().addListener(this::handleCurrentProjectChange);
-
+        //projectManager.currentProjectProperty().addListener(this::handleCurrentProjectChange);
         // create the query bar
-        // queryBar = new QueryBar(context);
         queryBar = new SearchBar(context);
         // add the query bar to the 
         toolBar.getItems().add(queryBar);
@@ -252,19 +254,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
 
         // ???
         projectSelectionModel = projectViewTabPane.getSelectionModel();
-        projectSelectionModel.selectedItemProperty().addListener(new ChangeListener<Tab>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
-                if (newValue != null && newValue.getUserData() != null && newValue.getUserData() instanceof Project) {
-                    //listeners won't be notify if the current project is 
-                    //already equal to the one corresponding to the tab. 
-                    if (projectManager != null) {
-                        projectManager.setCurrentProject((Project) newValue.getUserData());
-                    }
-                }
-            }
-        });
+        projectSelectionModel.selectedItemProperty().addListener(this::onTabSelected);
 
         // when the button are enabled, a animation is triggered
         undoButton.disableProperty().addListener((obs, old, newValue) -> {
@@ -288,6 +278,20 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
 
         if (projectManager != null) {
             isProjectOpen.setValue(projectManager.hasProject());
+        }
+    }
+
+    private void onTabSelected(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+        if (newValue != null && newValue.getUserData() != null && newValue.getUserData() instanceof Project) {
+            //listeners won't be notify if the current project is 
+            //already equal to the one corresponding to the tab. 
+            if (projectManager != null) {
+                projectManager.setCurrentProject((Project) newValue.getUserData());
+                projectDisplayService.setActiveProjectDisplay(projectDisplayService.getProjectDisplay((Project) newValue.getUserData()));
+            }
+        } else {
+            projectManager.setCurrentProject(null);
+            projectDisplayService.setActiveProjectDisplay(null);
         }
     }
 
@@ -327,7 +331,6 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         browserUiService.newProject();
     }
 
-    
     private void setUndoCmdName(String name) {
         undoMessageProperty.set(name == null ? "" : rb.getString("undo") + " " + name);
     }
@@ -349,12 +352,18 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
     private void onProjectDisplayCreated(ProjectDisplayCreatedEvent event) {
         createProjectTab(event.getProjectDisplay().getProject());
     }
-    
-    
-    private void createProjectTab(Project project) {
 
+    @org.scijava.event.EventHandler
+    private void onProjectDisplayClosed(ProjectDisplayClosedEvent event) {
+        removeProjectTab(event.getProjectDisplay().getProject());
+    }
+
+    private void createProjectTab(Project project) {
+        if (project == null) {
+            return;
+        }
         Tab tab = new Tab(project.toString());
-        tab.setContent(new ProjectPane(context,project));
+        tab.setContent(new ProjectPane(context, project));
         tab.setUserData(project);
         tab.setGraphic(new ProjectTabController(project, context));
         tabMap.put(project, tab);
@@ -371,30 +380,10 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         return null;
     }
 
-    private void handleProjectListChange(ListChangeListener.Change<? extends Project> c) {
-        while (c.next()) {
-            if (c.wasAdded()) {
-                for (Project newProject : c.getAddedSubList()) {
-                    if(newProject != null)
-                    createProjectTab(newProject);
-                }
-                //the list was empty before
-                if (c.getFrom() == 0 && c.getTo() == c.getList().size()) {
-                    //handleNonEmptyProjectList();
-                }
-            } else if (c.wasRemoved()) {
-                for (Project removedProject : c.getRemoved()) {
-                    removeProjectTab(removedProject);
-                }
-                if (c.getList().isEmpty()) {
-                    //handleEmptyProjectList();
-                }
-            }
-        }
-    }
+    @org.scijava.event.EventHandler
+    private void handleCurrentProjectChange(ProjectDisplayActived event) {
 
-    private void handleCurrentProjectChange(ObservableValue<? extends Project> observable, Project oldValue, Project newValue) {
-
+        Project newValue = event.getProjectDisplay().getProject();
         if (newValue == null) {
             undoDisableProperty.unbind();
             redoDisableProperty.unbind();

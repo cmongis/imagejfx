@@ -32,6 +32,7 @@ public final class UiContexts {
             ,DEBUG = "debug"
             ,PROJECT_BATCH_PROCESSING = "project-batch-processing"
             ,FILE_BATCH_PROCESSING = "file-batch-processing"
+            ,PROJECT_PLANE_SELECTED = "project-plane-selected"
             ;
     
     public static String or(String... contextList) {

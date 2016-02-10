@@ -29,7 +29,7 @@ import javafx.scene.control.TreeItem;
  */
 public class TreeItemUtils {
     // go through the whole tree and execute the handler
-     public static <T> void goThrough(TreeItem<? extends T> root, Consumer<TreeItem<? extends T>> handler) {
+     public synchronized static <T> void goThrough(TreeItem<? extends T> root, Consumer<TreeItem<? extends T>> handler) {
         handler.accept(root);
         for(TreeItem<? extends T> child : root.getChildren()) {
             goThrough(child, handler);

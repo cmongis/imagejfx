@@ -87,9 +87,12 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
             projects.add(project);
         }
 
+        
+         eventService.publish(new ProjectCreatedEvent(project));
+        
          if(project!=null) setCurrentProject(project);
          
-         eventService.publish(new ProjectCreatedEvent(project));
+        
     }
 
     @Override
@@ -124,10 +127,12 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
                 logger.info("Setting new project " + project.toString());
             } else {
                 logger.info("There is no project open anymore");
+                
             }
             if (!projects.contains(project)) {
                 projects.add(project); // currentProject will be automatically updated
             }
+            
             
                 projectContextService.updateContext(project);
                 notifyPossibleTagChange(project);
@@ -137,23 +142,7 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
 
     }
 
-    private void changeCurrentProject(ListChangeListener.Change<? extends Project> c) {
-        while (c.next()) {
-            if (c.wasAdded()) { // set the current project to the recently added project
-                currentProject.set(c.getList().get(c.getFrom()));
-            } else if (c.wasRemoved()) {
-                if (c.getList().isEmpty()) {
-                    currentProject.set(null);
-                } else {
-                    int oldIndex = c.getFrom();
-                    if (oldIndex == c.getList().size()) {
-                        oldIndex = oldIndex - 1;
-                    }
-                    currentProject.set(c.getList().get(oldIndex));
-                }
-            }
-        }
-    }
+   
 
     @Override
     public Project getCurrentProject() {
@@ -198,7 +187,10 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
     @Override
     public Set<String> getAllPossibleMetadataKeys(Project project) {
 
+        
+        
         Set<String> keys = new HashSet<>();
+        if(project == null) return keys;
         project.getImages().stream().parallel().forEach(image -> {
             image.getMetaDataSet().keySet().forEach(key -> {
                 if (!keys.contains(key)) {

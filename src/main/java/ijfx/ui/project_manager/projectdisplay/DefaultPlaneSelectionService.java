@@ -21,9 +21,13 @@ package ijfx.ui.project_manager.projectdisplay;
 
 import ijfx.core.project.Project;
 import ijfx.core.project.imageDBService.PlaneDB;
+import ijfx.service.uicontext.UiContextService;
+import ijfx.ui.UiContexts;
 import ijfx.ui.project_manager.project.TreeItemUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -40,19 +44,22 @@ public class DefaultPlaneSelectionService extends AbstractService implements Pla
     @Parameter
     ProjectDisplayService projectDisplayService;
     
+    @Parameter
+    UiContextService uiContextService;
+    
     @Override
     public void selectPlane(Project project, PlaneDB planeDB) {
         
         
-        
+        setPlaneSelection(project,planeDB,true);
     }
 
     @Override
-    public void selectPlanes(Project project, List<PlaneDB> planeDB) {
+    public void selectPlanes(Project project, List<PlaneDB> planeList) {
         
         
         
-        
+        setPlaneSelection(project,planeList,true);
        
        
         
@@ -61,24 +68,41 @@ public class DefaultPlaneSelectionService extends AbstractService implements Pla
 
     @Override
     public void setPlaneSelection(Project project, PlaneDB planeDB, boolean selected) {
-        if(selected) {
-            
-            
-            
-            
-        }
+        ArrayList<PlaneDB> planes = new ArrayList<>(1);
+        planes.add(planeDB);
+        setPlaneSelection(project, planes, selected);
     }
 
     @Override
     public void setPlaneSelection(Project project, List<PlaneDB> planeList, boolean selected) {
         PlaneSet selectionPlaneSet = getSelectionPlaneSet(project);
-        if(selected) {  
+        
+        if(selected) {
             // adding plane list to the tree
-            selectionPlaneSet.getPlaneList().addAll(planeList);
+            // (only adds it if the plane is not already inside)
+            selectionPlaneSet.getPlaneList().addAll(
+                    planeList
+                            .parallelStream()
+                            .filter(plane->selectionPlaneSet.getPlaneList().contains(plane) == false)
+                            .collect(Collectors.toList())
+            );
+            
+           
         }    
         else {
             selectionPlaneSet.getPlaneList().removeAll(planeList);
         }
+        
+        
+        
+        Platform.runLater(()->{
+        for(PlaneDB plane : planeList) {
+            plane.select(selected);
+        }
+        });//.start();
+        
+        
+        updateContext();
     }
 
     @Override
@@ -92,7 +116,7 @@ public class DefaultPlaneSelectionService extends AbstractService implements Pla
          PlaneSet selectedPlaneSet = projectDisplay.getPlaneSet(ProjectDisplay.SELECTED_IMAGES);
          
          if(selectedPlaneSet == null) {
-             projectDisplay.getPlaneSetList().add(new DefaultPlaneSet(project,ProjectDisplay.SELECTED_IMAGES));
+             projectDisplay.getPlaneSetList().add(new DefaultPlaneSet(projectDisplay,ProjectDisplay.SELECTED_IMAGES));
          }
          
          return projectDisplay.getPlaneSet(ProjectDisplay.SELECTED_IMAGES);
@@ -110,6 +134,37 @@ public class DefaultPlaneSelectionService extends AbstractService implements Pla
         
         setPlaneSelection(project, children, selected);
 
+        updateContext();
     }
     
+    private void updateContext() {
+        
+        System.out.println(uiContextService.getActualContextListAsString());
+        
+        PlaneSet selectedImages  = projectDisplayService.getActiveProjectDisplay().getPlaneSet(ProjectDisplay.SELECTED_IMAGES);
+        
+        
+        
+        if(selectedImages != null && selectedImages.getPlaneList().size() > 0) {
+            uiContextService.enter(UiContexts.PROJECT_PLANE_SELECTED);
+            uiContextService.update();
+        }
+        else {
+            uiContextService.leave(UiContexts.PROJECT_PLANE_SELECTED);
+            uiContextService.update();
+        }
+    }
+    
+    
+    @Override
+    public boolean isPlaneSelected(Project project, PlaneDB plane) {
+        ProjectDisplay projectDisplay = projectDisplayService.getProjectDisplay(project);
+        
+        return (projectDisplay.getPlaneSet(ProjectDisplay.SELECTED_IMAGES) != null
+                && projectDisplay
+                        .getPlaneSet(ProjectDisplay.SELECTED_IMAGES)
+                        .getPlaneList()
+                        .contains(plane));
+        
+    }
 }

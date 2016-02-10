@@ -133,6 +133,11 @@ public class BatchService extends AbstractService implements ImageJService {
                         logger.info("Loading input...");
                         try {
                             getContext().inject(input);
+                        }
+                        catch(IllegalStateException ise) {
+                            logger.warning("Context already injected");
+                        }
+                        try {
                             input.load();
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Couldn't load input", e);

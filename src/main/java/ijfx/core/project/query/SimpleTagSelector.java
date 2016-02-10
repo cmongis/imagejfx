@@ -23,19 +23,27 @@ package ijfx.core.project.query;
 import ijfx.core.project.imageDBService.PlaneDB;
 import java.util.regex.Pattern;
 import mongis.utils.ConditionList;
+import org.scijava.Priority;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
+@Plugin(type = Selector.class, priority = Priority.VERY_LOW_PRIORITY)
 public class SimpleTagSelector implements Selector{
 
     
     private String[] tags;
     
     final static private String separator = ",";   
-    final static private Pattern validPattern = Pattern.compile("([^=]+,)*(.*)");
+    final static private Pattern validPattern = Pattern.compile("tagged with:([^=]+,)*(.*)");
     
+    String queryString;
+    
+    public SimpleTagSelector() {
+        
+    }
     
     public SimpleTagSelector(String queryString) {
         parse(queryString);
@@ -43,7 +51,9 @@ public class SimpleTagSelector implements Selector{
     
     @Override
     public void parse(String queryString) {
+        
         tags = queryString.split(separator);
+        this.queryString = queryString;
     }
 
     @Override
@@ -55,7 +65,9 @@ public class SimpleTagSelector implements Selector{
     public boolean matches(PlaneDB planeDB, String metadataSetName) {
         
         //boolean[] results = new boolean[tags.length];
-        
+        if(tags == null) {
+            parse(queryString);
+        }
         ConditionList results = new ConditionList(tags.length);
         
         for(int i = 0; i!= tags.length;i++) {
@@ -76,7 +88,7 @@ public class SimpleTagSelector implements Selector{
         
     }
     
-    public static boolean canParse(String unparsedQuery) {
+    public boolean canParse(String unparsedQuery) {
         return validPattern.matcher(unparsedQuery).matches();
     }
     

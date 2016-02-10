@@ -24,6 +24,7 @@ package ijfx.core.project.query;
  *
  * @author Cyril MONGIS, 2015
  */
+@Deprecated
 public class DefaultSelectorFactory implements SelectorFactory{
 
     
@@ -34,7 +35,7 @@ public class DefaultSelectorFactory implements SelectorFactory{
     public Selector create(String query) {
         
         //if(SimpleSelector.canParse(query)) return new SimpleSelector(query);
-        return new DefaultSelector(query);
+        return null; //new DefaultSelector(query);
     }
     
     

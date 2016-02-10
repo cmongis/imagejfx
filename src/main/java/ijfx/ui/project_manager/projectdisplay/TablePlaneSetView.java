@@ -23,6 +23,8 @@ import static com.squareup.okhttp.internal.Internal.logger;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.project.imageDBService.PlaneDB;
+import ijfx.core.project.query.QueryService;
+import ijfx.core.project.query.Selector;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
@@ -30,9 +32,14 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -41,10 +48,13 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.ConditionList;
 import mongis.utils.FXUtilities;
 import org.reactfx.EventStreams;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -66,13 +76,23 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
 
     PlaneSet planeSet;
 
-    public TablePlaneSetView() {
+    @Parameter
+    PlaneSelectionService planeSelectionService;
+    
+    
+    @Parameter
+    QueryService queryService;
+    
+    
+   
+    
+    public TablePlaneSetView(Context context) {
         super();
         try {
             FXUtilities.injectFXML(this);
-
+            context.inject(this);
             tableView.setItems(filteredList);
-
+            tableView.setEditable(true);
             EventStreams.valuesOf(filterTextField.textProperty()).successionEnds(Duration.ofSeconds(1))
                     .subscribe(this::onFilterTypingEnded);
 
@@ -85,6 +105,11 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
         if (value == null) {
             return;
         }
+        
+        
+        
+        
+        
         filteredList.clear();
         if (planeList == null) {
             logger.warning("planeList is null");
@@ -114,6 +139,7 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
 
     @Override
     public PlaneSet getCurrentPlaneSet() {
+        if(true) return null;
         return planeSet;
     }
 
@@ -186,7 +212,17 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
 
     private class PlaneFilterFactory {
 
+        Selector selector;
+        
         public Predicate<PlaneDB> create(String query) {
+            
+            selector = queryService.getSelector(query);
+            
+            if(selector.canParse(query)) {
+                return plane->selector.matches(plane, null);
+            }
+            
+            
             if (query.contains(("="))) {
                 System.out.println("key and value !");
                 String[] keyAndValue = query.split("=");
@@ -204,6 +240,16 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
 
     @Override
     public void setCurrentPlaneSet(PlaneSet planeSet) {
+        
+        if(this.planeSet != null) {
+            this.planeSet.getPlaneList().removeListener(this::onListChanged);
+        }
+        
+        
+        this.planeSet = planeSet;
+        
+        this.planeSet.getPlaneList().addListener(this::onListChanged);
+        
         logger.info("" + planeSet);
         if (planeSet == null) {
             return;
@@ -219,6 +265,15 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
 
     }
 
+    public void onListChanged(ListChangeListener.Change<? extends PlaneDB> change) {
+        while(change.next()) {
+            updateFiltered();
+        }
+    }
+    
+    
+    
+    
     protected void updateFiltered() {
         logger.info("Updating the filtered");
         if (planeList == null) {
@@ -231,19 +286,46 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
     public Node getIcon() {
         return new FontAwesomeIconView(FontAwesomeIcon.TABLE);
     }
+    
+    
+    @FXML
+    public void selectForProcessing() {
+        planeSelectionService.selectPlanes(planeSet.getProjectDisplay().getProject(), filteredList);
+    }
 
     public void addFirstColumn() {
 
+        
+        TableColumn<PlaneDB,Boolean> selected = new TableColumn<>();
+        
+        selected.setEditable(true);
+        selected.setCellFactory(p->new CheckBoxTableCell());
+        //selected.setCellValueFactory(p->p.getValue().selectedProperty());
+        selected.setCellValueFactory(p-> new PlaneSelectionProperty(planeSelectionService, planeSet.getProjectDisplay().getProject(), p.getValue()));
+        selected.setPrefWidth(USE_COMPUTED_SIZE+30);
+        
         TableColumn<PlaneDB, String> column = new TableColumn<>();
+        
+        
+        
+        
         column.setText("Object");
         column.setCellValueFactory(this::getFirstColumnData);
 
-        tableView.getColumns().add(column);
+        
+        
+        
+        tableView.getColumns().addAll(selected,column);
 
     }
 
     private ObservableValue<String> getFirstColumnData(CellDataFeatures<PlaneDB, String> features) {
         return new SimpleStringProperty(features.getValue().getImageID());
+    }
+    
+    @FXML
+    private void unselectAll() {
+        planeSelectionService.setPlaneSelection(planeSet.getProjectDisplay().getProject(), planeList, false);
     }
 
     @Override
@@ -270,7 +352,7 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
         try {
             return new SimpleStringProperty(features.getValue().getMetaDataSet().get(features.getTableColumn().getId()).getStringValue());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Damn", e);
+            //logger.log(Level.SEVERE, "Damn", e);
 
             return null;
         }

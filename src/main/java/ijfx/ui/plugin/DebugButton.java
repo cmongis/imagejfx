@@ -124,7 +124,7 @@ public class DebugButton extends MenuButton implements UiPlugin{
         getScene().getStylesheets().add(debugStyleSheet);
         
         
-        eventService.publish(new DebugEvent("reloadSideMenu"));
+        //eventService.publish(new DebugEvent("reloadSideMenu"));
     }
     
     public void reloadAnOther(ActionEvent event) {

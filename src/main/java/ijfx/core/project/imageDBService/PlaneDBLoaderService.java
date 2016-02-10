@@ -44,6 +44,9 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class, priority = Priority.LOW_PRIORITY)
 public class PlaneDBLoaderService extends AbstractService{
     
+    
+    
+    
      /**
      * set attributes of the image object based on a string with the json
      * format.
@@ -59,7 +62,7 @@ public class PlaneDBLoaderService extends AbstractService{
      */
     public PlaneDB create(String json) throws IOException, JSONException {
         PlaneDB imageDB = new PlaneDBInMemory();
-
+        getContext().inject(imageDB);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode;
         rootNode = mapper.readTree(json);

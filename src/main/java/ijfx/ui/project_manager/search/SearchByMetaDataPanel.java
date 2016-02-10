@@ -21,7 +21,7 @@
 package ijfx.ui.project_manager.search;
 
 import ijfx.core.project.event.PossibleMetaDataKeysChangeEvent;
-import ijfx.core.project.query.SimpleSelector;
+import ijfx.core.project.query.MetaDataSelector;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -72,7 +72,7 @@ public class SearchByMetaDataPanel extends GridPane {
     
     @FXML
     public void search() {
-        searchHandler.search(new SimpleSelector(keyComboBox.getValue(),valueTextField.getText()));
+        searchHandler.search(new MetaDataSelector(keyComboBox.getValue(),valueTextField.getText()));
     }
     
     @EventHandler

@@ -21,7 +21,10 @@
 package ijfx.service.batch;
 
 import ijfx.core.hash.HashService;
+import ijfx.core.metadata.GenericMetaData;
+import ijfx.core.metadata.MetaData;
 import ijfx.core.project.Project;
+import ijfx.core.project.imageDBService.ImageReferenceImpl;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
@@ -30,7 +33,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -49,12 +51,23 @@ public class PlaneDBBatchInput extends ImagePlaneBatchInput{
     
     private final PlaneDB plane;
     
-    public PlaneDBBatchInput(Project project,PlaneDB plane) {
+    public enum SaveMode {
+        REPLACE_ENTRY
+        ,ADD_ENTRY
+    };
+    
+    
+    private final SaveMode saveMode;
+    
+    
+    
+    public PlaneDBBatchInput(Project project,PlaneDB plane,SaveMode saveMode) {
         this.project = project;
         this.plane = plane;
         setFileSource(plane.getFile());
         setPlaneIndex(plane.getPlaneIndex());
         
+        this.saveMode = saveMode;
         
         
     }
@@ -99,6 +112,12 @@ public class PlaneDBBatchInput extends ImagePlaneBatchInput{
             // change save path
             setSavePath(tmpImageFile.getAbsolutePath());
       
+            
+            plane.setImageReference(new ImageReferenceImpl(hash, getSavePath()));
+            plane.setPlaneIndex(0);
+            plane.addMetaData(new GenericMetaData(MetaData.WAS_MODIFIED, 1));
+            plane.addTag(MetaData.WAS_MODIFIED);
+            
             
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);

@@ -21,10 +21,26 @@
 package ijfx.ui.project_manager.search;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.project.ProjectManagerService;
+import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.core.project.query.QueryService;
 import ijfx.core.project.query.Selector;
+import ijfx.ui.project_manager.projectdisplay.DefaultPlaneSet;
+import ijfx.ui.project_manager.projectdisplay.PlaneSet;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
+import java.util.List;
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
@@ -41,6 +57,11 @@ public class SearchBar extends HBox implements SearchHandler{
     
     SearchByMetaDataPanel searchByMetaDataPanel;
     
+    TextField searchTextField = new TextField();
+    
+    Button searchButton = new Button(null,new FontAwesomeIconView(FontAwesomeIcon.SEARCH));
+    
+    
     @Parameter
     Context context;
     
@@ -49,6 +70,18 @@ public class SearchBar extends HBox implements SearchHandler{
     
     @Parameter
     ProjectManagerService projectService;
+    
+    @Parameter
+    ProjectDisplayService projectDisplayService;
+    
+    Label statusLabel = new Label();
+    
+    ObjectProperty<List<PlaneDB>> lastSearch = new SimpleObjectProperty();
+    
+    BooleanProperty isSearching = new SimpleBooleanProperty();
+    
+    
+    
     
     public SearchBar(Context context) {
         
@@ -60,6 +93,16 @@ public class SearchBar extends HBox implements SearchHandler{
         searchByMetaDataPanel = new SearchByMetaDataPanel(context);
         searchByMetaDataPanel.setSearchHandler(this);
         
+        statusLabel.setVisible(false);
+        
+        
+        
+        searchTextField.setPromptText("Advanded search : e.g. file name contains: \"stack\" and z = 0 or tagged with: modified");
+        searchTextField.textProperty().addListener(this::onTextFieldTyping);
+        searchTextField.setOnAction(this::onSearchButtonClicked);
+        searchButton.setOnAction(this::onSearchButtonClicked);
+        lastSearch.addListener(this::onLastSearchChanged);
+        
         getChildren().addAll(
                 new Label("Search by")
                 ,new PopoverToggleButton(searchByTagPanel, PopOver.ArrowLocation.TOP_CENTER)
@@ -69,8 +112,9 @@ public class SearchBar extends HBox implements SearchHandler{
                 ,new PopoverToggleButton(searchByMetaDataPanel, PopOver.ArrowLocation.TOP_CENTER)
                         .setButtonText("Metadata")
                 .setIcon(FontAwesomeIcon.KEY)
-                
-        
+                ,new Label("or")
+                ,searchTextField
+                ,searchButton
         );
         getStyleClass().add("hbox");
         
@@ -84,8 +128,81 @@ public class SearchBar extends HBox implements SearchHandler{
     }
 
     @Override
-    public void search(Selector selector) {
-
-        queryService.query(projectService.getCurrentProject(), selector, false);    
+    public void search(Selector selector) { 
+        
+        
+        QueryTask task = new QueryTask(selector);
+        
+        disableProperty().bind(task.runningProperty());
+        
+        statusLabel.visibleProperty().bind(task.runningProperty());
+        
+        task.setOnSucceeded(event->{
+            // Creating a new plane set
+            PlaneSet planeSet = new DefaultPlaneSet("Query : "+task.getValue().size(), projectDisplayService.getProjectDisplay(projectService.getCurrentProject()), FXCollections.observableArrayList(task.getValue()));
+           
+            // adding the plane set to the current project display
+            projectDisplayService.getProjectDisplay(projectService.getCurrentProject()).getPlaneSetList().add(planeSet);
+            projectDisplayService.getActiveProjectDisplay().setCurrentPlaneSet(planeSet);
+        });
+        
+        new Thread(task).start();
+        
+        
     }
+    
+    public void onTextFieldTyping (Observable obs, String oldValue, String newValue) {
+        
+        
+        if(newValue == null || newValue.equals("")) {
+            lastSearch.setValue(null);
+            return;
+        }
+        
+        Selector selector = queryService.getSelector(newValue);
+        
+       QueryTask task =  new QueryTask(selector);
+       task.setOnSucceeded(event->{
+           
+           lastSearch.setValue(task.getValue());
+       });
+       
+       new Thread(task).start();
+       
+        
+    }
+    
+    public void onLastSearchChanged(Observable obs, List<PlaneDB> oldValue, List<PlaneDB> newValue) {
+        
+        if(newValue == null) {
+            searchButton.setText(null);
+        }
+        else {
+            searchButton.setText(""+newValue.size());
+        }
+    }
+    
+    public void onSearchButtonClicked(ActionEvent event) {
+        
+        search(queryService.getSelector(searchTextField.getText()));
+        
+    }
+    
+    public class QueryTask extends Task<List<PlaneDB>> {
+
+        private final Selector selector;
+
+        public QueryTask(Selector selector) {
+            this.selector = selector;
+        }
+        public Selector getSelector() {
+            return selector;
+        }
+        @Override
+        protected List<PlaneDB> call() throws Exception {
+            return queryService.query(projectService.getCurrentProject(),selector,false);
+        }
+    
+}
+    
 }

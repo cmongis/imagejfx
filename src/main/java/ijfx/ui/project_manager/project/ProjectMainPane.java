@@ -112,10 +112,10 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
     ProjectManagerService projectService;
     
     private final MetaDataHierarchy mainTreeOrganisation;
-    private final MetaDataHierarchy selectionTreeOrganisation;
+ 
     private final SelectorEditor selectorEditor;
-    private final ModifierEditor modifierEditor;
-    private final Selector selector;
+
+
     private Pane displayedBrowser;
 
     SingleImageViewPane singleImageViewPane;
@@ -149,18 +149,15 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
 
         // editor for a selector
         selectorEditor = new SelectorEditor(context);
-        selector = selectorEditor.getSelector();
+      
         
-        // modifier editor (soon replace by smaller widget)/
-        // @Deprecated
-        modifierEditor = new ModifierEditor(context);
+       
 
         // projectSpecificViewModel.viewModeProperty().addListener(viewModeListener);
         //create a tree for the dataset
         mainTreeOrganisation = folderOrgService.getFolderCreator(project, FolderOrganisationService.PlaneClass.ALL_PLANE);
         
-        // creates a tree for the selected images
-        selectionTreeOrganisation = folderOrgService.getFolderCreator(project, FolderOrganisationService.PlaneClass.SELECTED_PLANE);
+     
         handleHierarchyChange();
         
         // load the FXML into this controller

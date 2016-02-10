@@ -23,35 +23,25 @@ package ijfx.core.project.imageDBService;
 import ijfx.core.metadata.GenericMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
-import io.scif.Format;
-import io.scif.FormatException;
-import io.scif.ImageMetadata;
-import io.scif.Reader;
-import io.scif.bf.BioFormatsFormat;
-import io.scif.img.DefaultImgFactoryHeuristic;
-import io.scif.img.DefaultImgUtilityService;
+import ijfx.ui.project_manager.projectdisplay.PlaneSelectionService;
 import java.awt.Image;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.ReadOnlyMapProperty;
 import javafx.beans.property.ReadOnlyMapWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import net.imglib2.img.Img;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.integer.ByteType;
-import net.imglib2.type.numeric.integer.ShortType;
-import net.imglib2.type.numeric.real.FloatType;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.scijava.plugin.Parameter;
 
 /**
  * this class is used to store an image with all it's linked informations
@@ -62,6 +52,10 @@ public class PlaneDBInMemory implements PlaneDB {
 
     public static HashMap<String, String> ACCEPTED_FORMAT_MAP = new HashMap<>();
 
+    @Parameter
+    PlaneSelectionService planeSelectionService;
+    
+    
     /**
      * A HashMap containing different metaDatasets.
      */
@@ -77,11 +71,16 @@ public class PlaneDBInMemory implements PlaneDB {
      */
     private ReadOnlyListWrapper<String> tags = new ReadOnlyListWrapper<>(this, "tags", FXCollections.observableArrayList());
 
-    private ReadOnlyBooleanWrapper selected = new ReadOnlyBooleanWrapper(this, "selected", false);
+    
     private ReadOnlyBooleanWrapper destructed = new ReadOnlyBooleanWrapper(this, "destructed", false);
-    private final PropertyChangeSupport listenableService = new PropertyChangeSupport(this);
+    private BooleanProperty selectedProperty = new SimpleBooleanProperty(false);
+    
     private long planeIndex;
 
+    boolean selected = false;
+    
+   // boolean selected
+    
     public PlaneDBInMemory() {
         addMetaDataSet(new MetaDataSet(), METADATASET_STRING);
         addMetaDataSet(new MetaDataSet(), MODIFIED_METADATASET_STRING);
@@ -90,7 +89,7 @@ public class PlaneDBInMemory implements PlaneDB {
 
     @Override
     public void select(boolean select) {
-        selected.set(select);
+        selectedProperty.setValue(select);
     }
 
     @Override
@@ -303,9 +302,11 @@ public class PlaneDBInMemory implements PlaneDB {
 
     @Override
     public ReadOnlyBooleanProperty selectedProperty() {
-        return selected.getReadOnlyProperty();
+        return selectedProperty;
     }
 
+    
+    
     
 
 }

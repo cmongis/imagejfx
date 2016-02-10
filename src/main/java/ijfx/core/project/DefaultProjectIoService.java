@@ -20,7 +20,6 @@
  */
 package ijfx.core.project;
 
-import ijfx.core.project.query.DefaultSelector;
 import ijfx.core.project.query.DefaultModifier;
 import ijfx.core.project.query.Selector;
 import ijfx.core.project.query.QueryParser;
@@ -65,6 +64,7 @@ import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 import static ijfx.core.project.Project.SETTINGS_STRING;
+import ijfx.core.project.query.QueryService;
 
 /**
  *
@@ -84,6 +84,8 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
     @Parameter
     LoadingScreenService loadingService;
     
+    @Parameter
+    QueryService queryService;
 
     @Override
     public Project createProject() {
@@ -91,6 +93,8 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         addProject(project);
         return project;
     }
+    
+    
 
     @Override
     public void load(File file) throws IOException, DataFormatException {
@@ -146,12 +150,12 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         
         timer.elapsed("project.setFile()");
         
-        System.out.println(settingsNode.toString());
+        if(settingsNode != null) {
         settingsNode.fields().forEachRemaining((str)->{
             
            project.getSettings().put(new GenericMetaData(str.getKey(),str.getValue().asText()));
         });
-        
+        }
         System.out.println(project.getSettings());
         
         addProject(project);
@@ -208,7 +212,7 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         String modifierString = ruleNode.get(Modifier.MODIFIER_STRING).get(QueryParser.NON_PARSED_STRING).asText();
         boolean enable = ruleNode.get(QueryParser.ENABLE).asBoolean();
         if (selectorString != null && modifierString != null) {
-            Selector selector = new DefaultSelector(selectorString);
+            Selector selector = queryService.getSelector(selectorString);
             Modifier modifier = new DefaultModifier(modifierString);
             AnnotationRule rule = new AnnotationRuleImpl(selector, modifier);
             rule.setUnable(enable);

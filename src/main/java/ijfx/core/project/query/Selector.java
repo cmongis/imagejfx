@@ -20,18 +20,20 @@
  */
 package ijfx.core.project.query;
 
-import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.project.imageDBService.PlaneDB;
+import java.util.Map;
+import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
  * @author Cyril Quinton
  */
-public interface Selector {
+public interface Selector extends SciJavaPlugin {
     public static String SELECTOR_STRING = "selector";
    
     
     public void parse(String queryString);
+    public boolean canParse(String queryString);
     public String getQueryString();
     
     //String getParsedSelector();
@@ -49,4 +51,17 @@ public interface Selector {
    
     public boolean matches(PlaneDB planeDB, String metadataSetName);
 
+    /** 
+     * This method corrects the user mistakes regarding the case of the image 
+     * 
+     * @param metadataSet
+     * @param key key possibly written with the wrong case
+     * @return right key disregarding the case. 
+     */
+    public static  String findKey(Map<String, ? extends Object> metadataSet, String key) {
+
+        return metadataSet.keySet().stream().filter(mapKey -> mapKey.toLowerCase().equals(key.toLowerCase())).findFirst().orElse(null);
+
+    }
+    
 }

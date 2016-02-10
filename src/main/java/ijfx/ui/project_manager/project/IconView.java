@@ -73,6 +73,8 @@ public class IconView extends StackPane {
    
     LinkedList<IconItem> cachedControllerList = new LinkedList<>();
 
+    
+    
     public IconView(Context context) {
         super();
 
@@ -119,25 +121,6 @@ public class IconView extends StackPane {
                 list.removeAll(c.getRemoved());
                 list.addAll(c.getAddedSubList());
                 
-                /*
-                if (c.wasPermutated()) {
-                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                        //permutate
-                    }
-                } else if (c.wasUpdated()) {
-                    //update item
-                } else {
-
-                    //for (IconItem remitem : c.getRemoved()) {
-                    //if (list.contains(c.getRemoved())) {
-                    //    list.remove(remitem);
-                    //}
-                    //}
-                    //for (IconItem additem : c.getAddedSubList()) {
-                    //  list.add(additem);
-                    //}
-                }*/
-
             }
         });
 
@@ -234,22 +217,8 @@ public class IconView extends StackPane {
 
 
 
-        //List<TreeItem> items = new ArrayList<TreeItem>(newValue.getChildren().size());
-
-        //if (newValue.isLeaf() == false) {
-            //GenericMetaData metadata = item.getValue();
             update(newValue.getChildren());
 
-            /*
-             newValue.getChildren().forEach(child -> {
-             // System.out.println("adding item "+child.toString());
-             itemListView.getItems().add(child);
-             });*/
-            //System.out.println(itemListView.getItems().size());
-        //}
-        //else {
-            
-        //}
         
       
     }

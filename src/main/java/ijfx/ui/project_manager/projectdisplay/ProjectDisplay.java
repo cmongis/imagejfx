@@ -41,4 +41,9 @@ public interface ProjectDisplay {
     PlaneSet getPlaneSet(String id);
     void setCurrentPlaneSet(PlaneSet planeSet);
     
+    public static ProjectDisplay NO_DISPLAY = null;
+    
+    
+   
+    
 }

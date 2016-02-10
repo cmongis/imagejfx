@@ -22,6 +22,7 @@ package ijfx.ui.project_manager.projectdisplay;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.project.Project;
+import ijfx.ui.context.animated.Animation;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,10 +31,12 @@ import java.util.logging.Logger;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -64,7 +67,7 @@ public class ProjectPane extends BorderPane {
     ProjectDisplay projectDisplay;
 
     @Parameter
-    DefaultProjectDisplayService projectDisplayService;
+    ProjectDisplayService projectDisplayService;
 
     Logger logger = ImageJFX.getLogger();
 
@@ -74,10 +77,17 @@ public class ProjectPane extends BorderPane {
     @FXML
     HBox planeSetHBox;
 
+    @FXML
+    ToggleButton dashboardToggleButton;
+    
     ToggleGroup viewToggleGroup = new ToggleGroup();
 
     ToggleGroup planeSetToggleGroup = new ToggleGroup();
 
+    HashMap<Class<?>,Toggle> toggleMap = new HashMap<>();
+
+    
+    
     @Parameter
     Context context;
 
@@ -93,9 +103,18 @@ public class ProjectPane extends BorderPane {
 
             this.project = project;
 
+            
+            
+            this.project.getHierarchy().addListener((obs,oldValue,newValue)->{
+                updateHierarchy();
+            });
+            
             // binding properties
             currentView.addListener(this::onCurrentViewChanged);
             currentItem.addListener(this::onCurrentItemChanged);
+            currentPlaneSet.bind(projectDisplay.currentPlaneSetProperty());
+
+            // adding listeners for project display variables
             currentPlaneSet.addListener(this::onCurrentPlaneSetChanged);
 
             // to create toggle buttons for each plane set created
@@ -105,48 +124,82 @@ public class ProjectPane extends BorderPane {
             viewToggleGroup.selectedToggleProperty().addListener(this::onViewToggleSelectionChanged);
             planeSetToggleGroup.selectedToggleProperty().addListener(this::onPlaneSetToggleSelectionChanged);
 
-            // initializing the different views
-            viewMap.put(TreeTablePlaneSetView.class, new TreeTablePlaneSetView());
-            viewMap.put(TablePlaneSetView.class, new TablePlaneSetView());
-            viewMap.put(IconPlaneSetView.class, new IconPlaneSetView(context));
-            currentView.setValue(TreeTablePlaneSetView.class);
+            // initializing the different dashboard view
+           
+            registerPlaneSetView(new DashBoardPlaneSetView(context), dashboardToggleButton);
+            
+            
+            viewToggleGroup.selectToggle(dashboardToggleButton);
 
             // initialising the toggles button for the different types of view
-            for (PlaneSetView view : viewMap.values()) {
-                System.out.println(view.getNode());
-                ValueToggleButton<Class<? extends PlaneSetView>> toggleButton = new ValueToggleButton<>(view.getClass(), view.getIcon());
-
-                toggleButton.setSelected(toggleButton.getValue() == currentView.getValue());
-                viewToggleGroup.getToggles().add(toggleButton);
-
+            for (PlaneSetView view : new PlaneSetView[] {
+                new IconPlaneSetView(context)
+               ,new TablePlaneSetView(context)
+            }) {
+                ToggleButton toggleButton = new ToggleButton(null,view.getIcon());
+                registerPlaneSetView(view, toggleButton);
                 viewHBox.getChildren().add(toggleButton);
             }
 
-            // adding toggle button for the PlaneSets
+            // initializing toggle button for the PlaneSets
             for (PlaneSet added : projectDisplay.getPlaneSetList()) {
-                ToggleButton toggleButton = new ToggleButton(added.getName());
-                toggleButton.setUserData(added);
-                
-                if(added.getName().equals(ProjectDisplay.ALL_IMAGES)) {
-                    toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.BUILDING));
-                }
-                else if(added.getName().equals(ProjectDisplay.SELECTED_IMAGES)){
-                    toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_SQUARE));
-                }
-                else {
-                    toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SEARCH));
-                }
-                planeSetToggleGroup.getToggles().add(toggleButton);
-                planeSetHBox.getChildren().add(toggleButton);
-
+                createPlaneSetToggleButton(added);
             }
 
             currentItem.bind(projectDisplay.getCurrentPlaneSet().currentItemProperty());
+            
+            
+            updateHierarchy();
+            
 
         } catch (IOException ex) {
             Logger.getLogger(ProjectPane.class.getName()).log(Level.SEVERE, null, ex);
 
         }
+
+    }
+    
+    
+    
+    
+    
+    private void registerPlaneSetView(PlaneSetView view, ToggleButton button) {
+        button.setUserData(view.getClass());
+        toggleMap.put(view.getClass(), button);
+        viewMap.put(view.getClass(), view);
+        viewToggleGroup.getToggles().add(button);
+    }
+    
+    private Toggle getToggle(Class<?> clazz) {
+        return toggleMap.get(clazz);
+    }
+
+    private ToggleButton createPlaneSetToggleButton(PlaneSet added) {
+
+        ToggleButton toggleButton = new ToggleButton(added.getName());
+        toggleButton.setUserData(added);
+        
+        if (added.getName().equals(ProjectDisplay.ALL_IMAGES)) {
+            toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.BUILDING));
+        } else if (added.getName().equals(ProjectDisplay.SELECTED_IMAGES)) {
+            toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_SQUARE));
+        } else {
+            
+            Node node = new FontAwesomeIconView(FontAwesomeIcon.CLOSE);
+            toggleButton.setGraphic(node);
+            toggleButton.setContentDisplay(ContentDisplay.LEFT);
+            node.setOnMouseClicked(event->{
+                projectDisplay.getPlaneSetList().remove(added);
+                event.consume();
+            });
+            
+        }
+        
+        
+        planeSetToggleGroup.getToggles().add(toggleButton);
+        planeSetHBox.getChildren().add(toggleButton);
+        Animation.QUICK_EXPAND.configure(toggleButton, 500).play();
+        return toggleButton;
 
     }
 
@@ -155,17 +208,34 @@ public class ProjectPane extends BorderPane {
         if (newValue == null) {
             return;
         }
-        ValueToggleButton<Class<PlaneSetView>> toggleButton = (ValueToggleButton<Class<PlaneSetView>>) newValue;
+      
+        if(planeSetToggleGroup.getSelectedToggle() == null && planeSetToggleGroup.getToggles().size() > 0) {
+            planeSetToggleGroup.selectToggle(planeSetToggleGroup.getToggles().get(0));
+        }
+        
         // chanding the current view
-        currentView.setValue(toggleButton.getValue());
-
+        currentView.setValue((Class<? extends PlaneSetView>)newValue.getUserData());
+       
     }
 
     // when a toggle button representing a PlaneSet is clicked
     public void onPlaneSetToggleSelectionChanged(Observable obs, Toggle oldValue, Toggle newValue) {
+        if (newValue == null) {
+            return;
+        }
         PlaneSet newPlaneSet = (PlaneSet) newValue.getUserData();
-        currentPlaneSet.setValue(newPlaneSet);
+
+        if (newPlaneSet == null) {
+            logger.warning("newPlaneSet is null");
+            return;
+        }
+        //currentPlaneSet.setValue(newPlaneSet);
         projectDisplay.setCurrentPlaneSet(newPlaneSet);
+        
+        if(currentView.getValue() == DashBoardPlaneSetView.class) {
+            viewToggleGroup.selectToggle(toggleMap.get(IconPlaneSetView.class));
+            
+        }
     }
 
     @FXML
@@ -185,21 +255,20 @@ public class ProjectPane extends BorderPane {
 
         if (newValue == null) {
             logger.warning("The new view is null");
+            return;
         };
 
         // getting the new for the new value
         PlaneSetView planeSetView = getPlaneSetView(newValue);
         logger.info("Changing PlaneSet view " + planeSetView.getClass().getSimpleName());
         if (planeSetView == null) {
-
             logger.warning("PlaneSetView not found !");
             return;
         }
-        System.out.println(projectDisplay.getCurrentPlaneSet().getPlaneList().size());
         setCenter(planeSetView.getNode());
-
+        
         updateView(planeSetView, projectDisplay.getCurrentPlaneSet());
-
+        
     }
 
     // when the current item changed,
@@ -208,6 +277,7 @@ public class ProjectPane extends BorderPane {
         logger.info("Changing current item");
         // the current view is updated
         if (newValue != null) {
+            if(getCurrentView() == null) return;
             getCurrentView().setCurrentItem(newValue);
         }
     }
@@ -215,25 +285,28 @@ public class ProjectPane extends BorderPane {
     public void onCurrentPlaneSetChanged(Observable obs, PlaneSet oldValue, PlaneSet newValue) {
 
         updateView(getCurrentView(), newValue);
-
+        
     }
 
     public void updateView(PlaneSetView planeSetView, PlaneSet planeSet) {
 
         currentItem.unbind();
-        if(planeSetView.getCurrentItem() == null) planeSet.setCurrentItem(planeSet.getRoot());
-        
-        // setting the view to the current item
-        planeSetView.setCurrentItem(planeSet.getCurrentItem());
-        
-        // binding the listener to the current item of the new view
-        currentItem.bind(planeSet.currentItemProperty());
-        
-        // refreshing the view if the last plane set was different
+        if (planeSetView.getCurrentItem() == null) {
+            planeSet.setCurrentItem(planeSet.getRoot());
+        }
+
+        // setting the current plane set
         if (planeSetView.getCurrentPlaneSet() != planeSet) {
             planeSetView.setCurrentPlaneSet(planeSet);
-            planeSetView.setHirarchy(projectDisplay.getProject().getHierarchy());
         }
+
+        // setting the view to the current item
+        planeSetView.setCurrentItem(planeSet.getCurrentItem());
+
+        // binding the listener to the current item of the new view
+        currentItem.bind(planeSet.currentItemProperty());
+
+        
     }
 
     // when the list of plane set changed
@@ -243,10 +316,8 @@ public class ProjectPane extends BorderPane {
 
             // adding new toggle buttons to the toggle group and to the hbox
             for (PlaneSet added : change.getAddedSubList()) {
-                ToggleButton toggleButton = new ToggleButton(added.getName());
-                toggleButton.setUserData(added);
-                planeSetToggleGroup.getToggles().add(toggleButton);
-                planeSetHBox.getChildren().add(toggleButton);
+
+                createPlaneSetToggleButton(added);
 
             }
 
@@ -260,36 +331,20 @@ public class ProjectPane extends BorderPane {
             }
         }
     }
-
     private PlaneSetView getCurrentView() {
         return viewMap.get(currentView.getValue());
     }
-
-    private class ValueToggleButton<T> extends ToggleButton {
-
-        private final T view;
-
-        public ValueToggleButton(T view, Node graphics) {
-
-            super(null, graphics);
-            this.view = view;
-            setUserData(view);
-
-        }
-
-        public T getValue() {
-            return view;
-        }
-
-        public ValueToggleButton<? extends T> bind(Property<? extends T> property) {
-            selectedProperty().bind(Bindings.createBooleanBinding(() -> property.getValue() == view, property));
-            return this;
-        }
-
+    
+    private void updateHierarchy() {
+        
+        viewMap.values().forEach(view->{
+            view.setHirarchy(project.getHierarchy());
+        });
+        
+        
+        
     }
-
-    private class PlaneSetToggleButton extends ToggleButton {
-
-    }
-
+    
+    
 }
+   

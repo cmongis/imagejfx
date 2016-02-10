@@ -45,7 +45,7 @@ public class DefaultProjectDisplay extends ArrayList<PlaneSet> implements Projec
      
     public DefaultProjectDisplay(Project project) {
         this.project = project;
-        planeSetList.add(new DefaultPlaneSet(project));
+        planeSetList.add(new DefaultPlaneSet(this));
         currentPlaneSetProperty.setValue(planeSetList.get(0));
     }
     

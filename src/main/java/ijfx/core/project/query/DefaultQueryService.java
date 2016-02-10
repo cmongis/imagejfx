@@ -38,6 +38,7 @@ import ijfx.core.project.command.addRuleCommand;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.core.project.imageDBService.command.AddTagCommand;
 import ijfx.core.project.imageDBService.command.RemoveTagCommand;
+import ijfx.core.project.query.tree.SelectorNode;
 import ijfx.ui.main.ImageJFX;
 
 import java.util.ArrayList;
@@ -75,7 +76,10 @@ public class DefaultQueryService extends AbstractService implements QueryService
 
     Logger logger = ImageJFX.getLogger();
 
-    SelectorFactory selectorFactory = new DefaultSelectorFactory();
+    @Parameter
+    private SelectorService selectorService;
+    
+    //SelectorFactory selectorFactory = new DefaultSelectorFactory();
 
     public DefaultQueryService() {
         rb = ProjectManagerService.rb;
@@ -83,7 +87,14 @@ public class DefaultQueryService extends AbstractService implements QueryService
 
     @Override
     public Selector getSelector(String query) {
-        return selectorFactory.create(query);
+        try {
+        Selector selector = new SelectorNode(selectorService.getSelectorFactory());
+        selector.parse(query);
+        return selector;
+        }
+        catch(Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -211,35 +222,36 @@ public class DefaultQueryService extends AbstractService implements QueryService
 
         MercuryTimer timer = new MercuryTimer("query");
         List<PlaneDB> queryResultList = new ArrayList<>();
-        List<PlaneDB> selectPlane = new ArrayList<>();
-        List<PlaneDB> deselectPlane = new ArrayList<>();
-        List<Command> cmds = new ArrayList<>();
+        //List<PlaneDB> selectPlane = new ArrayList<>();
+        //List<PlaneDB> deselectPlane = new ArrayList<>();
+        //List<Command> cmds = new ArrayList<>();
 
         project.getImages().stream().parallel().forEach(plane -> {
 
-            if (!onSelection || onSelection && plane.selectedProperty().get()) {
+            //if (!onSelection || onSelection && plane.selectedProperty().get()) {
                 boolean queryResult = query(plane, selector, metaDataSetName);
 
                 if (queryResult) {
                     queryResultList.add(plane);
                 }
+                
+                
+                /* The selection shouldn't be done by the query service anymore
                 if (queryResult != plane.selectedProperty().get()) {
                     if (plane.selectedProperty().get()) {
                         deselectPlane.add(plane);
                     } else {
                         selectPlane.add(plane);
                     }
-                }
+                }*/
 
-            }
+           // }
         });
 
-        projectModifier.selectPlane(project, deselectPlane, selectPlane);
+        //projectModifier.selectPlane(project, deselectPlane, selectPlane);
         timer.elapsed("query");
         eventService.publish(new QueryStop());
-        if (queryResultList.size() > 0) {
-
-        }
+        
         return queryResultList;
 
     }

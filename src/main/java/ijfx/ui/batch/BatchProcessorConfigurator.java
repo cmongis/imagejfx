@@ -20,7 +20,6 @@
  */
 package ijfx.ui.batch;
 
-import ijfx.core.project.Project;
 import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.service.batch.BatchService;
@@ -63,11 +62,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -77,19 +73,24 @@ import javafx.stage.DirectoryChooser;
 import org.controlsfx.control.textfield.TextFields;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
-import org.scijava.menu.AbstractMenuCreator;
 import org.scijava.menu.MenuService;
 import org.scijava.menu.ShadowMenu;
 import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import mongis.utils.DraggableListCell;
 import mongis.utils.FXUtilities;
 import mongis.utils.FakeTask;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
+import ijfx.ui.project_manager.projectdisplay.PlaneSet;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplay;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayActived;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.control.ComboBox;
 
 /**
  *
@@ -126,9 +127,11 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     @Parameter
     private ProjectManagerService projectService;
 
+    @Parameter
+    private ProjectDisplayService projectDisplayService;
     
     
-    private SimpleListProperty selectedImageCountProperty = new SimpleListProperty();
+    
     
     /*
      JavaFX Components
@@ -136,8 +139,7 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     @FXML
     private GridPane gridPane;
 
-    @FXML
-    private Label selectedCountLabel;
+   
 
     @FXML
     private Button saveFolderButton;
@@ -166,6 +168,10 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     @FXML
     private Button startButton;
 
+    @FXML
+    private ComboBox<PlaneSet> planeSetComboBox;
+    
+    
     /*
      Properties
      */
@@ -180,10 +186,15 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
 
     private ObjectProperty<Task> currentTaskProperty = new SimpleObjectProperty(null);
 
+    IntegerProperty selectedCountProperty = new SimpleIntegerProperty();
+    
     private HashMap<String, Runnable> modules = new HashMap<>();
 
     private SimpleListProperty listProperty = new SimpleListProperty(steps);
 
+    
+    
+    
    private StringBinding startButtonText = Bindings.createStringBinding(()->{
        if(currentTaskProperty.getValue() == null) return "Start processing";
        else return "Processing...";
@@ -217,14 +228,16 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
         // and if there is no task in the currentTaskProperty.
         startButton.disableProperty().bind(cannotStart);
 
-         
-        
+
         progressLabel.visibleProperty().bind(currentTaskProperty.isNotNull());
         progressBar.visibleProperty().bind(currentTaskProperty.isNotNull());
         
         currentTaskProperty.addListener(this::onCurrentTaskChanged);
-
+        
+        
        
+        
+        
         
     } 
 
@@ -307,12 +320,12 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
 
         menuService.createMenus(new ChoiceBoxMenuCreator(this::onAddMenuButtonClicked), menuButton);
 
-         projectService.currentProjectProperty().addListener(this::onProjectChanged);
+         //projectService.currentProjectProperty().addListener(this::onProjectChanged);
         
-        selectedImageCountProperty.sizeProperty().addListener((event,oldValue,newValue)-> {
-
-            selectedCountLabel.setText(""+newValue);
-        });
+        
+        
+        
+        updatePlaneSet();
         
         
         return this;
@@ -340,11 +353,38 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
 
     }
     
-    public void onProjectChanged(Observable observable, Project oldProject, Project newProject) {
-        if(newProject == null) return;
-        selectedImageCountProperty.unbind();
-        selectedImageCountProperty.bind(newProject.getSelection());
+    @org.scijava.event.EventHandler
+    public void onProjectDisplayChanged(ProjectDisplayActived event) {
+        
+        updatePlaneSet();
+        System.out.println("plane set changed");
+        
     }
+            
+    
+    
+    
+    private void updatePlaneSet() {
+        
+        if(projectDisplayService.getActiveProjectDisplay() == ProjectDisplay.NO_DISPLAY) return;
+        
+        planeSetComboBox.setItems(projectDisplayService.getActiveProjectDisplay().getPlaneSetList());
+        planeSetComboBox.getSelectionModel().select(projectDisplayService.getActiveProjectDisplay().getCurrentPlaneSet());
+        
+        //selectedImageCountProperty.unbind();
+        
+        
+        
+       // ListProperty listProperty = new SimpleListProperty(projectDisplayService.getActiveProjectDisplay().getCurrentPlaneSet().getPlaneList());
+        selectedCountProperty.bind(Bindings.createIntegerBinding(
+                ()->projectDisplayService.getActiveProjectDisplay().getCurrentPlaneSet().getPlaneList().size(),
+                projectDisplayService.getActiveProjectDisplay().currentPlaneSetProperty())
+                
+        );
+        
+    }
+    
+    
 
     @Override
     public void execute(WorkflowStep t) {
@@ -363,19 +403,19 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     public void startBatchProcessing() {
 
         List<BatchSingleInput> inputs = new ArrayList<>();
+        PlaneSet<PlaneDB> planeSet = planeSetComboBox.getSelectionModel().getSelectedItem();
+        for (PlaneDB plane : planeSet.getPlaneList()) {
 
-        for (PlaneDB plane : projectService.getCurrentProject().getSelection()) {
+            PlaneDBBatchInput input = new PlaneDBBatchInput(planeSet.getProjectDisplay().getProject(),plane,PlaneDBBatchInput.SaveMode.REPLACE_ENTRY);
 
-            PlaneDBBatchInput input = new PlaneDBBatchInput(projectService.getCurrentProject(), plane);
-
-            context.inject(input);
+            //context.inject(input);
 
             input.setSaveDirectory(saveFolderProperty.getValue().getAbsolutePath());
             inputs.add(input);
         }
 
         
-        Task fakeTask = new FakeTask(null);
+        Task fakeTask = batchService.applyWorkflow(inputs, new DefaultWorkflow(steps));
         
         EventHandler<WorkerStateEvent> onFinished = event->{
             currentTaskProperty.setValue(null);

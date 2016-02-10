@@ -20,48 +20,53 @@
  */
 package ijfx.core.project.query;
 
-import ijfx.core.project.query.Selector;
+import ijfx.core.metadata.MetaData;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.ui.main.ImageJFX;
+import java.util.Map;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.scijava.Priority;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public class SimpleSelector implements Selector{
-    
+@Plugin(type = Selector.class, priority = Priority.LOW_PRIORITY)
+public class MetaDataSelector implements Selector {
+
     String queryString;
-    
+
     Logger logger = ImageJFX.getLogger();
-    
-    public static Pattern SIMPLE_QUERY_PATTERN = Pattern.compile("^\"(.*)\"\\s+=\\s+[\\/\\\"](.*)[\\/\\\"]$");
-    
+
+    //public static Pattern SIMPLE_QUERY_PATTERN = Pattern.compile("^\"(.*)\"\\s+=\\s+[\\/\\\"](.*)[\\/\\\"]$");
+    public static Pattern SIMPLE_QUERY_PATTERN = Pattern.compile("(.*)=(.*)");
     String keyString;
-    
+
     String valueString;
-    
-    public SimpleSelector() {
-        
+
+    public MetaDataSelector() {
+
     }
-    
-    public SimpleSelector(String queryString) {
+
+    public MetaDataSelector(String queryString) {
         parse(queryString);
     }
-    
-    public SimpleSelector(String key, String value) {
-        parse(String.format("\"%s\" = /%s/",key,value));
+
+    public MetaDataSelector(String key, String value) {
+        parse(String.format("\"%s\" = /%s/", key, value));
         keyString = key;
         valueString = value;
     }
-    
+
     public void parse(String queryString) {
         this.queryString = queryString;
     }
-    
-    public static boolean canParse(String query) {
+
+    public boolean canParse(String query) {
         return SIMPLE_QUERY_PATTERN.matcher(query).matches();
     }
 
@@ -72,36 +77,39 @@ public class SimpleSelector implements Selector{
 
     @Override
     public boolean matches(PlaneDB planeDB, String metadataSetName) {
-        
-        
-        
+
         Matcher m = SIMPLE_QUERY_PATTERN.matcher(queryString);
-        
-        if(m.matches()) {
-            
-                
-              String keyName = keyString == null ? m.group(1) : keyString;
-              String valueName = valueString == null ? m.group(2) : valueString;
-              
-              try {
-                String metadataValue = planeDB.getMetaDataSetProperty(metadataSetName).get(keyName).getStringValue();
-              } catch(NullPointerException e) {
-                  return false;
-              }
-              
-              Pattern p = Pattern.compile(valueName);
-              try {
-              return p.matcher(planeDB.getMetaDataSetProperty(metadataSetName).get(keyName).getStringValue()).matches();
-              }
-              catch(Exception e) {
-                  logger.warning("Error when matching the PlaneDB");
-              }
+        if (metadataSetName == null) {
+            metadataSetName = PlaneDB.MODIFIED_METADATASET_STRING;
         }
-        
-      
+
+        Map<String, MetaData> metadataSet = planeDB.getMetaDataSet();
+
+        if (m.matches()) {
+
+            String keyName = keyString == null ? m.group(1) : keyString;
+            String valueName = valueString == null ? m.group(2) : valueString;
+
+            // finds the right key even ignoring the case 
+            keyName = findKey(metadataSet, keyName.trim());
+            valueName = valueName.trim();
+            try {
+                String metadataValue = planeDB.getMetaDataSetProperty(metadataSetName).get(keyName).getStringValue();
+
+                return metadataValue.toLowerCase().equals(valueName.toLowerCase());
+            } catch (NullPointerException e) {
+                return false;
+            }
+
+        }
+
         return false;
-        
+
     }
-    
-    
+
+    public String findKey(Map<String, ? extends Object> metadata, String key) {
+
+        return metadata.keySet().stream().filter(mapKey -> mapKey.toLowerCase().equals(key.toLowerCase())).findFirst().orElse(key);
+
+    }
 }

@@ -160,7 +160,7 @@ public class RulesController extends BorderPane implements Initializable {
 
             @Override
             public void handle(TableColumn.CellEditEvent<AnnotationRule, String> event) {
-                Selector newSelector = new DefaultSelector(event.getNewValue());
+                Selector newSelector = queryService.getSelector(event.getNewValue());
                // Selector API modified
                 //handleCellEdit(event.getRowValue().getSelector(), event.getNewValue());
             }

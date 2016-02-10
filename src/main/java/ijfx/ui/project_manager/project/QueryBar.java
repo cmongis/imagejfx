@@ -29,11 +29,11 @@ import ijfx.core.project.query.DefaultSelector;
 import ijfx.core.project.command.Invoker.Operation;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.project_manager.projectdisplay.PlaneSelectionService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
@@ -84,6 +84,9 @@ public class QueryBar extends HBox {
     @Parameter
     private QueryService queryService;
 
+    @Parameter
+    private PlaneSelectionService planeSelectionService;
+    
     private static final ObservableList<String> keyList = FXCollections.observableArrayList();
 
     public static final String FORMAT_STRICT_SEARCH = "\"%s\" = \"%s\"";
@@ -198,13 +201,13 @@ public class QueryBar extends HBox {
         logger.info(request);
 
         // the generated selector
-        Selector selector = new DefaultSelector(request);
+        Selector selector = queryService.getSelector(request);
 
         // the query
         new Thread(() -> {
             List<PlaneDB> result = queryService.query(getCurrentProject(), selector, false);
             logger.info(String.format("%d planes found", result.size()));
-            modifierService.selectPlane(getCurrentProject(), result, true);
+            planeSelectionService.selectPlanes(getCurrentProject(), result);
         }).start();
 
     }

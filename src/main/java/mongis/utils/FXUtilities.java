@@ -100,6 +100,8 @@ public class FXUtilities {
     }
 
     public static void emptyPane(Pane pane) {
+        
+        if(pane == null) return;
         for (Node child : pane.getChildren()) {
             if (child instanceof Pane) {
                 emptyPane((Pane) child);
@@ -205,7 +207,7 @@ public class FXUtilities {
 
     public static void injectFXML(Object rootController, String location) throws IOException {
         //FXMLLoader loader = new FXMLLoader(rootController.getClass().getResource(location));
-
+        FXMLLoader loader = new FXMLLoader();
         loader.setRoot(rootController);
         loader.setController(rootController);
         loader.setResources(ImageJFX.getResourceBundle());

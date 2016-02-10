@@ -20,6 +20,7 @@
 package ijfx.ui.project_manager.projectdisplay;
 
 import ijfx.core.project.Project;
+import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.event.ProjectCloseEvent;
 import ijfx.core.project.event.ProjectCreatedEvent;
 import java.util.HashMap;
@@ -43,6 +44,9 @@ public class DefaultProjectDisplayService extends AbstractService implements Pro
     @Parameter
     EventService eventService;
     
+    @Parameter
+    ProjectManagerService projectService;
+    
     private ProjectDisplay addProject(Project project) {
         
         ProjectDisplay projectDisplay = new DefaultProjectDisplay(project);
@@ -55,6 +59,9 @@ public class DefaultProjectDisplayService extends AbstractService implements Pro
     
     @Override
     public ProjectDisplay getProjectDisplay(Project project) {
+        
+        if(project == Project.NO_PROJECT) return ProjectDisplay.NO_DISPLAY;
+        
         if(projectDisplayMap.containsKey(project) == false) {
             return addProject(project);
         }
@@ -75,8 +82,22 @@ public class DefaultProjectDisplayService extends AbstractService implements Pro
     @EventHandler
     private void onProjectClosed(ProjectCloseEvent event) {
         ProjectDisplay projectDisplay = getProjectDisplay(event.getProject());
-        projectDisplayMap.remove(projectDisplay);
+        
+        projectDisplayMap.remove(projectDisplay.getProject());
         eventService.publishLater(new ProjectDisplayClosedEvent(projectDisplay));
+         setActiveProjectDisplay(projectDisplayMap.values().stream().findFirst().orElse(null));
+    }
+
+    @Override
+    public ProjectDisplay getActiveProjectDisplay() {
+        return getProjectDisplay(projectService.getCurrentProject());
+    }
+
+    @Override
+    public void setActiveProjectDisplay(ProjectDisplay display) {
+        projectService.setCurrentProject(display.getProject());
+        eventService.publishLater(new ProjectDisplayActived(display));
+        
     }
     
    

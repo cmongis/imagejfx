@@ -40,7 +40,7 @@ public class SelectorEditor extends RuleEditor {
     
     public SelectorEditor(Context context) {
         super(context);
-        selector = new DefaultSelector();
+        selector = null; //new DefaultSelector();
         
         
         codeArea.setTooltip(new Tooltip(FXUtilities.getResourceBundle().getString("queryShortDirection")));

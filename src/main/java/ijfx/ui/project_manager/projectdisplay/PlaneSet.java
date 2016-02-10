@@ -48,4 +48,6 @@ public interface PlaneSet<T> {
     
     public void dispose();
     
+    public ProjectDisplay getProjectDisplay();
+    
 }

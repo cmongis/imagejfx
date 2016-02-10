@@ -105,4 +105,7 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
 
     public MetaDataSet getSettings();
    
+    public static Project NO_PROJECT = null;
+    
+    
 }

@@ -17,35 +17,41 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectdisplay;
+package ijfx.ui.project_manager.projectdisplay.card;
 
 import ijfx.core.project.Project;
-import ijfx.core.project.imageDBService.PlaneDB;
-import java.util.List;
-import javafx.scene.control.TreeItem;
-import net.imagej.ImageJService;
+import java.util.concurrent.Callable;
+import javafx.concurrent.Task;
+import javafx.util.Callback;
 
 /**
  *
  * @author cyril
  */
-public interface PlaneSelectionService extends ImageJService{
+public class ProjectUpdateTask extends Task<Boolean> {
     
     
+    private final Project project;
     
-    public void selectPlane(Project project, PlaneDB planeDB);
+    private final Callback<Project,Boolean> update;
+
+    public ProjectUpdateTask(Project project, Callback<Project,Boolean> callable) {
+        this.project = project;
+        this.update = callable;
+    }
+
+    public Project getProject() {
+        return project;
+    }
     
-    public void selectPlanes(Project project,List<PlaneDB> planeDB);
     
-    public void setPlaneSelection(Project project, PlaneDB planeDB, boolean selected);
+
+    @Override
+    protected Boolean call() throws Exception {
+        System.out.println("Starting thread");
+        return update.call(project);
+    }
     
-    public void setPlaneSelection(Project project, List<PlaneDB> planeList, boolean selected);
-    
-    public void setPlaneSelection(Project project, TreeItem<PlaneOrMetaData> planeList, boolean selected);
-    
-    public List<PlaneDB> getSelectedPlane(Project project);
-    
-    public boolean isPlaneSelected(Project project, PlaneDB plane);
     
     
 }

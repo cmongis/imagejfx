@@ -54,7 +54,12 @@ public class DefaultProjectContextCalculatorService extends AbstractService impl
     public ProjectContextCalculatorService updateContext(Project project) {
 
         
-        if(project == null) return this;
+        if(project == null) {
+            contextService.leave(PROJECT_OPEN,PROJECT_EMPTY,PROJECT_PLANE_SELECTED);
+            contextService.update();
+            return
+            this;
+        }
         
         // check if project are open
        contextService.toggleContext(PROJECT_OPEN, getProjectService().getProjects().size() > 0);

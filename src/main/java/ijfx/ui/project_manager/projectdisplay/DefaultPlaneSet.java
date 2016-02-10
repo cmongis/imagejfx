@@ -45,25 +45,32 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
     
     private final ObservableList<PlaneDB> planeList;
     
-    private final Project project;
+    private final ProjectDisplay projectDisplay;
 
     Logger logger = ImageJFX.getLogger();
     
-    public DefaultPlaneSet(Project project) {
+    public DefaultPlaneSet(ProjectDisplay projectDisplay) {
         
-        this("All images",project,project.getImages());
+        this(ProjectDisplay.ALL_IMAGES,projectDisplay,projectDisplay.getProject().getImages());
     }
     
-    public DefaultPlaneSet(Project project, String name) {
+    
+    private Project getProject() {
+        return projectDisplay.getProject();
+    }
+    
+    public DefaultPlaneSet(ProjectDisplay project, String name) {
         this(name,project,FXCollections.observableArrayList());
     }
     
-    public DefaultPlaneSet(String name, Project project, ObservableList<PlaneDB> planes) {
-       this.project = project;
+    public DefaultPlaneSet(String name, ProjectDisplay projectDisplay, ObservableList<PlaneDB> planes) {
+       this.projectDisplay = projectDisplay;
        setName(name);
        planeList = planes;
        logger.info(String.format("Creating PlaneSet %s that contains %d images.",name,planeList.size()));
-        
+       projectDisplay.getProject().getHierarchy().addListener((obs,oldValue,newValue)->{
+           updateTree();
+       });
        planeList.addListener(this::onListChanged);
        updateTree();
        setCurrentItem(getRoot());
@@ -76,7 +83,7 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
         
         while(change.next()) {
         
-             change.getAddedSubList().forEach(plane->ImageTreeService.placePlane(plane, getRoot(), project.getHierarchy()));
+             change.getAddedSubList().forEach(plane->ImageTreeService.placePlane(plane, getRoot(), getProject().getHierarchy()));
              
              ImageTreeService.removePlanes(change.getRemoved(), getRoot());
              
@@ -91,7 +98,7 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
         
         setRoot(new ProjectTreeItem());
         t.start();
-        ImageTreeService.placePlanes(planeList, rootProperty.getValue(), project.getHierarchy());
+        ImageTreeService.placePlanes(planeList, rootProperty.getValue(), getProject().getHierarchy());
         t.elapsed("Tree placement");
         
         setCurrentItem(getRoot());
@@ -132,7 +139,9 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
 
     @Override
     public ProjectTreeItem getCurrentItem() {
-        
+        if(currentItemProperty.getValue() ==null) {
+            currentItemProperty.setValue(getRoot());
+        }
         return currentItemProperty.getValue();
     }
 
@@ -147,18 +156,24 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
     }
     
     public void addImage(PlaneDB planeDB) {
-        addImage(planeDB,project.getHierarchy());
+        planeList.add(planeDB);
     }
     
-    private void addImage(PlaneDB planeDB,List<String> hierarchy) {
-        ImageTreeService.placePlane(planeDB, rootProperty.getValue(), hierarchy);
-    }
+   
 
     @Override
     public void dispose() {
     }
+
+    @Override
+    public ProjectDisplay getProjectDisplay() {
+        return projectDisplay;
+    }
     
-    
+    @Override
+    public String toString() {
+        return String.format("%s : %d",getName(),getPlaneList().size());
+    }
     
     
 }

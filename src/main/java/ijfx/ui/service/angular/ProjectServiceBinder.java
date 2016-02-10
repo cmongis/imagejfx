@@ -142,7 +142,7 @@ public class ProjectServiceBinder implements AngularService {
         
         final String selectorStr = params.getString("selector");
         final String modifierStr = params.getString("modifier");
-        final Selector selector = new DefaultSelector(selectorStr);
+        final Selector selector = queryService.getSelector(selectorStr);
         final Modifier modifier = queryService.getModifier(modifierStr);
 
 

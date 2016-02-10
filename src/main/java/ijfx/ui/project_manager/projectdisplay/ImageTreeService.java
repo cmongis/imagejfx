@@ -23,9 +23,11 @@ import ijfx.core.metadata.GenericMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.ui.project_manager.project.TreeItemUtils;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TreeItem;
+import javafx.util.Pair;
 
 /**
  *
@@ -38,60 +40,80 @@ public class ImageTreeService {
         // we progressively go down the tree to find the node corresponding to
         // the hierarchy
         ProjectTreeItem currentNode = root;
-        
-        for(String keyName : hierarchy) {
-            
+        //System.out.println("################# Placing plane "+planeDB.toString());
+        for (String keyName : hierarchy) {
+            //System.out.println("hierarchy "+hierarchy);
             // retrieve the metadata from the plane or create a metadata with missing inside
             // in order to compensate the lack of metadata
             MetaData metadata = planeDB.getMetaDataSet().getOrDefault(keyName, new GenericMetaData(keyName, 0));
-            
+
             // the parent node become the found one
             currentNode = findNode(metadata, currentNode);
             
-     
-            
+            System.out.println(currentNode);
+
         }
-        
+
         // the loop was repeated until finding the bottom of the hierarchy
         // so we put a last leaf containing the plane
         currentNode.getChildren().add(new ProjectTreeItem(planeDB));
+        //System.out.println("############### NODE PLACED #############");
     }
 
     public static void placePlanes(List<PlaneDB> planeList, ProjectTreeItem root, List<String> hieararchy) {
+
+
         
-        for( PlaneDB plane : planeList) {
+        for (PlaneDB plane : planeList) {
             placePlane(plane, root, hieararchy);
         }
-        
-        
+
     }
-    
+
     public static void removePlane(PlaneDB plane, ProjectTreeItem root) {
-        TreeItemUtils.goThrough(root, treeItem->{    
-            TreeItem parentNode = treeItem.getParent();
-            if(parentNode == null) return;
-            if(treeItem.getValue().isPlane() && treeItem.getValue().getPlaneDB() == plane) {
-               parentNode.getChildren().remove(treeItem);
+        
+        
+        List<Pair<TreeItem,TreeItem>> toRemove = new ArrayList<>();
+        
+        TreeItemUtils.goThroughLeaves(root, leaf->{
+            if(leaf.getValue() == null) return;
+            if(leaf.getValue().getPlaneDB() == plane || (leaf.getValue().isPlane() == false && leaf.getChildren().isEmpty())) {
+                toRemove.add(new Pair<>(leaf.getParent(),leaf));
             }
+            
+            /*
+            if(parent.getChildren().size() == 0) {
+                leaf = parent;
+                parent = parent.getParent();
+                parent.getChildren().remove(leaf);
+            }*/
+
         });
+        
+        for(Pair<TreeItem,TreeItem> pair : toRemove) {
+            pair.getKey().getChildren().remove(pair.getValue());
+        }
+       
     }
-    
+
     public static void removePlanes(List<? extends PlaneDB> planeList, ProjectTreeItem root) {
-        for(PlaneDB plane : planeList) {
-            removePlane(plane,root);
+        for (PlaneDB plane : planeList) {
+            removePlane(plane, root);
         }
     }
-    
+
     public static void deleteEmptyNodes(ProjectTreeItem root) {
-        if(true) return;
-        TreeItemUtils.goThrough(root, treeItem->{    
+        if (true) {
+            return;
+        }
+        TreeItemUtils.goThrough(root, treeItem -> {
             TreeItem parentNode = treeItem.getParent();
-            if(treeItem.getChildren().size() == 0) {
-               parentNode.getChildren().remove(treeItem);
+            if (treeItem.getChildren().size() == 0) {
+                parentNode.getChildren().remove(treeItem);
             }
         });
     }
-    
+
     public static ProjectTreeItem findNode(MetaData metadata, ProjectTreeItem root) {
 
         // find the child with the value of the plane
@@ -100,14 +122,16 @@ public class ImageTreeService {
                 && child.getValue().getMetaData().equals(metadata));
 
         if (filtered.size() == 0) {
+           
             ProjectTreeItem newItem = new ProjectTreeItem(metadata);
             root.getChildren().add(newItem);
             return newItem;
+        } else {
+           
+            return (ProjectTreeItem) filtered.get(0);
         }
-        else return (ProjectTreeItem)filtered.get(0);
-
-       
-
     }
 
 }
+
+

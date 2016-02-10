@@ -17,20 +17,23 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectdisplay;
+package ijfx.core.project.query.tree;
 
-import ijfx.core.project.Project;
-import net.imagej.ImageJService;
+import ijfx.core.project.query.Selector;
+import ijfx.core.project.query.SelectorFactory;
 
 /**
  *
  * @author cyril
  */
-public interface ProjectDisplayService extends ImageJService {
-
-    ProjectDisplay getProjectDisplay(Project project);
-    ProjectDisplay getActiveProjectDisplay();
-    void setActiveProjectDisplay(ProjectDisplay display);
+public class DummySelectorFactory implements SelectorFactory {
     
+    public DummySelectorFactory() {
+    }
+
+    @Override
+    public Selector create(String query) {
+        return new DummySelector(query);
+    }
     
 }

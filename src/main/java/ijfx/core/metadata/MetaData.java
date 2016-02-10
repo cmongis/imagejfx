@@ -99,5 +99,7 @@ public interface MetaData {
     
     public final static String PLANE_INDEX="Plane Index";
     
+    public final static String WAS_MODIFIED = "modified";
+    
     // addedd an other useful comment
 }

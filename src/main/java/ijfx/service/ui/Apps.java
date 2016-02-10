@@ -17,20 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectdisplay;
-
-import ijfx.core.project.Project;
-import net.imagej.ImageJService;
-
 /**
  *
  * @author cyril
  */
-public interface ProjectDisplayService extends ImageJService {
+package ijfx.service.ui;
 
-    ProjectDisplay getProjectDisplay(Project project);
-    ProjectDisplay getActiveProjectDisplay();
-    void setActiveProjectDisplay(ProjectDisplay display);
-    
-    
+
+public class Apps {
+    public static final String PROJECT_WIZARD = "project-wizard";
+    public static final String HIERARCHY_EDITOR = "hierarchy-editor";
 }

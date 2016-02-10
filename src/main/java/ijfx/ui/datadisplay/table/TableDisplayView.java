@@ -20,12 +20,12 @@
  */
 package ijfx.ui.datadisplay.table;
 
+import ijfx.core.project.query.QueryService;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -42,6 +42,7 @@ import javafx.util.Callback;
 import net.imagej.table.Table;
 import net.imagej.table.TableDisplay;
 import mongis.utils.FXUtilities;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -58,6 +59,8 @@ public class TableDisplayView extends BorderPane {
     
     final Logger logger = ImageJFX.getLogger();
     
+    @Parameter
+    QueryService queryService;
     
     public TableDisplayView() {
         

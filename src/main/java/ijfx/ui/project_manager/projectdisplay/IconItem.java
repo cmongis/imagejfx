@@ -45,6 +45,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import mongis.utils.ConditionList;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
@@ -54,7 +55,7 @@ import mongis.utils.ListCellController;
  *
  * @author Cyril MONGIS, 2015
  */
-public class IconItem extends BorderPane implements ListCellController<TreeItem<PlaneOrMetaData>> {
+public class IconItem extends BorderPane implements ListCellController<TreeItem<? extends PlaneOrMetaData>> {
 
     @FXML
     private CheckBox checkBox;
@@ -93,17 +94,18 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem<
 
     FolderContextMenu folderContextMenu;
 
-    
+   
     
     
     public IconItem(TreeItem item) {
         this();
         setItem(item);
+       
     }
 
     public IconItem() {
         super();
-
+        
         try {
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
@@ -117,8 +119,10 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem<
     }
 
     @Override
-    public void setItem(TreeItem t) {
-     
+    public void setItem(TreeItem< ? extends PlaneOrMetaData> t) {
+        
+            item = null; // cancelling all possible actions on the item
+        
             if (t instanceof CheckBoxTreeItem) {
 
                 CheckBoxTreeItem chItem = (CheckBoxTreeItem) t;
@@ -130,10 +134,22 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem<
             if (t != null) {
                 itemLabel.setText(t.getValue().toString());
                 item = t;
+                
+                ConditionList conditionList = new ConditionList(20);
+                
+                TreeItemUtils.goThroughLeaves(t, child->{
+                    conditionList.add(planeSelectionService.isPlaneSelected(projectService.getCurrentProject(),child.getValue().getPlaneDB()));
+                });
+                
+                checkBox.setSelected(conditionList.isOneTrue());
+                
+                
             } else {
 
             }
 
+            
+            
             updateIcon();
 
             /*
@@ -216,9 +232,9 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem<
         return item.getValue().isPlane();
     }
 
-    public void updateSelection(TreeItem item, boolean value) {
+    private void updateSelection(TreeItem item, boolean value) {
         
-       // modifierService.selectSubImages(projectService.currentProjectProperty().get(), item, value);
+      
         ((CheckBoxTreeItem) item).setSelected(value);
     }
 
@@ -282,12 +298,14 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem<
 
     /* Checkbox related methods */
     public void onCheckBoxClicked(Observable event, Boolean oldValue, Boolean newValue) {
-       /// modifierService.selectSubImages(projectService.currentProjectProperty().get(), item, newValue);
-        System.out.println("checking");
-        
+      
+        if(item == null) return;
         planeSelectionService.setPlaneSelection(projectService.getCurrentProject(), item, newValue);
         
         
+        
     }
+    
+    
 
 }

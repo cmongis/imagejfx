@@ -55,7 +55,8 @@ import javax.script.ScriptException;
  *
  * @author Cyril Quinton
  */
-public class DefaultSelector implements Selector, QueryParser {
+@Deprecated
+public class DefaultSelector implements  QueryParser {
 
     private List<MetaDataPosition> metaDataPositions = new ArrayList<>();
     private List<TagPosition> tagPositions = new ArrayList<>();
@@ -337,18 +338,15 @@ public class DefaultSelector implements Selector, QueryParser {
     
     
     private ScriptEngine getEngine() {
-        
-        
-        
         return new ScriptEngineManager().getEngineByName("nashorn");
     }
 
-    @Override
+   
     public String getQueryString() {
         return nonParsedString;
     }
 
-    @Override
+  
     public boolean matches(PlaneDB plane, String metaDataSetName) {
          ScriptEngine scriptEngine = getEngine();
         boolean queryResult = false;

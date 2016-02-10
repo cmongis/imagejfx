@@ -21,14 +21,13 @@ package ijfx.ui.project_manager.projectdisplay;
 
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.imageDBService.PlaneDB;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.CheckBoxTreeItem;
 
 /**
  *
  * @author cyril
  */
-public class ProjectTreeItem extends TreeItem<PlaneOrMetaData>{
+public class ProjectTreeItem extends CheckBoxTreeItem<PlaneOrMetaData>{
 
     
     public ProjectTreeItem() {

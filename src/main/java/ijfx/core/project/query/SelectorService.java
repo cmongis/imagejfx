@@ -17,35 +17,22 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectdisplay;
+package ijfx.core.project.query;
 
-import ijfx.core.project.Project;
-import ijfx.core.project.imageDBService.PlaneDB;
 import java.util.List;
-import javafx.scene.control.TreeItem;
 import net.imagej.ImageJService;
 
 /**
  *
  * @author cyril
  */
-public interface PlaneSelectionService extends ImageJService{
+public interface SelectorService extends ImageJService {
     
     
+    List<Selector> getSelectors();
     
-    public void selectPlane(Project project, PlaneDB planeDB);
+    Selector createSelector(Class<? extends Selector> clazz);
     
-    public void selectPlanes(Project project,List<PlaneDB> planeDB);
-    
-    public void setPlaneSelection(Project project, PlaneDB planeDB, boolean selected);
-    
-    public void setPlaneSelection(Project project, List<PlaneDB> planeList, boolean selected);
-    
-    public void setPlaneSelection(Project project, TreeItem<PlaneOrMetaData> planeList, boolean selected);
-    
-    public List<PlaneDB> getSelectedPlane(Project project);
-    
-    public boolean isPlaneSelected(Project project, PlaneDB plane);
-    
+    SelectorFactory getSelectorFactory();
     
 }
