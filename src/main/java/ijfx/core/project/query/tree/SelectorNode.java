@@ -44,6 +44,8 @@ public class SelectorNode implements Selector {
     private static final char POPEN = '(';
     private static final char PCLOSE = ')';
 
+    private static final String  PHRASE = "%s%s%s";
+    
     private String booleanOperation;
 
     public SelectorNode(SelectorFactory factory) {
@@ -240,6 +242,16 @@ public class SelectorNode implements Selector {
         }
         else {
             return selector != null;
+        }
+    }
+
+    @Override
+    public String phraseMe() {
+        if(left!=null && right != null) {
+            return String.format(PHRASE,left.phraseMe(),booleanOperation,right.phraseMe());
+        }
+        else {
+            return selector.phraseMe();
         }
     }
 

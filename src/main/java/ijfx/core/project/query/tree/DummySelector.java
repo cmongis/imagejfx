@@ -55,6 +55,11 @@ public class DummySelector implements Selector {
     public boolean canParse(String queryString) {
         return true;
     }
+
+    @Override
+    public String phraseMe() {
+        return "Does nothing... It's dumb.";
+    }
     
     
     
