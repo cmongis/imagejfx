@@ -72,8 +72,10 @@ public class IconPlaneSetView extends BorderPane implements PlaneSetView {
             context.inject(this);
             FXUtilities.injectFXML(this);
             flowPane.prefWidthProperty().bind(widthProperty());
+            flowPane.widthProperty().addListener((obs,oldVAlue,newValue)->System.out.println(newValue));
             FXUtilities.bindList(flowPane.getChildren(), itemControllerList);
             setCenter(flowPane);
+            
         } catch (IOException ex) {
             Logger.getLogger(IconPlaneSetView.class.getName()).log(Level.SEVERE, null, ex);
             setCenter(new Label("Error when initializing the panel"));

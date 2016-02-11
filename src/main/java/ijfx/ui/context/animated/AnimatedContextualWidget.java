@@ -35,7 +35,7 @@ public class AnimatedContextualWidget implements ContextualWidget<Node> {
     String name;
     Node component;
 
-    HashMap<String, Animation> transitionMap = new HashMap<>();
+    HashMap<String, Animations> transitionMap = new HashMap<>();
 
     Runnable onAnimationEnded;
 
@@ -48,8 +48,8 @@ public class AnimatedContextualWidget implements ContextualWidget<Node> {
         this.name = name;
         this.component = node;
 
-        setAnimation(AnimationAction.HIDE, Animation.NOTHING);
-        setAnimation(AnimationAction.SHOW, Animation.NOTHING);
+        setAnimation(AnimationAction.HIDE, Animations.NOTHING);
+        setAnimation(AnimationAction.SHOW, Animations.NOTHING);
 
     }
 
@@ -59,7 +59,7 @@ public class AnimatedContextualWidget implements ContextualWidget<Node> {
      * @param configurator
      * @return
      */
-    public AnimatedContextualWidget setTransition(String action, Animation configurator) {
+    public AnimatedContextualWidget setTransition(String action, Animations configurator) {
         return this;
     }
 
@@ -138,7 +138,7 @@ public class AnimatedContextualWidget implements ContextualWidget<Node> {
      * @param action
      * @return
      */
-    public Animation getAnimation(String action) {
+    public Animations getAnimation(String action) {
         return transitionMap.get(action);
     }
 
@@ -148,7 +148,7 @@ public class AnimatedContextualWidget implements ContextualWidget<Node> {
      * @param transition
      * @return
      */
-    public AnimatedContextualWidget setAnimation(String action, Animation transition) {
+    public AnimatedContextualWidget setAnimation(String action, Animations transition) {
         transitionMap.put(action, transition);
         return this;
     }

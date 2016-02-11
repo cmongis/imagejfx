@@ -21,8 +21,11 @@
 package ijfx.ui.context.animated;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
 import javafx.animation.SequentialTransition;
+import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.Node;
@@ -35,7 +38,7 @@ import javafx.util.Duration;
  * @author Cyril MONGIS, 2015
  */
 // configure and node and generate a animation.
-public interface Animation {
+public interface Animations {
 
     /**
      *
@@ -48,7 +51,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation ZOOMIN = (node, ms) -> {
+    public static Animations ZOOMIN = (node, ms) -> {
 
         ScaleTransition t = new ScaleTransition(new Duration(ms), node);
         t.setFromX(0);
@@ -63,7 +66,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation ZOOMOUT = (node, ms) -> {
+    public static Animations ZOOMOUT = (node, ms) -> {
         ScaleTransition t = new ScaleTransition(new Duration(ms), node);
         t.setFromX(t.getNode().getScaleX());
         t.setFromX(t.getNode().getScaleY());
@@ -75,7 +78,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation DISAPPEARS_LEFT = (node, ms) -> {
+    public static Animations DISAPPEARS_LEFT = (node, ms) -> {
 
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
         double shift = node.getBoundsInParent().getWidth();
@@ -91,7 +94,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation APPEARS_LEFT = (node, ms) -> {
+    public static Animations APPEARS_LEFT = (node, ms) -> {
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
         t.setToX(node.getTranslateX());
         t.setFromX(node.getTranslateX() - node.getBoundsInParent().getWidth());
@@ -102,7 +105,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation DISAPPEARS_RIGHT = (node, ms) -> {
+    public static Animations DISAPPEARS_RIGHT = (node, ms) -> {
 
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
 
@@ -114,7 +117,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation APPEARS_RIGHT = (node, ms) -> {
+    public static Animations APPEARS_RIGHT = (node, ms) -> {
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
         t.setToX(node.getTranslateX());
         t.setFromX(node.getTranslateX() + node.getBoundsInParent().getWidth());
@@ -124,7 +127,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation DISAPPEARS_UP = (node, ms) -> {
+    public static Animations DISAPPEARS_UP = (node, ms) -> {
 
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
 
@@ -137,7 +140,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation APPEARS_UP = (node, ms) -> {
+    public static Animations APPEARS_UP = (node, ms) -> {
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
 
         t.setToY(node.getTranslateY());
@@ -148,7 +151,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation DISAPPEARS_DOWN = (node, ms) -> {
+    public static Animations DISAPPEARS_DOWN = (node, ms) -> {
 
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
 
@@ -161,7 +164,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation APPEARS_DOWN = (node, ms) -> {
+    public static Animations APPEARS_DOWN = (node, ms) -> {
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
 
         t.setFromY(node.getBoundsInParent().getHeight());
@@ -172,7 +175,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation FADEIN = (node, ms) -> {
+    public static Animations FADEIN = (node, ms) -> {
         FadeTransition t = new FadeTransition(new Duration(ms), node);
         t.setFromValue(0);
         t.setToValue(1);
@@ -182,7 +185,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation FADEOUT = (node, ms) -> {
+    public static Animations FADEOUT = (node, ms) -> {
         FadeTransition t = new FadeTransition(new Duration(ms), node);
         t.setFromValue(1);
         t.setToValue(0);
@@ -192,7 +195,7 @@ public interface Animation {
     /**
      *
      */
-    public static Animation NOTHING = (node, ms) -> {
+    public static Animations NOTHING = (node, ms) -> {
         return new Transition() {
 
             @Override
@@ -201,7 +204,7 @@ public interface Animation {
         };
     };
     
-    public static Animation QUICK_EXPAND = (node,ms)-> {
+    public static Animations QUICK_EXPAND = (node,ms)-> {
         SequentialTransition sequence = new SequentialTransition();
         
         ScaleTransition growth = new ScaleTransition(Duration.millis(ms), node);
@@ -224,6 +227,28 @@ public interface Animation {
         sequence.getChildren().addAll(growth,shrink);
         
         return sequence;
+    };
+    
+    public static Animations FADE_OUT_LEFT = (node,ms)->{
+    
+        Timeline timeLine = new Timeline();
+        KeyFrame begin = new KeyFrame(Duration.millis(0),
+                new KeyValue(node.translateXProperty(),0)
+                ,new KeyValue(node.opacityProperty(),1)
+        );
+        
+        
+        
+        KeyFrame end = new KeyFrame(Duration.millis(ms),
+                new KeyValue(node.translateXProperty(),300)
+                ,new KeyValue(node.opacityProperty(),1)
+        );
+        
+        return timeLine;
+    };
+    
+    public static Animations FADE_IN_FROM_LEFT = (node,ms)->{
+    
     };
 
 }

@@ -20,11 +20,11 @@
  */
 package ijfx.ui.history;
 import mongis.utils.DraggableListCell;
-import ijfx.ui.context.animated.Animation;
 import ijfx.service.workflow.WorkflowStep;
 
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
+import ijfx.ui.context.animated.Animations;
 
 
 /**

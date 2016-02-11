@@ -25,7 +25,6 @@ import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.PlaneDBBatchInput;
-import ijfx.ui.context.animated.Animation;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.service.uicontext.UiContextService;
@@ -91,6 +90,7 @@ import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.ComboBox;
+import ijfx.ui.context.animated.Animations;
 
 /**
  *
@@ -269,10 +269,10 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
             
             if(newValue) {
 
-                Animation.FADEIN.configure(node, ImageJFX.getAnimationDurationAsDouble()).play();
+                Animations.FADEIN.configure(node, ImageJFX.getAnimationDurationAsDouble()).play();
             }
             else {
-                Animation.FADEOUT.configure(node, ImageJFX.getAnimationDurationAsDouble()).play();
+                Animations.FADEOUT.configure(node, ImageJFX.getAnimationDurationAsDouble()).play();
             }
             
             

@@ -21,7 +21,6 @@
 package ijfx.ui.arcmenu;
 
 import ijfx.ui.arcmenu.skin.ArcItemCircleSkin;
-import ijfx.ui.context.animated.Animation;
 import ijfx.ui.main.ImageJFX;
 
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import ijfx.ui.context.animated.Animations;
 
 /**
  * The ArcMenu.
@@ -149,7 +149,7 @@ public class ArcMenu extends StackPane {
             logger.info("Hiding");
 
             // creating the fading transition that removes the object
-            Transition transition = Animation.FADEOUT.configure(this, ANIMATION_SPEED);
+            Transition transition = Animations.FADEOUT.configure(this, ANIMATION_SPEED);
 
             // when the transition is over, the pane is removed
             transition.setOnFinished(evt -> {
@@ -248,11 +248,11 @@ public class ArcMenu extends StackPane {
      */
     protected void addEvents(ArcItem itemCtrl) {
         itemCtrl.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            animateOtherThan(itemCtrl, Animation.FADEOUT);
+            animateOtherThan(itemCtrl, Animations.FADEOUT);
 
         });
         itemCtrl.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
-            animateOtherThan(itemCtrl, Animation.FADEIN);
+            animateOtherThan(itemCtrl, Animations.FADEIN);
         });
     }
 
@@ -261,7 +261,7 @@ public class ArcMenu extends StackPane {
      * @param excludedItemCtrl
      * @param animation
      */
-    protected void animateOtherThan(ArcItem excludedItemCtrl, Animation animation) {
+    protected void animateOtherThan(ArcItem excludedItemCtrl, Animations animation) {
 
         items.forEach(itemCtrl -> {
             if (itemCtrl == excludedItemCtrl) {
@@ -313,7 +313,7 @@ public class ArcMenu extends StackPane {
             Duration delayDuration = Duration.millis(index * delay);
 
             // fade in transition of the item
-            Transition fadeIn = Animation.FADEIN.configure(item, ANIMATION_SPEED);
+            Transition fadeIn = Animations.FADEIN.configure(item, ANIMATION_SPEED);
             fadeIn.setDelay(delayDuration);
 
             // translate transition : from the center to his edge

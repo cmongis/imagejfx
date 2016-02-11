@@ -22,7 +22,6 @@ package ijfx.ui.main;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import ijfx.ui.context.animated.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
@@ -36,6 +35,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import ijfx.ui.context.animated.Animations;
 
 /**
  *
@@ -127,12 +127,12 @@ public class LoadingIcon extends StackPane {
             pt.setCycleCount(300);
             iconTransition = pt;
         }
-        Animation.FADEIN.configure(this, ImageJFX.getAnimationDurationAsDouble());
+        Animations.FADEIN.configure(this, ImageJFX.getAnimationDurationAsDouble());
         iconTransition.play();
     }
     
     public void stop() {
-        Animation.FADEOUT.configure(this, ImageJFX.getAnimationDurationAsDouble());
+        Animations.FADEOUT.configure(this, ImageJFX.getAnimationDurationAsDouble());
         if(iconTransition != null) iconTransition.stop();
     }
     

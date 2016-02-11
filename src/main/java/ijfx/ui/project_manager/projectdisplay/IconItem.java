@@ -27,7 +27,6 @@ import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.ProjectModifierService;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.service.thumb.ThumbService;
-import ijfx.ui.context.animated.Animation;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -50,6 +49,7 @@ import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
 import mongis.utils.ListCellController;
+import ijfx.ui.context.animated.Animations;
 
 /**
  *
@@ -262,7 +262,7 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem<
 
             
                 setCenter(imageView);
-                Transition tr2 = Animation.FADEIN.configure(imageView, ImageJFX.getAnimationDurationAsDouble() / 2);
+                Transition tr2 = Animations.FADEIN.configure(imageView, ImageJFX.getAnimationDurationAsDouble() / 2);
                 
         });
 

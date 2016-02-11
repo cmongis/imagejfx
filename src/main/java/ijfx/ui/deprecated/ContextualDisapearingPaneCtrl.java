@@ -23,7 +23,6 @@ package ijfx.ui.deprecated;
 import ijfx.ui.context.ContextualUIController;
 import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.context.NodeContextualWidget;
-import ijfx.ui.context.animated.Animation;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +36,7 @@ import javafx.animation.Transition;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
+import ijfx.ui.context.animated.Animations;
 
 /**
  *
@@ -48,8 +48,8 @@ public class ContextualDisapearingPaneCtrl extends HashMap<String, NodeContextua
 
     Parent parentNode;
 
-    Animation animationOnShow = Animation.FADEIN;
-    Animation animationOnHide = Animation.FADEOUT;
+    Animations animationOnShow = Animations.FADEIN;
+    Animations animationOnHide = Animations.FADEOUT;
 
     List<ContextualWidget> toShow;
     List<ContextualWidget> toHide;
@@ -84,19 +84,19 @@ public class ContextualDisapearingPaneCtrl extends HashMap<String, NodeContextua
         this.parentNode = parentNode;
     }
 
-    public Animation getAnimationOnShow() {
+    public Animations getAnimationOnShow() {
         return animationOnShow;
     }
 
-    public void setAnimationOnShow(Animation animationOnShow) {
+    public void setAnimationOnShow(Animations animationOnShow) {
         this.animationOnShow = animationOnShow;
     }
 
-    public Animation getAnimationOnHide() {
+    public Animations getAnimationOnHide() {
         return animationOnHide;
     }
 
-    public ContextualDisapearingPaneCtrl setAnimationOnHide(Animation animationOnHide) {
+    public ContextualDisapearingPaneCtrl setAnimationOnHide(Animations animationOnHide) {
         this.animationOnHide = animationOnHide;
         return this;
     }

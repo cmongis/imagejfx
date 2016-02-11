@@ -26,7 +26,6 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.bridge.FxStatusBar;
 import ijfx.bridge.FxUserInterfaceBridge;
-import ijfx.ui.context.animated.Animation;
 import ijfx.ui.context.animated.TransitionQueue;
 import ijfx.ui.main.ImageJFX;
 import javafx.animation.Transition;
@@ -42,6 +41,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
+import ijfx.ui.context.animated.Animations;
 
 /**
  *
@@ -64,8 +64,8 @@ public class FxStatusBarWidget extends HBox implements UiPlugin {
     
     TransitionQueue queue = new TransitionQueue();
     
-    Transition appearance = Animation.FADEIN.configure(this,ImageJFX.getAnimationDurationAsDouble());
-    Transition disapearance = Animation.FADEOUT.configure(this,ImageJFX.getAnimationDurationAsDouble());
+    Transition appearance = Animations.FADEIN.configure(this,ImageJFX.getAnimationDurationAsDouble());
+    Transition disapearance = Animations.FADEOUT.configure(this,ImageJFX.getAnimationDurationAsDouble());
     
   
     

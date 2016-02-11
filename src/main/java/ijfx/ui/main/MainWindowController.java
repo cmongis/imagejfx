@@ -21,7 +21,6 @@
 package ijfx.ui.main;
 
 import ijfx.ui.context.animated.AnimatedPaneContextualView;
-import ijfx.ui.context.animated.Animation;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.notification.Notification;
@@ -94,6 +93,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
+import ijfx.ui.context.animated.Animations;
 
 /**
  * FXML Controller class
@@ -365,40 +365,40 @@ public class MainWindowController implements Initializable {
 
     public void registerWidgetControllers() {
         registerPaneCtrl(topLeftHBox)
-                .setAnimationOnHide(Animation.DISAPPEARS_LEFT)
-                .setAnimationOnShow(Animation.APPEARS_LEFT);
+                .setAnimationOnHide(Animations.DISAPPEARS_LEFT)
+                .setAnimationOnShow(Animations.APPEARS_LEFT);
 
         registerPaneCtrl(topRightHBox)
-                .setAnimationOnHide(Animation.DISAPPEARS_UP)
-                .setAnimationOnShow(Animation.APPEARS_UP);
+                .setAnimationOnHide(Animations.DISAPPEARS_UP)
+                .setAnimationOnShow(Animations.APPEARS_UP);
 
         registerPaneCtrl(leftVBox)
-                .setAnimationOnHide(Animation.DISAPPEARS_LEFT)
-                .setAnimationOnShow(Animation.APPEARS_LEFT);
+                .setAnimationOnHide(Animations.DISAPPEARS_LEFT)
+                .setAnimationOnShow(Animations.APPEARS_LEFT);
 
         registerPaneCtrl(rightVBox)
-                .setAnimationOnHide(Animation.DISAPPEARS_RIGHT)
-                .setAnimationOnShow(Animation.APPEARS_RIGHT);
+                .setAnimationOnHide(Animations.DISAPPEARS_RIGHT)
+                .setAnimationOnShow(Animations.APPEARS_RIGHT);
 
         registerPaneCtrl(bottomLeftHBox)
-                .setAnimationOnHide(Animation.DISAPPEARS_DOWN)
-                .setAnimationOnHide(Animation.APPEARS_DOWN);
+                .setAnimationOnHide(Animations.DISAPPEARS_DOWN)
+                .setAnimationOnHide(Animations.APPEARS_DOWN);
 
         registerPaneCtrl(bottomRightHBox)
-                .setAnimationOnHide(Animation.DISAPPEARS_DOWN)
-                .setAnimationOnShow(Animation.APPEARS_DOWN);
+                .setAnimationOnHide(Animations.DISAPPEARS_DOWN)
+                .setAnimationOnShow(Animations.APPEARS_DOWN);
 
         registerPaneCtrl(centerStackPane)
-                .setAnimationOnHide(Animation.FADEOUT)
-                .setAnimationOnShow(Animation.FADEIN);
+                .setAnimationOnHide(Animations.FADEOUT)
+                .setAnimationOnShow(Animations.FADEIN);
 
         registerPaneCtrl(topCenterHBox)
-                .setAnimationOnHide(Animation.DISAPPEARS_UP)
-                .setAnimationOnShow(Animation.APPEARS_UP);
+                .setAnimationOnHide(Animations.DISAPPEARS_UP)
+                .setAnimationOnShow(Animations.APPEARS_UP);
 
         registerPaneCtrl(bottomCenterHBox)
-                .setAnimationOnShow(Animation.APPEARS_DOWN)
-                .setAnimationOnHide(Animation.DISAPPEARS_DOWN);
+                .setAnimationOnShow(Animations.APPEARS_DOWN)
+                .setAnimationOnHide(Animations.DISAPPEARS_DOWN);
 
     }
 
@@ -676,7 +676,7 @@ public class MainWindowController implements Initializable {
         highligther.setOnMouseClicked(event -> {
 
             // creating a transition
-            Transition transition = Animation.DISAPPEARS_RIGHT.configure(highligther, ImageJFX.getAnimationDurationAsDouble());
+            Transition transition = Animations.DISAPPEARS_RIGHT.configure(highligther, ImageJFX.getAnimationDurationAsDouble());
             
             // and when the transition if finished
             transition
@@ -713,7 +713,7 @@ public class MainWindowController implements Initializable {
 
         //if(isHintDisplaying) {
         
-        Animation.APPEARS_LEFT.configure(highligther, ImageJFX.getAnimationDurationAsDouble()).play();
+        Animations.APPEARS_LEFT.configure(highligther, ImageJFX.getAnimationDurationAsDouble()).play();
         //}
 
         // gotItButton.setTranslateY(label.getTranslateY()+label.getBoundsInLocal().getHeight()+hintWidth/2);

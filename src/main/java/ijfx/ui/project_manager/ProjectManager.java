@@ -26,7 +26,6 @@ import ijfx.core.project.ProjectManagerService;
 import ijfx.ui.project_manager.project.BrowserUIService;
 import ijfx.ui.project_manager.project.MainProjectController;
 import ijfx.ui.project_manager.search.SearchBar;
-import ijfx.ui.context.animated.Animation;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.service.uicontext.UiContextService;
@@ -67,6 +66,7 @@ import ijfx.ui.project_manager.projectdisplay.ProjectDisplayClosedEvent;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayCreatedEvent;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
 import ijfx.ui.project_manager.projectdisplay.ProjectPane;
+import ijfx.ui.context.animated.Animations;
 
 /**
  * ProjectManager class. This is the main controller of the browser UI.
@@ -210,7 +210,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         queryBar.visibleProperty().addListener((obs, oldVaue, newValue) -> {
 
             if (newValue) {
-                Animation.QUICK_EXPAND
+                Animations.QUICK_EXPAND
                         .configure(queryBar, ImageJFX.getAnimationDurationAsDouble())
                         .play();
             }
@@ -259,14 +259,14 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         // when the button are enabled, a animation is triggered
         undoButton.disableProperty().addListener((obs, old, newValue) -> {
             if (newValue == false) {
-                Animation.QUICK_EXPAND.configure(undoButton, ImageJFX.getAnimationDurationAsDouble());
+                Animations.QUICK_EXPAND.configure(undoButton, ImageJFX.getAnimationDurationAsDouble());
 
             }
         });
 
         redoButton.disableProperty().addListener((obs, old, newValue) -> {
             if (newValue == false) {
-                Animation.QUICK_EXPAND.configure(redoButton, ImageJFX.getAnimationDurationAsDouble());
+                Animations.QUICK_EXPAND.configure(redoButton, ImageJFX.getAnimationDurationAsDouble());
 
             }
         });
@@ -394,7 +394,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
         undoDisableProperty.bind(newValue.getInvoker().undoDisableProperty());
         redoDisableProperty.bind(newValue.getInvoker().redoDisableProperty());
 
-        Animation.QUICK_EXPAND.configure(undoButton, 500).play();
+        Animations.QUICK_EXPAND.configure(undoButton, 500).play();
 
     }
 

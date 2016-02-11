@@ -21,7 +21,6 @@
 package ijfx.ui.main;
 
 import ijfx.service.thumb.ThumbService;
-import ijfx.ui.context.animated.Animation;
 import ijfx.ui.context.animated.TransitionQueue;
 import ijfx.ui.plugin.panel.LUTPanel;
 import java.io.File;
@@ -45,6 +44,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import net.imagej.ImageJ;
 import org.scijava.plugin.Parameter;
+import ijfx.ui.context.animated.Animations;
 
 /**
  *
@@ -115,12 +115,12 @@ public class UITesterCtrl implements Initializable {
     @FXML
     public void runAnimation(ActionEvent event) {
 
-        Transition tr = Animation.FADEOUT.configure(toggleButton, 300);
+        Transition tr = Animations.FADEOUT.configure(toggleButton, 300);
         tr.setOnFinished(evt -> System.out.println("something"));
         queue.emptyQueue();
         queue.queue(tr);
         queue.queue(new PauseTransition(Duration.seconds(1)));
-        queue.queue(Animation.FADEIN.configure(toggleButton, 300));
+        queue.queue(Animations.FADEIN.configure(toggleButton, 300));
 
     }
 

@@ -21,7 +21,6 @@
 package ijfx.ui.main;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.ui.context.animated.Animation;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.animation.Interpolator;
@@ -35,6 +34,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+import ijfx.ui.context.animated.Animations;
 
 /**
  * FXML Controller class
@@ -90,12 +90,12 @@ public class LoadingIcon2Ctrl implements Initializable {
             pt.setCycleCount(300);
             iconTransition = pt;
         }
-        Animation.FADEIN.configure(group, ImageJFX.getAnimationDurationAsDouble());
+        Animations.FADEIN.configure(group, ImageJFX.getAnimationDurationAsDouble());
         iconTransition.play();
     }
     
     public void stop() {
-        Animation.FADEOUT.configure(group, ImageJFX.getAnimationDurationAsDouble());
+        Animations.FADEOUT.configure(group, ImageJFX.getAnimationDurationAsDouble());
         if(iconTransition != null) iconTransition.stop();
     }
     

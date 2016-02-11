@@ -49,8 +49,8 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
 
     Pane pane;
 
-    Animation animationOnShow = Animation.FADEIN;
-    Animation animationOnHide = Animation.FADEOUT;
+    Animations animationOnShow = Animations.FADEIN;
+    Animations animationOnHide = Animations.FADEOUT;
 
     List<ContextualWidget> toShow;
     List<ContextualWidget> toHide;
@@ -123,7 +123,7 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
      *
      * @return
      */
-    public Animation getAnimationOnShow() {
+    public Animations getAnimationOnShow() {
         return animationOnShow;
     }
 
@@ -132,7 +132,7 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
      * @param animationOnShow
      * @return
      */
-    public AnimatedPaneContextualView setAnimationOnShow(Animation animationOnShow) {
+    public AnimatedPaneContextualView setAnimationOnShow(Animations animationOnShow) {
         this.animationOnShow = animationOnShow;
         return this;
     }
@@ -141,7 +141,7 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
      *
      * @return
      */
-    public Animation getAnimationOnHide() {
+    public Animations getAnimationOnHide() {
         return animationOnHide;
     }
 
@@ -150,7 +150,7 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
      * @param animationOnHide
      * @return
      */
-    public AnimatedPaneContextualView setAnimationOnHide(Animation animationOnHide) {
+    public AnimatedPaneContextualView setAnimationOnHide(Animations animationOnHide) {
         this.animationOnHide = animationOnHide;
         return this;
     }
