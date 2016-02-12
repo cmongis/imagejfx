@@ -93,7 +93,12 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
 
     public void setHierarchy(List<String> hierachyKey);
 
-    public List<String> getValues(String key);
+    /**
+     * Returns all the possible values for a defined key
+     * @param key
+     * @return all the possible values for a defined key, usually a set of string
+     */
+    public Collection<String> getValues(String key);
 
     public boolean containMetaDataKey(String key);
 

@@ -33,7 +33,9 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -55,28 +57,27 @@ import javafx.collections.FXCollections;
 public class DefaultProject implements Project {
 
     private String currentMetaDataDB = PlaneDB.MODIFIED_METADATASET_STRING;
-    
+
     private MetaDataSet settings;
-    
-    
+
     private boolean changed;
     /**
      * A list of all image object.
      */
-    private final ReadOnlyListWrapper<PlaneDB> images = 
-            new ReadOnlyListWrapper<>(this, "images", FXCollections.observableArrayList());
-    
+    private final ReadOnlyListWrapper<PlaneDB> images
+            = new ReadOnlyListWrapper<>(this, "images", FXCollections.observableArrayList());
+
     private final ReadOnlyListWrapper<PlaneDB> selectedPlanes = new ReadOnlyListWrapper<>(this, "selectedPlanes", FXCollections.observableArrayList());
     /**
      * A list of all rules
      */
-    private final ReadOnlyListWrapper<AnnotationRule> rules =
-            new ReadOnlyListWrapper<>(this, "annotationRules", FXCollections.observableArrayList());
+    private final ReadOnlyListWrapper<AnnotationRule> rules
+            = new ReadOnlyListWrapper<>(this, "annotationRules", FXCollections.observableArrayList());
     /**
      * a HierarchyImpl (defined by the user).
      */
-    private ReadOnlyListWrapper<String> hierarchy =
-            new ReadOnlyListWrapper<>(this, "hierarchy", FXCollections.observableArrayList());
+    private ReadOnlyListWrapper<String> hierarchy
+            = new ReadOnlyListWrapper<>(this, "hierarchy", FXCollections.observableArrayList());
 
     /**
      * * An identifier of the {@link MetaDataSet} object to modify in each
@@ -88,7 +89,6 @@ public class DefaultProject implements Project {
     private final InvokerImpl invoker;
     private File file;
     private final PropertyChangeSupport listenableService = new PropertyChangeSupport(this);
-    
 
     public InvokerImpl getInvoker() {
         return invoker;
@@ -96,7 +96,7 @@ public class DefaultProject implements Project {
 
     public DefaultProject() {
         invoker = new InvokerImpl(this);
-        changed = false; 
+        changed = false;
         hierarchy.add(MetaData.FILE_NAME);
         hierarchy.add(MetaData.TIME);
         hierarchy.add(MetaData.CHANNEL);
@@ -115,8 +115,6 @@ public class DefaultProject implements Project {
         image.setDestructed();
     }
 
-  
-
     public PlaneDB getImage(int index) {
         return images.get(index);
     }
@@ -127,15 +125,12 @@ public class DefaultProject implements Project {
         hierarchy.set(FXCollections.observableArrayList(hierarchyKey));
     }
 
-   
-
-  
     public void resetModifiedMetadatasets() {
         for (PlaneDB image : images) {
             image.resetModifiedMetaDataSet();
         }
     }
-    
+
     @Override
     public void query(Predicate<PlaneDB> p, Consumer<PlaneDB> c) {
         QueryCollection.query(p, c, images);
@@ -145,26 +140,21 @@ public class DefaultProject implements Project {
         return images.stream().anyMatch(p);
     }
 
-   
-
     @Override
     public ReadOnlyListProperty<PlaneDB> getSelection() {
         return selectedPlanes.getReadOnlyProperty();
     }
 
-   
-
     @Override
-    public List<String> getValues(String key) {
+    public Collection<String> getValues(String key) {
         Predicate<PlaneDB> p = (PlaneDB t) -> true;
-        List<String> values = new ArrayList<>();
+        Set<String> values = new HashSet<>();
         Consumer<PlaneDB> getValues = (PlaneDB t) -> {
-            ReadOnlyMapProperty<String,MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
+            ReadOnlyMapProperty<String, MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
             if (metaDataSet != null && metaDataSet.containsKey(key)) {
                 String value = metaDataSet.get(key).getStringValue();
-                if (!values.contains(value)) {
-                    values.add(value);
-                }
+
+                values.add(value);
 
             }
         };
@@ -175,18 +165,16 @@ public class DefaultProject implements Project {
     @Override
     public boolean containMetaDataKey(String key) {
         return check((PlaneDB t) -> {
-            ReadOnlyMapProperty<String,MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
+            ReadOnlyMapProperty<String, MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
             return metaDataSet != null && metaDataSet.containsKey(key);
         });
     }
-
-   
 
     @Override
     public List<String> getMetaDataKeys() {
         List<String> keys = new ArrayList<>();
         Consumer<PlaneDB> consumer = (PlaneDB t) -> {
-            ReadOnlyMapProperty<String,MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
+            ReadOnlyMapProperty<String, MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
             if (metaDataSet != null) {
                 metaDataSet.keySet().stream().filter((key) -> (!keys.contains(key))).forEach((key) -> {
                     keys.add(key);
@@ -222,7 +210,7 @@ public class DefaultProject implements Project {
     public void setChanged(boolean changed) {
         this.changed = changed;
     }
-     
+
     @Override
     public void addAnnotationRule(AnnotationRule rule) {
         rules.add(rule);
@@ -236,9 +224,9 @@ public class DefaultProject implements Project {
     @Override
     public void addPlane(Collection<PlaneDB> planes) {
         images.addAll(planes);
-                List<PlaneDB> selected = planes.stream().filter((PlaneDB t) -> t.selectedProperty().get()).collect(Collectors.toList());
-                selectedPlanes.addAll(selected);
-        
+        List<PlaneDB> selected = planes.stream().filter((PlaneDB t) -> t.selectedProperty().get()).collect(Collectors.toList());
+        selectedPlanes.addAll(selected);
+
     }
 
     @Override
@@ -267,11 +255,10 @@ public class DefaultProject implements Project {
 
     @Override
     public void addSelectedPlane(PlaneDB plane) {
-       
+
         selectedPlanes.add(plane);
-        
+
     }
-    
 
     @Override
     public void addSelectedPlane(Collection<PlaneDB> planes) {
@@ -281,7 +268,7 @@ public class DefaultProject implements Project {
     @Override
     public void removeSelectedPlane(Collection<PlaneDB> planes) {
         selectedPlanes.removeAll(planes);
-        
+
     }
 
     @Override
@@ -291,16 +278,10 @@ public class DefaultProject implements Project {
 
     @Override
     public MetaDataSet getSettings() {
-        if(settings == null) {
+        if (settings == null) {
             settings = new MetaDataSet();
         }
         return settings;
     }
-
-  
-
-  
-
- 
 
 }
