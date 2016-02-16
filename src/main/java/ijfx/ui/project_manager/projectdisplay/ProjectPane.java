@@ -22,16 +22,16 @@ package ijfx.ui.project_manager.projectdisplay;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.project.Project;
-import ijfx.ui.context.animated.Animation;
+import ijfx.ui.context.animated.AnimationPlus;
+import ijfx.ui.context.animated.Animations;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.Animation;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
@@ -79,15 +79,13 @@ public class ProjectPane extends BorderPane {
 
     @FXML
     ToggleButton dashboardToggleButton;
-    
+
     ToggleGroup viewToggleGroup = new ToggleGroup();
 
     ToggleGroup planeSetToggleGroup = new ToggleGroup();
 
-    HashMap<Class<?>,Toggle> toggleMap = new HashMap<>();
+    HashMap<Class<?>, Toggle> toggleMap = new HashMap<>();
 
-    
-    
     @Parameter
     Context context;
 
@@ -103,12 +101,10 @@ public class ProjectPane extends BorderPane {
 
             this.project = project;
 
-            
-            
-            this.project.getHierarchy().addListener((obs,oldValue,newValue)->{
+            this.project.getHierarchy().addListener((obs, oldValue, newValue) -> {
                 updateHierarchy();
             });
-            
+
             // binding properties
             currentView.addListener(this::onCurrentViewChanged);
             currentItem.addListener(this::onCurrentItemChanged);
@@ -125,18 +121,15 @@ public class ProjectPane extends BorderPane {
             planeSetToggleGroup.selectedToggleProperty().addListener(this::onPlaneSetToggleSelectionChanged);
 
             // initializing the different dashboard view
-           
             registerPlaneSetView(new DashBoardPlaneSetView(context), dashboardToggleButton);
-            
-            
+
             viewToggleGroup.selectToggle(dashboardToggleButton);
 
             // initialising the toggles button for the different types of view
-            for (PlaneSetView view : new PlaneSetView[] {
-                new IconPlaneSetView(context)
-               ,new TablePlaneSetView(context)
+            for (PlaneSetView view : new PlaneSetView[]{
+                new IconPlaneSetView(context), new TablePlaneSetView(context)
             }) {
-                ToggleButton toggleButton = new ToggleButton(null,view.getIcon());
+                ToggleButton toggleButton = new ToggleButton(null, view.getIcon());
                 registerPlaneSetView(view, toggleButton);
                 viewHBox.getChildren().add(toggleButton);
             }
@@ -147,10 +140,8 @@ public class ProjectPane extends BorderPane {
             }
 
             currentItem.bind(projectDisplay.getCurrentPlaneSet().currentItemProperty());
-            
-            
+
             updateHierarchy();
-            
 
         } catch (IOException ex) {
             Logger.getLogger(ProjectPane.class.getName()).log(Level.SEVERE, null, ex);
@@ -158,18 +149,14 @@ public class ProjectPane extends BorderPane {
         }
 
     }
-    
-    
-    
-    
-    
+
     private void registerPlaneSetView(PlaneSetView view, ToggleButton button) {
         button.setUserData(view.getClass());
         toggleMap.put(view.getClass(), button);
         viewMap.put(view.getClass(), view);
         viewToggleGroup.getToggles().add(button);
     }
-    
+
     private Toggle getToggle(Class<?> clazz) {
         return toggleMap.get(clazz);
     }
@@ -178,27 +165,26 @@ public class ProjectPane extends BorderPane {
 
         ToggleButton toggleButton = new ToggleButton(added.getName());
         toggleButton.setUserData(added);
-        
+
         if (added.getName().equals(ProjectDisplay.ALL_IMAGES)) {
             toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.BUILDING));
         } else if (added.getName().equals(ProjectDisplay.SELECTED_IMAGES)) {
             toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_SQUARE));
         } else {
-            
+
             Node node = new FontAwesomeIconView(FontAwesomeIcon.CLOSE);
             toggleButton.setGraphic(node);
             toggleButton.setContentDisplay(ContentDisplay.LEFT);
-            node.setOnMouseClicked(event->{
+            node.setOnMouseClicked(event -> {
                 projectDisplay.getPlaneSetList().remove(added);
                 event.consume();
             });
-            
+
         }
-        
-        
+
         planeSetToggleGroup.getToggles().add(toggleButton);
         planeSetHBox.getChildren().add(toggleButton);
-        Animation.QUICK_EXPAND.configure(toggleButton, 500).play();
+        Animations.QUICK_EXPAND.configure(toggleButton, 500).play();
         return toggleButton;
 
     }
@@ -208,14 +194,14 @@ public class ProjectPane extends BorderPane {
         if (newValue == null) {
             return;
         }
-      
-        if(planeSetToggleGroup.getSelectedToggle() == null && planeSetToggleGroup.getToggles().size() > 0) {
+
+        if (planeSetToggleGroup.getSelectedToggle() == null && planeSetToggleGroup.getToggles().size() > 0) {
             planeSetToggleGroup.selectToggle(planeSetToggleGroup.getToggles().get(0));
         }
-        
+
         // chanding the current view
-        currentView.setValue((Class<? extends PlaneSetView>)newValue.getUserData());
-       
+        currentView.setValue((Class<? extends PlaneSetView>) newValue.getUserData());
+
     }
 
     // when a toggle button representing a PlaneSet is clicked
@@ -231,10 +217,10 @@ public class ProjectPane extends BorderPane {
         }
         //currentPlaneSet.setValue(newPlaneSet);
         projectDisplay.setCurrentPlaneSet(newPlaneSet);
-        
-        if(currentView.getValue() == DashBoardPlaneSetView.class) {
+
+        if (currentView.getValue() == DashBoardPlaneSetView.class) {
             viewToggleGroup.selectToggle(toggleMap.get(IconPlaneSetView.class));
-            
+
         }
     }
 
@@ -265,10 +251,25 @@ public class ProjectPane extends BorderPane {
             logger.warning("PlaneSetView not found !");
             return;
         }
-        setCenter(planeSetView.getNode());
-        
-        updateView(planeSetView, projectDisplay.getCurrentPlaneSet());
-        
+
+        if (oldValue != null) {
+
+            Animation a1 = AnimationPlus.FADE_OUT_LEFT.configure(getPlaneSetView(oldValue).getNode(), null);
+            Animation a2 = AnimationPlus.FADE_IN_FROM_LEFT.configure(getPlaneSetView(newValue).getNode(), null);
+
+            a1.setOnFinished(event -> {
+                setCenter(planeSetView.getNode());
+                updateView(planeSetView, projectDisplay.getCurrentPlaneSet());
+                a2.play();
+            });
+            a1.play();
+            //AnimationPl //
+        } else {
+            setCenter(planeSetView.getNode());
+
+            updateView(planeSetView, projectDisplay.getCurrentPlaneSet());
+        }
+
     }
 
     // when the current item changed,
@@ -277,7 +278,9 @@ public class ProjectPane extends BorderPane {
         logger.info("Changing current item");
         // the current view is updated
         if (newValue != null) {
-            if(getCurrentView() == null) return;
+            if (getCurrentView() == null) {
+                return;
+            }
             getCurrentView().setCurrentItem(newValue);
         }
     }
@@ -285,7 +288,7 @@ public class ProjectPane extends BorderPane {
     public void onCurrentPlaneSetChanged(Observable obs, PlaneSet oldValue, PlaneSet newValue) {
 
         updateView(getCurrentView(), newValue);
-        
+
     }
 
     public void updateView(PlaneSetView planeSetView, PlaneSet planeSet) {
@@ -306,7 +309,6 @@ public class ProjectPane extends BorderPane {
         // binding the listener to the current item of the new view
         currentItem.bind(planeSet.currentItemProperty());
 
-        
     }
 
     // when the list of plane set changed
@@ -331,20 +333,17 @@ public class ProjectPane extends BorderPane {
             }
         }
     }
+
     private PlaneSetView getCurrentView() {
         return viewMap.get(currentView.getValue());
     }
-    
+
     private void updateHierarchy() {
-        
-        viewMap.values().forEach(view->{
+
+        viewMap.values().forEach(view -> {
             view.setHirarchy(project.getHierarchy());
         });
-        
-        
-        
+
     }
-    
-    
+
 }
-   
