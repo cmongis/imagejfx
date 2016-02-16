@@ -229,26 +229,8 @@ public interface Animations {
         return sequence;
     };
     
-    public static Animations FADE_OUT_LEFT = (node,ms)->{
+   
     
-        Timeline timeLine = new Timeline();
-        KeyFrame begin = new KeyFrame(Duration.millis(0),
-                new KeyValue(node.translateXProperty(),0)
-                ,new KeyValue(node.opacityProperty(),1)
-        );
-        
-        
-        
-        KeyFrame end = new KeyFrame(Duration.millis(ms),
-                new KeyValue(node.translateXProperty(),300)
-                ,new KeyValue(node.opacityProperty(),1)
-        );
-        
-        return timeLine;
-    };
     
-    public static Animations FADE_IN_FROM_LEFT = (node,ms)->{
-    
-    };
 
 }

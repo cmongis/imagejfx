@@ -19,6 +19,13 @@
  */
 package ijfx.ui.context.animated;
 
+import ijfx.ui.main.ImageJFX;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.scene.Node;
+import javafx.util.Duration;
+
 /**
  *
  * @author cyril
@@ -26,5 +33,50 @@ package ijfx.ui.context.animated;
 
 @FunctionalInterface
 public interface AnimationPlus {
-    public Animations 
+    public javafx.animation.Animation configure(Node node, Duration duration);
+    
+    
+    
+    
+    public static double FADE_LEFT_TRANSLATE = -100;
+    
+    public static AnimationPlus FADE_OUT_LEFT = (node,ms)->{
+    
+        if(ms == null) ms = ImageJFX.getAnimationDuration();
+        
+        KeyFrame begin = new KeyFrame(Duration.millis(0),
+                new KeyValue(node.translateXProperty(),0)
+                ,new KeyValue(node.opacityProperty(),1)
+        );
+        
+        
+        
+        KeyFrame end = new KeyFrame(ms,
+                new KeyValue(node.translateXProperty(),FADE_LEFT_TRANSLATE)
+                ,new KeyValue(node.opacityProperty(),0)
+        );
+        
+        
+        Timeline timeLine = new Timeline(begin,end);
+        return timeLine;
+    };
+    
+    public static AnimationPlus FADE_IN_FROM_LEFT = (node,ms)->{
+        
+        if(ms == null) ms = ImageJFX.getAnimationDuration();
+        
+         KeyFrame begin = new KeyFrame(Duration.millis(0),
+                new KeyValue(node.translateXProperty(),FADE_LEFT_TRANSLATE)
+                ,new KeyValue(node.opacityProperty(),0)
+        );
+        KeyFrame end = new KeyFrame(ms,
+                new KeyValue(node.translateXProperty(),0)
+                ,new KeyValue(node.opacityProperty(),1)
+        );
+        
+        
+        Timeline timeLine = new Timeline(begin,end);
+        return timeLine;
+    };
+    
 }
