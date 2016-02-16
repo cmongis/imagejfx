@@ -387,7 +387,7 @@ public class FileBatchProcessorPanel extends SplitPane implements UiPlugin {
     
     
     public void onFileMarkedForProcessing(Observable obs, Boolean oldValue, Boolean newValue) {
-        if(oldValue.equals(newValue)) return;
+        if(oldValue == null || oldValue.equals(newValue)) return;
         markLabelText.invalidate();
         markLabelText.getValue();
     }
