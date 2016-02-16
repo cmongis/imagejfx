@@ -77,5 +77,24 @@ public class MetaDataModifier implements ModifierPlugin{
     public String phraseMe() {
         return String.format(PHRASE,keyName,value);
     }
+
+    public String getKeyName() {
+        return keyName;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+    
+    
+    
     
 }
