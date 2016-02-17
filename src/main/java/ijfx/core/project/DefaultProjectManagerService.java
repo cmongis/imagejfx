@@ -22,6 +22,7 @@ package ijfx.core.project;
 
 import ijfx.core.project.event.PossibleMetaDataKeysChangeEvent;
 import ijfx.core.project.event.PossibleTagListChangeEvent;
+import ijfx.core.project.event.ProjectActivatedEvent;
 import ijfx.core.project.event.ProjectCloseEvent;
 import ijfx.core.project.event.ProjectCreatedEvent;
 import ijfx.ui.main.ImageJFX;
@@ -137,12 +138,11 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
                 projectContextService.updateContext(project);
                 notifyPossibleTagChange(project);
                 notifyMetaDataKeyChange(project);
+                eventService.publishLater(new ProjectActivatedEvent(project));
             
         }
 
     }
-
-   
 
     @Override
     public Project getCurrentProject() {

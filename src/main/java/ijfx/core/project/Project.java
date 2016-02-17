@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyProperty;
 
 /**
  *
@@ -93,6 +94,8 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
 
     public void setHierarchy(List<String> hierachyKey);
 
+    public ReadOnlyProperty<Boolean> hasChangedProperty();
+    
     /**
      * Returns all the possible values for a defined key
      * @param key

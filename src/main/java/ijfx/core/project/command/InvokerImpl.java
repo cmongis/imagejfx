@@ -160,6 +160,10 @@ public class InvokerImpl implements Invoker {
                 undoneCmdStack.clear();
             }
         }
+        
+        changeable.setChanged(true);
+        
+        
 
     }
 

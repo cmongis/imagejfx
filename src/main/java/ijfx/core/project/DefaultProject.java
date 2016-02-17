@@ -39,9 +39,12 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.ReadOnlyMapProperty;
+import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 
 /*
@@ -79,6 +82,9 @@ public class DefaultProject implements Project {
     private ReadOnlyListWrapper<String> hierarchy
             = new ReadOnlyListWrapper<>(this, "hierarchy", FXCollections.observableArrayList());
 
+    private BooleanProperty hasChangedProperty = new SimpleBooleanProperty(this,"hasChanged");
+    
+    
     /**
      * * An identifier of the {@link MetaDataSet} object to modify in each
      * ImageDBService object when applying rules. It should be
@@ -209,6 +215,8 @@ public class DefaultProject implements Project {
     @Override
     public void setChanged(boolean changed) {
         this.changed = changed;
+        hasChangedProperty.setValue(changed);
+        
     }
 
     @Override
@@ -255,9 +263,7 @@ public class DefaultProject implements Project {
 
     @Override
     public void addSelectedPlane(PlaneDB plane) {
-
         selectedPlanes.add(plane);
-
     }
 
     @Override
@@ -282,6 +288,11 @@ public class DefaultProject implements Project {
             settings = new MetaDataSet();
         }
         return settings;
+    }
+
+    @Override
+    public ReadOnlyProperty<Boolean> hasChangedProperty() {
+        return hasChangedProperty;
     }
 
 }
