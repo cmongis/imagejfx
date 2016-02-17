@@ -138,10 +138,7 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
     }
 
     @Override
-    public ProjectTreeItem getCurrentItem() {
-        if(currentItemProperty.getValue() ==null) {
-            currentItemProperty.setValue(getRoot());
-        }
+    public ProjectTreeItem getCurrentItem() {     
         return currentItemProperty.getValue();
     }
 

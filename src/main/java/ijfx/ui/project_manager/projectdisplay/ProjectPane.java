@@ -25,6 +25,7 @@ import ijfx.core.project.Project;
 import ijfx.ui.context.animated.AnimationPlus;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.project_manager.singleimageview.SingleImageViewPane;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -127,7 +128,8 @@ public class ProjectPane extends BorderPane {
 
             // initialising the toggles button for the different types of view
             for (PlaneSetView view : new PlaneSetView[]{
-                new IconPlaneSetView(context), new TablePlaneSetView(context)
+                new IconPlaneSetView(context),
+                new TablePlaneSetView(context), new SingleImageViewPane(context)
             }) {
                 ToggleButton toggleButton = new ToggleButton(null, view.getIcon());
                 registerPlaneSetView(view, toggleButton);
@@ -293,18 +295,20 @@ public class ProjectPane extends BorderPane {
 
     public void updateView(PlaneSetView planeSetView, PlaneSet planeSet) {
 
-        currentItem.unbind();
         if (planeSetView.getCurrentItem() == null) {
+            logger.info("Setting the current item as root");
             planeSet.setCurrentItem(planeSet.getRoot());
         }
 
         // setting the current plane set
         if (planeSetView.getCurrentPlaneSet() != planeSet) {
+            logger.info(String.format("Changing the current PlaneSet from %s to %s of the current view : %s", planeSetView.getCurrentPlaneSet(), planeSet, planeSetView));
             planeSetView.setCurrentPlaneSet(planeSet);
         }
 
         // setting the view to the current item
         planeSetView.setCurrentItem(planeSet.getCurrentItem());
+        logger.info("Setting currentItem to " + planeSet.getCurrentItem());
 
         // binding the listener to the current item of the new view
         currentItem.bind(planeSet.currentItemProperty());

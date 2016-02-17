@@ -89,6 +89,7 @@ public class IconPlaneSetView extends BorderPane implements PlaneSetView {
         if (item == null) {
             return;
         }
+        currentItem = item;
         ArrayList<TreeItem<? extends PlaneOrMetaData>> items = new ArrayList<>();
         items.addAll(item.getChildren());
         update(items);
@@ -176,7 +177,7 @@ public class IconPlaneSetView extends BorderPane implements PlaneSetView {
 
         // updating the controllers with the new data
         for (int i = 0; i < itemCount; i++) {
-            System.out.println("updating " + i);
+           
             if (i >= itemControllerList.size()) {
                 break;
             }
