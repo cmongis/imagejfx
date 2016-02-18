@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="selectorLabel" styleClass="h3" text="Label" />
+            <Label fx:id="modifierLabel" styleClass="h3" text="Label" />
+            <Label fx:id="countLabel" text="Label" />
+         </children>
+      </VBox>
+   </center>
+   <right>
+      <VBox prefWidth="150.0" styleClass="vbox" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="applyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#applyRule" text="Apply rule" />
+            <Button fx:id="deleteButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#delete" styleClass="danger" text="Delete" />
+         </children>
+      </VBox>
+   </right>
+</fx:root>
