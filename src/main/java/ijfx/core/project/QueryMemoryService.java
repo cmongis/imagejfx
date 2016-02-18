@@ -20,6 +20,7 @@
  */
 package ijfx.core.project;
 
+import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.core.project.query.Selector;
 import ijfx.core.project.query.Modifier;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class QueryMemoryService {
     private class SelectorMemory extends HashMap<Project, Selector> {
     }
 
-    private class ModifierMemory extends HashMap<Project, Modifier> {
+    private class ModifierMemory extends HashMap<Project, ModifierPlugin> {
     }
 
     private SelectorMemory selectorMemory = new SelectorMemory();
@@ -50,14 +51,14 @@ public class QueryMemoryService {
         selectorMemory.put(project, selector);
     }
 
-    public void updateLastModifier(Project project, Modifier modifier) {
+    public void updateLastModifier(Project project, ModifierPlugin modifier) {
         modifierMemory.put(project, modifier);
         if(getLastSelector(project) != null) {
              eventService.publishLater(new PossibleAnnotationRuleEvent(new AnnotationRuleImpl(getLastSelector(project), modifier)));
         }
     }
     
-    public Modifier getLastModifier(Project project) {
+    public ModifierPlugin getLastModifier(Project project) {
         return modifierMemory.get(project);
     }
 

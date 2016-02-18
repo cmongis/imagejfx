@@ -39,6 +39,15 @@ public class UniversalSelector implements Selector {
 
     private static final String PHRASE = "contains the word \"%s\" in one of metadata";
     
+    
+    public UniversalSelector() {
+        
+    }
+    
+    public UniversalSelector(String query) {
+        parse(query);
+    }
+    
     @Override
     public void parse(String queryString) {
         this.queryString = queryString;

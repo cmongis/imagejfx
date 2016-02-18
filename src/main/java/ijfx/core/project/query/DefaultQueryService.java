@@ -38,6 +38,7 @@ import ijfx.core.project.command.addRuleCommand;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.core.project.imageDBService.command.AddTagCommand;
 import ijfx.core.project.imageDBService.command.RemoveTagCommand;
+import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.core.project.query.tree.SelectorNode;
 import ijfx.ui.main.ImageJFX;
 
@@ -98,7 +99,7 @@ public class DefaultQueryService extends AbstractService implements QueryService
     }
 
     @Override
-    public Modifier getModifier(String modifyQuery) {
+    public ModifierPlugin getModifier(String modifyQuery) {
         return ModifierFactory.create(modifyQuery);
     }
 
@@ -144,7 +145,7 @@ public class DefaultQueryService extends AbstractService implements QueryService
 
     @Override
 
-    public AnnotationRule addAnnotationRule(Project project, Selector selector, Modifier modifier) {
+    public AnnotationRule addAnnotationRule(Project project, Selector selector, ModifierPlugin modifier) {
         AnnotationRule rule = new AnnotationRuleImpl(selector, modifier);
         addAnnotationRule(project, rule, true);
         return rule;
@@ -187,12 +188,12 @@ public class DefaultQueryService extends AbstractService implements QueryService
         nbAutamaticallyAnnotatedPlane = nbPlaneModified;
         return cmdList;
     }
-
+    // TODO: fix this method (or delete it completly)
     private List<Command> applyRuleCmd(Project project, PlaneDB plane) {
         List<Command> cmdList = new ArrayList<>();
         for (AnnotationRule rule : project.getAnnotationRules().filtered((AnnotationRule t) -> t.unableProperty().get())) {
             if (query(plane, rule.getSelector())) {
-                cmdList.addAll(modifyCmd(plane, rule.getModifier()));
+                cmdList.addAll(modifyCmd(plane, null));
             }
         }
         return cmdList;

@@ -27,6 +27,7 @@ import ijfx.core.project.command.Command;
 import ijfx.core.project.imageDBService.PlaneDB;
 import static ijfx.core.project.imageDBService.PlaneDB.METADATASET_STRING;
 import static ijfx.core.project.imageDBService.PlaneDB.TAG_STRING;
+import ijfx.core.project.modifier.ModifierPlugin;
 import java.util.List;
 import java.util.Map;
 import javax.script.ScriptEngine;
@@ -64,7 +65,7 @@ public interface QueryService extends ImageJService{
 
     boolean query(PlaneDB plane, Selector selector, String metaDataSetName);
 
-    Modifier getModifier(String modifyQuery);
+    ModifierPlugin getModifier(String modifyQuery);
 
     void modify(Project project, Modifier modifier);
 
@@ -72,7 +73,7 @@ public interface QueryService extends ImageJService{
 
     boolean modify(Project project, PlaneDB plane, Modifier modifier);
 
-    AnnotationRule addAnnotationRule(Project project, Selector selector, Modifier modifier);
+    AnnotationRule addAnnotationRule(Project project, Selector selector, ModifierPlugin modifier);
 
     void removeAnnotationRule(Project project, AnnotationRule rule);
 

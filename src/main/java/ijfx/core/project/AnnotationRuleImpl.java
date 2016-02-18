@@ -20,18 +20,18 @@
  */
 package ijfx.core.project;
 
+import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.core.project.query.Selector;
 import ijfx.core.project.query.Modifier;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 
 
 public class AnnotationRuleImpl implements AnnotationRule {
     private final Selector selector;
-    private final Modifier modifier;
+    private final ModifierPlugin modifier;
     private final BooleanProperty unableProperty;
-    public AnnotationRuleImpl(Selector selector, Modifier modifier) {
+    public AnnotationRuleImpl(Selector selector, ModifierPlugin modifier) {
         this.selector = selector;
         this.modifier = modifier;
         unableProperty = new SimpleBooleanProperty(true);
@@ -42,7 +42,7 @@ public class AnnotationRuleImpl implements AnnotationRule {
     }
 
     @Override
-    public Modifier getModifier() {
+    public ModifierPlugin getModifier() {
         return modifier;
     }
 

@@ -26,15 +26,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.AnnotationRule;
 import ijfx.core.project.DefaultImageLoaderService;
-import ijfx.core.project.query.Modifier;
 import ijfx.core.project.Project;
 import ijfx.core.project.DefaultProjectIoService;
 import ijfx.core.project.DefaultProjectManagerService;
 import ijfx.core.project.DefaultProjectModifierService;
 import ijfx.core.project.query.DefaultQueryService;
 import ijfx.core.project.query.Selector;
-import ijfx.core.project.query.DefaultSelector;
 import ijfx.core.project.imageDBService.PlaneDB;
+import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.LoadingScreen;
 import ijfx.service.ui.LoadingScreenService;
@@ -143,7 +142,7 @@ public class ProjectServiceBinder implements AngularService {
         final String selectorStr = params.getString("selector");
         final String modifierStr = params.getString("modifier");
         final Selector selector = queryService.getSelector(selectorStr);
-        final Modifier modifier = queryService.getModifier(modifierStr);
+        final ModifierPlugin modifier = queryService.getModifier(modifierStr);
 
 
         

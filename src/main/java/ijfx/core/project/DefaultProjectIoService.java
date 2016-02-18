@@ -64,6 +64,8 @@ import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 import static ijfx.core.project.Project.SETTINGS_STRING;
+import ijfx.core.project.modifier.ModifierPlugin;
+import ijfx.core.project.query.ModifierFactory;
 import ijfx.core.project.query.QueryService;
 
 /**
@@ -213,7 +215,7 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         boolean enable = ruleNode.get(QueryParser.ENABLE).asBoolean();
         if (selectorString != null && modifierString != null) {
             Selector selector = queryService.getSelector(selectorString);
-            Modifier modifier = new DefaultModifier(modifierString);
+            ModifierPlugin modifier = queryService.getModifier(modifierString);
             AnnotationRule rule = new AnnotationRuleImpl(selector, modifier);
             rule.setUnable(enable);
             return rule;
@@ -292,8 +294,8 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         Selector selector = rule.getSelector();
         selectorNode.put(QueryParser.NON_PARSED_STRING, selector.getQueryString());
         ObjectNode modifierNode = mapper.createObjectNode();
-        Modifier modifier = rule.getModifier();
-        modifierNode.put(QueryParser.NON_PARSED_STRING, modifier.getNonParsedString());
+        ModifierPlugin modifier = rule.getModifier();
+        modifierNode.put(QueryParser.NON_PARSED_STRING, modifier.toString());
         root.put(Selector.SELECTOR_STRING, selectorNode);
         root.put(Modifier.MODIFIER_STRING, modifierNode);
         root.put(QueryParser.ENABLE, rule.unableProperty().get());

@@ -44,6 +44,8 @@ import javafx.util.Callback;
  *
  * @author Cyril Quinton
  */
+
+@Deprecated
 public class RulePickerController extends BorderPane implements Initializable {
 
     @FXML
@@ -79,7 +81,7 @@ public class RulePickerController extends BorderPane implements Initializable {
 
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures<AnnotationRule, String> param) {
-                return new ReadOnlyObjectWrapper<>(param.getValue().getModifier().getNonParsedString());
+                return new ReadOnlyObjectWrapper<>(param.getValue().getModifier().toString());
             }
         });
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

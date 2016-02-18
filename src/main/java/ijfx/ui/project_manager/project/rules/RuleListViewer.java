@@ -19,13 +19,25 @@
  */
 package ijfx.ui.project_manager.project.rules;
 
+import ijfx.core.project.AnnotationRule;
+import ijfx.core.project.AnnotationRuleImpl;
+import ijfx.core.project.event.ProjectActivatedEvent;
+import ijfx.core.project.query.UniversalSelector;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import java.io.IOException;
+import java.util.logging.Level;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
+import mongis.utils.ListCellController;
+import org.scijava.Context;
+import org.scijava.event.EventHandler;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -35,8 +47,21 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id="rule-list-view",context="project-rule-edition",localization=Localization.CENTER)
 public class RuleListViewer extends BorderPane implements UiPlugin{
-    public RuleListViewer() throws IOException {
-        FXUtilities.injectFXML(this);
+    
+    @FXML
+    ListView<AnnotationRule> listView;
+    
+    @Parameter
+    Context context;
+    
+    
+    
+    public RuleListViewer()  {
+        try {
+            FXUtilities.injectFXML(this);
+        } catch (IOException ex) {
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -46,6 +71,29 @@ public class RuleListViewer extends BorderPane implements UiPlugin{
 
     @Override
     public UiPlugin init() {
+        
+        //listView = new AnnotationRuleImpl(new UniversalSelector("actin"), new AddMetaDat)
+        
         return this;
     }
+    
+     public ListCellController<AnnotationRule> createController() {
+        
+        
+        ListCellController<AnnotationRule> ctrl = new RuleCellController();
+        context.inject(ctrl);
+        return ctrl;
+        
+        
+        
+    }
+     
+     @EventHandler
+     public void onProjectActivated(ProjectActivatedEvent event) {
+         listView.setItems(event.getProject().getAnnotationRules());
+     }
+   
+    
+    
+    
 }

@@ -21,17 +21,19 @@
 package ijfx.core.project.query;
 
 import ijfx.core.project.RegExpModifier;
+import ijfx.core.project.modifier.ModifierPlugin;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
 public class ModifierFactory {
-    public static Modifier create(String nonParsedString) {
+    public static ModifierPlugin create(String nonParsedString) {
         if (nonParsedString.startsWith("regexp(")) {
             return new RegExpModifier(nonParsedString);
         } else {
-            return new DefaultModifier(nonParsedString);
+            //return new DefaultModifier(nonParsedString);
+            return null;
         }
     }
 }

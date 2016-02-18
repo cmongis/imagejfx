@@ -22,10 +22,10 @@ package ijfx.ui.project_manager;
 
 import mongis.utils.FXUtilities;
 import ijfx.core.project.AnnotationRule;
-import ijfx.core.project.query.Modifier;
 import ijfx.core.project.query.DefaultModifier;
 import ijfx.core.project.Project;
 import ijfx.core.project.ProjectIoService;
+import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.core.project.query.QueryService;
 import ijfx.core.project.query.Selector;
 import ijfx.core.project.query.DefaultSelector;
@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -97,7 +96,7 @@ public class RulesController extends BorderPane implements Initializable {
     private final SelectorEditor selectorEditor;
     private final ModifierEditor modifierEditor;
     private Selector newSelector;
-    private Modifier newModifier;
+    private ModifierPlugin newModifier;
     private final BooleanProperty addEnableProperty;
     
     // Services
@@ -152,7 +151,7 @@ public class RulesController extends BorderPane implements Initializable {
 
         TableColumn<AnnotationRule, String> modifierCol = new TableColumn<>(resources.getString("modifier"));
 
-        modifierCol.setCellValueFactory((TableColumn.CellDataFeatures<AnnotationRule, String> param) -> new ReadOnlyObjectWrapper<>(param.getValue().getModifier().getNonParsedString()));
+        modifierCol.setCellValueFactory((TableColumn.CellDataFeatures<AnnotationRule, String> param) -> new ReadOnlyObjectWrapper<>(param.getValue().getModifier().toString()));
         Predicate<String> editChecker = (String t) -> new DefaultSelector(t).validSyntaxProperty().get();
         selectorCol.setCellFactory((TableColumn<AnnotationRule, String> param)
                 -> new EditingQueryCell(contextService, new SelectorEditor(context), editChecker));

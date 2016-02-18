@@ -45,7 +45,7 @@ public class ModifierEditor extends RuleEditor {
 
     @Override
     protected void handleCodeChange(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        modifier = ModifierFactory.create(newValue);
+        modifier = null; //ModifierFactory.create(newValue);
         modifier.parse(newValue);
         highlighter.highLight(codeArea, modifier.getWordPositions());
     }

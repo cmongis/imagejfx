@@ -24,13 +24,13 @@ import ijfx.core.project.query.Modifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ijfx.core.metadata.GenericMetaData;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.project.command.Command;
 import ijfx.core.project.imageDBService.PlaneDB;
+import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.ui.main.ImageJFX;
-import io.scif.Metadata;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,7 +47,7 @@ import org.apache.commons.lang.StringUtils;
  * Query example
  * regexp(/Well=(/\d+)__Position=(\d+)/,"File Name")=["Well","Position"]
  */
-public class RegExpModifier implements Modifier{
+public class RegExpModifier implements ModifierPlugin{
 
     String request;
     
@@ -77,32 +77,14 @@ public class RegExpModifier implements Modifier{
     }
     
     public RegExpModifier(String nonParsedString) {
-        parse(nonParsedString);
+        configure(nonParsedString);
     }
    
 
-    @Override
-    public String getAddTagSyntax(String tag) {
-        return null;
-    }
+   
 
     @Override
-    public String getAddMetaDataSyntax(MetaData metaData) {
-        return null;
-    }
-
-    @Override
-    public String getAddMetaDataSyntax(String key, String value) {
-        return null;
-    }
-
-    @Override
-    public String getSeparator() {
-        return null;
-    }
-
-    @Override
-    public void parse(String nonParsedString) {
+    public boolean configure(String nonParsedString) {
         this.request = nonParsedString;
         
         Matcher matcher = syntaxVerifier.matcher(nonParsedString);
@@ -123,11 +105,11 @@ public class RegExpModifier implements Modifier{
                 
                 
                 // checking if it went well
-                if(outputMetadataNameList == null)  return;
+                if(outputMetadataNameList == null)  return false;
                 
                 
                 // checking that the list of input is the same as the list of output
-                if(StringUtils.countMatches(regExp, "(") < outputMetadataNameList.size()) return;
+                if(StringUtils.countMatches(regExp, "(") < outputMetadataNameList.size()) return false;
                 
                 
                 
@@ -146,41 +128,24 @@ public class RegExpModifier implements Modifier{
             
             else {
                 setValidSyntax(false);
+                
             }
-        
+        return validSyntaxProperty.getValue();
     }
 
-    @Override
-    public List<WordPosition> getWordPositions() {
-        return null;
-    }
+    
 
-    @Override
-    public List<MetaDataPosition> getMetaDataPositions() {
-        return null;
-    }
-
-    @Override
-    public List<TagPosition> getTagPositions() {
-        return null;
-    }
-
-    @Override
-    public String getNonParsedString() {
-        return request;
-        
-    }
-
-    @Override
+    
     public ReadOnlyBooleanProperty validSyntaxProperty() {
         return validSyntaxProperty;
     }
 
-    @Override
+   
     public void setValidSyntax(boolean valid) {
         validSyntaxProperty.set(valid);
     }
     
+    /*
     public static void main(String... args) {
         
         String input = "";
@@ -203,8 +168,10 @@ public class RegExpModifier implements Modifier{
             
         }
         
-    }
+    }*/
 
+    
+    /*
     @Override
     public ModificationRequest getModificationRequest(PlaneDB plane) {
         
@@ -242,6 +209,21 @@ public class RegExpModifier implements Modifier{
     @Override
     public ModificationRequest getModificationRequest() {
         return new DefaultModificationRequest();
+    }*/
+
+    @Override
+    public Command getModifyingCommand(PlaneDB planeDB) {
+        return null;
+    }
+
+    @Override
+    public boolean wasApplied(PlaneDB planeDB) {
+        return true;
+    }
+
+    @Override
+    public String phraseMe() {
+        return "Sorry, cannot be described right now";
     }
     
    

@@ -20,10 +20,10 @@
  */
 package ijfx.core.project;
 
+import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.core.project.query.Selector;
 import ijfx.core.project.query.Modifier;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 
 /**
  *This interface is meant for classes that contain one {@link Selector} and one {@link Modifier}.
@@ -32,7 +32,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
  */
 public interface AnnotationRule {
     Selector getSelector();
-    Modifier getModifier();
+    ModifierPlugin getModifier();
     BooleanProperty unableProperty();
     void setUnable(boolean unable);
 }
