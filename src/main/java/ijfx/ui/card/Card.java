@@ -17,17 +17,33 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.project_manager.projectdisplay.card;
+package ijfx.ui.card;
 
-import ijfx.core.project.Project;
-import ijfx.ui.card.Card;
-import org.scijava.plugin.SciJavaPlugin;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import javafx.beans.property.Property;
+import javafx.concurrent.Task;
+import javafx.scene.Node;
 
 /**
  *
  * @author cyril
  */
-public interface ProjectCard extends Card<Project>,SciJavaPlugin{
+public interface Card<T> {
+
+    public Node getContent();
+
+    public Task<Boolean> update(T source);
+
+    public String getName();
+
+    public FontAwesomeIcon getIcon();
+
+    public default void dissmiss() {
+        dismissed().setValue(true);
+    }    
     
+    public Property<Boolean> dismissable();
+    
+    public Property<Boolean> dismissed();
     
 }

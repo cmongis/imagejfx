@@ -27,6 +27,7 @@ import ijfx.service.ui.Apps;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.Property;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -35,11 +36,13 @@ import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = ProjectCard.class, priority = 1.0)
 public class HierarchyProjectCard extends BorderPane implements ProjectCard{
 
     
@@ -56,14 +59,15 @@ public class HierarchyProjectCard extends BorderPane implements ProjectCard{
     @Parameter
     AppService appService;
     
-    public HierarchyProjectCard(Context context) {
+    public HierarchyProjectCard() {
         try {
-            context.inject(this);
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
             Logger.getLogger(HierarchyProjectCard.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
     
     @Override
     public Node getContent() {
@@ -96,4 +100,19 @@ public class HierarchyProjectCard extends BorderPane implements ProjectCard{
     public void changePlaneOrganization() {
         appService.showApp(Apps.HIERARCHY_EDITOR);
     }
+    
+    
+    DismissableCardDecorator<Project> decorator = new DismissableCardDecorator<>(this);
+    
+    @Override
+    public Property<Boolean> dismissable() {
+        return decorator.dismissable();
+        
+    }
+
+    @Override
+    public Property<Boolean> dismissed() {
+        return decorator.dismissed();
+    }
+    
 }

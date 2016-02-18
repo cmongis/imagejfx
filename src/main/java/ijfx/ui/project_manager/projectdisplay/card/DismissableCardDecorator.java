@@ -20,79 +20,58 @@
 package ijfx.ui.project_manager.projectdisplay.card;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.core.project.Project;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import ijfx.ui.card.Card;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
-import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import mongis.utils.FXUtilities;
 
 /**
  *
  * @author cyril
  */
-public class ProjectCardContainer extends BorderPane implements ProjectCard{
+public class DismissableCardDecorator<T> implements Card<T>{
+    
+    private  final Card<T> card;
 
+    private final Property<Boolean> dismissableProperty = new SimpleBooleanProperty(false);
+    private final Property<Boolean> dismissedProperty = new SimpleBooleanProperty(false);
     
-    @FXML
-    Label titleLabel;
-    
-    @FXML
-    FontAwesomeIconView icon;
-    
-    final ProjectCard projectCard;
-    
-    public ProjectCardContainer(ProjectCard projectCard) {
-        this.projectCard = projectCard;
-        try {
-            FXUtilities.injectFXML(this);
-            
-            
-            setCenter(projectCard.getContent());
-            titleLabel.setText(projectCard.getName());
-            icon.setIcon(projectCard.getIcon());
-        } catch (IOException ex) {
-            Logger.getLogger(ProjectCardContainer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+    public DismissableCardDecorator(Card card) {
+        this.card = card;
     }
-    
-    
+
     @Override
     public Node getContent() {
-        return this;
+        return card.getContent();
     }
 
     @Override
-    public Task<Boolean> update(Project project) {
-        return projectCard.update(project);
+    public Task<Boolean> update(T source) {
+        return card.update(source);
     }
 
     @Override
     public String getName() {
-        return projectCard.getName();
+        return card.getName();
     }
 
     @Override
     public FontAwesomeIcon getIcon() {
-        return projectCard.getIcon();
+        return card.getIcon();
     }
 
     @Override
     public Property<Boolean> dismissable() {
-        return projectCard.dismissable();
+        return dismissableProperty;
     }
 
     @Override
     public Property<Boolean> dismissed() {
-        return projectCard.dismissed();
+        return dismissedProperty;
     }
+    
+    
     
     
     

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -39,11 +40,13 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
 import mongis.utils.FileButtonBinding;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = ProjectCard.class, priority = 2.0)
 public class StatisticCard extends BorderPane implements ProjectCard{
 
     public static final String NAME = "Settings & Stats";
@@ -155,6 +158,17 @@ public class StatisticCard extends BorderPane implements ProjectCard{
     
     
     
+    DismissableCardDecorator<Project> decorator = new DismissableCardDecorator<>(this);
     
+    @Override
+    public Property<Boolean> dismissable() {
+        return decorator.dismissable();
+        
+    }
+
+    @Override
+    public Property<Boolean> dismissed() {
+        return decorator.dismissed();
+    }
     
 }
