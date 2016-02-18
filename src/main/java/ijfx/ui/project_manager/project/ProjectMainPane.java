@@ -118,7 +118,7 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
 
     private Pane displayedBrowser;
 
-    SingleImageViewPane singleImageViewPane;
+   
 
     IconView folderDisplayBrowser;
 
@@ -226,7 +226,7 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
                         createGalleryView();
                         break;
                     case SINGLE_STACK:
-                        createSingleImageView();
+                        //createSingleImageView();
                 }
             }
         };
@@ -245,18 +245,7 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
 
     }
 
-    private void createSingleImageView() {
-        //int currentIndex = projectSpecificViewModel.indexProperty().get();
-        // displayedBrowser = new FXMLSingleImageNavigatorController(project, context);
-
-        if (singleImageViewPane == null) {
-            singleImageViewPane = new SingleImageViewPane(projectSpecificViewModel);
-            context.inject(singleImageViewPane);
-            singleImageViewPane.onTreeItemChanged(null, null, projectSpecificViewModel.nodeProperty().get());
-        }
-
-        innerPane.setCenter(singleImageViewPane);
-    }
+   
 
     @Override
     public void stopListening() {
@@ -329,9 +318,7 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
         if(newValue.getValue() == null) return;
 
         if (PlaneDB.class.isAssignableFrom(newValue.getValue().getClass())) {
-            
-          
-                createSingleImageView();
+               // createSingleImageView();
                 
            
         } else {
@@ -342,20 +329,6 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
 
     }
 
-    @EventHandler
-    public void createNewGalleryView(DebugRefreshEvent event) {
 
-        // displayedBrowser = new IconView(context);
-        singleImageViewPane = new SingleImageViewPane(viewModelService.getViewModel(project));
-
-        context.inject(singleImageViewPane);
-
-        Platform.runLater(() -> {
-            innerPane.setCenter(singleImageViewPane);
-            singleImageViewPane.onTreeItemChanged(null, null, viewModelService.getViewModel(project).nodeProperty().getValue());
-
-        });
-
-    }
 
 }

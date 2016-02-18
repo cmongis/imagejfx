@@ -82,7 +82,18 @@ public class DefaultProject implements Project {
     private ReadOnlyListWrapper<String> hierarchy
             = new ReadOnlyListWrapper<>(this, "hierarchy", FXCollections.observableArrayList());
 
-    private BooleanProperty hasChangedProperty = new SimpleBooleanProperty(this,"hasChanged");
+    private SimpleBooleanProperty hasChangedProperty = new SimpleBooleanProperty(this,"hasChanged") {
+        @Override
+        public void setValue(Boolean value) {
+            super.setValue(value);
+             if(value) fireValueChangedEvent();
+        }
+    };
+    
+    
+    
+    
+    //private BoundPropertySupport bps = new BoundPropertySupport(this);
     
     
     /**
@@ -215,8 +226,9 @@ public class DefaultProject implements Project {
     @Override
     public void setChanged(boolean changed) {
         this.changed = changed;
-        hasChangedProperty.setValue(changed);
-        
+        hasChangedProperty.setValue(!hasChangedProperty.getValue());
+       
+       
     }
 
     @Override
@@ -293,6 +305,7 @@ public class DefaultProject implements Project {
     @Override
     public ReadOnlyProperty<Boolean> hasChangedProperty() {
         return hasChangedProperty;
+        
     }
 
 }

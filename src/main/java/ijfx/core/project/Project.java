@@ -74,6 +74,7 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
 
     public ReadOnlyListProperty<PlaneDB> getSelection();
     
+    /* TODO: removing all these methods */
     public void addSelectedPlane(PlaneDB plane);
     
     public void addSelectedPlane(Collection<PlaneDB> planes);
@@ -85,6 +86,8 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
     public void addAnnotationRule(AnnotationRule rule);
     
     public void removeAnnotationRule(AnnotationRule rule);
+    
+    /* end of TODO */
     
     public ReadOnlyListProperty<AnnotationRule> getAnnotationRules();
 
@@ -114,6 +117,7 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
     public MetaDataSet getSettings();
    
     public static Project NO_PROJECT = null;
+    
     
     
 }

@@ -24,11 +24,13 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.modifier.AddTagModifier;
 import ijfx.core.project.modifier.ModifierPlugin;
+import ijfx.service.ui.SuggestionService;
 import ijfx.ui.project_manager.project.TagCompletionCallback;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.textfield.TextFields;
@@ -48,11 +50,27 @@ public class AddTagEditor extends VBox implements ModifierEditorWidget {
 
     TextField textField = new TextField();
 
+    ListView listView = new ListView();
+    
     @Parameter
     ProjectManagerService projectManagerService;
 
+    @Parameter
+    SuggestionService suggestionService;
+    
     TagCompletionCallback completionCallback = null;
 
+    public AddTagEditor() {
+        super();
+        
+        getChildren().add(textField);
+        
+        
+    }
+
+    
+    
+    
     @Override
     public ModifierPlugin create() {
         return new AddTagModifier();
@@ -65,6 +83,9 @@ public class AddTagEditor extends VBox implements ModifierEditorWidget {
 
             // binding to a callback that will return the possible tags of the current project
             TextFields.bindAutoCompletion(textField, completionCallback);
+            
+            listView.setItems(suggestionService.getPossibleTagsAutoupdatedList());
+            
         }
     }
 

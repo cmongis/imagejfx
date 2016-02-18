@@ -22,14 +22,13 @@ package ijfx.core.project;
 
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.imageDBService.PlaneDB;
-import ijfx.service.thumb.ThumbService;
 import ijfx.ui.project_manager.project.SimplerCounter;
 import ijfx.ui.project_manager.project.TreeItemUtils;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.uicontext.UiContextService;
+import ijfx.ui.project_manager.projectdisplay.PlaneOrMetaData;
 import io.scif.Format;
 import io.scif.FormatException;
-import io.scif.ImageMetadata;
 import io.scif.Plane;
 import io.scif.Reader;
 import io.scif.SCIFIO;
@@ -87,7 +86,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
 
     private final static Logger logger = ImageJFX.getLogger();
 
-    public Dataset convert(Project project, TreeItem root) {
+    public Dataset convert(Project project, TreeItem<PlaneOrMetaData> root) {
 
         TreeItem item = root;
 
@@ -112,7 +111,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         AxisType[] axes = new AxisType[dims.length];
 
         // getting a leaf to get the width
-        PlaneDB leaf = (PlaneDB) getALeaf(root).getValue();
+        PlaneDB leaf = getALeaf(root).getValue().getPlaneDB();
 
         // preparing X and Y axis
         int width = leaf.getMetaDataSet().get(MetaData.WIDTH).getIntegerValue();
@@ -177,7 +176,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
                     int planeIndex = counter.getCount();
 
                     // inserting the plane
-                    insertPlaneIntoDataset((TreeItem<PlaneDB>) child.getChildren().get(0), dataset, planeIndex, pixelType);
+                    insertPlaneIntoDataset(child.getChildren().get(0), dataset, planeIndex, pixelType);
 
                     // incrementing the counter
                     counter.increment();
@@ -185,7 +184,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
             });
         } else {
 
-            insertPlaneIntoDataset((TreeItem<PlaneDB>) root, dataset, 0, pixelType);
+            insertPlaneIntoDataset(root, dataset, 0, pixelType);
 
         }
 
@@ -194,8 +193,8 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         return dataset;
     }
 
-    private void insertPlaneIntoDataset(TreeItem<PlaneDB> childItem, Dataset dataset, int planeIndex, int pixelType) {
-        PlaneDB planeDB = childItem.getValue();
+    private void insertPlaneIntoDataset(TreeItem<? extends PlaneOrMetaData> childItem, Dataset dataset, int planeIndex, int pixelType) {
+        PlaneDB planeDB = childItem.getValue().getPlaneDB();
         try {
 
             Plane plane = getPlane(planeDB.getFile(), planeDB.getPlaneIndex());
@@ -255,10 +254,10 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
 
     }
 
-    public TreeItem getALeaf(TreeItem root) {
-        TreeItem item = root;
+    public <T> TreeItem<? extends T> getALeaf(TreeItem<? extends T> root) {
+        TreeItem<? extends T> item = root;
         while (item.isLeaf() == false) {
-            item = (TreeItem) item.getChildren().get(0);
+            item = item.getChildren().get(0);
 
         }
 

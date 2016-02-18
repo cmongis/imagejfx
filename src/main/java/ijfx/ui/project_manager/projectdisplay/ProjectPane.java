@@ -129,7 +129,8 @@ public class ProjectPane extends BorderPane {
             // initialising the toggles button for the different types of view
             for (PlaneSetView view : new PlaneSetView[]{
                 new IconPlaneSetView(context),
-                new TablePlaneSetView(context), new SingleImageViewPane(context)
+                new TablePlaneSetView(context),
+                new SingleImageViewPane(context)
             }) {
                 ToggleButton toggleButton = new ToggleButton(null, view.getIcon());
                 registerPlaneSetView(view, toggleButton);
@@ -245,7 +246,9 @@ public class ProjectPane extends BorderPane {
             logger.warning("The new view is null");
             return;
         };
-
+        
+        
+        
         // getting the new for the new value
         PlaneSetView planeSetView = getPlaneSetView(newValue);
         logger.info("Changing PlaneSet view " + planeSetView.getClass().getSimpleName());
@@ -271,6 +274,8 @@ public class ProjectPane extends BorderPane {
 
             updateView(planeSetView, projectDisplay.getCurrentPlaneSet());
         }
+        
+        viewToggleGroup.selectToggle(getToggle(newValue)); //getToggle(oldValue)
 
     }
 
@@ -283,6 +288,10 @@ public class ProjectPane extends BorderPane {
             if (getCurrentView() == null) {
                 return;
             }
+            if(newValue.getValue() != null && newValue.getValue().isPlane()) {
+                currentView.setValue(SingleImageViewPane.class);
+            }
+            
             getCurrentView().setCurrentItem(newValue);
         }
     }

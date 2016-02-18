@@ -20,6 +20,8 @@
  */
 package ijfx.ui.project_manager.singleimageview;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.GenericMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.PlaneDBModifierService;
@@ -28,19 +30,19 @@ import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.ProjectToImageJService;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.service.thumb.ThumbService;
-import mongis.utils.FXUtilities;
+import ijfx.service.ui.SuggestionService;
 import ijfx.ui.project_manager.other.EditHandler;
-import ijfx.ui.project_manager.project.ProjectViewModel;
 import ijfx.ui.project_manager.project.ProjectViewModelService;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.project_manager.projectdisplay.PlaneOrMetaData;
+import ijfx.ui.project_manager.projectdisplay.PlaneSet;
+import ijfx.ui.project_manager.projectdisplay.PlaneSetView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -49,6 +51,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
@@ -62,12 +65,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
+import org.scijava.Context;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public class SingleImageViewPane extends BorderPane implements EditHandler {
+public class SingleImageViewPane extends BorderPane implements EditHandler, PlaneSetView {
 
     /* UI Elements */
     @FXML
@@ -99,7 +103,9 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
 
     @FXML
     ListView suggestionsListView;
-    
+
+    TreeItem<PlaneOrMetaData> currentItem;
+
     ResourceBundle rb = rb = FXUtilities.getResourceBundle();
 
     /* 
@@ -121,16 +127,15 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
     PlaneDBModifierService planeModifierService;
 
     @Parameter
-            ProjectToImageJService projectToImageJService;
-    
-    
-    
+    ProjectToImageJService projectToImageJService;
+
+    @Parameter
+    SuggestionService suggestionService;
+
     /* Observable list */
     ObservableList<String> sortedTagList = FXCollections.observableArrayList();
 
     ObservableList<MetaData> metaList = FXCollections.observableArrayList();
-
-    ProjectViewModel viewModel;
 
     /* Plane related */
     PlaneDB currentPlane;
@@ -143,26 +148,28 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
             metaList.remove(change.getValueRemoved());
         }
     };
-    
+
+    /*
     ListChangeListener<String> tagListener = new ListChangeListener<String>() {
 
         @Override
         public void onChanged(ListChangeListener.Change<? extends String> c) {
-            
-            while(c.next()) {
-                
+
+            while (c.next()) {
+
                 //suggestionsListView.getItems().add(c.getAddedSubList());
                 updateSuggestions();
             }
-            
-        }
-    };
 
-    public SingleImageViewPane(ProjectViewModel viewModel) {
+        }
+    };*/
+
+    public SingleImageViewPane(Context context) {
         super();
 
         try {
             FXUtilities.injectFXML(this);
+            context.inject(this);
         } catch (IOException ex) {
             ImageJFX.getLogger();
         }
@@ -188,11 +195,10 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
         addTagButton.setTooltip(new Tooltip(rb.getString("addTag")));
         addMetaDataButton.setTooltip(new Tooltip(rb.getString("addMetaData")));
 
-        this.viewModel = viewModel;
-        viewModel.nodeProperty().addListener(this::onTreeItemChanged);
+        // this.viewModel = viewModel;
+        //viewModel.nodeProperty().addListener(this::onTreeItemChanged);
         //canvas.setWidth(Double.MAX_VALUE);
         //canvas.setHeight(Double.MAX_VALUE);
-
         canvas.widthProperty().bind(imageStackPane.widthProperty());
         canvas.heightProperty().bind(imageStackPane.heightProperty());
         //canvas.maxWidth(Double.MAX_VALUE);
@@ -205,7 +211,9 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
         imageStackPane.widthProperty().addListener((obs, o, n) -> {
 
         });
-
+        
+        suggestionsListView.setItems(suggestionService.getPossibleTagsAutoupdatedList());
+        
         //widthProperty().addListener((obj, old, nw) -> canvas.repaint());
     }
 
@@ -213,12 +221,11 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
         return projectService.getCurrentProject();
     }
 
-    public void listenPlaneDB(PlaneDB planeDB) {
+    private void listenPlaneDB(PlaneDB planeDB) {
         planeDB.getMetaDataSet().addListener(metaDataListener);
         tagsListView.setItems(planeDB.getTags());
-        planeDB.getTags().addListener(tagListener);
-        
-        
+        //planeDB.getTags().addListener(tagListener);
+
     }
 
     public void stopListeningPlaneDB(PlaneDB planeDB) {
@@ -227,7 +234,7 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
         }
 
         planeDB.getMetaDataSet().removeListener(metaDataListener);
-        planeDB.getTags().removeListener(tagListener);
+        //planeDB.getTags().removeListener(tagListener);
     }
 
     @Override
@@ -239,27 +246,32 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
     public void remove(String value) {
         planeModifierService.removeTag(getCurrentProject(), currentPlane, value);
     }
-    
+
     public Project getCurrentProject() {
         return projectService.getCurrentProject();
     }
-    
-    
-    public void onTreeItemChanged(Observable observable, TreeItem oldValue, TreeItem newValue) {
 
-        if (newValue == null) {
+    public void onTreeItemChanged(Observable observable, TreeItem<PlaneOrMetaData> oldValue, TreeItem<PlaneOrMetaData> newValue) {
+
+        if (newValue == null || newValue.getValue() == null) {
             return;
         }
 
+        System.out.println(newValue);
+        while (newValue.isLeaf() == false && newValue.getValue().isPlane() == false) {
+            System.out.println(newValue.isLeaf());
+            System.out.println(newValue.getValue().isPlane());
 
+            newValue = newValue.getChildren().get(0);
 
-        if (ProjectViewModelService.containsPlane(newValue)) {
-
-            stopListeningPlaneDB(currentPlane);
-            currentPlane = (PlaneDB) newValue.getValue();
-            listenPlaneDB(currentPlane);
-            updateData();
         }
+
+        stopListeningPlaneDB(currentPlane);
+
+        currentPlane = newValue.getValue().getPlaneDB();
+        listenPlaneDB(currentPlane);
+        updateData();
+
     }
 
     private void updateData() {
@@ -287,40 +299,75 @@ public class SingleImageViewPane extends BorderPane implements EditHandler {
 
     @FXML
     public void nextImage() {
-        viewModel.nextImage();
+        //viewModel.nextImage();
     }
 
     @FXML
     public void previousImage() {
-        viewModel.previousImage();
+        //viewModel.previousImage();
     }
 
-     @FXML
+    @FXML
     public void openSinglePlane() {
-        projectToImageJService.convert(projectService.getCurrentProject(), viewModel.nodeProperty().getValue());
+        projectToImageJService.convert(projectService.getCurrentProject(), currentItem);
     }
-    
+
     public void addMetaData() {
         planeModifierService.addMetaData(projectService.getCurrentProject(), currentPlane, new GenericMetaData(addKeyTextField.getText(), addValueTextField.getText()));
         addValueTextField.setText("");
         addKeyTextField.setText("");
-        
+
     }
+
     public void addTag() {
         planeModifierService.addTag(projectService.getCurrentProject(), currentPlane, newTagTextField.getText());
         newTagTextField.setText("");
     }
-    
-    
+
     public void updateSuggestions() {
         Set<String> tags = projectService.getAllPossibleTag(getCurrentProject());
-        
+
         suggestionsListView.getItems().clear();
         suggestionsListView.getItems().addAll(tags);
-        
+
     }
-    
-    
-   
+
+    @Override
+    public void setCurrentItem(TreeItem<PlaneOrMetaData> item) {
+        currentItem = item;
+        onTreeItemChanged(null, null, item);
+    }
+
+    @Override
+    public TreeItem<PlaneOrMetaData> getCurrentItem() {
+        return currentItem;
+    }
+
+    @Override
+    public void setCurrentPlaneSet(PlaneSet planeSet) {
+        this.planset = planeSet;
+    }
+
+    PlaneSet planset;
+
+    @Override
+    public PlaneSet getCurrentPlaneSet() {
+        return planset;
+    }
+
+    @Override
+    public void setHirarchy(List<String> hierarchy) {
+
+    }
+
+    @Override
+    public Node getIcon() {
+        return new FontAwesomeIconView(FontAwesomeIcon.PICTURE_ALT);
+    }
+
+    @Override
+    public Node getNode() {
+        return this;
+    }
 
 }

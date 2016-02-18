@@ -60,6 +60,8 @@ public class InvokerImpl implements Invoker {
     private Changeable changeable;
     private boolean cmdStackFreed = false;
 
+    
+    
     ObjectProperty<Operation> operationProperty = new SimpleObjectProperty<>();
     
     public InvokerImpl() {

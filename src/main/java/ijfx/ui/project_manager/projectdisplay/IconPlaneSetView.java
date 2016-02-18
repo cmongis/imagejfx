@@ -236,7 +236,7 @@ public class IconPlaneSetView extends BorderPane implements PlaneSetView {
                 //if (i != hierarchy.size() - 1) {
                 builder.append("   >   ");
                 //}
-                if (treeItem.getValue() != null) {
+                if (treeItem.getValue() != null && treeItem.isLeaf() == false) {
                     builder.append(treeItem.getValue().getMetaData().getStringValue());
                 }
 

@@ -22,11 +22,13 @@ package ijfx.service.ui;
 import ijfx.core.project.Project;
 import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.event.ProjectActivatedEvent;
+import ijfx.ui.main.ImageJFX;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import net.imagej.ImageJService;
 import org.scijava.Priority;
 import org.scijava.event.EventHandler;
@@ -77,37 +79,61 @@ public class SuggestionService extends AbstractService implements ImageJService 
         
     }
     
-    
+     */
     public ObservableList<String> getPossibleTagsAutoupdatedList() {
-        
-    }*/
+        return possibleTags;
+    }
+
     @EventHandler
     public void onCurrentProjectChanged(ProjectActivatedEvent event) {
+        System.out.println("something should happen");
         if (event.getProject() != null) {
             // listening to the current project
             bind(event.getProject());
+            updateCurrentPossibleTagList();
+
         }
+        currentProject = event.getProject();
     }
-    
+
     private void bind(Project newProject) {
         if (currentProject != null) {
             currentProject.hasChangedProperty().removeListener(onProjectChangedListener);
         }
         newProject.hasChangedProperty().addListener(onProjectChangedListener);
     }
-    
+
     public void updateCurrentPossibleTagList() {
+        System.out.println("updating !");
+        if (currentProject == null) {
+            return;
+        }
+
+        // running the search in the backgroudn
+        Task<Collection<String>> task = new Task<Collection<String>>() {
+            @Override
+            protected Collection<String> call() throws Exception {
+
+                return projectManagerService.getAllPossibleTag(currentProject);
+            }
+
+        };
         
-        if(currentProject == null) return;
+        // updating through the FX Thread when over
+        task.setOnSucceeded(event->{
+            possibleTags.clear();
+             possibleTags.addAll(task.getValue());
+        });
         
+        // starting the thread
+        ImageJFX.getThreadPool().submit(task);
+
         // clearing the field
-        possibleTags.clear();
-        possibleTags.addAll(projectManagerService.getAllPossibleTag(currentProject));
+        
     }
-    
-    
-    
+
     private final ChangeListener<Boolean> onProjectChangedListener = (obs, newValue, oldValue) -> {
+        
         updateCurrentPossibleTagList();
     };
 

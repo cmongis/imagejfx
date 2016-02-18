@@ -20,54 +20,77 @@
 package ijfx.ui.project_manager.projectdisplay.card;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import ijfx.ui.card.Card;
+import ijfx.core.project.Project;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import mongis.utils.FXUtilities;
 
 /**
  *
  * @author cyril
  */
-public class DismissableCardDecorator<T> implements Card<T>{
-    
-    private  final Card<T> card;
+public class RulesCard extends BorderPane implements ProjectCard{
 
-    private final Property<Boolean> dismissableProperty = new SimpleBooleanProperty(false);
-    private final Property<Boolean> dismissedProperty = new SimpleBooleanProperty(false);
     
-    public DismissableCardDecorator(Card card) {
-        this.card = card;
+    @FXML
+    Label ruleNumber;
+    
+    public RulesCard() {
+        try {
+            FXUtilities.injectFXML(this);
+        } catch (IOException ex) {
+            Logger.getLogger(RulesCard.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
     public Node getContent() {
-        return card.getContent();
+        return this;
     }
 
     @Override
-    public Task<Boolean> update(T source) {
-        return card.update(source);
+    public Task<Boolean> update(Project source) {
+        Task<Boolean> task = new ProjectUpdateTask(source, project->{
+            
+            ruleNumber.setText(""+project.getAnnotationRules().size());
+            
+            return true;
+        });
+        
+        
+        return task;
     }
 
     @Override
     public String getName() {
-        return card.getName();
+        return "Annotation rules";
     }
 
     @Override
     public FontAwesomeIcon getIcon() {
-        return card.getIcon();
+        return FontAwesomeIcon.ANGELLIST;
     }
 
+    
+     DismissableCardDecorator<Project> decorator = new DismissableCardDecorator<>(this);
+    
     @Override
     public Property<Boolean> dismissable() {
-        return dismissableProperty;
+        return decorator.dismissable();
     }
 
     @Override
     public Property<Boolean> dismissed() {
-        return dismissedProperty;
-    }    
+        return decorator.dismissed();
+    }
+    
+    
+    
 }

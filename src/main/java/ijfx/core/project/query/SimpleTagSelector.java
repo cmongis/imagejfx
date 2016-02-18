@@ -40,7 +40,7 @@ public class SimpleTagSelector implements Selector{
     private String[] tags;
     
     final static  public String TAG_SEPARATOR = ",";   
-    final static  public Pattern TAG_QUERY_PATTERN = Pattern.compile("tagged with:(.*)");
+    final static  public Pattern TAG_QUERY_PATTERN = Pattern.compile("tagged with: (.*)");
     
     
     final private String PHRASE = "tagged with *%s*";
@@ -78,9 +78,9 @@ public class SimpleTagSelector implements Selector{
     public boolean matches(PlaneDB planeDB, String metadataSetName) {
         
         //boolean[] results = new boolean[tags.length];
-        if(tags == null) {
+       
             parse(queryString);
-        }
+        
         ConditionList results = new ConditionList(tags.length);
         
         for(int i = 0; i!= tags.length;i++) {

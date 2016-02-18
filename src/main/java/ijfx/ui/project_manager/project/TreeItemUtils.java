@@ -23,6 +23,7 @@ package ijfx.ui.project_manager.project;
 import java.util.function.Consumer;
 import javafx.scene.control.TreeItem;
 
+
 /**
  *
  * @author Cyril MONGIS, 2015
@@ -31,6 +32,7 @@ public class TreeItemUtils {
     // go through the whole tree and execute the handler
      public synchronized static <T> void goThrough(TreeItem<? extends T> root, Consumer<TreeItem<? extends T>> handler) {
         handler.accept(root);
+        
         for(TreeItem<? extends T> child : root.getChildren()) {
             goThrough(child, handler);
         };
@@ -44,7 +46,7 @@ public class TreeItemUtils {
     }
     
     // recursive property that allows to go through a certain sub level of the tree
-    public static void goThroughLevel(TreeItem<TreeItem> root, int level,Handler<TreeItem> handler) {
+    public static <T> void goThroughLevel(TreeItem<? extends T> root, int level,Handler<TreeItem<? extends T>> handler) {
         if(level == 0) {
             handler.handle(root);
             return;
@@ -64,7 +66,7 @@ public class TreeItemUtils {
         return counter.getCount();
     }
     
-    public static int getDeepestLevel(TreeItem<TreeItem> root, int level) {
+    public static int getDeepestLevel(TreeItem root, int level) {
         int count = 0;
         int currentLevel = 0;
         
@@ -79,7 +81,7 @@ public class TreeItemUtils {
         }
     }
     
-    public static int getBrotherLevelMaxChildrenNumber(TreeItem<TreeItem> root, int level) {
+    public static <T> int getBrotherLevelMaxChildrenNumber(TreeItem<? extends T> root, int level) {
         
         MaxHolder maxHolder = new MaxHolder();
         goThroughLevel(root, level, item->{

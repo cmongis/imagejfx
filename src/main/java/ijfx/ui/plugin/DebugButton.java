@@ -72,7 +72,7 @@ public class DebugButton extends MenuButton implements UiPlugin{
     
     public DebugButton() {
         super("D",GlyphsDude.createIcon(FontAwesomeIcon.BUG));
-        
+        getStyleClass().add("icon");
         addItem("Reload CSS",this::reloadCss);
         addItem("Reload Debug Button",event->widgetService.reload(DebugButton.class));
         addItem("Reload App Browser",event->appService.reloadCurrentView());

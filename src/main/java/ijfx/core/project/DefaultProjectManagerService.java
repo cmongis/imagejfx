@@ -40,6 +40,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import mercury.core.MercuryTimer;
 import org.scijava.Priority;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
@@ -173,14 +174,17 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
     public Set<String> getAllPossibleTag(Project project) {
        
         Set<String> tags = new HashSet<>();
+        
          if(project == null) return tags;
         project.getImages().stream().parallel().forEach(image -> {
             image.getTags().forEach(tag -> {
-                if (!tags.contains(tag)) {
+                //if (!tags.contains(tag)) {
                     tags.add(tag);
-                }
+                //}
             });
         });
+        
+        
         return tags;
     }
 
