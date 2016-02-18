@@ -91,6 +91,31 @@
    -fx-stroke: -fx-text-base-color;
 } 
 
+.label.success,.label.warning,.label.danger {
+    -fx-background-color:transparent;
+    
+}
+.label.success {
+    -fx-text-fill:-flatter-success;
+}
+.label.warning {
+    -fx-text-fill:-flatter-warning;
+}
+.label.danger {
+    -fx-text-fill:-flatter-danger;
+    
+}
+.label.next-to-number {
+    -fx-font-size:1.3em;
+    -fx-pref-height:2em;;
+    -fx-label-padding: 0.8em 0 0 0.2em;
+}
+.label.number {
+    -fx-font-size:2em;
+    
+    -fx-pref-height:2em;
+}
+
 .text {
     -fx-font-family:'Open Sans';
     /*-fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); */
@@ -120,7 +145,7 @@
  *                                                                             *
  ******************************************************************************/
 
-.toggle-button, .button{
+.toggle-button, .button,.menu-button{
     -fx-background-color: -flatter-primary;
     -fx-background-insets:  0.0;
     -fx-background-radius: 2.0;
@@ -628,6 +653,8 @@
     -fx-background-color: -flatter-red;
 }
 
+
+
 .tool-bar {
     -fx-background-color:-bg-dark;
 }
@@ -858,6 +885,17 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .button.icon, .toggle-button.icon {
     -fx-padding:9px;
     -fx-background:red;
+}
+.half-button-right,.half-button-right:focused {
+    -fx-background-radius: 0 2.0 2.0 0;
+}
+.half-button-left,.half-button-left:focused {
+    -fx-background-radius: 2.0 0 0 2.0;
+}
+
+
+.menu-button.icon {
+    -fx-padding:3px;
 }
 .tool-bar-button {
     -fx-font-size: 18px;
@@ -1374,6 +1412,9 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .big-icon {
     -glyph-size: 40px;
+    -fx-text-size:40px;
+    -fx-pref-width:40px;
+    -fx-background-color:red;
 }
 .small-icon {
     -glyph-size: 15px;
@@ -1618,4 +1659,15 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .project-card-icon, .project-card-title{
     -fx-text-fill:derive(-flatter-warning,30%);
     -fx-fill:derive(-flatter-warning,30%);
+}
+
+.rich-message {
+    -fx-background-color:-dark;
+    -fx-fill:-dark;
+}
+
+.button.square,.toggle-button.square {
+    -fx-base:coral;
+    -fx-pref-width:125px;
+    -fx-pref-height:125px;
 }

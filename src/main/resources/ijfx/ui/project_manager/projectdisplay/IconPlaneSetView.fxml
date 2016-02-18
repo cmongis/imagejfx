@@ -6,12 +6,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
          <content>
-            <FlowPane fx:id="flowPane" maxHeight="1.7976931348623157E308" />
+            <FlowPane fx:id="flowPane" />
          </content>
       </ScrollPane>
    </center>

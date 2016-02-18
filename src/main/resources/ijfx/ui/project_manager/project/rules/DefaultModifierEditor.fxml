@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxWidth="1.7976931348623157E308" minHeight="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <BorderPane fx:id="borderPane" BorderPane.alignment="CENTER" />
+   </center>
+   <top>
+      <FlowPane fx:id="flowPane" BorderPane.alignment="CENTER" />
+   </top>
+</fx:root>
