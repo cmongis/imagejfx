@@ -37,7 +37,7 @@ public class UniversalSelector implements Selector {
 
     String queryString;
 
-    private static final String PHRASE = "contains the word \"%s\" in one of metadata";
+    private static final String PHRASE = "the word *%s* is in one of the metadata";
     
     
     public UniversalSelector() {

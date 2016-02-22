@@ -48,7 +48,7 @@ public class MetaDataSelector implements Selector {
 
     String valueString;
 
-    private static final String PHRASE = "contains the metadata *%s* with the exact value *%s*";
+    private static final String PHRASE = "the metadata *%s* has the exact value *%s*";
     
     
     public MetaDataSelector() {

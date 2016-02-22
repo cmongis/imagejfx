@@ -235,18 +235,7 @@ public class DefaultQueryService extends AbstractService implements QueryService
                 if (queryResult) {
                     queryResultList.add(plane);
                 }
-                
-                
-                /* The selection shouldn't be done by the query service anymore
-                if (queryResult != plane.selectedProperty().get()) {
-                    if (plane.selectedProperty().get()) {
-                        deselectPlane.add(plane);
-                    } else {
-                        selectPlane.add(plane);
-                    }
-                }*/
-
-           // }
+               
         });
 
         //projectModifier.selectPlane(project, deselectPlane, selectPlane);

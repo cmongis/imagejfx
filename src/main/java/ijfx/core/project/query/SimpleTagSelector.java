@@ -22,6 +22,7 @@ package ijfx.core.project.query;
 
 import ijfx.core.project.imageDBService.PlaneDB;
 import java.util.Arrays;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class SimpleTagSelector implements Selector{
     private String[] tags;
     
     final static  public String TAG_SEPARATOR = ",";   
-    final static  public Pattern TAG_QUERY_PATTERN = Pattern.compile("tagged with: (.*)");
+    final static  public Pattern TAG_QUERY_PATTERN = Pattern.compile("tagged with\\:?\\s*(.*)");
     
     
     final private String PHRASE = "tagged with *%s*";
@@ -64,7 +65,8 @@ public class SimpleTagSelector implements Selector{
         this.queryString = queryString;
         Matcher m = TAG_QUERY_PATTERN.matcher(queryString);
         if(m.matches()) {
-            tags = queryString.split(m.group(1));
+            System.out.println("tags : "+m.group(1));
+            tags = m.group(1).split(TAG_SEPARATOR);
         }
       
     }
@@ -107,7 +109,9 @@ public class SimpleTagSelector implements Selector{
 
     @Override
     public String phraseMe() {
-        return String.format(PHRASE, Arrays.asList(tags).stream().collect(Collectors.joining(PHRASE_DELIMITER)));
+        
+        
+        return String.format(PHRASE, String.join(PHRASE_DELIMITER,tags));
     }
     
     
