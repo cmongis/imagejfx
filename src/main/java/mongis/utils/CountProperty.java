@@ -38,8 +38,9 @@ public class CountProperty extends SimpleDoubleProperty {
         this.incrementValue = incrementValue;
     }
 
-    public void increment() {
+    public double increment() {
         setValue(getValue() + getIncrementValue());
+        return getValue();
     }
 
     public void decrement() {

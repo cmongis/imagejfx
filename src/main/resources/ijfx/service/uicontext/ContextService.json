@@ -16,5 +16,13 @@
         "name":"file-batch-processing"
         ,"incompatibleWith":["webapp","imagej","project-manager","project-batch-processing"]
     }
+    ,{
+        "name":"project-rule-list"
+        ,"incompatibleWith":["webapp","project-manager"]
+    }
+    ,{
+        "name":"project-rule-edition"
+        ,"incompatibleWith":["project-rule-list","project-manager"]
+    }
 
 ]

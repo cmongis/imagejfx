@@ -59,6 +59,8 @@ public class Dimension {
     public void setSize(int size) {
         this.size = size;
     }
+    
+   
 
     public Dimension getSubDimension() {
         return subDimension;

@@ -37,12 +37,12 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej</artifactId>
-            <version>2.0.0-rc-42</version>
+            <version>2.0.0-rc-44</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-api</artifactId>
-            <version>5.1.5</version>
+            <version>5.1.8</version>
         </dependency>
         <dependency>
             <groupId>io.scif</groupId>
@@ -62,17 +62,17 @@
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-bsd</artifactId>
-            <version>5.1.5</version>
+            <version>5.1.8</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-gpl</artifactId>
-            <version>5.1.5</version>
+            <version>5.1.8</version>
         </dependency>
         <dependency>
             <groupId>de.jensd</groupId>
             <artifactId>fontawesomefx</artifactId>
-            <version>8.4</version>
+            <version>8.9</version>
         </dependency>
         
         <dependency>
@@ -151,7 +151,7 @@
         <dependency>
             <groupId>de.biomedical-imaging.ij</groupId>
             <artifactId>ij_blob</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.8</version>
         </dependency>
         <dependency>
             <groupId>org.reactfx</groupId>

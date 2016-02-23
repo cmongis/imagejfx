@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="with-padding" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+         <top>
+            <GridPane fx:id="gridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="grid-pane" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" minWidth="50.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <TextArea fx:id="selectorTextArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" prefHeight="60.0" prefWidth="200.0" promptText="Write your selection rule here" wrapText="true" GridPane.rowIndex="1" />
+                  <HBox GridPane.columnSpan="2" GridPane.rowIndex="2">
+                     <children>
+                        <Label fx:id="planeCountLabel" text="45">
+                           <styleClass>
+                              <String fx:value="number" />
+                              <String fx:value="warning" />
+                           </styleClass>
+                        </Label>
+                        <Label styleClass="next-to-number" text="plane selected" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Select all the plane where...">
+                           <styleClass>
+                              <String fx:value="h4" />
+                              <String fx:value="success" />
+                           </styleClass>
+                        </Label>
+                        <Button mnemonicParsing="false" text="Help">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="INFO" />
+                           </graphic>
+                        </Button>
+                     </children>
+                     <styleClass>
+                        <String fx:value="hbox" />
+                        <String fx:value="with-top-padding" />
+                     </styleClass>
+                  </HBox>
+                  <Label text=".. and apply the following modification : " GridPane.rowIndex="3">
+                     <styleClass>
+                        <String fx:value="h4" />
+                        <String fx:value="success" />
+                        <String fx:value="with-top-padding" />
+                     </styleClass>
+                  </Label>
+               </children>
+            </GridPane>
+         </top>
+         <center>
+            <Group fx:id="modifierGroup" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </center>
+   <bottom>
+      <HBox alignment="BOTTOM_LEFT" styleClass="hbox" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" onAction="#save" styleClass="success" text="Add the rule">
+               <graphic>
+                  <FontAwesomeIconView glyphName="PLUS" />
+               </graphic></Button>
+            <Button mnemonicParsing="false" onAction="#cancel" styleClass="danger" text="Cancel">
+               <graphic>
+                  <FontAwesomeIconView glyphName="REMOVE" />
+               </graphic></Button>
+         </children>
+      </HBox>
+   </bottom>
+   <top>
+      <Label maxWidth="1.7976931348623157E308" styleClass="h2" text="Edit rule" BorderPane.alignment="CENTER" />
+   </top>
+</fx:root>

@@ -1,21 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root styleClass="with-padding" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
-      <HBox BorderPane.alignment="CENTER">
+      <HBox styleClass="hbox" BorderPane.alignment="CENTER">
          <children>
             <Label styleClass="h2" text="Annotation rules" />
+            <Button mnemonicParsing="false" onAction="#addRule" text="Add rule">
+               <graphic>
+                  <FontAwesomeIconView glyphName="PLUS_CIRCLE" />
+               </graphic>
+               <styleClass>
+                  <String fx:value="after-h3" />
+                  <String fx:value="success" />
+               </styleClass>
+            </Button>
          </children>
       </HBox>
    </top>
    <center>
-      <ListView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
+   <bottom>
+      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+          <Button mnemonicParsing="false" onAction="#backToProjectManager" text="Back to project">
+               <graphic>
+                  <FontAwesomeIconView glyphName="ARROW_LEFT" />
+               </graphic>
+            </Button>
+        </items>
+      </ToolBar>
+   </bottom>
 </fx:root>

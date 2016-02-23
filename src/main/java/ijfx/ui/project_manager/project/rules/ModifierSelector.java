@@ -20,25 +20,24 @@
 package ijfx.ui.project_manager.project.rules;
 
 import ijfx.core.project.modifier.ModifierPlugin;
-import ijfx.core.project.query.Phrasable;
 import javafx.beans.property.Property;
-import javafx.scene.Node;
-import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
  * @author cyril
  */
-public interface ModifierEditor extends Phrasable,SciJavaPlugin {
+public interface ModifierSelector<N>{
     
-    public ModifierPlugin create();
     
-    public boolean configure(ModifierPlugin modifier);
+    void afterContextInjection();
     
-    public Node getNode();
     
-    Property<ModifierPlugin> editedModifierPluginProperty();
+    void setEditedModifier(ModifierPlugin modifier);
     
-    public Node getIcon();
+    ModifierPlugin getEditedModifier();
+    
+    Property<ModifierPlugin> editedModifierProperty();
+    
+    N getUiElement();
     
 }

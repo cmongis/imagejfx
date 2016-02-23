@@ -19,26 +19,18 @@
  */
 package ijfx.ui.project_manager.project.rules;
 
-import ijfx.core.project.modifier.ModifierPlugin;
-import ijfx.core.project.query.Phrasable;
-import javafx.beans.property.Property;
-import javafx.scene.Node;
-import org.scijava.plugin.SciJavaPlugin;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-public interface ModifierEditor extends Phrasable,SciJavaPlugin {
+@Plugin(type = ModifierEditor.class)
+public class NameChannelModifierEditor extends DummyModifierBase {
     
-    public ModifierPlugin create();
-    
-    public boolean configure(ModifierPlugin modifier);
-    
-    public Node getNode();
-    
-    Property<ModifierPlugin> editedModifierPluginProperty();
-    
-    public Node getIcon();
+    public NameChannelModifierEditor() {
+        super("Name channels", FontAwesomeIcon.LIST_OL);
+    }
     
 }

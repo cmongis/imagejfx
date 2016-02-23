@@ -19,11 +19,9 @@
  */
 package ijfx.ui.project_manager.projectdisplay.card;
 
-
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.core.project.Project;
-import ijfx.service.ui.AppService;
-import ijfx.service.ui.Apps;
+import ijfx.ui.project_manager.project.BrowserUIService;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,10 +29,9 @@ import javafx.beans.property.Property;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
-import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -42,31 +39,23 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ProjectCard.class, priority = 9.0)
-public class HierarchyProjectCard extends BorderPane implements ProjectCard{
+@Plugin(type = ProjectCard.class,priority=100.0)
+public class EmptyProjectCard extends GridPane implements ProjectCard {
 
-    
-    private static final String NAME = "Plane Organization";
-    
-    
-    
-    @FXML
-    ListView<String> listView;
+    public static final String NAME = "Hello";
     
     @Parameter
-    Context context;
+    BrowserUIService browserUIService;
     
-    @Parameter
-    AppService appService;
-    
-    public HierarchyProjectCard() {
+    public EmptyProjectCard() {
         try {
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
-            Logger.getLogger(HierarchyProjectCard.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EmptyProjectCard.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
-    
+
     
     
     @Override
@@ -75,34 +64,45 @@ public class HierarchyProjectCard extends BorderPane implements ProjectCard{
     }
 
     @Override
-    public Task<Boolean> update(Project project) {
+    public Task<Boolean> update(Project source) {
         
+        return new AsyncCallback<Project,Boolean>()
+                .setInput(source)
+                .run(this::countImages)
+                .then(result->decorator.dismissed().setValue(result));
         
-        return new ProjectUpdateTask(project, this::updateListView);
     }
 
     @Override
     public String getName() {
         return NAME;
+        
     }
 
     @Override
     public FontAwesomeIcon getIcon() {
-        return FontAwesomeIcon.CUBES;
+        return FontAwesomeIcon.SMILE_ALT;
+    }
+
+    /**
+     * Returns true if the card should be dismissed
+     * @param project
+     * @return if the card should be dismissed
+     */
+    public Boolean countImages(Project project) {
+        
+        
+        if(project.getImages().size() >0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+        
     }
     
-    public Boolean updateListView(Project project) {
-        listView.setItems(project.getHierarchy());
-        return true;
-    }
     
-    @FXML
-    public void changePlaneOrganization() {
-        appService.showApp(Apps.HIERARCHY_EDITOR);
-    }
-    
-    
-    DismissableCardDecorator<Project> decorator = new DismissableCardDecorator<>(this);
+     DismissableCardDecorator<Project> decorator = new DismissableCardDecorator<>(this);
     
     @Override
     public Property<Boolean> dismissable() {
@@ -115,4 +115,14 @@ public class HierarchyProjectCard extends BorderPane implements ProjectCard{
         return decorator.dismissed();
     }
     
+    @FXML
+    private void scanFolder() {
+        browserUIService.addImageFromDirectoryAction();
+    }
+    
+    @FXML
+    private void addImages() {
+        browserUIService.addImageAction();
+    }
+
 }

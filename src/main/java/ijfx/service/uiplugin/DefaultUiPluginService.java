@@ -46,6 +46,12 @@ import ijfx.ui.UiConfiguration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import mongis.utils.AsyncCallback;
+import mongis.utils.CountProperty;
+import org.scijava.InstantiableException;
 
 /**
  *
@@ -61,9 +67,9 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
     HashMap<String, UiPlugin> uiPluginMap;
 
     HashMap<String, Double> orderMap = new HashMap<>();
-    
+
     HashMap<String, String> localizationMap = new HashMap<>();
-    
+
     @Parameter
     Context context;
 
@@ -72,7 +78,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
 
     @Parameter
     EventService eventService;
-    
+
     Logger logger = ImageJFX.getLogger();
 
     public static final String MSG_INITALIZE = "[%s] Initializing...";
@@ -90,7 +96,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
         Task<Collection<UiPlugin>> task = new Task<Collection<UiPlugin>>() {
 
             @Override
-            protected Collection<UiPlugin> call()  {
+            protected Collection<UiPlugin> call() {
 
                 if (uiPluginMap == null) {
                     uiPluginMap = new HashMap<>();
@@ -147,13 +153,33 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
             MercuryTimer timer = new MercuryTimer("Starting");
             timer.setLogger(logger);
             timer.start();
-
+            
+            
+            CountProperty counter = new CountProperty();
+            
+            
+            ExecutorService executor = Executors.newFixedThreadPool(4);
+            
             // for each plugin   
             for (PluginInfo<UiPlugin> uiPlugin : pluginService.getPluginsOfType(UiPlugin.class)) {
-                loadWidget(uiPlugin);
-                LoadingScreen.getInstance().setText(String.format(MSG_LOADING_COUNT, count++, total));
+                
+                executor.submit(
+                new AsyncCallback<>(this::loadWidget)
+                        .setInput(uiPlugin)
+                        .then(plugin->{
+                         LoadingScreen.getInstance().setText(String.format(MSG_LOADING_COUNT, counter.increment(), total));
+                        }));
+                
+                
+               
             }
-
+            try {
+                executor.awaitTermination(1, TimeUnit.MINUTES);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DefaultUiPluginService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
         }
         return uiPluginMap.values();
     }
@@ -166,27 +192,41 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
         timer.start();
         //getting the class name for further use
         String widgetClassName = uiPluginInfos.getClassName();
-        
+
         UiPlugin uiPlugin = null;
         UiConfiguration uiConfiguration = null;
         try {
-            
+
             String pluginId;
-            
+
             // some logging
             logger.info(String.format(MSG_INITALIZE, widgetClassName));
 
             // creating the instance
-            uiPlugin = (UiPlugin) uiPluginInfos.createInstance();
-            timer.elapsed(String.format("[%s]Instance creation",widgetClassName));
+            
+            /*
+            uiPlugin = (UiPlugin) new AsyncCallback<PluginInfo<UiPlugin>, UiPlugin>()
+                    .setInput(uiPluginInfos)
+                    .run(info -> {
+                        try {
+                            return info.createInstance();
+                        } catch (InstantiableException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                            return null;
+                        }
+                    })
+                    .ui()
+                    .getValue();*/
+            uiPlugin = uiPluginInfos.createInstance();
+            timer.elapsed(String.format("[%s]Instance creation", widgetClassName));
 
             // context injection
             context.inject(uiPlugin);
-            timer.elapsed(String.format("[%s]Instance injection",widgetClassName));
+            timer.elapsed(String.format("[%s]Instance injection", widgetClassName));
 
             // initializing the plugin
             uiPlugin.init();
-            timer.elapsed(String.format("[%s]plugin.init()",widgetClassName));
+            timer.elapsed(String.format("[%s]plugin.init()", widgetClassName));
 
             if (uiPlugin.getUiElement() == null) {
                 logger.log(Level.SEVERE, String.format(MSG_NODE_NULL, widgetClassName));
@@ -203,8 +243,8 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
                 pluginId = uiConfiguration.id();
                 uiPlugin.getUiElement().setId(pluginId);
                 uiPlugin.getUiElement().getStyleClass().add(pluginId);
-                setOrder(pluginId,uiConfiguration.order());
-                setLocalization(pluginId,uiConfiguration.localization());
+                setOrder(pluginId, uiConfiguration.order());
+                setLocalization(pluginId, uiConfiguration.localization());
 
             } catch (NullPointerException ne) {
 
@@ -224,25 +264,23 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
             // adding the widget to the map and list
             uiPluginMap.put(pluginId, uiPlugin);
 
-            localizationMap.put(pluginId,getDefaultLocalization(uiPlugin));
-            orderMap.put(pluginId,getDefaultOrder(uiPlugin));
-            
-            
+            localizationMap.put(pluginId, getDefaultLocalization(uiPlugin));
+            orderMap.put(pluginId, getDefaultOrder(uiPlugin));
+
             // the widget has been launch successfully
             logger.info(String.format(MSG_INITALIZE, widgetClassName));
         } catch (Exception ex) {
             //logger.warning(String.format(MSG_ERROR_WHEN_LAUNCHING, widgetClassName));
-           
+
             /*
             logErrorService.notifyError(
                     new LogEntry(LogEntryType.ERROR)
                     .setTitle(String.format(MSG_ERROR_WHEN_LAUNCHING, widgetClassName))
                     .setException(ex)
             );*/
-
             logger.log(Level.SEVERE, MSG_ERROR_WHEN_LAUNCHING, ex);
         }
-        
+
         return uiPlugin;
     }
 
@@ -262,23 +300,19 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
     }
 
     @Override
-    public void reload(Class<? extends UiPlugin> clazz ) {
-       
-        
+    public void reload(Class<? extends UiPlugin> clazz) {
+
         PluginInfo<UiPlugin> pluginInfo = pluginService.getPlugin(clazz, UiPlugin.class);
-        
+
         UiPlugin plugin = loadWidget(pluginInfo);
         eventService.publish(new UiPluginReloadedEvent(plugin));
-        
-        
-        
+
     }
 
-    
-    private void setLocalization(String id,String localization) {
-        localizationMap.put(id,localization);
+    private void setLocalization(String id, String localization) {
+        localizationMap.put(id, localization);
     }
-    
+
     @Override
     public String getDefaultLocalization(UiPlugin uiPlugin) {
         return localizationMap.get(getInfos(uiPlugin).id());
@@ -296,7 +330,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
 
     @Override
     public Double setOrder(String id, Double order) {
-        orderMap.put(id,order);
+        orderMap.put(id, order);
         return order;
     }
 
@@ -307,16 +341,14 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
 
     @Override
     public List<Node> getSortedList(List<Node> input) {
-         ArrayList<Node> sortedNodes = new ArrayList<>(input);
+        ArrayList<Node> sortedNodes = new ArrayList<>(input);
         sort(sortedNodes);
         return sortedNodes;
     }
+
     @Override
     public void sort(List<Node> pluginList) {
-         Collections.sort(pluginList, (n1, n2) -> getOrder(n1.getId()).compareTo(getOrder(n2.getId())));
+        Collections.sort(pluginList, (n1, n2) -> getOrder(n1.getId()).compareTo(getOrder(n2.getId())));
     }
-   
-    
-    
 
 }

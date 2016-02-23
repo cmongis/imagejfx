@@ -26,6 +26,7 @@ import ijfx.core.project.imageDBService.PlaneDB;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyProperty;
 
@@ -118,6 +119,8 @@ public interface Project extends QueryCollection<PlaneDB>, Changeable {
    
     public static Project NO_PROJECT = null;
     
+    
+    public Property<String> groupByProperty();
     
     
 }

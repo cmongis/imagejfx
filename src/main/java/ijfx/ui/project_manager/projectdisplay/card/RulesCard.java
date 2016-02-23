@@ -21,6 +21,7 @@ package ijfx.ui.project_manager.projectdisplay.card;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.core.project.Project;
+import ijfx.service.uicontext.UiContextService;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,16 +32,22 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = ProjectCard.class, priority=8.0)
 public class RulesCard extends BorderPane implements ProjectCard{
 
     
     @FXML
     Label ruleNumber;
+    
+    @Parameter
+    UiContextService uiContextService;
     
     public RulesCard() {
         try {
@@ -91,6 +98,11 @@ public class RulesCard extends BorderPane implements ProjectCard{
         return decorator.dismissed();
     }
     
+    @FXML
+    public void editRules() {
+        uiContextService.enter("project-rule-list");
+        uiContextService.update();
+    }
     
     
 }

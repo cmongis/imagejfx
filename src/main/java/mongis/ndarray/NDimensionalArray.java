@@ -21,7 +21,8 @@
 package mongis.ndarray;
 
 import java.util.ArrayList;
-import mongis.ndarray.Dimension;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -29,39 +30,45 @@ import mongis.ndarray.Dimension;
  */
 public class NDimensionalArray extends ArrayList<Dimension> {
 
+    
+    public NDimensionalArray(String names, Integer... sizes) {
+        super();
+        for (int i = 0; i != sizes.length; i++) {
+            add(new Dimension(String.valueOf(names.charAt(i)), sizes[i], this));
+
+        }
+    }
     public NDimensionalArray(String names, int... sizes) {
         super();
         for (int i = 0; i != sizes.length; i++) {
             add(new Dimension(String.valueOf(names.charAt(i)), sizes[i], this));
-           
+
         }
     }
-    
+
     public NDimensionalArray(long[] dims) {
-        for(int i = 0;i!=dims.length;i++) {
-            add(new Dimension("",(int)dims[i],this));
+        for (int i = 0; i != dims.length; i++) {
+            add(new Dimension("", (int) dims[i], this));
         }
     }
-    
-    
-    
+
     public NDimensionalArray() {
         super();
     }
 
     public boolean add(String dimensionName, int size) {
-        return add(new Dimension(dimensionName,size,this));
+        return add(new Dimension(dimensionName, size, this));
     }
-  
+
     @Override
     public boolean add(Dimension dimension) {
-       
-            if (size() > 0) {
-                get(size() - 1).setSubDimension(dimension);
-            }
-            return  super.add(dimension);
+
+        if (size() > 0) {
+            get(size() - 1).setSubDimension(dimension);
+        }
+        return super.add(dimension);
     }
-    
+
     public class Element extends ArrayList<Dimension> {
 
     }
@@ -72,8 +79,12 @@ public class NDimensionalArray extends ArrayList<Dimension> {
         Dimension d;
     }
 
-    
-    
+    public long[] getIndexes(int flatIndex) {
+            return get(0).generateAllPossibilities()[flatIndex];
+        }
+
+        
+
     
 
 }

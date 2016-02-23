@@ -309,7 +309,7 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
 
     @FXML
     public void openSinglePlane() {
-        projectToImageJService.convert(projectService.getCurrentProject(), currentItem);
+        projectToImageJService.convert(currentItem);
     }
 
     public void addMetaData() {

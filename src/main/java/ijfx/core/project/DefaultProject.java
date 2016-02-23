@@ -39,12 +39,13 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.ReadOnlyMapProperty;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 /*
@@ -90,7 +91,7 @@ public class DefaultProject implements Project {
         }
     };
     
-    
+    Property<String> groupBy = new SimpleStringProperty();
     
     
     //private BoundPropertySupport bps = new BoundPropertySupport(this);
@@ -306,6 +307,11 @@ public class DefaultProject implements Project {
     public ReadOnlyProperty<Boolean> hasChangedProperty() {
         return hasChangedProperty;
         
+    }
+
+    @Override
+    public Property<String> groupByProperty() {
+        return groupBy;
     }
 
 }

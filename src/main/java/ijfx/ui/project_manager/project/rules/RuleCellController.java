@@ -24,14 +24,19 @@ import ijfx.core.project.Project;
 import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.core.project.query.QueryService;
+import ijfx.ui.RichMessageDisplayer;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Level;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebView;
+import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import mongis.utils.FunctionnalTask;
 import mongis.utils.ListCellController;
@@ -64,24 +69,39 @@ public class RuleCellController extends BorderPane implements ListCellController
 
     /*
         FXML
-     */
+    
     @FXML
     Label selectorLabel;
     @FXML
     Label modifierLabel;
+     */
     @FXML
     Label countLabel;
 
     @FXML
     Button applyButton;
 
+    @FXML
+    WebView ruleWebView;
+
+    RichMessageDisplayer richMessageDisplayer;
+
     public static final String APPLY_RULE_TO = "Apply (%d planes)";
     public static final String APPLY_RULE = "Apply rule";
     public static final String COUNT = "%d planes are concerned, %d are left to be modified";
 
+    Consumer<AnnotationRule> deleteHandler;
+
+    Consumer<AnnotationRule> applyHandler;
+
     public RuleCellController() {
         try {
             FXUtilities.injectFXML(this);
+            richMessageDisplayer = new RichMessageDisplayer(ruleWebView)
+                    .addStringProcessor(RichMessageDisplayer.COLOR_IMPORTANT_WORDS)
+                    .addStringProcessor(RichMessageDisplayer.BIGGER);
+            ruleWebView.setPrefHeight(70);
+            ruleWebView.prefWidthProperty().bind(Bindings.subtract(widthProperty(), 200));
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
@@ -100,33 +120,30 @@ public class RuleCellController extends BorderPane implements ListCellController
         return rule;
     }
 
+    public void updateCounts() {
+        selectedPlaneCount = calculateSelectedPlaneCount();
+        modifiablePlaneCount = calculateModifiablePlaneCount();
+    }
+
+    public void updateUi() {
+        applyButton.setDisable(modifiablePlaneCount <= 0);
+        applyButton.setText(modifiablePlaneCount > 0 ? String.format(APPLY_RULE_TO, modifiablePlaneCount) : APPLY_RULE);
+
+        countLabel.setText(String.format(COUNT, selectedPlaneCount, modifiablePlaneCount));
+    }
+
     private void update() {
         if (rule == null) {
             return;
         }
 
-        selectorLabel.setText(rule.getSelector().phraseMe());
-        modifierLabel.setText(rule.getModifier().phraseMe());
+        //selectorLabel.setText(rule.getSelector().phraseMe());
+        //modifierLabel.setText(rule.getModifier().phraseMe());
+        richMessageDisplayer.setMessage(rule.getModifier().phraseMe() + " to all the planes where " + rule.getSelector().phraseMe());
 
-        
-        
-        new FunctionnalTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-
-                selectedPlaneCount = calculateSelectedPlaneCount();
-                modifiablePlaneCount = calculateModifiablePlaneCount();
-
-                return null;
-            }
-        }
-                .onSucceed(event -> {
-                    applyButton.setDisable(modifiablePlaneCount <= 0);
-                    applyButton.setText(modifiablePlaneCount > 0 ? String.format(APPLY_RULE_TO, modifiablePlaneCount) : APPLY_RULE);
-
-                    countLabel.setText(String.format(COUNT, selectedPlaneCount, modifiablePlaneCount));
-
-                })
+        new AsyncCallback<Void, Void>()
+                .run(this::updateCounts)
+                .then(v -> updateUi())
                 .start();
 
     }
@@ -144,8 +161,22 @@ public class RuleCellController extends BorderPane implements ListCellController
     }
 
     @FXML
-    public void applyRule() {
-        System.out.println("Hello, it's me.");
+    private void applyRule() {
+        applyHandler.accept(rule);
+    }
+
+    @FXML
+    private void delete() {
+        deleteHandler.accept(rule);
+    }
+
+    public void setDeleteHandler(Consumer<AnnotationRule> deleteHandler) {
+        this.deleteHandler = deleteHandler;
+    }
+
+    public void setApplyHandler(Consumer<AnnotationRule> applyHandler) {
+        this.applyHandler = applyHandler;
+        update();
     }
 
 }

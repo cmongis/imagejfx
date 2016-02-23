@@ -39,7 +39,7 @@ public class ContainStringSelector implements Selector{
     String keyword;
     
     public static final String PHRASE = "*%s* contains the word *%s*";
-    public static final Pattern PATTERN = Pattern.compile("([\\d\\s\\w]) contains (.*)");
+    public static Pattern PATTERN = Pattern.compile("([\\s\\d\\w]+) contains (.*)");
     
     @Override
     public void parse(String queryString) {
@@ -49,7 +49,7 @@ public class ContainStringSelector implements Selector{
     @Override
     public boolean canParse(String queryString) {
         Matcher m = PATTERN.matcher(queryString);
-        
+        System.out.println(queryString);
         if(m.matches()) {
             metadataKey = m.group(1);
             keyword = m.group(2);

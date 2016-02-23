@@ -21,14 +21,13 @@ package ijfx.ui.project_manager.projectdisplay;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.ui.project_manager.projectdisplay.card.DummyCard;
-import ijfx.ui.project_manager.projectdisplay.card.HierarchyProjectCard;
+import ijfx.core.project.Project;
+import ijfx.ui.context.animated.Animations;
 import ijfx.ui.project_manager.projectdisplay.card.ProjectCard;
 import ijfx.ui.project_manager.projectdisplay.card.ProjectCardContainer;
-import ijfx.ui.project_manager.projectdisplay.card.RulesCard;
-import ijfx.ui.project_manager.projectdisplay.card.StatisticCard;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.animation.Animation;
 import javafx.beans.Observable;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -36,6 +35,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.TilePane;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.PluginService;
 
 /**
  *
@@ -50,25 +50,36 @@ public class DashBoardPlaneSetView extends TilePane implements PlaneSetView {
     @Parameter
     Context context;
 
+    @Parameter
+    PluginService pluginService;
+
     ScrollPane scrollPane = new ScrollPane();
 
     private int column = 2;
+
+    Project project;
 
     public DashBoardPlaneSetView(Context context) {
         super();
 
         context.inject(this);
 
+        /*
         projectCardList.add(new ProjectCardContainer(new DummyCard()));
         projectCardList.add(new ProjectCardContainer(new StatisticCard()));
         projectCardList.add(new ProjectCardContainer(new HierarchyProjectCard()));
         projectCardList.add(new ProjectCardContainer(new RulesCard()));
-        ;
+        ;*/
+        for (ProjectCard card : pluginService.createInstancesOfType(ProjectCard.class)) {
 
-        for (ProjectCard node : projectCardList) {
-            context.inject(node);
+            projectCardList.add(new ProjectCardContainer(card));
+
         }
 
+        /*
+        for (ProjectCard node : projectCardList) {
+            context.inject(node.getContent());
+        }*/
         getStyleClass().add("project-card-container");
 
         widthProperty().addListener(this::onWidthModified);
@@ -76,7 +87,24 @@ public class DashBoardPlaneSetView extends TilePane implements PlaneSetView {
         scrollPane.setContent(this);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         prefWidthProperty().bind(scrollPane.widthProperty());
+        
+        
 
+    }
+
+    public void bindProject(Project project) {
+
+        if (this.project == null) {
+            
+            project.hasChangedProperty().addListener(this::onProjectChanged);
+            this.project = project;
+            
+        }
+
+    }
+
+    public void onProjectChanged(Observable obs, Boolean oldValue, Boolean newValue) {
+       updateCards();
     }
 
     public void onWidthModified(Observable obs, Number oldValue, Number newValue) {
@@ -109,14 +137,38 @@ public class DashBoardPlaneSetView extends TilePane implements PlaneSetView {
     @Override
     public void setCurrentPlaneSet(PlaneSet planeSet) {
         this.planeSet = planeSet;
+        bindProject(planeSet.getProjectDisplay().getProject());
+        updateCards();
+    }
 
-        getChildren().clear();
+    
+    
+    
+    private void updateCards() {
 
         for (ProjectCard card : projectCardList) {
-            getChildren().add(card.getContent());
-            new Thread(card.update(planeSet.getProjectDisplay().getProject())).start();
+            if (getChildren().contains(card.getContent()) == false && card.dismissed().getValue() == false) {
+                getChildren().add(card.getContent());
+            }
+            new Thread(card.update(project)).start();
+            
+            card.dismissed().addListener((obs,oldValue,newValue)->{
+                
+                if(newValue) {
+                    Animation t = Animations.ZOOMOUT.configure(card.getContent(), 300);
+                    t.setOnFinished(event->{
+                        getChildren().remove(card.getContent());
+                    });
+                    t.play();
+                }
+                else {
+                    getChildren().add(card.getContent());
+                    Animations.ZOOMIN.configure(card.getContent(), 300).play();
+                }
+            
+            });
+            
         }
-
     }
 
     @Override

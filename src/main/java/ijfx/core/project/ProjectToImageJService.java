@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -86,17 +87,20 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
 
     private final static Logger logger = ImageJFX.getLogger();
 
-    public Dataset convert(Project project, TreeItem<PlaneOrMetaData> root) {
+    public Dataset convert(TreeItem<PlaneOrMetaData> root) {
 
         TreeItem item = root;
 
         // getting the deepest level
+        
+        logger.info("Converting root "+root.getValue().getMetaData());
+        
         int deepest = TreeItemUtils.getDeepestLevel(root, 0);
         logger.info("Deepest tree level :  " + deepest);
         // the number of dimensions is equivalent to the number of level
         // in the tree + 2 for the X and Y axis
         long[] dims;
-
+        
         // if it's a leaf directly selected, there two dimensions
         if (deepest == 0) {
             dims = new long[2];
@@ -107,12 +111,14 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
             dims = new long[deepest + 2 - 1];
         }
 
+        logger.info("Dimensions "+Arrays.toString(dims));
+        
         // axes
         AxisType[] axes = new AxisType[dims.length];
 
         // getting a leaf to get the width
         PlaneDB leaf = getALeaf(root).getValue().getPlaneDB();
-
+        logger.info("Leaf found  :"+leaf);
         // preparing X and Y axis
         int width = leaf.getMetaDataSet().get(MetaData.WIDTH).getIntegerValue();
         int height = leaf.getMetaDataSet().get(MetaData.HEIGHT).getIntegerValue();
@@ -135,7 +141,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
                     if (axes[index + 2] != null) {
                         return;
                     }
-                    MetaData metadata = (MetaData) metadataItem.getValue();
+                    MetaData metadata = (MetaData) metadataItem.getValue().getMetaData();
 
                     if (metadata.getName().toLowerCase().contains("channel")) {
                         axes[index + 2] = Axes.CHANNEL;
@@ -148,6 +154,8 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
 
             }
         }
+        
+        
 
         for (int i = 0; i != dims.length; i++) {
             logger.info(String.format("Dimesion %d : %d", i, dims[i]));
@@ -163,7 +171,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         // if it's not a single plane
         if (deepest > 0) {
             TreeItemUtils.goThroughLevel(root, deepest - 1, child -> {
-                if (child.getChildren().size() == 1) {
+                if (child.getChildren().size() == 1 && child.getChildren().get(0).getValue().isPlane()) {
 
                     // caculating the dimensions indexes of the child
                     List<Long> indexes = getLeafValues(root, child);
@@ -198,7 +206,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         try {
 
             Plane plane = getPlane(planeDB.getFile(), planeDB.getPlaneIndex());
-            dataset.setPlane(planeIndex, getConvertedArray(pixelType, plane.getBytes()));
+            dataset.setPlaneSilently(planeIndex, getConvertedArray(pixelType, plane.getBytes()));
 
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, String.format("Couldn't extract plane %d from %s", planeIndex, planeDB.getFile().getName()));

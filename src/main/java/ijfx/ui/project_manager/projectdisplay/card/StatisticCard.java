@@ -38,6 +38,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import mongis.utils.FileButtonBinding;
 import org.scijava.plugin.Plugin;
@@ -46,7 +47,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ProjectCard.class, priority = 2.0)
+@Plugin(type = ProjectCard.class, priority = 10.0)
 public class StatisticCard extends BorderPane implements ProjectCard{
 
     public static final String NAME = "Settings & Stats";
@@ -86,7 +87,10 @@ public class StatisticCard extends BorderPane implements ProjectCard{
 
     @Override
     public Task<Boolean> update(Project project) {
-        return new ProjectUpdateTask(project, this::updateValues);
+        return new AsyncCallback<Project,Boolean>()
+                .setInput(project)
+                .run(this::updateValues);
+                
     }
 
     @Override

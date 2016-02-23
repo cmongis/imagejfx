@@ -26,7 +26,6 @@ import ijfx.core.project.Project;
 import ijfx.core.project.DefaultProjectManagerService;
 import ijfx.core.project.ProjectModifierService;
 import ijfx.core.project.ProjectToImageJService;
-import ijfx.ui.project_manager.project.ProjectViewModel;
 import ijfx.ui.project_manager.project.ProjectViewModelService;
 import ijfx.ui.project_manager.search.PopoverToggleButton;
 import ijfx.ui.main.Localization;
@@ -52,8 +51,15 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.notification.NotificationService;
+import ijfx.ui.project_manager.projectdisplay.DefaultPlaneSet;
+import ijfx.ui.project_manager.projectdisplay.PlaneOrMetaData;
+import ijfx.ui.project_manager.projectdisplay.PlaneSet;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplay;
+import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
+import ijfx.ui.project_manager.projectdisplay.ProjectTreeItem;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.TreeItem;
 
 /**
  *
@@ -90,6 +96,9 @@ public class BottomActionBar extends BorderPane implements UiPlugin {
     @Parameter
     UiContextService contextService;
 
+    @Parameter
+    ProjectDisplayService projectDisplayService;
+    
     @Parameter
     Context context;
 
@@ -146,8 +155,30 @@ public class BottomActionBar extends BorderPane implements UiPlugin {
 
     @FXML
     public void openSelection() {
-        ProjectViewModel projectViewModel = projectViewModelService.getViewModel(projectManager.getCurrentProject());
-        projectToImageJService.convert(projectManager.getCurrentProject(), projectViewModel.getCheckedChildren().get(0));
+        //ProjectViewModel projectViewModel = projectViewModelService.getViewModel(projectManager.getCurrentProject());
+        
+        ProjectDisplay display = projectDisplayService.getActiveProjectDisplay();
+        
+        String groupBy = display.getProject().groupByProperty().getValue();
+        if(groupBy == null) groupBy = display.getProject().getHierarchy().get(0);
+        
+        ProjectTreeItem projectTreeItem = display.getPlaneSet(ProjectDisplay.SELECTED_IMAGES).getRoot();
+        
+        
+        convert(projectTreeItem,groupBy);
+        
+        
+    }
+    
+    public void convert(TreeItem<PlaneOrMetaData> item, String groupBy) {
+        if(item.getValue() != null && item.getValue().getMetaData().getName().equals(groupBy)) {
+            projectToImageJService.convert(item);
+        }
+        else {
+            for(TreeItem<PlaneOrMetaData> child : item.getChildren()) {
+                convert(child,groupBy);
+            }
+        }
     }
 
     @FXML

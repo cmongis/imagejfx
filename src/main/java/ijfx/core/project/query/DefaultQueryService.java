@@ -30,6 +30,7 @@ import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.ProjectModifierService;
 import ijfx.core.project.command.AddMetaDataCommand;
 import ijfx.core.project.command.Command;
+import ijfx.core.project.command.CommandList;
 import ijfx.core.project.command.EnableAnnotationRuleCommand;
 import ijfx.core.project.command.Invoker;
 import ijfx.core.project.command.ModifyMetaDataCommand;
@@ -43,9 +44,11 @@ import ijfx.core.project.query.tree.SelectorNode;
 import ijfx.ui.main.ImageJFX;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import mercury.core.MercuryTimer;
@@ -250,6 +253,18 @@ public class DefaultQueryService extends AbstractService implements QueryService
         return ImageJFX.getLogger();
     }
 
+    @Override
+    public void applyAnnotationRule(Project project, AnnotationRule rule) {
+        List<Command> commands = query(project, rule.getSelector(), false)
+                .stream()
+                .map(plane->rule.getModifier().getModifyingCommand(plane))
+                .collect(Collectors.toList());
+        
+        project.getInvoker().executeCommand(new CommandList(commands));
+        
+        
+    }
+
     public class QueryStart extends SciJavaEvent {
 
     }
@@ -350,5 +365,7 @@ public class DefaultQueryService extends AbstractService implements QueryService
     public int getNbOfAnnotatedPlane() {
         return nbAutamaticallyAnnotatedPlane;
     }
+    
+    
 
 }

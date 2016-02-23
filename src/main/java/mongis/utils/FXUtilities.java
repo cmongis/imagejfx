@@ -100,8 +100,10 @@ public class FXUtilities {
     }
 
     public static void emptyPane(Pane pane) {
-        
-        if(pane == null) return;
+
+        if (pane == null) {
+            return;
+        }
         for (Node child : pane.getChildren()) {
             if (child instanceof Pane) {
                 emptyPane((Pane) child);
@@ -213,31 +215,31 @@ public class FXUtilities {
         loader.setResources(ImageJFX.getResourceBundle());
         loader.setLocation(rootController.getClass().getResource(location));
         loader.setClassLoader(rootController.getClass().getClassLoader());
-        
+
         loader.load();
 
         URL css
                 = rootController.getClass().getResource(rootController.getClass().getSimpleName() + ".css");
-
+        System.out.println(css);
         try {
             if (css != null) {
-                
+
                 // gets the root of the loader
                 Node root = loader.getRoot();
-                
+
                 // get the url of the css
                 String url = css.toExternalForm();
-                
+
                 // going through the list to check if there is an existing URL
                 String existingURL = root.getScene()
                         .getStylesheets()
                         .stream()
-                        .filter(str->str.equals(url))
+                        .filter(str -> str.equals(url))
                         .findFirst().orElse(null);
-                
+
                 // if there is, it's deleted from the list to update the Scene with
                 // possible modification
-                if(existingURL != null) {
+                if (existingURL != null) {
                     root.getScene().getStylesheets().remove(existingURL);
                 }
                 root.getScene().getStylesheets().add(css.toExternalForm());
@@ -246,6 +248,22 @@ public class FXUtilities {
             Logger.getGlobal().log(Level.WARNING, "Couldn't load CSS", e);
         }
 
+    }
+
+    public static void injectFXMLSafe(final Object controller) throws IOException {
+        try {
+        runAndWait(() -> {
+            try {
+                injectFXML(controller);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        }
+        catch(Exception e) {
+            Logger.getGlobal().log(Level.WARNING, "Couldn't load CSS", e);
+        }
+        
     }
 
     public static String javaClassToName(String className) {
@@ -437,15 +455,10 @@ public class FXUtilities {
 
         changingList.addListener((ListChangeListener.Change<? extends T> c) -> {
 
-
             while (c.next()) {
-
-
 
                 listToUpdate.removeAll(c.getRemoved());
                 listToUpdate.addAll(c.getAddedSubList());
-                
-                
 
             }
         });

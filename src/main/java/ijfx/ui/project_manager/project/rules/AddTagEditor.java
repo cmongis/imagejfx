@@ -26,10 +26,12 @@ import ijfx.core.project.modifier.AddTagModifier;
 import ijfx.core.project.modifier.ModifierPlugin;
 import ijfx.service.ui.SuggestionService;
 import ijfx.ui.project_manager.project.TagCompletionCallback;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -41,8 +43,8 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ModifierEditorWidget.class)
-public class AddTagEditor extends VBox implements ModifierEditorWidget {
+@Plugin(type = ModifierEditor.class)
+public class AddTagEditor extends VBox implements ModifierEditor {
 
     ObjectProperty<ModifierPlugin> editedModifierProperty = new SimpleObjectProperty<>();
 
@@ -62,10 +64,10 @@ public class AddTagEditor extends VBox implements ModifierEditorWidget {
 
     public AddTagEditor() {
         super();
-        
-        getChildren().add(textField);
-        
-        
+        Label label = new Label("Type the tags you want to add",new FontAwesomeIconView(FontAwesomeIcon.TAGS));
+        label.getStyleClass().addAll("in-between");
+        textField.setPromptText("e.g. modified, control,good,bad");
+        getChildren().addAll(label,textField);
     }
 
     
@@ -85,7 +87,7 @@ public class AddTagEditor extends VBox implements ModifierEditorWidget {
             TextFields.bindAutoCompletion(textField, completionCallback);
             
             listView.setItems(suggestionService.getPossibleTagsAutoupdatedList());
-            
+           textField.textProperty().addListener(this::onTextEdited);
         }
     }
 
@@ -108,7 +110,7 @@ public class AddTagEditor extends VBox implements ModifierEditorWidget {
     }
 
     @Override
-    public Property<ModifierPlugin> editerModifierPluginProperty() {
+    public Property<ModifierPlugin> editedModifierPluginProperty() {
         return editedModifierProperty;
     }
 
@@ -120,6 +122,10 @@ public class AddTagEditor extends VBox implements ModifierEditorWidget {
     @Override
     public String phraseMe() {
         return "Add tags";
+    }
+    
+    private void onTextEdited(Observable value, String oldValue, String newValue) {
+        editedModifierProperty.setValue(new AddTagModifier(newValue));
     }
 
 }

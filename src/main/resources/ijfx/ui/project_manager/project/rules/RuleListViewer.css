@@ -15,30 +15,10 @@
     along with ImageJ FX.  If not, see <http://www.gnu.org/licenses/>. 
     
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
-	
- */
-package ijfx.ui.project_manager.project.rules;
+        
+*//* 
+   Created on : Feb 18, 2016, 5:10:06 PM
+   Author     : cyril
+*/
 
-import ijfx.core.project.modifier.ModifierPlugin;
-import ijfx.core.project.query.Phrasable;
-import javafx.beans.property.Property;
-import javafx.scene.Node;
-import org.scijava.plugin.SciJavaPlugin;
 
-/**
- *
- * @author cyril
- */
-public interface ModifierEditor extends Phrasable,SciJavaPlugin {
-    
-    public ModifierPlugin create();
-    
-    public boolean configure(ModifierPlugin modifier);
-    
-    public Node getNode();
-    
-    Property<ModifierPlugin> editedModifierPluginProperty();
-    
-    public Node getIcon();
-    
-}

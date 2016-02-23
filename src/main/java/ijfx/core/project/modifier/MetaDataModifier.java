@@ -86,12 +86,14 @@ public class MetaDataModifier implements ModifierPlugin{
         return value;
     }
 
-    public void setKeyName(String keyName) {
+    public MetaDataModifier setKeyName(String keyName) {
         this.keyName = keyName;
+        return this;
     }
 
-    public void setValue(String value) {
+    public MetaDataModifier setValue(String value) {
         this.value = value;
+        return this;
     }
     
     

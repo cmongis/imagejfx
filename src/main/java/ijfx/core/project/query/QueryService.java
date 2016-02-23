@@ -102,7 +102,8 @@ public interface QueryService extends ImageJService{
      * during the first time.
      */
     boolean applyAnnotationRules(Project project, PlaneDB plane);
-
+    
+    
     /**
      *
      * @param project The project that contains the planes. The annotation rules
@@ -111,10 +112,14 @@ public interface QueryService extends ImageJService{
      */
     void applyAnnotationRules(Project project, List<PlaneDB> planes);
 
+    
+    
     List<Command> applyAnnotationRulesCommand(Project project, List<PlaneDB> planes);
 
     void enableAnnotationRule(Project project, AnnotationRule rule, boolean enable);
 
+    void applyAnnotationRule(Project project, AnnotationRule rule);
+    
     /**
      * Gives the number of modified plane by the last call any modifying
      * function

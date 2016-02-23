@@ -43,7 +43,18 @@ public class AddTagModifier implements ModifierPlugin {
     
     public static final Pattern TAG_MODIFIER_PATTERN = Pattern.compile("add tags:(.*)");
     public static final String TAG_SEPARATOR = ",";
-    public static final String PHRASE = "adds the tags %s";
+    public static final String PHRASE = "adds the tag(s) *%s*";
+    public static String PHRASE_TAG_SEPARATOR = "*, *";
+    
+    
+    public AddTagModifier() {
+        
+    }
+    
+    public AddTagModifier(String tags) {
+        this.tags = Arrays.asList(tags.split(TAG_SEPARATOR));
+    }
+    
     @Override
     public boolean configure(String query) {
         
@@ -77,7 +88,8 @@ public class AddTagModifier implements ModifierPlugin {
 
     @Override
     public String phraseMe() {
-       return String.format(PHRASE,String.join(TAG_SEPARATOR, tags));
+        if(tags == null) return "";
+       return String.format(PHRASE,String.join(PHRASE_TAG_SEPARATOR, tags));
     }
     
 }

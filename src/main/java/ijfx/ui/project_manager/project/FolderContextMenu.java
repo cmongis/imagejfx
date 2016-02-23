@@ -63,7 +63,7 @@ public class FolderContextMenu extends ContextMenu {
     }
     
     public void open(ActionEvent evnt) {
-        imageJService.convert(project, item);
+        imageJService.convert(item);
     }
     
     

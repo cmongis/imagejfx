@@ -32,11 +32,13 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
+
 public class ProjectCardContainer extends BorderPane implements ProjectCard{
 
     

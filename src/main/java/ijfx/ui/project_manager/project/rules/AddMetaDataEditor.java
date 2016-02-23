@@ -30,10 +30,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -47,8 +49,8 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ModifierEditorWidget.class)
-public class AddMetaDataEditor extends HBox implements ModifierEditorWidget {
+@Plugin(type = ModifierEditor.class)
+public class AddMetaDataEditor extends HBox implements ModifierEditor {
 
     TextField keyNameTextField = new TextField();
 
@@ -72,9 +74,17 @@ public class AddMetaDataEditor extends HBox implements ModifierEditorWidget {
         keyNameTextField.getStyleClass().add("half-button-left");
         menuButton.getStyleClass().add("half-button-right");
 
-        FontAwesomeIconView view = new FontAwesomeIconView(FontAwesomeIcon.ARROW_LEFT);
-
-        getChildren().addAll(keyNameTextField, menuButton, view, valueNameTextField);
+        keyNameTextField.setPromptText("e.g. Well");
+        valueNameTextField.setPromptText("e.g. A12");
+        
+        FontAwesomeIconView view = new FontAwesomeIconView(FontAwesomeIcon.ARROW_RIGHT);
+        
+        Label label = new Label(null,view);
+        label.getStyleClass().addAll("in-between","warning");
+        getChildren().addAll(keyNameTextField, menuButton, label, valueNameTextField);
+        
+        keyNameTextField.textProperty().addListener(this::notifyChange);
+        valueNameTextField.textProperty().addListener(this::notifyChange);
 
     }
 
@@ -146,7 +156,7 @@ public class AddMetaDataEditor extends HBox implements ModifierEditorWidget {
     }
 
     @Override
-    public Property<ModifierPlugin> editerModifierPluginProperty() {
+    public Property<ModifierPlugin> editedModifierPluginProperty() {
         return plugin;
     }
 
@@ -163,6 +173,18 @@ public class AddMetaDataEditor extends HBox implements ModifierEditorWidget {
     @Override
     public ModifierPlugin create() {
         return new MetaDataModifier();
+    }
+    
+    public void notifyChange(Observable value, String oldValue, String newValue) {
+       
+        
+        plugin.setValue(new MetaDataModifier()
+                .setKeyName(keyNameTextField.getText())
+                .setValue(valueNameTextField.getText()));
+        
+        
+        
+        
     }
 
 }

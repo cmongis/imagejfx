@@ -26,6 +26,7 @@ import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.core.project.query.QueryService;
 import ijfx.core.project.query.Selector;
+import ijfx.ui.RichMessageDisplayer;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.project_manager.projectdisplay.DefaultPlaneSet;
 import ijfx.ui.project_manager.projectdisplay.PlaneSet;
@@ -86,8 +87,7 @@ public class SearchBar extends HBox implements SearchHandler {
 
     PopOver searchPopOver;
 
-    private static final String CSS_URL = ImageJFX.class.getResource("/web/css/bijou.min.css").toExternalForm();
-    private static final String CSS_HEADER = "<html><head><link rel='stylesheet' href='%s'/></head><body style='padding:10px;margin:0'>Matches all the planes that<br><b> - %s</b></body></html>";
+    RichMessageDisplayer richMessageDisplayer;
 
     public SearchBar(Context context) {
 
@@ -123,6 +123,9 @@ public class SearchBar extends HBox implements SearchHandler {
          */
         Platform.runLater(() -> {
             webView = new WebView();
+            richMessageDisplayer = new RichMessageDisplayer(webView);
+            richMessageDisplayer.addStringProcessor(RichMessageDisplayer.BACKLINE_ANDS_AND_ORS);
+            richMessageDisplayer.addStringProcessor(RichMessageDisplayer.COLOR_IMPORTANT_WORDS);
             searchPopOver = new PopOver(webView);
             webView.getStyleClass().add("rich-message");
             webView.setPrefWidth(500);
@@ -175,9 +178,8 @@ public class SearchBar extends HBox implements SearchHandler {
         if (searchPopOver.showingProperty().getValue()== false) {
             searchPopOver.show(searchTextField);
         }
-        System.out.println(CSS_URL);
-        System.out.println(ImageJFX.class.getResource("/web/css/bijou.min.css").toExternalForm());
-        webView.getEngine().loadContent(String.format(CSS_HEADER, ImageJFX.class.getResource("/web/css/bijou.min.css").toExternalForm(),selector.phraseMe()));
+       
+        richMessageDisplayer.setMessage("Find all planes where :<br><br>"+selector.phraseMe());
         QueryTask task = new QueryTask(selector);
         task.setOnSucceeded(event -> {
 

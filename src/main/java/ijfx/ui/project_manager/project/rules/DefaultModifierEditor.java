@@ -20,9 +20,7 @@
 package ijfx.ui.project_manager.project.rules;
 
 import ijfx.core.project.modifier.ModifierPlugin;
-import ijfx.ui.UiConfiguration;
-import ijfx.ui.UiPlugin;
-import ijfx.ui.main.Localization;
+import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,34 +30,35 @@ import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "modifier", localization = Localization.BOTTOM_CENTER, context = "debug")
-public class DefaultModifierEditor extends BorderPane implements ModifierEditor, UiPlugin {
+public class DefaultModifierEditor extends BorderPane implements ModifierSelector<Node> {
 
     @Parameter
     PluginService pluginService;
 
-    Collection<ModifierEditorWidget> modifierWidgetList = new ArrayList<>();
+    Collection<ModifierEditor> modifierWidgetList = new ArrayList<>();
 
     Property<ModifierPlugin> editedModifier = new SimpleObjectProperty<>();
 
-    Property<ModifierEditorWidget> widget = new SimpleObjectProperty<>();
+    Property<ModifierEditor> widget = new SimpleObjectProperty<>();
 
     ToggleGroup group = new ToggleGroup();
 
@@ -69,9 +68,13 @@ public class DefaultModifierEditor extends BorderPane implements ModifierEditor,
     @FXML
     BorderPane borderPane;
 
+   Logger logger = ImageJFX.getLogger();
+    
     public DefaultModifierEditor() {
         try {
             FXUtilities.injectFXML(this);
+            flowPane.getStyleClass().add("flow-pane");
+            
         } catch (IOException ex) {
             Logger.getLogger(DefaultModifierEditor.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -80,7 +83,7 @@ public class DefaultModifierEditor extends BorderPane implements ModifierEditor,
 
     @Override
     public void afterContextInjection() {
-        modifierWidgetList.addAll(pluginService.createInstancesOfType(ModifierEditorWidget.class));
+        modifierWidgetList.addAll(pluginService.createInstancesOfType(ModifierEditor.class));
 
         createToggle(flowPane.getChildren());
 
@@ -92,10 +95,17 @@ public class DefaultModifierEditor extends BorderPane implements ModifierEditor,
     }
 
     public void createToggle(Collection<Node> nodes) {
-        for (ModifierEditorWidget widget : modifierWidgetList) {
+        for (ModifierEditor widget : modifierWidgetList) {
+            try {
             System.out.println("Adding widget " + widget.phraseMe());
             widget.getIcon().getStyleClass().add("big-icon");
-            ToggleButton toggleButton = new ToggleButton(widget.phraseMe(), widget.getIcon());
+            VBox vbox = new VBox();
+            vbox.setAlignment(Pos.CENTER);
+            Label label = new Label(widget.phraseMe());
+            label.setTextAlignment(TextAlignment.CENTER);
+            label.setWrapText(true);
+            vbox.getChildren().addAll(widget.getIcon(),label);
+            ToggleButton toggleButton = new ToggleButton(null, vbox);
 
             toggleButton.setUserData(widget);
             toggleButton.setContentDisplay(ContentDisplay.TOP);
@@ -103,19 +113,25 @@ public class DefaultModifierEditor extends BorderPane implements ModifierEditor,
             toggleButton.getStyleClass().add("square");
             group.getToggles().add(toggleButton);
             nodes.add(toggleButton);
+            }
+            catch(Exception e) {
+                logger.log(Level.SEVERE, "Error when initializing ModifierEditor", e);
+            }
         }
     }
 
     public void onModifierChanged(Observable obs, ModifierPlugin oldValue, ModifierPlugin newValue) {
-
-        ModifierEditorWidget modifierEditor = null;
+         System.out.println("***It changed !");
+        ModifierEditor modifierEditor = null;
         if (newValue != null) {
             modifierEditor = modifierWidgetList.stream().filter(editor -> editor.configure(newValue)).findFirst().orElse(null);
+            //richMessageDisplayer.setMessage(modifierEditor.editedModifierPluginProperty().getValue().phraseMe());
         }
         if (modifierEditor == null) {
             System.out.println("No Editor for this type of plugin " + newValue.phraseMe());
             return;
         }
+       
 
         widget.setValue(modifierEditor);
         modifierEditor.configure(newValue);
@@ -130,16 +146,19 @@ public class DefaultModifierEditor extends BorderPane implements ModifierEditor,
 
             return;
         };
-        ModifierEditorWidget widget = (ModifierEditorWidget) newValue.getUserData();
+        ModifierEditor widget = (ModifierEditor) newValue.getUserData();
 
         editedModifier.unbind();
         if (editedModifier.getValue() == null || !widget.configure(editedModifier.getValue())) {
             System.out.println("creating");
             editedModifier.setValue(widget.create());
             widget.configure(editedModifier.getValue());
+            widget.editedModifierPluginProperty().setValue(editedModifier.getValue());
+            
         }
-
-        editedModifier.bind(widget.editerModifierPluginProperty());
+        
+        editedModifier.bind(widget.editedModifierPluginProperty());
+        System.out.println(widget.editedModifierPluginProperty().getValue());
         borderPane.setCenter(widget.getNode());
 
     }
@@ -159,8 +178,8 @@ public class DefaultModifierEditor extends BorderPane implements ModifierEditor,
         }
     }
 
-    public ModifierEditorWidget getWidgetFromToggle(Toggle toggle) {
-        return (ModifierEditorWidget) toggle.getUserData();
+    public ModifierEditor getWidgetFromToggle(Toggle toggle) {
+        return (ModifierEditor) toggle.getUserData();
     }
 
     @Override
@@ -175,12 +194,6 @@ public class DefaultModifierEditor extends BorderPane implements ModifierEditor,
 
     @Override
     public Node getUiElement() {
-        return this;
-    }
-
-    @Override
-    public UiPlugin init() {
-        afterContextInjection();
         return this;
     }
 
