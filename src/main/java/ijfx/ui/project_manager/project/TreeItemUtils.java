@@ -58,6 +58,13 @@ public class TreeItemUtils {
         }
     }
     
+    public static <T> TreeItem<? extends T> findFirstLeaf(TreeItem<? extends T> root) {
+        while(root.isLeaf() == false) {
+            root = root.getChildren().get(0);
+        }
+        return root;
+    }
+    
     // count all item on a certain level
     public static int countItemOnLevel(TreeItem<TreeItem> root, int level) {
         SimplerCounter counter = new SimplerCounter();

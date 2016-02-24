@@ -50,4 +50,7 @@ public interface PlaneSet<T> {
     
     public ProjectDisplay getProjectDisplay();
     
+    public void previousItem();
+    public void nextItem();
+    
 }

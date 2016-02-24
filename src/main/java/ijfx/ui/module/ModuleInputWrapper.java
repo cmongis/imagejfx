@@ -71,7 +71,8 @@ public class ModuleInputWrapper<T extends Object> implements Input{
 
     @Override
     public boolean multipleChoices() {
-        return moduleItem.getChoices().size() > 0;
+        
+        return moduleItem.getChoices() != null && moduleItem.getChoices().size() > 0;
     }
 
     @Override

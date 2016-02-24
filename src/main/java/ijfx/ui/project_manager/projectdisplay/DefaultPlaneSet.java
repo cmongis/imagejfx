@@ -22,6 +22,8 @@ package ijfx.ui.project_manager.projectdisplay;
 import ijfx.core.project.Project;
 import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.project_manager.project.TreeItemUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javafx.beans.property.Property;
@@ -29,6 +31,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 import mercury.core.MercuryTimer;
 
 /**
@@ -48,6 +51,8 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
     private final ProjectDisplay projectDisplay;
 
     Logger logger = ImageJFX.getLogger();
+    
+    List<TreeItem<? extends PlaneOrMetaData>> leaveList;
     
     public DefaultPlaneSet(ProjectDisplay projectDisplay) {
         
@@ -76,6 +81,10 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
        setCurrentItem(getRoot());
         
     }
+    
+    public DefaultPlaneSet(String name, ProjectDisplay projectDisplay, List<PlaneDB> planes) {
+        this(name,projectDisplay,FXCollections.observableArrayList(planes));
+    }
 
     private void onListChanged(ListChangeListener.Change<? extends PlaneDB> change) {
         
@@ -88,6 +97,8 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
              ImageTreeService.removePlanes(change.getRemoved(), getRoot());
              
              ImageTreeService.deleteEmptyNodes(getRoot());
+             
+             buildItemOrder();
         }
         
     }
@@ -172,5 +183,31 @@ public class DefaultPlaneSet implements PlaneSet<PlaneDB>{
         return String.format("%s : %d",getName(),getPlaneList().size());
     }
     
+    public void previousItem() {
+        
+        setCurrentItem((ProjectTreeItem)leaveList.get(getCurrentItemIndex()-1));
+    }
     
+    public int getCurrentItemIndex() {
+        
+        System.out.println(leaveList.size());
+        if(getCurrentItem().isLeaf() == false) {
+            setCurrentItem((ProjectTreeItem)TreeItemUtils.findFirstLeaf(getCurrentItem()));
+        }
+        
+        int index = leaveList.indexOf(getCurrentItem());
+        if(index <= 0) index = 0;
+        if(index >= leaveList.size()-1) index = leaveList.size()-1;
+        return index;
+    }
+    
+    public void nextItem() {
+         setCurrentItem((ProjectTreeItem)leaveList.get(getCurrentItemIndex()+1));
+    }
+    
+    private void buildItemOrder() {
+        leaveList = new ArrayList<>();
+        TreeItemUtils.goThroughLeaves(getRoot(), leaf->leaveList.add(leaf));
+        
+    }
 }

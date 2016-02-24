@@ -149,21 +149,6 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
         }
     };
 
-    /*
-    ListChangeListener<String> tagListener = new ListChangeListener<String>() {
-
-        @Override
-        public void onChanged(ListChangeListener.Change<? extends String> c) {
-
-            while (c.next()) {
-
-                //suggestionsListView.getItems().add(c.getAddedSubList());
-                updateSuggestions();
-            }
-
-        }
-    };*/
-
     public SingleImageViewPane(Context context) {
         super();
 
@@ -211,9 +196,9 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
         imageStackPane.widthProperty().addListener((obs, o, n) -> {
 
         });
-        
+
         suggestionsListView.setItems(suggestionService.getPossibleTagsAutoupdatedList());
-        
+
         //widthProperty().addListener((obj, old, nw) -> canvas.repaint());
     }
 
@@ -251,19 +236,13 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
         return projectService.getCurrentProject();
     }
 
-    public void onTreeItemChanged(Observable observable, TreeItem<PlaneOrMetaData> oldValue, TreeItem<PlaneOrMetaData> newValue) {
+    private void onTreeItemChanged(Observable observable, TreeItem<PlaneOrMetaData> oldValue, TreeItem<PlaneOrMetaData> newValue) {
 
-        if (newValue == null || newValue.getValue() == null) {
+        if (newValue == null) {
             return;
         }
-
-        System.out.println(newValue);
-        while (newValue.isLeaf() == false && newValue.getValue().isPlane() == false) {
-            System.out.println(newValue.isLeaf());
-            System.out.println(newValue.getValue().isPlane());
-
+        while (newValue.isLeaf() == false) {
             newValue = newValue.getChildren().get(0);
-
         }
 
         stopListeningPlaneDB(currentPlane);
@@ -300,6 +279,7 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
     @FXML
     public void nextImage() {
         //viewModel.nextImage();
+        planset.previousItem();
     }
 
     @FXML
