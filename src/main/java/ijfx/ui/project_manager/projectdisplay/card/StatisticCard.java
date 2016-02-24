@@ -52,9 +52,9 @@ public class StatisticCard extends BorderPane implements ProjectCard{
 
     public static final String NAME = "Settings & Stats";
     
-    public static final String FILE_NUMBER = "%d different files";
+    public static final String FILE_NUMBER = "%d";
     
-    public static final String PLANE_NUMBER = "%d planes";
+    public static final String PLANE_NUMBER = "%d";
     
     ObjectProperty<File> saveFolder;
     
