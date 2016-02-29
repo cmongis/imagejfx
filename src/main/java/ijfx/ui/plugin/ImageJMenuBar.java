@@ -30,8 +30,6 @@ import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import net.imagej.legacy.LegacyService;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
 import org.scijava.menu.MenuService;
@@ -52,8 +50,8 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
     @Parameter
     MenuService menuService;
 
-    @Parameter
-    LegacyService legacyService;
+    //@Parameter
+    //LegacyService legacyService;
 
     @Parameter
     ModuleService moduleService;
@@ -92,6 +90,8 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
         
         
         if(true) return this;
+        
+        /*
         ij1PluginService.getCommandListFromMenu().forEach(command -> {
 
             try {
@@ -110,7 +110,7 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
                 e.printStackTrace();
             }
         });
-
+        */
         return this;
 
     }

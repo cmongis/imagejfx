@@ -1,0 +1,11 @@
+[
+    {
+        "target":"#workflowEditor"
+        ,"text":"Each time you use a ImageJ module, it will be displayed in this panel."
+        
+    }
+    ,{
+        "target":"#workflowToolbar"
+        ,"text":"You can use these buttons to re-run all the actions with different parameters, or import/export then as workflows."
+    }
+]

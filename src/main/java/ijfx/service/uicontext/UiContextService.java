@@ -306,7 +306,7 @@ public class UiContextService extends AbstractService implements UiContextManage
         try {
             resultJson = mapper.writeValueAsString(uiContextMap.values());
         } catch (JsonProcessingException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when exporting context configuration.",ex);;
         }
 
         return resultJson;

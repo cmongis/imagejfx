@@ -20,7 +20,6 @@
  */
 package ijfx.service.ui;
 
-import ij.ImagePlus;
 import ij.Menus;
 import java.awt.Menu;
 import java.awt.MenuItem;
@@ -29,9 +28,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.imagej.ImageJService;
-import net.imagej.display.ImageDisplay;
-import net.imagej.legacy.LegacyImageMap;
-import net.imagej.legacy.LegacyService;
 import org.scijava.display.DisplayService;
 import org.scijava.options.OptionsService;
 import org.scijava.plugin.Parameter;
@@ -46,8 +42,8 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class ImageJ1PluginService extends AbstractService implements ImageJService{
 
-    @Parameter
-    LegacyService legacyService;
+    //@Parameter
+   // LegacyService legacyService;
 
     @Parameter
     OptionsService optionsService;
@@ -143,7 +139,7 @@ public class ImageJ1PluginService extends AbstractService implements ImageJServi
         }
         return null;
     }
-
+    /*
     public void executeCommand(ImageJCommand command) {
         
         if(!legacyService.isSyncEnabled()) {
@@ -182,7 +178,7 @@ public class ImageJ1PluginService extends AbstractService implements ImageJServi
             legacyService.runLegacyCommand(command.getCommand(), "");
         }
         //legaxcyService.runLegacyCompatibleCommand(command.getCommand());
-    }
+    }*/
 
     Pattern cmdPattern = Pattern.compile("(.*)\\(\"(.*)\"\\)");
 

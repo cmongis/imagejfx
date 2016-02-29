@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javafx.animation.SequentialTransition;
@@ -200,7 +201,7 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
         try {
             lock.lockInterruptibly();
         } catch (InterruptedException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
     }
 

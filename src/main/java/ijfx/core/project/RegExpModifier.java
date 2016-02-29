@@ -31,6 +31,7 @@ import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -120,7 +121,7 @@ public class RegExpModifier implements ModifierPlugin{
      
             } catch (IOException ex) {
                 setValidSyntax(false);
-                ImageJFX.getLogger();
+                ImageJFX.getLogger().log(Level.WARNING,null,ex);;
             }
                 
                 

@@ -22,6 +22,10 @@
             <id>imagej.releases</id>
             <url>http://maven.imagej.net/content/repositories/releases/</url>
         </repository>
+        <repository>
+            <id>imagej.snapshots</id>
+            <url>http://maven.imagej.net/content/repositories/snapshots</url>
+        </repository>
         <!-- NB: for project parent -->
         <repository>
             <id>ome.releases</id>
@@ -37,7 +41,7 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej</artifactId>
-            <version>2.0.0-rc-44</version>
+            <version>2.0.0-rc-45-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
@@ -60,6 +64,24 @@
             <version>0.5.2</version>
         </dependency>
         <dependency>
+            <groupId>net.imglib2</groupId>
+            <artifactId>imglib2-ij</artifactId>
+            <version>2.0.0-beta-31</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scijava</groupId>
+            <artifactId>scijava-plugins-commands</artifactId>
+            <version>0.2.2</version>
+        </dependency>
+        <!--
+         <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>imagej-deprecated</artifactId>
+            <version>0.1.1</version>
+            
+        </dependency>
+        -->
+        <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-bsd</artifactId>
             <version>5.1.8</version>
@@ -72,7 +94,7 @@
         <dependency>
             <groupId>de.jensd</groupId>
             <artifactId>fontawesomefx</artifactId>
-            <version>8.9</version>
+            <version>8.5</version>
         </dependency>
         
         <dependency>

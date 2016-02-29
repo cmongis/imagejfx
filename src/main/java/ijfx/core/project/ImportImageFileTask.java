@@ -208,7 +208,7 @@ public class ImportImageFileTask extends Task<Command> {
     }
 
     private void warnFileNotLoaded(File file, String message) {
-        ImageJFX.getLogger();
+        ImageJFX.getLogger().warning("File no imported for some reason : "+file.getAbsolutePath());
         String warning = rb.getString("fileNotImported") + " : " + file.getName()
                 + ".\t" + rb.getString("reason") + " : " + message;
         updateMessage(warning);
@@ -227,17 +227,11 @@ public class ImportImageFileTask extends Task<Command> {
     @Override
     protected void updateMessage(String message) {
         super.updateMessage(message);
-        ImageJFX.getLogger();
+        //ImageJFX.getLogger();
        // sleep(MESSAGE_SLEEP_TIME);
     }
 
-    private void sleep(int milliSecond) {
-        try {
-            Thread.sleep(milliSecond);
-        } catch (InterruptedException ex) {
-            ImageJFX.getLogger();
-        }
-    }
+    
     
     public Logger logger() {
         if(logger == null) {

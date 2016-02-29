@@ -22,6 +22,7 @@ package mongis.utils;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -107,6 +108,7 @@ public class TaskButtonBinding {
 
     public TaskButtonBinding setBaseIcon(FontAwesomeIcon baseIcon) {
         this.baseIcon = baseIcon;
+        button.setGraphic(new FontAwesomeIconView(baseIcon));
         return this;
     }
 
@@ -146,6 +148,7 @@ public class TaskButtonBinding {
 
     public TaskButtonBinding setTextBeforeTask(String initialText) {
         this.textBeforeTask = initialText;
+        button.setText(initialText);
         return this;
     }
 

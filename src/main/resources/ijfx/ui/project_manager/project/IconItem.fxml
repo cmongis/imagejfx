@@ -10,7 +10,7 @@
    <bottom>
       <BorderPane fx:id="bottomPane" BorderPane.alignment="CENTER">
          <center>
-            <Label fx:id="itemLabel" text="Label" BorderPane.alignment="CENTER" />
+            <Label fx:id="itemLabel" maxWidth="1.7976931348623157E308" text="Label" wrapText="true" BorderPane.alignment="CENTER" />
          </center>
          <left>
             <CheckBox fx:id="checkBox" mnemonicParsing="false" BorderPane.alignment="CENTER" />

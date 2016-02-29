@@ -405,7 +405,7 @@ public class AngularBinder {
                 }
                 catch(Exception ex) {
                     getJsMessageList().add(new LogEntry(ex).setTitle(ACTION_EXECUTION_ERROR.format(actionName)));
-                    ImageJFX.getLogger();
+                    ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
                 }
                 finally {
                     return;

@@ -23,9 +23,10 @@ package ijfx.ui.tool;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import org.controlsfx.glyphfont.Glyph;
+import javafx.scene.layout.StackPane;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -66,7 +67,7 @@ public class PolygonTool extends AbstractPathTool {
     public void onClick(MouseEvent event) {
         
         
-        
+       
         elongPath(event, polygonPath);
         
         if(event.getButton() == MouseButton.SECONDARY) {
@@ -76,6 +77,10 @@ public class PolygonTool extends AbstractPathTool {
             event.consume();
             return;
         }
+        
+        Button label = new Button("Press right click to end tracing");
+       
+        
         
         elongPath(event, polygonPath);
       
@@ -108,4 +113,11 @@ public class PolygonTool extends AbstractPathTool {
     public void onActivated() {
         polygonPath = new FxPath();
     }
+    
+    private StackPane getContainer() {
+        return (StackPane)getCanvas().getParent();
+    }
+    
+    
+    
 }

@@ -20,6 +20,7 @@
  */
 package ijfx.bridge;
 
+import com.sun.javafx.tk.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -108,14 +109,14 @@ public class FxStatusBar implements StatusBar {
     
     @Override
     public void setStatus(String string) {
-
+        
         Platform.runLater(() -> statusProperty.setValue(string));
 
     }
 
     @Override
     public void setProgress(int i, int i1) {
-        Platform.runLater(() -> progressProperty.setValue(1.0 * i / i1));
+       Platform.runLater(() -> progressProperty.setValue(1.0 * i / i1));
     }
 
     public StringProperty statusProperty() {

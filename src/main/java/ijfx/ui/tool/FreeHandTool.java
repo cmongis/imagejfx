@@ -28,11 +28,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import net.imagej.axis.AxisType;
-
-import net.imagej.legacy.LegacyService;
 import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.RealPoint;
+import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.util.ColorRGB;
@@ -46,9 +44,11 @@ public class FreeHandTool extends AbstractPathTool {
 
     
     
-   @Parameter
-   LegacyService legacyService;
+  // @Parameter
+   //LegacyService legacyService;
     
+    @Parameter
+    Context context;
     
     @Override
     public void beforeDrawing(FxPath path) {
@@ -81,7 +81,7 @@ public class FreeHandTool extends AbstractPathTool {
         ArrayList<Point2D> pathOnImage = path.getPathOnImage();
         
         
-        PolygonOverlay overlay = new PolygonOverlay(legacyService.getContext());
+        PolygonOverlay overlay = new PolygonOverlay(context);
         
         overlay.setName("new overlay");
         overlay.setFillColor(new ColorRGB(244,14,14));

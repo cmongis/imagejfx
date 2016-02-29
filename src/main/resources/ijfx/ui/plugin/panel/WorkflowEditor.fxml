@@ -15,7 +15,7 @@
                 <HBox alignment="TOP_RIGHT" styleClass="hbox" BorderPane.alignment="CENTER" />
             </top>
             <bottom>
-                <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                <ToolBar fx:id="workflowToolbar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <items>
                         <Button mnemonicParsing="false" onAction="#repeatAll">
                             <graphic>

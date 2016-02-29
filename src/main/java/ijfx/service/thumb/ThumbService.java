@@ -62,6 +62,8 @@ public class ThumbService extends AbstractService implements ImageJService {
     @Parameter
     FormatService formatService;
 
+    
+    
     public SCIFIO scifio() {
         if (scifio == null) {
             scifio = new SCIFIO(context);
@@ -77,9 +79,10 @@ public class ThumbService extends AbstractService implements ImageJService {
         WritableImage wi = new WritableImage(width, height);
 
         try {
+            ImageJFX.getLogger().info("Reading "+file.getAbsolutePath());
             reader = scifio().initializer().initializeReader(file.getAbsolutePath());
         } catch (FormatException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+            ImageJFX.getLogger().warning("SCIFIO Reader doesn't work with "+file.getName());
             reader = null;
         }
 
@@ -113,7 +116,7 @@ public class ThumbService extends AbstractService implements ImageJService {
             reader.close();
 
         } catch (Exception e) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when preparing thumbs",e);
             return null;
         }
 

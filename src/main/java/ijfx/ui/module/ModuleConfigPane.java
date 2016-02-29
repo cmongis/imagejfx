@@ -111,7 +111,7 @@ public class ModuleConfigPane extends BorderPane {
         try {
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
 
         // add the necessary listener.
@@ -354,16 +354,16 @@ public class ModuleConfigPane extends BorderPane {
             m.invoke(object);
             ImageJFX.getLogger().info("call back executed " + callback);
         } catch (NoSuchMethodException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.WARNING,null,ex);;
 
         } catch (SecurityException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         } catch (IllegalAccessException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         } catch (IllegalArgumentException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         } catch (InvocationTargetException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
     }
 

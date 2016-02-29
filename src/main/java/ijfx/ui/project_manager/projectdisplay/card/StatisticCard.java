@@ -119,9 +119,9 @@ public class StatisticCard extends BorderPane implements ProjectCard{
         saveFolder = new SimpleObjectProperty<File>() {
             @Override
             public File get() {
-                System.out.println("Getting things");
-                System.out.println(project.getSettings().getOrDefault("saveFolder",new GenericMetaData("saveFolder", project.getFile().getParentFile().getAbsoluteFile())));
-                return new File(project.getSettings().getOrDefault("saveFolder",new GenericMetaData("saveFolder", project.getFile().getParentFile().getAbsoluteFile())).getStringValue());
+              
+                System.out.println(project.getSettings().getOrDefault("saveFolder", new GenericMetaData("saveFolder","./")));
+                return new File(project.getSettings().getOrDefault("saveFolder",new GenericMetaData("saveFolder", "./")).getStringValue());
             }
             
             @Override

@@ -30,6 +30,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import net.imagej.overlay.Overlay;
 
@@ -67,7 +68,7 @@ public class FxImageCanvas extends Canvas {
     // Overlay ... to be taken care of 
     ArrayList<Overlay> overlays;
     
-    
+    Pane container;
     
     
     /**

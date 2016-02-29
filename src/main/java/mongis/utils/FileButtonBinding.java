@@ -31,45 +31,39 @@ import javafx.stage.DirectoryChooser;
 
 /**
  *
- * A helper class to create buttons that allow the selection of the directory. When clicking on the button,
- * it opens a file saving dialog or open dialog
- * 
- * Ex : 
- * 
+ * A helper class to create buttons that allow the selection of the directory.
+ * When clicking on the button, it opens a file saving dialog or open dialog
+ *
+ * Ex :
+ *
  * Button aButton = new Button();
- * 
- * FileButtonBinding fileButtonBinding = 
- *      new FileButtonBinding(aButton)
- *      .setSaveDialog(true)
- *      .
- * 
+ *
+ * FileButtonBinding fileButtonBinding = new FileButtonBinding(aButton)
+ * .setSaveDialog(true) .
+ *
  * fileButtonBinding
- * 
- * 
+ *
+ *
  * @author cyril
  */
 public class FileButtonBinding {
-     
+
     private final Button button;
-    
-    
+
     private final ObjectProperty<File> fileProperty = new SimpleObjectProperty<>(null);
-    
+
     private String buttonDefaultText = "Choose a directory ...";
-    
-    
-    
+
     public FileButtonBinding(Button b) {
         this.button = b;
-        
+
         button.setOnAction(this::onClick);
         fileProperty.addListener(this::onFileChanged);
-        
-        
-        onFileChanged(null,null,fileProperty.getValue());
+
+        onFileChanged(null, null, fileProperty.getValue());
         button.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.FOLDER_ALT));
     }
-    
+
     protected void onClick(ActionEvent event) {
         DirectoryChooser chooser = new DirectoryChooser();
 
@@ -88,22 +82,23 @@ public class FileButtonBinding {
         this.buttonDefaultText = buttonDefaultText;
         return this;
     }
-    
-    
+
     protected void onFileChanged(Observable obs, File oldValue, File newValue) {
-        if(newValue == null ) {
+        if (newValue == null) {
             button.setText(buttonDefaultText);
-        }
-        else {
-            button.setText(newValue.getParentFile().getName() + " / " + newValue.getName());
+        } else {
+          
+
+            if (newValue.getParentFile() == null) {
+                button.setText(newValue.getName());
+            } else {
+                button.setText(newValue.getParentFile().getName() + " / " + newValue.getName());
+            }
         }
     }
-    
-    
-    
+
     public ObjectProperty<File> fileProperty() {
         return fileProperty;
     }
-    
-    
+
 }

@@ -23,7 +23,7 @@
             <FontAwesomeIconView glyphName="FOLDER" />
          </graphic>
       </Button>
-      <Label minHeight="50.0" minWidth="100.0" styleClass="with-padding" text="Your project is empty. You can scan a folder to add all the images it contains automatically or add them one by one." textAlignment="CENTER" wrapText="true" />
+      <Label minHeight="50.0" minWidth="100.0" text="Your project is empty. You can scan a folder to add all its images automatically or add them one by one." textAlignment="CENTER" wrapText="true" />
       <Label alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" text="or" textAlignment="CENTER" GridPane.rowIndex="2" />
       <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addImages" text="Add images" GridPane.rowIndex="3">
          <graphic>

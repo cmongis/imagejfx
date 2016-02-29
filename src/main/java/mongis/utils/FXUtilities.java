@@ -220,7 +220,7 @@ public class FXUtilities {
 
         URL css
                 = rootController.getClass().getResource(rootController.getClass().getSimpleName() + ".css");
-        System.out.println(css);
+        
         try {
             if (css != null) {
 
@@ -245,7 +245,7 @@ public class FXUtilities {
                 root.getScene().getStylesheets().add(css.toExternalForm());
             }
         } catch (Exception e) {
-            Logger.getGlobal().log(Level.WARNING, "Couldn't load CSS", e);
+            Logger.getGlobal().warning("No CSS found for "+rootController.getClass().getSimpleName());
         }
 
     }

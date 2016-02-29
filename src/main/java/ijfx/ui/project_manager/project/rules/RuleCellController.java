@@ -134,6 +134,7 @@ public class RuleCellController extends BorderPane implements ListCellController
 
     private void update() {
         if (rule == null) {
+            System.out.println("Rule is null ?");
             return;
         }
 
@@ -153,6 +154,7 @@ public class RuleCellController extends BorderPane implements ListCellController
     }
 
     public long calculateModifiablePlaneCount() {
+        System.out.println("Calculating");
         return selectedPlanes.parallelStream().filter(plane -> !rule.getModifier().wasApplied(plane)).count();
     }
 
@@ -163,6 +165,7 @@ public class RuleCellController extends BorderPane implements ListCellController
     @FXML
     private void applyRule() {
         applyHandler.accept(rule);
+        update();
     }
 
     @FXML
@@ -176,7 +179,7 @@ public class RuleCellController extends BorderPane implements ListCellController
 
     public void setApplyHandler(Consumer<AnnotationRule> applyHandler) {
         this.applyHandler = applyHandler;
-        update();
+        
     }
 
 }

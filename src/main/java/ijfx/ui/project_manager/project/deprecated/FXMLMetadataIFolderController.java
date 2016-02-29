@@ -80,7 +80,7 @@ public class FXMLMetadataIFolderController extends AnchorPane implements NodeCon
     
     private final MetaData metaData;
     private final Project project;
-    private final FolderContextMenu contextMenu;
+    private FolderContextMenu contextMenu;
 
     @FXML
     private Label label;
@@ -122,9 +122,9 @@ public class FXMLMetadataIFolderController extends AnchorPane implements NodeCon
         item.selectedProperty().addListener(itemSelectionListener);
         item.indeterminateProperty().addListener(itemIndeterminateListener);
         this.setOnMouseClicked(this::handleClickEvent);
-        contextMenu = new FolderContextMenu(item, project, context);
+        //contextMenu = new FolderContextMenu(item, project, context);
         this.setOnContextMenuRequested((ContextMenuEvent event) -> {
-            contextMenu.show(this, Side.RIGHT, 0, 0);
+            //contextMenu.show(this, Side.RIGHT, 0, 0);
         });
         this.setOnKeyReleased(this::handleKeyReleased);
         FXUtilities.loadView(getClass().getResource("FXMLMetaDataFolder.fxml"), this, true);

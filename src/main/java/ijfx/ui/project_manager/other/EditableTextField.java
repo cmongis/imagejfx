@@ -39,7 +39,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import org.jfree.chart.util.TextUtils;
+
 
 /**
  *

@@ -80,7 +80,7 @@ public class AddTagModifier implements ModifierPlugin {
     @Override
     public boolean wasApplied(PlaneDB planeDB) {
         
-        
+        System.out.println("Was applied ? "+planeDB.getTags().containsAll(tags));
         return planeDB.getTags().containsAll(tags);
         
         

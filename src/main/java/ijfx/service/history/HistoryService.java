@@ -140,7 +140,7 @@ public class HistoryService extends AbstractService implements ImageJService{
 
             return workflow;
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when loading workflow",ex);;
         }
         return null;
     }
@@ -149,7 +149,7 @@ public class HistoryService extends AbstractService implements ImageJService{
         try {
             return loadWorkflow(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when loading workflow.",ex);;
         }
         return null;
     }
@@ -165,7 +165,7 @@ public class HistoryService extends AbstractService implements ImageJService{
             mapper.writeValue(new File(path), workflow);
             return true;
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when saving worflow. It's possible you don't have the permission.",ex);;
         }
         return false;
     }

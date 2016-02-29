@@ -103,7 +103,7 @@ public class ErrorButton extends AbstractContextButton {
             
 
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
 
         return this;

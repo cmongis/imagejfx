@@ -145,7 +145,7 @@ public class WorkflowEditor extends TitledPane implements UiPlugin {
                         editService.loadWorkflow(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
                         updateProgress(3,3);
                     } catch (Exception ex) {
-                        ImageJFX.getLogger();
+                        ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
                         uiService.showDialog(ERROR_MESSAGE, DialogPrompt.MessageType.ERROR_MESSAGE);
                     }
                     return null;

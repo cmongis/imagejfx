@@ -77,7 +77,7 @@ public class DefaultHintService extends AbstractService implements HintService {
             List<Hint> nonReadHint = new ArrayList<>();
             
             hintList.forEach(hint->{
-                if(history.contains(hint.getId()) == false) {
+                if(wasRead(hint) == false) {
                     nonReadHint.add(new HintDecorator(hint));
                 }
             });
@@ -140,8 +140,8 @@ public class DefaultHintService extends AbstractService implements HintService {
 
     // check if a hint was read
     private boolean wasRead(Hint hint) {
-
-       return history.contains(hint.getId());
+        return false;
+       //return history.contains(hint.getId());
 
     }
 

@@ -122,7 +122,7 @@ public class ProjectManagerWebWrapper extends AbstractService implements ImageJS
                                 try {
                                     imageLoader.loadImageFromFile(file, getCurrentProject());
                                 } catch (IOException ex) {
-                                    ImageJFX.getLogger();
+                                    ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
                                 }
                             }
                     );

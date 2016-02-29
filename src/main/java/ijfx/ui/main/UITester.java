@@ -56,7 +56,7 @@ public class UITester extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
 
     }

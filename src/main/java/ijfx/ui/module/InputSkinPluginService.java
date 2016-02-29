@@ -32,7 +32,7 @@ import org.scijava.service.Service;
  * @author Cyril MONGIS, 2015
  */
 
-public interface InputSkinPluginService extends Service,ImageJService,InputSkinFactory{
+public interface InputSkinPluginService extends ImageJService,InputSkinFactory{
     
     
     

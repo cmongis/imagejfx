@@ -112,7 +112,7 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
             ImageJFX.getConfigDirectory();
             objectMapper.writeValue(f, new WorkflowList(workflowList));
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when saving workflow.",ex);;
         }
     }
     

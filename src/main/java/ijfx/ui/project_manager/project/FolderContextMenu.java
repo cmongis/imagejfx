@@ -22,6 +22,7 @@ package ijfx.ui.project_manager.project;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.project.Project;
+import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.ProjectModifierService;
 import ijfx.core.project.ProjectToImageJService;
 import mongis.utils.FXUtilities;
@@ -33,23 +34,26 @@ import javafx.scene.control.TreeItem;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import ijfx.ui.project_manager.ProjectManagerUtils;
+import ijfx.ui.service.angular.ProjectServiceBinder;
 
 /**
  *
  * @author Cyril Quinton
  */
 public class FolderContextMenu extends ContextMenu {
-    private final Project project;
-    private final Context context;
-    private final TreeItem item;
+    
+    private TreeItem item;
     
     @Parameter
     ProjectToImageJService imageJService;
     
-    public FolderContextMenu(TreeItem item, Project project, Context context) {
-        this.project = project;
-        this.context = context;
-        this.item = item;
+    @Parameter
+    ProjectModifierService projectModifierService;
+    
+    @Parameter
+    ProjectManagerService projectManagerService;
+    
+    public FolderContextMenu(Context context) {
         ResourceBundle rb = FXUtilities.getResourceBundle();
         FontAwesomeIconView removeIcon = ProjectManagerUtils.getRemoveIcon();
         MenuItem removeImageItem = new MenuItem(rb.getString("removeAllImageInFolder"), removeIcon);
@@ -68,7 +72,9 @@ public class FolderContextMenu extends ContextMenu {
     
     
     public void remove(ActionEvent event) {
-        ProjectModifierService service = context.getService(ProjectModifierService.class);
-        service.removeSubPlanes(project, item);
+       projectModifierService.removeSubPlanes(projectManagerService.getCurrentProject(), item);
     }
+    
+    
+    
 }

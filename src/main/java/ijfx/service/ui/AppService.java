@@ -116,7 +116,7 @@ public class AppService extends AbstractService implements ImageJService {
                     context.inject(service);
                     helper.registerService(service.getAngularName(), service);
                 } catch (InstantiableException ex) {
-                    ImageJFX.getLogger();
+                    ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
                 }
             
             

@@ -184,7 +184,7 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
             for (JsonNode ruleNode : rulesNode) {
                 AnnotationRule rule = parseAnnotationRule(ruleNode);
                 if (rule == null) {
-                    ImageJFX.getLogger();
+                    ImageJFX.getLogger().warning("No rule associated to the project.");
                 } else {
                     ruleList.add(rule);
                 }

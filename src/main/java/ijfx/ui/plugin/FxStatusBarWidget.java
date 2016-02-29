@@ -67,6 +67,7 @@ public class FxStatusBarWidget extends HBox implements UiPlugin {
     Transition appearance = Animations.FADEIN.configure(this,ImageJFX.getAnimationDurationAsDouble());
     Transition disapearance = Animations.FADEOUT.configure(this,ImageJFX.getAnimationDurationAsDouble());
     
+    
   
     
     Property<Boolean> canCancel = FxStatusBar.getInstance().canCancelProperty();

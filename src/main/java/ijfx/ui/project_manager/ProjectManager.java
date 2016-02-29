@@ -67,6 +67,7 @@ import ijfx.ui.project_manager.projectdisplay.ProjectDisplayCreatedEvent;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
 import ijfx.ui.project_manager.projectdisplay.ProjectPane;
 import ijfx.ui.context.animated.Animations;
+import java.util.logging.Level;
 
 /**
  * ProjectManager class. This is the main controller of the browser UI.
@@ -169,7 +170,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
             //FXUtilities.loadView(getClass().getResource("ProjectManager.fxml"), this, true);
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
     }
 

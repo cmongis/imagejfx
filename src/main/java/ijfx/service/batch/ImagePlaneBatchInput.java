@@ -138,7 +138,7 @@ public class ImagePlaneBatchInput implements BatchSingleInput {
         try {
             datasetIOService.save(dataset, savePath);
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when saving image "+savePath,ex);;
         }
         
     }

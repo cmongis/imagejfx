@@ -110,12 +110,12 @@ public class WorkflowService extends AbstractService implements ImageJService {
                 logger.info(String.format("[%s] module finished", moduleName));
             } catch (InterruptedException ex) {
                 eventService.publish(new WorkflowEndedEvent(WorkflowEnd.ERROR));
-                ImageJFX.getLogger();
+                ImageJFX.getLogger().log(Level.SEVERE,"Error when running workflow",ex);;
                
 
             } catch (ExecutionException ex) {
                 eventService.publish(new WorkflowEndedEvent(WorkflowEnd.ERROR));
-                ImageJFX.getLogger();
+                ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
             }
             
             if (run == null) {

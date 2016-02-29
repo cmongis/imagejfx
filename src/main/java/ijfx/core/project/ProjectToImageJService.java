@@ -89,18 +89,22 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
 
     public Dataset convert(TreeItem<PlaneOrMetaData> root) {
 
-        TreeItem item = root;
+        final TreeItem item;
+        if (root.getValue().isPlane()) {
+            item = root.getParent();
+        } else {
+            item = root;
+        }
 
         // getting the deepest level
-        
-        logger.info("Converting root "+root.getValue().getMetaData());
-        
+        logger.info("Converting root " + root.getValue().getMetaData());
+
         int deepest = TreeItemUtils.getDeepestLevel(root, 0);
         logger.info("Deepest tree level :  " + deepest);
         // the number of dimensions is equivalent to the number of level
         // in the tree + 2 for the X and Y axis
         long[] dims;
-        
+
         // if it's a leaf directly selected, there two dimensions
         if (deepest == 0) {
             dims = new long[2];
@@ -111,14 +115,14 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
             dims = new long[deepest + 2 - 1];
         }
 
-        logger.info("Dimensions "+Arrays.toString(dims));
-        
+        logger.info("Dimensions " + Arrays.toString(dims));
+
         // axes
         AxisType[] axes = new AxisType[dims.length];
 
         // getting a leaf to get the width
         PlaneDB leaf = getALeaf(root).getValue().getPlaneDB();
-        logger.info("Leaf found  :"+leaf);
+        logger.info("Leaf found  :" + leaf);
         // preparing X and Y axis
         int width = leaf.getMetaDataSet().get(MetaData.WIDTH).getIntegerValue();
         int height = leaf.getMetaDataSet().get(MetaData.HEIGHT).getIntegerValue();
@@ -129,7 +133,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         axes[0] = Axes.X;
         axes[1] = Axes.Y;
 
-        final int pixelType = FormatTools.UINT16;
+        final int pixelType = leaf.getMetaDataSet().get(MetaData.PIXEL_TYPE).getIntegerValue();
 
         // feeling the other dimensions size
         if (deepest != 0) {
@@ -148,14 +152,9 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
                     } else {
                         axes[index + 2] = new DefaultAxisType(metadata.getName());
                     }
-
-                });
-                //axes[i + 2] = new DefaultAxisType("Awesome",false);
-
+                }); 
             }
         }
-        
-        
 
         for (int i = 0; i != dims.length; i++) {
             logger.info(String.format("Dimesion %d : %d", i, dims[i]));
@@ -167,7 +166,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         // going through the deepest level (-1) that hold the
         // last metadata and should contain only one plane
         final SimplerCounter counter = new SimplerCounter();
-        
+
         // if it's not a single plane
         if (deepest > 0) {
             TreeItemUtils.goThroughLevel(root, deepest - 1, child -> {

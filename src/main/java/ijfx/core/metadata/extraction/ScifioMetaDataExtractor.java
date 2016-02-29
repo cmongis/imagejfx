@@ -88,6 +88,7 @@ public class ScifioMetaDataExtractor  {
             ReaderFilter r;
             
             if (path.endsWith("tif") || path.endsWith(".dv")) {
+                logger.info("Using BioFormat extractor");
                 PlaneList planeList = bioformatExtractor.extract(file);
                 
                 return planeList;
@@ -276,11 +277,11 @@ public class ScifioMetaDataExtractor  {
 
                 return true;
             } catch (FormatException ex) {
-                ImageJFX.getLogger();
+                ImageJFX.getLogger().log(Level.SEVERE,"Error when saving files. Saving format is not handled",ex);;
                 ex.printStackTrace();
 
             } catch (IOException ex) {
-                ImageJFX.getLogger();
+                ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
                 ex.printStackTrace();
             }
 

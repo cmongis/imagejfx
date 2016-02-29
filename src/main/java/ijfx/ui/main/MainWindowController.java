@@ -610,12 +610,15 @@ public class MainWindowController implements Initializable {
     public void showHelpSequence(Hint hint) {
 
         if (hint == null) {
+            
             return;
         }
 
         Node node = mainAnchorPane.getScene().lookup(hint.getTarget());
         if (node == null) {
             logger.warning("Couldn't find node " + hint.getTarget());
+            nextHint();
+            
             return;
         }
 
@@ -623,10 +626,11 @@ public class MainWindowController implements Initializable {
         isHintDisplaying = true;
         double hintWidth = 200;
         double hintMargin = 20;
-
+        double rectanglePadding = 5;
         Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
-
-        Rectangle rectangle = new Rectangle(nodeBounds.getMinX(), nodeBounds.getMinY(), nodeBounds.getWidth(), nodeBounds.getHeight());
+        
+        Bounds rectangleBounds;
+        Rectangle rectangle = new Rectangle(nodeBounds.getMinX()-rectanglePadding, nodeBounds.getMinY()-rectanglePadding, nodeBounds.getWidth()+rectanglePadding*2, nodeBounds.getHeight()+rectanglePadding*2);
         Rectangle bigOne = new Rectangle(0, 0, mainAnchorPane.getScene().getWidth(), mainAnchorPane.getScene().getHeight());
 
         Shape highligther = Path.subtract(bigOne, rectangle);
@@ -641,22 +645,23 @@ public class MainWindowController implements Initializable {
         label.setWrapText(true);
         label.setPrefWidth(hintWidth);
         
+        rectangleBounds = rectangle.getBoundsInLocal();
         
         label.translateXProperty().bind(Bindings.createDoubleBinding(()->{
-        if (nodeBounds.getMinX() < hintWidth + hintMargin) {
-           return nodeBounds.getMaxX() + hintMargin + highligther.getTranslateX();
+        if (rectangleBounds.getMinX() < hintWidth + hintMargin) {
+           return rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
 
         } else {
-            return nodeBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
+            return rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
         }
         }, highligther.translateXProperty()));
         
 
         label.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
-            if (nodeBounds.getMinY() + label.getHeight() > node.getScene().getHeight()) {
-                return nodeBounds.getMaxY() - label.getHeight();
+            if (rectangleBounds.getMinY() + label.getHeight() > node.getScene().getHeight()) {
+                return rectangleBounds.getMaxY() - label.getHeight();
             } else {
-                return nodeBounds.getMinY();
+                return rectangleBounds.getMinY();
             }
         }, label.heightProperty()));
 

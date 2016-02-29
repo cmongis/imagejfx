@@ -41,10 +41,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebView;
 import javafx.stage.PopupWindow;
 import org.controlsfx.control.PopOver;
@@ -103,16 +106,19 @@ public class SearchBar extends HBox implements SearchHandler {
 
         searchTextField.setPromptText("Advanded search : e.g. file name contains: \"stack\" and z = 0 or tagged with: modified");
         searchTextField.textProperty().addListener(this::onTextFieldTyping);
+        setId("search-bar");
         searchTextField.setOnAction(this::onSearchButtonClicked);
         searchButton.setOnAction(this::onSearchButtonClicked);
+        searchButton.setGraphicTextGap(10);
         lastSearch.addListener(this::onLastSearchChanged);
-
+         searchButton.setContentDisplay(ContentDisplay.RIGHT);
         getChildren().addAll(
                 new Label("Search by"), new PopoverToggleButton(searchByTagPanel, PopOver.ArrowLocation.TOP_CENTER)
                 .setButtonText("Tag")
                 .setIcon(FontAwesomeIcon.TAG), new Label("or"), new PopoverToggleButton(searchByMetaDataPanel, PopOver.ArrowLocation.TOP_CENTER)
                 .setButtonText("Metadata")
                 .setIcon(FontAwesomeIcon.KEY), new Label("or"), searchTextField, searchButton
+                
         );
         getStyleClass().add("hbox");
 
@@ -130,8 +136,10 @@ public class SearchBar extends HBox implements SearchHandler {
             webView.getStyleClass().add("rich-message");
             webView.setPrefWidth(500);
             webView.setPrefHeight(100);
-
+            getChildren().add(new SearchSyntaxButton());
         });
+        
+        
 
         //webView.setFill(null);
     }
@@ -191,12 +199,16 @@ public class SearchBar extends HBox implements SearchHandler {
     }
 
     public void onLastSearchChanged(Observable obs, List<PlaneDB> oldValue, List<PlaneDB> newValue) {
-
+       
         if (newValue == null) {
-            searchButton.setText(null);
+            //searchButton.setText(null);
+            searchButton.setText("Find");
 
         } else {
-            searchButton.setText("" + newValue.size());
+            
+            
+            
+            searchButton.setText(String.format("%d",newValue.size()));
 
             searchPopOver.show(searchTextField);
 

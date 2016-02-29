@@ -39,7 +39,6 @@ import java.io.File;
 import java.net.URL;
 
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import static javafx.application.Application.launch;

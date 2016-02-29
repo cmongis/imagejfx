@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -70,7 +71,7 @@ public class TableDisplayView extends BorderPane {
             FXUtilities.injectFXML(this);
             logger.info("FXML injected");
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
         logger.info("Creating table model");
         model = new FlexibleColumnModel(tableView);

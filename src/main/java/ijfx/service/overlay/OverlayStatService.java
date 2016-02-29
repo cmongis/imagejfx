@@ -21,11 +21,14 @@
 package ijfx.service.overlay;
 
 import ijfx.ui.main.ImageJFX;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.ImageJ;
 import net.imagej.ImageJService;
+import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.OverlayService;
 import net.imagej.measure.StatisticsService;
@@ -33,11 +36,13 @@ import net.imagej.measure.StatisticsService;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.Overlay;
 import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.FloatType;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
@@ -64,6 +69,8 @@ public class OverlayStatService extends AbstractService implements ImageJService
     @Parameter
     private StatisticsService statService;
 
+    
+    
     final private Logger logger = ImageJFX.getLogger();
 
     public final static String LBL_MEAN = "Mean";
@@ -75,40 +82,75 @@ public class OverlayStatService extends AbstractService implements ImageJService
 
     public HashMap<String, Double> getStat(ImageDisplay imageDisplay, Overlay overlay) {
 
-
+        
+     
+        System.out.println("Getting the stats...");
         //final PointSet ps = getRegion(imageDisplay, overlay);
         final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
-
+        
+        /*
+        System.out.println("got it !");
+        AxisType xa = ds.axis(0).type();
+        AxisType xy = ds.axis(1).type();
+       AxisType[] axes = new AxisType[] {xa,xy};
+        
+       // AxisType activeAxis = imageDisplay.getActiveAxis();
+       
+        long[] dims = new long[] { ds.max(0), ds.max(1) };
+        
+        RealType t = ds.getType();
+       // Dataset planeDataset = datasetService.create(dims, "", axes, ds.getType().getBitsPerPixel(), t.getMinValue() < 0, t.equals(new FloatType()), true);
+        
+        //planeDataset.setPlaneSilently(0, ds.getPlane())
+        
         for (int i = 0; i != imageDisplay.numDimensions(); i++) {
             // overlay.setAxis(imageDisplay.axis(i), imageDisplay.getIntPosition(i));
         }
 
-        RoiPointSet rps = new RoiPointSet(overlay.getRegionOfInterest());
+        */
 
+        System.out.println("Creting the point set");
+        RoiPointSet rps = new RoiPointSet(overlay.getRegionOfInterest());
+        
         HashMap<String, ParallelMeasurement> measures = new HashMap<>();
         HashMap<String, Double> stats = new HashMap<>();
+        
+        
 
-
+        
+         
         DescriptiveStatistics statistics = new DescriptiveStatistics();
 
-        PointSetIterator c = rps.cursor();
+        PointSetIterator psc = rps.cursor();
+        Cursor dsc = ds.cursor();
+        RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
+        long[] position = new long[imageDisplay.numDimensions()];
+        imageDisplay.localize(position);
+        System.out.println(Arrays.toString(position));
+        int safe = 0;
+        while(psc.hasNext()) {
+            psc.fwd();
+            
+            long[] roiPosition = psc.get();
+            
+            for(int i =0;i!=roiPosition.length;i++) {
+                position[i] = roiPosition[i];
+            }
+            randomAccess.setPosition(position);
+            statistics.addValue(randomAccess.get().getRealDouble());
+        }
 
-        Cursor<? extends RealType<?>> dsc = ds.getImgPlus().cursor();
+        //Cursor<? extends RealType<?>> dsc = ds.getImgPlus().cursor();
 
-        measures.put(LBL_MIN, () -> statService.minimum(ds, rps));
-        measures.put(LBL_MAX, () -> statService.maximum(ds, rps));
-        measures.put(LBL_MEAN, () -> {
-            return statService.arithmeticMean(ds, rps);
-        });
-        measures.put("Std. Dev.", () -> statService.populationStdDev(ds, rps));
-        measures.put("Variance", () -> statService.populationVariance(ds, rps));
-        measures.put(LBL_MEDIAN, () -> statService.median(ds, rps));
+        measures.put(LBL_MIN, () -> statistics.getMin());
+        measures.put(LBL_MAX, () -> statistics.getMax());
+        measures.put(LBL_MEAN, () -> statistics.getMean());
+        measures.put("Std. Dev.", () -> statistics.getStandardDeviation());
+        measures.put("Variance", () -> statistics.getVariance());
+        measures.put(LBL_MEDIAN, () -> statistics.getPercentile(50));
 
-        measures.put(LBL_AREA, () -> statService.geometricMean(ds, rps));
-        measures.put("Mid point", () -> statService.midpoint(ds, rps));
-        measures.put("Product", () -> statService.product(ds, rps));
-        measures.put("Pop. Kurtosis", () -> statService.populationKurtosis(ds, rps));
-        measures.put("Pop. Skew", () -> statService.populationSkew(ds, rps));
+        //measures.put(LBL_AREA, () -> statService.geometricMean(ds, rps));
+        
 
         
         for (String key : measures.keySet()) {

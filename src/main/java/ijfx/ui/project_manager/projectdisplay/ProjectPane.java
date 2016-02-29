@@ -22,6 +22,7 @@ package ijfx.ui.project_manager.projectdisplay;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.project.Project;
+import ijfx.service.ui.HintService;
 import ijfx.ui.context.animated.AnimationPlus;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.main.ImageJFX;
@@ -90,6 +91,9 @@ public class ProjectPane extends BorderPane {
     @Parameter
     Context context;
 
+    @Parameter
+    HintService hintService;
+    
     public ProjectPane(Context context, Project project) {
 
         try {
@@ -133,6 +137,8 @@ public class ProjectPane extends BorderPane {
                 new SingleImageViewPane(context)
             }) {
                 ToggleButton toggleButton = new ToggleButton(null, view.getIcon());
+                toggleButton.setId(view.getClass().getSimpleName().toLowerCase()+"-button");
+                logger.info("Creating button "+toggleButton.getId());
                 registerPlaneSetView(view, toggleButton);
                 viewHBox.getChildren().add(toggleButton);
             }
@@ -142,9 +148,14 @@ public class ProjectPane extends BorderPane {
                 createPlaneSetToggleButton(added);
             }
 
+            
             currentItem.bind(projectDisplay.getCurrentPlaneSet().currentItemProperty());
-
+            
             updateHierarchy();
+            
+            
+            hintService.displayHints(ProjectPane.class, false);
+            
 
         } catch (IOException ex) {
             Logger.getLogger(ProjectPane.class.getName()).log(Level.SEVERE, null, ex);
@@ -154,6 +165,8 @@ public class ProjectPane extends BorderPane {
     }
 
     private void registerPlaneSetView(PlaneSetView view, ToggleButton button) {
+        
+       
         button.setUserData(view.getClass());
         toggleMap.put(view.getClass(), button);
         viewMap.put(view.getClass(), view);
@@ -168,7 +181,7 @@ public class ProjectPane extends BorderPane {
 
         ToggleButton toggleButton = new ToggleButton(added.getName());
         toggleButton.setUserData(added);
-
+        
         if (added.getName().equals(ProjectDisplay.ALL_IMAGES)) {
             toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.BUILDING));
         } else if (added.getName().equals(ProjectDisplay.SELECTED_IMAGES)) {

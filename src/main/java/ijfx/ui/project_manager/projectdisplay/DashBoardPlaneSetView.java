@@ -117,8 +117,7 @@ public class DashBoardPlaneSetView extends TilePane implements PlaneSetView {
         }
 
         double tileWidth = (newValue.doubleValue() / column) - (hgapProperty().getValue() * (column - 1)) - 15 / column;
-        System.out.println(String.format("Columns : %d, width : %.0f", column, tileWidth));
-        System.out.println(tileWidth);
+        
         setPrefColumns(column);
         setPrefTileWidth(tileWidth);
 
@@ -143,6 +142,17 @@ public class DashBoardPlaneSetView extends TilePane implements PlaneSetView {
 
     
     
+    private void showCard(ProjectCard card) {
+        if(getChildren().contains(card.getContent()) == false) {
+            getChildren().add(card.getContent());
+        }
+    }
+    
+    private void hideCard(ProjectCard card) {
+        if(getChildren().contains(card.getContent())) {
+            getChildren().remove(card.getContent());
+        }
+    }
     
     private void updateCards() {
 
@@ -154,16 +164,18 @@ public class DashBoardPlaneSetView extends TilePane implements PlaneSetView {
             
             card.dismissed().addListener((obs,oldValue,newValue)->{
                 
-                if(newValue) {
-                    Animation t = Animations.ZOOMOUT.configure(card.getContent(), 300);
+                if(newValue && !oldValue) {
+                  
+                    Animation t = Animations.FADEOUT.configure(card.getContent(), 300);
                     t.setOnFinished(event->{
-                        getChildren().remove(card.getContent());
+                        hideCard(card);
                     });
                     t.play();
                 }
-                else {
-                    getChildren().add(card.getContent());
-                    Animations.ZOOMIN.configure(card.getContent(), 300).play();
+                else if(!newValue && oldValue) {
+                 
+                    showCard(card);
+                    Animations.FADEIN.configure(card.getContent(), 300).play();
                 }
             
             });

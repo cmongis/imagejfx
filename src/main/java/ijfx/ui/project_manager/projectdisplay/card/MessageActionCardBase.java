@@ -29,6 +29,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import mongis.utils.AsyncCallback;
 import mongis.utils.TaskButtonBinding;
 
@@ -50,12 +51,18 @@ public abstract class MessageActionCardBase extends BorderPane implements Projec
     public MessageActionCardBase(String name, String message, FontAwesomeIcon icon) {
         this.icon = icon;
         label.setText(message);
+        label.setWrapText(true);
+        label.setTextAlignment(TextAlignment.CENTER);
         NAME = name;
+        
         configureBinding(taskButtonBinding);
         taskButtonBinding.runTaskOnClick(this::onClick);
         setCenter(label);
         setBottom(buttonBox);
+        button.setMaxWidth(Double.POSITIVE_INFINITY);
         buttonBox.getChildren().add(button);
+        buttonBox.getStyleClass().addAll("vbox","with-top-padding");
+        
     }
 
     protected abstract void configureBinding(TaskButtonBinding binding);
@@ -96,15 +103,25 @@ public abstract class MessageActionCardBase extends BorderPane implements Projec
         return new AsyncCallback<Project,Boolean>()
                .setInput(project)
                 .run(this::shouldDisplay)
-                .then(result->decorator.dismissed().setValue(!result))
+                .then(this::then)
                 ;
+    }
+    
+    public void then(Boolean result) {
+        System.out.println("Calculation finished result : "+result);
+        decorator.dismissed().setValue(!result);
     }
     
     public void addButton(String text, FontAwesomeIcon icon,Runnable runnable, String... cssClasses) {
         Button button = new Button(text,new FontAwesomeIconView(icon));
         button.setOnAction(event->runnable.run());
         button.getStyleClass().addAll(cssClasses);
+        button.setMaxWidth(Double.POSITIVE_INFINITY);
         buttonBox.getChildren().add(button);
+    }
+    
+    public Project getProject() {
+        return project;
     }
 
 }

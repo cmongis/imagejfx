@@ -27,20 +27,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.concurrent.Task;
-import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.display.process.ActiveDatasetPreprocessor;
-import net.imagej.legacy.LegacyService;
-import net.imagej.legacy.display.LegacyImageDisplayService;
-import net.imagej.legacy.plugin.LegacyCommand;
+
 import org.scijava.Context;
 import org.scijava.Priority;
 import org.scijava.command.InteractiveCommand;
 import org.scijava.display.DisplayService;
 import mongis.utils.FXUtilities;
 import org.scijava.module.Module;
-import org.scijava.module.ModuleItem;
 import org.scijava.module.ModuleService;
 import org.scijava.module.process.AbstractPreprocessorPlugin;
 import org.scijava.module.process.PreprocessorPlugin;
@@ -76,20 +71,19 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
     @Parameter
     InputSkinPluginService inputSkinPluginService;
 
-    @Parameter
-    LegacyService legacyService;
+    //@Parameter
+   // LegacyService legacyService;
 
-    @Parameter
-    LegacyImageDisplayService legacyImageDisplayService;
+   
 
     @Override
     public void process(Module module) {
 
-        legacyService.syncActiveImage();
-        legacyService.getImageMap().getImageDisplays().forEach(display -> System.out.println(display));
+        //legacyService.syncActiveImage();
+        //legacyService.getImageMap().getImageDisplays().forEach(display -> System.out.println(display));
         ImageDisplay imgDisplay = displayService.getActiveDisplay(ImageDisplay.class);
 
-        legacyService.getIJ1Helper().syncActiveImage(imgDisplay);
+       // legacyService.getIJ1Helper().syncActiveImage(imgDisplay);
 
         logger.info("Preprocessing : " + module.getDelegateObject().getClass().getSimpleName());
         logger.info(module.getDelegateObject().getClass().getName());
@@ -108,10 +102,11 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
                 return;
             }
 
+            /*
             // if it's a legacy command, it's also ignore
             if (LegacyCommand.class.isAssignableFrom(module.getDelegateObject().getClass())) {
                 return;
-            }
+            }*/
 
             // task displaying the generator
             // the generator is executed in the FXUIThread
@@ -135,9 +130,12 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
 
             //recorder.process(module);
         } catch (InterruptedException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);
         } catch (ExecutionException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+        }
+        catch(Exception ex) {
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);
         }
     }
 

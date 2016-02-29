@@ -110,10 +110,10 @@ public class PlaneDBBatchInput extends ImagePlaneBatchInput{
             tmpImageFile.renameTo(finalDestination);
             
             // change save path
-            setSavePath(tmpImageFile.getAbsolutePath());
+            setSavePath(finalDestination.getAbsolutePath());
       
             
-            plane.setImageReference(new ImageReferenceImpl(hash, getSavePath()));
+            plane.setImageReference(new ImageReferenceImpl(hash,finalDestination.getAbsolutePath()));
             plane.setPlaneIndex(0);
             plane.addMetaData(new GenericMetaData(MetaData.WAS_MODIFIED, 1));
             plane.addTag(MetaData.WAS_MODIFIED);

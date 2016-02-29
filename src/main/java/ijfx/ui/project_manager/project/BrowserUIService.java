@@ -133,7 +133,7 @@ public class BrowserUIService extends AbstractService implements ImageJService {
                 Task task = imageLoader.loadImageFromFile(files, projectManager.currentProjectProperty().get());
                 runLoadingImageTask(task);
             } catch (IOException ex) {
-                ImageJFX.getLogger();
+                ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
             }
         }
     }
@@ -153,7 +153,7 @@ public class BrowserUIService extends AbstractService implements ImageJService {
                 Task task = imageLoader.loadImageFromDirectory(dir, projectManager.currentProjectProperty().get());
                 runLoadingImageTask(task);
             } catch (IOException ex) {
-                ImageJFX.getLogger();
+                ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
             }
         }
     }
@@ -199,7 +199,7 @@ public class BrowserUIService extends AbstractService implements ImageJService {
         try {
             saveProjectService.saveProjectAs(projectManager.currentProjectProperty().get(), null);
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
 
     }
@@ -258,7 +258,7 @@ public class BrowserUIService extends AbstractService implements ImageJService {
                         + "file reference checking ended");
             }
         } else {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().info("File refererenced ok");
         }
     }
 

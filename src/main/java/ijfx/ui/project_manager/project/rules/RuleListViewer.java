@@ -31,7 +31,11 @@ import ijfx.ui.UiPlugin;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
@@ -69,11 +73,12 @@ public class RuleListViewer extends BorderPane implements UiPlugin{
     
     
     public RuleListViewer()  {
+       
         try {
             FXUtilities.injectFXML(this);
             
             listView.setCellFactory(new ListCellControllerFactory(this::createController));
-            
+             this.projectChangeListener = new WeakChangeListener<Boolean>(this::onProjectChanged);
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
@@ -94,6 +99,8 @@ public class RuleListViewer extends BorderPane implements UiPlugin{
         return this;
     }
     
+    ArrayList<RuleCellController> createdControllers = new ArrayList<>();
+    
      public ListCellController<AnnotationRule> createController() {
         
         
@@ -101,17 +108,25 @@ public class RuleListViewer extends BorderPane implements UiPlugin{
         context.inject(ctrl);
         ctrl.setDeleteHandler(this::onDeleteRequest);
         ctrl.setApplyHandler(this::onApplyRequest);
+        createdControllers.add(ctrl);
         return ctrl;
         
         
         
     }
      
+     ChangeListener<Boolean> projectChangeListener;
+     
+             
      @EventHandler
      public void onProjectActivated(ProjectActivatedEvent event) {
          listView.setItems(event.getProject().getAnnotationRules());
+         event.getProject().hasChangedProperty().addListener(projectChangeListener);
      }
    
+     public void onProjectChanged(Observable obs, Boolean oldValue, Boolean newValue) {
+         createdControllers.forEach(ctrl->ctrl.updateUi());
+     }
      
      @FXML
      public void addRule() {
@@ -125,6 +140,7 @@ public class RuleListViewer extends BorderPane implements UiPlugin{
          
          System.out.println("I should apply this one...");
          queryService.applyAnnotationRule(getCurrentProject(), rule);
+         
          
      }
     

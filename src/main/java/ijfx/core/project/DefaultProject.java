@@ -119,6 +119,7 @@ public class DefaultProject implements Project {
         hierarchy.add(MetaData.TIME);
         hierarchy.add(MetaData.CHANNEL);
         hierarchy.add(MetaData.Z_POSITION);
+        settings = new MetaDataSet();
     }
 
     @Override
@@ -211,6 +212,9 @@ public class DefaultProject implements Project {
 
     @Override
     public File getFile() {
+        if(file == null) {
+            return new File("./");
+        }
         return file;
     }
 

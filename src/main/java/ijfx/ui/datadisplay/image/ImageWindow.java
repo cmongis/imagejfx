@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -61,12 +60,13 @@ import net.imagej.display.OverlayService;
 import net.imagej.display.event.AxisPositionEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import net.imagej.event.DataUpdatedEvent;
+import net.imagej.event.DatasetUpdatedEvent;
 import net.imagej.lut.LUTService;
 import net.imagej.overlay.Overlay;
 
 import net.imglib2.display.screenimage.awt.ARGBScreenImage;
 import org.controlsfx.control.HiddenSidesPane;
-import org.jfree.data.general.DatasetChangeEvent;
+
 import org.scijava.Context;
 
 import org.scijava.display.Display;
@@ -476,7 +476,7 @@ public class ImageWindow extends Window {
     }
     
     
-    public boolean isOnOverlay(double x, double y, Overlay overlay) {
+    private boolean isOnOverlay(double x, double y, Overlay overlay) {
 
         double x1 = overlay.getRegionOfInterest().realMin(0);
         double y1 = overlay.getRegionOfInterest().realMin(1);
@@ -586,18 +586,22 @@ public class ImageWindow extends Window {
     /*
      Event handling
      */
-    public void onCanvasClick(MouseEvent event) {
+    private void onCanvasClick(MouseEvent event) {
 
-
+        System.out.println("Click 1");
+        
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
-
-        overlayService.getOverlays(imageDisplay).parallelStream().forEach(o -> {
+        
+        for(Overlay o : overlayService.getOverlays(imageDisplay))
+            //.parallelStream().forEach(o -> 
+        {
             if (isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o)) {
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, true);
+                event.consume();
             } else {
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, false);
             }
-        });
+        };
         contextCalculationService.determineContext(imageDisplay);
         refreshSourceImage();
         updateInfoLabel();
@@ -633,10 +637,10 @@ public class ImageWindow extends Window {
     }
 
     @EventHandler
-    protected void onEvent(DatasetChangeEvent event) {
+    protected void onEvent(DatasetUpdatedEvent event) {
         //imageDisplay.update();
 
-        logger.info("DatasetChangedEvent : " + event.getDataset());
+        logger.info("DatasetChangedEvent : " + event.getObject());
         refreshSourceImage();
     }
 

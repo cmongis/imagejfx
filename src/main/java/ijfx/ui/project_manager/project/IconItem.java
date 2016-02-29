@@ -100,7 +100,7 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem>
         try {
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
 
         addEventHandler(MouseEvent.MOUSE_CLICKED, this::onClick);
@@ -134,7 +134,7 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem>
             updateIcon();
 
             if (folderContextMenu == null && context != null) {
-                folderContextMenu = new FolderContextMenu(item, projectService.getCurrentProject(), context);
+                //folderContextMenu = new FolderContextMenu(item, projectService.getCurrentProject(), context);
                 itemLabel.setContextMenu(folderContextMenu);
             }
             
@@ -228,7 +228,7 @@ public class IconItem extends BorderPane implements ListCellController<TreeItem>
 
                     return thumbService.getThumb(plane.getFile(), (int) plane.getPlaneIndex(), thumbSize, thumbSize);
                 } catch (IOException ex) {
-                    ImageJFX.getLogger();
+                    ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
                 }
                 return null;
             }

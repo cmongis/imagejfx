@@ -93,7 +93,7 @@ public class HistoryStepCtrl extends BorderPane {
         try {
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
 
         popover.setContentNode(moduleConfigPane);

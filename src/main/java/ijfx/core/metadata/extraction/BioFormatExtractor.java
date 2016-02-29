@@ -90,6 +90,8 @@ public class BioFormatExtractor extends AbstractService implements MetaDataExtra
         commonMetaData.putGeneric(MetaData.WIDTH, width);
         commonMetaData.putGeneric(MetaData.HEIGHT, height);
         commonMetaData.putGeneric(MetaData.FILE_NAME, file.getName());
+        commonMetaData.putGeneric(MetaData.PIXEL_TYPE,r.getPixelType());
+        
         long dateLong = file.lastModified();
          Date date = new Date(dateLong);
          Calendar calendar = Calendar.getInstance();
@@ -108,10 +110,12 @@ public class BioFormatExtractor extends AbstractService implements MetaDataExtra
          commonMetaData.putGeneric(MetaData.MONTH, month);
          commonMetaData.putGeneric(MetaData.DAY, day); 
          
+         /*
          Map<String,Object> globalMeta = r.getGlobalMetadata();
+         
          for (String key: globalMeta.keySet()) {
              commonMetaData.putGeneric(key, globalMeta.get(key));
-         }
+         }*/
 
         for (int z = 0; z < stacks; z++) {
             for (int c = 0; c < channels; c++) {
@@ -139,7 +143,7 @@ public class BioFormatExtractor extends AbstractService implements MetaDataExtra
                         plane.setSourceFile(imageFile);
                         planes.add(plane);
                     } catch (Exception ex) {
-                        ImageJFX.getLogger();
+                        ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
 
                     }
                 }

@@ -101,5 +101,7 @@ public interface MetaData {
     
     public final static String WAS_MODIFIED = "modified";
     
+    public final static String PIXEL_TYPE = "Pixel Type";
+    
     // addedd an other useful comment
 }

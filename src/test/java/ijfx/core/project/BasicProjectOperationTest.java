@@ -19,8 +19,10 @@
  */
 package ijfx.core.project;
 
+import javafx.application.Application;
 import net.imagej.ImageJ;
 import org.junit.Test;
+import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -43,20 +45,23 @@ public class BasicProjectOperationTest {
     
     public static ImageJ getImageJ() {
         if(imagej == null) {
-            imagej = new ImageJ();
+            Context context = new Context();
+            imagej = new ImageJ(context);
         }
         return imagej;
     }
     
     
     public void init() {
+        
+        
         getImageJ().getContext().inject(this);
     }
     
     @Test
     public void testProjectSettings() {
         
-        //init();
+      //  init();
         
         System.out.println(projectService);
         

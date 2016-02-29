@@ -1,6 +1,6 @@
 [
     {
         "target":"#module-search"
-        ,"text":"Quickly find the ImageJ Plugin you search for. Type its name and check the propositions."
+        ,"text":"Find and apply quickly a ImageJ plugins by typing its name here."
     }
 ]

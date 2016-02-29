@@ -16,7 +16,7 @@
    <bottom>
       <HBox BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" onAction="#selectForProcessing" styleClass="success" text="Select all for processing">
+            <Button mnemonicParsing="false" onAction="#selectForProcessing" styleClass="success" text="Select all for processing/modification">
                <graphic>
                   <FontAwesomeIconView fx:id="CHECK_SQUARE" glyphName="CHECK_SQUARE" />
                </graphic>

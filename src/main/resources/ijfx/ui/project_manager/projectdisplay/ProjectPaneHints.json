@@ -1,0 +1,37 @@
+[
+    {
+        "target":"#dashboardToggleButton"
+        ,"text":"You can click here to access your dashboard."
+    },
+    {
+        "target":""
+        ,"text":"Your dashboard gives you access to statistics and gives you advices to annotate your database."
+        
+    }
+    ,{
+        "target":"#search-bar"
+        ,"text":"This bar help you finding and select subset of planes for visualization or processing."
+    }
+    ,{
+        "target":"#search-syntax-button"
+        ,"text":"This button displayes the syntax used by the advanced query."
+    }
+    ,{
+        "target":"#viewHBox"
+        ,"text":"These buttons are your 'View Buttons'. Views help you going through your database by different ways."
+    }
+    ,{
+        "target":"#iconplanesetview-button"
+        ,"text":"This  button activates the 'Icon View'. It gives a folder/file representation of your database according to the Plane Organisation."
+    }
+    ,{
+        "target":"#tableplanesetview-button"
+        ,"text":"The 'Table View' shows your planes in a table"  
+    },
+    {
+        "target":"#singleimageviewpane-button"
+        ,"text":"The 'Single Plane View' helps you  check your database plane by plane with a bigger display."
+    }
+    
+    
+]

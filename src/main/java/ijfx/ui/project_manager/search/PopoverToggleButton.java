@@ -89,12 +89,11 @@ public class PopoverToggleButton extends ToggleButton {
         setSelected(newValue);
     }
 
-    public static void bind(ToggleButton button, Node panel, ArrowLocation location) {
+    
+    public static void bind(ToggleButton button, PopOver popover) {
+        
 
-        PopOver popover = new PopOver(panel);
-
-        popover.setArrowLocation(location);
-        popover.addEventHandler(POPOVER_CLOSE_REQUEST, event -> {
+         popover.addEventHandler(POPOVER_CLOSE_REQUEST, event -> {
             popover.hide();
 
         });
@@ -116,6 +115,40 @@ public class PopoverToggleButton extends ToggleButton {
             }
             
         });
+        
+    }
+    public static void bind(ToggleButton button, Node panel, ArrowLocation location) {
+
+        PopOver popover = new PopOver(panel);
+
+        popover.setArrowLocation(location);
+        
+        bind(button,popover);
+        
+        
+        /*
+        popover.addEventHandler(POPOVER_CLOSE_REQUEST, event -> {
+            popover.hide();
+
+        });
+        popover.showingProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue && !button.isSelected()) {
+                button.setSelected(true);
+            }
+            if (!newValue && button.isSelected()) {
+                button.setSelected(false);
+            }
+
+        });
+
+        button.setOnAction(action -> {
+            if (!popover.isShowing()) {
+                popover.show(button);
+            } else {
+                popover.hide();
+            }
+            
+        });*/
 
     }
 

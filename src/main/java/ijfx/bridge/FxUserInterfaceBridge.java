@@ -115,9 +115,9 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
         try {
             FXUtilities.runAndWait(() -> lastDialog = new FxPromptDialog(string, string1, mt, ot));
         } catch (InterruptedException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         } catch (ExecutionException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
 
         return lastDialog;
