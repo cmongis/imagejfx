@@ -21,6 +21,7 @@
 package ijfx.service.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ijfx.core.metadata.MetaDataJsonModule;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imagej.ImageJService;
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
@@ -45,9 +47,19 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
     
     private final File configDirectory = ImageJFX.getConfigDirectory();  
     
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper;
     
+    private final static Logger logger = ImageJFX.getLogger();
     
+   public ObjectMapper getMapper() {
+        if(mapper == null) {
+            mapper = new ObjectMapper();
+            
+            mapper.registerModule(new MetaDataJsonModule());
+            
+        }
+        return mapper;
+    }
     
     public <T> void savePreference(T toSaveAsJson, String filename) {
         try {
@@ -55,7 +67,7 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
             
             
             
-            mapper.writeValue(new File(configDirectory,addExtension(filename)), toSaveAsJson);
+            getMapper().writeValue(new File(configDirectory,addExtension(filename)), toSaveAsJson);
         } catch (IOException ex) {
              ImageJFX.getLogger().log(Level.SEVERE,"Error when saving the configuration file"+filename,ex);
         }
@@ -64,7 +76,7 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
     public <K extends Object> K loadFromJson(String filename, K defaultPreference) {
         
         try {
-            return mapper.readValue(new File(configDirectory,addExtension(filename)), (Class<K>) defaultPreference.getClass());
+            return getMapper().readValue(new File(configDirectory,addExtension(filename)), (Class<K>) defaultPreference.getClass());
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE,"Error when reading the configuration file"+filename,ex);
         }
@@ -83,10 +95,19 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
     public <K extends Object> List<K> loadListFromJson(String filename, Class<K> clazz) {
         
         try {
-            return mapper.readValue(new File(configDirectory,addExtension(filename)),mapper.getTypeFactory().constructCollectionType(List.class,clazz));
+            
+            File finput = new File(configDirectory,addExtension(filename));
+            if(finput.exists() == false) {
+                logger.warning("No such file as "+filename);
+                return new ArrayList<K>();
+                
+            }
+            
+            return getMapper().readValue(finput,getMapper().getTypeFactory().constructCollectionType(List.class,clazz));
         }
+        
         catch(Exception e) {
-             ImageJFX.getLogger().log(Level.SEVERE,"Error when reading the configuration file"+filename,e);
+             logger.log(Level.SEVERE,"Error when reading the configuration file"+filename,e);
             return new ArrayList<K>();
         }
         
@@ -96,7 +117,7 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
     public <K extends Object> Set<K> loadSetFromJson(String filename, Class<K> clazz) {
         
          try {
-            return mapper.readValue(new File(configDirectory,addExtension(filename)),mapper.getTypeFactory().constructCollectionType(Set.class,clazz));
+            return getMapper().readValue(new File(configDirectory,addExtension(filename)),getMapper().getTypeFactory().constructCollectionType(Set.class,clazz));
         }
         catch(Exception e) {
              ImageJFX.getLogger().log(Level.SEVERE,"Error when reading the configuration file"+filename,e);

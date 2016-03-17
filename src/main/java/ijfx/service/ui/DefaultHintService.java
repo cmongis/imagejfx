@@ -140,8 +140,8 @@ public class DefaultHintService extends AbstractService implements HintService {
 
     // check if a hint was read
     private boolean wasRead(Hint hint) {
-        return false;
-       //return history.contains(hint.getId());
+        //return false;
+       return history.contains(hint.getId());
 
     }
 

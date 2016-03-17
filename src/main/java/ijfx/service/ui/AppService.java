@@ -22,14 +22,19 @@ package ijfx.service.ui;
 
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.log.LogService;
+import ijfx.ui.activity.Activity;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.LoadingScreenRequestEvent;
 import ijfx.ui.service.angular.AngularService;
+import ijfx.ui.service.angular.WebAppActivityContainer;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
+import javafx.scene.Node;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import mercury.core.AngularMethod;
@@ -75,6 +80,9 @@ public class AppService extends AbstractService implements ImageJService {
     @Parameter
     ProjectManagerWebWrapper projectManager;
 
+    @Parameter
+    ActivityService activityService;
+    
     //@Parameter
     //ImageJInfoService imageJInfoService;
     public AppService() {
@@ -96,6 +104,7 @@ public class AppService extends AbstractService implements ImageJService {
 
             helper.registerService("AppService", this);
             helper.registerService("ImageJService", context.getService(ImageJInfoService.class));
+            helper.registerService("ActivityService",activityService);
             //helper.registerService("ProjectService", projectManager);
             helper.getBinder().getJsMessageList().addListener(new ListChangeListener<LogEntry>() {
 
@@ -141,17 +150,8 @@ public class AppService extends AbstractService implements ImageJService {
     @AngularMethod(sync = true, description = "launch and ImageFX App", inputExample = "index")
     public void showApp(String app) {
         
+        activityService.open(new WebAppActivity(app));
         
-        contextService.enter("webapp");
-        contextService.update();
-        
-        if(currentWebView == null) {
-            ImageJFX.getScheduledThreadPool().schedule(()->showApp(app), 1, TimeUnit.SECONDS);
-        }
-        else {
-             getHelper().loadAppOnView(app, currentWebView);
-        }
-       
     }
     
    
@@ -187,4 +187,35 @@ public class AppService extends AbstractService implements ImageJService {
 
     }
 
+    private class WebAppActivity implements Activity {
+
+        String name;
+        final String  id;
+        
+        WebAppActivityContainer webAppContainer = (WebAppActivityContainer) activityService.getActivity(WebAppActivityContainer.class);
+        
+        public WebAppActivity(String webAppId) {
+            this.id = webAppId;
+        }
+        
+        @Override
+        public String getActivityId() {
+            return webAppContainer.getActivityId();
+        }
+        
+        @Override
+        public Node getContent() {
+            
+            //getHelper().loadAppOnView(id, currentWebView);
+            System.out.println("Web App ID : "+id);
+            webAppContainer.setCurrentApp(id);
+            return webAppContainer.getContent();
+        }
+
+        @Override
+        public Task updateOnShow() {
+            return webAppContainer.updateOnShow();
+        }
+    }
+    
 }
