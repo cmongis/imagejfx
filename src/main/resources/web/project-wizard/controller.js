@@ -1,9 +1,8 @@
 angular.module("ProjectCreator", ["MercuryAngular", "ngRoute", "ngAnimate", "MetadataExtractor", "dndLists"])
 
-.controller("MainCtrl", function ($scope, ContextService, $location) {
+.controller("MainCtrl", function ($scope, ActivityService, $location) {
 	$scope.enterImageJ = function () {
-		ContextService.enter("imagej always");
-		ContextService.update();
+		ActivityService.switchToActivity("imagej");
 	};
 	var self = $scope;
 

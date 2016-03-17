@@ -49,14 +49,13 @@ import mongis.utils.CountProperty;
 
 /**
  * JavaFx implementation of Image Status Bar
- * 
+ *
  * This is mainly a ViewModel which widgets can bind to.
- * 
+ *
  * @author Cyril MONGIS, 2015
  */
 public class FxStatusBar implements StatusBar {
 
-    
     protected final SimpleDoubleProperty progressProperty = new SimpleDoubleProperty(0);
 
     protected final SimpleStringProperty statusProperty = new SimpleStringProperty("");
@@ -73,20 +72,21 @@ public class FxStatusBar implements StatusBar {
     // List of running modules
     protected final ObservableList<Module> moduleRunning = FXCollections.observableArrayList();
 
-   // current submited task
+    // current submited task
     Task currentTask;
-    
+
     // tells if the currently submitted task can be canceled
     BooleanProperty canCancel = new SimpleBooleanProperty(false);
-    
-   
-    
+
+    int count;
+    int total;
+    String status;
+
     private FxStatusBar() {
-        
-     
-       moduleCount.addListener(this::onModuleCountChange);
-       progressProperty.addListener(this::onProgressChange);
-       //isProgressProperty().addListener(event->logger.info(event.toString()));
+
+        moduleCount.addListener(this::onModuleCountChange);
+        progressProperty.addListener(this::onProgressChange);
+        //isProgressProperty().addListener(event->logger.info(event.toString()));
     }
 
     Logger logger = getLogger(FxStatusBar.class.getName());
@@ -100,23 +100,43 @@ public class FxStatusBar implements StatusBar {
 
     protected void onProgressChange(Observable obs, Number oldValue, Number newValue) {
         //logger.info(newValue.toString());
-       // isProgressing.setValue(newValue.doubleValue() > 0.0 && newValue.doubleValue() < 1.0);
+        // isProgressing.setValue(newValue.doubleValue() > 0.0 && newValue.doubleValue() < 1.0);
     }
+
     protected void onModuleCountChange(Observable obs, Number oldValue, Number newValue) {
-       // logger.info(newValue.toString());
+        // logger.info(newValue.toString());
         isProgressing.setValue(newValue.doubleValue() > 0.0);
     }
-    
+
     @Override
     public void setStatus(String string) {
-        
-        Platform.runLater(() -> statusProperty.setValue(string));
+        status = string;
+        try {
+            Platform.runLater(this::updateStatusProperty);
+        } catch (IllegalStateException e) {
 
+        }
+
+    }
+
+    private void updateStatusProperty() {
+        statusProperty.setValue(status);
     }
 
     @Override
     public void setProgress(int i, int i1) {
-       Platform.runLater(() -> progressProperty.setValue(1.0 * i / i1));
+        count = i;
+        total = i1;
+        try {
+            Platform.runLater(this::updateProgressProperty);
+        } catch (IllegalStateException e) {
+
+        }
+
+    }
+
+    private void updateProgressProperty() {
+        progressProperty.setValue(1.0 * count / total);
     }
 
     public StringProperty statusProperty() {
@@ -126,17 +146,16 @@ public class FxStatusBar implements StatusBar {
     public Property<Number> progressProperty() {
         return progressProperty;
     }
-    
+
     public Property<Boolean> canCancelProperty() {
         return canCancel;
     }
 
     public void setIsProgressing(final boolean value) {
-        
-        
+
         Platform.runLater(() -> isProgressing.setValue(value));
     }
-    
+
     public BooleanProperty isProgressProperty() {
         return isProgressing;
     }
@@ -156,7 +175,9 @@ public class FxStatusBar implements StatusBar {
 
     @EventHandler
     public void onEvent(ModuleCanceledEvent event) {
-        if(moduleRunning.contains(event.getModule())==false) return;
+        if (moduleRunning.contains(event.getModule()) == false) {
+            return;
+        }
         decrementRunningModule();
         moduleRunning.remove(event.getModule());
         logger.info("Module canceled");
@@ -164,7 +185,9 @@ public class FxStatusBar implements StatusBar {
 
     @EventHandler
     public void onEvent(ModuleFinishedEvent event) {
-        if(moduleRunning.contains(event.getModule())==false) return;
+        if (moduleRunning.contains(event.getModule()) == false) {
+            return;
+        }
         decrementRunningModule();
         moduleRunning.remove(event.getModule());
         logger.info("Module finished");
@@ -192,57 +215,53 @@ public class FxStatusBar implements StatusBar {
     public CountProperty moduleCountProperty() {
         return moduleCount;
     }
-    
-    
-   
-    
-    
-  public void submitTask(final Task task, final boolean canCancel) {
-            
+
+    public void submitTask(final Task task, final boolean canCancel) {
+
         progressProperty().bind(task.progressProperty());
-       
+
         if (task.isRunning()) {
             //System.out.println("The task is already running");
-             isProgressing.setValue(true);
-             currentTask = task;
-             this.canCancel.setValue(canCancel);
+            isProgressing.setValue(true);
+            currentTask = task;
+            this.canCancel.setValue(canCancel);
         } else {
             task.addEventHandler(WorkerStateEvent.WORKER_STATE_RUNNING, ch -> {
                 //System.out.println("The task starts");
-                 currentTask = task;
-                 
-                 this.canCancel.setValue(canCancel);
+                currentTask = task;
+
+                this.canCancel.setValue(canCancel);
                 statusProperty().bind(task.messageProperty());
                 isProgressing.setValue(true);
-               
+
             });
-            task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,this::onTaskOver);
-            task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED,this::onTaskOver);
+            task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, this::onTaskOver);
+            task.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, this::onTaskOver);
             task.addEventHandler(WorkerStateEvent.WORKER_STATE_FAILED, this::onTaskOver);
         }
-       // System.out.println("End of submission");
+        // System.out.println("End of submission");
     }
 
-  public void onCancel(ActionEvent event) {
-        if(currentTask!=null) {
+    public void onCancel(ActionEvent event) {
+        if (currentTask != null) {
             currentTask.cancel();
             currentTask = null;
             isProgressing.setValue(false);
         }
-  }
-  
-  public void onTaskOver(Event event) {
-    
+    }
+
+    public void onTaskOver(Event event) {
+
         progressProperty().unbind();
         statusProperty().unbind();
-        
-          if(event.getEventType().equals(WorkerStateEvent.WORKER_STATE_CANCELLED)) {
-              statusProperty().set("Cancel !");
-      }
-        
+
+        if (event.getEventType().equals(WorkerStateEvent.WORKER_STATE_CANCELLED)) {
+            statusProperty().set("Cancel !");
+        }
+
         isProgressing.setValue(false);
         canCancel.setValue(false);
         currentTask = null;
-       
-  }
+
+    }
 }

@@ -26,7 +26,6 @@ import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.PlaneDBBatchInput;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.main.Localization;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.MyWorkflowService;
 import ijfx.service.workflow.DefaultWorkflow;
@@ -79,10 +78,9 @@ import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
-import mongis.utils.FakeTask;
 import ijfx.ui.UiPlugin;
-import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
+import ijfx.ui.activity.Activity;
 import ijfx.ui.project_manager.projectdisplay.PlaneSet;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplay;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayActived;
@@ -96,9 +94,9 @@ import ijfx.ui.context.animated.Animations;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "batch-processor-configurator", context = UiContexts.PROJECT_BATCH_PROCESSING, localization = Localization.CENTER)
-public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, ActionHandler<WorkflowStep> {
+@Plugin(type = Activity.class,name=UiContexts.PROJECT_BATCH_PROCESSING)
+//@UiConfiguration(id = "batch-processor-configurator", context = UiContexts.PROJECT_BATCH_PROCESSING, localization = Localization.CENTER)
+public class BatchProcessorConfigurator extends BorderPane implements Activity, ActionHandler<WorkflowStep> {
 
     /*
      Services
@@ -130,7 +128,8 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     @Parameter
     private ProjectDisplayService projectDisplayService;
     
-    
+    @Parameter
+    private UiContextService uiContextService;
     
     
     /*
@@ -286,14 +285,14 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
     }
     
     @Override
-    public Node getUiElement() {
+    public Node getContent() {
         return this;
     }
 
     @Override
-    public UiPlugin init() {
+    public Task updateOnShow() {
        
-
+        
         stepListView.setCellFactory(newCell -> new DraggableStepCell(context, s -> execute(s)));
 
         stepListView.setItems(steps);
@@ -309,12 +308,12 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
 
 
             if (event.getCode() == KeyCode.ENTER) {
-                modules.get(moduleSearchTextField.getText()).run();
-                moduleSearchTextField.setText("");
+                add();
             }
         });
 
         moduleSearchTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+            // set true if a module with this name exists
             isModuleNameValidProperty.setValue(modules.containsKey(newValue));
         });
 
@@ -328,12 +327,28 @@ public class BatchProcessorConfigurator extends BorderPane implements UiPlugin, 
         updatePlaneSet();
         
         
-        return this;
+        return null;
     }
 
+    @FXML
+    public void add() {
+        modules.get(moduleSearchTextField.getText()).run();
+        moduleSearchTextField.setText("");
+    } 
+    
+    @FXML
+    public void backToDatabase() {
+        uiContextService
+                .leave("batch-processor-configurator");
+        uiContextService
+                .enter(UiContexts.PROJECT_MANAGER);
+        uiContextService.update();
+    }
+    
     
     public void onAddMenuButtonClicked(ShadowMenu shadowMenu) {
         addStep(shadowMenu.getModuleInfo());
+        moduleSearchTextField.setText("");
     }
     
     public void onSaveFolderChange(Observable obs, File oldValue, File newValue) {

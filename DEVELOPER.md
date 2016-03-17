@@ -48,7 +48,7 @@ Here is a boiler plate UiPlugin
 ~~~java
 
 @Plugin(type = UiPlugin.class)
-@Widget(id = "context-switch-button", localization = Localization.BOTTOM_RIGHT, context="always")
+@UiConfiguration(id = "context-switch-button", localization = Localization.BOTTOM_RIGHT, context="always")
 public class ContextSwitchButton {
 	
 	// the services will be injected *AFTER* instanciation
@@ -93,7 +93,7 @@ public class ContextSwitchButton {
 
 ~~~
 
-As you can see, a UiContext doesn't need to be pre-existent. You can create as many UiContext as you want but it's also your responsability to provide a way to the user to come back to a previous contexts.
+As you can see, a UiContext doesn't need to be pre-existent. You can create as many UiContext as you want but it's also your responsability to provide a way for the user to come back to a previous context.
 
 In this way, one could imagine creating an set of widgets and plugins linked to "Super-resolution" processes.
 
@@ -230,7 +230,7 @@ This is a very naive example but it illustrates what can be done with the differ
 JavaFX provides an API to listen easily to the model. An alternative to the previous design would be to propose a service that only returns an ObservableList<File>. Since this type of object already deals with event propagation, SciJavaEvent classes would become useless. However, this implementation would enforce the use of JavaFX API and perhaps close the possibility of linking your service with other types of interface.
 
 
-## Userful ImageJFX Classes
+## Useful ImageJFX Classes
 
 ### AbstractContextButton
 
@@ -275,3 +275,63 @@ public class FloatTheImage extends AbstractContextButton {
 } // end of class
 ~~~
 
+### AsyncCallback
+(name may change soon)
+
+The **AsyncCallback** class gives a way to quickly create a task that takes an generic input and a output and execute some process in the FX Thread afterwards. For instance, let's say we want to do calculation from a list of specific object in a separate thread and use the result to set a JavaFX Property (which may fails if done outside the FX Thread), one can do it like this : 
+
+~~~java
+// a list set before
+
+List<PlaneDB> planes = getListFromSomewhere()
+
+AsyncCallback<List<PlaneDB>,Integer> countSpecificPlanes = new AsyncCallback<>()
+	.setInput(planes) // we set a specific input. Setting the input right away is not necessary
+	// the run takes a callback as input
+	.run(list->list 
+		.stream()
+		.filter(plane->plane.isSpecific() == true)
+		.count()
+	)
+	// defining what happends when the task succeed
+	.then(resultCount->planeCountProperty.setValue(resultCount))
+	.start(); // starts the task in the ImageJFX thread pool
+	
+~~~
+
+
+Note that **AsyncCallback** extends **Task<OUTPUT>** so you can choose to return it and submit it to any thread pool you want.
+
+Note also that the run method takes a **Callback** which means one can also use a method as input.
+
+~~~java
+ListView<File> fileListView;
+
+public void updateFileList(File directory) {
+   new AsyncCallback<File,List<File>>()
+   		.setInput(directory)
+   		.run(this::listDirectory)
+   		.then(this::setFileList)
+   		.start();
+}
+
+private List<File> listDirectory(File directory) {
+	return directory.listFiles();
+}
+
+private setFileList(List<File> fileToDisplay) {
+	fileListView.getItems().addAll(fileToDisplay);
+}
+
+~~~
+	
+This class is pretty convenient when developing user-interfaces. It allows you to keep the logic in a separate method while giving you the possibility to choose what is executed in the FX Thread and what is executed in a separate thread.
+
+
+# Personal Database and Cards
+
+The Personal Database Dashboar provides a card system which allows you to run quick quality check of the database and propose easy and quick solution to the user.
+
+A card is a simple element composed of a JavaFX Node to be shown and a **Task** which will be executed each time the project is changed or updated. The **Task** will be executed in a separate thread and should be used to do quality check or any statistic gathering on the PDB.
+
+In this case, we will do a card that check if all the files specified in the Personal Database actually exist. Then we will propose a solution for the user.

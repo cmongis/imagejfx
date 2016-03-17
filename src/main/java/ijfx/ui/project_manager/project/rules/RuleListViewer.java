@@ -25,17 +25,16 @@ import ijfx.core.project.ProjectManagerService;
 import ijfx.core.project.event.ProjectActivatedEvent;
 import ijfx.core.project.query.QueryService;
 import ijfx.service.uicontext.UiContextService;
-import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
-import ijfx.ui.UiPlugin;
+import ijfx.ui.activity.Activity;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.main.Localization;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
@@ -52,9 +51,9 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id="rule-list-view",context="project-rule-list",localization=Localization.CENTER)
-public class RuleListViewer extends BorderPane implements UiPlugin{
+@Plugin(type = Activity.class,name="rule-list-viewer")
+//@UiConfiguration(id="rule-list-view",context="project-rule-list",localization=Localization.CENTER)
+public class RuleListViewer extends BorderPane implements Activity{
     
     @FXML
     ListView<AnnotationRule> listView;
@@ -85,18 +84,18 @@ public class RuleListViewer extends BorderPane implements UiPlugin{
     }
 
     @Override
-    public Node getUiElement() {
+    public Node getContent() {
         return this;
     }
 
     @Override
-    public UiPlugin init() {
+    public Task updateOnShow() {
         
         //listView = new AnnotationRuleImpl(new UniversalSelector("actin"), new AddMetaDat)
         if(projectManagerService.getCurrentProject() != null) {
             listView.setItems(projectManagerService.getCurrentProject().getAnnotationRules());
         }
-        return this;
+        return null;
     }
     
     ArrayList<RuleCellController> createdControllers = new ArrayList<>();

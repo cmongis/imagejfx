@@ -17,14 +17,29 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
+package ijfx.ui.canvas;
 
-import org.scijava.service.SciJavaService;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  *
  * @author cyril
  */
-public interface IjfxService extends SciJavaService{
+public class FxCanvasTest2 extends Application{
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+       FxImageCanvas2 canvas = new FxImageCanvas2();
+        Scene scene = new Scene(canvas);
+       
+       primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+    
+    public static void main(String... args) {
+        launch(args);
+    }
     
 }

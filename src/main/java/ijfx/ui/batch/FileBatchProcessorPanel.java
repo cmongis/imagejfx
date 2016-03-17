@@ -27,6 +27,7 @@ import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
 import ijfx.ui.UiPlugin;
+import ijfx.ui.activity.Activity;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.utils.CurrentTaskProperty;
@@ -75,9 +76,9 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "file-batch-processing-panel", context = UiContexts.FILE_BATCH_PROCESSING, localization = Localization.CENTER)
-public class FileBatchProcessorPanel extends SplitPane implements UiPlugin {
+@Plugin(type = Activity.class,name=UiContexts.FILE_BATCH_PROCESSING)
+//@UiConfiguration(id = "file-batch-processing-panel", context = UiContexts.FILE_BATCH_PROCESSING, localization = Localization.CENTER)
+public class FileBatchProcessorPanel extends SplitPane implements Activity {
 
     private final static Logger logger = ImageJFX.getLogger();
 
@@ -371,18 +372,18 @@ public class FileBatchProcessorPanel extends SplitPane implements UiPlugin {
     }
 
     @Override
-    public Node getUiElement() {
+    public Node getContent() {
         return this;
     }
 
     @Override
-    public UiPlugin init() {
+    public Task updateOnShow() {
 
         workflowPanel = new WorkflowPanel(context);
         setDividerPositions(0.5);
         //getChildren().add(workflowPanel);
         rightBorderPane.setCenter(workflowPanel);
-        return this;
+        return null;
     }
     
     

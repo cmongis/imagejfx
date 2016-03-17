@@ -17,14 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
-
-import org.scijava.service.SciJavaService;
+package ijfx.core.metadata;
 
 /**
  *
  * @author cyril
  */
-public interface IjfxService extends SciJavaService{
+public interface MetaDataOwner {
+     public MetaDataSet getMetaDataSet();
+     
     
 }

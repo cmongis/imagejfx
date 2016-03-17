@@ -40,9 +40,9 @@ import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
 
 import mongis.utils.FXUtilities;
-import ijfx.ui.UiPlugin;
-import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
+import ijfx.ui.activity.Activity;
+import javafx.concurrent.Task;
 import org.scijava.plugins.commands.io.OpenFile;
 
 /**
@@ -52,9 +52,9 @@ import org.scijava.plugins.commands.io.OpenFile;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(context = "imagej", id = "imagej-container", localization = "centerStackPane")
-public class ImageJContainer extends BorderPane implements UiPlugin {
+@Plugin(type = Activity.class,name="imagej",label="Visualization")
+//@UiConfiguration(context = "imagej", id = "imagej-container", localization = "centerStackPane")
+public class ImageJContainer extends BorderPane implements Activity {
 
     //MenuBar menuBar = new MenuBar();
     ToolBar toolbar = new ToolBar();
@@ -80,19 +80,27 @@ public class ImageJContainer extends BorderPane implements UiPlugin {
     private static final String DRAG_OVER_CSS_STYLE = "dragover";
 
     @Override
-    public Node getUiElement() {
+    public Node getContent() {
         return this;
     }
     public static final String TOP = "imagej-container-top";
 
     AnimatedPaneContextualView hboxViewCtrl;
 
+    
     public ImageJContainer() {
 
         // setting the singleton in the center
         setCenter(ImageWindowContainer.getInstance());
         ImageWindowContainer.getInstance().getChildren().addListener(this::onListChange);
 
+        
+        this.setOnDragDropped(this::onDragDropped);
+        this.setOnDragOver(this::onDragOver);
+        this.setOnDragEntered(this::onDragEntered);
+        this.setOnDragExited(this::onDragExited);
+
+        
     }
 
     /* method called when the number of windows is changed. The container 
@@ -156,14 +164,10 @@ public class ImageJContainer extends BorderPane implements UiPlugin {
     }
 
     @Override
-    public UiPlugin init() {
+    public Task updateOnShow() {
 
-        this.setOnDragDropped(this::onDragDropped);
-        this.setOnDragOver(this::onDragOver);
-        this.setOnDragEntered(this::onDragEntered);
-        this.setOnDragExited(this::onDragExited);
-
-        return this;
+      
+        return null;
     }
 
     private void openFile(File file) {

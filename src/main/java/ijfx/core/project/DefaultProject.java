@@ -46,6 +46,8 @@ import javafx.beans.property.ReadOnlyMapProperty;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 
 /*
@@ -120,6 +122,11 @@ public class DefaultProject implements Project {
         hierarchy.add(MetaData.CHANNEL);
         hierarchy.add(MetaData.Z_POSITION);
         settings = new MetaDataSet();
+        groupBy.addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            }
+        });
     }
 
     @Override

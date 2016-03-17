@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
@@ -30,6 +31,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="Type the step name :" GridPane.rowIndex="2" />
@@ -38,7 +40,7 @@
             <Button fx:id="saveFolderButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeSaveFolder" text="Choose a directory..." GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
             <CheckBox mnemonicParsing="false" text="Replace entries in DB" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
             <TextField fx:id="moduleSearchTextField" promptText="e.g. Gaussian Blur..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Button fx:id="addButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Add" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Button fx:id="addButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add" text="Add" GridPane.columnIndex="2" GridPane.rowIndex="2" />
             <MenuButton fx:id="menuButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Menu" GridPane.columnIndex="3" GridPane.rowIndex="2" />
             <Button fx:id="startButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startBatchProcessing" styleClass="success" text="Start processing" GridPane.columnIndex="1" GridPane.rowIndex="7" />
             <ProgressBar fx:id="progressBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
@@ -48,6 +50,8 @@
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveWorkflow" text="Save workflow" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
             <Label text="Plane set" />
             <ComboBox fx:id="planeSetComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#backToDatabase" text="Back to Project" GridPane.rowIndex="10" />
+            <FontAwesomeIconView glyphName="ARROW_LEFT" GridPane.rowIndex="10" />
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

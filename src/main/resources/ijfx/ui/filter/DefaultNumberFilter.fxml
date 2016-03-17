@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="200.0" minWidth="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <BarChart fx:id="barChart" barGap="0.0" categoryGap="0.0" legendVisible="false" BorderPane.alignment="CENTER">
+        <xAxis>
+          <CategoryAxis fx:id="categoryAxis" endMargin="0.0" gapStartAndEnd="false" side="BOTTOM" startMargin="0.0" tickLabelGap="0.0" tickLabelsVisible="false" tickLength="5.0" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="numberAxis" minorTickCount="1" side="LEFT" tickLabelGap="0.0" tickLabelsVisible="false" tickLength="0.0" />
+        </yAxis>
+      </BarChart>
+   </center>
+</fx:root>

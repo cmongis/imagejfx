@@ -19,10 +19,9 @@
  */
 package ijfx.core.project;
 
-import javafx.application.Application;
-import net.imagej.ImageJ;
+import ijfx.core.imagedb.ImageRecordService;
 import org.junit.Test;
-import org.scijava.Context;
+import org.scijava.SciJava;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -31,10 +30,10 @@ import org.scijava.plugin.Parameter;
  */
 
 
-public class BasicProjectOperationTest {
+public class BaseSciJavaTest {
     
     
-    public static ImageJ imagej;
+    public static SciJava scijava;
     
     
     @Parameter
@@ -43,25 +42,29 @@ public class BasicProjectOperationTest {
     @Parameter
     ProjectIoService projectIOService;
     
-    public static ImageJ getImageJ() {
-        if(imagej == null) {
-            Context context = new Context();
-            imagej = new ImageJ(context);
+    @Parameter
+    ImageRecordService imageRecordService;
+    
+    public static SciJava getSciJava() {
+        if(scijava == null) {
+            System.out.println("Initializing SCIJAVA");
+           scijava = new SciJava();
+            System.out.println("Inialization over");
         }
-        return imagej;
+        return scijava;
     }
     
     
     public void init() {
         
-        
-        getImageJ().getContext().inject(this);
+        System.out.println("Injecting context");
+        getSciJava().getContext().inject(this);
     }
     
-    @Test
+
     public void testProjectSettings() {
         
-      //  init();
+       init();
         
         System.out.println(projectService);
         

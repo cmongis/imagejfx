@@ -71,6 +71,8 @@ public class FxImageCanvas extends Canvas {
     Pane container;
     
     
+    
+    
     /**
      * Creates an FxImageCanvas
      */
@@ -168,7 +170,7 @@ public class FxImageCanvas extends Canvas {
             // getting the part of the image seen the camera
             final Rectangle2D camRectangle = camera.getSeenRectangle();
 
-            
+            ;
             final double sx = camRectangle.getMinX();
             final double sy = camRectangle.getMinY();
             final double sw = camRectangle.getWidth();

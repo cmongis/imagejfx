@@ -1697,3 +1697,14 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .after-h3, .after-h3:hover {
     -fx-translate-y:10px;
 }
+
+.image-icon-item .title-label {
+    -fx-pref-height:3em;
+    -fx-font-size:0.9em;
+    -fx-wrap-text:true;
+}
+
+.image-icon-item .subtitle-label {
+    -fx-text-fill:-txt-normal;
+    -fx-font-size:0.8em;
+}

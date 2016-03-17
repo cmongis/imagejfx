@@ -17,14 +17,30 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
+package ijfx.core.metadata;
 
-import org.scijava.service.SciJavaService;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
 
 /**
  *
  * @author cyril
  */
-public interface IjfxService extends SciJavaService{
+public class MetaDataSerializer extends JsonSerializer<MetaDataSet> {
+
+   
+    @Override
+    public void serialize(MetaDataSet t, JsonGenerator jg, SerializerProvider sp) throws IOException, JsonGenerationException {
+        jg.writeStartObject();
+        for (MetaData m : t.values()) {
+            jg.writeObjectField(m.getName(), m.getValue());
+        }
+        jg.writeEndObject();
+    }
+
+    
     
 }

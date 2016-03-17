@@ -39,6 +39,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import ijfx.ui.context.animated.Animations;
+import javafx.scene.layout.Pane;
 
 /**
  * The ArcMenu.
@@ -73,7 +74,7 @@ public class ArcMenu extends StackPane {
     protected boolean isAnimating = false;
 
     // attached stack pane
-    StackPane attachedPane = null;
+    Pane attachedPane = null;
 
     /**
      *
@@ -122,7 +123,7 @@ public class ArcMenu extends StackPane {
      *
      * @param pane
      */
-    public void attachedTo(StackPane pane) {
+    public void attachedTo(Pane pane) {
         attachedPane = pane;
         attachedPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             toggle(event);
@@ -179,11 +180,15 @@ public class ArcMenu extends StackPane {
             double paneHeight = attachedPane.heightProperty().getValue();
 
             // calculating the distance to the center of the pane and the mouse event
-            double xToCenter = -paneWidth / 2 + event.getX();
-            xToCenter *= attachedPane.getScaleX();
-            double yToCenter = -paneHeight / 2 + event.getY();
-            yToCenter *= 1 / attachedPane.getScaleY();
+            double xToCenter =  event.getX();//-paneWidth / 2 + event.getX();
+           // xToCenter *= attachedPane.getScaleX();
+            double yToCenter = event.getY(); //paneHeight / 2 + event.getY();
+           // yToCenter *= 1 / attachedPane.getScaleY();
 
+            
+            //this.setLayoutX(centerX);
+            //this.setLayoutY(centerY);
+            
             // setting the translation 
             this.setTranslateX(xToCenter);
             this.setTranslateY(yToCenter);
@@ -419,7 +424,7 @@ public class ArcMenu extends StackPane {
      *
      * @param stackPane
      */
-    public void detachFrom(StackPane stackPane) {
+    public void detachFrom(Pane stackPane) {
 
         if (stackPane.getChildren().contains(this)) {
             stackPane.getChildren().remove(this);

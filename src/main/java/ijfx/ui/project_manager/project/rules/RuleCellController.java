@@ -38,7 +38,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
-import mongis.utils.FunctionnalTask;
 import mongis.utils.ListCellController;
 import org.scijava.plugin.Parameter;
 

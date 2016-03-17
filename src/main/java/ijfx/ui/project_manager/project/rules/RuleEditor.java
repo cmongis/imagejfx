@@ -26,14 +26,13 @@ import ijfx.core.project.query.QueryService;
 import ijfx.core.project.query.Selector;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.RichMessageDisplayer;
-import ijfx.ui.UiConfiguration;
-import ijfx.ui.UiPlugin;
+import ijfx.ui.activity.Activity;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.main.Localization;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -47,14 +46,15 @@ import mongis.utils.FXUtilities;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import static ucar.nc2.iosp.nexrad2.NexradStationDB.init;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "rule-editor", localization = Localization.CENTER, context = "project-rule-edition")
-public class RuleEditor extends BorderPane implements UiPlugin {
+@Plugin(type = Activity.class,name ="rule-editor")
+//@UiConfiguration(id = "rule-editor", localization = Localization.CENTER, context = "project-rule-edition")
+public class RuleEditor extends BorderPane implements Activity {
 
     @Parameter
     Context context;
@@ -144,18 +144,18 @@ public class RuleEditor extends BorderPane implements UiPlugin {
     }
 
     @Override
-    public Node getUiElement() {
+    public Node getContent() {
         return this;
     }
 
     @Override
-    public UiPlugin init() {
+    public Task updateOnShow() {
         if (context != null) {
             context.inject(modifierEditor);
             modifierEditor.afterContextInjection();
             borderPane.setCenter(modifierEditor.getUiElement());
         }
-        return this;
+        return null;
     }
 
     @FXML

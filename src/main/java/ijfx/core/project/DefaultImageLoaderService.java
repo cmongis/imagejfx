@@ -62,9 +62,11 @@ public class DefaultImageLoaderService extends AbstractService implements ImageL
     private final static String FORMAT_FILE_NAME = "supportedFormats.txt";
     public List<String> formats = new ArrayList<>();
 
+    @Override
     public IOFileFilter getIOFileFilter() {
         List<IOFileFilter> suffixFilters = new ArrayList<>();
-        for (String ext : formats) {
+        for (String ext : getSupportedExtensions()) {
+            
             suffixFilters.add(new SuffixFileFilter(ext));
         }
         IOFileFilter suffixFilter = new OrFileFilter(suffixFilters);

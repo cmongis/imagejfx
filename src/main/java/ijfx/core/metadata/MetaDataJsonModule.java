@@ -17,14 +17,18 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
+package ijfx.core.metadata;
 
-import org.scijava.service.SciJavaService;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  *
  * @author cyril
  */
-public interface IjfxService extends SciJavaService{
-    
+public class MetaDataJsonModule extends SimpleModule{
+    public MetaDataJsonModule() {
+        
+        addSerializer(MetaDataSet.class,new MetaDataSerializer());
+        addDeserializer(MetaDataSet.class, new MetaDataDeserializer());
+    }
 }
