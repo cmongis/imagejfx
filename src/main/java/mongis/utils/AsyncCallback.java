@@ -55,6 +55,10 @@ public class AsyncCallback<INPUT,OUTPUT> extends Task<OUTPUT>{
     }
     
     public AsyncCallback<INPUT,OUTPUT> run(Runnable runnable) {
+        if(runnable == null) {
+            System.out.println("Cannot run null :-S");
+            return this;
+        }
         this.callback = input->{runnable.run(); return null;};
         return this;
     }

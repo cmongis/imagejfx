@@ -26,10 +26,10 @@ import javafx.scene.Node;
  *
  * @author Cyril MONGIS, 2015
  */
-public interface ListCellController<T> {
+public interface ListCellController<T>{
 
     
-   
+    
     
     public void setItem(T t);
 
