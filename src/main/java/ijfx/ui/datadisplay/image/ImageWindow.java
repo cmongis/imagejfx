@@ -44,9 +44,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
@@ -78,6 +78,7 @@ import org.scijava.event.EventService;
 import org.scijava.log.LogService;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.PluginService;
 import org.scijava.thread.ThreadService;
 
 /**
@@ -137,6 +138,8 @@ public class ImageWindow extends Window {
     @Parameter
     OverlayDrawingService overlayDrawer;
     
+    @Parameter
+    PluginService pluginService;
     
     FxTool currentTool;
 
@@ -147,7 +150,7 @@ public class ImageWindow extends Window {
     HiddenSidesPane hiddenSidePane = new HiddenSidesPane();
     BorderPane borderPane = new BorderPane();
     FxImageCanvas canvas = new FxImageCanvas();
-    StackPane stackPane = new StackPane();
+    AnchorPane stackPane = new AnchorPane();
     
     HBox hbox = new HBox();
 
@@ -223,6 +226,7 @@ public class ImageWindow extends Window {
         infoLabel.getStyleClass().add(INFO_LABEL_CLASS_NAME);
        
 
+        
     }
 
     public ImageWindow(Display<?> display) {
