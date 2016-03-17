@@ -31,12 +31,15 @@ import org.scijava.plugin.SciJavaPlugin;
 public interface Activity extends SciJavaPlugin {
     
     public default String getName() {
-         Plugin declaredAnnotation = getClass().getDeclaredAnnotation(Plugin.class);
+         Plugin declaredAnnotation = getClass().getAnnotation(Plugin.class);
         return declaredAnnotation.label();
     }
     
-    public default String getId() {
-        Plugin declaredAnnotation = getClass().getDeclaredAnnotation(Plugin.class);
+    public default String getActivityId() {
+        System.out.println("getting the id");
+        Plugin declaredAnnotation = getClass().getAnnotation(Plugin.class);
+        String id = declaredAnnotation.name();
+        System.out.println(id);
         return declaredAnnotation.name();
     }
     

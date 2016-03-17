@@ -20,6 +20,7 @@
 package ijfx.ui.activity;
 
 import ijfx.service.IjfxService;
+import ijfx.ui.plugin.WebAppContainer;
 import java.util.Collection;
 
 /**
@@ -32,11 +33,14 @@ public interface ActivityService extends IjfxService{
     
     public String getActivityName(Class<? extends Activity> activity);
     
-    public void switchTo(String string); 
+    public Activity getActivityByName(String id);
+    public Activity getActivity(Class<? extends Activity> activityClass);
     
-    public void switchTo(Class<? extends Activity> activity);
+    public void openByName(String string); 
     
-    public void switchTo(Activity activity);
+    public void openByType(Class<? extends Activity> activity);
+    
+    public void open(Activity activity);
     
     public void back();
     
@@ -45,6 +49,8 @@ public interface ActivityService extends IjfxService{
     public boolean isForwardPossible();
     
     public boolean isBackPossible();
+
+
     
     
 }
