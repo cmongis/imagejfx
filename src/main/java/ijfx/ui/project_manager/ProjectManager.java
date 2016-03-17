@@ -27,7 +27,6 @@ import ijfx.ui.project_manager.project.BrowserUIService;
 import ijfx.ui.project_manager.project.MainProjectController;
 import ijfx.ui.project_manager.search.SearchBar;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.main.Localization;
 import ijfx.service.uicontext.UiContextService;
 import java.io.IOException;
 import java.net.URL;
@@ -58,9 +57,8 @@ import javafx.stage.Stage;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import ijfx.ui.UiPlugin;
-import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiContexts;
+import ijfx.ui.activity.Activity;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayActived;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayClosedEvent;
 import ijfx.ui.project_manager.projectdisplay.ProjectDisplayCreatedEvent;
@@ -68,6 +66,7 @@ import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
 import ijfx.ui.project_manager.projectdisplay.ProjectPane;
 import ijfx.ui.context.animated.Animations;
 import java.util.logging.Level;
+import javafx.concurrent.Task;
 
 /**
  * ProjectManager class. This is the main controller of the browser UI.
@@ -76,9 +75,9 @@ import java.util.logging.Level;
  * @author Cyril Quinton
  *
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = UiContexts.PROJECT_MANAGER, context = UiContexts.PROJECT_MANAGER, localization = Localization.CENTER)
-public class ProjectManager extends BorderPane implements Initializable, UiPlugin {
+@Plugin(type = Activity.class,name=UiContexts.PROJECT_MANAGER)
+//@UiConfiguration(id = UiContexts.PROJECT_MANAGER, context = UiContexts.PROJECT_MANAGER, localization = Localization.CENTER)
+public class ProjectManager extends BorderPane implements Initializable, Activity {
 
     @FXML
     private TabPane projectViewTabPane;
@@ -175,12 +174,12 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
     }
 
     @Override
-    public Node getUiElement() {
+    public Node getContent() {
         return this;
     }
 
     @Override
-    public UiPlugin init() {
+    public Task updateOnShow() {
 
         // listen for changes in the list of opened projects
         //projectManager.getProjects().addListener(this::handleProjectListChange);
@@ -217,7 +216,7 @@ public class ProjectManager extends BorderPane implements Initializable, UiPlugi
             }
         });
 
-        return this;
+        return null;
     }
 
     @Override

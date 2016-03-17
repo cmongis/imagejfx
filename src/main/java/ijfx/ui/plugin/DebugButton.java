@@ -73,7 +73,7 @@ public class DebugButton extends MenuButton implements UiPlugin{
         addItem("Reload CSS",this::reloadCss);
         addItem("Reload Debug Button",event->widgetService.reload(DebugButton.class));
         addItem("Reload App Browser",event->appService.reloadCurrentView());
-        addItem("Reload Batch Processing Screen",event->widgetService.reload(BatchProcessorConfigurator.class));
+        //addItem("Reload Batch Processing Screen",event->widgetService.reload(BatchProcessorConfigurator.class));
         addItem("Reload an other",this::reloadAnOther);
         addItem("Test hints",this::testHints);
         addItem("Show/Hide sideMenu",this::triggerDebugEvent);
@@ -130,7 +130,7 @@ public class DebugButton extends MenuButton implements UiPlugin{
        
         //widgetService.reload(OverlayManagerPanel.class);
         //widgetService.reload(OverlayPanel.class);
-        widgetService.reload(ProjectManager.class);
+        //widgetService.reload(ProjectManager.class);
         //widgetService.reload(RuleEditor.class);
         //widgetService.reload(RuleListViewer.class);
         //notificationService.publish(new DefaultNotification("It works !","perfectly !").addAction("Tell him",()->System.out.println("Yeah")));

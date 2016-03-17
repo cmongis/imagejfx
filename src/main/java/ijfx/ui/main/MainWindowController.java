@@ -23,6 +23,7 @@ package ijfx.ui.main;
 import ijfx.ui.context.animated.AnimatedPaneContextualView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.bridge.ImageJContainer;
 import ijfx.ui.notification.Notification;
 import ijfx.ui.notification.NotificationEvent;
 import ijfx.service.ui.AppService;
@@ -46,7 +47,6 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
@@ -66,6 +66,10 @@ import ijfx.ui.IjfxCss;
 import ijfx.ui.UiContexts;
 import ijfx.ui.UiPluginSorter;
 import ijfx.ui.WebApps;
+import ijfx.ui.activity.Activity;
+import ijfx.ui.activity.ActivityChangedEvent;
+import ijfx.ui.activity.ActivityService;
+import ijfx.ui.batch.FileBatchProcessorPanel;
 import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.plugin.DebugEvent;
 import java.util.LinkedList;
@@ -94,6 +98,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
+import ijfx.ui.explorer.FileFilterActivity;
+import ijfx.ui.project_manager.ProjectManager;
+import mongis.utils.AnimationChain;
 
 /**
  * FXML Controller class
@@ -137,8 +144,10 @@ public class MainWindowController implements Initializable {
     AnchorPane mainAnchorPane;
 
     @FXML
-    private StackPane centerStackPane;
+    BorderPane mainBorderPane;
 
+    //@FXML
+    //private StackPane centerStackPane;
     @FXML
     private BorderPane sideMenu;
 
@@ -166,8 +175,7 @@ public class MainWindowController implements Initializable {
     HashMap<String, AnimatedPaneContextualView> uiPluginCtrl = new HashMap<>();
 
     protected BooleanBinding isSideMenuHidden;
-    
-    
+
     @Parameter
     UiPluginService uiPluginService;
 
@@ -184,6 +192,9 @@ public class MainWindowController implements Initializable {
 
     @Parameter
     HintService hintService;
+
+    @Parameter
+    ActivityService activityService;
 
     Queue<Hint> hintQueue = new LinkedList<>();
 
@@ -209,7 +220,7 @@ public class MainWindowController implements Initializable {
 
             Font.loadFont(FontAwesomeIcon.class.getResource("fontawesome-webfont.ttf").toExternalForm(), 16);
 
-            logger.info("Stargin ImageJ Loading");
+            logger.info("Starting ImageJ Loading");
             updateMessage("Initializing ImageJ");
             try {
                 imageJ = new ImageJ();
@@ -239,13 +250,11 @@ public class MainWindowController implements Initializable {
         // binding the sides to the pseudo class empty
         final PseudoClass empty = PseudoClass.getPseudoClass("empty");
         final PseudoClass hidden = PseudoClass.getPseudoClass("hidden");
-        
+
         BindingsUtils.bindNodeToPseudoClass(empty, leftVBox, new SimpleListProperty<Node>(leftVBox.getChildren()).emptyProperty());
         BindingsUtils.bindNodeToPseudoClass(empty, rightVBox, new SimpleListProperty<Node>(rightVBox.getChildren()).emptyProperty());
-        BindingsUtils.bindNodeToPseudoClass(hidden, sideMenu, Bindings.createBooleanBinding(()->sideMenu.getTranslateX() <= -1.0 * sideMenu.getWidth()+2,sideMenu.translateXProperty()));
-        
-       
-        
+        BindingsUtils.bindNodeToPseudoClass(hidden, sideMenu, Bindings.createBooleanBinding(() -> sideMenu.getTranslateX() <= -1.0 * sideMenu.getWidth() + 2, sideMenu.translateXProperty()));
+
         /*
         BooleanBinding binding = Bindings.isEmpty(leftVBox.getChildren()).addListener((obs,oldValue,newValue)->{
 
@@ -257,7 +266,7 @@ public class MainWindowController implements Initializable {
             rightVBox.pseudoClassStateChanged(empty, newValue);
         });
 
-        loadingScreen.setDefaultPane(centerStackPane);
+        loadingScreen.setDefaultPane(mainAnchorPane);
 
         initMenuAction();
         Platform.runLater(() -> hideSideMenu());
@@ -388,10 +397,10 @@ public class MainWindowController implements Initializable {
                 .setAnimationOnHide(Animations.DISAPPEARS_DOWN)
                 .setAnimationOnShow(Animations.APPEARS_DOWN);
 
+        /*
         registerPaneCtrl(centerStackPane)
                 .setAnimationOnHide(Animations.FADEOUT)
-                .setAnimationOnShow(Animations.FADEIN);
-
+                .setAnimationOnShow(Animations.FADEIN);*/
         registerPaneCtrl(topCenterHBox)
                 .setAnimationOnHide(Animations.DISAPPEARS_UP)
                 .setAnimationOnShow(Animations.APPEARS_UP);
@@ -413,12 +422,12 @@ public class MainWindowController implements Initializable {
     public void showLoading() {
         logger.info("Showing loading screen");
 
-        Platform.runLater(() -> loadingScreen.showOn(centerStackPane));
+        Platform.runLater(() -> loadingScreen.showOn(mainAnchorPane));
     }
 
     public void hideLoading() {
         logger.info("Hiding logging screen");
-        Platform.runLater(() -> loadingScreen.hideFrom(centerStackPane));
+        Platform.runLater(() -> loadingScreen.hideFrom(mainAnchorPane));
     }
 
     public AnimatedPaneContextualView registerPaneCtrl(Pane node) {
@@ -539,6 +548,27 @@ public class MainWindowController implements Initializable {
         Platform.runLater(() -> nextHint());
     }
 
+    @EventHandler
+    public void onActivityChanged(ActivityChangedEvent event) {
+        System.out.println("?");
+        logger.info("Activity changed : " + event.toString());
+        Task updateTask = event.getActivity().updateOnShow();
+        Runnable runnable = updateTask;
+        if (runnable == null) {
+            runnable = () -> {
+            };
+
+        }
+        new AnimationChain()
+                .animate(mainBorderPane.getCenter(), Animations.FADEOUT)
+                .then(runnable)
+                .thenInFXThread(() -> mainBorderPane.setCenter(event.getActivity().getContent()))
+                .animate(event.getActivity().getContent(), Animations.FADEIN)
+                .execute();
+
+        Platform.runLater(() -> mainBorderPane.setCenter(event.getActivity().getContent()));
+    }
+
     private void showNotification(Notification notification) {
 
         Platform.runLater(() -> {
@@ -588,9 +618,7 @@ public class MainWindowController implements Initializable {
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
-        
-       
-        
+
     }
 
     public void onUiPluginDisplaed(ContextualWidget<Node> uiPlugin) {
@@ -600,17 +628,19 @@ public class MainWindowController implements Initializable {
     }
 
     public synchronized void nextHint() {
-        
-        if(isHintDisplaying) return;
-        
+
+        if (isHintDisplaying) {
+            return;
+        }
+
         showHelpSequence(hintQueue.poll());
-        
+
     }
 
     public void showHelpSequence(Hint hint) {
 
         if (hint == null) {
-            
+
             return;
         }
 
@@ -618,118 +648,114 @@ public class MainWindowController implements Initializable {
         if (node == null) {
             logger.warning("Couldn't find node " + hint.getTarget());
             nextHint();
-            
+
             return;
         }
 
         try {
-        isHintDisplaying = true;
-        double hintWidth = 200;
-        double hintMargin = 20;
-        double rectanglePadding = 5;
-        Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
-        
-        Bounds rectangleBounds;
-        Rectangle rectangle = new Rectangle(nodeBounds.getMinX()-rectanglePadding, nodeBounds.getMinY()-rectanglePadding, nodeBounds.getWidth()+rectanglePadding*2, nodeBounds.getHeight()+rectanglePadding*2);
-        Rectangle bigOne = new Rectangle(0, 0, mainAnchorPane.getScene().getWidth(), mainAnchorPane.getScene().getHeight());
+            isHintDisplaying = true;
+            double hintWidth = 200;
+            double hintMargin = 20;
+            double rectanglePadding = 5;
+            Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
 
-        Shape highligther = Path.subtract(bigOne, rectangle);
-        highligther.setFill(Paint.valueOf("black"));
-        highligther.setOpacity(0.7);
+            Bounds rectangleBounds;
+            Rectangle rectangle = new Rectangle(nodeBounds.getMinX() - rectanglePadding, nodeBounds.getMinY() - rectanglePadding, nodeBounds.getWidth() + rectanglePadding * 2, nodeBounds.getHeight() + rectanglePadding * 2);
+            Rectangle bigOne = new Rectangle(0, 0, mainAnchorPane.getScene().getWidth(), mainAnchorPane.getScene().getHeight());
 
-        mainAnchorPane.getChildren().add(highligther);
-        Label label = new Label(hint.getText());
-        label.setPadding(new Insets(hintMargin));
-        label.getStyleClass().add("help-label");
-        label.setMaxWidth(hintWidth);
-        label.setWrapText(true);
-        label.setPrefWidth(hintWidth);
-        
-        rectangleBounds = rectangle.getBoundsInLocal();
-        
-        label.translateXProperty().bind(Bindings.createDoubleBinding(()->{
-        if (rectangleBounds.getMinX() < hintWidth + hintMargin) {
-           return rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
+            Shape highligther = Path.subtract(bigOne, rectangle);
+            highligther.setFill(Paint.valueOf("black"));
+            highligther.setOpacity(0.7);
 
-        } else {
-            return rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
-        }
-        }, highligther.translateXProperty()));
-        
+            mainAnchorPane.getChildren().add(highligther);
+            Label label = new Label(hint.getText());
+            label.setPadding(new Insets(hintMargin));
+            label.getStyleClass().add("help-label");
+            label.setMaxWidth(hintWidth);
+            label.setWrapText(true);
+            label.setPrefWidth(hintWidth);
 
-        label.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
-            if (rectangleBounds.getMinY() + label.getHeight() > node.getScene().getHeight()) {
-                return rectangleBounds.getMaxY() - label.getHeight();
-            } else {
-                return rectangleBounds.getMinY();
-            }
-        }, label.heightProperty()));
+            rectangleBounds = rectangle.getBoundsInLocal();
 
-        //label.setTranslateY(nodeBounds.getMinY());
-        Button gotItButton = new Button("Got it !");
-        
+            label.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
+                if (rectangleBounds.getMinX() < hintWidth + hintMargin) {
+                    return rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
 
-        gotItButton.translateXProperty().bind(label.translateXProperty());
-        
-        gotItButton.setPrefWidth(hintWidth);
-        
-        gotItButton.getStyleClass().add(IjfxCss.WARNING);
-        
-        gotItButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK));
-        
-        // when clicking on the anywhere on the screen
-        highligther.setOnMouseClicked(event -> {
+                } else {
+                    return rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
+                }
+            }, highligther.translateXProperty()));
 
-            // creating a transition
-            Transition transition = Animations.DISAPPEARS_RIGHT.configure(highligther, ImageJFX.getAnimationDurationAsDouble());
-            
-            // and when the transition if finished
-            transition
-                    .setOnFinished(event2
-                            -> { 
-                        //deleting the elements fromthe main panel
-                        mainAnchorPane.getChildren().removeAll(highligther, label, gotItButton);});
-            
-                        // set that the hint is not displayed again
-                        isHintDisplaying = false;
-            
-                        // displaying the next hint
-                         nextHint();
-            transition.play();
+            label.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
+                if (rectangleBounds.getMinY() + label.getHeight() > node.getScene().getHeight()) {
+                    return rectangleBounds.getMaxY() - label.getHeight();
+                } else {
+                    return rectangleBounds.getMinY();
+                }
+            }, label.heightProperty()));
 
-        });
-        mainAnchorPane.getChildren().addAll(label, gotItButton);
+            //label.setTranslateY(nodeBounds.getMinY());
+            Button gotItButton = new Button("Got it !");
 
-        
-        gotItButton.translateYProperty().bind(
-                Bindings.createDoubleBinding(
-                        () -> {
-                            return label.translateYProperty().getValue() + label.heightProperty().getValue() + hintMargin / 2;
-                        }, label.translateYProperty(), label.heightProperty()));
+            gotItButton.translateXProperty().bind(label.translateXProperty());
 
-        gotItButton.setOnAction(event -> {
-            highligther.getOnMouseClicked().handle(null);
-            hint.setRead();
-           
+            gotItButton.setPrefWidth(hintWidth);
 
-            //if(hintQueue.size() ==0 ) {
+            gotItButton.getStyleClass().add(IjfxCss.WARNING);
+
+            gotItButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK));
+
+            // when clicking on the anywhere on the screen
+            highligther.setOnMouseClicked(event -> {
+
+                // creating a transition
+                Transition transition = Animations.DISAPPEARS_RIGHT.configure(highligther, ImageJFX.getAnimationDurationAsDouble());
+
+                // and when the transition if finished
+                transition
+                        .setOnFinished(event2
+                                -> {
+                            //deleting the elements fromthe main panel
+                            mainAnchorPane.getChildren().removeAll(highligther, label, gotItButton);
+                        });
+
+                // set that the hint is not displayed again
+                isHintDisplaying = false;
+
+                // displaying the next hint
+                nextHint();
+                transition.play();
+
+            });
+            mainAnchorPane.getChildren().addAll(label, gotItButton);
+
+            gotItButton.translateYProperty().bind(
+                    Bindings.createDoubleBinding(
+                            () -> {
+                                return label.translateYProperty().getValue() + label.heightProperty().getValue() + hintMargin / 2;
+                            }, label.translateYProperty(), label.heightProperty()));
+
+            gotItButton.setOnAction(event -> {
+                highligther.getOnMouseClicked().handle(null);
+                hint.setRead();
+
+                //if(hintQueue.size() ==0 ) {
+                //}
+            });
+
+            //if(isHintDisplaying) {
+            Animations.APPEARS_LEFT.configure(highligther, ImageJFX.getAnimationDurationAsDouble()).play();
             //}
-        });
 
-        //if(isHintDisplaying) {
-        
-        Animations.APPEARS_LEFT.configure(highligther, ImageJFX.getAnimationDurationAsDouble()).play();
-        //}
+            // gotItButton.setTranslateY(label.getTranslateY()+label.getBoundsInLocal().getHeight()+hintWidth/2);
+            System.out.println(highligther.getLayoutBounds().getHeight());
+        } catch (Exception e) {
 
-        // gotItButton.setTranslateY(label.getTranslateY()+label.getBoundsInLocal().getHeight()+hintWidth/2);
-        System.out.println(highligther.getLayoutBounds().getHeight());
-        }catch(Exception e) {
-            
             isHintDisplaying = false;
             nextHint();
-            logger.log(Level.SEVERE,"Error when showing hint.",e);
+            logger.log(Level.SEVERE, "Error when showing hint.", e);
         }
-             
+
     }
 
     /**
@@ -740,40 +766,36 @@ public class MainWindowController implements Initializable {
     public void initMenuAction() {
 
         sideMenuMainTopVBox.getChildren().addAll(
-                new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", UiContexts.IMAGEJ, "browser image-browser webapp").setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", UiContexts.FILE_BATCH_PROCESSING, UiContexts.and(UiContexts.PROJECT_MANAGER, UiContexts.IMAGEJ)).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", UiContexts.PROJECT_MANAGER, "").setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR)
+                new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", ImageJContainer.class).setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", FileBatchProcessorPanel.class).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", ProjectManager.class).setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR)
+                ,new SideMenuButton("Explore",FileFilterActivity.class).setIcon(FontAwesomeIcon.COMPASS)
         );
 
     }
 
     private class SideMenuButton extends Button {
 
-        String contextToEnter;
-        String contextToLeave;
-
         String appToOpen;
+        Class<? extends Activity> activityClass;
 
-        public SideMenuButton() {
+        public SideMenuButton(String name) {
 
             super();
-
+            setText(name);
+            setOnAction(this::onAction);
             getStyleClass().add("side-menu-button");
             setMaxWidth(Double.MAX_VALUE);
         }
 
         public SideMenuButton(String name, String appToOpen) {
-            this();
-            setText(name);
+            this(name);
+
             this.appToOpen = appToOpen;
-            setOnAction(this::onAction);
+
         }
 
-        public SideMenuButton(String name, String contextToEnter, String contextToLeave) {
-            this();
-            setText(name);
-            this.contextToEnter = contextToEnter;
-            this.contextToLeave = contextToLeave;
-
-            setOnAction(this::onAction);
+        public SideMenuButton(String name, Class<? extends Activity> activityClass) {
+            this(name);
+            this.activityClass = activityClass;
         }
 
         public SideMenuButton setIcon(FontAwesomeIcon icon) {
@@ -790,13 +812,9 @@ public class MainWindowController implements Initializable {
             if (appToOpen != null) {
 
                 appService.showApp(appToOpen);
-                uiContextService.enter("webapp");
-                uiContextService.update();
 
             } else {
-                uiContextService.leave(contextToLeave);
-                uiContextService.enter(contextToEnter);
-                uiContextService.update();
+                activityService.openByType(this.activityClass);
             }
 
             hideSideMenu();

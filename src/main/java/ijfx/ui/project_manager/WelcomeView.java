@@ -21,7 +21,6 @@
 package ijfx.ui.project_manager;
 
 import mongis.utils.FXUtilities;
-import ijfx.ui.main.Localization;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -34,16 +33,16 @@ import javafx.scene.layout.BorderPane;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import ijfx.ui.UiPlugin;
-import ijfx.ui.UiConfiguration;
+import ijfx.ui.activity.Activity;
+import javafx.concurrent.Task;
 
 /**
  *
  * @author Cyril Quinton
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "fx-welcome-view", context = "no-project", localization = Localization.CENTER)
-public class WelcomeView extends BorderPane implements UiPlugin, Initializable {
+@Plugin(type = Activity.class)
+//@UiConfiguration(id = "fx-welcome-view", context = "no-project", localization = Localization.CENTER)
+public class WelcomeView extends BorderPane implements Activity, Initializable {
 
     @Parameter
     EventService eventService;
@@ -57,13 +56,13 @@ public class WelcomeView extends BorderPane implements UiPlugin, Initializable {
     }
 
     @Override
-    public Node getUiElement() {
+    public Node getContent() {
         return this;
     }
 
     @Override
-    public UiPlugin init() {
-        return this;
+    public Task updateOnShow() {
+        return null;
     }
 
     @Override

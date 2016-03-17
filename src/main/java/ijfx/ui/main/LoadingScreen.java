@@ -41,9 +41,11 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -65,8 +67,8 @@ public class LoadingScreen extends StackPane {
     Circle circle = new Circle(4 * 16);
     public static LoadingScreen singleton = new LoadingScreen();
     
-    StackPane defaultPane;
-    StackPane currentPane;
+    Pane defaultPane;
+    Pane currentPane;
     
     Button cancelButton = new Button("Cancel");
     ProgressBar progressBar = new ProgressBar();
@@ -82,9 +84,9 @@ public class LoadingScreen extends StackPane {
     private class TaskRequest {
         Task task;
         boolean cancelable;
-        StackPane pane;
+        Pane pane;
 
-        public TaskRequest(Task task, boolean cancelable, StackPane pane) {
+        public TaskRequest(Task task, boolean cancelable, Pane pane) {
             this.task = task;
             this.cancelable = cancelable;
             this.pane = pane;
@@ -171,7 +173,7 @@ public class LoadingScreen extends StackPane {
         return statusText.textProperty().getValue();
     }
 
-    public void showOn(StackPane node) {
+    public void showOn(Pane node) {
         // rectangle.widthProperty().setValue(node.widthProperty().getValue());
         //rectangle.heightProperty().setValue(node.heightProperty().getValue());
       //  System.out.println("Is the loading screen already displayed ?");
@@ -182,11 +184,11 @@ public class LoadingScreen extends StackPane {
             return;
         }
         
-       
-        
-
-        rectangle.setWidth(node.getWidth());
-        rectangle.setHeight(node.getHeight());
+        Bounds boundsInParent = node.getBoundsInParent();
+        double with = boundsInParent.getWidth();
+        double height = boundsInParent.getHeight();
+        rectangle.setWidth(with);
+        rectangle.setHeight(height);
         //MainWindowController.logger.info("" + node.getWidth());
         
         if(node.getChildren().contains(this) == false)   {
@@ -208,7 +210,7 @@ public class LoadingScreen extends StackPane {
         Platform.runLater(()->hideFrom(getDefaultPane()));
     }
 
-    public void hideFrom(StackPane node) {
+    public void hideFrom(Pane node) {
         final LoadingScreen thisLoadingScreen = this;
         
         if(currentTaskRequest != null) return;
@@ -258,7 +260,7 @@ public class LoadingScreen extends StackPane {
         submit(task, getInstance().getDefaultPane());
     }
     
-    public static void submit(Task task, StackPane pane) {
+    public static void submit(Task task, Pane pane) {
         getInstance().submitTask(task, pane);
     }
     
@@ -270,12 +272,12 @@ public class LoadingScreen extends StackPane {
         submitTask(task, canCancel,getDefaultPane());
     }
     
-    public void submitTask(Task task, StackPane pane) {
+    public void submitTask(Task task, Pane pane) {
         submitTask(task, true, pane);
     }
     
     
-    public void submitTask(Task task, boolean canCancel, StackPane pane) {
+    public void submitTask(Task task, boolean canCancel, Pane pane) {
          
         TaskRequest request = new TaskRequest(task, canCancel, pane);
         
@@ -296,7 +298,7 @@ public class LoadingScreen extends StackPane {
         
         final boolean canCancel = request.cancelable;
         final Task task = request.task;
-        final StackPane pane = request.pane;
+        final Pane pane = request.pane;
        
         progressBar.progressProperty().bind(task.progressProperty());
        
@@ -357,11 +359,11 @@ public class LoadingScreen extends StackPane {
         transitionQueue.get(0).play();
     }
     
-    public StackPane getDefaultPane() {
+    public Pane getDefaultPane() {
         return defaultPane;
     }
 
-    public void setDefaultPane(StackPane defaultPane) {
+    public void setDefaultPane(Pane defaultPane) {
         this.defaultPane = defaultPane;
     }
 

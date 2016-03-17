@@ -57,7 +57,7 @@ public class RectangleTool extends AbstractPathTool {
         }
 
         Rectangle2D r = FxPath.toRectangle(points);
-
+        
         getCanvas().repaint();
 
         getCanvas().getGraphicsContext2D().setStroke(Color.YELLOW);

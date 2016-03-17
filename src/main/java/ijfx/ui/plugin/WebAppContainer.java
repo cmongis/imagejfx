@@ -37,8 +37,8 @@ import ijfx.ui.UiConfiguration;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(context = "webapp", localization = "centerStackPane", id = "webapp-container")
+//@Plugin(type = UiPlugin.class)
+//@UiConfiguration(context = "webapp", localization = "centerStackPane", id = "webapp-container")
 public class WebAppContainer implements UiPlugin {
 
     WebView webView;
