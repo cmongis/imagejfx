@@ -20,7 +20,6 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
-import ijfx.ui.datadisplay.image.OverlayDrawer;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -65,7 +64,7 @@ public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
     }
 
     @Override
-    public boolean canDraw(RectangleOverlay t) {
+    public boolean canHandle(RectangleOverlay t) {
         return t instanceof RectangleOverlay;
     }
     

@@ -101,4 +101,12 @@ public class RectangleOverlayHelper {
         return overlay.getExtent(1);
     }
     
+    public Property<Point2D> minEdgeProperty() {
+        return minEdgeProperty;
+    }
+    
+    public Property<Point2D> maxEdgeProperty() {
+        return maxEdgeProperty;
+    }
+    
 }

@@ -17,23 +17,23 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.datadisplay.image;
+package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
-import javafx.scene.Node;
+import ijfx.ui.tool.overlay.MoveablePoint;
+import java.util.List;
 import net.imagej.overlay.Overlay;
-import org.scijava.plugin.SciJavaPlugin;
 
 /**
- *
+ * A modifier is a set of MoveablePoints which should be listened by the Modifier. Each time a point is moved
+ * the modifier should update the Overlay (and note its representation).
  * @author cyril
  */
-public interface OverlayDrawer<T extends Overlay> extends SciJavaPlugin {
-    
-    public boolean canDraw(T t);
-    
-    // returns a node updated according to the overlay parameter
-    // with size and position depending on the viewport
-    public Node update(T overlay, ViewPort viewport);
 
+public interface OverlayModifier<T extends Overlay> extends ClassHandler<Overlay>  {
+    
+ 
+    
+    public List<MoveablePoint> getModifiers(ViewPort viewport, T overlay);
+    
 }
