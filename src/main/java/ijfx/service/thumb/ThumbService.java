@@ -93,6 +93,7 @@ public class ThumbService extends AbstractService implements ImageJService {
                 Format format = new BioFormatsFormat();
                 context.inject(format);
                 reader = format.createReader();
+               
                 reader.setSource(file.getAbsolutePath());
 
             } catch (FormatException ex) {
