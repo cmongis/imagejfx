@@ -51,7 +51,7 @@ public abstract class ImageJ1PluginAdapter implements Command{
     DatasetService service;
     
     @Parameter
-            ImageDisplayService imageDisplayService;
+    ImageDisplayService imageDisplayService;
     
     
     public ImagePlus getInput() {
