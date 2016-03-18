@@ -20,20 +20,18 @@
 package ijfx.ui.canvas;
 
 import ijfx.ui.datadisplay.image.overlay.RectangleOverlayHelper;
-import ijfx.ui.datadisplay.image.overlay.RectangleOverlayDrawer;
+
 import ijfx.ui.canvas.utils.CanvasCamera;
+import ijfx.ui.datadisplay.image.overlay.RectangleDrawer;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import javafx.application.Application;
 import javafx.beans.property.Property;
-import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import net.imagej.overlay.RectangleOverlay;
 
@@ -74,8 +72,8 @@ public class FxCanvasTest3 extends Application {
         MoveablePoint p2 = new MoveablePoint(canvas.getCamera());
         
         // each time the point change the position on the image it update the model
-        helper.minEdgeProperty.bind(p1.positionOnImagePropety());
-        helper.maxEdgeProperty.bind(p2.positionOnImagePropety());
+        helper.minEdgeProperty().bind(p1.positionOnImagePropety());
+        helper.maxEdgeProperty().bind(p2.positionOnImagePropety());
        
         // setting the position on the screen of the first point
         p1.positionOnScreenProperty().setValue(new Point2D(20,20));
@@ -90,8 +88,9 @@ public class FxCanvasTest3 extends Application {
 
         
         // now let's take care of overlay representation indepentenly of interaction
-        RectangleOverlayDrawer drawer = new RectangleOverlayDrawer(this);
-
+        RectangleDrawer drawer = new RectangleDrawer();
+        
+        
         Runnable paintOverlay = () -> {
             Node node = drawer.update(rectangleOverlay, canvasCamera);
             if (pane.getChildren().contains(node) == false) {
@@ -104,8 +103,9 @@ public class FxCanvasTest3 extends Application {
         p1.positionOnScreenProperty().addListener(pointChangeListener);
         p2.positionOnScreenProperty().addListener(pointChangeListener);
         
+        
         canvas.getCamera().addListener(camera -> {
-            paintOverlay.run();
+            //paintOverlay.run();
         });
 
         
