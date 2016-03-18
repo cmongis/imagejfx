@@ -19,22 +19,19 @@
  */
 package ijfx.ui.filter;
 
+import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataOwner;
 import java.util.Collection;
 import java.util.function.Predicate;
-import javafx.beans.property.Property;
-import javafx.beans.property.StringProperty;
 
 /**
  *
  * @author cyril
  */
-public interface StringFilter {
+public interface MetaDataFilterFactory  {
     
-    void setAllPossibleValues(Collection<String> values);
     
-    StringProperty keyWordProperty();
-    
-    Property<Predicate<String>> predicateProperty();
+    public MetaDataOwnerFilter generateFilter(Collection<MetaData> allPossibileValues);
     
     
 }
