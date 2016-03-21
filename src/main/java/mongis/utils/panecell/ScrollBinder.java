@@ -40,8 +40,6 @@ import static mongis.utils.panecell.ScrollWindowEvent.SCROLL_WINDOW_EXITED;
  */
 public class ScrollBinder {
 
-   
-
     //public static EventType SCROLL_WINDOW_EXITED = new EventType(EventType.ROOT,"SCROLL_WINDOW_EXITED");
     ObservableList<Node> visiblesNode = FXCollections.observableArrayList();
 
@@ -56,9 +54,8 @@ public class ScrollBinder {
 
         //
         visiblesNode.addListener(this::onListChange);
-        
-       onScroll(null,null,scrollPane.hminProperty().doubleValue());
-        
+
+        onScroll(null, null, scrollPane.hminProperty().doubleValue());
 
     }
 
@@ -75,41 +72,29 @@ public class ScrollBinder {
     }
 
     public void onScroll(Observable observable, Number oldValue, Number newValue) {
-        
+
         double minX = scrollPane.getHvalue() * scrollPane.getContent().getBoundsInLocal().getWidth();
         double minY = scrollPane.getVvalue() * scrollPane.getContent().getBoundsInLocal().getHeight();
-        
-        Bounds scrollWindow = new BoundingBox(minX, minY,scrollPane.getWidth(),scrollPane.getHeight());
-       
+        Bounds scrollWindow = new BoundingBox(minX, minY, scrollPane.getWidth(), scrollPane.getHeight());
+
         Parent node = (Parent) scrollPane.getContent();
         node.getChildrenUnmodifiable().forEach(child -> {
             Bounds boundsInParent = child.getBoundsInParent();
-            
-            //System.out.println("Bounds in parent");
-            //System.out.println(boundsInParent);
-            //System.out.println(scrollWindow);
+
             // if the child is inside the scroll window then we add it
             // to the list of visible nodes (if not added already);
-            
-          
-            
             if (scrollWindow.intersects(boundsInParent)) {
                 if (!visiblesNode.contains(child)) {
-                    System.out.println(node.toString() + " is now visible.");
+
                     visiblesNode.add(child);
                 }
 
-            // if it doesn't belong to the visible node window,
-            // then it's remove from the visible node list.
+                // if it doesn't belong to the visible node window,
+                // then it's remove from the visible node list.
             } else if (visiblesNode.contains(child)) {
-                System.out.println("");
+
                 visiblesNode.remove(child);
             }
-            
-
         });
-        System.out.println(String.format("%d visible nodes right now ", visiblesNode.size()));
     }
-
-    
 }

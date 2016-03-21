@@ -22,6 +22,7 @@ package mongis.utils.panecell;
 import com.sun.javafx.scene.SceneEventDispatcher;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.ui.main.LoadingIcon;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,7 +81,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     
     Image currentImage = null;
     
-    
+    LoadingIcon icon = new LoadingIcon(100);
     
     public PaneIconCell() {
         try {
@@ -139,7 +140,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
 
     public void setImage(Image image) {
-
+        setCenter(imageView);
         imageView.setImage(image);
 
     }
@@ -193,6 +194,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         if (newItem == null) {
             return;
         }
+        
+        setCenter(icon);
+        icon.play();
         
         currentImageSearch = new AsyncCallback<T, Image>()
                 .setInput(newItem)
