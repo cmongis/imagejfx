@@ -19,21 +19,33 @@
  */
 package ijfx.ui.datadisplay.image.overlay;
 
+import ijfx.plugins.ImageJ1PluginAdapter;
 import ijfx.ui.canvas.utils.ViewPort;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
+import net.imagej.overlay.Overlay;
 import net.imagej.overlay.RectangleOverlay;
+import net.imagej.plugins.commands.imglib.GaussianBlur;
+import org.scijava.Context;
+import org.scijava.command.CommandService;
+import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
+import org.scijava.module.process.AbstractPostprocessorPlugin;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.util.ColorRGB;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = OverlayDrawer.class)
 public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
 
-    
-    Rectangle rectangle;
+   private Rectangle rectangle;
     
     @Override
     public Node update(RectangleOverlay overlay, ViewPort viewport) {
@@ -52,10 +64,12 @@ public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
         Point2D b = helper.getMaxEdge();
         a = viewport.getPositionOnCamera(a);
         b = viewport.getPositionOnCamera(b);
-        rectangle.setFill(Color.RED);
+      
         rectangle.setVisible(true);
         rectangle.setX(a.getX());
         rectangle.setY(a.getY());
+        
+        ClassHandler.color(overlay, rectangle);
         rectangle.setWidth(Math.abs(a.getX() - b.getX()));
         rectangle.setHeight(Math.abs(a.getY() - b.getY()));
         return rectangle;
