@@ -30,49 +30,56 @@ import javafx.util.Callback;
  *
  * @author cyril
  */
-public class AsyncCallback<INPUT,OUTPUT> extends Task<OUTPUT>{
+public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
 
     INPUT input;
-    
-    
-    Callback<INPUT,OUTPUT> callback;
-    
-    
-    
+
+    Callback<INPUT, OUTPUT> callback;
+
     public AsyncCallback() {
         super();
     }
-    
-    public AsyncCallback(Callback<INPUT,OUTPUT> callback) {
+
+    public AsyncCallback(Callback<INPUT, OUTPUT> callback) {
         this();
         this.callback = callback;
     }
-    
-    
-    public AsyncCallback<INPUT,OUTPUT> run(Callback<INPUT,OUTPUT> callback) {
+
+    public AsyncCallback<INPUT, OUTPUT> run(Callback<INPUT, OUTPUT> callback) {
         this.callback = callback;
         return this;
     }
-    
-    public AsyncCallback<INPUT,OUTPUT> run(Runnable runnable) {
-        if(runnable == null) {
+
+    public AsyncCallback<INPUT, OUTPUT> run(Runnable runnable) {
+        if (runnable == null) {
             System.out.println("Cannot run null :-S");
             return this;
         }
-        this.callback = input->{runnable.run(); return null;};
+        this.callback = input -> {
+            runnable.run();
+            return null;
+        };
         return this;
     }
-    
-   
+
     public OUTPUT call() {
         try {
-        return callback.call(input);
-        }catch(Exception e) {
-            ImageJFX.getLogger().log(Level.SEVERE,"Error when executing AsyncCallback "+callback.toString(),e);
+            if (isCancelled()) {
+                return null;
+            }
+            OUTPUT output = callback.call(input);
+            if (isCancelled()) {
+                return null;
+            } else {
+                return output;
+            }
+        } catch (Exception e) {
+            ImageJFX.getLogger().log(Level.SEVERE, "Error when executing AsyncCallback " + callback.toString(), e);
         }
         return null;
     }
-    public AsyncCallback<INPUT,OUTPUT>  setInput(INPUT input) {
+
+    public AsyncCallback<INPUT, OUTPUT> setInput(INPUT input) {
         this.input = input;
         return this;
     }
@@ -80,28 +87,34 @@ public class AsyncCallback<INPUT,OUTPUT> extends Task<OUTPUT>{
     public INPUT getInput() {
         return input;
     }
-    
-    public AsyncCallback<INPUT,OUTPUT>  start() {
+
+    public AsyncCallback<INPUT, OUTPUT> start() {
         ImageJFX.getThreadPool().submit(this);
         return this;
     }
-    
-    public AsyncCallback<INPUT,OUTPUT>  queue() {
+
+    public AsyncCallback<INPUT, OUTPUT> queue() {
         ImageJFX.getThreadQueue().submit(this);
         return this;
     }
-    
-    
-    public AsyncCallback<INPUT,OUTPUT>  then(Consumer<OUTPUT> consumer) {
-        setOnSucceeded(event->consumer.accept(getValue()));
+
+    public AsyncCallback<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
+        setOnSucceeded(event -> {
+            if (!isCancelled()) {
+                consumer.accept(getValue());
+            }
+        });
         return this;
     }
-    
-    public AsyncCallback<INPUT,OUTPUT> ui() {
-        if(Platform.isFxApplicationThread()) call();
-        else Platform.runLater(this);
-        
+
+    public AsyncCallback<INPUT, OUTPUT> ui() {
+        if (Platform.isFxApplicationThread()) {
+            call();
+        } else {
+            Platform.runLater(this);
+        }
+
         return this;
     }
-    
+
 }
