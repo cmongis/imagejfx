@@ -96,12 +96,17 @@ public class PaneCellController<T> {
 
                 // adding these controllers to the cache
                 cachedControllerList.addAll(toRemove);
+                
 
                 logger.info(String.format("Deleting %d controllers", toRemove.size()));
 
                 // removing from the list
                 itemControllerList.removeAll(toRemove);
+               
                 pane.getChildren().removeAll(getContent(toRemove));
+                
+                cachedControllerList.stream().forEach(item->item.setItem(null));
+                
                 logger.info(String.format("%d controllers left.", itemControllerList.size()));
             }
 

@@ -19,6 +19,7 @@
  */
 package mongis.utils.panecell;
 
+import com.sun.javafx.scene.SceneEventDispatcher;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
@@ -28,136 +29,175 @@ import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
-
+import static ucar.unidata.util.Format.i;
 
 /**
  *
  * @author cyril
  */
-public class PaneIconCell<T> extends BorderPane implements PaneCell<T>{
-    
-    
+public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
+
     @FXML
     private ImageView imageView;
-    
+
     @FXML
     private FontAwesomeIconView titleIconView;
-    
+
     @FXML
     private Label titleLabel;
-    
+
     @FXML
-   private  Label subtitleLabel;
+    private Label subtitleLabel;
+
+    private final ObjectProperty<T> item = new SimpleObjectProperty<T>();
+
+    private Callback<T, String> titleFactory = T -> "No title factory";
+
+    private Callback<T, String> subtitleFactory = T -> "No subtitle factory";
+
+    private Callback<T, String> additionalInfoFactory = T -> "you could benefit from **Awesome display**\n";
+
+    private Callback<T, Image> imageFactory;
+
+    private Task currentImageSearch;
+
+    private boolean loadImageOnShow = true;
     
-    private  final ObjectProperty<T> item = new SimpleObjectProperty<T>();
+    private boolean isInsideScrollWindow = false;
     
-    
-    private Callback<T,String> titleFactory = T->"No title factory";
-    
-    private Callback<T,String> subtitleFactory = T->"No subtitle factory";
-    
-    private Callback<T,String> additionalInfoFactory =  T-> "you could benefit from **Awesome display**\n";
-    
-    private Callback<T,Image> imageFactory;
+    Image currentImage = null;
     
     
     
     public PaneIconCell() {
         try {
-            FXUtilities.injectFXML(this,"/ijfx/ui/explorer/ImageIconItem.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
             imageView.fitWidthProperty().bind(widthProperty());
             imageView.fitHeightProperty().bind(widthProperty());
             item.addListener(this::onItemChanged);
             
+            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
+            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED,event->isInsideScrollWindow = false);
+            
+
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
     public PaneIconCell<T> setIcon(FontAwesomeIcon icon) {
         titleIconView.setIcon(icon);
         return this;
     }
+
+    public void onScrollWindowEntered(ScrollWindowEvent event) {
+        isInsideScrollWindow = true;
+        if(currentImage == null && currentImageSearch == null) {
+            updateImageAsync(getItem());
+        }
+    }
     
     public void setItem(T item) {
         this.item.setValue(item);
-      
-       
-         new AsyncCallback<T,Image>()
-                .setInput(item)
-                .run(imageFactory)
-                .then(this::setImage)
-                .start();
-        
     }
-    
+
     public T getItem() {
         return this.item.getValue();
     }
-    
+
     public Node getContent() {
         return this;
     }
-    
+
     public Property<T> itemProperty() {
         return item;
     }
-    
+
     public void setTitle(String title) {
         titleLabel.setText(title);
     }
-    
+
     public void setSubtitle(String subtitle) {
         subtitleLabel.setText(subtitle);
     }
-    
+
     public void setAdditionalData(String text) {
-        
+
     }
-    
+
     public void setImage(Image image) {
-        
-         
+
         imageView.setImage(image);
-        
-      
+
     }
-    
+
     public void onItemChanged(Observable obs, T oldItem, T newItem) {
         
+        
+        
+        // cancelling the possible image search
+        if (currentImageSearch != null) {
+            currentImageSearch.cancel();
+        }
+        
+        // setting the current image to null
+        currentImage = null;
+        currentImageSearch = null;
+
+        // avoiding other task to start
+        if (newItem == null) {
+            return;
+        }
+
+        //otherwise starting to charge everything
         new AsyncCallback<T, String>()
                 .setInput(newItem)
                 .run(titleFactory)
                 .then(this::setTitle)
                 .queue();
-        
-        new AsyncCallback<T,String>()
+
+        new AsyncCallback<T, String>()
                 .setInput(newItem)
                 .run(subtitleFactory)
                 .then(this::setSubtitle)
                 .queue();
-        
+
         /*
-        new AsyncCallback<T,Image>()
-                .setInput(newItem)
-                .run(imageFactory)
-                .then(this::setImage)
-                .start();
-        */
-        new AsyncCallback<T,String>()
+        
+         */
+        new AsyncCallback<T, String>()
                 .setInput(newItem)
                 .run(additionalInfoFactory)
                 .then(this::setAdditionalData)
+                .start();
+
+        if(loadImageOnShow == false || isInsideScrollWindow) updateImageAsync(newItem);
+
+    }
+
+    private void updateImageAsync(T newItem) {
+
+        if (newItem == null) {
+            return;
+        }
+        
+        currentImageSearch = new AsyncCallback<T, Image>()
+                .setInput(newItem)
+                .run(imageFactory)
+                .then(this::setImage)
                 .start();
     }
 
@@ -180,14 +220,5 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T>{
         this.imageFactory = imageFactory;
         return this;
     }
-    
-    
-   
-    
-    
-    
-    
-    
-    
-    
+
 }
