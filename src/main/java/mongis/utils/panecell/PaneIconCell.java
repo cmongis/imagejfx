@@ -19,7 +19,6 @@
  */
 package mongis.utils.panecell;
 
-import com.sun.javafx.scene.SceneEventDispatcher;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.main.LoadingIcon;
@@ -31,19 +30,16 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
-import static ucar.unidata.util.Format.i;
 
 /**
  *
@@ -81,11 +77,23 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     
     Image currentImage = null;
     
-    LoadingIcon icon = new LoadingIcon(100);
+    LoadingIcon icon = new LoadingIcon(50);
+    
+    private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
     
     public PaneIconCell() {
         try {
-            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
+            //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
+            
+            synchronized(LOADER) {
+                
+               
+                
+                LOADER.setController(this);
+                LOADER.setRoot(this);
+                LOADER.load();
+            }
+            
             imageView.fitWidthProperty().bind(widthProperty());
             imageView.fitHeightProperty().bind(widthProperty());
             item.addListener(this::onItemChanged);
@@ -225,4 +233,6 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         return this;
     }
 
+    
+    
 }
