@@ -17,20 +17,32 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.datadisplay.image.overlay;
+package ijfx.ui.utils;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Shape;
-import net.imagej.overlay.Overlay;
-import org.scijava.plugin.SciJavaPlugin;
-import org.scijava.util.ColorRGB;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Point2D;
 
 /**
  *
  * @author cyril
  */
-public interface ClassHandler<T> extends SciJavaPlugin{
-
+public class Point2DUtils {
     
-    boolean canHandle(T t);
+   
+    
+    public static Property<Point2D> createProperty() {
+        return new SimpleObjectProperty<>();
+    }
+    
+    public static Property<Point2D> createProperty(Point2D initialValue) {
+        return new SimpleObjectProperty<>(initialValue);
+    }
+
+    public static double[] asArray(Point2D point) {
+        double[] pAsArray = new double[2];
+        pAsArray[0] = point.getX();
+        pAsArray[1] = point.getY();
+        return pAsArray;
+    }
 }

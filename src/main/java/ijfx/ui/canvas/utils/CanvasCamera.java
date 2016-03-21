@@ -20,6 +20,7 @@
  */
 package ijfx.ui.canvas.utils;
 
+import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -240,6 +241,14 @@ public class CanvasCamera implements ViewPort  {
     public Point2D getPositionOnCamera(Point2D point) {
         
         Rectangle2D r = getSeenRectangle();
+        
+        if(point == null) {
+            ImageJFX.getLogger().warning("Error ! Position null");
+            
+            return new Point2D(-1,-1);
+            
+            
+        }
         
        double x,y;
         

@@ -30,8 +30,12 @@ import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.PixelDrawer;
+import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.datadisplay.image.overlay.OverlayDrawerService;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -40,6 +44,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
@@ -61,6 +66,7 @@ import net.imagej.display.event.AxisPositionEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import net.imagej.event.DataUpdatedEvent;
 import net.imagej.event.DatasetUpdatedEvent;
+import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.lut.LUTService;
 import net.imagej.overlay.Overlay;
 
@@ -91,58 +97,64 @@ public class ImageWindow extends Window {
 
     Logger logger = ImageJFX.getLogger();
 
-    Dataset dataset;
+    private Dataset dataset;
 
-    DatasetView datasetView;
-
-    @Parameter
-    DisplayService displayService;
+    private DatasetView datasetView;
 
     @Parameter
-    ImageDisplayService imageDisplayService;
+    private DisplayService displayService;
 
     @Parameter
-    DatasetService datasetService;
-
-    ImageDisplay imageDisplay;
+    private ImageDisplayService imageDisplayService;
 
     @Parameter
-    LUTService lutService;
+    private DatasetService datasetService;
 
-    Slider slider = new Slider();
-
-    @Parameter
-    EventService eventService;
+    private ImageDisplay imageDisplay;
 
     @Parameter
-    LogService logService;
+    private LUTService lutService;
+
+    private Slider slider = new Slider();
 
     @Parameter
-    ThreadService threadService;
+    private EventService eventService;
 
     @Parameter
-    DefaultFxToolService toolService;
+    private LogService logService;
 
     @Parameter
-    Context context;
+    private ThreadService threadService;
 
     @Parameter
-    UiContextCalculatorService contextCalculationService;
+    private DefaultFxToolService toolService;
 
     @Parameter
-    OverlaySelectionService overlaySelectionService;
+    private Context context;
 
     @Parameter
-    OverlayService overlayService;
+    private UiContextCalculatorService contextCalculationService;
 
     @Parameter
-    OverlayDrawingService overlayDrawer;
+    private OverlaySelectionService overlaySelectionService;
+
+    @Parameter
+    private OverlayService overlayService;
+
+    @Parameter
+    private OverlayDrawingService overlayDrawer;
     
     @Parameter
-    PluginService pluginService;
+    private PluginService pluginService;
+    
+    @Parameter
+    private OverlayDrawerService overlayDrawerService;
     
     FxTool currentTool;
 
+    
+    
+    
     /*
             JavaFX Nodes
     */
@@ -150,7 +162,7 @@ public class ImageWindow extends Window {
     HiddenSidesPane hiddenSidePane = new HiddenSidesPane();
     BorderPane borderPane = new BorderPane();
     FxImageCanvas canvas = new FxImageCanvas();
-    AnchorPane stackPane = new AnchorPane();
+    AnchorPane anchorPane = new AnchorPane();
     
     HBox hbox = new HBox();
 
@@ -177,15 +189,15 @@ public class ImageWindow extends Window {
         getStyleClass().add(WINDOW_CLASS_NAME);
         setTitleBarStyleClass(TITLE_CLASS_NAME);
         
-        hiddenSidePane.setContent(stackPane);
+        hiddenSidePane.setContent(anchorPane);
         borderPane.setCenter(hiddenSidePane);
 
-        stackPane.getChildren().add(canvas);
+        anchorPane.getChildren().add(canvas);
         //hbox.getChildren().add(canvas);
 
         // Bind canvas size to stack pane size.
-        canvas.widthProperty().bind(stackPane.widthProperty());
-        canvas.heightProperty().bind(stackPane.heightProperty());
+        canvas.widthProperty().bind(anchorPane.widthProperty());
+        canvas.heightProperty().bind(anchorPane.heightProperty());
 
         // Adding clicking listening
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onCanvasClick);
@@ -201,7 +213,7 @@ public class ImageWindow extends Window {
         widthProperty().addListener((obj, old, nw) -> canvas.repaint());
 
         // I forgot why but it must be important
-        stackPane.setMinSize(0, 0);
+        anchorPane.setMinSize(0, 0);
 
         // close icon
         CloseIcon closeIcon = new CloseIcon(this);
@@ -226,6 +238,7 @@ public class ImageWindow extends Window {
         infoLabel.getStyleClass().add(INFO_LABEL_CLASS_NAME);
        
 
+        canvas.getCamera().addListener(this::onViewPortChange);
         
     }
 
@@ -247,10 +260,6 @@ public class ImageWindow extends Window {
             addEventHandler(t, this::putInFront);
             getContentPane().addEventHandler(t, this::putInFront);
         }
-        
-      
-
-        
         
         focusedProperty().addListener(this::onFocus);
 
@@ -289,7 +298,7 @@ public class ImageWindow extends Window {
         logService.setLevel(LogService.INFO);
 
         if (arcMenu != null) {
-            arcMenu.detachFrom(stackPane);
+            arcMenu.detachFrom(anchorPane);
             arcMenu = null;
         }
         arcMenu = new ArcMenu();
@@ -306,10 +315,7 @@ public class ImageWindow extends Window {
                     continue;
                 }
 
-                //      System.out.println(imageDisplay.axis(i));
-                //    System.out.println(imageDisplay.axis(i).type());
-                //    System.out.println(imageDisplay.min(i));
-                //    System.out.println(imageDisplay.max(i));
+                
                 Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
 
                 arcMenu.addAll(new AxisArcItem(imageDisplay, i));
@@ -318,7 +324,7 @@ public class ImageWindow extends Window {
         }
 
         arcMenu.build();
-        arcMenu.attachedTo(stackPane);
+        arcMenu.attachedTo(anchorPane);
 
         refreshSourceImage();
     }
@@ -440,10 +446,12 @@ public class ImageWindow extends Window {
                 writableImage = getWrittableImage();
             }
 
+            
+            /*
             //Create a drawer to draw the overlays
             ColoredPixelDrawer drawer = new WritableImagePixelDrawer(writableImage, getOverlayColor());
 
-            SwingFXUtils.toFXImage(bf, writableImage);
+           
             getOverlays().forEach(o -> {
                 
                 logger.info("Drawing overlay "+o.toString());
@@ -458,13 +466,57 @@ public class ImageWindow extends Window {
 
                 overlayDrawer.drawOverlay(o, OverlayDrawingService.OUTLINER, drawer);
             });
+            */
+            
+             SwingFXUtils.toFXImage(bf, writableImage);
+            
             canvas.repaint();
             
             updateInfoLabel();
             
+            updateOverlays();
+            
         }
     }
 
+    public void updateOverlays() {
+        getOverlays().forEach(this::updateOverlay);
+    }
+    public void updateOverlay(Overlay overlay) {
+        Node node = overlayDrawerService.getDrawer(overlay).update(overlay, canvas.getCamera());
+         node.setMouseTransparent(true);
+        if(anchorPane.getChildren().contains(node) == false) {
+           
+            anchorPane.getChildren().add(node);
+        }
+    }
+    
+    // add the MoveablePoints of a overlay in order to edit it
+    private void setEdited(Overlay overlay) {
+        
+            // delete all the moveable points
+            Node[] nodes = anchorPane.getChildren().stream().filter(node->MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size->new Node[size]);
+            anchorPane.getChildren().removeAll(nodes);
+            
+            // if an overlay has been selected
+            if(overlay!=null) {
+                // it get the modifier which will returns the set of moveable points
+                System.out.println(overlayDrawerService.getModifier(overlay));
+                List<MoveablePoint> modifiers = overlayDrawerService.getModifier(overlay).getModifiers(canvas.getCamera(), overlay);
+                
+                modifiers.forEach(m->m.positionOnImageProperty().addListener(this::onMoveablePointMoved));
+                anchorPane.getChildren().addAll(modifiers);
+                
+                
+            }
+            
+        
+    }
+    
+    public void onViewPortChange(ViewPort viewport) {
+        updateOverlays();
+    }
+    
     public void updateInfoLabel() {
         
         String imageType = getDataset().getTypeLabelShort();
@@ -523,6 +575,9 @@ public class ImageWindow extends Window {
      Overlay drawing
      */
     public List<Overlay> getOverlays() {
+        System.out.println();
+        List<Overlay> overlays = overlayService.getOverlays(imageDisplay);
+        if(overlays == null) return new ArrayList<Overlay>();
         return overlayService.getOverlays(imageDisplay);
     }
 
@@ -592,14 +647,16 @@ public class ImageWindow extends Window {
      */
     private void onCanvasClick(MouseEvent event) {
 
-        System.out.println("Click 1");
-        
+        System.out.println("canvas click");
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
-        
+        System.out.println(positionOnImage);
+        logger.info(String.format("This image contains %s overlays",overlayService.getOverlays(imageDisplay).size()));
         for(Overlay o : overlayService.getOverlays(imageDisplay))
             //.parallelStream().forEach(o -> 
         {
             if (isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o)) {
+                
+                logger.info("Selecting overlay "+o.toString());
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, true);
                 event.consume();
             } else {
@@ -609,7 +666,7 @@ public class ImageWindow extends Window {
         contextCalculationService.determineContext(imageDisplay);
         refreshSourceImage();
         updateInfoLabel();
-
+       
     }
 
     @EventHandler
@@ -675,12 +732,13 @@ public class ImageWindow extends Window {
     }
     
     
-    
-    
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
         System.out.println("selection changed");
         System.out.println(event.getOverlay());
+        
+        Platform.runLater(()->setEdited(event.getOverlay()));
+        
         refreshSourceImage();
     }
     
@@ -696,27 +754,37 @@ public class ImageWindow extends Window {
             setCurrentTool(null);
         }
     }
+    
+    @EventHandler
+    void onOverlayModified(OverlayUpdatedEvent event) {
+        updateOverlay(event.getObject());
+    }
 
     protected boolean isWindowConcernedByModule(Module module) {
         return module.getInputs().values().stream().filter(obj -> (obj == imageDisplay || obj == getDataset())).count() > 0;
     }
+    
+    protected void onMoveablePointMoved(Observable obs, Point2D oldValue, Point2D newValue) {
+        updateOverlays();
+    }
+    
     /*
     @EventHandler
     protected void onEvent(ModuleStartedEvent event) {
         if(isWindowConcernedByModule(event.getModule())) {
-            Platform.runLater(()->LoadingScreen.getInstance().showOn(stackPane));
+            Platform.runLater(()->LoadingScreen.getInstance().showOn(anchorPane));
         }
     }
     
     @EventHandler void onEvent(ModuleFinishedEvent event) {
         if(isWindowConcernedByModule(event.getModule()) ) {
-            Platform.runLater(()->LoadingScreen.getInstance().hideFrom(stackPane));
+            Platform.runLater(()->LoadingScreen.getInstance().hideFrom(anchorPane));
         }
     }
     
       @EventHandler void onEvent(ModuleCanceledEvent event) {
         if(isWindowConcernedByModule(event.getModule()) ) {
-           Platform.runLater(()->LoadingScreen.getInstance().hideFrom(stackPane));
+           Platform.runLater(()->LoadingScreen.getInstance().hideFrom(anchorPane));
         }
     }*/
 

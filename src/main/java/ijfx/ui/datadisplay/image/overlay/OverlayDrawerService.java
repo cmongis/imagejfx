@@ -19,24 +19,24 @@
  */
 package ijfx.ui.datadisplay.image.overlay;
 
+import ijfx.service.IjfxService;
 import java.util.HashMap;
-import net.imagej.display.event.ImageDisplayEvent;
 import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.overlay.Overlay;
-import org.scijava.display.event.DisplayDeletedEvent;
+import org.scijava.Context;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
 import org.scijava.service.AbstractService;
-import org.scijava.service.Service;
+import org.scijava.service.SciJavaService;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = Service.class)
-public class OverlayDrawerService extends AbstractService {
+@Plugin(type = SciJavaService.class)
+public class OverlayDrawerService extends AbstractService implements IjfxService{
 
     HashMap<Overlay, OverlayDrawer> drawerMap = new HashMap<>();
     HashMap<Overlay, OverlayModifier> modifierMap = new HashMap<>();
@@ -44,6 +44,9 @@ public class OverlayDrawerService extends AbstractService {
     @Parameter
     PluginService pluginService;
 
+    @Parameter
+    Context context;
+    
     public OverlayModifier getModifier(Overlay overlay) {
        return findPluginFor(OverlayModifier.class, overlay, modifierMap);
     }
@@ -65,11 +68,12 @@ public class OverlayDrawerService extends AbstractService {
     
     
     private <T extends ClassHandler, C> T findPluginFor(Class<? extends T> handlerType, C overlay, HashMap<C, T> map) {
-
-        if (map.containsKey(overlay) == false) {
-
+       
+        if (map.containsKey(overlay) == false || map.get(overlay) == null) {
             for (T plugin : pluginService.createInstancesOfType(handlerType)) {
                 if (plugin.canHandle(overlay)) {
+                    
+                   
                     map.put(overlay, plugin);
                     break;
                 }

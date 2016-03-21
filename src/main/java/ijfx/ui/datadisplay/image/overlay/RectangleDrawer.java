@@ -69,7 +69,7 @@ public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
         rectangle.setX(a.getX());
         rectangle.setY(a.getY());
         
-        ClassHandler.color(overlay, rectangle);
+        OverlayDrawer.color(overlay, rectangle);
         rectangle.setWidth(Math.abs(a.getX() - b.getX()));
         rectangle.setHeight(Math.abs(a.getY() - b.getY()));
         return rectangle;
@@ -78,8 +78,10 @@ public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
     }
 
     @Override
-    public boolean canHandle(RectangleOverlay t) {
+    public boolean canHandle(Overlay t) {
         return t instanceof RectangleOverlay;
     }
+
+   
     
 }

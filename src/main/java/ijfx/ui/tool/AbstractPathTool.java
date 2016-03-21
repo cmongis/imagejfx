@@ -355,5 +355,4 @@ public abstract class AbstractPathTool implements FxTool {
     
     
     
-    
 }
