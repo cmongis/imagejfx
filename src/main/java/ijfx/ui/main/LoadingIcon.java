@@ -36,6 +36,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import ijfx.ui.context.animated.Animations;
+import javafx.beans.binding.Bindings;
 
 /**
  *
@@ -49,7 +50,7 @@ public class LoadingIcon extends StackPane {
     public static final String CSS_CLASS = "loading-icon";
     public static final String CSS_CLASS_CIRCLE = "circle";
     public static final String CSS_CLASS_GLYPH = "glyph";
-    
+     private final DoubleProperty size = new SimpleDoubleProperty();
     protected final double  circleGrowth = 0.1;
     
     public LoadingIcon(double size) {
@@ -59,15 +60,24 @@ public class LoadingIcon extends StackPane {
         setPrefWidth(size);
         
         //iconNode = new FontAwesomeIconView(FontAwesomeIcon.CIRCLE_ALT_NOTCH);
-        iconNode = GlyphsDude.createIcon(FontAwesomeIcon.CIRCLE_ALT_NOTCH);
+        
+        // creatin the node that contains the circle
+        iconNode = GlyphsDude.createIcon(FontAwesomeIcon.CIRCLE_ALT_NOTCH,"16");
         iconNode.setFill(Color.WHITE);
-        iconNode.setScaleX(16.0 / size /2);
-        iconNode.setScaleY(16.0 / size /2);
+        
+        // binding it scales so it adapt to the StackPane size
+        iconNode.scaleXProperty().bind(Bindings.createDoubleBinding(this::calculateScale, sizeProperty()));
+        iconNode.scaleYProperty().bind(Bindings.createDoubleBinding(this::calculateScale,sizeProperty()));
+        
+        // creating a circle so the radius also adapt to the scale pane
         circle = new Circle(size * (1.0 - circleGrowth));
+         
+        circle.radiusProperty().bind(Bindings.createDoubleBinding(this::calculateCircleRadius, sizeProperty()));
+        
         circle.setStroke(Color.WHITE);
         
         //
-        circle.setStrokeWidth(size * 2.5 / 16);
+        circle.setStrokeWidth(size * 2 / 16);
         circle.setStroke(Color.WHITE);
         circle.setFill(null);
 
@@ -79,11 +89,14 @@ public class LoadingIcon extends StackPane {
         
         getChildren().addAll(circle,iconNode);
         
+        sizeProperty().bind(prefWidthProperty());
         
 
     }
-    private final DoubleProperty size = new SimpleDoubleProperty();
+   
 
+    
+    
     public double getSize() {
         return size.get();
     }
@@ -96,6 +109,16 @@ public class LoadingIcon extends StackPane {
         return size;
     }
 
+    
+    private double calculateScale() {
+        return getSize() * 0.85 / 16;
+    }
+    
+    private double calculateCircleRadius() {
+        System.out.println(getSize());
+        return sizeProperty().doubleValue() * (1. - circleGrowth) - circle.getStrokeWidth();
+    }
+    
     
     
     
