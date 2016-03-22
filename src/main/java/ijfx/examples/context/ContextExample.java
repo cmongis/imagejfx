@@ -23,8 +23,13 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.context.PaneContextualView;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -44,19 +49,24 @@ public class ContextExample extends Application {
     UiContextService contextService;
 
     Pane flowPane;
-
+    BorderPane borderpane;
+    HBox fakeToolBar;
+    BorderPane borderPaneGeneral;
     public ContextExample() {
-        
-        
+
     }
+
     public void init(Context context) {
-
+         borderPaneGeneral= new BorderPane();
         context.inject(this);
-
-        flowPane = new HBox();
-        flowPane.setPrefSize(300, 300);
-        
-        
+        borderpane = new BorderPane();
+        flowPane = new FlowPane();
+        fakeToolBar = new HBox();
+        flowPane.setPrefSize(30, 30);
+        borderpane.setCenter(flowPane);
+        borderpane.getCenter().setVisible(false);
+        borderpane.getCenter().setStyle("-fx-background-color: black;");
+        borderpane.getCenter().prefHeight(30);
         Button fruitButton = new Button("fruit");
         fruitButton.setId("fruit");
 
@@ -71,11 +81,26 @@ public class ContextExample extends Application {
 
         PaneContextualView contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
 
-        contextualView.registerNode(fruitButton, "always");
-        contextualView.registerNode(vegetableButton, "always");
+        //contextualView.registerNode(fruitButton, "always");
+        //contextualView.registerNode(vegetableButton, "always");
         contextualView.registerNode(bananaButton, "fruit");
         contextualView.registerNode(aubergineButton, "vegetable");
+        
+        Button show = new Button("Show");
+        //show.hoverProperty().addListener((e) -> borderpane.getCenter().setVisible(true));
+        //show.setOnAction((e)-> borderpane.getCenter().setVisible(true));
+        show.addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> borderpane.getCenter().setVisible(true));
+        show.addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> borderpane.getCenter().setVisible(false));
+        borderpane.getCenter().addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> borderpane.getCenter().setVisible(true));
+        borderpane.getCenter().addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> borderpane.getCenter().setVisible(false));
 
+        fakeToolBar.getChildren().add(show);
+        borderpane.setTop(fakeToolBar);
+        HBox toolbarTest = new HBox();
+        toolbarTest.getChildren().addAll(fruitButton, vegetableButton);
+        //borderpane.setBottom(toolbarTest);
+        borderPaneGeneral.setTop(borderpane);
+        borderPaneGeneral.setBottom(toolbarTest);
         fruitButton.setOnAction(event -> {
             contextService.leave("vegetable");
             contextService.enter("fruit");
@@ -86,31 +111,36 @@ public class ContextExample extends Application {
             contextService.leave("fruit");
             contextService.enter("vegetable");
             contextService.update();
-            
+
         });
-        
-        
+
         contextService.enter("always");
         contextService.update();
-
+        
     }
 
     public Pane flowPane() {
         return flowPane;
     }
 
+    public BorderPane borderPane() {
+        return borderpane;
+    }
+    public BorderPane getLayout(){
+        return borderPaneGeneral;
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        
         init(imageJ.getContext());
-        
-        Scene scene = new Scene(flowPane());
+
+        Scene scene = new Scene(getLayout());
         primaryStage.setScene(scene);
         primaryStage.show();
-        
+
     }
-    
+
     public static void main(String... args) {
         launch(args);
     }
