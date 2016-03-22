@@ -72,8 +72,8 @@ public class FxCanvasTest3 extends Application {
         MoveablePoint p2 = new MoveablePoint(canvas.getCamera());
         
         // each time the point change the position on the image it update the model
-        helper.minEdgeProperty().bind(p1.positionOnImagePropety());
-        helper.maxEdgeProperty().bind(p2.positionOnImagePropety());
+        helper.minEdgeProperty().bind(p1.positionOnImageProperty());
+        helper.maxEdgeProperty().bind(p2.positionOnImageProperty());
        
         // setting the position on the screen of the first point
         p1.positionOnScreenProperty().setValue(new Point2D(20,20));

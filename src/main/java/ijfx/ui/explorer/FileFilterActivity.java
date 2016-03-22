@@ -36,6 +36,7 @@ import javafx.scene.layout.TilePane;
 import mongis.utils.FileUtils;
 import mongis.utils.panecell.PaneCellController;
 import mongis.utils.panecell.PaneIconCell;
+import mongis.utils.panecell.ScrollBinder;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -46,18 +47,20 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Activity.class, name = "file-filter-activity")
 public class FileFilterActivity extends BorderPane implements Activity {
 
-    ScrollPane scrollPane = new ScrollPane();
+    private ScrollPane scrollPane = new ScrollPane();
 
-    TilePane tilePane = new TilePane();
-
-    @Parameter
-    ThumbService thumbService;
+    private TilePane tilePane = new TilePane();
 
     @Parameter
-    ImageRecordService imageRecordService;
+    private ThumbService thumbService;
 
-    PaneCellController<ImageRecord> cellPaneCtrl = new PaneCellController<>(tilePane);
+    @Parameter
+    private ImageRecordService imageRecordService;
 
+    private PaneCellController<ImageRecord> cellPaneCtrl = new PaneCellController<>(tilePane);
+
+    private ScrollBinder binder;
+    
     public FileFilterActivity() {
 
         setCenter(scrollPane);
@@ -70,7 +73,7 @@ public class FileFilterActivity extends BorderPane implements Activity {
         //tilePane.setPrefTileHeight(Control.USE_PREF_SIZE);
         tilePane.setVgap(5);
         tilePane.setHgap(5);
-        
+        binder = new ScrollBinder(scrollPane);
         cellPaneCtrl.setCellFactory(this::createIcon);
 
     }

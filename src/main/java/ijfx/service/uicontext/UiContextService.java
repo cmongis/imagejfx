@@ -63,7 +63,7 @@ public class UiContextService extends AbstractService implements UiContextManage
 
     private ContextLinkSet linkSet = new ContextLinkSet();
 
-    private HashMap<String, ContextualView> controllers = new HashMap<>();
+    private HashMap<String, ContextualView> viewMap = new HashMap<>();
 
     private static final Logger logger = ImageJFX.getLogger();
 
@@ -167,7 +167,7 @@ public class UiContextService extends AbstractService implements UiContextManage
         //logger.info(linkSet.toString());
         // for each controller, update the controller by telling it which widget it should show
         // and which widget it should hide
-        controllers.values().parallelStream().forEach(controller -> updateController(controller));
+        viewMap.values().parallelStream().forEach(controller -> updateController(controller));
         return this;
     }
 
@@ -279,7 +279,7 @@ public class UiContextService extends AbstractService implements UiContextManage
     public UiContextManager addContextualView(ContextualView contextualView) {
 
         logger.info(String.format("Registering the contextual view : %s", contextualView.getName()));
-        controllers.put(contextualView.getName(), contextualView);
+        viewMap.put(contextualView.getName(), contextualView);
         contextualView
                 .getWidgetList()
                 .forEach(widget -> registerWidget(widget));

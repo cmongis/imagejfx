@@ -27,6 +27,7 @@ import javafx.geometry.Point2D;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
 import org.scijava.Context;
+import org.scijava.convert.ConvertService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -47,6 +48,9 @@ public class LineModifier implements OverlayModifier<LineOverlay> {
 
     List<MoveablePoint> points = new ArrayList<>();
 
+    @Parameter
+    ConvertService convertService;
+    
     @Override
     public List getModifiers(ViewPort viewport, LineOverlay overlay) {
         if (lineHelper == null) {
@@ -67,7 +71,9 @@ public class LineModifier implements OverlayModifier<LineOverlay> {
             points.add(a);
             points.add(b);
             
-            context.inject(lineHelper);
+          
+            
+            
             
         }
         return points;

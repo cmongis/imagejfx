@@ -93,8 +93,6 @@ import org.scijava.thread.ThreadService;
  */
 public class ImageWindow extends Window {
 
-   
-
     Logger logger = ImageJFX.getLogger();
 
     private Dataset dataset;
@@ -143,27 +141,23 @@ public class ImageWindow extends Window {
 
     @Parameter
     private OverlayDrawingService overlayDrawer;
-    
+
     @Parameter
     private PluginService pluginService;
-    
+
     @Parameter
     private OverlayDrawerService overlayDrawerService;
-    
+
     FxTool currentTool;
 
-    
-    
-    
     /*
             JavaFX Nodes
-    */
-    
+     */
     HiddenSidesPane hiddenSidePane = new HiddenSidesPane();
     BorderPane borderPane = new BorderPane();
     FxImageCanvas canvas = new FxImageCanvas();
     AnchorPane anchorPane = new AnchorPane();
-    
+
     HBox hbox = new HBox();
 
     HBox bottomHBox = new HBox();
@@ -171,7 +165,7 @@ public class ImageWindow extends Window {
     Label infoLabel = new Label("Some text as example I guess");
 
     ArcMenu arcMenu;
-    
+
     static String TITLE_CLASS_NAME = "image-window-titlebar";
 
     static String WINDOW_CLASS_NAME = "image-window";
@@ -185,10 +179,10 @@ public class ImageWindow extends Window {
         super();
         logger.info("Creating window.");
         setContentPane(borderPane);
-        
+
         getStyleClass().add(WINDOW_CLASS_NAME);
         setTitleBarStyleClass(TITLE_CLASS_NAME);
-        
+
         hiddenSidePane.setContent(anchorPane);
         borderPane.setCenter(hiddenSidePane);
 
@@ -217,7 +211,7 @@ public class ImageWindow extends Window {
 
         // close icon
         CloseIcon closeIcon = new CloseIcon(this);
-        
+
         getRightIcons().add(closeIcon);
 
         closeIcon.onActionProperty().addListener(event -> {
@@ -232,14 +226,12 @@ public class ImageWindow extends Window {
         borderPane.setBottom(bottomHBox);
 
         // adding a hidden side pane for info
-       
         //hiddenSidePane.setContent(infoLabel);
         hiddenSidePane.setTop(infoLabel);
         infoLabel.getStyleClass().add(INFO_LABEL_CLASS_NAME);
-       
 
         canvas.getCamera().addListener(this::onViewPortChange);
-        
+
     }
 
     public ImageWindow(Display<?> display) {
@@ -254,16 +246,12 @@ public class ImageWindow extends Window {
 
         setCurrentTool(toolService.getCurrentTool());
 
-        
-        
-        for(EventType<? extends MouseEvent> t : new EventType[] { MouseEvent.MOUSE_CLICKED, MouseEvent.DRAG_DETECTED, MouseEvent.MOUSE_PRESSED }) {
+        for (EventType<? extends MouseEvent> t : new EventType[]{MouseEvent.MOUSE_CLICKED, MouseEvent.DRAG_DETECTED, MouseEvent.MOUSE_PRESSED}) {
             addEventHandler(t, this::putInFront);
             getContentPane().addEventHandler(t, this::putInFront);
         }
-        
-        focusedProperty().addListener(this::onFocus);
 
-       
+        focusedProperty().addListener(this::onFocus);
 
         translateXProperty().addListener(event -> putInFront());
 
@@ -281,7 +269,7 @@ public class ImageWindow extends Window {
 
     public void putInFront() {
         //  System.out.println("putting display to front");
-        logger.info("Putting in front "+imageDisplay);
+        logger.info("Putting in front " + imageDisplay);
         displayService.setActiveDisplay(imageDisplay);
         setMoveToFront(true);
     }
@@ -315,7 +303,6 @@ public class ImageWindow extends Window {
                     continue;
                 }
 
-                
                 Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
 
                 arcMenu.addAll(new AxisArcItem(imageDisplay, i));
@@ -446,7 +433,6 @@ public class ImageWindow extends Window {
                 writableImage = getWrittableImage();
             }
 
-            
             /*
             //Create a drawer to draw the overlays
             ColoredPixelDrawer drawer = new WritableImagePixelDrawer(writableImage, getOverlayColor());
@@ -466,72 +452,70 @@ public class ImageWindow extends Window {
 
                 overlayDrawer.drawOverlay(o, OverlayDrawingService.OUTLINER, drawer);
             });
-            */
-            
-             SwingFXUtils.toFXImage(bf, writableImage);
-            
+             */
+            SwingFXUtils.toFXImage(bf, writableImage);
+
             canvas.repaint();
-            
+
             updateInfoLabel();
-            
+
             updateOverlays();
-            
+
         }
     }
 
     public void updateOverlays() {
         getOverlays().forEach(this::updateOverlay);
     }
+
     public void updateOverlay(Overlay overlay) {
-        Node node = overlayDrawerService.getDrawer(overlay).update(overlay, canvas.getCamera());
-         node.setMouseTransparent(true);
-        if(anchorPane.getChildren().contains(node) == false) {
-           
-            anchorPane.getChildren().add(node);
-        }
+
+        Platform.runLater(() -> {
+
+            Node node = overlayDrawerService.getDrawer(overlay).update(overlay, canvas.getCamera());
+            node.setMouseTransparent(true);
+            if (anchorPane.getChildren().contains(node) == false) {
+
+                anchorPane.getChildren().add(node);
+            }
+        });
     }
-    
+
     // add the MoveablePoints of a overlay in order to edit it
     private void setEdited(Overlay overlay) {
-        
-            // delete all the moveable points
-            Node[] nodes = anchorPane.getChildren().stream().filter(node->MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size->new Node[size]);
-            anchorPane.getChildren().removeAll(nodes);
-            
-            // if an overlay has been selected
-            if(overlay!=null) {
-                // it get the modifier which will returns the set of moveable points
-                System.out.println(overlayDrawerService.getModifier(overlay));
-                List<MoveablePoint> modifiers = overlayDrawerService.getModifier(overlay).getModifiers(canvas.getCamera(), overlay);
-                
-                modifiers.forEach(m->m.positionOnImageProperty().addListener(this::onMoveablePointMoved));
-                anchorPane.getChildren().addAll(modifiers);
-                
-                
-            }
-            
-        
+
+        // delete all the moveable points
+        Node[] nodes = anchorPane.getChildren().stream().filter(node -> MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size -> new Node[size]);
+        anchorPane.getChildren().removeAll(nodes);
+
+        // if an overlay has been selected
+        if (overlay != null) {
+            // it get the modifier which will returns the set of moveable points
+            System.out.println(overlayDrawerService.getModifier(overlay));
+            List<MoveablePoint> modifiers = overlayDrawerService.getModifier(overlay).getModifiers(canvas.getCamera(), overlay);
+
+            modifiers.forEach(m -> m.positionOnImageProperty().addListener(this::onMoveablePointMoved));
+            anchorPane.getChildren().addAll(modifiers);
+
+        }
+
     }
-    
+
     public void onViewPortChange(ViewPort viewport) {
         updateOverlays();
     }
-    
+
     public void updateInfoLabel() {
-        
+
         String imageType = getDataset().getTypeLabelShort();
-        
+
         long width = getDataset().dimension(0);
         long height = getDataset().dimension(1);
-        
-        
-       
-        
-        infoLabel.setText(String.format("%s - %d x %d",imageType,width,height));
-        
+
+        infoLabel.setText(String.format("%s - %d x %d", imageType, width, height));
+
     }
-    
-    
+
     private boolean isOnOverlay(double x, double y, Overlay overlay) {
 
         double x1 = overlay.getRegionOfInterest().realMin(0);
@@ -566,8 +550,9 @@ public class ImageWindow extends Window {
         if (currentTool != null) {
             currentTool.unsubscribe(canvas);
         }
-        if(tool!= null)
-        tool.subscribe(canvas);
+        if (tool != null) {
+            tool.subscribe(canvas);
+        }
         currentTool = tool;
     }
 
@@ -577,7 +562,9 @@ public class ImageWindow extends Window {
     public List<Overlay> getOverlays() {
         System.out.println();
         List<Overlay> overlays = overlayService.getOverlays(imageDisplay);
-        if(overlays == null) return new ArrayList<Overlay>();
+        if (overlays == null) {
+            return new ArrayList<Overlay>();
+        }
         return overlayService.getOverlays(imageDisplay);
     }
 
@@ -650,13 +637,12 @@ public class ImageWindow extends Window {
         System.out.println("canvas click");
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
         System.out.println(positionOnImage);
-        logger.info(String.format("This image contains %s overlays",overlayService.getOverlays(imageDisplay).size()));
-        for(Overlay o : overlayService.getOverlays(imageDisplay))
-            //.parallelStream().forEach(o -> 
+        logger.info(String.format("This image contains %s overlays", overlayService.getOverlays(imageDisplay).size()));
+        for (Overlay o : overlayService.getOverlays(imageDisplay)) //.parallelStream().forEach(o -> 
         {
             if (isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o)) {
-                
-                logger.info("Selecting overlay "+o.toString());
+
+                logger.info("Selecting overlay " + o.toString());
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, true);
                 event.consume();
             } else {
@@ -666,7 +652,7 @@ public class ImageWindow extends Window {
         contextCalculationService.determineContext(imageDisplay);
         refreshSourceImage();
         updateInfoLabel();
-       
+
     }
 
     @EventHandler
@@ -730,31 +716,29 @@ public class ImageWindow extends Window {
     protected void onEvent(ToolChangeEvent event) {
         setCurrentTool(event.getTool());
     }
-    
-    
+
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
         System.out.println("selection changed");
         System.out.println(event.getOverlay());
-        
-        Platform.runLater(()->setEdited(event.getOverlay()));
-        
+
+        Platform.runLater(() -> setEdited(event.getOverlay()));
+
         refreshSourceImage();
     }
-    
+
     @EventHandler
     protected void onActiveDisplayChanged(DisplayActivatedEvent event) {
-        if(event.getDisplay() == imageDisplay) {
+        if (event.getDisplay() == imageDisplay) {
             System.out.println("I'm activaed !" + imageDisplay.getName());
             setFocused(true);
             setCurrentTool(toolService.getCurrentTool());
-        }
-        else {
+        } else {
             setFocused(false);
             setCurrentTool(null);
         }
     }
-    
+
     @EventHandler
     void onOverlayModified(OverlayUpdatedEvent event) {
         updateOverlay(event.getObject());
@@ -763,11 +747,11 @@ public class ImageWindow extends Window {
     protected boolean isWindowConcernedByModule(Module module) {
         return module.getInputs().values().stream().filter(obj -> (obj == imageDisplay || obj == getDataset())).count() > 0;
     }
-    
+
     protected void onMoveablePointMoved(Observable obs, Point2D oldValue, Point2D newValue) {
         updateOverlays();
     }
-    
+
     /*
     @EventHandler
     protected void onEvent(ModuleStartedEvent event) {
@@ -787,5 +771,4 @@ public class ImageWindow extends Window {
            Platform.runLater(()->LoadingScreen.getInstance().hideFrom(anchorPane));
         }
     }*/
-
 }

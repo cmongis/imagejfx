@@ -21,14 +21,13 @@
 package ijfx.service.overlay;
 
 import ijfx.ui.main.ImageJFX;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
-import net.imagej.ImageJ;
 import net.imagej.ImageJService;
-import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.OverlayService;
 import net.imagej.measure.StatisticsService;
@@ -42,7 +41,6 @@ import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.FloatType;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
@@ -88,26 +86,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         //final PointSet ps = getRegion(imageDisplay, overlay);
         final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
         
-        /*
-        System.out.println("got it !");
-        AxisType xa = ds.axis(0).type();
-        AxisType xy = ds.axis(1).type();
-       AxisType[] axes = new AxisType[] {xa,xy};
-        
-       // AxisType activeAxis = imageDisplay.getActiveAxis();
        
-        long[] dims = new long[] { ds.max(0), ds.max(1) };
-        
-        RealType t = ds.getType();
-       // Dataset planeDataset = datasetService.create(dims, "", axes, ds.getType().getBitsPerPixel(), t.getMinValue() < 0, t.equals(new FloatType()), true);
-        
-        //planeDataset.setPlaneSilently(0, ds.getPlane())
-        
-        for (int i = 0; i != imageDisplay.numDimensions(); i++) {
-            // overlay.setAxis(imageDisplay.axis(i), imageDisplay.getIntPosition(i));
-        }
-
-        */
 
         System.out.println("Creting the point set");
         RoiPointSet rps = new RoiPointSet(overlay.getRegionOfInterest());
@@ -164,6 +143,42 @@ public class OverlayStatService extends AbstractService implements ImageJService
         };
         logger.fine("finished");
         return stats;
+    }
+    
+    public Double[] getValueList(ImageDisplay imageDisplay, Overlay overlay) {
+        
+          
+        final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
+        ArrayList<Double> values = new ArrayList<Double>(10000);
+        RoiPointSet rps = new RoiPointSet(overlay.getRegionOfInterest());
+        
+        HashMap<String, ParallelMeasurement> measures = new HashMap<>();
+        HashMap<String, Double> stats = new HashMap<>();
+                 
+    
+
+        PointSetIterator psc = rps.cursor();
+        RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
+        
+        
+        long[] position = new long[imageDisplay.numDimensions()];
+        imageDisplay.localize(position);
+       
+        
+        
+        while(psc.hasNext()) {
+            psc.fwd();
+            long[] roiPosition = psc.get();
+            
+            for(int i =0;i!=roiPosition.length;i++) {
+                position[i] = roiPosition[i];
+            }
+            randomAccess.setPosition(position);
+            values.add(randomAccess.get().getRealDouble());
+        }
+        
+        return values.toArray(new Double[values.size()]);
+        
     }
 
     private interface ParallelMeasurement {
