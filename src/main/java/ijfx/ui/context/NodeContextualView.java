@@ -22,12 +22,13 @@ package ijfx.ui.context;
 
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.Node;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public class SimpleContextUIController extends ArrayList<ContextualWidget> implements ContextualView {
+public class NodeContextualView extends ArrayList<ContextualWidget<Node>> implements ContextualView<Node> {
 
     String name;
 
@@ -35,7 +36,7 @@ public class SimpleContextUIController extends ArrayList<ContextualWidget> imple
      *
      * @param name
      */
-    public SimpleContextUIController(String name) {
+    public NodeContextualView(String name) {
         setName(name);
     }
 
@@ -60,7 +61,7 @@ public class SimpleContextUIController extends ArrayList<ContextualWidget> imple
      * @param widget
      * @return
      */
-    public SimpleContextUIController registerWidget(ContextualWidget widget) {
+    public NodeContextualView registerWidget(ContextualWidget widget) {
         add(widget);
         return this;
     }
@@ -69,7 +70,7 @@ public class SimpleContextUIController extends ArrayList<ContextualWidget> imple
      *
      * @return
      */
-    public List<ContextualWidget> getWidgetList() {
+    public List<ContextualWidget<Node>> getWidgetList() {
         return this;
     }
 
@@ -80,7 +81,7 @@ public class SimpleContextUIController extends ArrayList<ContextualWidget> imple
      * @return
      */
     @Override
-    public ContextualView onContextChanged(List<? extends ContextualWidget> toShow, List<? extends ContextualWidget> toHide) {
+    public ContextualView<Node> onContextChanged(List<? extends ContextualWidget<Node>> toShow, List<? extends ContextualWidget<Node>> toHide) {
         toShow.forEach(widget -> widget.show());
         toHide.forEach(widget -> widget.hide());
         return this;

@@ -171,12 +171,12 @@ public class UiContextService extends AbstractService implements UiContextManage
         return this;
     }
 
-    public void updateController(ContextualView controller) {
+    public <T> void updateController(ContextualView<T> view) {
 
-        ArrayList<ContextualWidget> toShow = new ArrayList<>();
-        ArrayList<ContextualWidget> toHide = new ArrayList<>();
+        ArrayList<ContextualWidget<T>> toShow = new ArrayList<>();
+        ArrayList<ContextualWidget<T>> toHide = new ArrayList<>();
 
-        controller.getWidgetList().parallelStream().forEach(widget -> {
+        view.getWidgetList().parallelStream().forEach(widget -> {
             boolean shouldShow = shouldShow(widget);
             boolean shouldHide = !shouldShow;
 
@@ -190,7 +190,12 @@ public class UiContextService extends AbstractService implements UiContextManage
             }
 
         });
-        ImageJFX.getThreadQueue().submit(() -> controller.onContextChanged(toShow, toHide));
+        try {
+        view.onContextChanged(toShow, toHide);
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE, "Error when updating ContextualView", e);
+        }
     }
 
     public boolean shouldShow(String contextualWidget) {
@@ -276,7 +281,7 @@ public class UiContextService extends AbstractService implements UiContextManage
     }
 
     @Override
-    public UiContextManager addContextualView(ContextualView contextualView) {
+    public <T> UiContextManager addContextualView(ContextualView<T> contextualView) {
 
         logger.info(String.format("Registering the contextual view : %s", contextualView.getName()));
         viewMap.put(contextualView.getName(), contextualView);

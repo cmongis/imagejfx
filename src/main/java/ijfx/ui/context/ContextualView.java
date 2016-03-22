@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Cyril MONGIS, 2015
  */
-public interface ContextualView {
+public interface ContextualView<T> {
 
     /**
      *
@@ -38,7 +38,7 @@ public interface ContextualView {
      *
      * @return
      */
-    public List<ContextualWidget> getWidgetList();
+    public List<ContextualWidget<T>> getWidgetList();
 
     /**
      *
@@ -46,5 +46,5 @@ public interface ContextualView {
      * @param toHide
      * @return
      */
-    public ContextualView onContextChanged(List<? extends ContextualWidget> toShow, List<? extends ContextualWidget> toHide);
+    public ContextualView<T> onContextChanged(List<? extends ContextualWidget<T>> toShow, List<? extends ContextualWidget<T>> toHide);
 }
