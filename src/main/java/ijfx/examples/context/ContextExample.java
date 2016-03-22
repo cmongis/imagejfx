@@ -49,24 +49,24 @@ public class ContextExample extends Application {
     UiContextService contextService;
 
     Pane flowPane;
-    BorderPane borderpane;
+    BorderPane toolbarBorderpane;
     HBox fakeToolBar;
-    BorderPane borderPaneGeneral;
+    BorderPane borderPane;
     public ContextExample() {
 
     }
 
     public void init(Context context) {
-         borderPaneGeneral= new BorderPane();
+         borderPane= new BorderPane();
         context.inject(this);
-        borderpane = new BorderPane();
+        toolbarBorderpane = new BorderPane();
         flowPane = new FlowPane();
         fakeToolBar = new HBox();
         flowPane.setPrefSize(30, 30);
-        borderpane.setCenter(flowPane);
-        borderpane.getCenter().setVisible(false);
-        borderpane.getCenter().setStyle("-fx-background-color: black;");
-        borderpane.getCenter().prefHeight(30);
+        toolbarBorderpane.setCenter(flowPane);
+        toolbarBorderpane.getCenter().setVisible(false);
+        toolbarBorderpane.getCenter().setStyle("-fx-background-color: black;");
+        toolbarBorderpane.getCenter().prefHeight(30);
         Button fruitButton = new Button("fruit");
         fruitButton.setId("fruit");
 
@@ -87,20 +87,20 @@ public class ContextExample extends Application {
         contextualView.registerNode(aubergineButton, "vegetable");
         
         Button show = new Button("Show");
-        //show.hoverProperty().addListener((e) -> borderpane.getCenter().setVisible(true));
-        //show.setOnAction((e)-> borderpane.getCenter().setVisible(true));
-        show.addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> borderpane.getCenter().setVisible(true));
-        show.addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> borderpane.getCenter().setVisible(false));
-        borderpane.getCenter().addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> borderpane.getCenter().setVisible(true));
-        borderpane.getCenter().addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> borderpane.getCenter().setVisible(false));
+        //show.hoverProperty().addListener((e) -> toolbarBorderpane.getCenter().setVisible(true));
+        //show.setOnAction((e)-> toolbarBorderpane.getCenter().setVisible(true));
+        show.addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> toolbarBorderpane.getCenter().setVisible(true));
+        show.addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> toolbarBorderpane.getCenter().setVisible(false));
+        toolbarBorderpane.getCenter().addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> toolbarBorderpane.getCenter().setVisible(true));
+        toolbarBorderpane.getCenter().addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> toolbarBorderpane.getCenter().setVisible(false));
 
         fakeToolBar.getChildren().add(show);
-        borderpane.setTop(fakeToolBar);
+        toolbarBorderpane.setTop(fakeToolBar);
         HBox toolbarTest = new HBox();
         toolbarTest.getChildren().addAll(fruitButton, vegetableButton);
         //borderpane.setBottom(toolbarTest);
-        borderPaneGeneral.setTop(borderpane);
-        borderPaneGeneral.setBottom(toolbarTest);
+        borderPane.setTop(toolbarBorderpane);
+        borderPane.setBottom(toolbarTest);
         fruitButton.setOnAction(event -> {
             contextService.leave("vegetable");
             contextService.enter("fruit");
@@ -124,10 +124,10 @@ public class ContextExample extends Application {
     }
 
     public BorderPane borderPane() {
-        return borderpane;
+        return toolbarBorderpane;
     }
     public BorderPane getLayout(){
-        return borderPaneGeneral;
+        return borderPane;
     }
 
     @Override
