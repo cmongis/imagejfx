@@ -39,13 +39,15 @@ public class DefaultTimer implements Timer {
     
     String id = "DefaultTimer";
     
+    
+    
     public DefaultTimer(String id) {
         this();
         this.id = id;
     }
     
     public DefaultTimer() {
-
+        start();
     }
 
     @Override
@@ -80,24 +82,41 @@ public class DefaultTimer implements Timer {
     
     protected String getLog(String id) {
         return  new StringBuilder()
-                .append("####")
-                .append(id)
-                .append("#####")
-                .append(getStats(id).toString())
+                .append(getColumns())
+                .append(getRow(id, getStats(id)))
                 .toString();
         
     }
 
     @Override
     public void logAll() {
+        
+        
+        final StringBuilder builder = new StringBuilder()
+                .append(String.format("[%s]",id))
+                .append(getColumns());
         stats.forEach((key,value)->{
-            log(key);
+            builder.append(getRow(key,value));
         });
+        
+        logger.info(builder.toString());
+        
     }
 
     @Override
     public void log(String id) {
-        logger.info(getLog(id));
+        //logger.info("");
     }
 
+    
+    private static String COLUMNS = String.format("+\n%22s|%22s|%22s\n+--------------\n","Action","Mean","Std. Deviation");
+    protected String getColumns() {
+        return COLUMNS;
+    }
+    
+    protected String getRow(String id,SummaryStatistics statics) {
+        
+        return String.format("%22s|%20.0fms|%20.0fms\n",id.length() > 22 ? id.substring(0, 21) : id,statics.getMean(),statics.getStandardDeviation());
+        
+    }
 }
