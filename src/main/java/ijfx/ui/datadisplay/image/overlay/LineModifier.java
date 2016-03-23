@@ -56,8 +56,11 @@ public class LineModifier implements OverlayModifier<LineOverlay> {
         if (lineHelper == null) {
             lineHelper = new LineHelper(overlay);
 
+            context.inject(lineHelper);
             a = new MoveablePoint(viewport);
             b = new MoveablePoint(viewport);
+            
+            
             
             Point2D startOnScreen = lineHelper.getStartOnScreen(viewport);
             Point2D endOnScreen = lineHelper.getEndOnScreen(viewport);
