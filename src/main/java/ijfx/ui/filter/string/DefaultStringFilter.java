@@ -7,6 +7,7 @@ package ijfx.ui.filter.string;
 
 
 import ijfx.ui.filter.StringFilter;
+import ijfx.ui.filter.StringFilterWrapper;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,11 +21,14 @@ import java.util.function.Predicate;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -79,7 +83,8 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
         // change the factory to the class method
         listView.setCellFactory(this::createListCell);
         listView.setItems(observableList);
-
+        
+//        predicateProperty().addListener();
     }
     
     public ListCell<Item> createListCell(ListView<Item> listView) {
@@ -166,9 +171,10 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
         predicate.setValue(p -> listBuffer.contains(p));
         getStylesheets().remove(CSS_FILE);
         getStylesheets().add(CSS_FILE);
-      
     }
     
+    
+    @Override
     public Property<Predicate<String>> predicateProperty() {
         return predicate;
     }
@@ -178,7 +184,8 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
         return textField.textProperty();
     }
 
-   
-    
-
+    @Override
+    public Node getContent(){
+        return this;
+   }
 }

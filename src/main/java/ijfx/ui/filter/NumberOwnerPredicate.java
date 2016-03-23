@@ -20,17 +20,41 @@
 package ijfx.ui.filter;
 
 import ijfx.core.metadata.MetaDataOwner;
-import java.io.IOException;
-import java.util.Collection;
+import java.util.function.Predicate;
 
 /**
  *
- * @author cyril
+ * @author Pierre BONNEAU
  */
-public interface MetaDataFilterFactory  {
+public class NumberOwnerPredicate implements Predicate<MetaDataOwner>{
     
+    String keyName;
     
-    public MetaDataOwnerFilter generateFilter(Collection<MetaDataOwner> ownerList, String keyName)throws IOException;
+    Double value;
     
+    Predicate<Double> predicate;
     
+    public NumberOwnerPredicate(String keyName, Predicate<Double> predicate){
+        this.keyName = keyName;
+        this.predicate = predicate;
+    }
+    
+    @Override
+    public boolean test(MetaDataOwner t) {
+        value = t.getMetaDataSet().get(keyName).getDoubleValue();
+        return predicate.test(value);
+    }
+    
+    public Double getKey(){
+        return this.value;
+    }
+   
+    
+    public Predicate<Double> getPredicate(){
+        return this.predicate;
+    }
+    
+    public void setPredicate(Predicate<Double> predicate){
+        this.predicate = predicate;
+    }
 }
