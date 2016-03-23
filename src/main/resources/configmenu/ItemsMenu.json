@@ -1,0 +1,62 @@
+{
+  "categories" : [
+  {
+    "name":"Colors"
+    ,"context":"image-open"
+    ,"items":[
+        {
+          "type":"Command"
+          ,"label":"Merge channels"
+          ,"action":"net.imagej.plugins.commands.MergeChannels"
+          ,"icon":"/something.svg"
+          ,"context":"multichannel"
+          
+        }
+        ,
+        {
+          "type":"Command"
+          ,"label":"Separate channels"
+          ,"action":"net.imagej.plugins.commands.SeparateChannel"
+          ,"icon":"/somethingelse.svg"
+          ,"context":"multichannel rgb-image"
+        }
+      ]
+  }
+  ,{
+    "name":"Stacks"
+    ,"context":"image-open multi-z"
+    ,"items":[
+        {
+          "type":"Command"
+          ,"label":"Merge stacks"
+          ,"action":"net.imagej.plugins.command.MergeStacks"
+          ,"icon":"/something.svg"
+          ,"context":"multi-z"
+        }
+        ,{
+          "type":"Command"
+          ,"label":"Separate stacks"
+          ,"action":"net.imagej.plugins.commands.SeparateStacks"
+          ,"icon":"/somthingelse.svg"
+          ,"context":"multi-z"
+        }
+      ]
+  },
+  {"name":"Filters"
+  ,"context":"image-open"
+  ,"items":[
+        {
+          "type":"Command"
+          ,"label":"Gaussian"
+          ,"action":"net.imagej.plugins.commands.imglib.GaussianBlur"
+          ,"icon":"preview"
+          ,"context":"image-open"
+          ,"parameters":{
+            "radius":3
+            ,"usePixels":false
+          }
+        }
+      ]
+  }
+]
+}

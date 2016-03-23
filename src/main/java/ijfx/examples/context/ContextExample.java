@@ -24,22 +24,27 @@ import ijfx.ui.context.PaneContextualView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import net.imagej.ImageJ;
+import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 
 /**
  *
- * @author cyril
+ * @author tuananh
  */
 public class ContextExample extends Application {
 
@@ -49,24 +54,21 @@ public class ContextExample extends Application {
     UiContextService contextService;
 
     Pane flowPane;
-    BorderPane toolbarBorderpane;
     HBox fakeToolBar;
     BorderPane borderPane;
+    private PopOver popOver;
+
     public ContextExample() {
 
     }
 
     public void init(Context context) {
-         borderPane= new BorderPane();
+        borderPane = new BorderPane();
         context.inject(this);
-        toolbarBorderpane = new BorderPane();
         flowPane = new FlowPane();
         fakeToolBar = new HBox();
         flowPane.setPrefSize(30, 30);
-        toolbarBorderpane.setCenter(flowPane);
-        toolbarBorderpane.getCenter().setVisible(false);
-        toolbarBorderpane.getCenter().setStyle("-fx-background-color: black;");
-        toolbarBorderpane.getCenter().prefHeight(30);
+ 
         Button fruitButton = new Button("fruit");
         fruitButton.setId("fruit");
 
@@ -85,21 +87,24 @@ public class ContextExample extends Application {
         //contextualView.registerNode(vegetableButton, "always");
         contextualView.registerNode(bananaButton, "fruit");
         contextualView.registerNode(aubergineButton, "vegetable");
-        
+
         Button show = new Button("Show");
-        //show.hoverProperty().addListener((e) -> toolbarBorderpane.getCenter().setVisible(true));
-        //show.setOnAction((e)-> toolbarBorderpane.getCenter().setVisible(true));
-        show.addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> toolbarBorderpane.getCenter().setVisible(true));
-        show.addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> toolbarBorderpane.getCenter().setVisible(false));
-        toolbarBorderpane.getCenter().addEventFilter(MouseEvent.MOUSE_ENTERED, (e)-> toolbarBorderpane.getCenter().setVisible(true));
-        toolbarBorderpane.getCenter().addEventFilter(MouseEvent.MOUSE_EXITED, (e)-> toolbarBorderpane.getCenter().setVisible(false));
+ 
+        show.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (e) -> {
+            createPopOver(show);
+       
+        });
+     
 
         fakeToolBar.getChildren().add(show);
-        toolbarBorderpane.setTop(fakeToolBar);
         HBox toolbarTest = new HBox();
         toolbarTest.getChildren().addAll(fruitButton, vegetableButton);
-        //borderpane.setBottom(toolbarTest);
-        borderPane.setTop(toolbarBorderpane);
+        borderPane.setTop(fakeToolBar);
+        Rectangle c = new Rectangle();
+        c.widthProperty().bind(borderPane.widthProperty());
+        c.setHeight(600);
+        c.setFill(Color.RED);
+        borderPane.setCenter(c);
         borderPane.setBottom(toolbarTest);
         fruitButton.setOnAction(event -> {
             contextService.leave("vegetable");
@@ -116,7 +121,37 @@ public class ContextExample extends Application {
 
         contextService.enter("always");
         contextService.update();
+
+    }
+
+    private void createPopOver(Node node) {
+        if (popOver == null)
+        {
+        popOver = new PopOver(flowPane);
+            setPopOver(node);
+
+        }
+        else if (!popOver.isShowing())
+            
+                {
+            setPopOver(node);
+        }
+
         
+    }
+    
+    private void setPopOver(Node node)
+    {
+                popOver.setDetached(false);
+        popOver.setDetachable(false);
+        popOver.setHideOnEscape(false);
+        popOver.setAutoFix(true);
+        popOver.setAutoHide(true);
+        popOver.setOpacity(1.0);
+        popOver.setHideOnEscape(false);
+        popOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                    popOver.show(node, node.localToScreen(10, 10).getX(), node.localToScreen(10, 10).getY());
+                    
     }
 
     public Pane flowPane() {
@@ -126,7 +161,8 @@ public class ContextExample extends Application {
     public BorderPane borderPane() {
         return toolbarBorderpane;
     }
-    public BorderPane getLayout(){
+
+    public BorderPane getLayout() {
         return borderPane;
     }
 
