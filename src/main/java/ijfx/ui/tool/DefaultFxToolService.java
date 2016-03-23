@@ -20,10 +20,14 @@
  */
 package ijfx.ui.tool;
 
-import net.imagej.ImageJService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.plugin.PluginService;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 
@@ -42,15 +46,52 @@ public class DefaultFxToolService extends AbstractService implements FxToolServi
     @Parameter
     EventService eventService;
 
+    @Parameter
+    PluginService pluginService;
+    
+    Map<Class<? extends FxTool>,FxTool> toolMap;
+    List<FxTool> toolList;
+    
+    
+    
+    
+    protected void init() {
+        if(toolMap == null) {
+            toolMap = new HashMap<>();
+            toolList = new ArrayList<>();
+            
+            
+            List<? extends FxTool> tools = pluginService.createInstancesOfType(FxTool.class);
+            
+            for(FxTool tool : tools) {
+                toolMap.put(tool.getClass(), tool);
+                toolList.add(tool);
+            }
+        }
+    }
+    
+    public List<FxTool> getTools() {
+        init();
+        return toolList;
+    }
+    
+    protected FxTool getTool(Class<? extends FxTool> toolClass) {
+        init();
+        return toolMap.get(toolClass);
+    }
+    
     @Override
     public FxTool getCurrentTool() {
         return currentTool;
     }
 
     @Override
-    public void setCurrentTool(FxTool currentTool) {
-        this.currentTool = currentTool;
+    public void setCurrentTool(Class<? extends FxTool> currentToolCl) {
+        
+        this.currentTool = getTool(currentToolCl);
         eventService.publish(new ToolChangeEvent(currentTool));
     }
 
+    
+    
 }

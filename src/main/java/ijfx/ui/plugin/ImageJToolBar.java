@@ -21,12 +21,10 @@
 package ijfx.ui.plugin;
 
 import ijfx.ui.UiPlugin;
-import ijfx.bridge.ImageJContainer;
 import ijfx.ui.main.Localization;
 import ijfx.ui.tool.FxTool;
 import ijfx.service.uicontext.UiContextService;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
@@ -38,6 +36,8 @@ import org.scijava.plugin.PluginService;
 import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.tool.FxToolService;
+import java.util.Map;
 
 /**
  *
@@ -59,6 +59,9 @@ public class ImageJToolBar extends VBox implements UiPlugin {
     @Parameter
     PluginService pluginService;
 
+    @Parameter
+    FxToolService fxToolService;
+
     @Override
     public Node getUiElement() {
 
@@ -67,26 +70,15 @@ public class ImageJToolBar extends VBox implements UiPlugin {
 
     @Override
     public UiPlugin init() {
+        for (FxTool tool : fxToolService.getTools()) {
+            getChildren().add(tool.getNode());
 
-        pluginService.getPluginsOfType(FxTool.class).forEach(plugin -> {
-            try {
-                FxTool tool = plugin.createInstance();
+            if (ToggleButton.class.isAssignableFrom(tool.getNode().getClass())) {
 
-                context.inject(tool);
-                tool.getNode().setId(plugin.getClassName());
-                getChildren().add(tool.getNode());
-
-                if (ToggleButton.class.isAssignableFrom(tool.getNode().getClass())) {
-
-                    ToggleButton button = (ToggleButton)tool.getNode();
-                    button.setText("");
-                }
+                ToggleButton button = (ToggleButton) tool.getNode();
+                button.setText("");
             }
-
-         catch (InstantiableException ex) {
-                ImageJFX.getLogger().log(Level.SEVERE, null, ex);
-            }
-        });
+        }
         return this;
     }
 

@@ -297,7 +297,7 @@ public abstract class AbstractPathTool implements FxTool {
     }
 
     private void onButtonClick(ActionEvent event) {
-        toolService.setCurrentTool(this);
+        toolService.setCurrentTool(this.getClass());
     }
     
     public void onActivated() {

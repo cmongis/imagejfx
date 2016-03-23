@@ -74,6 +74,7 @@ public class PolygonTool extends AbstractPathTool {
             addOverlay(polygonPath);
             polygonPath = new FxPath();
             smoothPath = new FxPath();
+            toolService.setCurrentTool(Hand.class);
             event.consume();
             return;
         }
@@ -87,7 +88,7 @@ public class PolygonTool extends AbstractPathTool {
         updateSmoothPath();
         drawPath(polygonPath);
         drawPath(smoothPath);
-
+        
         //getCanvas().repaint();
 
     }

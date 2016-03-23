@@ -64,7 +64,7 @@ public class LineHelper {
     }
 
     private void onLineEndChange(Observable obs, Point2D oldValue, Point2D newValue) {
-
+        if(newValue == null) return;
         overlay.setLineEnd(Point2DUtils.asArray(newValue));
         fireChangeEvent();
     }
