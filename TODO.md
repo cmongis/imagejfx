@@ -1,4 +1,5 @@
 Batch process
+
   - button add doesn't work. X
   - textfield problem rememebers what was there before ?
   - put a back button on the batch processing screen X
