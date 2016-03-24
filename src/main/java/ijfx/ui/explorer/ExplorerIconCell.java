@@ -17,37 +17,37 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui;
+package ijfx.ui.explorer;
 
-import org.scijava.event.SciJavaEvent;
+import javafx.scene.image.Image;
+import mongis.utils.panecell.PaneIconCell;
 
 /**
  *
  * @author cyril
  */
-public abstract class IjfxEvent<T> extends SciJavaEvent{
+public class ExplorerIconCell extends PaneIconCell<Iconazable>{
     
-    private T object;
-
-    public IjfxEvent() {}
-    
-  
-    
-    public IjfxEvent<T> setObject(T t) {
-        object = t;
-        return this;
+    public ExplorerIconCell() {
+        super();
+        
+        setTitleFactory(this::getTitle);
+        setSubtitleFactory(this::getSubtitle);
+        setImageFactory(this::getImage);
+        
     }
     
-    public IjfxEvent(T object) {
-        this.object = object;
+    
+    public String getTitle(Iconazable iconazable) {
+        return iconazable.getTitle();
     }
-     
-     
-     
-     public T getObject() {
-         return object;
-     }
-     
-     
+    
+    public String getSubtitle(Iconazable iconazable) {
+        return iconazable.getSubtitle();
+    }
+    
+    public Image getImage(Iconazable iconazable) {
+        return iconazable.getImage();
+    }
     
 }

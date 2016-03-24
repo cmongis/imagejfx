@@ -17,37 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui;
+package ijfx.ui.explorer;
 
-import org.scijava.event.SciJavaEvent;
+import ijfx.core.metadata.MetaDataOwner;
+import ijfx.service.IjfxService;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  *
  * @author cyril
  */
-public abstract class IjfxEvent<T> extends SciJavaEvent{
+public interface ExplorerService extends IjfxService{
     
-    private T object;
-
-    public IjfxEvent() {}
+    List<Explorable> getItems();
     
-  
     
-    public IjfxEvent<T> setObject(T t) {
-        object = t;
-        return this;
-    }
+    void setItems(List<Explorable> items);
     
-    public IjfxEvent(T object) {
-        this.object = object;
-    }
-     
-     
-     
-     public T getObject() {
-         return object;
-     }
-     
-     
+    void applyFilter(Predicate<MetaDataOwner> predicate);
     
+    
+    List<Explorable> getFilteredItems();
 }

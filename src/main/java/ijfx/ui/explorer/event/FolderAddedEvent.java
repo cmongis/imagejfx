@@ -17,37 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui;
+package ijfx.ui.explorer.event;
 
-import org.scijava.event.SciJavaEvent;
+import ijfx.ui.IjfxEvent;
+import ijfx.ui.explorer.Folder;
 
 /**
  *
  * @author cyril
  */
-public abstract class IjfxEvent<T> extends SciJavaEvent{
-    
-    private T object;
-
-    public IjfxEvent() {}
-    
-  
-    
-    public IjfxEvent<T> setObject(T t) {
-        object = t;
-        return this;
-    }
-    
-    public IjfxEvent(T object) {
-        this.object = object;
-    }
-     
-     
-     
-     public T getObject() {
-         return object;
-     }
-     
-     
+public class FolderAddedEvent extends IjfxEvent<Folder> {
     
 }

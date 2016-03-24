@@ -190,8 +190,8 @@ public class ArcMenu extends StackPane {
             //this.setLayoutY(centerY);
             
             // setting the translation 
-            this.setTranslateX(xToCenter);
-            this.setTranslateY(yToCenter);
+            this.setTranslateX(xToCenter-(getWidth())/2);
+            this.setTranslateY(yToCenter-(getHeight()/2));
 
             animate();
         }

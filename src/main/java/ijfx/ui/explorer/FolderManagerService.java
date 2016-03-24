@@ -17,37 +17,23 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui;
+package ijfx.ui.explorer;
 
-import org.scijava.event.SciJavaEvent;
+import java.io.File;
+import java.util.List;
 
 /**
  *
  * @author cyril
  */
-public abstract class IjfxEvent<T> extends SciJavaEvent{
+public interface FolderManagerService {
     
-    private T object;
-
-    public IjfxEvent() {}
+    public void addFolder(File file);
     
-  
+    public List<Folder> getFolderList();
     
-    public IjfxEvent<T> setObject(T t) {
-        object = t;
-        return this;
-    }
+    public Folder getCurrentFolder();
     
-    public IjfxEvent(T object) {
-        this.object = object;
-    }
-     
-     
-     
-     public T getObject() {
-         return object;
-     }
-     
-     
+    public void setCurrentFolder();
     
 }

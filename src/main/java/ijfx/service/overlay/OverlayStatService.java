@@ -20,6 +20,7 @@
  */
 package ijfx.service.overlay;
 
+import ij.blob.Blob;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.scijava.plugin.Attr;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -111,33 +113,36 @@ public class OverlayStatService extends AbstractService implements ImageJService
         logger.fine("finished");
         return stats;
     }
-    
-    
-    
-    
+   
     public Double[] getValueList(ImageDisplay imageDisplay, Overlay overlay) {
         
         
-        System.out.println("Getting value list");
+        
          if(overlay instanceof LineOverlay) return getValueList(imageDisplay,(LineOverlay)overlay);
+         
+        // getting the dataset corresponding to the display
         final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
+        
+        // Array containing all the pixel values
         ArrayList<Double> values = new ArrayList<>(10000);
+        
+        
+        // RoiPointSet used to iterate through the pixel inside the Roi
         RoiPointSet rps = new RoiPointSet(overlay.getRegionOfInterest());
-       
-        HashMap<String, ParallelMeasurement> measures = new HashMap<>();
-        HashMap<String, Double> stats = new HashMap<>();
                  
-    
-
+        
         PointSetIterator psc = rps.cursor();
+        
+        // Random access of the dataset
         RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
-        
-        
+         
+        // position of the image display
         long[] position = new long[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
-       
         psc.reset();
         int c = 0;
+        
+        // getting the 
         while(psc.hasNext()) {
             psc.fwd();
             long[] roiPosition = psc.get();
@@ -154,7 +159,9 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
     }
     
-    public Double[] getValueList(ImageDisplay imageDisplay, LineOverlay overlay) {
+   
+    
+    protected Double[] getValueList(ImageDisplay imageDisplay, LineOverlay overlay) {
         
         
         
@@ -191,14 +198,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         return values;
     }
-    
-    /*
-    private int[][] traceLine(int x0, int y0, int x1, int y1) {
-        
-    
-        
-    
-    }*/
 
     private interface ParallelMeasurement {
 

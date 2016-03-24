@@ -40,6 +40,11 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
         super();
     }
 
+    public AsyncCallback(INPUT input) {
+        this();
+        setInput(input);
+    }
+    
     public AsyncCallback(Callback<INPUT, OUTPUT> callback) {
         this();
         this.callback = callback;
