@@ -42,8 +42,23 @@ import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 
 /**
- *
- * @author cyril
+ * The PaneIconCell is a generic class used to display items in form of Icons with a text and subtext under.
+ * The PaneIconCell is configured by setting a Model object which contain the data
+ * and callback that define how to get the informations from the models.
+ * In this way, when the model is changed, the icon update itself automatically using
+ * the defined callback;
+ * 
+ * Example, if I want to create a PaneIconCell that display a File.
+ * 
+ * PaneIconCell<File> icon = new PaneIconCell();
+ * icon.setTitleCallback(f-> f.getName());
+ * icon.setSubtitleCallback(f->f.getLength());
+ * icon.setImageCallback(f->f.getName().endsWith(".jpg") ? new Image(f.getAbsoluthPath()) : new Image("/path/to/file.jpg");
+ * 
+ * The last callback will return an Image
+ * 
+ * @author Cyril MONGIS
+ * @param <T> Contained model
  */
 public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
@@ -58,9 +73,10 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     @FXML
     private Label subtitleLabel;
-
+    
     private final ObjectProperty<T> item = new SimpleObjectProperty<T>();
 
+    // Callback 
     private Callback<T, String> titleFactory = T -> "No title factory";
 
     private Callback<T, String> subtitleFactory = T -> "No subtitle factory";
@@ -119,22 +135,43 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         }
     }
     
+    /**
+     * Set the Model item contained by the PaneIconCell. The PaneCell will call the different callback to update
+     * the view.
+     * @param item
+     */
+    @Override
     public void setItem(T item) {
         this.item.setValue(item);
     }
 
+    /**
+     * 
+     * @return the item displayed the cell
+     */
+    @Override
     public T getItem() {
         return this.item.getValue();
     }
 
+    /**
+     *
+     * @return the Node representing the PaneCell
+     */
+    @Override
     public Node getContent() {
         return this;
     }
 
+    
     public Property<T> itemProperty() {
         return item;
     }
 
+    /**
+     * Set directly the title of the Icon. The title may be overridden later by the title callback
+     * @param title
+     */
     public void setTitle(String title) {
         titleLabel.setText(title);
     }
@@ -218,16 +255,32 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         return this;
     }
 
+    /**
+     * 
+     * @param titleFactory Callback that takes a model item as input and return a string representing the title of the icon
+     * @return the PaneIconCell for convenient reasons
+     */
     public PaneIconCell<T> setTitleFactory(Callback<T, String> titleFactory) {
         this.titleFactory = titleFactory;
         return this;
     }
 
+     /**
+     * 
+     * @param subtitleFactory Callback that takes a model item as input and return a string representing the title of the icon
+     * @return the PaneIconcell for convenient reasons
+     */
     public PaneIconCell<T> setSubtitleFactory(Callback<T, String> subtitleFactory) {
         this.subtitleFactory = subtitleFactory;
         return this;
     }
 
+     /**
+     * 
+     * @param imageFactory Callback that takes a model item as input and return an Image as icon for the model. The callback is always executed in a separated thread in order to
+     * avoid blocking the display of the icon.
+     * @return the PaneIconCell for convenient reasons
+     */
     public PaneIconCell<T> setImageFactory(Callback<T, Image> imageFactory) {
         this.imageFactory = imageFactory;
         return this;

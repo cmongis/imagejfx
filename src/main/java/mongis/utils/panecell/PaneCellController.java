@@ -36,8 +36,13 @@ import javafx.scene.layout.Pane;
 import mercury.core.MercuryTimer;
 
 /**
+ * The PaneController takes care of filling a Pane with PaneCells. Like a
+ * ListView, PaneCells are just container that update themselves when changes of
+ * the model occurs. The PaneController cache used PaneCell and create new when
+ * necessary. When the list of items change, the PaneCellController update the
+ * children nodes of the associated Pane.
  *
- * @author cyril
+ * @author Cyril MONGIS
  */
 public class PaneCellController<T> {
 
@@ -52,15 +57,14 @@ public class PaneCellController<T> {
 
     Pane pane;
 
-   
-    
     public PaneCellController(Pane pane) {
         setPane(pane);
-        
-        
-        
     }
 
+    /**
+     * Set the pane that should be updated by the controller
+     * @param pane
+     */
     public void setPane(Pane pane) {
         this.pane = pane;
     }
@@ -69,6 +73,12 @@ public class PaneCellController<T> {
         this.cellFactory = cellFactory;
     }
 
+    /**
+     *  Give it a list of items coming from the model and the controller will update
+     *  the pane. If necessary, new PanelCell will be created. Unnecessary PaneCells
+     *  will be cached.
+     * @param List of items coming from the model
+     */
     public synchronized void update(List<T> items) {
 
         try {
@@ -96,17 +106,16 @@ public class PaneCellController<T> {
 
                 // adding these controllers to the cache
                 cachedControllerList.addAll(toRemove);
-                
 
                 logger.info(String.format("Deleting %d controllers", toRemove.size()));
 
                 // removing from the list
                 itemControllerList.removeAll(toRemove);
-               
+
                 pane.getChildren().removeAll(getContent(toRemove));
-                
-                cachedControllerList.stream().forEach(item->item.setItem(null));
-                
+
+                cachedControllerList.stream().forEach(item -> item.setItem(null));
+
                 logger.info(String.format("%d controllers left.", itemControllerList.size()));
             }
 
@@ -125,7 +134,7 @@ public class PaneCellController<T> {
 
                     // if there is no more controllers in the cache
                     if (cachedControllerList.size() == 0) {
-                        
+
                         fillCache(itemCount - i);
                     }
                     // we pop the first
@@ -158,16 +167,19 @@ public class PaneCellController<T> {
         }
     }
 
+    // get the list of cells
     public Collection<Node> getContent(Collection<PaneCell<T>> cellList) {
         return cellList.stream().map(PaneCell::getContent).collect(Collectors.toList());
     }
 
+    // fills the cache by creating a certain number of cells
     private void fillCache(int number) {
 
         cachedControllerList.addAll(IntStream.range(0, number).parallel().mapToObj(n -> createPaneCell()).collect(Collectors.toList()));
 
     }
-
+    
+    // creates a pane cell
     private PaneCell<T> createPaneCell() {
         try {
             return cellFactory.call();
@@ -176,84 +188,4 @@ public class PaneCellController<T> {
         }
         return null;
     }
-
-    /*
-    private class PaneCellSelectionModel<T> extends MultipleSelectionModel<T> {
-
-        ObservableList<Integer> selectedIndices = FXCollections.observableArrayList();
-        
-        ObservableList<T> selectedItems = FXCollections.observableArrayList();
-        
-        @Override
-        public ObservableList<Integer> getSelectedIndices() {
-            return selectedIndices;
-        }
-
-        @Override
-        public ObservableList<T> getSelectedItems() {
-            return selectedItems;
-        }
-
-        @Override
-        public void selectIndices(int index, int... indices) {
-            
-            //int[] all = new int[1+indices.length];
-            int[] all = ArrayUtils.addAll(indices,index);
-            
-            
-            List<T> items = IntStream.of(all)
-                    .mapToObj(i->itemControllerList.get(i).getItem())
-                    .
-        }
-
-        @Override
-        public void selectAll() {
-        }
-
-        @Override
-        public void selectFirst() {
-        }
-
-        @Override
-        public void selectLast() {
-        }
-
-        @Override
-        public void clearAndSelect(int index) {
-        }
-
-        @Override
-        public void select(int index) {
-        }
-
-        @Override
-        public void select(T obj) {
-        }
-
-        @Override
-        public void clearSelection(int index) {
-        }
-
-        @Override
-        public void clearSelection() {
-        }
-
-        @Override
-        public boolean isSelected(int index) {
-        }
-
-        @Override
-        public boolean isEmpty() {
-        }
-
-        @Override
-        public void selectPrevious() {
-        }
-
-        @Override
-        public void selectNext() {
-        }
-        
-    }*/
-    
 }

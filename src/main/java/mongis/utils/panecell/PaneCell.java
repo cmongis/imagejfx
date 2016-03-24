@@ -22,7 +22,7 @@ package mongis.utils.panecell;
 import javafx.scene.Node;
 
 /**
- *
+ * Interface that dictate the behaviour of object controlled by the PaneCellController.
  * @author cyril
  */
 public interface PaneCell<T> {
