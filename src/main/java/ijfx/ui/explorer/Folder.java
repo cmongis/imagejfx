@@ -17,18 +17,23 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.ui.explorer;
 
-import javafx.scene.Node;
+import java.io.File;
+import java.util.List;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public interface Folder {
     
+    public String getName();
     
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
+    public void setName(String name);
+    
+    public File getDirectory();
+    
+    public List<Explorable> getItemList();
+    
 }

@@ -17,18 +17,25 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.service;
 
-import javafx.scene.Node;
+import java.util.Map;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public interface Timer {
     
     
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
+    void start();
+    long elapsed(String id);
+    SummaryStatistics getStats(String id);
+    Map<String,SummaryStatistics> getStats();
+    
+    public void logAll();
+    
+    public void log(String id);
+    
 }

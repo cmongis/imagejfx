@@ -64,7 +64,7 @@ public class LineHelper {
     }
 
     private void onLineEndChange(Observable obs, Point2D oldValue, Point2D newValue) {
-
+        if(newValue == null) return;
         overlay.setLineEnd(Point2DUtils.asArray(newValue));
         fireChangeEvent();
     }
@@ -88,6 +88,7 @@ public class LineHelper {
 
     private void fireChangeEvent() {
         if (eventService != null) {
+            System.out.println("Firing change...");
             eventService.publishLater(new OverlayUpdatedEvent(overlay));
         }
     }
@@ -96,8 +97,7 @@ public class LineHelper {
     public static Point2D getLineStart(LineOverlay overlay) {
         double x = overlay.getLineStart(0);
         double y = overlay.getLineStart(1);
-        System.out.println(x);
-        System.out.println(y);
+       
         return new Point2D(x,y);
     }
     

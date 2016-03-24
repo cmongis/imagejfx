@@ -20,10 +20,12 @@
  */
 package ijfx.service.overlay;
 
+import ij.blob.Blob;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
@@ -33,6 +35,7 @@ import net.imagej.display.OverlayService;
 import net.imagej.measure.StatisticsService;
 
 import net.imagej.ops.OpService;
+import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -41,7 +44,9 @@ import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.scijava.plugin.Attr;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -80,54 +85,18 @@ public class OverlayStatService extends AbstractService implements ImageJService
 
     public HashMap<String, Double> getStat(ImageDisplay imageDisplay, Overlay overlay) {
 
-        
-     
-        System.out.println("Getting the stats...");
-        //final PointSet ps = getRegion(imageDisplay, overlay);
-        final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
-        
        
-
-        System.out.println("Creting the point set");
-        RoiPointSet rps = new RoiPointSet(overlay.getRegionOfInterest());
+         HashMap<String, ParallelMeasurement> measures = new HashMap<>();
+          HashMap<String, Double> stats = new HashMap<>();
+         DescriptiveStatistics statistics = new DescriptiveStatistics(ArrayUtils.toPrimitive(getValueList(imageDisplay, overlay)));
         
-        HashMap<String, ParallelMeasurement> measures = new HashMap<>();
-        HashMap<String, Double> stats = new HashMap<>();
-        
-        
-
-        
-         
-        DescriptiveStatistics statistics = new DescriptiveStatistics();
-
-        PointSetIterator psc = rps.cursor();
-        Cursor dsc = ds.cursor();
-        RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
-        long[] position = new long[imageDisplay.numDimensions()];
-        imageDisplay.localize(position);
-        System.out.println(Arrays.toString(position));
-        int safe = 0;
-        while(psc.hasNext()) {
-            psc.fwd();
-            
-            long[] roiPosition = psc.get();
-            
-            for(int i =0;i!=roiPosition.length;i++) {
-                position[i] = roiPosition[i];
-            }
-            randomAccess.setPosition(position);
-            statistics.addValue(randomAccess.get().getRealDouble());
-        }
-
-        //Cursor<? extends RealType<?>> dsc = ds.getImgPlus().cursor();
-
         measures.put(LBL_MIN, () -> statistics.getMin());
         measures.put(LBL_MAX, () -> statistics.getMax());
         measures.put(LBL_MEAN, () -> statistics.getMean());
         measures.put("Std. Dev.", () -> statistics.getStandardDeviation());
         measures.put("Variance", () -> statistics.getVariance());
         measures.put(LBL_MEDIAN, () -> statistics.getPercentile(50));
-
+        
         //measures.put(LBL_AREA, () -> statService.geometricMean(ds, rps));
         
 
@@ -144,28 +113,36 @@ public class OverlayStatService extends AbstractService implements ImageJService
         logger.fine("finished");
         return stats;
     }
-    
+   
     public Double[] getValueList(ImageDisplay imageDisplay, Overlay overlay) {
         
-          
+        
+        
+         if(overlay instanceof LineOverlay) return getValueList(imageDisplay,(LineOverlay)overlay);
+         
+        // getting the dataset corresponding to the display
         final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
-        ArrayList<Double> values = new ArrayList<Double>(10000);
+        
+        // Array containing all the pixel values
+        ArrayList<Double> values = new ArrayList<>(10000);
+        
+        
+        // RoiPointSet used to iterate through the pixel inside the Roi
         RoiPointSet rps = new RoiPointSet(overlay.getRegionOfInterest());
-        
-        HashMap<String, ParallelMeasurement> measures = new HashMap<>();
-        HashMap<String, Double> stats = new HashMap<>();
                  
-    
-
+        
         PointSetIterator psc = rps.cursor();
+        
+        // Random access of the dataset
         RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
-        
-        
+         
+        // position of the image display
         long[] position = new long[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
-       
+        psc.reset();
+        int c = 0;
         
-        
+        // getting the 
         while(psc.hasNext()) {
             psc.fwd();
             long[] roiPosition = psc.get();
@@ -175,10 +152,51 @@ public class OverlayStatService extends AbstractService implements ImageJService
             }
             randomAccess.setPosition(position);
             values.add(randomAccess.get().getRealDouble());
+            c++;
         }
-        
+        System.out.printf("%d values retrieved\n",c);
         return values.toArray(new Double[values.size()]);
         
+    }
+    
+   
+    
+    protected Double[] getValueList(ImageDisplay imageDisplay, LineOverlay overlay) {
+        
+        
+        
+        final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
+        
+        System.out.printf("Num dimensions %d\n",overlay.numDimensions());
+        
+         RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
+         
+         
+         
+         int x0 = new Double(overlay.getLineStart(0)).intValue();
+         int y0 = new Double(overlay.getLineStart(1)).intValue();
+         int x1 = new Double(overlay.getLineEnd(0)).intValue();
+         int y1 = new Double(overlay.getLineEnd(1)).intValue();
+         
+         List<int[]> pixels = Bresenham.findLine(x0, y0, x1, y1);
+         
+         
+         long[] position = new long[imageDisplay.numDimensions()];
+         Double[] values = new Double[pixels.size()];
+         
+         int i = 0;
+         for(int[] coordinate : pixels) {
+             position[0] = coordinate[0];
+             position[1] = coordinate[1];
+             randomAccess.setPosition(position);
+             
+             values[i] = randomAccess.get().getRealDouble();
+             i++;
+         }
+         
+        
+        
+        return values;
     }
 
     private interface ParallelMeasurement {

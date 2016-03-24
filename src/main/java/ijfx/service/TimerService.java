@@ -17,18 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
-
-import javafx.scene.Node;
+package ijfx.service;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public interface TimerService extends IjfxService{
+    Timer getTimer(Class<?> clazz);
+    Timer getTimer(String id);
     
-    
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
 }

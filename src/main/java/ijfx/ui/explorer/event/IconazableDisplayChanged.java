@@ -17,18 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.ui.explorer.event;
 
-import javafx.scene.Node;
+import ijfx.ui.IjfxEvent;
+import ijfx.ui.explorer.Iconazable;
+import java.util.List;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public class IconazableDisplayChanged extends IjfxEvent<List<? extends Iconazable>>{
     
-    
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
 }

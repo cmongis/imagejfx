@@ -17,18 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.ui.explorer;
 
-import javafx.scene.Node;
+import ijfx.core.metadata.MetaDataOwner;
+import ijfx.service.IjfxService;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public interface ExplorerService extends IjfxService{
+    
+    List<Explorable> getItems();
     
     
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
+    void setItems(List<Explorable> items);
+    
+    void applyFilter(Predicate<MetaDataOwner> predicate);
+    
+    
+    List<Explorable> getFilteredItems();
 }

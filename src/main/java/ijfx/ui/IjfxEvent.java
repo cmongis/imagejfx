@@ -17,18 +17,37 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.ui;
 
-import javafx.scene.Node;
+import org.scijava.event.SciJavaEvent;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public abstract class IjfxEvent<T> extends SciJavaEvent{
     
+    private T object;
+
+    public IjfxEvent() {}
     
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
+  
+    
+    public IjfxEvent<T> setObject(T t) {
+        object = t;
+        return this;
+    }
+    
+    public IjfxEvent(T object) {
+        this.object = object;
+    }
+     
+     
+     
+     public T getObject() {
+         return object;
+     }
+     
+     
+    
 }

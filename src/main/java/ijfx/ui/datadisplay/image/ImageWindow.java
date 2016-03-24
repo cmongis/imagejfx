@@ -32,11 +32,13 @@ import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.PixelDrawer;
 import ijfx.ui.canvas.utils.ViewPort;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawerService;
+import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.Observable;
@@ -53,6 +55,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
 import net.imagej.Dataset;
@@ -433,26 +436,6 @@ public class ImageWindow extends Window {
                 writableImage = getWrittableImage();
             }
 
-            /*
-            //Create a drawer to draw the overlays
-            ColoredPixelDrawer drawer = new WritableImagePixelDrawer(writableImage, getOverlayColor());
-
-           
-            getOverlays().forEach(o -> {
-                
-                logger.info("Drawing overlay "+o.toString());
-                
-                //if (overlayService.getActiveOverlay(imageDisplay) == o) {
-                if(overlaySelectionService.getSelectedOverlays(imageDisplay).contains(o)) {
-                System.out.println(o + " is selected !");
-                    drawer.setColor(selectedOverlayColor);
-                } else {
-                    drawer.setColor(overlayColor);
-                }
-
-                overlayDrawer.drawOverlay(o, OverlayDrawingService.OUTLINER, drawer);
-            });
-             */
             SwingFXUtils.toFXImage(bf, writableImage);
 
             canvas.repaint();
@@ -471,12 +454,22 @@ public class ImageWindow extends Window {
     public void updateOverlay(Overlay overlay) {
 
         Platform.runLater(() -> {
+            try {
+                Node node = overlayDrawerService.getDrawer(overlay).update(overlay, canvas.getCamera());
+                node.setMouseTransparent(true);
 
-            Node node = overlayDrawerService.getDrawer(overlay).update(overlay, canvas.getCamera());
-            node.setMouseTransparent(true);
-            if (anchorPane.getChildren().contains(node) == false) {
+                if (anchorPane.getChildren().contains(node) == false) {
 
-                anchorPane.getChildren().add(node);
+                    anchorPane.getChildren().add(node);
+                }
+
+                if (overlaySelectionService.getSelectedOverlays(imageDisplay).contains(overlay)) {
+                    Shape shape = (Shape) node;
+                    shape.setFill(shape.getStroke());
+                }
+
+            } catch (NullPointerException e) {
+                logger.log(Level.WARNING, "Couldn't draw overlay. Probably because of a lack of Drawer", e);
             }
         });
     }
@@ -491,8 +484,13 @@ public class ImageWindow extends Window {
         // if an overlay has been selected
         if (overlay != null) {
             // it get the modifier which will returns the set of moveable points
-            System.out.println(overlayDrawerService.getModifier(overlay));
-            List<MoveablePoint> modifiers = overlayDrawerService.getModifier(overlay).getModifiers(canvas.getCamera(), overlay);
+
+            OverlayModifier modifier = overlayDrawerService.getModifier(overlay);
+            if (modifier == null) {
+                logger.warning("No modifier was found for this overlay " + overlay.getClass().getSimpleName());
+                return;
+            }
+            List<MoveablePoint> modifiers = modifier.getModifiers(canvas.getCamera(), overlay);
 
             modifiers.forEach(m -> m.positionOnImageProperty().addListener(this::onMoveablePointMoved));
             anchorPane.getChildren().addAll(modifiers);
@@ -638,10 +636,12 @@ public class ImageWindow extends Window {
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
         System.out.println(positionOnImage);
         logger.info(String.format("This image contains %s overlays", overlayService.getOverlays(imageDisplay).size()));
+
+        boolean wasOverlaySelected = false;
         for (Overlay o : overlayService.getOverlays(imageDisplay)) //.parallelStream().forEach(o -> 
         {
             if (isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o)) {
-
+                wasOverlaySelected = true;
                 logger.info("Selecting overlay " + o.toString());
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, true);
                 event.consume();
@@ -649,6 +649,10 @@ public class ImageWindow extends Window {
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, false);
             }
         };
+
+        if (!wasOverlaySelected) {
+            setEdited(null);
+        }
         contextCalculationService.determineContext(imageDisplay);
         refreshSourceImage();
         updateInfoLabel();

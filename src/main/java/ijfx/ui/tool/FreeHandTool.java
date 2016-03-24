@@ -39,7 +39,7 @@ import org.scijava.util.ColorRGB;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = FxTool.class)
+@Plugin(type = FxTool.class,priority=98)
 public class FreeHandTool extends AbstractPathTool {
 
     

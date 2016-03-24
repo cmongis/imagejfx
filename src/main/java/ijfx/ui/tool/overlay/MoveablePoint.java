@@ -127,6 +127,7 @@ public class MoveablePoint extends Rectangle{
          
          System.out.println(positionOnImage.getValue());
     }
+    
    
     public Property<Point2D> positionOnScreenProperty() {
         return positionOnScreen;

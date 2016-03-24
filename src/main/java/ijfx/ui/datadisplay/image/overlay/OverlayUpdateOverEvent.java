@@ -17,18 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.ui.datadisplay.image.overlay;
 
-import javafx.scene.Node;
+import ijfx.ui.IjfxEvent;
+import net.imagej.overlay.Overlay;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public class OverlayUpdateOverEvent extends IjfxEvent<Overlay>{
     
-    
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
 }

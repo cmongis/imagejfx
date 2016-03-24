@@ -17,18 +17,32 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.service;
 
-import javafx.scene.Node;
+import java.util.HashMap;
+import java.util.Map;
+import org.scijava.plugin.Plugin;
+import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
-    
-    
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
+@Plugin(type = Service.class)
+public class DefaultTimerService extends AbstractService implements TimerService {
+
+    private Map<String, Timer> timerMap = new HashMap<>();
+
+    @Override
+    public Timer getTimer(Class<?> clazz) {
+        return getTimer(clazz.getName());
+    }
+
+    @Override
+    public Timer getTimer(String id) {
+        timerMap.putIfAbsent(id, new DefaultTimer(id));
+        return timerMap.get(id);
+    }
+
 }

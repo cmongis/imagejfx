@@ -40,6 +40,11 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
         super();
     }
 
+    public AsyncCallback(INPUT input) {
+        this();
+        setInput(input);
+    }
+    
     public AsyncCallback(Callback<INPUT, OUTPUT> callback) {
         this();
         this.callback = callback;
@@ -67,11 +72,17 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
             if (isCancelled()) {
                 return null;
             }
-            OUTPUT output = callback.call(input);
-            if (isCancelled()) {
+            try {
+                OUTPUT output = callback.call(input);
+
+                if (isCancelled()) {
+                    return null;
+                } else {
+                    return output;
+                }
+            } catch (Exception e) {
+                ImageJFX.getLogger().log(Level.SEVERE, "Error when executing callback", e);
                 return null;
-            } else {
-                return output;
             }
         } catch (Exception e) {
             ImageJFX.getLogger().log(Level.SEVERE, "Error when executing AsyncCallback " + callback.toString(), e);
@@ -100,8 +111,13 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
 
     public AsyncCallback<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
         setOnSucceeded(event -> {
-            if (!isCancelled()) {
+            if (!isCancelled() && getValue() != null) {
+                
                 consumer.accept(getValue());
+            }
+            
+            if(getValue() == null) {
+                ImageJFX.getLogger().warning("Return value was null :-(");
             }
         });
         return this;

@@ -36,7 +36,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = FxTool.class)
+
 public class MagicWandTool extends AbstractPathTool{
 
     

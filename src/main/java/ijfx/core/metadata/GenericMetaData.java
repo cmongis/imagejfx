@@ -105,7 +105,7 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
     }
     
     
-    private String numberToString(Double d) {
+    public static String numberToString(Double d) {
         return new DecimalFormat("#.####").format(d);
     }
 

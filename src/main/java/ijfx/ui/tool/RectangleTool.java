@@ -40,7 +40,7 @@ import ijfx.ui.UiConfiguration;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = FxTool.class)
+@Plugin(type = FxTool.class,priority=99)
 
 public class RectangleTool extends AbstractPathTool {
 

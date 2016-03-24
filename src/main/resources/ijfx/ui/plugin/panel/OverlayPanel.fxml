@@ -28,25 +28,26 @@
                   </ToolBar>
                </bottom>
                <top>
-                  <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                  <VBox fx:id="chartVBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                      <children>
                         <TextField fx:id="overlayNameField" styleClass="editable-label" />
-                        <LineChart fx:id="lineChart">
+                        <LineChart fx:id="lineChart" animated="false" createSymbols="false">
                           <xAxis>
-                            <CategoryAxis side="BOTTOM" />
+                            <NumberAxis side="BOTTOM" />
                           </xAxis>
                           <yAxis>
                             <NumberAxis side="LEFT" />
                           </yAxis>
                         </LineChart>
-                        <AreaChart fx:id="areaChart">
+                        <AreaChart fx:id="areaChart" animated="false" createSymbols="false">
                           <xAxis>
-                            <CategoryAxis side="BOTTOM" />
+                            <NumberAxis side="BOTTOM" />
                           </xAxis>
                           <yAxis>
                             <NumberAxis side="LEFT" />
                           </yAxis>
                         </AreaChart>
+                        <BorderPane fx:id="chartBorderPane" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                </top>

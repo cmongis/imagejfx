@@ -20,6 +20,8 @@
  */
 package ijfx.ui.plugin.panel;
 
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.service.overlay.OverlaySelectionService;
@@ -53,6 +55,7 @@ import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -60,6 +63,7 @@ import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.layout.VBox;
 import mongis.utils.AsyncCallback;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.LineOverlay;
@@ -68,7 +72,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.display.event.DisplayActivatedEvent;
-import ucar.ma2.ArrayBoolean;
 
 /**
  *
@@ -99,6 +102,9 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @Parameter
     DisplayService displayService;
 
+    @Parameter
+    TimerService timerService;
+
     @FXML
     TableView<MyEntry> tableView;
 
@@ -114,10 +120,16 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     TextField overlayNameField;
 
     @FXML
-    LineChart<String,Double> lineChart;
+    LineChart<Double, Double> lineChart;
 
     @FXML
-    AreaChart<String,Double> areaChart;
+    AreaChart<Double, Double> areaChart;
+
+    @FXML
+    VBox chartVBox;
+
+    @FXML
+    BorderPane chartBorderPane;
 
     private final static String EMPTY_FIELD = "Name your overlay here :-)";
 
@@ -139,6 +151,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         overlayNameField.textProperty().addListener(this::onOverlayNameChanged);
 
         overlayProperty.addListener(this::onOverlaySelectionChanged);
+
+        chartVBox.getChildren().removeAll(areaChart, lineChart);
 
     }
 
@@ -189,7 +203,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
             }
         };
         overlayProperty.setValue(event.getOverlay());
-
+        Platform.runLater(()->updateChart(event.getOverlay()));
         ImageJFX.getThreadPool().submit(task);
 
     }
@@ -204,12 +218,17 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         updateChart(event.getObject());
     }
 
+    
     private void updateChart(Overlay overlay) {
 
         boolean isLineOverlay = overlay instanceof LineOverlay;
 
-        lineChart.setVisible(isLineOverlay);
-        areaChart.setVisible(!isLineOverlay);
+        if (isLineOverlay) {
+            System.out.println("Updateing line chart");
+            chartBorderPane.setCenter(lineChart);
+        } else {
+            chartBorderPane.setCenter(areaChart);
+        }
 
         if (isLineOverlay) {
 
@@ -219,61 +238,103 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         }
     }
 
-    private void updateLineChart(LineOverlay overlay) {
-
-    }
-
+    
+    /*
+        Area Chart related methods
+    */
+   
     private void updateAreaChart(Overlay overlay) {
 
-        new AsyncCallback<Overlay, XYChart.Series<String, Double>>()
+        Timer timer = timerService.getTimer(this.getClass());
+
+        new AsyncCallback<Overlay, XYChart.Series<Double, Double>>()
                 .setInput(overlay)
-                .run(o -> {
-                    System.out.println("Starting calculatution");
-                    Double[] valueList = statsService.getValueList(currentDisplay(), o);
-                    HistogramModel model = new HistogramModel();
-                    SummaryStatistics sumup = new SummaryStatistics();
-                    for (Double v : valueList) {
-                        sumup.addValue(v);
-                    }
-
-                    double min = sumup.getMin();
-                    double max = sumup.getMax();
-
-                    int bins = new Double(max - min).intValue();
-                    
-                    System.out.println(String.format("%.0f to %.0f with %d values",min,max,bins));
-                    
-                    EmpiricalDistribution distribution = new EmpiricalDistribution(bins);
-                    
-                    /*
-                    Double[] values = Arrays.asList(valueList)
-                            .stream()
-                            .map(v -> v.doubleValue())
-                            .sorted()
-                            //.toArray();
-                            .toArray(size -> new Double[size]);*/
-                    distribution.load(ArrayUtils.toPrimitive(valueList));
-
-                    XYChart.Series<String, Double> serie = new XYChart.Series<>();
-                    ArrayList<Data<String, Double>> data = new ArrayList<>(bins);
-                    for (double cat : distribution.getUpperBounds()) {
-                        data.add(new Data<String, Double>(new Double(cat).toString(), distribution.density(cat)));
-                    }
-
-                    serie.getData().clear();
-                    serie.getData().addAll(data);
-                    
-                    return serie;
-
-                })
+                .run(this::getOverlayHistogram)
                 .then(serie -> {
-                   // areaChart.getData().clear();
-                   // areaChart.getData().add(serie);
+                    
+                    timer.start();
+                    areaChart.getData().clear();
+                    areaChart.getData().add(serie);
+                    timer.elapsed("Area Chart rendering");
+
+                    timer.logAll();
 
                 })
                 .start();
 
+    }
 
+    protected XYChart.Series<Double, Double> getOverlayHistogram(Overlay overlay) {
+
+        Timer timer = timerService.getTimer(this.getClass());
+        timer.start();
+        Double[] valueList = statsService.getValueList(currentDisplay(), overlay);
+        timer.elapsed("Getting the stats");
+        SummaryStatistics sumup = new SummaryStatistics();
+        for (Double v : valueList) {
+            sumup.addValue(v);
+        }
+        timer.elapsed("Building the sumup");
+
+        double min = sumup.getMin();
+        double max = sumup.getMax();
+        double range = max - min;
+        int bins = 100;//new Double(max - min).intValue();
+
+        EmpiricalDistribution distribution = new EmpiricalDistribution(bins);
+
+        double[] values = ArrayUtils.toPrimitive(valueList);
+        Arrays.parallelSort(values);
+        distribution.load(values);
+
+        timer.elapsed("Sort and distrubution repartition up");
+
+        XYChart.Series<Double, Double> serie = new XYChart.Series<>();
+        ArrayList<Data<Double, Double>> data = new ArrayList<>(bins);
+        double k = min;
+        for (SummaryStatistics st : distribution.getBinStats()) {
+            data.add(new Data<Double, Double>(k, new Double(st.getN())));
+            k += range / bins;
+        }
+
+        serie.getData().clear();
+        serie.getData().addAll(data);
+        timer.elapsed("Creating charts");
+        return serie;
+    }
+
+    /*
+    
+        Line Chart related methods
+    */
+    
+     private void updateLineChart(LineOverlay overlay) {
+        new AsyncCallback<Overlay, XYChart.Series<Double, Double>>()
+                .setInput(overlay)
+                .run(this::getLineChartSerie)
+                .then(this::updateLineChart)
+                .start();
+
+    }
+
+    private void updateLineChart(XYChart.Series<Double, Double> serie) {
+        lineChart.getData().clear();
+        lineChart.getData().add(serie);
+    }
+
+    
+    protected XYChart.Series<Double, Double> getLineChartSerie(Overlay overlay) {
+        System.out.println("Doing things ;-)");
+        Double[] valueList = statsService.getValueList(currentDisplay(), overlay);
+        
+        ArrayList<Data<Double, Double>> data = new ArrayList<>(valueList.length);
+        for (int i = 0; i != valueList.length; i++) {
+            data.add(new Data<>(new Double(i), valueList[i]));
+        }
+
+        XYChart.Series<Double, Double> serie = new XYChart.Series<>();
+        serie.getData().addAll(data);
+        return serie;
     }
 
     @FXML
