@@ -85,7 +85,7 @@ public interface Animations {
         if (shift == 0) {
             shift = 200;
         }
-        t.setFromX(node.getTranslateX());
+        t.setFromX(0);
         t.setToX(node.getTranslateX() - shift);
 
         return t;
@@ -96,7 +96,7 @@ public interface Animations {
      */
     public static Animations APPEARS_LEFT = (node, ms) -> {
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
-        t.setToX(node.getTranslateX());
+        t.setToX(0);
         t.setFromX(node.getTranslateX() - node.getBoundsInParent().getWidth());
 
         return t;
@@ -109,7 +109,7 @@ public interface Animations {
 
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
 
-        t.setFromX(node.getTranslateX());
+        t.setFromX(0);
         t.setToX(node.getTranslateX() + node.getBoundsInParent().getWidth());
         return t;
     };
@@ -119,7 +119,7 @@ public interface Animations {
      */
     public static Animations APPEARS_RIGHT = (node, ms) -> {
         TranslateTransition t = new TranslateTransition(new Duration(ms), node);
-        t.setToX(node.getTranslateX());
+        t.setToX(0);
         t.setFromX(node.getTranslateX() + node.getBoundsInParent().getWidth());
         return t;
     };

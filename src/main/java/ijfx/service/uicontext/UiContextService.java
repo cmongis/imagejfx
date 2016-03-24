@@ -63,7 +63,7 @@ public class UiContextService extends AbstractService implements UiContextManage
 
     private ContextLinkSet linkSet = new ContextLinkSet();
 
-    private HashMap<String, ContextualView> controllers = new HashMap<>();
+    private HashMap<String, ContextualView> viewMap = new HashMap<>();
 
     private static final Logger logger = ImageJFX.getLogger();
 
@@ -167,16 +167,16 @@ public class UiContextService extends AbstractService implements UiContextManage
         //logger.info(linkSet.toString());
         // for each controller, update the controller by telling it which widget it should show
         // and which widget it should hide
-        controllers.values().parallelStream().forEach(controller -> updateController(controller));
+        viewMap.values().parallelStream().forEach(controller -> updateController(controller));
         return this;
     }
 
-    public void updateController(ContextualView controller) {
+    public <T> void updateController(ContextualView<T> view) {
 
-        ArrayList<ContextualWidget> toShow = new ArrayList<>();
-        ArrayList<ContextualWidget> toHide = new ArrayList<>();
+        ArrayList<ContextualWidget<T>> toShow = new ArrayList<>();
+        ArrayList<ContextualWidget<T>> toHide = new ArrayList<>();
 
-        controller.getWidgetList().parallelStream().forEach(widget -> {
+        view.getWidgetList().parallelStream().forEach(widget -> {
             boolean shouldShow = shouldShow(widget);
             boolean shouldHide = !shouldShow;
 
@@ -190,7 +190,12 @@ public class UiContextService extends AbstractService implements UiContextManage
             }
 
         });
-        ImageJFX.getThreadQueue().submit(() -> controller.onContextChanged(toShow, toHide));
+        try {
+        view.onContextChanged(toShow, toHide);
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE, "Error when updating ContextualView", e);
+        }
     }
 
     public boolean shouldShow(String contextualWidget) {
@@ -276,10 +281,10 @@ public class UiContextService extends AbstractService implements UiContextManage
     }
 
     @Override
-    public UiContextManager addContextualView(ContextualView contextualView) {
+    public <T> UiContextManager addContextualView(ContextualView<T> contextualView) {
 
         logger.info(String.format("Registering the contextual view : %s", contextualView.getName()));
-        controllers.put(contextualView.getName(), contextualView);
+        viewMap.put(contextualView.getName(), contextualView);
         contextualView
                 .getWidgetList()
                 .forEach(widget -> registerWidget(widget));

@@ -23,8 +23,11 @@ import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
+import net.imagej.event.OverlayUpdatedEvent;
 
 import net.imagej.overlay.RectangleOverlay;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -33,9 +36,11 @@ import net.imagej.overlay.RectangleOverlay;
 public class RectangleOverlayHelper {
     
     final RectangleOverlay overlay;
-    Property<Point2D> minEdgeProperty = new SimpleObjectProperty();
-    Property<Point2D> maxEdgeProperty = new SimpleObjectProperty();
+    final private Property<Point2D> minEdgeProperty = new SimpleObjectProperty();
+    final private Property<Point2D> maxEdgeProperty = new SimpleObjectProperty();
 
+    @Parameter
+    EventService eventService;
     
     public RectangleOverlayHelper(RectangleOverlay overlay) {
         this.overlay = overlay;
@@ -47,10 +52,12 @@ public class RectangleOverlayHelper {
 
     private void onMinEdgeChanged(Observable obs, Point2D oldValue, Point2D newValue) {
         setMinEdge(newValue);
+       
     }
     
      private void onMaxEdgeChanged(Observable obs, Point2D oldValue, Point2D newValue) {
         setMaxEdge(newValue);
+        
     }
     
     public void setMinEdge(Point2D p) {
@@ -70,19 +77,24 @@ public class RectangleOverlayHelper {
         double newWidth = getWidth()+vector.getX();
         double newHeight = getHeight()+vector.getY();
         
-        System.out.println(newWidth);
-        System.out.println(getWidth());
-        
+     
         this.overlay.setExtent(newWidth, 0);
         this.overlay.setExtent(newHeight, 1);
         
-        
+         if(eventService != null) {
+            eventService.publishLater(new OverlayUpdatedEvent(overlay));
+        }
         
     }
 
     public void setMaxEdge(Point2D p) {
         this.overlay.setExtent(p.getX() - overlay.getOrigin(0), 0);
         this.overlay.setExtent(p.getY() - overlay.getOrigin(1), 1);
+        
+         if(eventService != null) {
+            eventService.publishLater(new OverlayUpdatedEvent(overlay));
+        }
+        
     }
 
     public Point2D getMinEdge() {

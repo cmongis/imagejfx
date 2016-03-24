@@ -20,6 +20,7 @@
 package ijfx.ui.tool.overlay;
 
 import ijfx.ui.canvas.utils.CanvasCamera;
+import ijfx.ui.canvas.utils.ViewPort;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
@@ -29,6 +30,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import net.imagej.event.OverlayUpdatedEvent;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -37,11 +41,10 @@ import javafx.scene.shape.Rectangle;
 public class MoveablePoint extends Rectangle{
     
     
-    CanvasCamera camera;
+    ViewPort viewport;
     
     private Property<Point2D> positionOnScreen = new SimpleObjectProperty<>();
     private Property<Point2D> positionOnImage = new SimpleObjectProperty<>();
-    
     
     
     public MoveablePoint() {
@@ -59,25 +62,21 @@ public class MoveablePoint extends Rectangle{
         positionOnScreen.addListener(this::onPositionOnScreenChange);
     }
     
-    public MoveablePoint(CanvasCamera camera) {
+    public MoveablePoint(ViewPort camera) {
         this();
-        this.camera = camera;
+        this.viewport = camera;
         camera.addListener(this::onCameraChange);
     }
     
     public void onCameraChange(CanvasCamera camera) {
         
-        System.out.println("######\nSeen rectangle :");
-        System.out.println(camera.getSeenRectangle());
+  
         
         Rectangle2D r = camera.getSeenRectangle();
         
         
-        Point2D newPosition = camera.getPositionOnCamera(positionOnImage.getValue());
-        System.out.println("new position");
-        System.out.println(newPosition);
-        System.out.println("position on image");
-        System.out.println(positionOnImage.getValue());
+        Point2D newPosition = camera.getPositionOnCamera(getPositionOnImage());
+       
         setVisible(camera.isVisibleOnCamera(newPosition));
         
         
@@ -88,14 +87,26 @@ public class MoveablePoint extends Rectangle{
         
     }
     
+    public Point2D getPositionOnImage() {
+       
+        return positionOnImage.getValue();
+    }
+    
     // place the points without alerting the listeners
     public void placeOnScreen(Point2D positionOnScreen) {
         setX(positionOnScreen.getX());
         setY(positionOnScreen.getY());
     }
     
+    // set the position on the screen without alerting the
+    // the observers
+    public void setPositionSilently(Point2D positionOnScreen) {
+        placeOnScreen(positionOnScreen);
+    }
+    
     public void onPositionOnScreenChange(Observable value, Point2D oldValue, Point2D newValue) {
-        if(camera != null) positionOnImage.setValue(camera.getPositionOnImage(positionOnScreen.getValue()));
+        if(viewport != null) positionOnImage.setValue(viewport.getPositionOnImage(positionOnScreen.getValue()));
+       
          System.out.println(String.format("Point (%.0f x %.0f)",getX(),getY()));
     }
     
@@ -116,11 +127,12 @@ public class MoveablePoint extends Rectangle{
          
          System.out.println(positionOnImage.getValue());
     }
+    
    
     public Property<Point2D> positionOnScreenProperty() {
         return positionOnScreen;
     }
-    public Property<Point2D> positionOnImagePropety() {
+    public Property<Point2D> positionOnImageProperty() {
         return positionOnImage;
     }
     

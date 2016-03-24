@@ -20,6 +20,7 @@
  */
 package ijfx.ui.tool;
 
+import java.util.List;
 import net.imagej.ImageJService;
 
 /**
@@ -33,6 +34,8 @@ public interface FxToolService extends ImageJService{
 
     FxTool getCurrentTool();
 
-    void setCurrentTool(FxTool currentTool);
+    void setCurrentTool(Class<? extends FxTool> currentTool);
+    
+    List<FxTool> getTools();
     
 }

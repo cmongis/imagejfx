@@ -40,7 +40,7 @@ import ijfx.ui.UiConfiguration;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = FxTool.class)
+@Plugin(type = FxTool.class,priority=99)
 
 public class RectangleTool extends AbstractPathTool {
 
@@ -64,6 +64,7 @@ public class RectangleTool extends AbstractPathTool {
         getCanvas().getGraphicsContext2D().setLineWidth(1);
 
         getCanvas().getGraphicsContext2D().strokeRect(r.getMinX(), r.getMinY(), r.getWidth(), r.getHeight());
+        
         
         
         

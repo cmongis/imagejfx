@@ -31,6 +31,7 @@ import javafx.stage.Stage;
 import mercury.core.MercuryTimer;
 import mongis.utils.panecell.PaneCellController;
 import mongis.utils.panecell.PaneIconCell;
+import mongis.utils.panecell.ScrollBinder;
 
 /**
  *
@@ -59,11 +60,14 @@ public class ImageIconItemTest extends Application{
         
        
         files.setCellFactory(ImageIconItemTest::createIconItem);
+        
+        
+        
          files.update(Arrays.asList(new File("/Users/cyril/Pictures").listFiles()));
         primaryStage.setScene(scene);
         primaryStage.show();
         
-        
+        ScrollBinder scrollBinder = new ScrollBinder(scrollPane);
         
     }
     

@@ -673,7 +673,7 @@ public class ArcItem<T> extends Control {
     }
 
     private double getTranslateValue() {
-
+      
         final double sliderW = sliderWidth.getValue();
 
         return (sliderW / 2) - sliderRatio.get() * sliderW;

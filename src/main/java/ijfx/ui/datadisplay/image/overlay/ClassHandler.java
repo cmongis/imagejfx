@@ -19,12 +19,18 @@
  */
 package ijfx.ui.datadisplay.image.overlay;
 
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape;
+import net.imagej.overlay.Overlay;
 import org.scijava.plugin.SciJavaPlugin;
+import org.scijava.util.ColorRGB;
 
 /**
  *
  * @author cyril
  */
 public interface ClassHandler<T> extends SciJavaPlugin{
+
+    
     boolean canHandle(T t);
 }

@@ -165,6 +165,6 @@ public interface UiContextManager {
      * @param contextualView
      * @return
      */
-    public UiContextManager addContextualView(ContextualView contextualView);
+    public <T> UiContextManager  addContextualView(ContextualView<T> contextualView);
 
 }

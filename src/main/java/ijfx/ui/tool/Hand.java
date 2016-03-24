@@ -34,7 +34,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = FxTool.class)
+@Plugin(type = FxTool.class,priority = 100)
 public class Hand extends AbstractPathTool {
 
     Point2D previousPoint;

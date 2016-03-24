@@ -44,7 +44,7 @@ import mongis.utils.Handler;
  *
  * @author Cyril MONGIS, 2015
  */
-public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWidget> implements ContextualView {
+public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWidget> implements ContextualView<Node> {
 
     String name;
 
@@ -242,7 +242,7 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
      * @return
      */
     @Override
-    public ContextualView onContextChanged(List<? extends ContextualWidget> toShow, List<? extends ContextualWidget> toHide) {
+    public ContextualView onContextChanged(List<? extends ContextualWidget<Node>> toShow, List<? extends ContextualWidget<Node>> toHide) {
 
         if (toShow != null && toShow.size() > 0) {
             logger.info(msg("Must show %d items : ", toShow.size()));
@@ -342,8 +342,8 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
      * @return
      */
     @Override
-    public List<ContextualWidget> getWidgetList() {
-        ArrayList<ContextualWidget> list = new ArrayList<>();
+    public List<ContextualWidget<Node>> getWidgetList() {
+        ArrayList<ContextualWidget<Node>> list = new ArrayList<>();
         values().forEach(widget -> list.add(widget));
         return list;
     }

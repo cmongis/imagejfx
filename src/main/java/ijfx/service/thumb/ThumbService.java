@@ -71,7 +71,7 @@ public class ThumbService extends AbstractService implements ImageJService {
         return scifio;
     }
 
-    public synchronized Image getThumb(File file, int planeIndex, int width, int height) throws IOException {
+    public Image getThumb(File file, int planeIndex, int width, int height) throws IOException {
 
         // we use SCIFIO initializer to get the right reader
         Reader reader = null;
