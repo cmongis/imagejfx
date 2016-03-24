@@ -19,6 +19,7 @@
  */
 package ijfx.ui.filter;
 
+import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.ui.filter.string.DefaultStringFilter;
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class DefaultMetaDataFilterFactory implements MetaDataFilterFactory{
             owner = (MetaDataOwner) it.next();
             int newType = owner.getMetaDataSet().get(keyName).getType();
             if(newType != type){
-                type = 0;
+                type = MetaData.TYPE_STRING;
                 break;
             }
         }

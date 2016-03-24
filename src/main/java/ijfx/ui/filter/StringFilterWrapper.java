@@ -20,7 +20,6 @@
 package ijfx.ui.filter;
 
 import ijfx.core.metadata.MetaDataOwner;
-import java.util.Collection;
 import java.util.function.Predicate;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
