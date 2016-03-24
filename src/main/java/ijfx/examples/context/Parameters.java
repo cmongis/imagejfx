@@ -19,14 +19,14 @@
  */
 package ijfx.examples.context;
 
-import ijfx.ui.context.ContextualWidget;
-import javafx.event.Event;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  *
  * @author tuananh
  */
-interface ContextualPaneIcon extends ContextualWidget{
-    public String getContext();
-    public Event getOnAction();
+@JsonDeserialize(as=DefaultParameter.class)
+public interface Parameters {
+    public double getRadius();
+    public boolean getUsePixels();
 }

@@ -29,10 +29,9 @@ import mongis.utils.panecell.PaneIconCell;
  *
  * @author tuananh
  */
-public class ContextualPaneIconWrapper extends PaneIconCell implements ContextualWidget, ContextualPaneIcon {
+public class ContextualPaneIconWrapper  implements ContextualWidget, ContextualPaneIcon {
 
     private String context;
-    private String pathIcon;
     private final Node node;
     private final Pane parentPane;
 
@@ -46,10 +45,7 @@ public class ContextualPaneIconWrapper extends PaneIconCell implements Contextua
         return context;
     }
 
-    @Override
-    public String getIcon() {
-        return pathIcon;
-    }
+ 
 
     @Override
     public Event getOnAction() {

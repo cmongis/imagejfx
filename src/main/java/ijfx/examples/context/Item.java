@@ -19,14 +19,11 @@
  */
 package ijfx.examples.context;
 
-import ijfx.ui.context.ContextualWidget;
-import javafx.event.Event;
-
 /**
  *
  * @author tuananh
  */
-interface ContextualPaneIcon extends ContextualWidget{
+public interface Item {
     public String getContext();
-    public Event getOnAction();
+    public Item getValue();
 }

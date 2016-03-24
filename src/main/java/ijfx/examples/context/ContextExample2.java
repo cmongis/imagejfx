@@ -22,6 +22,7 @@ package ijfx.examples.context;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.context.PaneContextualView;
 import javafx.application.Application;
+import static javafx.application.Application.launch;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -37,6 +38,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import mongis.utils.panecell.PaneIconCell;
 import net.imagej.ImageJ;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
@@ -46,7 +48,7 @@ import org.scijava.plugin.Parameter;
  *
  * @author tuananh
  */
-public class ContextExample extends Application {
+public class ContextExample2 extends Application {
 
     public static ImageJ imageJ = new ImageJ();
 
@@ -58,14 +60,15 @@ public class ContextExample extends Application {
     BorderPane borderPane;
     private PopOver popOver;
 
-    public ContextExample() {
+    public ContextExample2() {
 
     }
 
     public void init(Context context) {
-        JsonReader jsReader = new JsonReader();
-        jsReader.read();
-        jsReader.separate();
+        JsonReader jsonReader = new JsonReader();
+        jsonReader.read();
+        System.out.println("ijfx.examples.context.ContextExample2.init()");
+        jsonReader.separate();
         borderPane = new BorderPane();
         context.inject(this);
         flowPane = new FlowPane();
@@ -86,6 +89,12 @@ public class ContextExample extends Application {
 
         PaneContextualView contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
 
+        jsonReader.getCategoryList().stream().forEach( (e) ->{
+            PaneIconCell paneIconCell = FactoryPaneIconCell.generate(e);
+            String itemContext = ((Item) paneIconCell.getItem()).getContext();
+            contextualView.registerNode(paneIconCell, itemContext);
+            
+        });
         //contextualView.registerNode(fruitButton, "always");
         //contextualView.registerNode(vegetableButton, "always");
         contextualView.registerNode(bananaButton, "fruit");

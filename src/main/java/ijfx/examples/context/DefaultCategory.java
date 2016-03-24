@@ -19,14 +19,29 @@
  */
 package ijfx.examples.context;
 
-import ijfx.ui.context.ContextualWidget;
-import javafx.event.Event;
+public class DefaultCategory implements ItemCategory{
 
-/**
- *
- * @author tuananh
- */
-interface ContextualPaneIcon extends ContextualWidget{
-    public String getContext();
-    public Event getOnAction();
+    private String name;
+    private String context;
+   
+    public DefaultCategory(String n, String c)
+    {
+        this.name = n;
+        this.context = c;
+    }
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getContext() {
+        return context;
+    }
+
+    @Override
+    public Item getValue() {
+        return this;
+    }
+    
 }

@@ -19,14 +19,27 @@
  */
 package ijfx.examples.context;
 
-import ijfx.ui.context.ContextualWidget;
-import javafx.event.Event;
+import mongis.utils.panecell.PaneIconCell;
 
 /**
  *
  * @author tuananh
  */
-interface ContextualPaneIcon extends ContextualWidget{
-    public String getContext();
-    public Event getOnAction();
+public class FactoryPaneIconCell {
+    public static PaneIconCell generate(ItemCategory itemCategory)
+    {
+        PaneIconCell paneIconCell = new PaneIconCell();
+        paneIconCell.setItem(itemCategory);
+        paneIconCell.setTitle(itemCategory.getName());
+        return paneIconCell;
+    }
+    
+    public static PaneIconCell generate(ItemWidget itemWidget)
+    {
+        PaneIconCell paneIconCell = new PaneIconCell();
+        paneIconCell.setItem(itemWidget);
+        paneIconCell.setTitle(itemWidget.getLabel());
+        return paneIconCell;
+        
+    }
 }

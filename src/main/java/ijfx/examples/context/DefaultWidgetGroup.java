@@ -19,14 +19,33 @@
  */
 package ijfx.examples.context;
 
-import ijfx.ui.context.ContextualWidget;
-import javafx.event.Event;
 
-/**
- *
- * @author tuananh
- */
-interface ContextualPaneIcon extends ContextualWidget{
-    public String getContext();
-    public Event getOnAction();
+public class DefaultWidgetGroup implements WidgetGroup {
+    private ItemWidget[] items;
+    private String name;
+    private String context;
+
+    public DefaultWidgetGroup(ItemWidget[] items, String name, String context) {
+        this.items = items;
+        this.name = name;
+        this.context = context;
+    }
+    public DefaultWidgetGroup(){
+        
+    }
+    @Override
+    public ItemWidget[] getItems() {
+        return items;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getContext() {
+        return context;
+    }
+    
 }
