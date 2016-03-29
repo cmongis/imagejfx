@@ -23,6 +23,7 @@ public class DefaultCategory implements ItemCategory{
 
     private String name;
     private String context;
+    
    
     public DefaultCategory(String n, String c)
     {
@@ -31,6 +32,7 @@ public class DefaultCategory implements ItemCategory{
     }
     @Override
     public String getName() {
+        System.out.println(name);
         return name;
     }
 

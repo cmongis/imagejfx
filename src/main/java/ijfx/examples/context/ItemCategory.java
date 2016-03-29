@@ -25,4 +25,5 @@ package ijfx.examples.context;
  */
 public interface ItemCategory extends Item  {
     public String getName();
+    public String getContext();
 }

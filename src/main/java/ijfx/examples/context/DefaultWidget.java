@@ -62,6 +62,11 @@ public Parameters parameters;
     public Parameters getParameters() {
         return parameters;
     }
+
+    @Override
+    public String getContext() {
+        return context;
+    }
     
     
 }

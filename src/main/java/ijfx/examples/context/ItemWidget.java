@@ -31,5 +31,6 @@ public interface ItemWidget {
     public String getAction();
     public String getLabel();
     public String getIcon();
+    public String getContext();
     public Parameters getParameters();
 }
