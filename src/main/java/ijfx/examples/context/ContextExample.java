@@ -37,6 +37,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import mongis.utils.panecell.PaneIconCell;
 import net.imagej.ImageJ;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
@@ -57,20 +59,21 @@ public class ContextExample extends Application {
     HBox fakeToolBar;
     BorderPane borderPane;
     private PopOver popOver;
-
+HBox toolbarTest ;
     public ContextExample() {
 
     }
 
     public void init(Context context) {
-        JsonReader jsReader = new JsonReader();
-        jsReader.read();
-        jsReader.separate();
+        JsonReader jsonReader = new JsonReader();
+        jsonReader.read();
+        jsonReader.separate();
         borderPane = new BorderPane();
         context.inject(this);
         flowPane = new FlowPane();
         fakeToolBar = new HBox();
         flowPane.setPrefSize(30, 30);
+        toolbarTest = new HBox();
 
         Button fruitButton = new Button("fruit");
         fruitButton.setId("fruit");
@@ -85,7 +88,55 @@ public class ContextExample extends Application {
         aubergineButton.setId("aubergine");
 
         PaneContextualView contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
+ jsonReader.getCategoryList().stream().forEach( (e) ->{
+            PaneIconCell <ItemCategory> paneIconCell = FactoryPaneIconCell.generate(e);
+            paneIconCell.setTitleFactory(f -> f.getName());
+            
+            ItemCategory itemCategory= (ItemCategory)paneIconCell.getItem();
+            String itemContext = ((ItemCategory) paneIconCell.getItem()).getContext();
+            paneIconCell.setId(((ItemCategory) paneIconCell.getItem()).getName());
+            //paneIconCell.setTitle("e");
+            toolbarTest.getChildren().add(paneIconCell);
+                    paneIconCell.setOnMouseClicked(event -> {
+            //contextService.leave("vegetable");
+            contextService.enter(paneIconCell.getItem().getContext());
+            contextService.update();
+        });
+                    
+                            paneIconCell.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (ee) -> {
+            createPopOver(paneIconCell);
+                        contextService.enter(paneIconCell.getItem().getContext());
+            contextService.update();
 
+        });
+            //contextualView.registerNode(paneIconCell, itemContext);
+            
+        });
+ 
+ 
+ 
+ jsonReader.getWidgetList().stream().forEach( (e) ->{
+            PaneIconCell <ItemWidget> paneIconCell = FactoryPaneIconCell.generate(e);
+            paneIconCell.setTitleFactory(f -> f.getLabel());
+            
+            ItemWidget itemWidget= (ItemWidget)paneIconCell.getItem();
+            String itemContext = ((ItemWidget) paneIconCell.getItem()).getContext();
+            paneIconCell.setId(((ItemWidget) paneIconCell.getItem()).getLabel());
+            //paneIconCell.setTitle("e");
+            //toolbarTest.getChildren().add(paneIconCell);
+                    paneIconCell.setOnMouseClicked(event -> {
+                        System.out.println(paneIconCell.getItem().getLabel());
+            //contextService.leave("vegetable");
+            contextService.enter(paneIconCell.getItem().getContext());
+            contextService.update();
+        });
+            contextualView.registerNode(paneIconCell, itemContext);
+            
+        });
+ 
+ 
+ 
+ 
         //contextualView.registerNode(fruitButton, "always");
         //contextualView.registerNode(vegetableButton, "always");
         contextualView.registerNode(bananaButton, "fruit");
@@ -99,14 +150,13 @@ public class ContextExample extends Application {
         });
 
         fakeToolBar.getChildren().add(show);
-        HBox toolbarTest = new HBox();
-        toolbarTest.getChildren().addAll(fruitButton, vegetableButton);
+        //toolbarTest.getChildren().addAll(fruitButton, vegetableButton);
         borderPane.setTop(fakeToolBar);
-        Rectangle c = new Rectangle();
+        /*Rectangle c = new Rectangle();
         c.widthProperty().bind(borderPane.widthProperty());
         c.setHeight(600);
         c.setFill(Color.RED);
-        borderPane.setCenter(c);
+        borderPane.setCenter(c);*/
         borderPane.setBottom(toolbarTest);
         fruitButton.setOnAction(event -> {
             contextService.leave("vegetable");
