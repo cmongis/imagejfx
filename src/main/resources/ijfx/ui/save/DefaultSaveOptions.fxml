@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="404.0" prefWidth="327.0" type="Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="title" layoutX="16.0" layoutY="13.0" text="Save Options" />
+      <RadioButton fx:id="replaceFilesBtn" layoutX="16.0" layoutY="47.0" mnemonicParsing="false" text="Replace File" />
+      <RadioButton fx:id="newFilesBtn" layoutX="16.0" layoutY="83.0" mnemonicParsing="false" text="Add suffix" />
+      <TextField fx:id="newSuffix" layoutX="14.0" layoutY="113.0" promptText="file name" />
+      <Label fx:id="extension" layoutX="196.0" layoutY="118.0" text=".tiff" />
+      <Button fx:id="destinationFolderBtn" layoutX="90.0" layoutY="190.0" mnemonicParsing="false" text="Destination folder" />
+      <Button fx:id="startBtn" layoutX="133.0" layoutY="241.0" mnemonicParsing="false" text="Start" />
+   </children>
+</fx:root>
