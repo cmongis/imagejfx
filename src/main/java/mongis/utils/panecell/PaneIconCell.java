@@ -87,7 +87,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private Task currentImageSearch;
 
-    private boolean loadImageOnShow = true;
+    private boolean loadImageOnlyWhenVisible = true;
     
     private boolean isInsideScrollWindow = false;
     
@@ -230,7 +230,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .then(this::setAdditionalData)
                 .start();
 
-        if(loadImageOnShow == false || isInsideScrollWindow) updateImageAsync(newItem);
+        if(loadImageOnlyWhenVisible == false || isInsideScrollWindow) updateImageAsync(newItem);
 
     }
 
@@ -286,6 +286,17 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         return this;
     }
 
+    /**
+     * When false, the image is loaded whenever the item is updated. When true, the image is loaded
+     * only if the Ui element appears on the scroll window.
+     * @param loadImageOnlyWhenVisible
+     */
+    public void setLoadImageOnlyWhenVisible(boolean loadImageOnlyWhenVisible) {
+        this.loadImageOnlyWhenVisible = loadImageOnlyWhenVisible;
+    }
+
+    
+    
     
     
 }
