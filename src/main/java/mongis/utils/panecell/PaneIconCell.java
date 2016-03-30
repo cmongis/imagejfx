@@ -102,9 +102,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
             
             synchronized(LOADER) {
-                
-               
-                
+                                
                 LOADER.setController(this);
                 LOADER.setRoot(this);
                 LOADER.load();
@@ -190,6 +188,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     }
 
+    
+   
+    
     public void onItemChanged(Observable obs, T oldItem, T newItem) {
         
         
@@ -208,6 +209,11 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             return;
         }
 
+        forceUpdate(newItem);
+
+    }
+    
+     public void forceUpdate(T newItem) {
         //otherwise starting to charge everything
         new AsyncCallback<T, String>()
                 .setInput(newItem)
@@ -231,7 +237,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .start();
 
         if(loadImageOnlyWhenVisible == false || isInsideScrollWindow) updateImageAsync(newItem);
-
+        
+        
     }
 
     private void updateImageAsync(T newItem) {
