@@ -50,17 +50,16 @@ public class FilterFactoryTest extends Application{
         Collection<MetaDataOwner> ownerList = new ArrayList<>();
         String[] keyName= {"Name", "Date", "Amount"};
         
-        for (int i = 0; i != 50; i++) {
+        for (int i = 0; i != 200; i++) {
             ownerList.add(new OwnerTest());
         }
         
         MetaDataFilterFactory factory = new DefaultMetaDataFilterFactory();
         
-//        for(String key : keyName){
-            MetaDataOwnerFilter filter = factory.generateFilter(ownerList, keyName[0]);
-//        }
+        RandomDataGenerator generator = new RandomDataGenerator();
+        int index = generator.nextInt(0, 2);
         
-        
+        MetaDataOwnerFilter filter = factory.generateFilter(ownerList, keyName[1]);
         
         Scene scene = new Scene((Parent)filter.getContent());
         primaryStage.setScene(scene);
@@ -133,7 +132,7 @@ public class FilterFactoryTest extends Application{
         
         public Number generateRandomNumber(){
             RandomDataGenerator generator = new RandomDataGenerator();
-            double number = generator.nextUniform(10, 100);
+            double number = generator.nextUniform(10, 1000);
             return number;
         }
     }

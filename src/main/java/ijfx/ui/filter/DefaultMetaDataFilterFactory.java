@@ -87,7 +87,10 @@ public class DefaultMetaDataFilterFactory implements MetaDataFilterFactory{
     
     public MetaDataOwnerFilter createStringFilter(Collection<Object> possibleValues, String keyName) throws IOException{
         
+        Collection<String> possibleStringValues = (Collection) possibleValues;
+        
         StringFilter filter = new DefaultStringFilter();
+        filter.setAllPossibleValues(possibleStringValues);
         MetaDataOwnerFilter wrapper = new StringFilterWrapper(filter, keyName);
         
         return wrapper;
@@ -96,7 +99,10 @@ public class DefaultMetaDataFilterFactory implements MetaDataFilterFactory{
     
     public MetaDataOwnerFilter createNumberFilter(Collection<Object> possibleValues, String keyName){
         
+        Collection< ? extends Number> possibleNumberValues = (Collection) possibleValues;
+        
         NumberFilter filter = new DefaultNumberFilter();
+        filter.setAllPossibleValue(possibleNumberValues);
         MetaDataOwnerFilter wrapper = new NumberFilterWrapper(filter, keyName);
         
         return wrapper;
