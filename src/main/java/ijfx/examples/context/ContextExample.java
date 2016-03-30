@@ -23,11 +23,14 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.context.PaneContextualView;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -54,8 +57,8 @@ public class ContextExample extends Application {
 
     @Parameter
     UiContextService contextService;
-
-    Pane flowPane;
+Button removeContext;
+    FlowPane flowPane;
     HBox fakeToolBar;
     BorderPane borderPane;
     private PopOver popOver;
@@ -71,44 +74,40 @@ HBox toolbarTest ;
         borderPane = new BorderPane();
         context.inject(this);
         flowPane = new FlowPane();
+        flowPane.setColumnHalignment(HPos.CENTER);
+        flowPane.setRowValignment(VPos.CENTER);
         fakeToolBar = new HBox();
-        flowPane.setPrefSize(30, 30);
         toolbarTest = new HBox();
 
-        Button fruitButton = new Button("fruit");
-        fruitButton.setId("fruit");
-
-        Button vegetableButton = new Button("vegetable");
-        vegetableButton.setId("vegetable");
-
-        Button bananaButton = new Button("Banana");
-        bananaButton.setId("banana");
-
-        Button aubergineButton = new Button("Aubergine");
-        aubergineButton.setId("aubergine");
 
         PaneContextualView contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
  jsonReader.getCategoryList().stream().forEach( (e) ->{
             PaneIconCell <ItemCategory> paneIconCell = FactoryPaneIconCell.generate(e);
-            paneIconCell.setTitleFactory(f -> f.getName());
-            
-            ItemCategory itemCategory= (ItemCategory)paneIconCell.getItem();
-            String itemContext = ((ItemCategory) paneIconCell.getItem()).getContext();
+
             paneIconCell.setId(((ItemCategory) paneIconCell.getItem()).getName());
             //paneIconCell.setTitle("e");
             toolbarTest.getChildren().add(paneIconCell);
                     paneIconCell.setOnMouseClicked(event -> {
             //contextService.leave("vegetable");
-            contextService.enter(paneIconCell.getItem().getContext());
-            contextService.update();
-        });
+            //contextService.enter(paneIconCell.getItem().getContext());
+            //contextService.update();
+        //});
                     
-                            paneIconCell.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (ee) -> {
-            createPopOver(paneIconCell);
-                        contextService.enter(paneIconCell.getItem().getContext());
+          //                  paneIconCell.addEventFilter(MouseEvent.MOUSE_CLICKED, (ee) -> {
+                        contextService.enter(paneIconCell.getItem().getName());
             contextService.update();
-
+            createPopOver(flowPane, paneIconCell);
+                        try {
+                            popOver.setOnHiding((eee) -> contextService.leave(paneIconCell.getItem().getName()));
+                            popOver.setOnAutoHide((eeee)-> contextService.leave(paneIconCell.getItem().getName()));
+                            
+                        } catch (Exception exception) {
+                        }
         });
+                            /*paneIconCell.addEventFilter(MouseEvent.MOUSE_EXITED_TARGET, (ee) -> {
+                                contextService.leave(paneIconCell.getItem().getName());
+                                contextService.update();
+                            });*/
             //contextualView.registerNode(paneIconCell, itemContext);
             
         });
@@ -117,86 +116,82 @@ HBox toolbarTest ;
  
  jsonReader.getWidgetList().stream().forEach( (e) ->{
             PaneIconCell <ItemWidget> paneIconCell = FactoryPaneIconCell.generate(e);
-            paneIconCell.setTitleFactory(f -> f.getLabel());
             
             ItemWidget itemWidget= (ItemWidget)paneIconCell.getItem();
-            String itemContext = ((ItemWidget) paneIconCell.getItem()).getContext();
+            String itemContext = ((ItemWidget) paneIconCell.getItem()).getContext() ;
             paneIconCell.setId(((ItemWidget) paneIconCell.getItem()).getLabel());
+                        contextualView.registerNode(paneIconCell, itemContext);
+            System.out.println(itemContext);
             //paneIconCell.setTitle("e");
             //toolbarTest.getChildren().add(paneIconCell);
                     paneIconCell.setOnMouseClicked(event -> {
-                        System.out.println(paneIconCell.getItem().getLabel());
-            //contextService.leave("vegetable");
-            contextService.enter(paneIconCell.getItem().getContext());
-            contextService.update();
+                        System.out.println("Click" +paneIconCell.getItem().getLabel()+paneIconCell.getItem().getContext());
+ 
         });
-            contextualView.registerNode(paneIconCell, itemContext);
+
             
         });
  
  
- 
- 
-        //contextualView.registerNode(fruitButton, "always");
-        //contextualView.registerNode(vegetableButton, "always");
-        contextualView.registerNode(bananaButton, "fruit");
-        contextualView.registerNode(aubergineButton, "vegetable");
-
-        Button show = new Button("Show");
-
-        show.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (e) -> {
-            createPopOver(show);
+        TextField textField = new TextField();
+        textField.promptTextProperty();
+        textField.setPromptText("Enter Context");
+        Button validateContext = new Button("Validate context");
+        validateContext.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (e) -> {
+            contextService.enter(textField.getText());
 
         });
+        removeContext = new Button("Remove context");
+        removeContext.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (e) -> contextService.leave(contextService.getActualContextListAsString()));
 
-        fakeToolBar.getChildren().add(show);
+        fakeToolBar.getChildren().addAll(textField, validateContext, removeContext);
         //toolbarTest.getChildren().addAll(fruitButton, vegetableButton);
-        borderPane.setTop(fakeToolBar);
-        /*Rectangle c = new Rectangle();
+        borderPane.setBottom(fakeToolBar);
+        Rectangle c = new Rectangle();
         c.widthProperty().bind(borderPane.widthProperty());
-        c.setHeight(600);
+        c.setHeight(100);
         c.setFill(Color.RED);
-        borderPane.setCenter(c);*/
-        borderPane.setBottom(toolbarTest);
-        fruitButton.setOnAction(event -> {
-            contextService.leave("vegetable");
-            contextService.enter("fruit");
-            contextService.update();
-        });
+        borderPane.setCenter(c);
+        borderPane.setTop(toolbarTest);
 
-        vegetableButton.setOnAction(event -> {
-            contextService.leave("fruit");
-            contextService.enter("vegetable");
-            contextService.update();
-
-        });
-
-        contextService.enter("always");
+        
+        contextService.enter("always image-open multi-z");
         contextService.update();
 
     }
 
-    private void createPopOver(Node node) {
-        if (popOver == null) {
-            popOver = new PopOver(flowPane);
-            setPopOver(node);
+    private void createPopOver(FlowPane pane, Node owner) {
+        /*Stage stage = new Stage();
+        FlowPane flowPane2 = new FlowPane(pane);
+        Scene scene = new Scene(flowPane2);
+        stage.setScene(scene);
+        stage.setHeight(flowPane2.getHeight());
+        stage.show();*/
+        if (popOver == null /*&& !pane.getChildren().isEmpty()*/) {
+            popOver = new PopOver(pane);
+            setPopOver(pane, owner);
 
-        } else if (!popOver.isShowing()) {
-            setPopOver(node);
+        } else if (!popOver.isShowing() && !pane.getChildren().isEmpty()) {
+            popOver.setContentNode(pane);
+            setPopOver(pane, owner);
         }
 
     }
 
-    private void setPopOver(Node node) {
+    private void setPopOver(Pane pane, Node owner) {
+        
+        //popOver.setConsumeAutoHidingEvents(true);
+        popOver.setHeight(400);
         popOver.setDetached(false);
         popOver.setDetachable(false);
         popOver.setHideOnEscape(false);
         popOver.setAutoFix(true);
         popOver.setAutoHide(true);
         popOver.setOpacity(1.0);
-        popOver.setHideOnEscape(false);
+        popOver.setHideOnEscape(true);
         popOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
-        popOver.show(node, node.localToScreen(10, 10).getX(), node.localToScreen(10, 10).getY());
+        popOver.show(owner);
+        System.out.println("ijfx.examples.context.ContextExample.setPopOver()");
 
     }
 

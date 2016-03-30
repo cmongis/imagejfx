@@ -60,6 +60,8 @@ public class JsonReader {
             categoryList.add(itemCategory);
             for (ItemWidget itemwidget: widgetGroup.getItems())
             {
+                itemwidget.addContext("+"+itemCategory.getName());
+                itemwidget.removeSpaceContext();
                 widgetList.add(itemwidget);
                 PaneIconCell p = new PaneIconCell();
             }

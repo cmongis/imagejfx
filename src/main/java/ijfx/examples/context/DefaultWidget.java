@@ -35,7 +35,9 @@ public Parameters parameters;
         this.action = action;
         this.icon = icon;
         this.context = context;
-        parameters=null;
+        this.parameters = null;
+
+
     }
 
     @Override
@@ -66,6 +68,18 @@ public Parameters parameters;
     @Override
     public String getContext() {
         return context;
+    }
+    
+    @Override
+    public void addContext(String s){
+        context = context +s;
+    }
+
+    @Override
+    public void removeSpaceContext() {
+        this.context = this.context.replaceAll("\\s", "+");
+
+        System.out.println(this.context);
     }
     
     

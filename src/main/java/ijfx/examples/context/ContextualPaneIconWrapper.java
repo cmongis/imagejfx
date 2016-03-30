@@ -93,7 +93,7 @@ public class ContextualPaneIconWrapper  implements ContextualWidget, ContextualP
 
     @Override
     public Node getObject() {
-        System.out.println(node);
+        System.out.println("Node "+node);
         return node;
     }
 

@@ -26,20 +26,21 @@ import mongis.utils.panecell.PaneIconCell;
  * @author tuananh
  */
 public class FactoryPaneIconCell {
-    public static PaneIconCell generate(ItemCategory itemCategory)
-    {
-        PaneIconCell paneIconCell = new PaneIconCell();
+
+    public static PaneIconCell generate(ItemCategory itemCategory) {
+        PaneIconCell<ItemCategory> paneIconCell = new PaneIconCell();
+        paneIconCell.setTitleFactory(f -> f.getName());
         paneIconCell.setItem(itemCategory);
-        paneIconCell.setTitle(itemCategory.getName());
+
         return paneIconCell;
     }
-    
-    public static PaneIconCell generate(ItemWidget itemWidget)
-    {
-        PaneIconCell paneIconCell = new PaneIconCell();
+
+    public static PaneIconCell generate(ItemWidget itemWidget) {
+        PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
+        paneIconCell.setTitleFactory(f -> f.getLabel());
         paneIconCell.setItem(itemWidget);
-        paneIconCell.setTitle(itemWidget.getLabel());
+
         return paneIconCell;
-        
+
     }
 }
