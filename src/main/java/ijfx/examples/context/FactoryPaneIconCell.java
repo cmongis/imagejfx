@@ -30,6 +30,7 @@ public class FactoryPaneIconCell {
     public static PaneIconCell generate(ItemCategory itemCategory) {
         PaneIconCell<ItemCategory> paneIconCell = new PaneIconCell();
         paneIconCell.setTitleFactory(f -> f.getName());
+        paneIconCell.setLoadImageOnlyWhenVisible(false);
         paneIconCell.setItem(itemCategory);
 
         return paneIconCell;
@@ -38,6 +39,7 @@ public class FactoryPaneIconCell {
     public static PaneIconCell generate(ItemWidget itemWidget) {
         PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
         paneIconCell.setTitleFactory(f -> f.getLabel());
+        paneIconCell.setLoadImageOnlyWhenVisible(false);
         paneIconCell.setItem(itemWidget);
 
         return paneIconCell;
