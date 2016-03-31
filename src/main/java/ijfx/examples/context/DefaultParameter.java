@@ -18,7 +18,10 @@
 	
  */
 package ijfx.examples.context;
-
+/**
+ * 
+ * @author Tuan anh TRINH
+ */
 
 public class DefaultParameter implements Parameters {
     private double radius;

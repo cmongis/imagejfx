@@ -18,7 +18,10 @@
 	
  */
 package ijfx.examples.context;
-
+/**
+ * 
+ * @author Tuan anh TRINH
+ */
 
 public class DefaultWidgetGroup implements WidgetGroup {
     private ItemWidget[] items;

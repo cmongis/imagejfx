@@ -21,9 +21,8 @@ package ijfx.examples.context;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public interface ItemCategory extends Item  {
     public String getName();
-    public String getContext();
 }

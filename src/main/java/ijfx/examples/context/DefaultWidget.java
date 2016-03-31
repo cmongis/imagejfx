@@ -7,7 +7,7 @@ package ijfx.examples.context;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public class DefaultWidget implements ItemWidget{
 public String type;
@@ -78,8 +78,6 @@ public Parameters parameters;
     @Override
     public void removeSpaceContext() {
         this.context = this.context.replaceAll("\\s", "+");
-
-        System.out.println(this.context);
     }
     
     

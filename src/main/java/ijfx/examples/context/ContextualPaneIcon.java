@@ -24,7 +24,7 @@ import javafx.event.Event;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 interface ContextualPaneIcon extends ContextualWidget{
     public String getContext();

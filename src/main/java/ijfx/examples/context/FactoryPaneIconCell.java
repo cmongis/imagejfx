@@ -23,7 +23,7 @@ import mongis.utils.panecell.PaneIconCell;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public class FactoryPaneIconCell {
 

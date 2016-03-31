@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 @JsonDeserialize(as=DefaultParameter.class)
 public interface Parameters {

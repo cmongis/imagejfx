@@ -18,11 +18,14 @@
 	
  */
 package ijfx.examples.context;
-
+/**
+ * 
+ * @author Tuan anh TRINH
+ */
 public class DefaultCategory implements ItemCategory{
 
-    private String name;
-    private String context;
+    private final String name;
+    private final String context;
     
    
     public DefaultCategory(String n, String c)
@@ -32,7 +35,6 @@ public class DefaultCategory implements ItemCategory{
     }
     @Override
     public String getName() {
-        System.out.println(name);
         return name;
     }
 

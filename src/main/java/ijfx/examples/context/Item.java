@@ -21,7 +21,7 @@ package ijfx.examples.context;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public interface Item {
     public String getContext();

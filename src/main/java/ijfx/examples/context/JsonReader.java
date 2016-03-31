@@ -16,13 +16,13 @@ import mongis.utils.panecell.PaneIconCell;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public class JsonReader {
 
     private ArrayList<WidgetGroup> widgetGroupList;
-    private ArrayList<ItemCategory> categoryList;
-    private ArrayList<ItemWidget> widgetList;
+    private final ArrayList<ItemCategory> categoryList;
+    private final ArrayList<ItemWidget> widgetList;
 
     public  ArrayList<ItemCategory> getCategoryList(){
         return categoryList;
@@ -36,7 +36,7 @@ public class JsonReader {
         categoryList = new ArrayList<>();
         widgetList = new ArrayList<>();
     }
-    public void read() {
+    public void read(String path) {
  
         ObjectMapper mapper = new ObjectMapper();
 
@@ -45,7 +45,7 @@ public class JsonReader {
             //JSON from file to Object
             TypeFactory typeFactory = TypeFactory.defaultInstance();
 
-            widgetGroupList = mapper.readValue(new File("./src/main/resources/ijfx/ui/menutoolbar/myJson.json"), typeFactory.constructCollectionType(ArrayList.class, DefaultWidgetGroup.class));
+            widgetGroupList = mapper.readValue(new File(path), typeFactory.constructCollectionType(ArrayList.class, DefaultWidgetGroup.class));
         } catch (IOException ex) {
             Logger.getLogger(JsonReader.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 @JsonDeserialize(as=DefaultWidget.class)
 public interface ItemWidget {

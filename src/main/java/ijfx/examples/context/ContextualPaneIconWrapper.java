@@ -23,11 +23,10 @@ import ijfx.ui.context.ContextualWidget;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
-import mongis.utils.panecell.PaneIconCell;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public class ContextualPaneIconWrapper  implements ContextualWidget, ContextualPaneIcon {
 

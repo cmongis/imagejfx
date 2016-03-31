@@ -19,12 +19,9 @@
  */
 package ijfx.examples.context;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public interface WidgetGroup {
     public ItemWidget[] getItems();
