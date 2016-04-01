@@ -1,4 +1,4 @@
-/*
+    /*
     This file is part of ImageJ FX.
 
     ImageJ FX is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 
 /**
  *
@@ -36,5 +37,5 @@ public interface StringFilter {
     
     Property<Predicate<String>> predicateProperty();
     
-    
+    Node getContent();
 }
