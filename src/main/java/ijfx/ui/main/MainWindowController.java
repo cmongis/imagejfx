@@ -141,11 +141,14 @@ public class MainWindowController implements Initializable {
     private HBox bottomCenterHBox;
 
     @FXML
-    AnchorPane mainAnchorPane;
+    private AnchorPane mainAnchorPane;
 
     @FXML
-    BorderPane mainBorderPane;
+   private BorderPane mainBorderPane;
 
+    @FXML
+    private VBox topToolBarVBox;
+    
     //@FXML
     //private StackPane centerStackPane;
     @FXML
@@ -409,6 +412,9 @@ public class MainWindowController implements Initializable {
                 .setAnimationOnShow(Animations.APPEARS_DOWN)
                 .setAnimationOnHide(Animations.DISAPPEARS_DOWN);
 
+        registerPaneCtrl(topToolBarVBox)
+                .setAnimationOnShow(Animations.FADEIN)
+                .setAnimationOnHide(Animations.FADEOUT);
     }
 
     public void populateWidgets() {

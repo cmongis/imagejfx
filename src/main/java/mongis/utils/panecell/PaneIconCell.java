@@ -26,8 +26,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -39,7 +41,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
-import mongis.utils.FXUtilities;
 
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons with a text and subtext under.
@@ -97,6 +98,15 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     
     private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
     
+    
+    boolean subtitleVisible = true;
+    boolean showIcon = true;
+    
+   
+    BooleanProperty showIconProperty;
+    BooleanProperty loadImageOnlyWhenVisibleProperty;
+    
+    
     public PaneIconCell() {
         try {
             //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
@@ -115,7 +125,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED,event->isInsideScrollWindow = false);
             
-
+            
+          
+            
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -302,6 +314,22 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         this.loadImageOnlyWhenVisible = loadImageOnlyWhenVisible;
     }
 
+    
+    public BooleanProperty subtibleVisibleProperty() {
+       return subtitleLabel.visibleProperty();
+    }
+
+    public void setSubtitleVisible(boolean subtitleVisible) {
+       subtibleVisibleProperty().setValue(subtitleVisible);
+         
+       
+    }
+
+    public boolean isSubtitleVisible() {
+        return subtibleVisibleProperty().getValue();
+    }
+    
+    
     
     
     

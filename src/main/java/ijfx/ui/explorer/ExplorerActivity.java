@@ -69,22 +69,19 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
     ToggleButton filterToggleButton;
-    
+
     @FXML
     VBox filterVBox;
-    
+
     @FXML
     TextField filterTextField;
-    
-    
+
     @Parameter
     FolderManagerService folderManagerService;
 
     @Parameter
     ExplorerService explorerService;
 
-   
-    
     ExplorerView view = new IconView();
 
     public ExplorerActivity() {
@@ -92,20 +89,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             FXUtilities.injectFXML(this);
 
             contentBorderPane.setCenter(view.getNode());
-            folderListView.setCellFactory(listview->new FolderListCell());
+            folderListView.setCellFactory(listview -> new FolderListCell());
             folderListView.getSelectionModel().selectedItemProperty().addListener(this::onFolderSelectionChanged);
 
             SideMenuBinding binding = new SideMenuBinding(filterVBox);
-           
+
             binding.showProperty().bind(filterToggleButton.selectedProperty());
-             filterVBox.setTranslateX(-250);
-             
-            
-             
-             
-             
-             
-            
+            filterVBox.setTranslateX(-250);
+
         } catch (IOException ex) {
             Logger.getLogger(ExplorerActivity.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -172,8 +163,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     @FXML
-    public void test() {
-        folderManagerService.addFolder(new File("/Users/cyril/test_img/nikon/orginal"));
+    public void addFolder() {
+        File f = FXUtilities.openFolder("Open a folder", null);
+
+        if (f != null) {
+            folderManagerService.addFolder(f);
+        }
     }
 
     @EventHandler
@@ -193,7 +188,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     private class FolderListCell extends ListCell<Folder> {
 
-        FolderListCellCtrl ctrl = new FolderListCellCtrl();    
+        FolderListCellCtrl ctrl = new FolderListCellCtrl();
+
         public FolderListCell() {
             super();
             getStyleClass().add("selectable");
@@ -204,10 +200,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             if (newValue == null) {
                 setGraphic(null);
             } else {
-               
+
                 setGraphic(ctrl);
-                
-                if(newValue != null) ctrl.setItem(newValue);
+
+                if (newValue != null) {
+                    ctrl.setItem(newValue);
+                }
             }
         }
 

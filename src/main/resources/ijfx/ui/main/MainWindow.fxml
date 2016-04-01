@@ -53,6 +53,9 @@
                        </padding>
                    </HBox>
                </center>
+               <bottom>
+                  <VBox fx:id="topToolBarVBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+               </bottom>
            </BorderPane>
        </top>
        <center>

@@ -42,7 +42,7 @@ public class SideMenuBinding {
         this.node = node;
         
         show.addListener(this::onShowChanged);
-        
+        node.translateXProperty().addListener(this::onTranslatePropertyChanged);
     }
 
     public BooleanProperty showProperty() {
@@ -65,6 +65,10 @@ public class SideMenuBinding {
             timeline.getKeyFrames().add(kf);
             timeline.play();
         }
+    }
+    
+    private void onTranslatePropertyChanged(Observable obs, Number oldValue, Number newValue) {
+        System.out.println("Translate property : "+newValue);
     }
 
 }

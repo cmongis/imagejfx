@@ -34,9 +34,9 @@
                </styleClass>
             </Label>
             <Rectangle fill="#1f96ff00" height="10.0" smooth="false" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="20.0" />
-            <Button mnemonicParsing="false" onAction="#test">
+            <Button mnemonicParsing="false" onAction="#addFolder">
                <graphic>
-                  <FontAwesomeIconView glyphName="PLUS" onMouseClicked="#test" styleClass="h4" />
+                  <FontAwesomeIconView glyphName="PLUS" styleClass="h4" />
                </graphic>
             </Button>
             <Rectangle fill="#1f96ff00" height="10.0" smooth="false" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="150.0" />
