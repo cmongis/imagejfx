@@ -130,7 +130,16 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter{
     }
     
     public void updateChart() {
-        EmpiricalDistribution distribution = new EmpiricalDistribution(20);
+       
+        
+        double min; // minimum value
+        double max; // maximum value
+        double range; // max - min
+        double binSize;
+        int binNumber = 20;
+        
+         EmpiricalDistribution distribution = new EmpiricalDistribution(binNumber);
+        
         Double[] values = possibleValues
                 .stream()
                 .map(v->v.doubleValue())
@@ -140,12 +149,21 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter{
                 .toArray(size->new Double[size]);
         distribution.load(ArrayUtils.toPrimitive(values));
         
+         min = values[0];
+         max = values[values.length-1];
+        range = max - min;
+        binSize = range/binNumber;
+        
         
         XYChart.Series<String,Double> serie = new XYChart.Series<>();
         ArrayList<Data<String,Double>> data = new ArrayList<>(); 
-        for(double cat : distribution.getUpperBounds()) {
-            data.add(new Data<String,Double>(Double.toString(cat), distribution.density(cat)));
+        double k = min;
+        for (SummaryStatistics st : distribution.getBinStats()) {
+            data.add(new Data<String,Double>(new Double(k).toString(), new Double(st.getN())));
+            k += binSize;
         }
+            
+          
         
         serie.getData().addAll(data);
         barChart.getData().clear();
