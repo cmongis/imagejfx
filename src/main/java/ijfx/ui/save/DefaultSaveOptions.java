@@ -21,8 +21,13 @@ package ijfx.ui.save;
 
 import java.io.File;
 import java.io.IOException;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -30,18 +35,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import mongis.utils.FileButtonBinding;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public class DefaultSaveOptions extends Pane implements SaveOptions{
+public class DefaultSaveOptions extends VBox implements SaveOptions{
     
-    SaveType saveType;
-    String  suffix;
-    File folder;
+    private Property<SaveType> saveType;
+    private Property<String>  suffix;
+    private Property<File> folder;
     
     
     @FXML
@@ -73,16 +78,76 @@ public class DefaultSaveOptions extends Pane implements SaveOptions{
         loader.setController(this);
         loader.load();
         
+        saveType = new SimpleObjectProperty<>();
+        suffix = new SimpleStringProperty();
+        folder =new SimpleObjectProperty<>();
+        
         ToggleGroup toggleGroup = new ToggleGroup();
         
         replaceFilesBtn.setToggleGroup(toggleGroup);
         newFilesBtn.setToggleGroup(toggleGroup);
+        
+        replaceFilesBtn.selectedProperty().setValue(Boolean.TRUE);
+        
+        
+        ObjectBinding<SaveType> obinding = Bindings.createObjectBinding(() -> {
+            
+            SaveType newSaveType = SaveType.NEW;
+            
+            if(replaceFilesBtn.selectedProperty().getValue()){
+                newSaveType = SaveType.REPLACE;
+            }
+            
+            else if(newFilesBtn.selectedProperty().getValue()){
+                newSaveType = SaveType.NEW;
+            }
+            
+            return newSaveType;
+        },
+                toggleGroup.selectedToggleProperty()
+        );
+        
+        saveType().bind(obinding);
+        
+        StringBinding sbinding = Bindings.createStringBinding(()->{
+            return newSuffix.textProperty().getValue();
+        },
+                newSuffix.textProperty());
+        
+        suffix().bind(sbinding);
         
         newSuffix.disableProperty().bind(replaceFilesBtn.selectedProperty());
         destinationFolderBtn.disableProperty().bind(replaceFilesBtn.selectedProperty());
         
         FileButtonBinding fbinding = new FileButtonBinding(destinationFolderBtn);
         
+        folder().bind(fbinding.fileProperty());
+        
+        suffix().addListener(this::display);
+        saveType().addListener(this::display);
+        folder().addListener(this::display);
     }
     
+    
+    public Property<SaveType> saveType(){
+        return this.saveType;
+    }
+    
+    
+    public Property<String> suffix(){
+        return this.suffix;
+    }
+    
+    
+    public Property<File> folder(){
+        return this.folder;
+    }
+    
+    
+    public void display(Observable obs){
+        System.out.println(saveType().getValue().toString());
+        System.out.println(suffix().getValue());
+        System.out.println(folder().getValue().toString());
+
+    }
 }

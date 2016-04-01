@@ -1,18 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="404.0" prefWidth="327.0" type="Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="BASELINE_CENTER" minHeight="250.0" minWidth="250.0" prefHeight="250.0" prefWidth="250.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="title" layoutX="16.0" layoutY="13.0" text="Save Options" />
-      <RadioButton fx:id="replaceFilesBtn" layoutX="16.0" layoutY="47.0" mnemonicParsing="false" text="Replace File" />
-      <RadioButton fx:id="newFilesBtn" layoutX="16.0" layoutY="83.0" mnemonicParsing="false" text="Add suffix" />
-      <TextField fx:id="newSuffix" layoutX="14.0" layoutY="113.0" promptText="file name" />
-      <Label fx:id="extension" layoutX="196.0" layoutY="118.0" text=".tiff" />
-      <Button fx:id="destinationFolderBtn" layoutX="90.0" layoutY="190.0" mnemonicParsing="false" text="Destination folder" />
-      <Button fx:id="startBtn" layoutX="133.0" layoutY="241.0" mnemonicParsing="false" text="Start" />
+      <Label fx:id="title" text="Save Options">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font></Label>
+      <RadioButton fx:id="replaceFilesBtn" mnemonicParsing="false" text="Replace File" />
+      <RadioButton fx:id="newFilesBtn" mnemonicParsing="false" text="Add suffix" />
+      <HBox alignment="CENTER" prefHeight="39.0" prefWidth="327.0" spacing="5.0">
+         <children>
+            <TextField fx:id="newSuffix" promptText="new suffix" />
+            <Label fx:id="extension" text=".tiff" />
+         </children>
+      </HBox>
+      <Button fx:id="destinationFolderBtn" mnemonicParsing="false" text="Destination folder">
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin></Button>
+      <Button fx:id="startBtn" mnemonicParsing="false" text="Start" />
    </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
 </fx:root>
