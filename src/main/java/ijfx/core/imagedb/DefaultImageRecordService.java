@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import mercury.core.MercuryTimer;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.scijava.Priority;
+import org.scijava.app.StatusService;
 import org.scijava.event.EventHandler;
 import org.scijava.module.event.ModuleFinishedEvent;
 import org.scijava.plugin.Parameter;
@@ -78,6 +79,9 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
     @Parameter
     NotificationService notificationService;
 
+    @Parameter
+    StatusService statusService;
+    
     private static String FILE_ADDED = "%s images where analyzed.";
 
     private static String JSON_FILE = "image_record.json";
@@ -172,6 +176,8 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
         }
     }
 
+    
+    
     @EventHandler
     public void onFileOpened(ModuleFinishedEvent event) {
         logger.info("Module event !\n" + event.toString());
@@ -191,6 +197,31 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
     
     private List<DefaultImageRecord> load() {
         return jsonPreferenceService.loadListFromJson(JSON_FILE, DefaultImageRecord.class);
+    }
+
+    @Override
+    public synchronized Collection<? extends ImageRecord> getRecordsFromDirectory(File directory) {
+        
+        List<ImageRecord> records = new ArrayList<>();
+        
+        statusService.showStatus(1, 10, "Analyzing folder : "+directory.getName());
+        Collection<File> files = imageLoaderService.getAllImagesFromDirectory(directory);
+        int count = 0;
+        int total = files.size();
+        for(File f : files) {
+            if(isPresent(f)) {
+                records.add(getRecordMap().get(f));
+            }
+            else {
+                MetaDataSet m = metadataExtractorService.extractMetaData(f);
+                addRecord(f, m);
+                records.add(recordMap.get(f));
+            }
+            statusService.showProgress(count++, total);
+        }
+        
+        
+        return records;
     }
 
     

@@ -121,6 +121,7 @@ public class ImageJFX extends Application {
 
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getStylesheet());
+            
             // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Open+Sans");
             //scene.getStylesheets().add("http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css");
             //Font.loadFont(FontAwesomeIconView.class.getResource("fontawesome-webfont.ttf").toExternalForm().toString(), 0);

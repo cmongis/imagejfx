@@ -50,5 +50,6 @@ public interface ImageRecordService extends IjfxService{
     // query a list of record using the following condition
     public Collection<? extends ImageRecord> queryRecords(Predicate<ImageRecord> query);
     
+    public Collection<? extends ImageRecord> getRecordsFromDirectory(File file);
     
 }

@@ -20,7 +20,9 @@
 package ijfx.core.imagedb;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.ui.explorer.Iconazable;
 import java.io.File;
 import java.util.Date;
 
@@ -29,9 +31,9 @@ import java.util.Date;
  * @author cyril
  */
 @JsonSerialize(as = DefaultImageRecord.class)
-public interface ImageRecord {
+public interface ImageRecord extends MetaDataOwner{
     File getFile();
-    MetaDataSet getMetaDataSet();
+  
     public RecordStatus getLastStatus();
     public Date getLastStatusChange();
     
