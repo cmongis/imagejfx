@@ -17,24 +17,17 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.ui.explorer.event;
 
-import ijfx.service.IjfxService;
-import java.io.File;
-import java.util.List;
+import ijfx.ui.IjfxEvent;
+import ijfx.ui.explorer.Folder;
 
 /**
  *
  * @author cyril
  */
-public interface FolderManagerService extends IjfxService{
+public class FolderUpdatedEvent extends IjfxEvent<Folder>{
     
-    public Folder addFolder(File file);
     
-    public List<Folder> getFolderList();
-    
-    public Folder getCurrentFolder();
-    
-    public void setCurrentFolder(Folder folder);
     
 }

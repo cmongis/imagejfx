@@ -20,25 +20,197 @@
 package ijfx.ui.explorer;
 
 import ijfx.ui.activity.Activity;
+import ijfx.ui.explorer.cell.FolderListCellCtrl;
+import ijfx.ui.explorer.event.FolderAddedEvent;
+import ijfx.ui.explorer.event.FolderDeletedEvent;
+import ijfx.ui.explorer.event.ExploreredListChanged;
+import ijfx.ui.explorer.view.IconView;
+import ijfx.ui.main.SideMenuBinding;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.concurrent.Task;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import mongis.utils.AsyncCallback;
+import mongis.utils.FXUtilities;
+import mongis.utils.FileButtonBinding;
+import org.scijava.event.EventHandler;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type=Activity.class)
-public class ExplorerActivity implements Activity{
+@Plugin(type = Activity.class)
+public class ExplorerActivity extends AnchorPane implements Activity {
+
+    @FXML
+    ListView<Folder> folderListView;
+
+    @FXML
+    BorderPane contentBorderPane;
+
+    @FXML
+    ToggleButton filterToggleButton;
+    
+    @FXML
+    VBox filterVBox;
+    
+    @FXML
+    TextField filterTextField;
+    
+    
+    @Parameter
+    FolderManagerService folderManagerService;
+
+    @Parameter
+    ExplorerService explorerService;
+
+   
+    
+    ExplorerView view = new IconView();
+
+    public ExplorerActivity() {
+        try {
+            FXUtilities.injectFXML(this);
+
+            contentBorderPane.setCenter(view.getNode());
+            folderListView.setCellFactory(listview->new FolderListCell());
+            folderListView.getSelectionModel().selectedItemProperty().addListener(this::onFolderSelectionChanged);
+
+            SideMenuBinding binding = new SideMenuBinding(filterVBox);
+           
+            binding.showProperty().bind(filterToggleButton.selectedProperty());
+             filterVBox.setTranslateX(-250);
+             
+            
+             
+             
+             
+             
+            
+        } catch (IOException ex) {
+            Logger.getLogger(ExplorerActivity.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
 
     @Override
     public Node getContent() {
-        return null;
+        return this;
     }
 
     @Override
     public Task updateOnShow() {
-        return null;
+
+        return new AsyncCallback<Void, List<Explorable>>()
+                .run(this::update)
+                .then(this::updateUi)
+                .start();
     }
-    
+
+    // get the list of items to show from the explorer service
+    public List<Explorable> update(Void v) {
+        if (folderManagerService.getCurrentFolder() == null) {
+            return new ArrayList<Explorable>();
+        } else {
+            return explorerService.getFilteredItems();
+        }
+    }
+
+    public void onFolderSelectionChanged(Observable obs, Folder oldValue, Folder newValue) {
+        folderManagerService.setCurrentFolder(newValue);
+    }
+
+    public void updateFolderList() {
+        folderListView
+                .getItems()
+                .addAll(
+                        folderManagerService
+                        .getFolderList()
+                        .stream()
+                        .filter(this::isNotDisplayed)
+                        .collect(Collectors.toList()));
+    }
+
+    public void updateUi(List<? extends Explorable> explorable) {
+
+        updateFolderList();
+        System.out.println(explorable.size());
+        if (explorable == null) {
+            contentBorderPane.setCenter(new Label("Drag and drop a folder containing your image to explore it"));
+
+        } else if (explorable.size() == 0) {
+            contentBorderPane.setCenter(new Label("This folder doesn't contain any images... for now"));
+        } else {
+            contentBorderPane.setCenter(view.getNode());
+            view.setItem(explorable);
+        }
+
+    }
+
+    // returns true if the folder is not displayed yet
+    private boolean isNotDisplayed(Folder folder) {
+        return !folderListView.getItems().contains(folder);
+    }
+
+    @FXML
+    public void test() {
+        folderManagerService.addFolder(new File("/Users/cyril/test_img/nikon/orginal"));
+    }
+
+    @EventHandler
+    public void onFolderAdded(FolderAddedEvent event) {
+        Platform.runLater(this::updateFolderList);
+    }
+
+    @EventHandler
+    public void onFolderDeleted(FolderDeletedEvent event) {
+        folderListView.getItems().remove(event.getObject());
+    }
+
+    @EventHandler
+    public void onDisplayedItemListChanged(ExploreredListChanged event) {
+        Platform.runLater(() -> updateUi(event.getObject()));
+    }
+
+    private class FolderListCell extends ListCell<Folder> {
+
+        FolderListCellCtrl ctrl = new FolderListCellCtrl();    
+        public FolderListCell() {
+            super();
+            getStyleClass().add("selectable");
+            itemProperty().addListener(this::onItemChanged);
+        }
+
+        public void onItemChanged(Observable obs, Folder oldValue, Folder newValue) {
+            if (newValue == null) {
+                setGraphic(null);
+            } else {
+               
+                setGraphic(ctrl);
+                
+                if(newValue != null) ctrl.setItem(newValue);
+            }
+        }
+
+    }
+
 }

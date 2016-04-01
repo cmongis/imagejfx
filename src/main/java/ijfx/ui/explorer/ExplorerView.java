@@ -19,22 +19,17 @@
  */
 package ijfx.ui.explorer;
 
-import ijfx.service.IjfxService;
-import java.io.File;
 import java.util.List;
+import javafx.scene.Node;
 
 /**
  *
  * @author cyril
  */
-public interface FolderManagerService extends IjfxService{
+public interface ExplorerView {
     
-    public Folder addFolder(File file);
+    public Node getNode();
     
-    public List<Folder> getFolderList();
-    
-    public Folder getCurrentFolder();
-    
-    public void setCurrentFolder(Folder folder);
+    public void setItem(List<? extends Explorable> items);
     
 }
