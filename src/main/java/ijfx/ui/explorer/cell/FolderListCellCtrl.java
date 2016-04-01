@@ -50,14 +50,16 @@ public class FolderListCellCtrl extends VBox implements ListCellController<Folde
             Logger.getLogger(FolderListCellCtrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @Override
     public void setItem(Folder t) {
-        currentFolder = t;
-        
-        titleLabel.setText(t.getName());
-        subtitleLabel.setText(String.format("%d images",t.getItemList().size()));
 
+        currentFolder = t;
+
+        if (t != null) {
+            titleLabel.setText(t.getName());
+            subtitleLabel.setText(String.format("%d images", t.getItemList().size()));
+        }
     }
 
     @Override
