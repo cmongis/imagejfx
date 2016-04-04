@@ -53,6 +53,13 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
 
     @Override
     public void setValue(Object value) {
+        
+        if(value == null) {
+            number = null;
+            string = null;
+            return;
+        }
+        
         try {   
             number = new Double(value.toString());
         } catch (Exception e) {
@@ -62,9 +69,14 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
 
     @Override
     public String getStringValue() {
+        if(number == null && string == null) return "null";
         return number == null ? string : numberToString(number);
     }
 
+    @Override
+    public boolean isNull() {
+        return number == null && string == null;
+    }
     
     
     @Override
