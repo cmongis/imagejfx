@@ -114,5 +114,13 @@ public interface MetaData {
     public final static String BITS_PER_PIXEL = "Bits per pixels";
     public final static String TIME_COUNT = "Time frame number";
 
+    
+    public final static String STATS_PIXEL_MIN = "Min";
+    public final static String STATS_PIXEL_MAX = "Max";
+    public final static String STATS_PIXEL_MEAN = "Mean";
+    
+    public final static String STATS_PIXEL_STD_DEV = "Standard deviation";
+ 
+    
     // addedd an other useful comment
 }

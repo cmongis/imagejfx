@@ -17,25 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.imagedb;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import ijfx.core.metadata.MetaDataOwner;
-import ijfx.core.metadata.MetaDataSet;
-import ijfx.ui.explorer.Iconazable;
-import java.io.File;
-import java.util.Date;
+package ijfx.examples.context;
 
 /**
  *
- * @author cyril
+ * @author Tuan anh TRINH
  */
-@JsonSerialize(as = DefaultImageRecord.class)
-public interface ImageRecord extends MetaDataOwner{
-    File getFile();
-  
-    public RecordStatus getLastStatus();
-    public Date getLastStatusChange();
-    
-    
+public interface WidgetGroup {
+    public ItemWidget[] getItems();
+    public String getName();
+    public String getContext();
 }

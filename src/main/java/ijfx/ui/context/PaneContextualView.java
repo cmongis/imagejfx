@@ -19,6 +19,7 @@
  */
 package ijfx.ui.context;
 
+import ijfx.examples.context.ContextualPaneIconWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public class PaneContextualView implements ContextualView<Node> {
     }
 
     public void registerNode(Node node, String context) {
-        ContextualPaneNodeWrapper wrapper = new ContextualPaneNodeWrapper(pane, node);
+        ContextualPaneIconWrapper wrapper = new ContextualPaneIconWrapper(pane, node);
         manager.link(wrapper.getName(), context);
         wrapperList.add(wrapper);
     }
@@ -70,7 +71,7 @@ public class PaneContextualView implements ContextualView<Node> {
 
         return this;
     }
-
+/*
     // widget that show itself by adding itself itside a pane
     private class ContextualPaneNodeWrapper implements ContextualWidget<Node> {
 
@@ -129,6 +130,6 @@ public class PaneContextualView implements ContextualView<Node> {
         public String toString() {
             return node.toString();
         }
-    }
+    }*/
 
 }

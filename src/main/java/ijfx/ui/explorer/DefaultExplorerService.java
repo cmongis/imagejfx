@@ -20,7 +20,7 @@
 package ijfx.ui.explorer;
 
 import ijfx.core.metadata.MetaDataOwner;
-import ijfx.ui.explorer.event.IconazableDisplayChanged;
+import ijfx.ui.explorer.event.ExploreredListChanged;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -28,12 +28,15 @@ import java.util.stream.Collectors;
 import mongis.utils.AsyncCallback;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = Service.class)
 public class DefaultExplorerService extends AbstractService implements ExplorerService{
 
     
@@ -64,6 +67,8 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     }
 
     protected List<Explorable> filter(Predicate<MetaDataOwner> predicate) {
+        
+        if(predicate == null) return getItems();
         return getItems().parallelStream().filter(predicate).collect(Collectors.toList());
     }
 
@@ -80,7 +85,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     
     protected void setFilteredItems(List<Explorable> filteredItems) {
         this.filteredList = filteredItems;
-        eventService.publish(new IconazableDisplayChanged().setObject(filteredItems));
+        eventService.publishLater(new ExploreredListChanged().setObject(filteredItems));
     }
     
     

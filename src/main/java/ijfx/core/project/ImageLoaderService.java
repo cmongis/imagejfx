@@ -22,6 +22,7 @@ package ijfx.core.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import javafx.concurrent.Task;
 import net.imagej.ImageJService;
@@ -53,4 +54,6 @@ public interface ImageLoaderService extends FormatProvider,ImageJService {
 
     public String[] getSupportedExtensions();
 
+    Collection<File> getAllImagesFromDirectory(File file);
+    
 }

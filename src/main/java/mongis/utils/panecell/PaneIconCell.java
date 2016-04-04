@@ -26,8 +26,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -39,7 +41,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
-import mongis.utils.FXUtilities;
 
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons with a text and subtext under.
@@ -87,7 +88,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private Task currentImageSearch;
 
-    private boolean loadImageOnShow = true;
+    private boolean loadImageOnlyWhenVisible = true;
     
     private boolean isInsideScrollWindow = false;
     
@@ -97,14 +98,21 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     
     private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
     
+    
+    boolean subtitleVisible = true;
+    boolean showIcon = true;
+    
+   
+    BooleanProperty showIconProperty;
+    BooleanProperty loadImageOnlyWhenVisibleProperty;
+    
+    
     public PaneIconCell() {
         try {
             //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
             
             synchronized(LOADER) {
-                
-               
-                
+                                
                 LOADER.setController(this);
                 LOADER.setRoot(this);
                 LOADER.load();
@@ -117,7 +125,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED,event->isInsideScrollWindow = false);
             
-
+            
+          
+            
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -190,6 +200,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     }
 
+    
+   
+    
     public void onItemChanged(Observable obs, T oldItem, T newItem) {
         
         
@@ -208,6 +221,11 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             return;
         }
 
+        forceUpdate(newItem);
+
+    }
+    
+     public void forceUpdate(T newItem) {
         //otherwise starting to charge everything
         new AsyncCallback<T, String>()
                 .setInput(newItem)
@@ -230,8 +248,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .then(this::setAdditionalData)
                 .start();
 
-        if(loadImageOnShow == false || isInsideScrollWindow) updateImageAsync(newItem);
-
+        if(loadImageOnlyWhenVisible == false || isInsideScrollWindow) updateImageAsync(newItem);
+        
+        
     }
 
     private void updateImageAsync(T newItem) {
@@ -286,6 +305,33 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         return this;
     }
 
+    /**
+     * When false, the image is loaded whenever the item is updated. When true, the image is loaded
+     * only if the Ui element appears on the scroll window.
+     * @param loadImageOnlyWhenVisible
+     */
+    public void setLoadImageOnlyWhenVisible(boolean loadImageOnlyWhenVisible) {
+        this.loadImageOnlyWhenVisible = loadImageOnlyWhenVisible;
+    }
+
+    
+    public BooleanProperty subtibleVisibleProperty() {
+       return subtitleLabel.visibleProperty();
+    }
+
+    public void setSubtitleVisible(boolean subtitleVisible) {
+       subtibleVisibleProperty().setValue(subtitleVisible);
+         
+       
+    }
+
+    public boolean isSubtitleVisible() {
+        return subtibleVisibleProperty().getValue();
+    }
+    
+    
+    
+    
     
     
 }
