@@ -21,11 +21,13 @@ package ijfx.examples.context;
 
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.context.PaneContextualView;
+import ijfx.ui.main.ImageJFX;
+import ijfx.ui.plugin.DebugButton;
 import javafx.application.Application;
-
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -51,7 +53,6 @@ public class ToolBarBuilder extends Application {
 
     @Parameter
     UiContextService contextService;
-    private Button removeContext;
     private FlowPane flowPane;
     private HBox fakeToolBar;
     private BorderPane borderPane;
@@ -59,12 +60,14 @@ public class ToolBarBuilder extends Application {
     private HBox toolbarTest;
     private JsonReader jsonReader;
     private PaneContextualView contextualView;
+    private FlowPane f;
 
     public ToolBarBuilder() {
 
     }
 
     public void init(Context context) {
+        f = new FlowPane();
         context.inject(this);
         jsonReader = new JsonReader();
         jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/myJson.json");
@@ -78,7 +81,6 @@ public class ToolBarBuilder extends Application {
         contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
         generateItems(jsonReader, fakeToolBar, contextualView);
 
-        
         //Just for test, has to be removed after
         TextField textField = new TextField();
         textField.promptTextProperty();
@@ -88,7 +90,8 @@ public class ToolBarBuilder extends Application {
             contextService.enter(textField.getText());
 
         });
-        removeContext = new Button("Remove All context");
+        MenuButton debugButton = new DebugButton();
+        Button removeContext = new Button("Remove All context");
         removeContext.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (e) -> {
             String[] toDelete = contextService.getActualContextListAsString().split(" ");
             for (String toDelete1 : toDelete) {
@@ -96,7 +99,7 @@ public class ToolBarBuilder extends Application {
             }
         });
 
-        toolbarTest.getChildren().addAll(textField, validateContext, removeContext);
+        toolbarTest.getChildren().addAll(textField, validateContext, removeContext, debugButton);
         borderPane.setTop(fakeToolBar);
         Rectangle c = new Rectangle();
         c.widthProperty().bind(borderPane.widthProperty());
@@ -108,11 +111,12 @@ public class ToolBarBuilder extends Application {
         contextService.update();
 
     }
-/**
- * 
- * @param pane
- * @param owner 
- */
+
+    /**
+     *
+     * @param pane
+     * @param owner
+     */
     private void createPopOver(Pane pane, Node owner) {
 
         if (popOver == null) {
@@ -125,31 +129,45 @@ public class ToolBarBuilder extends Application {
         }
 
     }
-/**
- * Set the PopOver properties
- * @param pane
- * @param owner 
- */
-    private void setPopOver(Pane pane, Node owner) {
 
-        popOver.setWidth(pane.getWidth());
+    /**
+     * Set the PopOver properties
+     *
+     * @param pane
+     * @param owner
+     */
+    private void setPopOver(Pane pane, Node owner) {
+        popOver.setCornerRadius(0);
+        popOver.minWidthProperty().bind(borderPane.getScene().widthProperty());
+        popOver.setWidth(borderPane.getScene().widthProperty().getValue());
+        popOver.maxWidthProperty().bind(borderPane.getScene().widthProperty());
+        pane.setMinWidth(popOver.minWidthProperty().getValue());
+        pane.setMaxWidth(popOver.minWidthProperty().getValue());
         popOver.setDetached(false);
         popOver.setDetachable(false);
-        popOver.setHideOnEscape(false);
+        popOver.setHideOnEscape(true);
         popOver.setAutoFix(true);
         popOver.setAutoHide(true);
         popOver.setOpacity(1.0);
-        popOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+        popOver.setArrowSize(0);
         popOver.show(owner);
+        popOver.setAnchorX(borderPane.localToScreen(borderPane.getBoundsInParent()).getMinX());
+        popOver.setAnchorY(borderPane.localToScreen(borderPane.getTop().getBoundsInParent()).getMaxY());
+        popOver.getStyleClass().clear();
+        popOver.getStyleClass().add("popoverToolBar");
 
     }
 
     /**
      * Set action when user hoovers PaneIconCell
-     * @param paneIconCell 
+     *
+     * @param paneIconCell
      */
     public void setMouseAction(PaneIconCell<ItemCategory> paneIconCell) {
-
+        paneIconCell.addEventFilter(MouseEvent.MOUSE_RELEASED, (ee)
+                -> {
+            System.out.println(popOver.getY());
+        });
         paneIconCell.addEventFilter(MouseEvent.MOUSE_EXITED, (ee) -> {
             contextService.leave(paneIconCell.getItem().getName());
         });
@@ -158,6 +176,7 @@ public class ToolBarBuilder extends Application {
             contextService.update();
 
             if (!flowPane.getChildren().isEmpty()) {
+
                 popOver.setOpacity(0);
                 createPopOver(flowPane, paneIconCell);
             } else if (flowPane.getChildren().isEmpty()) {
@@ -168,11 +187,12 @@ public class ToolBarBuilder extends Application {
     }
 
     /**
-     * Generate ItemCategory and ItemWidget with FactoryPaneIconCell 
+     * Generate ItemCategory and ItemWidget with FactoryPaneIconCell
+     *
      * @see ijfx.examples.context.FactoryPaneIconCell
      * @param jsonReader
      * @param fakeToolBar
-     * @param contextualView 
+     * @param contextualView
      */
     public void generateItems(JsonReader jsonReader, HBox fakeToolBar, PaneContextualView contextualView) {
         jsonReader.getCategoryList().stream().forEach((e) -> {
@@ -196,7 +216,6 @@ public class ToolBarBuilder extends Application {
         });
     }
 
-
     public BorderPane getLayout() {
         return borderPane;
     }
@@ -206,6 +225,7 @@ public class ToolBarBuilder extends Application {
 
         init(imageJ.getContext());
         Scene scene = new Scene(getLayout());
+        //scene.getStylesheets().add(STYLESHEET_CASPIAN);
         primaryStage.setScene(scene);
         primaryStage.show();
 
