@@ -17,20 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.filter;
+package ijfx.core.metadata;
 
-import ijfx.core.metadata.MetaDataOwner;
-import java.io.IOException;
-import java.util.Collection;
+import mongis.utils.FileUtils;
+import mongis.utils.TextFileUtils;
 
 /**
  *
  * @author cyril
  */
-public interface MetaDataFilterFactory  {
+public class FileSizeMetaData extends GenericMetaData{
     
+    public FileSizeMetaData(long size) {
+        setName(MetaData.FILE_SIZE);
+        setValue(new Double(size));
+    }
     
-    public MetaDataOwnerFilter generateFilter(Collection<? extends MetaDataOwner> ownerList, String keyName);
+    @Override
+    public String getStringValue() {
+        return FileUtils.readableFileSize(getDoubleValue().longValue());
+    }
     
     
 }

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
@@ -137,8 +138,12 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter{
         double range; // max - min
         double binSize;
         int binNumber = 20;
+        int differentValuesCount = possibleValues.stream().collect(Collectors.toSet()).size();
+        if(differentValuesCount < binNumber) {
+            binNumber = differentValuesCount;
+        }
         
-         EmpiricalDistribution distribution = new EmpiricalDistribution(binNumber);
+        EmpiricalDistribution distribution = new EmpiricalDistribution(binNumber);
         
         Double[] values = possibleValues
                 .stream()
@@ -154,6 +159,8 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter{
         range = max - min;
         binSize = range/binNumber;
         
+        
+        System.out.println(String.format("min = %.0f, max = %.0f, range = %.0f, bin size = %.0f, bin number = %d",min,max,range,binSize,binNumber));
         
         XYChart.Series<String,Double> serie = new XYChart.Series<>();
         ArrayList<Data<String,Double>> data = new ArrayList<>(); 
@@ -179,7 +186,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter{
         
         double min = stats.getMin();
         double max = stats.getMax();
-        double range = max - min;
+        double range = Math.abs(max - min);
         double minorTick = range / 40;
         double majorTick = range / 10;
         rangeSlider.setMin(min);
@@ -187,7 +194,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter{
         rangeSlider.setLowValue(min);
         rangeSlider.setHighValue(max);
         
-        rangeSlider.setMajorTickUnit(majorTick);
+        if(majorTick > 0) rangeSlider.setMajorTickUnit(majorTick);
         rangeSlider.setMinorTickCount(2);
         rangeSlider.setLabelFormatter(new Converter());
         
@@ -197,6 +204,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter{
 
         @Override
         public String toString(Number object) {
+            
             return ""+object.intValue();
         }
 

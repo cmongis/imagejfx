@@ -5,7 +5,6 @@
  */
 package ijfx.ui.filter.string;
 
-
 import ijfx.ui.filter.StringFilter;
 import ijfx.ui.filter.StringFilterWrapper;
 import java.io.IOException;
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
@@ -57,43 +57,47 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
     private static List<Item> listValues;
     private ObservableList<Item> observableList;
     private boolean bigger = false;
-    
+
     private String CSS_FILE = getClass().getResource("DefaultStringFilter.css").toExternalForm();
-    
+
     // no static method !!! this is a reusable widget !
     private Property<Predicate<String>> predicate = new SimpleObjectProperty();
-    
-    
-    public DefaultStringFilter() throws IOException {
+
+    public DefaultStringFilter() {
         listValues = new ArrayList<>();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ijfx/ui/filter/string/DefaultStringFilter.fxml"));
         loader.setRoot(this);
         loader.setController(this);
-        loader.load();
+
         try {
-            observableList = FXCollections.observableArrayList(listValues.subList(0, 5));
-            getStylesheets().add(CSS_FILE);
-        } catch (Exception e) {
-        } finally {
-            if (observableList == null) {
-                observableList = FXCollections.observableArrayList(listValues);
+
+            loader.load();
+            try {
+                observableList = FXCollections.observableArrayList(listValues.subList(0, 5));
+                getStylesheets().add(CSS_FILE);
+            } catch (Exception e) {
+            } finally {
+                if (observableList == null) {
+                    observableList = FXCollections.observableArrayList(listValues);
+                }
             }
+            // change the factory to the class method
+            listView.setCellFactory(this::createListCell);
+            listView.setItems(observableList);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        // change the factory to the class method
-        listView.setCellFactory(this::createListCell);
-        listView.setItems(observableList);
-        
 //        predicateProperty().addListener();
     }
-    
+
     public ListCell<Item> createListCell(ListView<Item> listView) {
-        
+
         // I give a pointer to a runnable that will be executed each time
         // the something is ticked.
         // It makes the code more reuable
         ListCellCheckbox listCellCheckBox = new ListCellCheckbox(this::setPredicate);
-        
+
         return listCellCheckBox;
     }
 
@@ -101,12 +105,9 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
     public void initialize(URL url, ResourceBundle rb) {
         textField.onKeyPressedProperty();
         //Generate Array
-        List<String> t = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            t.add(generateString(new Random(), "az", 5));
-        }
-        setAllPossibleValues(t);
-        this.setPrefSize(listView.getPrefWidth(), listView.getPrefHeight() + 100);
+
+       
+        this.setPrefSize(listView.getPrefWidth(), 200);
 
     }
 
@@ -120,6 +121,9 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
 
     @Override
     public void setAllPossibleValues(Collection<String> list) {
+        
+        listValues.clear();
+        
         Map<String, Integer> items;
         items = new HashMap<>();
         list.stream().forEach((s) -> {
@@ -129,9 +133,17 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
                 items.put(s, items.get(s) + 1);
             }
         });
+        
+        
+        
         items.forEach((s, i) -> listValues.add(new ItemWrapper(s, i)));
 
-    }
+        observableList.clear();
+        observableList.addAll(listValues);
+        
+        predicateProperty().setValue(null);
+        
+    }   
 
     public void filterQuery() {
         String s = textField.getText();
@@ -162,18 +174,31 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
             filterQuery();
             moreButton.setVisible(false);
         }
-        
+
     }
 
     public void setPredicate() {
         List<String> listBuffer = new ArrayList<>();
-        listValues.stream().filter(e -> e.getState()).forEach(e -> listBuffer.add(e.getName()));
-        predicate.setValue(p -> listBuffer.contains(p));
-        getStylesheets().remove(CSS_FILE);
-        getStylesheets().add(CSS_FILE);
+        
+        
+        System.out.println(observableList.stream().filter(e->e.getState()).count());
+        if(observableList.stream().filter(e->e.getState()).count() == 0) {
+            
+            predicate.setValue(null);
+            return;
+        }
+        
+        
+        listBuffer = observableList
+                .stream()
+                .filter(e -> e.getState())
+                .map(e->e.getName())
+                .collect(Collectors.toList());
+        predicate.setValue(new ContainStringPredicate(listBuffer));
+        //getStylesheets().remove(CSS_FILE);
+        //getStylesheets().add(CSS_FILE);
     }
-    
-    
+
     @Override
     public Property<Predicate<String>> predicateProperty() {
         return predicate;
@@ -185,7 +210,26 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
     }
 
     @Override
-    public Node getContent(){
+    public Node getContent() {
         return this;
-   }
+    }
+    
+    private class ContainStringPredicate implements Predicate<String> {
+        
+       private final List<String> strings;
+
+        public ContainStringPredicate(List<String> strings) {
+            this.strings = strings;
+        }
+
+        @Override
+        public boolean test(String t) {
+            System.out.println(String.format("Testing %s against %d terms",t,strings.size()));
+            return strings.contains(t);
+        }
+       
+       
+        
+    }
+    
 }

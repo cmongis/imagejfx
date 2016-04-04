@@ -42,6 +42,7 @@ public class StringOwnerPredicate implements Predicate<MetaDataOwner>{
     @Override
     public boolean test(MetaDataOwner t) {
         value = t.getMetaDataSet().get(keyName).getStringValue();
+
         return predicate.test(value);
     }
     

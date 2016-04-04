@@ -22,92 +22,103 @@ package ijfx.ui.filter;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.ui.filter.string.DefaultStringFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author Pierre BONNEAU
+ * @author Cyril MONGIS
  */
-public class DefaultMetaDataFilterFactory implements MetaDataFilterFactory{
-    
+public class DefaultMetaDataFilterFactory implements MetaDataFilterFactory {
+
     @Override
-    public MetaDataOwnerFilter generateFilter(Collection<MetaDataOwner> ownerList, String keyName)throws IOException{
-        
-        Collection<Object> possibleValues = getAllPossibleValues(ownerList, keyName);
+    public MetaDataOwnerFilter generateFilter(Collection<? extends MetaDataOwner> ownerList, String keyName) {
+
+        Collection<MetaData> possibleValues = getAllPossibleValues(ownerList, keyName);
         int type = checktype(ownerList, keyName);
-        
-        MetaDataOwnerFilter ownerFilter;
-        
-        if(type == 0){
-            ownerFilter = createStringFilter(possibleValues, keyName);
+
+        int differentValues = possibleValues.stream().collect(Collectors.toSet()).size();
+
+        if (differentValues <= 1) {
+            return null;
         }
-        else{
-            ownerFilter = createNumberFilter(possibleValues, keyName);
+        if (differentValues <= 6) {
+            return createStringFilter(possibleValues, keyName);
+        } else {
+
+            MetaDataOwnerFilter ownerFilter;
+            if (type == MetaData.TYPE_STRING) {
+                ownerFilter = createStringFilter(possibleValues, keyName);
+            } else {
+                ownerFilter = createNumberFilter(possibleValues, keyName);
+            }
+            return ownerFilter;
         }
-        
-        return ownerFilter;
     }
 
-    
-    public Collection<Object> getAllPossibleValues(Collection<MetaDataOwner> ownerList, String keyName){
-        
-        Collection<Object> possibleValues = new ArrayList<>();
-        
-        ownerList.stream().forEach(owner -> possibleValues.add(owner.getMetaDataSet().get(keyName).getValue()));
-        
-        return possibleValues;
+    public Collection<MetaData> getAllPossibleValues(Collection<? extends MetaDataOwner> ownerList, String keyName) {
+
+        return ownerList.stream()
+                .map(owner -> owner.getMetaDataSet().get(keyName))
+                .filter(MetaData::notNull)
+                .collect(Collectors.toList());
+
     }
-    
-    
-    public int checktype(Collection<MetaDataOwner> ownerList, String keyName){
-        
-        boolean sameType = true;
-        
-        Iterator it = ownerList.iterator();
-        
-        MetaDataOwner owner = (MetaDataOwner) it.next();
-        
-        int type = owner.getMetaDataSet().get(keyName).getType();
-        
-        while(it.hasNext()){
-            owner = (MetaDataOwner) it.next();
-            int newType = owner.getMetaDataSet().get(keyName).getType();
-            if(newType != type){
-                type = MetaData.TYPE_STRING;
-                break;
-            }
+
+    public int checktype(Collection<? extends MetaDataOwner> ownerList, String keyName) {
+
+        System.out.println(String.format("Checking the type for %s (%d)", keyName, ownerList.size()));
+        if (ownerList.isEmpty()) {
+            return MetaData.TYPE_NOT_SET;
         }
-        
-        return type;
+
+        List<MetaData> nonNullMetaData
+                = ownerList
+                .parallelStream()
+                .map(owner -> owner.getMetaDataSet().get(keyName))
+                .filter(metadata -> metadata.getValue() != null)
+                .collect(Collectors.toList());
+
+        if (nonNullMetaData.size() == nonNullMetaData.stream().filter(metadata -> metadata.getType() == MetaData.TYPE_NUMBER).count()) {
+            return MetaData.TYPE_NUMBER;
+        } else {
+            return MetaData.TYPE_STRING;
+        }
+
     }
-    
-    
-    public MetaDataOwnerFilter createStringFilter(Collection<Object> possibleValues, String keyName) throws IOException{
-        
-        Collection<String> possibleStringValues = (Collection) possibleValues;
-        
+
+    public MetaDataOwnerFilter createStringFilter(Collection<MetaData> possibleValues, String keyName) {
+
+        Collection<String> possibleStringValues = possibleValues
+                .stream()
+                .filter(MetaData::notNull)
+                .map(metadata -> metadata.getStringValue())
+                .collect(Collectors.toList());
+
         StringFilter filter = new DefaultStringFilter();
         filter.setAllPossibleValues(possibleStringValues);
         MetaDataOwnerFilter wrapper = new StringFilterWrapper(filter, keyName);
-        
+
         return wrapper;
     }
-    
-    
-    public MetaDataOwnerFilter createNumberFilter(Collection<Object> possibleValues, String keyName){
-        
-        Collection< ? extends Number> possibleNumberValues = (Collection) possibleValues;
-        
+
+    public MetaDataOwnerFilter createNumberFilter(Collection<MetaData> possibleValues, String keyName) {
+
+        // filtering and getting the doubles from the list of metadata
+        Collection< ? extends Number> possibleNumberValues = possibleValues
+                .stream()
+                .filter(MetaData::notNull)
+                .map(metadata->metadata.getDoubleValue())
+                .collect(Collectors.toList());
+
         NumberFilter filter = new DefaultNumberFilter();
         filter.setAllPossibleValue(possibleNumberValues);
         MetaDataOwnerFilter wrapper = new NumberFilterWrapper(filter, keyName);
-        
+
         return wrapper;
     }
-    
-    
 
 }

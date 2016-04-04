@@ -27,6 +27,6 @@ import java.util.List;
  *
  * @author cyril
  */
-public class ExploreredListChanged extends IjfxEvent<List<? extends Explorable>>{
+public class DisplayedListChanged extends IjfxEvent<List<? extends Explorable>>{
     
 }

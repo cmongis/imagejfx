@@ -20,6 +20,8 @@
 package ijfx.core.metadata;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
+import javax.jws.HandlerChain;
 
 /**
  *
@@ -27,6 +29,7 @@ import java.text.DecimalFormat;
  */
 public class GenericMetaData implements MetaData, Comparable<Object> {
 
+ 
     Double number;
     String name;
     String string;
@@ -119,6 +122,32 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
     
     public static String numberToString(Double d) {
         return new DecimalFormat("#.####").format(d);
+    }
+    
+    
+    @Override
+    public boolean equals(Object o) {
+        
+        if(MetaData.class.isAssignableFrom(o.getClass())) {
+            
+            MetaData m = (MetaData)o;
+            
+            return m.getStringValue().equals(getStringValue());
+            
+            
+        }
+        else return false;
+        
+        
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 53 * hash + Objects.hashCode(this.number);
+        hash = 53 * hash + Objects.hashCode(this.string);
+        return hash;
     }
 
 }

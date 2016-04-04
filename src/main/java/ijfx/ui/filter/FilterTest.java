@@ -43,7 +43,7 @@ public class FilterTest extends Application {
         RandomDataGenerator generator = new RandomDataGenerator();
 
         for (int i = 0; i != 300; i++) {
-            numbers.add(generator.nextUniform(200, 1400));
+            numbers.add(new Double(generator.nextInt(0, 3)));
         }
 
         filter.setAllPossibleValue(numbers);

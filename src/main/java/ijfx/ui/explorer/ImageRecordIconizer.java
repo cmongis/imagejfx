@@ -80,6 +80,7 @@ public class ImageRecordIconizer implements Explorable {
 
     @Override
     public MetaDataSet getMetaDataSet() {
+        
         return imageRecord.getMetaDataSet();
     }
     

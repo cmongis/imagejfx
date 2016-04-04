@@ -17,20 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.filter;
+package ijfx.ui.explorer.event;
 
-import ijfx.core.metadata.MetaDataOwner;
-import java.io.IOException;
-import java.util.Collection;
+import ijfx.ui.IjfxEvent;
+import ijfx.ui.explorer.Explorable;
+import java.util.List;
 
 /**
  *
  * @author cyril
  */
-public interface MetaDataFilterFactory  {
-    
-    
-    public MetaDataOwnerFilter generateFilter(Collection<? extends MetaDataOwner> ownerList, String keyName);
-    
+public class ExploredListChanged extends IjfxEvent<List<? extends Explorable>>{
     
 }
