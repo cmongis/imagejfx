@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root alignment="BASELINE_CENTER" minHeight="250.0" minWidth="250.0" prefHeight="250.0" prefWidth="250.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="BASELINE_CENTER" minHeight="250.0" minWidth="250.0" prefHeight="400.0" prefWidth="280.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label fx:id="title" text="Save Options">
          <font>
@@ -20,6 +20,11 @@
             <Label fx:id="extension" text=".tiff" />
          </children>
       </HBox>
+      <Pane fx:id="messageBox" prefHeight="0.0" prefWidth="0.0">
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </Pane>
       <Button fx:id="destinationFolderBtn" mnemonicParsing="false" text="Destination folder">
          <VBox.margin>
             <Insets top="10.0" />

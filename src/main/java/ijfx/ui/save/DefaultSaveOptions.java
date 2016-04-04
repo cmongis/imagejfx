@@ -21,7 +21,9 @@ package ijfx.ui.save;
 
 import java.io.File;
 import java.io.IOException;
-import javafx.beans.Observable;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
@@ -30,12 +32,20 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import mongis.utils.FileButtonBinding;
 
 /**
@@ -48,6 +58,9 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     private Property<String>  suffix;
     private Property<File> folder;
     
+    private Timeline timeline;
+    
+    private String CSS_FILE = getClass().getResource("../main/flatterfx.css").toExternalForm();
     
     @FXML
     private Label title;
@@ -65,11 +78,13 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     private Label extension;
     
     @FXML
+    private Pane messageBox;
+    
+    @FXML
     private Button destinationFolderBtn;
     
     @FXML
     private Button startBtn;
-    
         
     public DefaultSaveOptions() throws IOException{
 
@@ -80,7 +95,7 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
         
         saveType = new SimpleObjectProperty<>();
         suffix = new SimpleStringProperty();
-        folder =new SimpleObjectProperty<>();
+        folder = new SimpleObjectProperty<>();
         
         ToggleGroup toggleGroup = new ToggleGroup();
         
@@ -123,9 +138,22 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
         
         folder().bind(fbinding.fileProperty());
         
-        suffix().addListener(this::display);
-        saveType().addListener(this::display);
-        folder().addListener(this::display);
+                
+        messageBox.setBackground(new Background(new BackgroundFill(Color.web("#ff0000"), CornerRadii.EMPTY, Insets.EMPTY)));
+        timeline = new Timeline();
+        timeline.setCycleCount(2);
+        timeline.setAutoReverse(true);
+        
+        KeyValue kv = new KeyValue(messageBox.prefHeightProperty(), 70);
+        KeyFrame kf = new KeyFrame(Duration.millis(200), (e) ->{
+            timeline.pause();
+            timeline.jumpTo(Duration.millis(200));
+        }, kv);
+        timeline.getKeyFrames().add(kf);
+        
+        startBtn.setOnMouseClicked(this::openClose);
+        
+        this.getStylesheets().add(CSS_FILE);
     }
     
     
@@ -144,10 +172,10 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     }
     
     
-    public void display(Observable obs){
-        System.out.println(saveType().getValue().toString());
-        System.out.println(suffix().getValue());
-        System.out.println(folder().getValue().toString());
+    public void openClose(MouseEvent e){
+        
+        timeline.play();
 
+        System.out.println("ANIMATION");
     }
 }
