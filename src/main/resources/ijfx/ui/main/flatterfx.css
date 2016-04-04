@@ -1042,8 +1042,6 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-fill:-bg-light!important;
     -fx-background-color:-bg-light;
     -fx-stroke:derive(-bg-light,20%)!important;
-    -fx-stroke-width:2;
-    -fx-padding : 0;
 }
 .range-slider .low-thumb, .range-slider .high-thumb, .slider .thumb {
     -fx-background-color:-flatter-primary;

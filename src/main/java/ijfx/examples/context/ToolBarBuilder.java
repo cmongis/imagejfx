@@ -24,12 +24,14 @@ import ijfx.ui.context.PaneContextualView;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.plugin.DebugButton;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -77,7 +79,7 @@ public class ToolBarBuilder extends Application {
         fakeToolBar = new HBox();
         toolbarTest = new HBox();
         popOver = new PopOver();
-
+        flowPane.setPadding(new Insets(10,10,10,10));
         contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
         generateItems(jsonReader, fakeToolBar, contextualView);
 
@@ -92,13 +94,13 @@ public class ToolBarBuilder extends Application {
         });
         MenuButton debugButton = new DebugButton();
         Button removeContext = new Button("Remove All context");
-        removeContext.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (e) -> {
+        removeContext.addEventFilter(MouseEvent.MOUSE_CLICKED, (e) -> {
             String[] toDelete = contextService.getActualContextListAsString().split(" ");
             for (String toDelete1 : toDelete) {
                 contextService.leave(toDelete1);
             }
         });
-
+        
         toolbarTest.getChildren().addAll(textField, validateContext, removeContext, debugButton);
         borderPane.setTop(fakeToolBar);
         Rectangle c = new Rectangle();
@@ -137,7 +139,7 @@ public class ToolBarBuilder extends Application {
      * @param owner
      */
     private void setPopOver(Pane pane, Node owner) {
-        popOver.setCornerRadius(0);
+        popOver.setCornerRadius(0);       
         popOver.minWidthProperty().bind(borderPane.getScene().widthProperty());
         popOver.setWidth(borderPane.getScene().widthProperty().getValue());
         popOver.maxWidthProperty().bind(borderPane.getScene().widthProperty());
@@ -151,8 +153,8 @@ public class ToolBarBuilder extends Application {
         popOver.setOpacity(1.0);
         popOver.setArrowSize(0);
         popOver.show(owner);
-        popOver.setAnchorX(borderPane.localToScreen(borderPane.getBoundsInParent()).getMinX());
-        popOver.setAnchorY(borderPane.localToScreen(borderPane.getTop().getBoundsInParent()).getMaxY());
+        popOver.setAnchorX(borderPane.localToScreen(borderPane.getBoundsInParent()).getMinX()+1);
+        popOver.setAnchorY(borderPane.localToScreen(borderPane.getTop().getBoundsInParent()).getMaxY()-1);
         popOver.getStyleClass().clear();
         popOver.getStyleClass().add("popoverToolBar");
 
@@ -179,7 +181,8 @@ public class ToolBarBuilder extends Application {
 
                 popOver.setOpacity(0);
                 createPopOver(flowPane, paneIconCell);
-            } else if (flowPane.getChildren().isEmpty()) {
+            } 
+            else if (flowPane.getChildren().isEmpty()) {
                 popOver.setOpacity(0);
             }
 
