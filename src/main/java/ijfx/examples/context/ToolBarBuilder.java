@@ -225,7 +225,7 @@ public class ToolBarBuilder extends Application {
 
         init(imageJ.getContext());
         Scene scene = new Scene(getLayout());
-        //scene.getStylesheets().add(STYLESHEET_CASPIAN);
+        scene.getStylesheets().add(ImageJFX.class.getResource(("flatterfx.css")).toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
 
