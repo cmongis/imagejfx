@@ -19,10 +19,17 @@
  */
 package ijfx.ui.save;
 
+import java.io.File;
+import javafx.beans.property.Property;
+
 /**
  *
  * @author Pierre BONNEAU
  */
 public interface SaveOptions {
+    
+    public Property<SaveType> saveType();
+    public Property<String> suffix();
+    public Property<File> folder();
     
 }

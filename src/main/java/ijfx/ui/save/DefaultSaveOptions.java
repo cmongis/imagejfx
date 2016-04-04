@@ -78,13 +78,12 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     private Label extension;
     
     @FXML
-    private Pane messageBox;
-    
-    @FXML
     private Button destinationFolderBtn;
     
     @FXML
     private Button startBtn;
+    
+    private MessageBox messageBox;
         
     public DefaultSaveOptions() throws IOException{
 
@@ -139,19 +138,25 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
         folder().bind(fbinding.fileProperty());
         
                 
-        messageBox.setBackground(new Background(new BackgroundFill(Color.web("#ff0000"), CornerRadii.EMPTY, Insets.EMPTY)));
-        timeline = new Timeline();
-        timeline.setCycleCount(2);
-        timeline.setAutoReverse(true);
+        messageBox = new DefaultMessageBox();
         
-        KeyValue kv = new KeyValue(messageBox.prefHeightProperty(), 70);
-        KeyFrame kf = new KeyFrame(Duration.millis(200), (e) ->{
-            timeline.pause();
-            timeline.jumpTo(Duration.millis(200));
-        }, kv);
-        timeline.getKeyFrames().add(kf);
-        
-        startBtn.setOnMouseClicked(this::openClose);
+//        messageBox.setBackground(new Background(new BackgroundFill(Color.web("#ff0000"), 
+//                CornerRadii.EMPTY, Insets.EMPTY)));
+//        
+//        
+//        timeline = new Timeline();
+//        timeline.setCycleCount(2);
+//        timeline.setAutoReverse(true);
+//        
+//        
+//        KeyValue kv = new KeyValue(messageBox.prefHeightProperty(), 70);
+//        KeyFrame kf = new KeyFrame(Duration.millis(200), (e) ->{
+//            timeline.pause();
+//            timeline.jumpTo(Duration.millis(200));
+//        }, kv);
+//        timeline.getKeyFrames().add(kf);
+//        
+//        startBtn.setOnMouseClicked(this::openClose);
         
         this.getStylesheets().add(CSS_FILE);
     }

@@ -23,6 +23,7 @@ package ijfx.ui.save;
  *
  * @author Pierre BONNEAU
  */
-public interface MessageBox {
+public interface MessageBox{
+    public void setMessage(String message);
     
 }
