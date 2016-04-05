@@ -48,11 +48,7 @@
             </ToggleButton>
          </items>
       </ToolBar>
-      <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0" />
-      <VBox fx:id="filterVBox" prefHeight="200.0" prefWidth="250.0" styleClass="bg-lighter" translateX="-250.0" translateZ="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
-         <children>
-            <Label fx:id="Filters" text="Label" />
-         </children>
-      </VBox>
+      <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="50.0" />
+      <Accordion fx:id="filterVBox" prefWidth="250.0" translateX="-300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="50.0" />
    </children>
 </fx:root>

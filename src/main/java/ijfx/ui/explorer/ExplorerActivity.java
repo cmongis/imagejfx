@@ -47,6 +47,7 @@ import javafx.beans.property.Property;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -78,18 +79,22 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     ToggleButton filterToggleButton;
 
-    @FXML
-    VBox filterVBox;
-
+    
     @FXML
     TextField filterTextField;
 
+     @FXML
+    Accordion filterVBox;
+    
     @Parameter
     FolderManagerService folderManagerService;
 
     @Parameter
     ExplorerService explorerService;
 
+    
+   
+    
     ExplorerView view = new IconView();
 
     public ExplorerActivity() {
@@ -250,13 +255,13 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         // making the new set of filters
         currentFilters = collect;
 
-        filterVBox.getChildren().clear();
+        filterVBox.getPanes().clear();
 
         // adding all the filter to the filter things
-        filterVBox.getChildren().addAll(
+        filterVBox.getPanes().addAll(
                 currentFilters
                 .stream()
-                .map(filter -> filter.getContent())
+                .map(filter -> (TitledPane)filter.getContent())
                 .collect(Collectors.toList())
         );
 
@@ -300,7 +305,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         private final MetaDataOwnerFilter filter;
         private final String title;
         private final TitledPane pane;
-
+        
         public MetaDataFilterWrapper(String title, MetaDataOwnerFilter filter) {
             this.filter = filter;
             this.title = title;
