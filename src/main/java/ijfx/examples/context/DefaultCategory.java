@@ -26,12 +26,13 @@ public class DefaultCategory implements ItemCategory{
 
     private final String name;
     private final String context;
-    
+    private final String icon;
    
-    public DefaultCategory(String n, String c)
+    public DefaultCategory(String n, String c, String icon)
     {
         this.name = n;
         this.context = c;
+        this.icon = icon;
     }
     @Override
     public String getName() {
@@ -46,6 +47,11 @@ public class DefaultCategory implements ItemCategory{
     @Override
     public Item getValue() {
         return this;
+    }
+
+    @Override
+    public String getIcon() {
+        return icon;
     }
     
 }

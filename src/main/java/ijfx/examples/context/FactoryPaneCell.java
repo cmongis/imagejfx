@@ -19,21 +19,26 @@
  */
 package ijfx.examples.context;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import mongis.utils.panecell.PaneIconCell;
+import mongis.utils.panecell.PaneLabelCell;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class FactoryPaneIconCell {
+public class FactoryPaneCell {
 
-    public static PaneIconCell generate(ItemCategory itemCategory) {
-        PaneIconCell<ItemCategory> paneIconCell = new PaneIconCell();
-        paneIconCell.setTitleFactory(f -> f.getName());
-        paneIconCell.setLoadImageOnlyWhenVisible(false);
-        paneIconCell.setItem(itemCategory);
+    public static PaneLabelCell generate(ItemCategory itemCategory) {
+        
+        PaneLabelCell<ItemCategory> paneLabelCell = new PaneLabelCell();
+        paneLabelCell.setIcon(FontAwesomeIcon.valueOf(itemCategory.getIcon()));
+        paneLabelCell.setTitleFactory(f -> f.getName());
+        paneLabelCell.setLoadImageOnlyWhenVisible(false);
+        paneLabelCell.setItem(itemCategory);
 
-        return paneIconCell;
+        return paneLabelCell;
     }
 
     public static PaneIconCell generate(ItemWidget itemWidget) {

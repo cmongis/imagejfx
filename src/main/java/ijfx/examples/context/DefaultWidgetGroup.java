@@ -27,7 +27,7 @@ public class DefaultWidgetGroup implements WidgetGroup {
     private ItemWidget[] items;
     private String name;
     private String context;
-
+    private String icon;
     public DefaultWidgetGroup(ItemWidget[] items, String name, String context) {
         this.items = items;
         this.name = name;
@@ -49,6 +49,11 @@ public class DefaultWidgetGroup implements WidgetGroup {
     @Override
     public String getContext() {
         return context;
+    }
+
+    @Override
+    public String getIcon() {
+        return icon;
     }
     
 }

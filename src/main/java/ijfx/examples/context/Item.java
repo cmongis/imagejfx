@@ -26,4 +26,5 @@ package ijfx.examples.context;
 public interface Item {
     public String getContext();
     public Item getValue();
+    public String getIcon();
 }

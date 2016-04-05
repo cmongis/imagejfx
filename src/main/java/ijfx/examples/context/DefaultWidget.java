@@ -79,6 +79,11 @@ public Parameters parameters;
     public void removeSpaceContext() {
         this.context = this.context.replaceAll("\\s", "+");
     }
+
+    @Override
+    public Item getValue() {
+        return this;
+    }
     
     
 }

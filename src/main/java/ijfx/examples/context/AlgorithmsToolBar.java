@@ -20,98 +20,83 @@
 package ijfx.examples.context;
 
 import ijfx.service.uicontext.UiContextService;
+import ijfx.service.uiplugin.UiPluginService;
+import ijfx.ui.UiConfiguration;
+import ijfx.ui.UiPlugin;
 import ijfx.ui.context.PaneContextualView;
-import ijfx.ui.main.ImageJFX;
-import ijfx.ui.plugin.DebugButton;
-import javafx.application.Application;
+import ijfx.ui.main.Localization;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 import mongis.utils.panecell.PaneIconCell;
-import net.imagej.ImageJ;
+import mongis.utils.panecell.PaneLabelCell;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.plugin.PluginService;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class ToolBarBuilder2 extends Application {
-
-    public static ImageJ imageJ = new ImageJ();
+@Plugin(type = UiPlugin.class)
+@UiConfiguration(id = "debdfsfsssdug-button", context = "imagej", order = 13.0, localization = Localization.TOP_TOOLBAR)
+public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
 
     @Parameter
+    Context context;
+
+    @Parameter
+    UiPluginService loaderService;
+    @Parameter
+    PluginService pluginService;
+    @Parameter
     UiContextService contextService;
-    private FlowPane flowPane;
     private HBox fakeToolBar;
-    private BorderPane borderPane;
+    private FlowPane flowPane;
     private PopOver popOver;
-    private HBox toolbarTest;
     private JsonReader jsonReader;
     private PaneContextualView contextualView;
-    private FlowPane f;
 
-    public ToolBarBuilder2() {
+    public AlgorithmsToolBar() {
+        super();
+        fakeToolBar = new HBox();
+        this.setTop(fakeToolBar);
 
     }
 
-    public void init(Context context) {
-        f = new FlowPane();
-        context.inject(this);
+    @Override
+    public Node getUiElement() {
+        return this;
+    }
+
+    @Override
+    public UiPlugin init() {
+//                context.inject(this);
+
+        createToolBar(fakeToolBar);
+
+        return this;
+    }
+
+    private void createToolBar(HBox hbox) {
         jsonReader = new JsonReader();
         jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/myJson.json");
         jsonReader.separate();
-        borderPane = new BorderPane();
         flowPane = new FlowPane();
-        fakeToolBar = new HBox();
-        toolbarTest = new HBox();
         popOver = new PopOver();
-        flowPane.setPadding(new Insets(10,10,10,10));
+        flowPane.setPadding(new Insets(10, 10, 10, 10));
         contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
-        generateItems(jsonReader, fakeToolBar, contextualView);
-
-        //Just for test, has to be removed after
-        TextField textField = new TextField();
-        textField.promptTextProperty();
-        textField.setPromptText("Enter Context");
-        Button validateContext = new Button("Validate context");
-        validateContext.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (e) -> {
-            contextService.enter(textField.getText());
-
-        });
-        MenuButton debugButton = new DebugButton();
-        Button removeContext = new Button("Remove All context");
-        removeContext.addEventFilter(MouseEvent.MOUSE_CLICKED, (e) -> {
-            String[] toDelete = contextService.getActualContextListAsString().split(" ");
-            for (String toDelete1 : toDelete) {
-                contextService.leave(toDelete1);
-            }
-        });
-        
-        toolbarTest.getChildren().addAll(textField, validateContext, removeContext, debugButton);
-        borderPane.setTop(fakeToolBar);
-        Rectangle c = new Rectangle();
-        c.widthProperty().bind(borderPane.widthProperty());
-        c.setHeight(100);
-        c.setFill(Color.RED);
-        borderPane.setCenter(c);
-        borderPane.setBottom(toolbarTest);
-        contextService.enter("always image-open multi-z");
-        contextService.update();
-
+        generateItems(jsonReader, hbox, contextualView);
+        System.out.println("ijfx.examples.context.AlgorithmsToolBar.createToolBar()");
     }
 
     /**
@@ -139,10 +124,10 @@ public class ToolBarBuilder2 extends Application {
      * @param owner
      */
     private void setPopOver(Pane pane, Node owner) {
-        popOver.setCornerRadius(0);       
-        popOver.minWidthProperty().bind(borderPane.getScene().widthProperty());
-        popOver.setWidth(borderPane.getScene().widthProperty().getValue());
-        popOver.maxWidthProperty().bind(borderPane.getScene().widthProperty());
+        popOver.setCornerRadius(0);
+        popOver.minWidthProperty().bind(this.getScene().widthProperty());
+        popOver.setWidth(this.getScene().widthProperty().getValue());
+        popOver.maxWidthProperty().bind(this.getScene().widthProperty());
         pane.setMinWidth(popOver.minWidthProperty().getValue());
         pane.setMaxWidth(popOver.minWidthProperty().getValue());
         popOver.setDetached(false);
@@ -153,8 +138,8 @@ public class ToolBarBuilder2 extends Application {
         popOver.setOpacity(1.0);
         popOver.setArrowSize(0);
         popOver.show(owner);
-        popOver.setAnchorX(borderPane.localToScreen(borderPane.getBoundsInParent()).getMinX()+1);
-        popOver.setAnchorY(borderPane.localToScreen(borderPane.getTop().getBoundsInParent()).getMaxY()-1);
+        popOver.setAnchorX(this.localToScreen(this.getBoundsInParent()).getMinX() + 1);
+        popOver.setAnchorY(this.localToScreen(this.getTop().getBoundsInParent()).getMaxY() - 1);
         popOver.getStyleClass().clear();
         popOver.getStyleClass().add("popoverToolBar");
 
@@ -165,7 +150,7 @@ public class ToolBarBuilder2 extends Application {
      *
      * @param paneIconCell
      */
-    public void setMouseAction(PaneIconCell<ItemCategory> paneIconCell) {
+    public void setMouseAction(PaneLabelCell<ItemCategory> paneIconCell) {
         paneIconCell.addEventFilter(MouseEvent.MOUSE_RELEASED, (ee)
                 -> {
             System.out.println(popOver.getY());
@@ -175,16 +160,17 @@ public class ToolBarBuilder2 extends Application {
         });
         paneIconCell.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
             contextService.enter(paneIconCell.getItem().getName());
-            contextService.update();
+            Platform.runLater(() ->{
+                contextService.updateController(contextualView);
 
             if (!flowPane.getChildren().isEmpty()) {
 
                 popOver.setOpacity(0);
                 createPopOver(flowPane, paneIconCell);
-            } 
-            else if (flowPane.getChildren().isEmpty()) {
+            } else if (flowPane.getChildren().isEmpty()) {
                 popOver.setOpacity(0);
             }
+            });
 
         });
     }
@@ -199,10 +185,10 @@ public class ToolBarBuilder2 extends Application {
      */
     public void generateItems(JsonReader jsonReader, HBox fakeToolBar, PaneContextualView contextualView) {
         jsonReader.getCategoryList().stream().forEach((e) -> {
-            PaneIconCell<ItemCategory> paneIconCell = FactoryPaneCell.generate(e);
-            paneIconCell.setId(((ItemCategory) paneIconCell.getItem()).getName());
-            fakeToolBar.getChildren().add(paneIconCell);
-            setMouseAction(paneIconCell);
+            PaneLabelCell<ItemCategory> paneLabelCell = FactoryPaneCell.generate(e);
+            paneLabelCell.setId(((ItemCategory) paneLabelCell.getItem()).getName());
+            fakeToolBar.getChildren().add(paneLabelCell);
+            setMouseAction(paneLabelCell);
         });
 
         jsonReader.getWidgetList().stream().forEach((e) -> {
@@ -218,22 +204,4 @@ public class ToolBarBuilder2 extends Application {
         });
     }
 
-    public BorderPane getLayout() {
-        return borderPane;
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-
-        init(imageJ.getContext());
-        Scene scene = new Scene(getLayout());
-        scene.getStylesheets().add(ImageJFX.class.getResource(("flatterfx.css")).toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-    }
-
-    public static void main(String... args) {
-        launch(args);
-    }
 }

@@ -24,6 +24,7 @@ import ijfx.ui.context.PaneContextualView;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.plugin.DebugButton;
 import javafx.application.Application;
+import static javafx.application.Application.launch;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -44,6 +45,7 @@ import net.imagej.ImageJ;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
+import static javafx.application.Application.launch;
 
 /**
  *
@@ -190,24 +192,23 @@ public class ToolBarBuilder extends Application {
     }
 
     /**
-     * Generate ItemCategory and ItemWidget with FactoryPaneIconCell
+     * Generate ItemCategory and ItemWidget with FactoryPaneCell
      *
-     * @see ijfx.examples.context.FactoryPaneIconCell
+     * @see ijfx.examples.context.FactoryPaneCell
      * @param jsonReader
      * @param fakeToolBar
      * @param contextualView
      */
     public void generateItems(JsonReader jsonReader, HBox fakeToolBar, PaneContextualView contextualView) {
         jsonReader.getCategoryList().stream().forEach((e) -> {
-            PaneIconCell<ItemCategory> paneIconCell = FactoryPaneIconCell.generate(e);
+            PaneIconCell<ItemCategory> paneIconCell = FactoryPaneCell.generate(e);
             paneIconCell.setId(((ItemCategory) paneIconCell.getItem()).getName());
             fakeToolBar.getChildren().add(paneIconCell);
             setMouseAction(paneIconCell);
-
         });
 
         jsonReader.getWidgetList().stream().forEach((e) -> {
-            PaneIconCell<ItemWidget> paneIconCell = FactoryPaneIconCell.generate(e);
+            PaneIconCell<ItemWidget> paneIconCell = FactoryPaneCell.generate(e);
             String itemContext = ((ItemWidget) paneIconCell.getItem()).getContext();
             paneIconCell.setId(((ItemWidget) paneIconCell.getItem()).getLabel());
             contextualView.registerNode(paneIconCell, itemContext);
@@ -226,7 +227,7 @@ public class ToolBarBuilder extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        init(imageJ.getContext());
+        //init(imageJ.getContext());
         Scene scene = new Scene(getLayout());
         scene.getStylesheets().add(ImageJFX.class.getResource(("flatterfx.css")).toExternalForm());
         primaryStage.setScene(scene);

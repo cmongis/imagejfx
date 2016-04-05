@@ -26,12 +26,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  * @author Tuan anh TRINH
  */
 @JsonDeserialize(as=DefaultWidget.class)
-public interface ItemWidget {
+public interface ItemWidget extends Item{
     public String getType();
     public String getAction();
     public String getLabel();
-    public String getIcon();
-    public String getContext();
     public void addContext(String s);
     public void removeSpaceContext();
     public Parameters getParameters();

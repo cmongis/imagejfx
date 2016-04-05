@@ -27,4 +27,5 @@ public interface WidgetGroup {
     public ItemWidget[] getItems();
     public String getName();
     public String getContext();
+    public String getIcon();
 }

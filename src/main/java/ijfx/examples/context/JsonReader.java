@@ -56,7 +56,7 @@ public class JsonReader {
     {
         for (WidgetGroup widgetGroup : widgetGroupList)
         {
-            ItemCategory itemCategory = new DefaultCategory(widgetGroup.getName(), widgetGroup.getContext());
+            ItemCategory itemCategory = new DefaultCategory(widgetGroup.getName(), widgetGroup.getContext(), widgetGroup.getIcon());
             categoryList.add(itemCategory);
             for (ItemWidget itemwidget: widgetGroup.getItems())
             {
