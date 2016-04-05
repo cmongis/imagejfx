@@ -325,13 +325,17 @@ private setFileList(List<File> fileToDisplay) {
 
 ~~~
 	
-This class is pretty convenient when developing user-interfaces. It allows you to keep the logic in a separate method while giving you the possibility to choose what is executed in the FX Thread and what is executed in a separate thread.
+This class is pretty convenient when developing user-interfaces. It allows you to keep long processes (a simple input/output) in a separate thread use the result to update the Ui in the FX thread.
 
+### FileButtonBinding
 
-# Personal Database and Cards
+Transform a normal button into a button that opens a directory.
 
-The Personal Database Dashboar provides a card system which allows you to run quick quality check of the database and propose easy and quick solution to the user.
+## Activities
 
-A card is a simple element composed of a JavaFX Node to be shown and a **Task** which will be executed each time the project is changed or updated. The **Task** will be executed in a separate thread and should be used to do quality check or any statistic gathering on the PDB.
+ImageJFX uses an activity based user interface. While, UiPlugins can popup on the sides, activities are set in the middle of the screen. They are used as main display.
 
-In this case, we will do a card that check if all the files specified in the Personal Database actually exist. Then we will propose a solution for the user.
+Activities are not context dependant but will automatically generate their own context so the UiPlugins can appear along with their activity.
+
+### Creating an activity
+

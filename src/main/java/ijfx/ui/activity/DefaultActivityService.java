@@ -68,6 +68,8 @@ public class DefaultActivityService extends AbstractService implements ActivityS
 
     Logger logger = ImageJFX.getLogger();
 
+    boolean debug = true;
+
     @Override
     public Collection<Activity> getActivityList() {
         return activityMap.values();
@@ -79,20 +81,20 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     }
 
     @Override
-  
+
     public void openByName(String activityId) {
-        
+
         open(getActivityByName(activityId));
     }
-    
-    @AngularMethod(sync = true, description="displays an activity")
+
+    @AngularMethod(sync = true, description = "displays an activity")
     public void switchToActivity(String activityId) {
         openByName(activityId);
     }
 
     @Override
     public void openByType(Class<? extends Activity> activityClass) {
-        
+
         open(getActivity(activityClass));
     }
 
@@ -102,16 +104,16 @@ public class DefaultActivityService extends AbstractService implements ActivityS
             logger.severe("Passing NULL as activity parameter !");
             return null;
         }
-        if (activityMap.containsKey(activityClass.getName()) == false) {
+        if (activityMap.containsKey(activityClass.getName()) == false || debug) {
             try {
                 logger.info("Loading activity : " + activityClass.getName());
                 PluginInfo<SciJavaPlugin> plugin;
-               
-               plugin = pluginService.getPlugin(activityClass.getName());
-               
+
+                plugin = pluginService.getPlugin(activityClass.getName());
+
                 logger.info("Activity loaded");
                 Activity activity = (Activity) plugin.createInstance();
-                
+
                 context.inject(activity);
                 activityMap.put(activity.getClass().getName(), activity);
                 activityMapById.put(activity.getActivityId(), activity);
@@ -119,8 +121,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error when initializing activity", ex);
             }
-        }
-        else {
+        } else {
             System.out.println("it exists !");
         }
         return activityMap.get(activityClass.getName());
@@ -130,7 +131,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     public Activity getActivityByName(String activityId) {
         logger.info(activityId);
         // checking if an activity with this has already been around
-        if (activityMapById.containsKey(activityId) == false) {
+        if (activityMapById.containsKey(activityId) == false || debug) {
             List<PluginInfo<Activity>> pluginsOfType = pluginService.getPluginsOfType(Activity.class);
 
             for (PluginInfo<Activity> info : pluginsOfType) {
@@ -162,10 +163,11 @@ public class DefaultActivityService extends AbstractService implements ActivityS
 
     @Override
     public void open(Activity activity) {
-        
-      
+
         // adding the activity to the back stack
-       if(activity != null) backStack.add(activity);
+        if (activity != null) {
+            backStack.add(activity);
+        }
         setCurrentActivity(activity);
     }
 
@@ -193,7 +195,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     }
 
     private void setCurrentActivity(Activity activity) {
-       
+
         // handling context changing
         if (getCurrentActivity() != null) {
             uiContextService.leave(getCurrentActivity().getActivityId());
@@ -203,7 +205,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
             logger.warning("The Current activity is null");
             return;
         }
-         System.out.println("setting the current activity");
+        System.out.println("setting the current activity");
         currentActivity = activity;
         uiContextService.enter(activity.getActivityId());
         uiContextService.update();

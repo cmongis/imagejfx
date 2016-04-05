@@ -29,6 +29,7 @@ public class Localization {
     public static final String BOTTOM_LEFT = "bottomLeftHBox";
     public static final String TOP_LEFT = "topLeftHBox";
     public static final String TOP_CENTER = "topCenterHBox";
+    public static final String TOP_TOOLBAR = "topToolBarVBox";
     public static final String RIGHT = "rightVBox";
     public static final String BOTTOM_CENTER = "bottomCenterHBox";
     public static final String TOP_RIGHT = "topRightHBox";

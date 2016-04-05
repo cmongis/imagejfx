@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import ijfx.service.IjfxService;
 import java.io.File;
 import java.util.List;
 
@@ -26,14 +27,14 @@ import java.util.List;
  *
  * @author cyril
  */
-public interface FolderManagerService {
+public interface FolderManagerService extends IjfxService{
     
-    public void addFolder(File file);
+    public Folder addFolder(File file);
     
     public List<Folder> getFolderList();
     
     public Folder getCurrentFolder();
     
-    public void setCurrentFolder();
+    public void setCurrentFolder(Folder folder);
     
 }

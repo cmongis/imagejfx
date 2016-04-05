@@ -98,7 +98,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
-import ijfx.ui.explorer.FileFilterActivity;
+import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.project_manager.ProjectManager;
 import mongis.utils.AnimationChain;
 
@@ -141,11 +141,14 @@ public class MainWindowController implements Initializable {
     private HBox bottomCenterHBox;
 
     @FXML
-    AnchorPane mainAnchorPane;
+    private AnchorPane mainAnchorPane;
 
     @FXML
-    BorderPane mainBorderPane;
+   private BorderPane mainBorderPane;
 
+    @FXML
+    private VBox topToolBarVBox;
+    
     //@FXML
     //private StackPane centerStackPane;
     @FXML
@@ -409,6 +412,9 @@ public class MainWindowController implements Initializable {
                 .setAnimationOnShow(Animations.APPEARS_DOWN)
                 .setAnimationOnHide(Animations.DISAPPEARS_DOWN);
 
+        registerPaneCtrl(topToolBarVBox)
+                .setAnimationOnShow(Animations.FADEIN)
+                .setAnimationOnHide(Animations.FADEOUT);
     }
 
     public void populateWidgets() {
@@ -767,7 +773,7 @@ public class MainWindowController implements Initializable {
 
         sideMenuMainTopVBox.getChildren().addAll(
                 new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", ImageJContainer.class).setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", FileBatchProcessorPanel.class).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", ProjectManager.class).setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR)
-                ,new SideMenuButton("Explore",FileFilterActivity.class).setIcon(FontAwesomeIcon.COMPASS)
+                ,new SideMenuButton("Explore",ExplorerActivity.class).setIcon(FontAwesomeIcon.COMPASS)
         );
 
     }

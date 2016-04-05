@@ -28,12 +28,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import mongis.utils.TextFileUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.CanReadFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -198,6 +199,11 @@ public class DefaultImageLoaderService extends AbstractService implements ImageL
             }
         };
         return task;
+    }
+
+    @Override
+    public Collection<File> getAllImagesFromDirectory(File file) {
+        return FileUtils.listFiles(file, getSupportedExtensions(), true);
     }
 
 }

@@ -20,13 +20,14 @@
 package ijfx.ui.explorer.event;
 
 import ijfx.ui.IjfxEvent;
-import ijfx.ui.explorer.Iconazable;
-import java.util.List;
+import ijfx.ui.explorer.Folder;
 
 /**
  *
  * @author cyril
  */
-public class IconazableDisplayChanged extends IjfxEvent<List<? extends Iconazable>>{
+public class FolderUpdatedEvent extends IjfxEvent<Folder>{
+    
+    
     
 }

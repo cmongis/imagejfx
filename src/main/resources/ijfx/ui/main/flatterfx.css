@@ -1043,6 +1043,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-background-color:-bg-light;
     -fx-stroke:derive(-bg-light,20%)!important;
 }
+
 .range-slider .low-thumb, .range-slider .high-thumb, .slider .thumb {
     -fx-background-color:-flatter-primary;
 }
@@ -1711,4 +1712,16 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .image-icon-item .subtitle-label {
     -fx-text-fill:-txt-normal;
     -fx-font-size:0.8em;
+}
+.label.normal {
+    -fx-text-fill:-txt-normal;
+}
+.selectable{
+    
+}
+.selectable:hover {
+    -fx-background-color:-bg-light;
+}
+.selectable:active {
+    -fx-background-color:-bg-light;
 }

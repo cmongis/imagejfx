@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="600.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane maxHeight="1.7976931348623157E308" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <HBox prefHeight="40.0" BorderPane.alignment="CENTER">
+               <styleClass>
+                  <String fx:value="bg-darker" />
+                  <String fx:value="explorer" />
+                  <String fx:value="hbox" />
+               </styleClass>
+            </HBox>
+         </top>
+      </BorderPane>
+      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0" />
+      <ToolBar layoutX="400.0" layoutY="-26.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <items>
+            <FontAwesomeIconView glyphName="FOLDER" styleClass="h4" />
+            <Label text="Folder">
+               <styleClass>
+                  <String fx:value="h4" />
+                  <String fx:value="dark-bg" />
+               </styleClass>
+            </Label>
+            <Rectangle fill="#1f96ff00" height="10.0" smooth="false" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="20.0" />
+            <Button mnemonicParsing="false" onAction="#addFolder">
+               <graphic>
+                  <FontAwesomeIconView glyphName="PLUS" styleClass="h4" />
+               </graphic>
+            </Button>
+            <Rectangle fill="#1f96ff00" height="10.0" smooth="false" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="150.0" />
+            <TextField fx:id="filterTextField" maxWidth="1.7976931348623157E308" promptText="Quick filter..." />
+            <ToggleButton fx:id="filterToggleButton" mnemonicParsing="false">
+               <graphic>
+                  <FontAwesomeIconView glyphName="FILTER" styleClass="icon" />
+               </graphic>
+            </ToggleButton>
+         </items>
+      </ToolBar>
+      <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0" />
+      <VBox fx:id="filterVBox" prefHeight="200.0" prefWidth="250.0" styleClass="bg-lighter" translateX="-250.0" translateZ="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
+         <children>
+            <Label fx:id="Filters" text="Label" />
+         </children>
+      </VBox>
+   </children>
+</fx:root>

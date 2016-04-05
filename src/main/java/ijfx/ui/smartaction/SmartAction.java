@@ -17,25 +17,22 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.imagedb;
+package ijfx.ui.smartaction;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import ijfx.core.metadata.MetaDataOwner;
-import ijfx.core.metadata.MetaDataSet;
-import ijfx.ui.explorer.Iconazable;
-import java.io.File;
-import java.util.Date;
+import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
  * @author cyril
  */
-@JsonSerialize(as = DefaultImageRecord.class)
-public interface ImageRecord extends MetaDataOwner{
-    File getFile();
-  
-    public RecordStatus getLastStatus();
-    public Date getLastStatusChange();
+public interface SmartAction<T> extends SciJavaPlugin{
     
+    boolean check(T t);
+    
+    String getActionQuestion();
+    
+    String getActionButtonLabel();
+    
+    void apply(T t);
     
 }
