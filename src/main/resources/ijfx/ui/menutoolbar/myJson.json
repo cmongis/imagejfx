@@ -2,6 +2,7 @@
   {
     "name":"Colors"
     ,"context":"image-open"
+    ,"icon":"BITCOIN"
     ,"items":[
         {
           "type":"Command"
@@ -24,6 +25,7 @@
   ,{
     "name":"Stacks"
     ,"context":"image-open multi-z"
+    ,"icon":"BITCOIN"
     ,"items":[
         {
           "type":"Command"
@@ -43,6 +45,7 @@
   },
   {"name":"Filters"
   ,"context":"image-open"
+  ,"icon":"BITCOIN"
   ,"items":[
         {
           "type":"Command"
