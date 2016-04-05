@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.save;
+package ijfx.ui.messageBox;
 
 /**
  *
@@ -26,5 +26,6 @@ package ijfx.ui.save;
 public enum MessageType {
     SUCCESS,
     WARNING,
-    DANGER    
+    DANGER,
+    NULL
 }

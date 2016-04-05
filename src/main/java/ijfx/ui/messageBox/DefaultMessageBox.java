@@ -17,20 +17,25 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.save;
+package ijfx.ui.messageBox;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.PauseTransition;
+import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 /**
  *
@@ -43,30 +48,55 @@ public class DefaultMessageBox extends Pane implements MessageBox{
     
     private Timeline timeline;
     
-    private String GREEN = "#00ff00";
-    private String ORANGE = "#ff6600";
-    private String RED = "#ff0000";
+    private final String GREEN = "#00ff00";
+    private final String ORANGE = "#ff6600";
+    private final String RED = "#ff0000";
     
-    private Double MAX_HEIGHT = 100.0;
+    private final double MAX_HEIGHT = 100.0;
+    
+    private final double ANIM_DURATION = 200.0;
+    private final int CYCLE_COUNT = 2;
+    private final boolean AUTO_REVERSE = true;
     
     public DefaultMessageBox(){
+        
+        message = new SimpleStringProperty();
+        type = new SimpleObjectProperty();
         
         messageProperty().setValue(null);
         typeProperty().setValue(null);
         
         this.maxHeightProperty().setValue(MAX_HEIGHT);
         
-        DoubleBinding sizeBinding = Bindings.createDoubleBinding(() -> {
-           return setHeight();
-        }, messageProperty());
         
-        this.prefHeightProperty().bind(sizeBinding);
+        messageProperty().addListener(this::playTimeline);
         
         typeProperty().addListener(this::setBgColor);
         
+        timeline = new Timeline();
+        timeline.setCycleCount(CYCLE_COUNT);
+        timeline.setAutoReverse(AUTO_REVERSE);
         
+        KeyValue kv = new KeyValue(this.prefHeightProperty(), setBoxHeight());
+        KeyFrame kf = new KeyFrame(Duration.millis(ANIM_DURATION), "end", (e) ->{
+            timeline.pause();
+            timeline.jumpTo(Duration.millis(ANIM_DURATION));
+//            timeline.jumpTo(timeline.getCuePoints().get("end"));
+            PauseTransition pauseTransition = new PauseTransition(Duration.millis(5000.0));
+            pauseTransition.setOnFinished((t)->{
+                timeline.play();
+            });
+            pauseTransition.playFromStart();
+        }, kv);
+        
+        timeline.getKeyFrames().add(kf);        
     }
     
+    
+    @Override
+    public Node getContent(){
+        return this;
+    }
     
     @Override
     public Property<String> messageProperty(){
@@ -79,11 +109,9 @@ public class DefaultMessageBox extends Pane implements MessageBox{
         return this.type;
     }
     
-    
-    public double setHeight(){
-        double newHeight = 0.0;
-        
-        return newHeight;
+
+    public void playTimeline(Observable obs){
+        timeline.playFromStart();
     }
     
     
@@ -91,13 +119,19 @@ public class DefaultMessageBox extends Pane implements MessageBox{
         
         String bgColor = null;
         
-        if (typeProperty().equals(MessageType.SUCCESS))
+        if (typeProperty().getValue().equals(MessageType.SUCCESS))
             bgColor = GREEN;
-        else if (typeProperty().equals(MessageType.WARNING))
+        else if (typeProperty().getValue().equals(MessageType.WARNING))
             bgColor = ORANGE;
-        else if (typeProperty().equals(MessageType.DANGER))
+        else if (typeProperty().getValue().equals(MessageType.DANGER))
             bgColor = RED;
         
         this.setBackground(new Background(new BackgroundFill(Color.web(bgColor), CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+    
+    
+    public double setBoxHeight(){
+        double newHeight = 70.0;
+        return newHeight;
     }
 }

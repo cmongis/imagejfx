@@ -17,13 +17,19 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.save;
+package ijfx.ui.messageBox;
+
+import javafx.beans.property.Property;
+import javafx.scene.Node;
 
 /**
  *
  * @author Pierre BONNEAU
  */
 public interface MessageBox{
-    public void setMessage(String message);
+    
+    public Node getContent();
+    public Property<String> messageProperty();
+    public Property<MessageType> typeProperty();
     
 }
