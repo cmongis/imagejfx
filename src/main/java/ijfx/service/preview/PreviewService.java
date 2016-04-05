@@ -19,10 +19,19 @@
  */
 package ijfx.service.preview;
 
+import io.scif.gui.AWTImageTools;
+import java.awt.image.BufferedImage;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
+import net.imagej.Position;
+import net.imagej.axis.CalibratedAxis;
+import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import net.imglib2.RandomAccess;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -37,13 +46,40 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     @Parameter
     ImageDisplayService imageDisplayService;
-    
-    public Image getPreview()
-    {
+
+//    @Parameter
+//    ImageDisplay imageDisplay;
+    public PreviewService() {
+    }
+
+    public Image getImageDisplay() {
+        
+        Position activePosition = imageDisplayService.getActivePosition();
         Dataset dataset = imageDisplayService.getActiveDataset();
-        Image image;
-        image = (Image) imageDisplayService.getActiveDatasetView().getData().getPlane(0);
-        return image;
+        long[] dimension = new long[dataset.numDimensions()-2];
+        activePosition.localize(dimension);
+        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
+        long[] position = new long[dataset.numDimensions()];
+        position[0]=0;
+        position[1]=0;
+        System.arraycopy(dimension, 0, position, 2, dimension.length);
+        randomAccess.setPosition(position);
+        int width =(int) dataset.max(0);
+        int height = (int)dataset.max(1);
+        
+        double [][] arrayImage = new double[width][height];
+        for (int x = 0; x != width; x++) {
+            randomAccess.setPosition(x,0);                
+            for (int y = 0; y != height; y++) {
+                randomAccess.setPosition(y,1);
+                arrayImage[x][y] = randomAccess.get().getRealDouble();
+            }
+
+        }
+        WritableImage wi = new WritableImage(width, height);
+        BufferedImage bufferedImage = AWTImageTools.makeImage(arrayImage, width, height);
+        SwingFXUtils.toFXImage(bufferedImage,wi);
+        return wi;
     }
 
 }
