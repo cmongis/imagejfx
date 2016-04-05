@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root styleClass="image-icon-item" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+
+   <bottom>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="titleLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="title-label" text="Some title" textAlignment="CENTER">
+               <graphic>
+                  <FontAwesomeIconView fx:id="titleIconView" styleClass="subtitle-label" />
+               </graphic>
+            </Label>
+            <Label fx:id="subtitleLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="subtitle-label" text="Label" />
+         </children>
+      </VBox>
+   </bottom>
+</fx:root>
