@@ -19,6 +19,7 @@
  */
 package ijfx.examples.context;
 
+import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.UiConfiguration;
@@ -37,6 +38,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import mongis.utils.panecell.PaneIconCell;
 import mongis.utils.panecell.PaneLabelCell;
+import net.imagej.display.ImageDisplayService;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
@@ -51,6 +53,8 @@ import org.scijava.plugin.PluginService;
 @UiConfiguration(id = "debdfsfsssdug-button", context = "imagej", order = 13.0, localization = Localization.TOP_TOOLBAR)
 public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
 
+    @Parameter
+    PreviewService previewService;
     @Parameter
     Context context;
 
@@ -148,25 +152,24 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
     /**
      * Set action when user hoovers PaneIconCell
      *
-     * @param paneIconCell
+     * @param paneLabelCell
      */
-    public void setMouseAction(PaneLabelCell<ItemCategory> paneIconCell) {
-        paneIconCell.addEventFilter(MouseEvent.MOUSE_RELEASED, (ee)
+    public void setMouseAction(PaneLabelCell<ItemCategory> paneLabelCell) {
+        paneLabelCell.addEventFilter(MouseEvent.MOUSE_RELEASED, (ee)
                 -> {
             System.out.println(popOver.getY());
         });
-        paneIconCell.addEventFilter(MouseEvent.MOUSE_EXITED, (ee) -> {
-            contextService.leave(paneIconCell.getItem().getName());
+        paneLabelCell.addEventFilter(MouseEvent.MOUSE_EXITED, (ee) -> {
+            contextService.leave(paneLabelCell.getItem().getName());
         });
-        paneIconCell.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
-            contextService.enter(paneIconCell.getItem().getName());
+        paneLabelCell.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
+            contextService.enter(paneLabelCell.getItem().getName());
             Platform.runLater(() ->{
                 contextService.updateController(contextualView);
 
             if (!flowPane.getChildren().isEmpty()) {
-
                 popOver.setOpacity(0);
-                createPopOver(flowPane, paneIconCell);
+                createPopOver(flowPane, paneLabelCell);
             } else if (flowPane.getChildren().isEmpty()) {
                 popOver.setOpacity(0);
             }
@@ -192,7 +195,7 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
         });
 
         jsonReader.getWidgetList().stream().forEach((e) -> {
-            PaneIconCell<ItemWidget> paneIconCell = FactoryPaneCell.generate(e);
+            PaneIconCell<ItemWidget> paneIconCell = FactoryPaneCell.generate(e, previewService);
             String itemContext = ((ItemWidget) paneIconCell.getItem()).getContext();
             paneIconCell.setId(((ItemWidget) paneIconCell.getItem()).getLabel());
             contextualView.registerNode(paneIconCell, itemContext);
