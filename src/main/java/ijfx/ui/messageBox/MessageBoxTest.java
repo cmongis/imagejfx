@@ -22,9 +22,6 @@ package ijfx.ui.messageBox;
 import java.io.IOException;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.binding.StringBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -55,6 +52,7 @@ public class MessageBoxTest extends Application{
         Scene scene = new Scene((Parent) mbox);
         
         primaryStage.setScene(scene);
+        primaryStage.resizableProperty().setValue(Boolean.FALSE);
         primaryStage.show();
     }
     
@@ -76,6 +74,9 @@ public class MessageBoxTest extends Application{
         @FXML
         private Button submitBtn;
         
+        @FXML
+        private Button clearBtn;
+        
         
         private ToggleGroup toggleGroup;
         
@@ -90,6 +91,8 @@ public class MessageBoxTest extends Application{
             loader.load();
             
             ToggleGroup toggleGroup = new ToggleGroup();
+            
+            
         
             successBtn.setToggleGroup(toggleGroup);
             warningBtn.setToggleGroup(toggleGroup);
@@ -114,7 +117,10 @@ public class MessageBoxTest extends Application{
                 messageBox.typeProperty().setValue(newType);
                 messageBox.messageProperty().setValue(textArea.getText());
             });
-
+            
+            clearBtn.onMouseClickedProperty().setValue((e) -> {
+                messageBox.messageProperty().setValue(null);
+            });
             
             this.getChildren().add(messageBox.getContent());
         }
