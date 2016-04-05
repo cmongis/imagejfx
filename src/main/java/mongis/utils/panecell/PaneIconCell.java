@@ -41,6 +41,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
+import net.imagej.display.ImageDisplayService;
+import org.scijava.plugin.Parameter;
 
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons with a text and subtext under.
@@ -330,7 +332,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
     
     
-    
+   
     
     
     
