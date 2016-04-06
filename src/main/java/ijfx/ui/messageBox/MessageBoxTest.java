@@ -32,6 +32,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import static javafx.application.Application.launch;
+import static javafx.application.Application.launch;
+import static javafx.application.Application.launch;
 
 /**
  *
@@ -52,7 +55,7 @@ public class MessageBoxTest extends Application{
         Scene scene = new Scene((Parent) mbox);
         
         primaryStage.setScene(scene);
-        primaryStage.resizableProperty().setValue(Boolean.FALSE);
+//        primaryStage.resizableProperty().setValue(Boolean.FALSE);
         primaryStage.show();
     }
     
