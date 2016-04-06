@@ -17,22 +17,38 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package mongis.utils.properties;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.scene.Node;
+import java.util.function.BiConsumer;
+import javafx.util.Callback;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public class ServiceProperty<ITEM,VALUE> extends SimpleUpdatablePoperty<VALUE>{
+    
+    final private ITEM item;
+    
+    final private BiConsumer<ITEM, VALUE> setter;
+    final private Callback<ITEM,VALUE> getter;
+
+    public ServiceProperty(ITEM item, BiConsumer<ITEM, VALUE> setter, Callback<ITEM, VALUE> getter) {
+        this.item = item;
+        this.setter = setter;
+        this.getter = getter;
+    }
     
     
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
+   
     
-    public BooleanProperty selectedProperty();
+    @Override
+    public VALUE get() {
+        return getter.call(item);
+    }
     
+    @Override
+    public void set(VALUE value) {
+        setter.accept(item, value);
+    }
 }

@@ -83,5 +83,11 @@ public class ImageRecordIconizer implements Explorable {
         
         return imageRecord.getMetaDataSet();
     }
+
+    public ImageRecord getImageRecord() {
+        return imageRecord;
+    }
+    
+    
     
 }

@@ -26,5 +26,6 @@ import ijfx.core.metadata.MetaDataOwner;
  * @author cyril
  */
 public interface Explorable extends Iconazable,MetaDataOwner{
-    
+     
+ 
 }

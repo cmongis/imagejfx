@@ -29,11 +29,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javafx.application.Platform;
+import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import javafx.css.PseudoClass;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import mercury.core.MercuryTimer;
+import mongis.utils.properties.ServiceProperty;
 
 /**
  * The PaneController takes care of filling a Pane with PaneCells. Like a
@@ -44,7 +51,7 @@ import mercury.core.MercuryTimer;
  *
  * @author Cyril MONGIS
  */
-public class PaneCellController<T> {
+public class PaneCellController<T extends Object> {
 
     ObservableList<T> items = FXCollections.observableArrayList();
 
@@ -56,7 +63,10 @@ public class PaneCellController<T> {
     Logger logger = ImageJFX.getLogger();
 
     Pane pane;
-
+    
+    ObservableSet<T> selectedItems = FXCollections.observableSet();
+        
+    
     public PaneCellController(Pane pane) {
         setPane(pane);
     }
@@ -179,13 +189,77 @@ public class PaneCellController<T> {
 
     }
     
+    PseudoClass SELECTED_PSEUDO_CLASS = new PseudoClass() {
+        private  final static String SELECTED = "selected";
+        @Override
+        public String getPseudoClassName() {
+            return SELECTED;
+        }
+    };
+    
     // creates a pane cell
     private PaneCell<T> createPaneCell() {
         try {
-            return cellFactory.call();
+            
+            PaneCell cell = cellFactory.call();
+           
+            return cell;
+            
         } catch (Exception ex) {
             Logger.getLogger(PaneCellController.class.getName()).log(Level.SEVERE, "Error when creating cell", ex);
         }
         return null;
+    }
+    
+    private class CellClickHandler implements EventHandler<MouseEvent> {
+
+        PaneCell<T> cell;
+        private final static long DOUBLE_CLICK_INTERVAL = 1000;
+        long lastClick;
+        
+        @Override
+        public void handle(MouseEvent event) {
+            
+            long now = System.currentTimeMillis();
+            
+            if(now - lastClick <= DOUBLE_CLICK_INTERVAL) {
+                
+            }
+            else {
+                setSelected(cell.getItem(), Boolean.TRUE);
+            }
+            
+        }
+    
+    }
+    
+    public Boolean isSelected(T item)  {
+        return selectedItems.contains(item);
+    }
+    
+    public void setSelected(T item, Boolean selection) {
+        if(selection)selectedItems.add(item);
+        else selectedItems.remove(item);
+        Platform.runLater(this::updateSelection);
+    }
+    
+    public void select(List<T> items) {
+        selectedItems.addAll(items);
+        Platform.runLater(this::updateSelection);
+    }
+    public void unselected(List<T> items) {
+        Platform.runLater(this::updateSelection);
+    }
+    
+    public Property<Boolean> getSelectedProperty(T item) {
+        return new ServiceProperty<>(item, this::setSelected, this::isSelected);
+    }
+    
+    public void updateSelection() {
+        itemControllerList.forEach(this::updateSelection);
+    }
+    
+    public void updateSelection(PaneCell<T> cell) {
+       cell.getContent().pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, isSelected(cell.getItem()));
     }
 }

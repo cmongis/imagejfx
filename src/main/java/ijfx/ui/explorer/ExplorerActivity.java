@@ -20,12 +20,14 @@
 package ijfx.ui.explorer;
 
 import ijfx.core.metadata.MetaDataOwner;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.explorer.cell.FolderListCellCtrl;
 import ijfx.ui.explorer.event.DisplayedListChanged;
 import ijfx.ui.explorer.event.FolderAddedEvent;
 import ijfx.ui.explorer.event.FolderDeletedEvent;
 import ijfx.ui.explorer.event.ExploredListChanged;
+import ijfx.ui.explorer.event.FolderUpdatedEvent;
 import ijfx.ui.explorer.view.IconView;
 import ijfx.ui.filter.DefaultMetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataFilterFactory;
@@ -56,9 +58,9 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
+import org.scijava.app.StatusService;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -79,30 +81,34 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     ToggleButton filterToggleButton;
 
-    
     @FXML
     TextField filterTextField;
 
-     @FXML
+    @FXML
     Accordion filterVBox;
-    
+
     @Parameter
     FolderManagerService folderManagerService;
 
     @Parameter
     ExplorerService explorerService;
 
-    
-   
-    
+    @Parameter
+    LoadingScreenService loadingScreenService;
+
+    @Parameter
+    StatusService statusService;
+
     ExplorerView view = new IconView();
+
+    List<Runnable> folderUpdateHandler = new ArrayList<>();
 
     public ExplorerActivity() {
         try {
             FXUtilities.injectFXML(this);
 
             contentBorderPane.setCenter(view.getNode());
-            folderListView.setCellFactory(listview -> new FolderListCell());
+            folderListView.setCellFactory(this::createFolderListCell);
             folderListView.getSelectionModel().selectedItemProperty().addListener(this::onFolderSelectionChanged);
 
             SideMenuBinding binding = new SideMenuBinding(filterVBox);
@@ -168,8 +174,6 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             view.setItem(explorable);
         }
 
-  
-
     }
 
     // returns true if the folder is not displayed yet
@@ -200,11 +204,17 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void onExploredItemListChanged(ExploredListChanged event) {
         Platform.runLater(this::updateFilters);
     }
-    
+
     @EventHandler
     public void onDisplayedItemListChanged(DisplayedListChanged event) {
         Platform.runLater(() -> updateUi(event.getObject()));
-        
+
+    }
+
+    @EventHandler
+    public void onFolderUpdated(FolderUpdatedEvent event) {
+        System.out.println("Folder updated !");
+        folderUpdateHandler.forEach(handler -> handler.run());
     }
 
     private class FolderListCell extends ListCell<Folder> {
@@ -230,24 +240,31 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             }
         }
 
+        public void update() {
+            System.out.println("updating cell");
+            Platform.runLater(ctrl::forceUpdate);
+        }
+    }
+
+    private ListCell<Folder> createFolderListCell(ListView<Folder> listView) {
+        FolderListCell cell = new FolderListCell();
+        folderUpdateHandler.add(cell::update);
+        return cell;
     }
 
     List<? extends MetaDataOwnerFilter> currentFilters = new ArrayList<>();
 
     public void updateFilters() {
-        MetaDataFilterFactory filterFactory = new DefaultMetaDataFilterFactory();
-        Set<String> keySet = new HashSet();
-        explorerService
-                .getItems()
-                .stream()
-                .map(owner -> owner.getMetaDataSet().keySet())
-                .forEach(keys -> keySet.addAll(keys));
 
-        List<MetaDataFilterWrapper> collect = keySet
-                .stream()
-                .map(key -> new MetaDataFilterWrapper(key, filterFactory.generateFilter(explorerService.getItems(), key)))
-                .filter(filter -> filter.getContent() != null)
-                .collect(Collectors.toList());
+        new AsyncCallback<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
+                .setInput(explorerService.getItems())
+                .run(this::generateFilter)
+                .then(this::replaceFilters)
+                .start();
+
+    }
+
+    protected void replaceFilters(List<MetaDataFilterWrapper> collect) {
 
         // stop listening to the current filters
         currentFilters.forEach(this::stopListeningToFilter);
@@ -261,12 +278,28 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         filterVBox.getPanes().addAll(
                 currentFilters
                 .stream()
-                .map(filter -> (TitledPane)filter.getContent())
+                .map(filter -> (TitledPane) filter.getContent())
                 .collect(Collectors.toList())
         );
 
         // start listening to the new set
         currentFilters.forEach(this::listenFilter);
+
+    }
+
+    public List<MetaDataFilterWrapper> generateFilter(List<? extends Explorable> items) {
+        MetaDataFilterFactory filterFactory = new DefaultMetaDataFilterFactory();
+        Set<String> keySet = new HashSet();
+        items
+                .stream()
+                .map(owner -> owner.getMetaDataSet().keySet())
+                .forEach(keys -> keySet.addAll(keys));
+
+        return keySet
+                .stream()
+                .map(key -> new MetaDataFilterWrapper(key, filterFactory.generateFilter(explorerService.getItems(), key)))
+                .filter(filter -> filter.getContent() != null)
+                .collect(Collectors.toList());
     }
 
     private void listenFilter(MetaDataOwnerFilter filter) {
@@ -278,26 +311,26 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     private void onFilterChanged(Observable obs, Predicate<MetaDataOwner> oldValue, Predicate<MetaDataOwner> newValue) {
-        System.out.println(currentFilters.stream().filter(f->f.predicateProperty().getValue() != null).count());
-        
-        Predicate<MetaDataOwner> predicate = e->true;
-        
+        System.out.println(currentFilters.stream().filter(f -> f.predicateProperty().getValue() != null).count());
+
+        Predicate<MetaDataOwner> predicate = e -> true;
+
         List<Predicate<MetaDataOwner>> predicateList = currentFilters
                 .stream()
-                .map(f->f.predicateProperty().getValue())
-                .filter(v->v!=null)
+                .map(f -> f.predicateProperty().getValue())
+                .filter(v -> v != null)
                 .collect(Collectors.toList());
-        
-        if(predicateList.isEmpty() == false) {
-            
-            for(Predicate<MetaDataOwner> p : predicateList) {
+
+        if (predicateList.isEmpty() == false) {
+
+            for (Predicate<MetaDataOwner> p : predicateList) {
                 predicate = predicate.and(p);
             }
-            
+
         }
-        
+
         explorerService.applyFilter(predicate);
-        
+
     }
 
     private class MetaDataFilterWrapper implements MetaDataOwnerFilter {
@@ -305,7 +338,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         private final MetaDataOwnerFilter filter;
         private final String title;
         private final TitledPane pane;
-        
+
         public MetaDataFilterWrapper(String title, MetaDataOwnerFilter filter) {
             this.filter = filter;
             this.title = title;

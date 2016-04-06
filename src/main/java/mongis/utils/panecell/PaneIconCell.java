@@ -32,15 +32,19 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
+import mongis.utils.BindingsUtils;
 
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons with a text and subtext under.
@@ -75,6 +79,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     @FXML
     private Label subtitleLabel;
     
+    @FXML
+    private BorderPane imageViewContainer;
+    
     private final ObjectProperty<T> item = new SimpleObjectProperty<T>();
 
     // Callback 
@@ -99,13 +106,18 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
     
     
-    boolean subtitleVisible = true;
-    boolean showIcon = true;
+    private boolean subtitleVisible = true;
+    private boolean showIcon = true;
     
    
     BooleanProperty showIconProperty;
     BooleanProperty loadImageOnlyWhenVisibleProperty;
     
+    private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
+    
+    private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
+    
+    private long lastClick;
     
     public PaneIconCell() {
         try {
@@ -118,15 +130,17 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 LOADER.load();
             }
             
-            imageView.fitWidthProperty().bind(widthProperty());
-            imageView.fitHeightProperty().bind(widthProperty());
+            imageView.fitWidthProperty().bind(imageViewContainer.widthProperty());
+            imageView.fitHeightProperty().bind(imageViewContainer.widthProperty());
             item.addListener(this::onItemChanged);
             
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED,event->isInsideScrollWindow = false);
             
+           addEventHandler(MouseEvent.MOUSE_CLICKED,this::onClick);
+            BindingsUtils.bindNodeToPseudoClass(SELECTED, this, selectedProperty());
             
-          
+            getStyleClass().add("pane-icon-cell");
             
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);
@@ -328,10 +342,32 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     public boolean isSubtitleVisible() {
         return subtibleVisibleProperty().getValue();
     }
+
+    @Override
+    public BooleanProperty selectedProperty() {
+        return isSelectedProperty;
+    }
     
     
+    private void onClick(MouseEvent event) {
+        long now = System.currentTimeMillis();
+        if(event.getButton() != MouseButton.PRIMARY) return;
+        if(now - lastClick <= 1000) {
+            onDoubleClick();
+        }
+        else {
+            onSimpleClick();
+        }
+        lastClick = now;
+    }
     
+    protected void onSimpleClick() {
+        selectedProperty().setValue(!selectedProperty().getValue());
+    }
     
+    protected void onDoubleClick() {
+        
+    }
     
     
 }

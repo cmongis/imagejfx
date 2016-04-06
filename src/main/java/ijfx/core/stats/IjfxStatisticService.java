@@ -17,22 +17,21 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package ijfx.core.stats;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.scene.Node;
+import ijfx.service.IjfxService;
+import java.io.File;
+import net.imagej.Dataset;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
+public interface IjfxStatisticService extends IjfxService{
     
     
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
-    
-    public BooleanProperty selectedProperty();
+    public SummaryStatistics getDatasetStatistics(Dataset dataset);
+    public SummaryStatistics getStatistics(File file);
     
 }

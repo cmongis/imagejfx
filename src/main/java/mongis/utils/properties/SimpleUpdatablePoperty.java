@@ -17,22 +17,17 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils.panecell;
+package mongis.utils.properties;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.scene.Node;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * Interface that dictate the behaviour of object controlled by the PaneCellController.
+ *
  * @author cyril
  */
-public interface PaneCell<T> {
-    
-    
-    public void setItem(T item);
-    public T getItem();
-    public Node getContent();
-    
-    public BooleanProperty selectedProperty();
-    
+public class SimpleUpdatablePoperty<T> extends SimpleObjectProperty<T> implements UpdatableProperty<T>{
+    @Override
+    public void fireChanged() {
+        fireValueChangedEvent();
+    }
 }
