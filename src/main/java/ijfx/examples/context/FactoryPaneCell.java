@@ -22,6 +22,7 @@ package ijfx.examples.context;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
+import javafx.scene.image.Image;
 import mongis.utils.panecell.PaneIconCell;
 import mongis.utils.panecell.PaneLabelCell;
 
@@ -44,8 +45,9 @@ public class FactoryPaneCell {
 
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
         PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-                        paneIconCell.setImageFactory((f) -> {
-                return previewService.getImageDisplay();
+                       paneIconCell.setImageFactory(f -> {
+                            Image image =previewService.getImageDisplay();
+                return image;
                         });
         paneIconCell.setTitleFactory(f -> f.getLabel());
         paneIconCell.setLoadImageOnlyWhenVisible(false);
