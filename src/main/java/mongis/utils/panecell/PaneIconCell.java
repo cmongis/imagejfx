@@ -240,6 +240,12 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .run(subtitleFactory)
                 .then(this::setSubtitle)
                 .queue();
+        
+        new AsyncCallback<T, Image>()
+                .setInput(newItem)
+                .run(imageFactory)
+                .then(this::setImage)
+                .queue();
 
         /*
         
