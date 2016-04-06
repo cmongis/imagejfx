@@ -23,7 +23,32 @@
             </HBox>
          </top>
       </BorderPane>
-      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0" />
+      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+         <bottom>
+            <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
+               <children>
+                  <Button fx:id="selectAllButton" mnemonicParsing="false" onAction="#selectAll" styleClass="success" text="Select all">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="CHECK" />
+                     </graphic>
+                  </Button>
+                  <Button fx:id="segmentButton" mnemonicParsing="false" onAction="#segment" styleClass="warning" text="Segment">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="THUMB_TACK" />
+                     </graphic>
+                  </Button>
+                  <Button fx:id="processButton" mnemonicParsing="false" onAction="#process" styleClass="warning" text="Process">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="GEARS" />
+                     </graphic>
+                  </Button>
+               </children>
+               <styleClass>
+                  <String fx:value="hbox" />
+                  <String fx:value="with-top-padding" />
+               </styleClass>
+            </HBox>
+         </bottom></BorderPane>
       <ToolBar layoutX="400.0" layoutY="-26.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
             <FontAwesomeIconView glyphName="FOLDER" styleClass="h4" />

@@ -362,4 +362,25 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         }
     }
 
+    
+    /*
+        FXML Action
+    */
+    
+    @FXML
+    public void selectAll() {
+        
+    }
+    
+    @FXML
+    public void segment() {
+        
+    }
+    
+    @FXML
+    public void process() {
+        
+    }
+    
+    
 }
