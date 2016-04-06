@@ -166,7 +166,11 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
             contextService.enter(paneLabelCell.getItem().getName());
             Platform.runLater(() ->{
                 contextService.updateController(contextualView);
-
+                flowPane.getChildren().forEach((e)-> {
+                PaneIconCell paneIconCell = (PaneIconCell)e;
+                paneIconCell.setImage(previewService.getImageDisplay());
+                    
+                });
             if (!flowPane.getChildren().isEmpty()) {
                 popOver.setOpacity(0);
                 createPopOver(flowPane, paneLabelCell);
