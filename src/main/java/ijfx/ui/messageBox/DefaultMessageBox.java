@@ -67,7 +67,7 @@ public class DefaultMessageBox extends Pane implements MessageBox {
     private final double CLOSED_HEIGHT = 0.0;
 
     private final double TIMELINE_DURATION = 250.0;
-    private final double FADE_DURATION = 200.0;
+    private final double FADE_DURATION = 300.0;
 
     public DefaultMessageBox() {
 
@@ -77,11 +77,11 @@ public class DefaultMessageBox extends Pane implements MessageBox {
         messageProperty().setValue(null);
         typeProperty().setValue(null);
 
-        messageProperty().addListener(this::playTimeline);
+        messageProperty().addListener(this::playAnimation);
         typeProperty().addListener(this::setBgColor);
 
-        this.maxHeightProperty().setValue(MAX_HEIGHT);
-        this.maxWidthProperty().setValue(MAX_WIDHT);
+//        this.maxHeightProperty().setValue(MAX_HEIGHT);
+//        this.maxWidthProperty().setValue(MAX_WIDHT);
 
         label = new Label();
         label.setMaxWidth(MAX_WIDHT);
@@ -103,8 +103,9 @@ public class DefaultMessageBox extends Pane implements MessageBox {
         fadeIn.setToValue(1.0);
 
         configureCloseTimeline();
-
+        
         this.getChildren().add(label);
+//        this.setTop(label);
     }
 
     @Override
@@ -123,9 +124,11 @@ public class DefaultMessageBox extends Pane implements MessageBox {
     }
     
     
-    public void playTimeline(Observable obs) {
-        if (messageProperty().getValue() == null)
+    public void playAnimation(Observable obs) {
+        if (messageProperty().getValue() == null){
+            label.setOpacity(0.0);
             closeTimeline.playFromStart();
+        }
         else {
             configureOpenTimeline();
             openSeqTransition = new SequentialTransition(openTimeline, fadeIn);
@@ -148,7 +151,11 @@ public class DefaultMessageBox extends Pane implements MessageBox {
                 break;
         }
 
-        this.setBackground(new Background(new BackgroundFill(Color.web(bgColor), CornerRadii.EMPTY, Insets.EMPTY)));
+        this.setBackground(new Background(
+                new BackgroundFill(
+                        Color.web(bgColor), 
+                        new CornerRadii(4.0), 
+                        Insets.EMPTY)));
     }
 
     public double setBoxHeight() {
@@ -158,8 +165,9 @@ public class DefaultMessageBox extends Pane implements MessageBox {
 
     public void configureOpenTimeline() {
         openTimeline.getKeyFrames().clear();
-        KeyValue kv = new KeyValue(this.prefHeightProperty(), setBoxHeight());
-        KeyFrame kf = new KeyFrame(Duration.millis(TIMELINE_DURATION), kv);
+        KeyValue heightValue = new KeyValue(this.prefHeightProperty(), computeTextHeight());
+        
+        KeyFrame kf = new KeyFrame(Duration.millis(TIMELINE_DURATION), heightValue);
 
         openTimeline.getKeyFrames().add(kf);
     }
@@ -169,5 +177,31 @@ public class DefaultMessageBox extends Pane implements MessageBox {
         KeyFrame kf = new KeyFrame(Duration.millis(TIMELINE_DURATION), kv);
 
         closeTimeline.getKeyFrames().add(kf);
+    }
+    
+    public double computeTextHeight(){
+        
+        double computedHeight;
+
+        int lineCount = 0;
+        
+        String[] subString = messageProperty().getValue().split("\n");
+        
+        lineCount = lineCount + subString.length;
+        
+        int charCount;
+        double subStringLenght;
+        int lineToAdd;
+        
+        for(String s : subString){
+            charCount = s.length();
+            subStringLenght = charCount * 3.0;
+            lineToAdd = (int)Math.ceil(subStringLenght/this.getWidth());
+            lineCount = lineCount + lineToAdd;
+        }
+        
+        computedHeight = lineCount * 20.0;
+        
+        return computedHeight;
     }
 }

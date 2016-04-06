@@ -21,7 +21,6 @@ package ijfx.ui.messageBox;
 
 import java.io.IOException;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -32,7 +31,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import static javafx.application.Application.launch;
 import static javafx.application.Application.launch;
 import static javafx.application.Application.launch;
 
@@ -85,6 +83,8 @@ public class MessageBoxTest extends Application{
         
         private MessageBox messageBox;
         
+        private String CSS_FILE = getClass().getResource("../main/flatterfx.css").toExternalForm();
+        
         
         public MBoxTest() throws IOException{
             
@@ -126,6 +126,8 @@ public class MessageBoxTest extends Application{
             });
             
             this.getChildren().add(messageBox.getContent());
+            
+            this.getStylesheets().add(CSS_FILE);
         }
     }
 }
