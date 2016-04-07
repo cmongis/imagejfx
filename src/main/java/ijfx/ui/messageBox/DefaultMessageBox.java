@@ -20,6 +20,7 @@
 package ijfx.ui.messageBox;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.SequentialTransition;
@@ -31,20 +32,30 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public class DefaultMessageBox extends Pane implements MessageBox {
+public class DefaultMessageBox extends VBox implements MessageBox {
 
     private Property<String> message;
     private Property<MessageType> type;
@@ -62,14 +73,16 @@ public class DefaultMessageBox extends Pane implements MessageBox {
     private final String ORANGE = "#ff6600";
     private final String RED = "#ff0000";
 
-    private final double MAX_HEIGHT = 100.0;
-    private final double MAX_WIDHT = 260.0;
+//    private final double MAX_HEIGHT = 100.0;
+//    private final double MAX_WIDHT = 260.0;
     private final double CLOSED_HEIGHT = 0.0;
 
     private final double TIMELINE_DURATION = 250.0;
     private final double FADE_DURATION = 300.0;
 
     public DefaultMessageBox() {
+        
+        this.setMinHeight(0.0);
 
         message = new SimpleStringProperty();
         type = new SimpleObjectProperty();
@@ -80,12 +93,8 @@ public class DefaultMessageBox extends Pane implements MessageBox {
         messageProperty().addListener(this::playAnimation);
         typeProperty().addListener(this::setBgColor);
 
-//        this.maxHeightProperty().setValue(MAX_HEIGHT);
-//        this.maxWidthProperty().setValue(MAX_WIDHT);
 
         label = new Label();
-        label.setMaxWidth(MAX_WIDHT);
-        label.setMaxHeight(MAX_HEIGHT);
         label.setWrapText(true);
         label.setOpacity(0.0);
         
@@ -105,7 +114,7 @@ public class DefaultMessageBox extends Pane implements MessageBox {
         configureCloseTimeline();
         
         this.getChildren().add(label);
-//        this.setTop(label);
+//        this.setCenter(label);
     }
 
     @Override
@@ -127,6 +136,7 @@ public class DefaultMessageBox extends Pane implements MessageBox {
     public void playAnimation(Observable obs) {
         if (messageProperty().getValue() == null){
             label.setOpacity(0.0);
+
             closeTimeline.playFromStart();
         }
         else {
@@ -158,14 +168,9 @@ public class DefaultMessageBox extends Pane implements MessageBox {
                         Insets.EMPTY)));
     }
 
-    public double setBoxHeight() {
-        double newHeight = 50.0;
-        return newHeight;
-    }
-
     public void configureOpenTimeline() {
         openTimeline.getKeyFrames().clear();
-        KeyValue heightValue = new KeyValue(this.prefHeightProperty(), computeTextHeight());
+        KeyValue heightValue = new KeyValue(this.prefHeightProperty(), computeTextHeight(), Interpolator.EASE_OUT);
         
         KeyFrame kf = new KeyFrame(Duration.millis(TIMELINE_DURATION), heightValue);
 
@@ -173,7 +178,7 @@ public class DefaultMessageBox extends Pane implements MessageBox {
     }
 
     public void configureCloseTimeline() {
-        KeyValue kv = new KeyValue(this.prefHeightProperty(), CLOSED_HEIGHT);
+        KeyValue kv = new KeyValue(this.prefHeightProperty(), CLOSED_HEIGHT, Interpolator.EASE_OUT);
         KeyFrame kf = new KeyFrame(Duration.millis(TIMELINE_DURATION), kv);
 
         closeTimeline.getKeyFrames().add(kf);
@@ -187,21 +192,28 @@ public class DefaultMessageBox extends Pane implements MessageBox {
         
         String[] subString = messageProperty().getValue().split("\n");
         
-        lineCount = lineCount + subString.length;
+//        lineCount = lineCount + subString.length;
         
         int charCount;
         double subStringLenght;
         int lineToAdd;
         
         for(String s : subString){
-            charCount = s.length();
-            subStringLenght = charCount * 3.0;
-            lineToAdd = (int)Math.ceil(subStringLenght/this.getWidth());
-            lineCount = lineCount + lineToAdd;
+            if(s != null){
+                charCount = s.length();
+                Text text = new Text(messageProperty().getValue());
+                subStringLenght = text.getLayoutBounds().getWidth();//charCount * 4.0;
+                lineToAdd = (int)Math.ceil(subStringLenght/this.getBoundsInParent().getWidth());
+                lineCount = lineCount + lineToAdd;
+            }
+            else
+                lineCount++;
         }
         
-        computedHeight = lineCount * 20.0;
-        
+        computedHeight = lineCount * 18.0;
+
+//        Text text = new Text(messageProperty().getValue());
+//        computedHeight = text.getLayoutBounds().getHeight();
         return computedHeight;
     }
 }

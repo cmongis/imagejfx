@@ -32,7 +32,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
 
 /**
  *
