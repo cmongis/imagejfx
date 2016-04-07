@@ -19,12 +19,7 @@
             <TextField fx:id="newSuffix" promptText="new suffix" />
             <Label fx:id="extension" text=".tiff" />
          </children>
-      </HBox>
-      <Pane fx:id="messageBox" prefHeight="0.0" prefWidth="0.0">
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-      </Pane>
+      </HBox> 
       <Button fx:id="destinationFolderBtn" mnemonicParsing="false" text="Destination folder">
          <VBox.margin>
             <Insets top="10.0" />

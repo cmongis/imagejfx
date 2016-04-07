@@ -19,6 +19,8 @@
  */
 package ijfx.ui.save;
 
+import ijfx.ui.messageBox.DefaultMessageBox;
+import ijfx.ui.messageBox.MessageBox;
 import java.io.File;
 import java.io.IOException;
 import javafx.animation.Timeline;
@@ -35,7 +37,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import mongis.utils.FileButtonBinding;
 
@@ -71,6 +72,8 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     
     @FXML
     private Button startBtn;
+    
+    private MessageBox messageBox;
         
     public DefaultSaveOptions() throws IOException{
 
@@ -124,20 +127,23 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
         
         folder().bind(fbinding.fileProperty());
         
+               
+        messageBox = new DefaultMessageBox();
+               
         this.getStylesheets().add(CSS_FILE);
     }
     
-    
+    @Override
     public Property<SaveType> saveType(){
         return this.saveType;
     }
     
-    
+    @Override
     public Property<String> suffix(){
         return this.suffix;
     }
     
-    
+    @Override
     public Property<File> folder(){
         return this.folder;
     }

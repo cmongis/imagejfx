@@ -17,19 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.save;
-
-import java.io.File;
-import javafx.beans.property.Property;
+package ijfx.ui.messageBox;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public interface SaveOptions {
-    
-    public Property<SaveType> saveType();
-    public Property<String> suffix();
-    public Property<File> folder();
-    
+public enum MessageType {
+    SUCCESS,
+    WARNING,
+    DANGER,
+    NULL
 }
