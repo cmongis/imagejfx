@@ -53,19 +53,19 @@ import mongis.utils.properties.ServiceProperty;
  */
 public class PaneCellController<T extends Object> {
 
-    ObservableList<T> items = FXCollections.observableArrayList();
+   
+    private List<T> currentItems;
+    private LinkedList<PaneCell<T>> itemControllerList = new LinkedList<PaneCell<T>>();
+    private LinkedList<PaneCell<T>> cachedControllerList = new LinkedList<>();
 
-    LinkedList<PaneCell<T>> itemControllerList = new LinkedList<PaneCell<T>>();
-    LinkedList<PaneCell<T>> cachedControllerList = new LinkedList<>();
+    private Callable<PaneCell<T>> cellFactory;
 
-    Callable<PaneCell<T>> cellFactory;
+    private Logger logger = ImageJFX.getLogger();
 
-    Logger logger = ImageJFX.getLogger();
-
-    Pane pane;
+    private Pane pane;
     
-    ObservableSet<T> selectedItems = FXCollections.observableSet();
-        
+   private  ObservableSet<T> selectedItems = FXCollections.observableSet();
+    
     
     public PaneCellController(Pane pane) {
         setPane(pane);
@@ -172,15 +172,20 @@ public class PaneCellController<T extends Object> {
             }
 
             timer.elapsed("controller update");
+            
+            
+            currentItems = items;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Couln't update the controllers", e);
         }
     }
 
     // get the list of cells
-    public Collection<Node> getContent(Collection<PaneCell<T>> cellList) {
+    protected Collection<Node> getContent(Collection<PaneCell<T>> cellList) {
         return cellList.stream().map(PaneCell::getContent).collect(Collectors.toList());
     }
+    
+    
 
     // fills the cache by creating a certain number of cells
     private void fillCache(int number) {
@@ -261,5 +266,17 @@ public class PaneCellController<T extends Object> {
     
     public void updateSelection(PaneCell<T> cell) {
        cell.getContent().pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, isSelected(cell.getItem()));
+    }
+    
+    public List<T> getItems() {
+        return currentItems;
+    }
+    
+    public List<PaneCell> getCells() {
+        return pane
+                .getChildren()
+                .stream()
+                .map(child->(PaneCell)child)
+                .collect(Collectors.toList());
     }
 }

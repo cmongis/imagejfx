@@ -84,6 +84,7 @@ import org.scijava.display.event.DisplayActivatedEvent;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
+import org.scijava.event.SciJavaEvent;
 import org.scijava.log.LogService;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
@@ -747,6 +748,8 @@ public class ImageWindow extends Window {
     void onOverlayModified(OverlayUpdatedEvent event) {
         updateOverlay(event.getObject());
     }
+    
+    
 
     protected boolean isWindowConcernedByModule(Module module) {
         return module.getInputs().values().stream().filter(obj -> (obj == imageDisplay || obj == getDataset())).count() > 0;

@@ -32,4 +32,7 @@ public interface ExplorerView {
     
     public void setItem(List<? extends Explorable> items);
     
+    
+    public List<? extends Explorable> getSelectedItems();
+    
 }

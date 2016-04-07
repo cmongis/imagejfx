@@ -17,17 +17,19 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.service.overlay.io;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
-   
- 
+public class Utils {
+
+    public static Double[] extractArray(IntFunction<Double> intFunction, int size) {
+        return IntStream.range(0, size).mapToObj(intFunction).toArray((int n) -> new Double[n]);
+    }
+    
 }

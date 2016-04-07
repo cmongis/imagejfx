@@ -32,16 +32,24 @@
                         <FontAwesomeIconView glyphName="CHECK" />
                      </graphic>
                   </Button>
-                  <Button fx:id="segmentButton" mnemonicParsing="false" onAction="#segment" styleClass="warning" text="Segment">
+                  <MenuButton mnemonicParsing="false" text="Segment">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
                      <graphic>
                         <FontAwesomeIconView glyphName="THUMB_TACK" />
                      </graphic>
-                  </Button>
-                  <Button fx:id="processButton" mnemonicParsing="false" onAction="#process" styleClass="warning" text="Process">
+                  </MenuButton>
+                  <MenuButton mnemonicParsing="false" text="Process">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
                      <graphic>
                         <FontAwesomeIconView glyphName="GEARS" />
                      </graphic>
-                  </Button>
+                  </MenuButton>
                </children>
                <styleClass>
                   <String fx:value="hbox" />

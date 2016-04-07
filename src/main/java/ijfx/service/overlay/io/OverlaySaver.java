@@ -17,17 +17,34 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.service.overlay.io;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import net.imagej.overlay.Overlay;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
+public class OverlaySaver {
    
- 
+    
+    public void save(List<? extends Overlay> overlays, File file) throws IOException{
+        
+        
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Overlay.class,new OverlaySerializer());
+        mapper.registerModule(module);
+        
+        mapper.writeValue(file, overlays);
+        
+    }
+    
+    
+    
 }

@@ -44,6 +44,7 @@ import org.scijava.Context;
 import org.scijava.command.CommandService;
 import org.scijava.menu.MenuService;
 import org.scijava.menu.ShadowMenu;
+import org.scijava.module.Module;
 import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
@@ -169,6 +170,9 @@ public class WorkflowPanel extends GridPane{
         stepList.add(new DefaultWorkflowStep(moduleInfo.getDelegateClassName()).createModule(commandService, moduleService));
     }
 
+    public void addStep(Class<? extends Module> moduleClass) {
+        
+    }
     
     public ObservableList<WorkflowStep> stepListProperty() {
         return stepList;

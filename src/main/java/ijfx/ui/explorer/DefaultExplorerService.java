@@ -91,5 +91,6 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         eventService.publishLater(new DisplayedListChanged().setObject(filteredItems));
     }
     
+  
     
 }

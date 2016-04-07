@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.scene.image.Image;
 
 /**
@@ -32,5 +33,6 @@ public interface Iconazable {
     String getInformations();
     Image getImage();
     public void open();
+    public BooleanProperty selectedProperty();
     
 }

@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import com.sun.javafx.scene.DirtyBits;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.activity.Activity;
@@ -45,6 +46,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -98,11 +100,13 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @Parameter
     StatusService statusService;
-
+    
     ExplorerView view = new IconView();
 
     List<Runnable> folderUpdateHandler = new ArrayList<>();
 
+    
+    
     public ExplorerActivity() {
         try {
             FXUtilities.injectFXML(this);
@@ -172,6 +176,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         } else {
             contentBorderPane.setCenter(view.getNode());
             view.setItem(explorable);
+            
         }
 
     }
@@ -369,7 +374,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     
     @FXML
     public void selectAll() {
-        
+        explorerService
+                .getFilteredItems()
+                .stream()
+                .forEach(item->item.selectedProperty().setValue(true));
     }
     
     @FXML
@@ -381,6 +389,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void process() {
         
     }
+    
+    public boolean isEverythingSelected() {
+        if(explorerService == null) return false;
+        return explorerService.getFilteredItems().stream().filter(item->item.selectedProperty().getValue()).count() ==
+                explorerService.getFilteredItems().size();
+    }
+    
+    
     
     
 }
