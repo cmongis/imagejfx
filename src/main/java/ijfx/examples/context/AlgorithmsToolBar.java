@@ -93,7 +93,7 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
 
     private void createToolBar(HBox hbox) {
         jsonReader = new JsonReader();
-        jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/myJson.json");
+        jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
         jsonReader.separate();
         flowPane = new FlowPane();
         popOver = new PopOver();
@@ -109,7 +109,9 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
      * @param owner
      */
     private void createPopOver(Pane pane, Node owner) {
-
+        contextService.enter("multi-z-img");
+        contextService.update();
+        System.out.println(contextService.getActualContextListAsString());
         if (popOver == null) {
             popOver = new PopOver(pane);
             setPopOver(pane, owner);
@@ -164,19 +166,23 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
         });
         paneLabelCell.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
             contextService.enter(paneLabelCell.getItem().getName());
-            Platform.runLater(() ->{
+            Platform.runLater(() -> {
                 contextService.updateController(contextualView);
-                flowPane.getChildren().forEach((e)-> {
-                PaneIconCell paneIconCell = (PaneIconCell)e;
-                paneIconCell.setImage(previewService.getImageDisplay());
-                    
+                flowPane.getChildren().forEach((e) -> {
+                    PaneIconCell paneIconCell = (PaneIconCell) e;
+                    ItemWidget itemWidget = (ItemWidget) paneIconCell.getItem();
+                    if (itemWidget.getIcon().equals("preview")) {
+                        String action = itemWidget.getAction();
+                        previewService.setParameters(0, 0, 120, 120);
+                        paneIconCell.setImage(previewService.getImageDisplay(action));
+                    }
                 });
-            if (!flowPane.getChildren().isEmpty()) {
-                popOver.setOpacity(0);
-                createPopOver(flowPane, paneLabelCell);
-            } else if (flowPane.getChildren().isEmpty()) {
-                popOver.setOpacity(0);
-            }
+                if (!flowPane.getChildren().isEmpty()) {
+                    popOver.setOpacity(0);
+                    createPopOver(flowPane, paneLabelCell);
+                } else if (flowPane.getChildren().isEmpty()) {
+                    popOver.setOpacity(0);
+                }
             });
 
         });
