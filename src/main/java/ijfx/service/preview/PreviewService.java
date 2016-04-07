@@ -19,12 +19,14 @@
  */
 package ijfx.service.preview;
 
-import ij.process.ImageProcessor;
-import ijfx.service.ui.FxImageService;
-import io.scif.gui.AWTImageTools;
-import java.awt.Color;
 import java.awt.image.BufferedImage;
-import static java.lang.Math.toIntExact;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -34,14 +36,13 @@ import net.imagej.ImageJService;
 import net.imagej.Position;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
-import net.imagej.display.DataView;
 import net.imagej.display.DatasetView;
-import net.imagej.display.DefaultDatasetView;
-import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.display.ColorTable;
 import net.imglib2.type.numeric.RealType;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -60,19 +61,67 @@ public class PreviewService extends AbstractService implements ImageJService {
     @Parameter
     DatasetService datasetService;
 
-    public PreviewService() {
+    @Parameter
+    CommandService commandService;
+    
+    private int width;
+    private int height;
+    private int x;
+    private int y;
+
+    public int getWidth() {
+        return width;
     }
 
-    public Image getImageDisplay() {
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
-        BufferedImage bufferedImage = datasetToBufferedImage(getPreviewDataset(200, 200, 0, 0));
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+    
+    public void setParameters(int x, int y, int w, int h)
+    {
+       this.x = x;
+       this.y = y;
+       this.width = w;
+       this.height = h;
+    }
+    public PreviewService() {
+    }
+    
+    public Image getImageDisplay(String command) {
+        Dataset preview = getPreviewDataset(width, height, 0, 0);
+        preview = applyCommand(preview, command);
+        BufferedImage bufferedImage = datasetToBufferedImage(preview);
 
         WritableImage wi = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
         SwingFXUtils.toFXImage(bufferedImage, wi);
         return wi;
     }
 
-    public Dataset getEmptyDataset(Dataset input, int width, int height) {
+    public Dataset getEmptyDataset(Dataset input) {
         AxisType[] axisType = new AxisType[input.numDimensions()];
         CalibratedAxis[] axeArray = new CalibratedAxis[input.numDimensions()];
         input.axes(axeArray);
@@ -80,7 +129,7 @@ public class PreviewService extends AbstractService implements ImageJService {
         long[] dims = new long[axeArray.length];
         for (int i = 0; i < dims.length; i++) {
             axisType[i] = axeArray[i].type();
-            dims[i] = toIntExact(input.max(i) + 1);
+            dims[i] = 1;//toIntExact(input.max(i) + 1);
 
         }
         dims[0] = width;
@@ -93,7 +142,7 @@ public class PreviewService extends AbstractService implements ImageJService {
         Position activePosition = imageDisplayService.getActivePosition();
 
         Dataset datasetOrigin = imageDisplayService.getActiveDataset();
-        Dataset datasetOutput = getEmptyDataset(datasetOrigin, width, height);
+        Dataset datasetOutput = getEmptyDataset(datasetOrigin);
 
         long[] dimension = new long[datasetOrigin.numDimensions() - 2];
         activePosition.localize(dimension);
@@ -117,16 +166,66 @@ public class PreviewService extends AbstractService implements ImageJService {
             }
         }
 
+//
+//        RandomAccess<T> randomAccessOrigin = (RandomAccess<T>) datasetOrigin.randomAccess();
+//        Cursor<T> cursorOutput = (Cursor<T>) datasetOutput.cursor();
+//        while (cursorOutput.hasNext()) {
+//            cursorOutput.fwd();
+//            randomAccessOrigin.setPosition(cursorOutput);
+//            cursorOutput.get().set(randomAccessOrigin.get());
+//            
+//        }
         return datasetOutput;
     }
 
     public BufferedImage datasetToBufferedImage(Dataset dataset) {
+        DatasetView activeDataview = imageDisplayService.getActiveDatasetView();
 
         final DatasetView view = (DatasetView) imageDisplayService.createDataView(dataset);
         Position activePosition = imageDisplayService.getActivePosition();
-        view.setPosition(activePosition);
+
+        view.getData().setChannelMaximum(0, activeDataview.getChannelMax(activePosition.getIntPosition(0)));
+        view.getData().setChannelMinimum(0, activeDataview.getChannelMin(activePosition.getIntPosition(0)));
+
+        //view.setPosition(activePosition);
+                view.setColorMode(activeDataview.getColorMode());
         view.rebuild();
+        List<ColorTable> colorTable = activeDataview.getColorTables();
+        long[] dimension = new long[dataset.numDimensions() - 2];
+        activePosition.localize(dimension);
+        
+        //Set LUT if nummber of channel >1
+        if (dimension[0] >1)
+        {
+        view.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
+        }
+        int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
+        int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
+        view.setChannelRange(0, minChannel, maxChannel);
+        
+        view.rebuild();
+
         return view.getScreenImage().image();
+    }
+    
+    public Dataset applyCommand(Dataset dataset, String command)
+    {
+        try {
+            Map<String,Object> inputMap = new HashMap<>();
+            inputMap.put("dataset", dataset);
+            inputMap.put("sigma", 3);
+            inputMap.put("useUnits", false);
+            final Future<CommandModule> futur =commandService.run(command, false, inputMap);
+            Map<String,Object> outMap = futur.get().getOutputs();
+        System.out.println("ijfx.service.preview.PreviewService.applyCommand()");
+        return (Dataset) outMap.get("dataset");
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PreviewService.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(PreviewService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+        
     }
 
 }

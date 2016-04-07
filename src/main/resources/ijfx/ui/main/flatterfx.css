@@ -1040,10 +1040,13 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 .popoverToolBar{
     -fx-fill:-bg-light!important;
-    -fx-background-color:-bg-light;
-    -fx-stroke:derive(-bg-light,20%)!important;
+    -fx-background-color:-bg-darker;
+    -fx-stroke:-bg-darker!important;
 }
 
+.icon-toolbar{
+    -glyph-size: 120px;
+}
 .range-slider .low-thumb, .range-slider .high-thumb, .slider .thumb {
     -fx-background-color:-flatter-primary;
 }
