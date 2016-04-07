@@ -109,12 +109,19 @@ public class MessageBoxTest extends Application{
 
                 MessageType newType = MessageType.NULL;
                 
-                if(label.equals("SUCCESS"))
-                    newType = MessageType.SUCCESS;
-                else if(label.equals("WARNING"))
-                    newType = MessageType.WARNING;
-                else if(label.equals("DANGER"))
-                    newType = MessageType.DANGER;
+                switch (label) {
+                    case "SUCCESS":
+                        newType = MessageType.SUCCESS;
+                        break;
+                    case "WARNING":
+                        newType = MessageType.WARNING;
+                        break;
+                    case "DANGER":
+                        newType = MessageType.DANGER;
+                        break;
+                    default:
+                        break;
+                }
                 
                 messageBox.typeProperty().setValue(newType);
                 messageBox.messageProperty().setValue(textArea.getText());

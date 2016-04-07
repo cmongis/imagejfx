@@ -25,37 +25,33 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
+
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
 import javafx.geometry.Insets;
-import javafx.scene.Group;
+
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
+
 import javafx.util.Duration;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public class DefaultMessageBox extends VBox implements MessageBox {
+public class DefaultMessageBox extends HBox implements MessageBox {
 
     private Property<String> message;
     private Property<MessageType> type;
@@ -73,16 +69,20 @@ public class DefaultMessageBox extends VBox implements MessageBox {
     private final String ORANGE = "#ff6600";
     private final String RED = "#ff0000";
 
-//    private final double MAX_HEIGHT = 100.0;
-//    private final double MAX_WIDHT = 260.0;
-    private final double CLOSED_HEIGHT = 0.0;
+    private final double MAX_HEIGHT = 300.0;
+    private final double MIN_HEIGHT = 0.0;
+    private final double PADDING = 4.0;
 
-    private final double TIMELINE_DURATION = 250.0;
+    private final double TIMELINE_DURATION = 300.0;
     private final double FADE_DURATION = 300.0;
+    
+    private final double LINE_HEIGHT = 20.0;
 
     public DefaultMessageBox() {
         
-        this.setMinHeight(0.0);
+        this.setMinHeight(MIN_HEIGHT);
+        this.setMaxHeight(MAX_HEIGHT);
+        this.setPadding(new Insets(PADDING));
 
         message = new SimpleStringProperty();
         type = new SimpleObjectProperty();
@@ -97,6 +97,7 @@ public class DefaultMessageBox extends VBox implements MessageBox {
         label = new Label();
         label.setWrapText(true);
         label.setOpacity(0.0);
+        label.setMinHeight(0.0);
         
         StringBinding sbinding = Bindings.createStringBinding(() -> {
             return messageProperty().getValue();
@@ -104,7 +105,7 @@ public class DefaultMessageBox extends VBox implements MessageBox {
 
         label.textProperty().bind(sbinding);
         
-
+        
         openTimeline = new Timeline();
         closeTimeline = new Timeline();
 
@@ -114,7 +115,6 @@ public class DefaultMessageBox extends VBox implements MessageBox {
         configureCloseTimeline();
         
         this.getChildren().add(label);
-//        this.setCenter(label);
     }
 
     @Override
@@ -136,7 +136,6 @@ public class DefaultMessageBox extends VBox implements MessageBox {
     public void playAnimation(Observable obs) {
         if (messageProperty().getValue() == null){
             label.setOpacity(0.0);
-
             closeTimeline.playFromStart();
         }
         else {
@@ -148,26 +147,28 @@ public class DefaultMessageBox extends VBox implements MessageBox {
 
     public void setBgColor(Observable obs) {
 
-        String bgColor = null;
+            String bgColor = null;
 
-        switch (typeProperty().getValue()) {
-            case SUCCESS:
-                bgColor = GREEN; break;
-            case WARNING:
-                bgColor = ORANGE; break;
-            case DANGER:
-                bgColor = RED; break;
-            default:
-                break;
-        }
+            switch (typeProperty().getValue()) {
+                case SUCCESS:
+                    bgColor = GREEN; break;
+                case WARNING:
+                    bgColor = ORANGE; break;
+                case DANGER:
+                    bgColor = RED; break;
+                default:
+                    break;
+            }
 
-        this.setBackground(new Background(
-                new BackgroundFill(
-                        Color.web(bgColor), 
-                        new CornerRadii(4.0), 
-                        Insets.EMPTY)));
+            this.setBackground(new Background(
+                    new BackgroundFill(
+                            Color.web(bgColor), 
+                            new CornerRadii(4.0), 
+                            Insets.EMPTY)));
+
     }
 
+    
     public void configureOpenTimeline() {
         openTimeline.getKeyFrames().clear();
         KeyValue heightValue = new KeyValue(this.prefHeightProperty(), computeTextHeight(), Interpolator.EASE_OUT);
@@ -177,12 +178,14 @@ public class DefaultMessageBox extends VBox implements MessageBox {
         openTimeline.getKeyFrames().add(kf);
     }
 
+    
     public void configureCloseTimeline() {
-        KeyValue kv = new KeyValue(this.prefHeightProperty(), CLOSED_HEIGHT, Interpolator.EASE_OUT);
+        KeyValue kv = new KeyValue(this.prefHeightProperty(), MIN_HEIGHT, Interpolator.EASE_OUT);
         KeyFrame kf = new KeyFrame(Duration.millis(TIMELINE_DURATION), kv);
 
         closeTimeline.getKeyFrames().add(kf);
     }
+    
     
     public double computeTextHeight(){
         
@@ -191,18 +194,14 @@ public class DefaultMessageBox extends VBox implements MessageBox {
         int lineCount = 0;
         
         String[] subString = messageProperty().getValue().split("\n");
-        
-//        lineCount = lineCount + subString.length;
-        
-        int charCount;
+
         double subStringLenght;
         int lineToAdd;
         
         for(String s : subString){
             if(s != null){
-                charCount = s.length();
                 Text text = new Text(messageProperty().getValue());
-                subStringLenght = text.getLayoutBounds().getWidth();//charCount * 4.0;
+                subStringLenght = text.getLayoutBounds().getWidth();
                 lineToAdd = (int)Math.ceil(subStringLenght/this.getBoundsInParent().getWidth());
                 lineCount = lineCount + lineToAdd;
             }
@@ -210,10 +209,8 @@ public class DefaultMessageBox extends VBox implements MessageBox {
                 lineCount++;
         }
         
-        computedHeight = lineCount * 18.0;
+        computedHeight = lineCount * LINE_HEIGHT;
 
-//        Text text = new Text(messageProperty().getValue());
-//        computedHeight = text.getLayoutBounds().getHeight();
         return computedHeight;
     }
 }
