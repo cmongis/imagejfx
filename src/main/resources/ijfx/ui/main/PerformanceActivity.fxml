@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <SplitPane dividerPositions="0.2842809364548495" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <items>
+            <ListView fx:id="timerListView" prefHeight="200.0" prefWidth="200.0" />
+            <TableView prefHeight="200.0" prefWidth="200.0">
+              <columns>
+                <TableColumn fx:id="idColumn" prefWidth="75.0" text="Action" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+         </items>
+      </SplitPane>
+   </center>
+</BorderPane>
