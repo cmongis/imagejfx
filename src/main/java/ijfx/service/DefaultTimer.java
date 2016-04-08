@@ -119,4 +119,11 @@ public class DefaultTimer implements Timer {
         return String.format("%22s|%20.0fms|%20.0fms\n",id.length() > 22 ? id.substring(0, 21) : id,statics.getMean(),statics.getStandardDeviation());
         
     }
+
+    @Override
+    public String getName() {
+        return id;
+    }
+    
+    
 }

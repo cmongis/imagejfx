@@ -19,6 +19,8 @@
  */
 package ijfx.service;
 
+import java.util.Collection;
+
 /**
  *
  * @author cyril
@@ -26,5 +28,5 @@ package ijfx.service;
 public interface TimerService extends IjfxService{
     Timer getTimer(Class<?> clazz);
     Timer getTimer(String id);
-    
+    Collection<? extends Timer> getTimers();
 }

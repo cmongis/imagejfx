@@ -22,7 +22,6 @@ package ijfx.ui.tool;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import ijfx.bridge.ImageJContainer;
 import java.util.List;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -33,8 +32,6 @@ import net.imagej.display.OverlayService;
 import net.imagej.overlay.RectangleOverlay;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import ijfx.ui.UiPlugin;
-import ijfx.ui.UiConfiguration;
 
 /**
  *
