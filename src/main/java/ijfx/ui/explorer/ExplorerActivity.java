@@ -246,7 +246,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         }
 
         public void update() {
-            System.out.println("updating cell");
+          
             Platform.runLater(ctrl::forceUpdate);
         }
     }

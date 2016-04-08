@@ -65,6 +65,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.VBox;
 import mongis.utils.AsyncCallback;
+import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
@@ -72,6 +73,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.display.event.DisplayActivatedEvent;
+import org.scijava.event.EventService;
 
 /**
  *
@@ -131,6 +133,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @FXML
     BorderPane chartBorderPane;
 
+    
     private final static String EMPTY_FIELD = "Name your overlay here :-)";
 
     ObjectProperty<Overlay> overlayProperty = new SimpleObjectProperty<>();
@@ -337,6 +340,9 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         return serie;
     }
 
+    @Parameter
+    EventService eventService;
+    
     @FXML
     public void deleteOverlay() {
 
@@ -345,7 +351,10 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         overlaySelectionService.getSelectedOverlays(display).forEach(overlay -> {
 
             overlayService.removeOverlay(display, overlay);
+            eventService.publishLater(new OverlayDeletedEvent(overlay));
         });
+        
+        
     }
 
     @Override

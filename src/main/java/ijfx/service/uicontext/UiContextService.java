@@ -85,7 +85,7 @@ public class UiContextService extends AbstractService implements UiContextManage
 
     @Override
     @AngularMethod(sync = true, description = "Enters a context")
-    public synchronized UiContextManager enter(String enteredContext) {
+    public UiContextManager enter(String enteredContext) {
 
         if (enteredContext.contains(" ")) {
             for (String context : enteredContext.split(" ")) {
@@ -143,7 +143,7 @@ public class UiContextService extends AbstractService implements UiContextManage
     }
 
     @Override
-    public synchronized UiContextManager leave(String context) {
+    public UiContextManager leave(String context) {
 
         if (currentContextList.contains(context) == false) {
             return this;
@@ -165,7 +165,7 @@ public class UiContextService extends AbstractService implements UiContextManage
 
     @Override
     @AngularMethod(sync = true, description = "Update the different widgets depending on the newly created context.")
-    public synchronized UiContextManager update() {
+    public UiContextManager update() {
         if (!hasChanged) {
             return this;
         }
