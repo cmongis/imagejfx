@@ -54,8 +54,8 @@
           ,"icon":"preview"
           ,"context":"image-open"
           ,"parameters":{
-            "radius":3
-            ,"usePixels":false
+            "sigma":3
+            ,"useUnits":false
           }
         }
       ]
