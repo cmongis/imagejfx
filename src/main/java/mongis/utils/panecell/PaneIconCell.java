@@ -70,15 +70,14 @@ import mongis.utils.BindingsUtils;
  */
 public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
-
+    @FXML
+    private Label titleLabel;
     @FXML
     private FontAwesomeIconView titleIconView;
     @FXML
     private ImageView imageView;
 
 
-    @FXML
-    private Label titleLabel;
 
     @FXML
     private Label subtitleLabel;
