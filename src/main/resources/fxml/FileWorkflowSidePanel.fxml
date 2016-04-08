@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <items>
+            <Label fx:id="titleLabel" styleClass="h3" text="Batch processing" />
+         </items>
+      </ToolBar>
+   </top>
+   <center>
+      <BorderPane fx:id="centerBorderPane" BorderPane.alignment="CENTER">
+         <top>
+            <VBox prefHeight="200.0" prefWidth="100.0" styleClass="vbox" BorderPane.alignment="CENTER">
+               <children>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Import workflow" />
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#applyMacro" text="Apply macro" />
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Copy ImageJ history" />
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Execute ImageJ action" />
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="or" textAlignment="CENTER">
+                     <styleClass>
+                        <String fx:value="with-top-padding" />
+                        <String fx:value="darker-background" />
+                     </styleClass>
+                  </Label>
+                  <Label />
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <Label text="Label" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </center>
+</fx:root>

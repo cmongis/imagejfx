@@ -54,7 +54,7 @@
                    </HBox>
                </center>
                <bottom>
-                  <VBox fx:id="topToolBarVBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+                  <VBox fx:id="topToolBarVBox" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
                </bottom>
            </BorderPane>
        </top>

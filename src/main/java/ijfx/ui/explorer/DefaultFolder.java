@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
+import ijfx.core.metadata.MetaData;
+import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
@@ -32,7 +34,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import mongis.utils.AsyncCallback;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.Context;
+import org.scijava.app.StatusService;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 
@@ -51,12 +55,18 @@ public class DefaultFolder implements Folder {
 
     @Parameter
     EventService eventService;
-    
+
     @Parameter
     Context context;
 
     @Parameter
     TimerService timerService;
+
+    @Parameter
+    IjfxStatisticService statsService;
+
+    @Parameter
+    StatusService statusService;
     
     public DefaultFolder() {
 
@@ -90,19 +100,18 @@ public class DefaultFolder implements Folder {
         if (items == null) {
 
             items = new ArrayList<>();
-            
-            new AsyncCallback<Void,List<Explorable>>()
+
+            new AsyncCallback<Void, List<Explorable>>()
                     .run(this::fetchItems)
                     .then(this::addItems)
                     .start();
-                    
-            
+
         }
         return items;
     }
 
     private List<Explorable> fetchItems(Void v) {
-        
+
         Timer timer = timerService.getTimer(this.getClass());
         timer.start();
         Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(file);
@@ -112,8 +121,8 @@ public class DefaultFolder implements Folder {
                 .map(record -> new ImageRecordIconizer(context, record))
                 .collect(Collectors
                         .toList());
-        
-        System.out.println(String.format("%d records fetched",records.size()));
+
+        System.out.println(String.format("%d records fetched", records.size()));
         return explorables;
     }
 
@@ -130,8 +139,43 @@ public class DefaultFolder implements Folder {
 
     private void addItems(List<Explorable> explorables) {
         items.addAll(explorables);
-        System.out.println("Added "+explorables.size());
+        System.out.println("Added " + explorables.size());
         eventService.publish(new FolderUpdatedEvent().setObject(this));
+
+        
+        // now we can start a second thread that will slowly get statistics from images
+        new AsyncCallback<List<Explorable>, Integer>()
+                .setInput(items)
+                .run(this::fetchMoreStatistics)
+                .then(count -> {
+                    if (count > 0) {
+                        eventService.publish(new FolderUpdatedEvent().setObject(this));
+                    }
+                })
+                .start();
+
+    }
+
+    private Integer fetchMoreStatistics(List<Explorable> explorableList) {
+        Integer elementAnalyzedCount = 0;
+        int elements = explorableList.size();
+        int i = 0;
+        for (Explorable e : explorableList) {
+            statusService.showStatus(i, elements, "Fetchting min/max for more exploration.");
+            
+            if (!e.getMetaDataSet().containsKey(MetaData.STATS_PIXEL_MIN)) {
+                if (e instanceof ImageRecordIconizer) {
+                    ImageRecordIconizer iconizer = (ImageRecordIconizer) e;
+                    SummaryStatistics stats = statsService.getStatistics(iconizer.getImageRecord().getFile());
+                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
+                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
+                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
+                    elementAnalyzedCount++;
+                }
+            }
+            i++;            
+        }
+        return elementAnalyzedCount;
     }
 
 }

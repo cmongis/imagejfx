@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.explorer.event.FolderAddedEvent;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
 import ijfx.ui.main.ImageJFX;
@@ -26,7 +27,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import mongis.utils.AsyncCallback;
 import org.scijava.Context;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -55,6 +55,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Parameter
     Context context;
     
+    
+    @Parameter
+            UiContextService uiContextService;
     
     Logger logger = ImageJFX.getLogger();
     
@@ -95,6 +98,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         
         explorerService.setItems(currentFolder.getItemList());
 
+        uiContextService.enter("explore-files");
+        uiContextService.update();
+        
     }
     
     @EventHandler

@@ -25,6 +25,8 @@ import ijfx.service.thumb.ThumbService;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import mongis.utils.FileUtils;
 import org.scijava.Context;
@@ -41,7 +43,9 @@ public class ImageRecordIconizer implements Explorable {
     @Parameter
     ThumbService thumbService;
     
+    private BooleanProperty selectedProperty;
     
+    boolean selected = false;
     
     public ImageRecordIconizer(Context context, ImageRecord imageRecord) {
         context.inject(this);
@@ -80,7 +84,30 @@ public class ImageRecordIconizer implements Explorable {
 
     @Override
     public MetaDataSet getMetaDataSet() {
+        
         return imageRecord.getMetaDataSet();
     }
+
+    public ImageRecord getImageRecord() {
+        return imageRecord;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    @Override
+    public BooleanProperty selectedProperty() {
+        if(selectedProperty == null) {
+           selectedProperty = new SimpleBooleanProperty(this, "selected", selected);
+        }
+        return  selectedProperty;
+    }
+    
+    
     
 }

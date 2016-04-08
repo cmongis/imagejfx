@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root minHeight="-Infinity" minWidth="-Infinity" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <stylesheets>
         <URL value="@widget.css" />
     </stylesheets>
@@ -15,12 +15,12 @@
 
    </children>
    <top>
-      <TextField fx:id="textField" onKeyReleased="#filterQuery" promptText="Filter propositions here..." BorderPane.alignment="CENTER" />
+      <TextField fx:id="textField" onKeyReleased="#updateDisplayedItems" promptText="Filter propositions here..." BorderPane.alignment="CENTER" />
    </top>
    <bottom>
-      <Button fx:id="moreButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#setBigger" styleClass="with-top-padding" text="Show all possibilities..." BorderPane.alignment="CENTER" />
+      <Button fx:id="moreButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#setBigger" text="Show all possibilities..." BorderPane.alignment="CENTER" />
    </bottom>
    <center>
-      <ListView fx:id="listView" maxHeight="170.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="listView" BorderPane.alignment="CENTER" />
    </center>
 </fx:root>

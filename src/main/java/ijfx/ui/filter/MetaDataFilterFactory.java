@@ -19,10 +19,9 @@
  */
 package ijfx.ui.filter;
 
-import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.function.Predicate;
 
 /**
  *
@@ -31,7 +30,7 @@ import java.util.function.Predicate;
 public interface MetaDataFilterFactory  {
     
     
-    public MetaDataOwnerFilter generateFilter(Collection<MetaData> allPossibileValues);
+    public MetaDataOwnerFilter generateFilter(Collection<? extends MetaDataOwner> ownerList, String keyName);
     
     
 }

@@ -17,16 +17,21 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer.event;
+package ijfx.core.stats;
 
-import ijfx.ui.IjfxEvent;
-import ijfx.ui.explorer.Explorable;
-import java.util.List;
+import ijfx.service.IjfxService;
+import java.io.File;
+import net.imagej.Dataset;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
  *
  * @author cyril
  */
-public class ExploreredListChanged extends IjfxEvent<List<? extends Explorable>>{
+public interface IjfxStatisticService extends IjfxService{
+    
+    
+    public SummaryStatistics getDatasetStatistics(Dataset dataset);
+    public SummaryStatistics getStatistics(File file);
     
 }

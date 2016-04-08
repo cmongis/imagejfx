@@ -53,6 +53,11 @@ public class MetaDataSet extends HashMap<String, MetaData> {
         }
     }
     
+    
+    public MetaData get(String key) {
+        return super.getOrDefault(key, new GenericMetaData(key,null));
+    }
+    
     public String toString() {
         StringBuffer buffer = new StringBuffer(10000);
         buffer.append("## Metadata Set ##");

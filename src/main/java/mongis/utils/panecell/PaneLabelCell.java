@@ -30,6 +30,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -75,7 +76,8 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
     private boolean loadImageOnlyWhenVisible = true;
     
     private boolean isInsideScrollWindow = false;
-    
+        private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
+
     Image currentImage = null;
     
     
@@ -298,6 +300,11 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
 
     public boolean isSubtitleVisible() {
         return subtibleVisibleProperty().getValue();
+    }
+
+    @Override
+    public BooleanProperty selectedProperty() {
+return isSelectedProperty;
     }
     
     

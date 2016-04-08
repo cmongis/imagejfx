@@ -215,7 +215,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @EventHandler
     public void onOverlayUpdated(OverlayUpdatedEvent event) {
-        updateChart(event.getObject());
+    Platform.runLater(()->updateChart(event.getObject()));
     }
 
     
