@@ -82,7 +82,7 @@ public class MessageBoxTest extends Application{
         
         private MessageBox messageBox;
         
-        private String CSS_FILE = getClass().getResource("../main/flatterfx.css").toExternalForm();
+        private String CSS_FILE = getClass().getResource("/ijfx/ui/main/flatterfx.css").toExternalForm();
         
         
         public MBoxTest() throws IOException{

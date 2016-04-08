@@ -27,11 +27,8 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 import javafx.geometry.Insets;
 
@@ -74,7 +71,7 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     private final double TIMELINE_DURATION = 300.0;
     private final double FADE_DURATION = 300.0;
     
-    private final double LINE_HEIGHT = 22.0;
+    private final double LINE_HEIGHT = 24.0;
 
     public DefaultMessageBox() {
         
@@ -93,10 +90,6 @@ public class DefaultMessageBox extends HBox implements MessageBox {
         label.setWrapText(true);
         label.setOpacity(0.0);
         label.setMinHeight(0.0);
-        
-//        StringBinding sbinding = Bindings.createStringBinding(() -> {
-//            return messageProperty().getValue();
-//        }, messageProperty());
 
         label.textProperty().bind(getMessage().textProperty());
         
