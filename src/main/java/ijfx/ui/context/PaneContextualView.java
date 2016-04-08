@@ -19,12 +19,11 @@
  */
 package ijfx.ui.context;
 
-import ijfx.examples.context.ContextualPaneIconWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import ijfx.ui.previewToolbar.ContextualPaneIconWrapper;
 import javafx.scene.layout.Pane;
 
 /**
