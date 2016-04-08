@@ -17,16 +17,22 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
 
-import ijfx.ui.context.ContextualWidget;
-import javafx.event.Event;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Map;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-interface ContextualPaneIcon extends ContextualWidget{
-    public String getContext();
-    public Event getOnAction();
+@JsonDeserialize(as=DefaultWidget.class)
+public interface ItemWidget extends Item{
+    public String getType();
+    public String getAction();
+    public String getLabel();
+    public void addContext(String s);
+    public void removeSpaceContext();
+    public Map<String, Object> getParameters();
+    
 }

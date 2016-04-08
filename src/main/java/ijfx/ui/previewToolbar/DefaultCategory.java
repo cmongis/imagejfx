@@ -17,30 +17,23 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
 /**
  * 
  * @author Tuan anh TRINH
  */
+public class DefaultCategory implements ItemCategory{
 
-public class DefaultWidgetGroup implements WidgetGroup {
-    private ItemWidget[] items;
-    private String name;
-    private String context;
-    private String icon;
-    public DefaultWidgetGroup(ItemWidget[] items, String name, String context) {
-        this.items = items;
-        this.name = name;
-        this.context = context;
+    private final String name;
+    private final String context;
+    private final String icon;
+   
+    public DefaultCategory(String n, String c, String icon)
+    {
+        this.name = n;
+        this.context = c;
+        this.icon = icon;
     }
-    public DefaultWidgetGroup(){
-        
-    }
-    @Override
-    public ItemWidget[] getItems() {
-        return items;
-    }
-
     @Override
     public String getName() {
         return name;
@@ -49,6 +42,11 @@ public class DefaultWidgetGroup implements WidgetGroup {
     @Override
     public String getContext() {
         return context;
+    }
+
+    @Override
+    public Item getValue() {
+        return this;
     }
 
     @Override

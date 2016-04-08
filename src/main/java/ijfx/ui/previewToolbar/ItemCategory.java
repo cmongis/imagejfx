@@ -17,15 +17,12 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface WidgetGroup {
-    public ItemWidget[] getItems();
+public interface ItemCategory extends Item  {
     public String getName();
-    public String getContext();
-    public String getIcon();
 }

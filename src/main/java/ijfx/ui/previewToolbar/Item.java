@@ -17,42 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-class Category {
-public String name;
-public String context;
-public DefaultWidget [] items;
-
-    public Category() {
-    }
-    
-    public Category(String name, String context, DefaultWidget [] items) {
-        this.name = name;
-        this.context = context;
-        this.items = items;
-    }
-
-    public Category(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getContext() {
-        return context;
-    }
-
-    public DefaultWidget[] getItems() {
-        return items;
-    }
-    
-
-
+public interface Item {
+    public String getContext();
+    public Item getValue();
+    public String getIcon();
 }

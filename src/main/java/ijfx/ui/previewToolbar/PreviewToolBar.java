@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
 
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
@@ -51,7 +51,7 @@ import org.scijava.plugin.PluginService;
  */
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "debdfsfsssdug-button", context = "imagej", order = 13.0, localization = Localization.TOP_TOOLBAR)
-public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
+public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     @Parameter
     PreviewService previewService;
@@ -70,7 +70,7 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
     private JsonReader jsonReader;
     private PaneContextualView contextualView;
 
-    public AlgorithmsToolBar() {
+    public PreviewToolBar() {
         super();
         fakeToolBar = new HBox();
         this.setTop(fakeToolBar);
@@ -109,9 +109,7 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
      * @param owner
      */
     private void createPopOver(Pane pane, Node owner) {
-        contextService.enter("multi-z-img");
-        contextService.update();
-        System.out.println(contextService.getActualContextListAsString());
+
         if (popOver == null) {
             popOver = new PopOver(pane);
             setPopOver(pane, owner);
@@ -157,10 +155,7 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
      * @param paneLabelCell
      */
     public void setMouseAction(PaneLabelCell<ItemCategory> paneLabelCell) {
-        paneLabelCell.addEventFilter(MouseEvent.MOUSE_RELEASED, (ee)
-                -> {
-            System.out.println(popOver.getY());
-        });
+
         paneLabelCell.addEventFilter(MouseEvent.MOUSE_EXITED, (ee) -> {
             contextService.leave(paneLabelCell.getItem().getName());
         });
@@ -191,7 +186,7 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
     /**
      * Generate ItemCategory and ItemWidget with FactoryPaneCell
      *
-     * @see ijfx.examples.context.FactoryPaneCell
+     * @see ijfx.ui.previewToolbar.FactoryPaneCell
      * @param jsonReader
      * @param fakeToolBar
      * @param contextualView

@@ -17,14 +17,11 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
 
-import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.image.Image;
 import mongis.utils.panecell.PaneIconCell;
 import mongis.utils.panecell.PaneLabelCell;
 
@@ -55,7 +52,6 @@ public class FactoryPaneCell {
         }
         catch(Exception e)
         {
-            e.printStackTrace();
         }
      
         paneIconCell.setTitleFactory(f -> f.getLabel());
