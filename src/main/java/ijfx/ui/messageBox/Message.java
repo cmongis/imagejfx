@@ -20,16 +20,18 @@
 package ijfx.ui.messageBox;
 
 import javafx.beans.property.Property;
-import javafx.scene.Node;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public interface MessageBox{
+public interface Message {
     
-    public Node getContent();
-    public Property<Message> messageProperty();
-    public Message getMessage();
+    public Property<MessageType> typeProperty();
     
+    public Property<String> textProperty();
+    
+    public MessageType getType();
+    
+    public String getText();
 }

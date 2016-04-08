@@ -123,12 +123,12 @@ public class MessageBoxTest extends Application{
                         break;
                 }
                 
-                messageBox.typeProperty().setValue(newType);
-                messageBox.messageProperty().setValue(textArea.getText());
+                messageBox.getMessage().typeProperty().setValue(newType);
+                messageBox.getMessage().textProperty().setValue(textArea.getText());
             });
             
             clearBtn.onMouseClickedProperty().setValue((e) -> {
-                messageBox.messageProperty().setValue(null);
+                messageBox.getMessage().textProperty().setValue(null);
             });
             
             this.getChildren().add(messageBox.getContent());
