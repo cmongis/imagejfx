@@ -19,7 +19,7 @@
  */
 package ijfx.ui.context;
 
-import ijfx.examples.context.ContextualPaneIconWrapper;
+import ijfx.ui.previewToolbar.ContextualPaneIconWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
