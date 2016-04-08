@@ -17,17 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.ui.explorer.event;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import ijfx.ui.IjfxEvent;
+import ijfx.ui.explorer.Explorable;
+import java.util.List;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
-   
- 
+public class DisplayedListChanged extends IjfxEvent<List<? extends Explorable>>{
+    
 }

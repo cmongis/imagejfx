@@ -1,0 +1,23 @@
+[
+    {
+        "ovl_type":"rectangle"
+        ,"origin":[20,40]
+        ,"extent":[12,15]
+    }
+    ,
+    {
+        "ovl_type":"polygon"
+        ,"points":[
+            [10,10]
+            ,[30,30]
+            ,[20,20]
+            ,[10,20]
+            ,[4,4]
+        ]
+    }
+    ,{
+        "ovl_type":"line"
+        ,"begin":[20,50]
+        ,"end":[20,50]
+    }
+]

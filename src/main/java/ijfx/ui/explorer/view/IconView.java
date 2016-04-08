@@ -25,8 +25,11 @@ import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.Iconazable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
@@ -56,6 +59,9 @@ public class IconView extends ScrollPane implements ExplorerView {
         tilePane.setHgap(5);
         binder = new ScrollBinder(this);
         cellPaneCtrl.setCellFactory(this::createIcon);
+        
+        addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
+        
     }
 
     @Override
@@ -73,4 +79,27 @@ public class IconView extends ScrollPane implements ExplorerView {
         return new ExplorerIconCell();
     }
 
+    @Override
+    public List<? extends Explorable> getSelectedItems() {
+        return cellPaneCtrl
+                .getItems()
+                .stream()
+                .map(item->(Explorable)item)
+                .filter(item->item.selectedProperty().getValue())
+                .collect(Collectors.toList());
+    }
+
+    
+    public void onMouseClick(MouseEvent event){
+        System.out.println(event);
+        if(event.getTarget() == tilePane) {
+            cellPaneCtrl.getItems().forEach(item->item.selectedProperty().setValue(false));
+        }
+    }
+    
+    public void onMouseDrag(DragEvent event) {
+        System.out.println(event);
+        
+    }
+    
 }

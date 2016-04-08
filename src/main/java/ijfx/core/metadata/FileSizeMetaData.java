@@ -17,17 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.core.metadata;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import mongis.utils.FileUtils;
+import mongis.utils.TextFileUtils;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
-   
- 
+public class FileSizeMetaData extends GenericMetaData{
+    
+    public FileSizeMetaData(long size) {
+        setName(MetaData.FILE_SIZE);
+        setValue(new Double(size));
+    }
+    
+    @Override
+    public String getStringValue() {
+        return FileUtils.readableFileSize(getDoubleValue().longValue());
+    }
+    
+    
 }

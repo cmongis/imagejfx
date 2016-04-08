@@ -675,6 +675,9 @@
     -fx-background:-bg-dark;
     -fx-background-color: -dark;
 }
+.darker-background {
+    -fx-background-color:-bg-darker;
+}
 .with-light-background,.light-background,.light-bg {
     -fx-background-color:-bg-light;
 }
@@ -1707,6 +1710,9 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-text-fill:-txt-normal;
     -fx-font-size:0.8em;
 }
+.pane-icon-cell:selected .subtitle-label {
+    -fx-text-fill:black;
+}
 .label.normal {
     -fx-text-fill:-txt-normal;
 }
@@ -1718,4 +1724,36 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .selectable:active {
     -fx-background-color:-bg-light;
+}
+.pane-icon-cell {
+    -fx-padding:1em;
+}
+.pane-icon-cell:hover {
+    -fx-background-color:-bg-light;
+}
+.pane-icon-cell:selected {
+    -fx-background-color:-flatter-primary;
+}
+
+
+.explorer-filter,#filterVBox {
+    -fx-background-color:-bg-darker;
+}
+.explorer-filter > .content{
+    -fx-padding: 0.6em;
+}
+
+
+
+/*
+    Number filter related classes
+
+*/ 
+
+.text-field.number {
+    -fx-font-size:0.7em;
+    -fx-pref-width:1em;
+}
+.number-filter #valueCountLabel{
+    -fx-font-size:0.7em;
 }

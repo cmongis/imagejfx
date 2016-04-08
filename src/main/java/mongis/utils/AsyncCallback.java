@@ -35,6 +35,7 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
     INPUT input;
 
     Callback<INPUT, OUTPUT> callback;
+    Runnable runnable;
 
     public AsyncCallback() {
         super();
@@ -44,7 +45,7 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
         this();
         setInput(input);
     }
-    
+
     public AsyncCallback(Callback<INPUT, OUTPUT> callback) {
         this();
         this.callback = callback;
@@ -60,25 +61,35 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
             System.out.println("Cannot run null :-S");
             return this;
         }
-        this.callback = input -> {
-            runnable.run();
-            return null;
-        };
+        this.runnable = runnable;
         return this;
     }
 
     public OUTPUT call() {
         try {
+            // first we check if the task was cancelled BEFORE RUNNING IT
             if (isCancelled()) {
                 return null;
             }
             try {
-                OUTPUT output = callback.call(input);
+                // now if we should execute a callback
+                if (callback != null) {
+                    // executing and betting the output
+                    OUTPUT output = callback.call(input);
+                    // if the task has been cancelled during execution,
+                    // we cancel the output and return null
+                    if (isCancelled()) {
+                        return null;
+                    } else {
+                        return output;
+                    }
+                } // now if we have a runnable as part of the task
+                else if (runnable != null) {
+                    runnable.run();
+                    // same if it was cancelled during the problem
 
-                if (isCancelled()) {
-                    return null;
                 } else {
-                    return output;
+                    return null;
                 }
             } catch (Exception e) {
                 ImageJFX.getLogger().log(Level.SEVERE, "Error when executing callback", e);
@@ -111,12 +122,13 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
 
     public AsyncCallback<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
         setOnSucceeded(event -> {
-            if (!isCancelled() && getValue() != null) {
-                
+            // if it wasn't cancelled and it was a callback executed
+            if (!isCancelled() && getValue() != null && runnable == null) {
                 consumer.accept(getValue());
+            } else if (!isCancelled() && runnable != null) {
+                consumer.accept(null);
             }
-            
-            if(getValue() == null) {
+            if (getValue() == null && runnable == null) {
                 ImageJFX.getLogger().warning("Return value was null :-(");
             }
         });

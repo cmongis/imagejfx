@@ -19,6 +19,7 @@
  */
 package ijfx.core.imagedb;
 
+import ijfx.core.metadata.FileSizeMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.ui.main.ImageJFX;
@@ -106,10 +107,11 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             metadataset.putGeneric(MetaData.ZSTACK_NUMBER, zCount);
             metadataset.putGeneric(MetaData.TIME_COUNT, timeCount);
             metadataset.putGeneric(MetaData.BITS_PER_PIXEL, bitsPerPixel);
-            metadataset.putGeneric(MetaData.FILE_SIZE, imageSize);
+            metadataset.put(new FileSizeMetaData(file.length()));
             metadataset.putGeneric(MetaData.SERIE_COUNT, serieCount);
             metadataset.putGeneric(MetaData.CHANNEL_COUNT, channelCount);
-
+            metadataset.putGeneric(MetaData.FILE_NAME, file.getName());
+            
             return metadataset;
 
         } catch (FormatException ex) {

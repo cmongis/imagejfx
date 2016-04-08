@@ -17,17 +17,38 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package mongis.utils.properties;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import java.util.function.BiConsumer;
+import javafx.util.Callback;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
+public class ServiceProperty<ITEM,VALUE> extends SimpleUpdatablePoperty<VALUE>{
+    
+    final private ITEM item;
+    
+    final private BiConsumer<ITEM, VALUE> setter;
+    final private Callback<ITEM,VALUE> getter;
+
+    public ServiceProperty(ITEM item, BiConsumer<ITEM, VALUE> setter, Callback<ITEM, VALUE> getter) {
+        this.item = item;
+        this.setter = setter;
+        this.getter = getter;
+    }
+    
+    
    
- 
+    
+    @Override
+    public VALUE get() {
+        return getter.call(item);
+    }
+    
+    @Override
+    public void set(VALUE value) {
+        setter.accept(item, value);
+    }
 }

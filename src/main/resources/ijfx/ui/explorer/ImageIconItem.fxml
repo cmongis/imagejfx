@@ -9,9 +9,6 @@
 <?import javafx.scene.layout.*?>
 
 <fx:root styleClass="image-icon-item" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <ImageView fx:id="imageView" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
-   </center>
    <bottom>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -24,4 +21,11 @@
          </children>
       </VBox>
    </bottom>
+   <center>
+      <BorderPane fx:id="imageViewContainer" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <center>
+            <ImageView fx:id="imageView" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </center>
 </fx:root>

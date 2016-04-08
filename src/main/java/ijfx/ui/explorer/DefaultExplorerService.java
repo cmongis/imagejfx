@@ -20,7 +20,8 @@
 package ijfx.ui.explorer;
 
 import ijfx.core.metadata.MetaDataOwner;
-import ijfx.ui.explorer.event.ExploreredListChanged;
+import ijfx.ui.explorer.event.DisplayedListChanged;
+import ijfx.ui.explorer.event.ExploredListChanged;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -53,7 +54,9 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     public void setItems(List<Explorable> items) {
         
         explorableList = items;
+        eventService.publish(new ExploredListChanged().setObject(items));
         applyFilter(lastFilter);
+        
     }
 
     @Override
@@ -85,8 +88,9 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     
     protected void setFilteredItems(List<Explorable> filteredItems) {
         this.filteredList = filteredItems;
-        eventService.publishLater(new ExploreredListChanged().setObject(filteredItems));
+        eventService.publishLater(new DisplayedListChanged().setObject(filteredItems));
     }
     
+  
     
 }

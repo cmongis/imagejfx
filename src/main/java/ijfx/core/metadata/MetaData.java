@@ -64,6 +64,8 @@ public interface MetaData {
 
     public Double getDoubleValue();
 
+    public boolean isNull();
+    
     public final static int TYPE_STRING = 0;
     public final static int TYPE_INTEGER = 1;
     public final static int TYPE_DOUBLE = 2;
@@ -107,9 +109,9 @@ public interface MetaData {
     public final static String WAS_MODIFIED = "modified";
 
     public final static String SERIE_COUNT = "Series";
-    public final static String CHANNEL_COUNT = "Cahnnel number";
+    public final static String CHANNEL_COUNT = "Channel number";
 
-    public final static String ZSTACK_NUMBER = "ZStack";
+    public final static String ZSTACK_NUMBER = "Z Slice number";
     public final static String PIXEL_TYPE = "Pixel Type";
     public final static String BITS_PER_PIXEL = "Bits per pixels";
     public final static String TIME_COUNT = "Time frame number";
@@ -121,6 +123,13 @@ public interface MetaData {
     
     public final static String STATS_PIXEL_STD_DEV = "Standard deviation";
  
+    public static boolean notNull(MetaData data) {
+        return data.isNull() == false;
+    }
+    
+    public static boolean isNull(MetaData data) {
+        return data.isNull();
+    }
     
     // addedd an other useful comment
 }

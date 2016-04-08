@@ -30,7 +30,7 @@ import java.util.Collection;
 public interface MetaDataFilterFactory  {
     
     
-    public MetaDataOwnerFilter generateFilter(Collection<MetaDataOwner> ownerList, String keyName)throws IOException;
+    public MetaDataOwnerFilter generateFilter(Collection<? extends MetaDataOwner> ownerList, String keyName);
     
     
 }

@@ -23,7 +23,40 @@
             </HBox>
          </top>
       </BorderPane>
-      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0" />
+      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+         <bottom>
+            <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
+               <children>
+                  <Button fx:id="selectAllButton" mnemonicParsing="false" onAction="#selectAll" styleClass="success" text="Select all">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="CHECK" />
+                     </graphic>
+                  </Button>
+                  <MenuButton mnemonicParsing="false" text="Segment">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="THUMB_TACK" />
+                     </graphic>
+                  </MenuButton>
+                  <MenuButton mnemonicParsing="false" text="Process">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="GEARS" />
+                     </graphic>
+                  </MenuButton>
+               </children>
+               <styleClass>
+                  <String fx:value="hbox" />
+                  <String fx:value="with-top-padding" />
+               </styleClass>
+            </HBox>
+         </bottom></BorderPane>
       <ToolBar layoutX="400.0" layoutY="-26.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
             <FontAwesomeIconView glyphName="FOLDER" styleClass="h4" />
@@ -48,11 +81,7 @@
             </ToggleButton>
          </items>
       </ToolBar>
-      <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0" />
-      <VBox fx:id="filterVBox" prefHeight="200.0" prefWidth="250.0" styleClass="bg-lighter" translateX="-250.0" translateZ="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
-         <children>
-            <Label fx:id="Filters" text="Label" />
-         </children>
-      </VBox>
+      <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="50.0" />
+      <Accordion fx:id="filterVBox" prefWidth="250.0" translateX="-300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="50.0" />
    </children>
 </fx:root>

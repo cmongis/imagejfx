@@ -47,6 +47,11 @@ import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 import mongis.utils.ConditionList;
 import ijfx.ui.context.UiContextManager;
+import ijfx.ui.context.UiContextUpdatedEvent;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -67,6 +72,9 @@ public class UiContextService extends AbstractService implements UiContextManage
 
     private static final Logger logger = ImageJFX.getLogger();
 
+    @Parameter
+    EventService eventService;
+    
     public UiContextManager registerWidget(ContextualWidget widget) {
         widgets.put(widget.getName(), widget);
         importContextConfiguration();
@@ -168,6 +176,9 @@ public class UiContextService extends AbstractService implements UiContextManage
         // for each controller, update the controller by telling it which widget it should show
         // and which widget it should hide
         viewMap.values().parallelStream().forEach(controller -> updateController(controller));
+        
+        eventService.publish(new UiContextUpdatedEvent().setObject(currentContextList));
+        
         return this;
     }
 
@@ -196,6 +207,9 @@ public class UiContextService extends AbstractService implements UiContextManage
         catch(Exception e) {
             logger.log(Level.SEVERE, "Error when updating ContextualView", e);
         }
+        
+        
+        
     }
 
     public boolean shouldShow(String contextualWidget) {
@@ -389,4 +403,8 @@ public class UiContextService extends AbstractService implements UiContextManage
     public HashMap<String, UiContext> getUIContextMap() {
         return uiContextMap;
     }
+    
+    
+    
+    
 }

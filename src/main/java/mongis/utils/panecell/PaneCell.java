@@ -19,6 +19,7 @@
  */
 package mongis.utils.panecell;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.scene.Node;
 
 /**
@@ -31,4 +32,7 @@ public interface PaneCell<T> {
     public void setItem(T item);
     public T getItem();
     public Node getContent();
+    
+    public BooleanProperty selectedProperty();
+    
 }

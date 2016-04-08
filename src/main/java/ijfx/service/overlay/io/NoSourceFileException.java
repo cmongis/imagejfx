@@ -17,17 +17,12 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
-
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+package ijfx.service.overlay.io;
 
 /**
- *
+ * Exception thrown when a dataset has no source file specified
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
-   
- 
+public class NoSourceFileException extends Exception{
+    
 }

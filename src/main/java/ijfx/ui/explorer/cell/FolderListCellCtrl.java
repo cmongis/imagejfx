@@ -67,4 +67,11 @@ public class FolderListCellCtrl extends VBox implements ListCellController<Folde
         return currentFolder;
     }
 
+    
+    public void forceUpdate() {
+        if(currentFolder != null) {
+            setItem(currentFolder);
+        }
+    }
+    
 }

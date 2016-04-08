@@ -31,37 +31,43 @@ import javafx.scene.Node;
  *
  * @author Pierre BONNEAU
  */
-public class NumberFilterWrapper implements MetaDataOwnerFilter{
-    
+public class NumberFilterWrapper implements MetaDataOwnerFilter {
+
     private final NumberFilter filter;
     private final Property<Predicate<MetaDataOwner>> metaDataOwnerProperty;
-    
-    public NumberFilterWrapper(NumberFilter filter, String keyName){
+
+    public NumberFilterWrapper(NumberFilter filter, String keyName) {
         this.filter = filter;
-        this.metaDataOwnerProperty = new SimpleObjectProperty<>();
-        metaDataOwnerProperty.setValue(new NumberOwnerPredicate(keyName, filter.predicateProperty().getValue()));
-        
+        this.metaDataOwnerProperty = new SimpleObjectProperty<>(null);
+
+        if (filter.predicateProperty().getValue() != null) {
+            metaDataOwnerProperty.setValue(new NumberOwnerPredicate(keyName, filter.predicateProperty().getValue()));
+        }
+
         filter.predicateProperty().addListener(new ChangeListener<Predicate<Double>>() {
             @Override
-            public void changed(ObservableValue<? extends Predicate<Double>> ov, Predicate<Double> t, Predicate<Double> t1) {
-                metaDataOwnerProperty.setValue(new NumberOwnerPredicate(keyName, t1));
+            public void changed(ObservableValue<? extends Predicate<Double>> ov, Predicate<Double> t, Predicate<Double> newValue) {
+
+                if (newValue != null) {
+                    metaDataOwnerProperty.setValue(new NumberOwnerPredicate(keyName, newValue));
+                } else {
+                    metaDataOwnerProperty.setValue(null);
+                }
             }
         });
     }
-    
+
     @Override
-    public Node getContent(){
+    public Node getContent() {
         return filter.getContent();
     }
-    
-    
+
     @Override
-    public Property<Predicate<MetaDataOwner>> predicateProperty(){
+    public Property<Predicate<MetaDataOwner>> predicateProperty() {
         return this.metaDataOwnerProperty;
     }
-    
-    
-    public NumberFilter getFilter(){
+
+    public NumberFilter getFilter() {
         return this.filter;
     }
 }

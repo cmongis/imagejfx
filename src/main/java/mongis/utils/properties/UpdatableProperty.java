@@ -17,17 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package mongis.utils.properties;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
-   
- 
+public interface UpdatableProperty<T> extends Property<T>{
+    
+    public void fireChanged();
+    
 }

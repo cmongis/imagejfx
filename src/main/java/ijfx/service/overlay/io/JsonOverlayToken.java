@@ -17,17 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
-
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+package ijfx.service.overlay.io;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
+public final class JsonOverlayToken {
+
+    
+    
+    public static String RECTANGLE_OVERLAY = "rectangle";
+    public static String LINE_OVERLAY = "line";
+    public static String POLYGON_OVERLAY = "polygon";
+    public static String EXTENT = "extent";
+    public static String ORIGIN = "origin";
+    public static String BEGIN = "begin";
+    public static String END = "end";
+    
+     public static final String OVERLAY_TYPE  = "ovl_type";
      
-   
- 
+     
+
 }

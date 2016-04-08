@@ -17,17 +17,17 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package mongis.utils.properties;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
-     
-   
- 
+public class SimpleUpdatablePoperty<T> extends SimpleObjectProperty<T> implements UpdatableProperty<T>{
+    @Override
+    public void fireChanged() {
+        fireValueChangedEvent();
+    }
 }

@@ -31,45 +31,47 @@ import javafx.scene.Node;
  *
  * @author Pierre BONNEAU
  */
-public class StringFilterWrapper implements MetaDataOwnerFilter{
-    
+public class StringFilterWrapper implements MetaDataOwnerFilter {
+
     private final StringFilter filter;
     private final Property<Predicate<MetaDataOwner>> metaDataOwnerProperty;
-    
-    public StringFilterWrapper(StringFilter filter, String keyName){
-        
+
+    public StringFilterWrapper(StringFilter filter, String keyName) {
+
         this.filter = filter;
-        metaDataOwnerProperty = new SimpleObjectProperty<>();
-        metaDataOwnerProperty.setValue(new StringOwnerPredicate(keyName, filter.predicateProperty().getValue()));
-        
+        metaDataOwnerProperty = new SimpleObjectProperty<>(null);
+       if(filter.predicateProperty().getValue() != null) metaDataOwnerProperty.setValue(new StringOwnerPredicate(keyName, filter.predicateProperty().getValue()));
+
         filter.predicateProperty().addListener(new ChangeListener<Predicate<String>>() {
             @Override
             public void changed(ObservableValue<? extends Predicate<String>> ov, Predicate<String> t, Predicate<String> t1) {
-                metaDataOwnerProperty.setValue(new StringOwnerPredicate(keyName, t1));
+                
+                // the predicate should be null if the user did nothing
+                if (t1 == null) {
+                    metaDataOwnerProperty.setValue(null);
+                } else {
+                    metaDataOwnerProperty.setValue(new StringOwnerPredicate(keyName, t1));
+                }
             }
         });
     }
-    
-    
+
     @Override
-    public Node getContent(){
+    public Node getContent() {
         return filter.getContent();
     }
-    
-    
+
     @Override
-    public Property<Predicate<MetaDataOwner>> predicateProperty(){
+    public Property<Predicate<MetaDataOwner>> predicateProperty() {
         return this.metaDataOwnerProperty;
     }
-    
-    
-    public StringFilter getFilter(){
+
+    public StringFilter getFilter() {
         return this.filter;
     }
-    
-    
-    public void updatePredicate(){
-        
+
+    public void updatePredicate() {
+
     }
-    
+
 }
