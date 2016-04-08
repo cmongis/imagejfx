@@ -111,9 +111,9 @@ public class PreviewService extends AbstractService implements ImageJService {
     public PreviewService() {
     }
     
-    public Image getImageDisplay(String command) {
+    public Image getImageDisplay(String command, Map<String,Object> inputMap) {
         Dataset preview = getPreviewDataset(width, height, 0, 0);
-        preview = applyCommand(preview, command);
+        preview = applyCommand(preview, command, inputMap);
         BufferedImage bufferedImage = datasetToBufferedImage(preview);
 
         WritableImage wi = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
@@ -208,14 +208,14 @@ public class PreviewService extends AbstractService implements ImageJService {
         return view.getScreenImage().image();
     }
     
-    public Dataset applyCommand(Dataset dataset, String command)
+    public Dataset applyCommand(Dataset dataset, String command, Map<String,Object> inputMap)
     {
         try {
-            Map<String,Object> inputMap = new HashMap<>();
-            inputMap.put("dataset", dataset);
-            inputMap.put("sigma", 3);
-            inputMap.put("useUnits", false);
-            final Future<CommandModule> futur =commandService.run(command, false, inputMap);
+            Map<String,Object> parameters = new HashMap<>(inputMap);
+            parameters.put("dataset", dataset);
+//            inputMap.put("sigma", 3);
+//            inputMap.put("useUnits", false);
+            final Future<CommandModule> futur =commandService.run(command, false, parameters);
             Map<String,Object> outMap = futur.get().getOutputs();
         System.out.println("ijfx.service.preview.PreviewService.applyCommand()");
         return (Dataset) outMap.get("dataset");

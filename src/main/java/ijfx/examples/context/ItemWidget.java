@@ -20,6 +20,7 @@
 package ijfx.examples.context;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Map;
 
 /**
  *
@@ -32,6 +33,6 @@ public interface ItemWidget extends Item{
     public String getLabel();
     public void addContext(String s);
     public void removeSpaceContext();
-    public Parameters getParameters();
+    public Map<String, Object> getParameters();
     
 }

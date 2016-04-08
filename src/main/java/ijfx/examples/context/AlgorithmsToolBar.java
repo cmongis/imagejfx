@@ -174,7 +174,7 @@ public class AlgorithmsToolBar extends BorderPane implements UiPlugin {
                     if (itemWidget.getIcon().equals("preview")) {
                         String action = itemWidget.getAction();
                         previewService.setParameters(0, 0, 120, 120);
-                        paneIconCell.setImage(previewService.getImageDisplay(action));
+                        paneIconCell.setImage(previewService.getImageDisplay(action, itemWidget.getParameters()));
                     }
                 });
                 if (!flowPane.getChildren().isEmpty()) {
