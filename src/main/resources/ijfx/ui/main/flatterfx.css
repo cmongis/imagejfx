@@ -238,6 +238,25 @@
     -fx-background-color: derive(-flatter-warning,10%);   
 }
 
+.toggle-group {
+   
+}
+.toggle-group .toggle-button{
+    -fx-background-radius: 0.0 0 0 0.0;
+   
+}
+
+.toggle-group .toggle-button.first {
+    -fx-background-radius: 2.0 0 0 2.0;
+}
+.toggle-group .toggle-button.last {
+    -fx-background-radius: 0.0 2.0 2.0 0.0;
+}
+.toggle-group .toggle-button:hover {
+    -fx-translate-x:0;
+    -fx-translate-y:0;
+    -fx-background-color:derive(-flatter-warning,-10%);
+}
 
 /*******************************************************************************
  *                                                                             *

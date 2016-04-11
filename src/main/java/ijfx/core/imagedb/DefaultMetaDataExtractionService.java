@@ -96,7 +96,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             Metadata metadata = getSCIFIO().format().getFormat(file.getAbsolutePath()).createParser().parse(file.getAbsolutePath());
             t.elapsed("Metadata parser creation");
             long serieCount, timeCount, zCount, channelCount, width, height, imageSize, bitsPerPixel;
-           
+            String dimensionOrder;
 
             serieCount = metadata.getImageCount();
             width = metadata.get(0).getAxisLength(Axes.X);
@@ -106,7 +106,8 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             channelCount = metadata.get(0).getAxisLength(Axes.CHANNEL);
             bitsPerPixel = metadata.get(0).getBitsPerPixel();
             imageSize = metadata.getDatasetSize();
-             
+            //dimensionOrder = metadata.get
+            
             metadataset.putGeneric(MetaData.WIDTH, width);
             metadataset.putGeneric(MetaData.HEIGHT, height);
             metadataset.putGeneric(MetaData.ZSTACK_NUMBER, zCount);
@@ -116,7 +117,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             metadataset.putGeneric(MetaData.SERIE_COUNT, serieCount);
             metadataset.putGeneric(MetaData.CHANNEL_COUNT, channelCount);
             metadataset.putGeneric(MetaData.FILE_NAME, file.getName());
-            
+            //metadataset.putGeneric(MetaData.DIMENSION_ORDER)
             return metadataset;
 
         } catch (FormatException ex) {

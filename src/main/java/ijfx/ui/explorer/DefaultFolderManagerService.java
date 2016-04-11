@@ -127,12 +127,12 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     
     
     private List<Explorable> getPlanes(Folder folder) {
-        
+        return null;
         
     }
     
     private List<Explorable> getObjects(Folder folder) {
-        
+        return null;
     }
 
 }

@@ -181,11 +181,19 @@ public class DefaultFolder implements Folder {
 
     
     public Project getFolderProject() {
-        
+        return null;
     }
     
     
-    
+    private Project createPlaneProject() {
+        
+        
+        
+        return null;
+        
+        
+        
+    }
     
     
     
