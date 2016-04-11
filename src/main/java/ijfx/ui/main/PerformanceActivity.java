@@ -24,6 +24,7 @@ import ijfx.service.TimerService;
 import ijfx.ui.activity.Activity;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.beans.value.ObservableValue;
@@ -32,6 +33,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -44,14 +46,14 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Activity.class)
+@Plugin(type = Activity.class,label="performance-activity")
 public class PerformanceActivity extends BorderPane implements Activity {
 
     @FXML
     ListView<Timer> timerListView;
 
     @FXML
-    TableView<SummaryStatistics> summaryStatistics;
+    TableView<TimerEntry> timerEntryTableView;
 
     @Parameter
     TimerService timerService;
@@ -60,28 +62,35 @@ public class PerformanceActivity extends BorderPane implements Activity {
     TableColumn<TimerEntry, String> idColumn;
 
     @FXML
-    TableColumn<TimerEntry, Double> meanColumn;
+    TableColumn<TimerEntry, Long> meanColumn;
 
     @FXML
-    TableColumn<TimerEntry, Double> minColumn;
+    TableColumn<TimerEntry, Long> minColumn;
 
     @FXML
-    TableColumn<TimerEntry, Double> maxColumn;
+    TableColumn<TimerEntry, Long> maxColumn;
 
     @FXML
-    TableColumn<TimerEntry, Double> stdDevColumn;
+    TableColumn<TimerEntry, Long> stdDevColumn;
 
+    @FXML
+    TableColumn<TimerEntry, Long> countColumn;
+    
     public PerformanceActivity() throws IOException {
         FXUtilities.injectFXML(this);
 
         timerListView.setCellFactory(this::createListCell);
-
+        timerListView.getSelectionModel().selectedItemProperty().addListener(this::onTimerChanged);
+        timerListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         idColumn.setCellValueFactory(this::readOnly);
+        meanColumn.setCellValueFactory(this::readOnly);
+        stdDevColumn.setCellValueFactory(this::readOnly);
+        minColumn.setCellValueFactory(this::readOnly);
+        maxColumn.setCellValueFactory(this::readOnly);
+        countColumn.setCellValueFactory(this::readOnly);
+        
 
     }
-
-   
-  
 
     @Override
     public Node getContent() {
@@ -91,16 +100,14 @@ public class PerformanceActivity extends BorderPane implements Activity {
 
     @Override
     public Task updateOnShow() {
-        
-        
+
         Collection<? extends Timer> timers = timerService.getTimers();
         timerListView.getItems().clear();
         timerListView.getItems().addAll(timers);
-        
-        if(timers.size() > 0 && timerListView.getSelectionModel().getSelectedItem() == null) {
+        System.out.println("timers "+timers.size());
+        if(timers.size() > 0) {
             timerListView.getSelectionModel().select(timers.iterator().next());
         }
-        
         
         return null;
 
@@ -117,6 +124,7 @@ public class PerformanceActivity extends BorderPane implements Activity {
         }
 
         public void onItemChanged(Observable obs, Timer oldValue, Timer newvalue) {
+            if(newvalue != null)
             setText(newvalue.getName());
         }
 
@@ -124,22 +132,46 @@ public class PerformanceActivity extends BorderPane implements Activity {
 
     private <T, R> ObservableValue<R> readOnly(TableColumn.CellDataFeatures<T, R> feature) {
         String propertyName = feature.getTableColumn().getId().replace("Column", "");
+        System.out.println("Property name : "+propertyName);
         T bean = feature.getValue();
+        
+        
+        
         try {
+            //return new SimpleObjectProperty(bean,propertyName);
+            
             return new JavaBeanObjectPropertyBuilder<>()
+                    
                     .bean(bean)
                     .name(propertyName)
                     .build();
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
+    
+    
+    private void onTimerChanged(Observable obs, Timer oldValue, Timer newValue) {
+        
+        
+        System.out.println(newValue.getName());
+        System.out.println(newValue.getStats().size());
+        timerEntryTableView.getItems().clear();
+        timerEntryTableView.getItems().addAll(
+                newValue
+                        .getStats()
+                        .entrySet()
+                        .stream()
+                        .map(entry->new TimerEntry(entry.getKey(),entry.getValue()))
+                        .collect(Collectors.toList())
+         );
+        
+    }
 
-    private class TimerEntry {
-
+    public class TimerEntry {
         private final String id;
         private final SummaryStatistics stats;
-
         public TimerEntry(String id, SummaryStatistics stats) {
             this.id = id;
 
@@ -149,26 +181,40 @@ public class PerformanceActivity extends BorderPane implements Activity {
         public String getId() {
             return id;
         }
-
+        
+        
+        
         public SummaryStatistics getStats() {
             return stats;
         }
 
-        public Double getMean() {
-            return getStats().getMean();
+        public Long getMean() {
+            return Math.round(getStats().getMean());
         }
 
-        public Double getMin() {
-            return getStats().getMin();
+        public Long getMin() {
+            return Math.round(getStats().getMin());
         }
 
-        public Double getMax() {
-            return getStats().getMax();
+        public Long getMax() {
+            return Math.round((getStats().getMax()));
         }
 
-        public Double getStdDev() {
-            return getStats().getMean();
+        public Long getStdDev() {
+            return Math.round((getStats().getStandardDeviation()));
         }
-
+        
+        public Long getCount() {
+            System.out.println("gettting n");
+            return getStats().getN();
+        }
+        
+       public void setId(String s) {}
+       public void setMean(Long d) {}
+       public void setMin(Long d) {}
+       public void setMax(Long d) {}
+       public void setStdDev(Long d) {}
+       public void setCount(Long l) {};
+       
     }
 }

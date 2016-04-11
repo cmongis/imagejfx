@@ -47,7 +47,7 @@ import org.scijava.plugin.PluginService;
  * @author Tuan anh TRINH
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "debdfsfsssdug-button", context = "imagej", order = 13.0, localization = Localization.TOP_TOOLBAR)
+@UiConfiguration(id = "imagej-top-toolbar", context = "imagej+image-open", order = 13.0, localization = Localization.TOP_TOOLBAR)
 public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -167,7 +167,9 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
                         String action = itemWidget.getAction();
                         previewService.setParameters(0, 0, 120, 120);
                         paneIconCell.setImage(previewService.getImageDisplay(action, itemWidget.getParameters()));
+                      
                     }
+                      paneIconCell.setSubtitleVisible(false);
                 });
                 if (!flowPane.getChildren().isEmpty()) {
                     popOver.setOpacity(0);
@@ -193,6 +195,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
             PaneLabelCell<ItemCategory> paneLabelCell = FactoryPaneCell.generate(e);
             paneLabelCell.setId(((ItemCategory) paneLabelCell.getItem()).getName());
             fakeToolBar.getChildren().add(paneLabelCell);
+             paneLabelCell.setSubtitleVisible(false);
             setMouseAction(paneLabelCell);
         });
 
@@ -205,6 +208,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
                 System.out.println("Click Action " + paneIconCell.getItem().getLabel() + paneIconCell.getItem().getContext());
 
             });
+           
 
         });
     }

@@ -19,10 +19,7 @@
  */
 package mongis.utils.panecell;
 
-import de.jensd.fx.glyphs.GlyphsDude;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.ui.main.LoadingIcon;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +40,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
 
@@ -83,6 +80,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     @FXML
     private Label subtitleLabel;
 
+    @FXML
+    private VBox titleVBox;
     
     @FXML
     private BorderPane imageViewContainer;
@@ -153,6 +152,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             BindingsUtils.bindNodeToPseudoClass(SELECTED, this, selectedProperty());
             
             getStyleClass().add("pane-icon-cell");
+            
+            subtibleVisibleProperty().addListener(this::onSubtitleVisibleChanged);
             
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);
@@ -365,7 +366,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     public void setSubtitleVisible(boolean subtitleVisible) {
         subtibleVisibleProperty().setValue(subtitleVisible);
-
+       
     }
 
     public boolean isSubtitleVisible() {
@@ -398,5 +399,13 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         
     }
     
+    protected void onSubtitleVisibleChanged(Observable obs, Boolean oldValue, Boolean newValue) {
+        if(newValue) {
+            titleVBox.getChildren().add(subtitleLabel);
+        }
+        else {
+            titleVBox.getChildren().remove(subtitleLabel);
+        }
+    }
     
 }

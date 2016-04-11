@@ -33,7 +33,7 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class DefaultTimerService extends AbstractService implements TimerService {
 
-    private Map<String, Timer> timerMap = new HashMap<>();
+    private final Map<String, Timer> timerMap = new HashMap<>();
 
     @Override
     public Timer getTimer(Class<?> clazz) {

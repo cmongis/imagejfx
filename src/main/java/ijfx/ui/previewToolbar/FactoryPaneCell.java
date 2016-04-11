@@ -48,7 +48,9 @@ public class FactoryPaneCell {
         {
         FontAwesomeIconView fontAwesomeIconView =new FontAwesomeIconView(FontAwesomeIcon.valueOf(itemWidget.getIcon()));
         fontAwesomeIconView.getStyleClass().add("icon-toolbar");
-        paneIconCell.setIcon(fontAwesomeIconView);    
+        
+        paneIconCell.setIcon(fontAwesomeIconView);
+        paneIconCell.setSubtitleVisible(false);
         }
         catch(Exception e)
         {
