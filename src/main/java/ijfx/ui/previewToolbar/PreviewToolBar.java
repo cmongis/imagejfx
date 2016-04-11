@@ -29,6 +29,7 @@ import ijfx.ui.main.Localization;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -62,10 +63,8 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     @Parameter
     UiContextService contextService;
     private HBox fakeToolBar;
-    private FlowPane flowPane;
     private PopOver popOver;
     private JsonReader jsonReader;
-    private PaneContextualView contextualView;
 
     public PreviewToolBar() {
         super();
@@ -92,11 +91,8 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         jsonReader = new JsonReader();
         jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
         jsonReader.separate();
-        flowPane = new FlowPane();
         popOver = new PopOver();
-        flowPane.setPadding(new Insets(10, 10, 10, 10));
-        contextualView = new PaneContextualView(contextService, flowPane, "flowPane");
-        generateItems(jsonReader, hbox, contextualView);
+        generateItems(jsonReader, hbox);
         System.out.println("ijfx.examples.context.AlgorithmsToolBar.createToolBar()");
     }
 
@@ -149,37 +145,33 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     /**
      * Set action when user hoovers PaneIconCell
      *
-     * @param paneLabelCell
+     * @param labelCategory
      */
-    public void setMouseAction(PaneLabelCell<ItemCategory> paneLabelCell) {
+    public void setMouseAction(LabelCategory labelCategory) {
 
-        paneLabelCell.addEventFilter(MouseEvent.MOUSE_EXITED, (ee) -> {
-            contextService.leave(paneLabelCell.getItem().getName());
-        });
-        paneLabelCell.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
-            contextService.enter(paneLabelCell.getItem().getName());
-            Platform.runLater(() -> {
-                contextService.updateController(contextualView);
-                flowPane.getChildren().forEach((e) -> {
-                    PaneIconCell paneIconCell = (PaneIconCell) e;
-                    ItemWidget itemWidget = (ItemWidget) paneIconCell.getItem();
-                    if (itemWidget.getIcon().equals("preview")) {
-                        String action = itemWidget.getAction();
-                        previewService.setParameters(0, 0, 120, 120);
-                        paneIconCell.setImage(previewService.getImageDisplay(action, itemWidget.getParameters()));
-                      
-                    }
-                      paneIconCell.setSubtitleVisible(false);
-                });
-                if (!flowPane.getChildren().isEmpty()) {
-                    popOver.setOpacity(0);
-                    createPopOver(flowPane, paneLabelCell);
-                } else if (flowPane.getChildren().isEmpty()) {
-                    popOver.setOpacity(0);
+
+        labelCategory.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
+
+            labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
+                PaneIconCell paneIconCell = (PaneIconCell) e;
+                ItemWidget itemWidget = (ItemWidget) paneIconCell.getItem();
+                if (itemWidget.getIcon().equals("preview")) {
+                    String action = itemWidget.getAction();
+                    previewService.setParameters(0, 0, 120, 120);
+                    paneIconCell.setImage(previewService.getImageDisplay(action, itemWidget.getParameters()));
+
                 }
+                paneIconCell.setSubtitleVisible(false);
             });
-
+            System.out.println(labelCategory.getText());
+            if (!labelCategory.getPane().getChildren().isEmpty()) {
+                popOver.setOpacity(0);
+                createPopOver(labelCategory.getContextualView().getPane(), labelCategory);
+            } else if (labelCategory.getPane().getChildren().isEmpty()) {
+                popOver.setOpacity(0);
+            }
         });
+
     }
 
     /**
@@ -188,27 +180,35 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      * @see ijfx.ui.previewToolbar.FactoryPaneCell
      * @param jsonReader
      * @param fakeToolBar
-     * @param contextualView
      */
-    public void generateItems(JsonReader jsonReader, HBox fakeToolBar, PaneContextualView contextualView) {
+    public void generateItems(JsonReader jsonReader, HBox fakeToolBar) {
         jsonReader.getCategoryList().stream().forEach((e) -> {
-            PaneLabelCell<ItemCategory> paneLabelCell = FactoryPaneCell.generate(e);
-            paneLabelCell.setId(((ItemCategory) paneLabelCell.getItem()).getName());
-            fakeToolBar.getChildren().add(paneLabelCell);
-             paneLabelCell.setSubtitleVisible(false);
-            setMouseAction(paneLabelCell);
+            LabelCategory labelCategory = FactoryPaneCell.generateLabel(e, contextService);
+
+            fakeToolBar.getChildren().add(labelCategory);
+            setMouseAction(labelCategory);
         });
 
         jsonReader.getWidgetList().stream().forEach((e) -> {
             PaneIconCell<ItemWidget> paneIconCell = FactoryPaneCell.generate(e, previewService);
             String itemContext = ((ItemWidget) paneIconCell.getItem()).getContext();
             paneIconCell.setId(((ItemWidget) paneIconCell.getItem()).getLabel());
-            contextualView.registerNode(paneIconCell, itemContext);
+
+            for (Node node : fakeToolBar.getChildren()) {
+                LabelCategory labelCategory = (LabelCategory) node;
+                if (itemContext.substring(itemContext.lastIndexOf("+") + 1).equals(labelCategory.getText()))
+                {
+                    labelCategory.getContextualView().registerNode(paneIconCell, itemContext.substring(0,itemContext.lastIndexOf("+")));
+
+                    System.out.println(labelCategory.getText());
+                    System.out.println(itemContext);
+                }
+            }
+
             paneIconCell.setOnMouseClicked(event -> {
                 System.out.println("Click Action " + paneIconCell.getItem().getLabel() + paneIconCell.getItem().getContext());
 
             });
-           
 
         });
     }

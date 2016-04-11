@@ -22,6 +22,7 @@ package ijfx.ui.previewToolbar;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
+import ijfx.service.uicontext.UiContextService;
 import mongis.utils.panecell.PaneIconCell;
 import mongis.utils.panecell.PaneLabelCell;
 
@@ -31,6 +32,11 @@ import mongis.utils.panecell.PaneLabelCell;
  */
 public class FactoryPaneCell {
 
+    public static LabelCategory generateLabel (ItemCategory itemCategory, UiContextService contextService)
+    {
+        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(), contextService);
+        return labelCategory;
+    }
     public static PaneLabelCell generate(ItemCategory itemCategory) {
 
         PaneLabelCell<ItemCategory> paneLabelCell = new PaneLabelCell();
@@ -48,7 +54,6 @@ public class FactoryPaneCell {
         {
         FontAwesomeIconView fontAwesomeIconView =new FontAwesomeIconView(FontAwesomeIcon.valueOf(itemWidget.getIcon()));
         fontAwesomeIconView.getStyleClass().add("icon-toolbar");
-        
         paneIconCell.setIcon(fontAwesomeIconView);
         paneIconCell.setSubtitleVisible(false);
         }
