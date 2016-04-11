@@ -253,7 +253,7 @@ public class MetaDataHierarchyImpl implements MetaDataHierarchy {
     }
 
     private boolean imageContainsKey(PlaneDB image, String key) {
-        return image.getMetaDataSetProperty(PlaneDB.MODIFIED_METADATASET).containsKey(key);
+        return image.getMetaDataSet().containsKey(key);
     }
 
     private void addImage(PlaneDB newPlane) {
