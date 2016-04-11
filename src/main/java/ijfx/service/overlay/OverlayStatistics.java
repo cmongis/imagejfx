@@ -17,29 +17,43 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.service.overlay;
 
-import ijfx.service.IjfxService;
-import java.io.File;
-import java.util.List;
+import java.awt.Rectangle;
+import javafx.geometry.Point2D;
+import net.imagej.overlay.Overlay;
 
 /**
  *
  * @author cyril
  */
-public interface FolderManagerService extends IjfxService{
-    
-    public Folder addFolder(File file);
-    
-    public List<Folder> getFolderList();
-    
-    public Folder getCurrentFolder();
-    
-    public void setCurrentFolder(Folder folder);
+public interface OverlayStatistics {
     
     
-    public void setExplorationMode(ExplorationMode mode);
     
-    public ExplorationMode getCurrentExplorationMode();
+    Overlay getOverlay();
+    double getMean();
+    double getMax();
+    double getMin();
+    double getArea();
+    double getStandardDeviation();
+    double getVariance();
+    double getMedian();
+    long getPixelCount();
+    
+    
+    Rectangle getMinimumBoudingRectangle();
+    Point2D getCenterOfGravity();
+    double getFeretDiameter();
+    double getMinFeretDiameter();
+    double getOrientationMajorAxis();
+    double getOrientationMinorAxis();
+    double getLongSideMBR();
+    double getShortSideMBR();
+    double getAspectRatio();
+    double getConvexity();
+    double getSolidity();
+    double getCircularity();
+    double getThinnesRatio();
     
 }

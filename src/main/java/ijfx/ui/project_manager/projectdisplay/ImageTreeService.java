@@ -45,7 +45,7 @@ public class ImageTreeService {
             //System.out.println("hierarchy "+hierarchy);
             // retrieve the metadata from the plane or create a metadata with missing inside
             // in order to compensate the lack of metadata
-            MetaData metadata = planeDB.getMetaDataSet().getOrDefault(keyName, new GenericMetaData(keyName, 0));
+            MetaData metadata = planeDB.metaDataSetProperty().getOrDefault(keyName, new GenericMetaData(keyName, 0));
 
             // the parent node become the found one
             currentNode = findNode(metadata, currentNode);

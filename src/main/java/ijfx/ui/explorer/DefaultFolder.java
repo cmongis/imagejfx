@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.project.Project;
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
@@ -178,4 +179,14 @@ public class DefaultFolder implements Folder {
         return elementAnalyzedCount;
     }
 
+    
+    public Project getFolderProject() {
+        
+    }
+    
+    
+    
+    
+    
+    
 }

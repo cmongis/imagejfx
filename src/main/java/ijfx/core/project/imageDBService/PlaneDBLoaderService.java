@@ -23,8 +23,6 @@ package ijfx.core.project.imageDBService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static ijfx.core.project.imageDBService.PlaneDB.IMAGE_REFERENCE_STRING;
-import static ijfx.core.project.imageDBService.PlaneDB.METADATASET_STRING;
-import static ijfx.core.project.imageDBService.PlaneDB.MODIFIED_METADATASET_STRING;
 import static ijfx.core.project.imageDBService.PlaneDB.TAG_STRING;
 import static ijfx.core.project.imageDBService.PlaneDBInMemory.jsonToMetaDataset;
 import ijfx.ui.main.ImageJFX;
@@ -36,6 +34,8 @@ import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import static ijfx.core.project.imageDBService.PlaneDB.ORIGINAL_METADATASET;
+import static ijfx.core.project.imageDBService.PlaneDB.MODIFIED_METADATASET;
 
 /**
  *
@@ -66,8 +66,8 @@ public class PlaneDBLoaderService extends AbstractService{
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode;
         rootNode = mapper.readTree(json);
-        JsonNode metaDataSetNode = rootNode.get(METADATASET_STRING);
-        JsonNode modifiedMetaDataSetNode = rootNode.get(MODIFIED_METADATASET_STRING);
+        JsonNode metaDataSetNode = rootNode.get(ORIGINAL_METADATASET);
+        JsonNode modifiedMetaDataSetNode = rootNode.get(MODIFIED_METADATASET);
         JsonNode imageReferenceNode = rootNode.get(IMAGE_REFERENCE_STRING);
         JsonNode tagsNode = rootNode.get(TAG_STRING);
         if (metaDataSetNode == null || modifiedMetaDataSetNode == null || imageReferenceNode == null) {
@@ -76,10 +76,10 @@ public class PlaneDBLoaderService extends AbstractService{
         }
         JSONObject jsonMeta = new JSONObject(metaDataSetNode.toString());
         
-        imageDB.addMetaDataSet(jsonToMetaDataset(jsonMeta), METADATASET_STRING);
+        imageDB.addMetaDataSet(jsonToMetaDataset(jsonMeta), ORIGINAL_METADATASET);
         try {
             JSONObject jsonModifiedMeta = new JSONObject(modifiedMetaDataSetNode.toString());
-            imageDB.addMetaDataSet(jsonToMetaDataset(jsonModifiedMeta), MODIFIED_METADATASET_STRING);
+            imageDB.addMetaDataSet(jsonToMetaDataset(jsonModifiedMeta), MODIFIED_METADATASET);
         } catch (JSONException ex) {
             ImageJFX.getLogger().log(Level.WARNING,
                     "can't get the modified metadata from the json", ex);

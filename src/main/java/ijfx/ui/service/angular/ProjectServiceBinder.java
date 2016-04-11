@@ -214,7 +214,7 @@ public class ProjectServiceBinder implements AngularService {
     public HashMap<String, Object> createHash(PlaneDB planeDB) {
         HashMap<String, Object> map = new HashMap<>();
 
-        ReadOnlyMapProperty<String, MetaData> set = planeDB.getMetaDataSet();
+        ReadOnlyMapProperty<String, MetaData> set = planeDB.metaDataSetProperty();
 
         map.put("Hash", planeDB.getImageID());
 

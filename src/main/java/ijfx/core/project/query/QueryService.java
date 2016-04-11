@@ -25,13 +25,13 @@ import ijfx.core.project.AnnotationRule;
 import ijfx.core.project.Project;
 import ijfx.core.project.command.Command;
 import ijfx.core.project.imageDBService.PlaneDB;
-import static ijfx.core.project.imageDBService.PlaneDB.METADATASET_STRING;
 import static ijfx.core.project.imageDBService.PlaneDB.TAG_STRING;
 import ijfx.core.project.modifier.ModifierPlugin;
 import java.util.List;
 import java.util.Map;
 import javax.script.ScriptEngine;
 import net.imagej.ImageJService;
+import static ijfx.core.project.imageDBService.PlaneDB.ORIGINAL_METADATASET;
 
 /**
  *
@@ -42,16 +42,16 @@ import net.imagej.ImageJService;
 public interface QueryService extends ImageJService{
 
     public static void putVariableInScriptEngine(ScriptEngine scriptEngine, PlaneDB plane) {
-        putVariableInScriptEngine(scriptEngine, plane.getTags().get(), plane.getMetaDataSet().get());
+        putVariableInScriptEngine(scriptEngine, plane.getTags().get(), plane.metaDataSetProperty().get());
     }
 
     public static void putVariableInScriptEngine(ScriptEngine engine, PlaneDB plane, String metaDataSetName) {
-        putVariableInScriptEngine(engine, plane.getTags().get(), plane.getMetaDataSetProperty(metaDataSetName).get());
+        putVariableInScriptEngine(engine, plane.getTags().get(), plane.getMetaDataSet());
 
     }
 
     public static void putVariableInScriptEngine(ScriptEngine scriptEngine, List<String> tags, Map<String, MetaData> set) {
-        scriptEngine.put(METADATASET_STRING, set);
+        scriptEngine.put(ORIGINAL_METADATASET, set);
         scriptEngine.put(TAG_STRING, tags);
     }
 

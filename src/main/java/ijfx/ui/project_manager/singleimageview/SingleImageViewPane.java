@@ -207,7 +207,7 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
     }
 
     private void listenPlaneDB(PlaneDB planeDB) {
-        planeDB.getMetaDataSet().addListener(metaDataListener);
+        planeDB.metaDataSetProperty().addListener(metaDataListener);
         tagsListView.setItems(planeDB.getTags());
         //planeDB.getTags().addListener(tagListener);
 
@@ -218,7 +218,7 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
             return;
         }
 
-        planeDB.getMetaDataSet().removeListener(metaDataListener);
+        planeDB.metaDataSetProperty().removeListener(metaDataListener);
         //planeDB.getTags().removeListener(tagListener);
     }
 
@@ -255,8 +255,8 @@ public class SingleImageViewPane extends BorderPane implements EditHandler, Plan
 
     private void updateData() {
         List<MetaData> metaDataList = new ArrayList<>();
-        for (String key : currentPlane.getMetaDataSet().keySet()) {
-            metaDataList.add(currentPlane.getMetaDataSet().get(key));
+        for (String key : currentPlane.metaDataSetProperty().keySet()) {
+            metaDataList.add(currentPlane.metaDataSetProperty().get(key));
         }
 
         metaList.clear();

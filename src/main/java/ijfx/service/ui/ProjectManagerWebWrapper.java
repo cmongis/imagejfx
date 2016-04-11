@@ -151,7 +151,7 @@ public class ProjectManagerWebWrapper extends AbstractService implements ImageJS
                 
                 if(count++ % 10 == 0)
                     deferred.notifySimpleJSON("progress",1.0*count/total);
-                data.add(createHash(planeDB.getMetaDataSet()));
+                data.add(createHash(planeDB.metaDataSetProperty()));
             };
             deferred.mapAndResolve(data);
         }

@@ -70,7 +70,7 @@ public class MetaDataModifier implements ModifierPlugin{
     @Override
     public boolean wasApplied(PlaneDB planeDB) {
         if(keyName == null) return false;
-        return planeDB.getMetaDataSet().get(keyName).getStringValue().equals(value);
+        return planeDB.metaDataSetProperty().get(keyName).getStringValue().equals(value);
     }
 
     @Override

@@ -25,13 +25,11 @@ import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.ui.project_manager.projectdisplay.PlaneSelectionService;
 import java.awt.Image;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -59,7 +57,7 @@ public class PlaneDBInMemory implements PlaneDB {
     /**
      * A HashMap containing different metaDatasets.
      */
-    private final HashMap<String, ReadOnlyMapWrapper<String, MetaData>> metaDataSets = new HashMap<>();
+    private final HashMap<String, MetaDataSet> metaDataSets = new HashMap<>();
 
     /**
      * An object that contains all the needed information to find the linked
@@ -82,8 +80,8 @@ public class PlaneDBInMemory implements PlaneDB {
    // boolean selected
     
     public PlaneDBInMemory() {
-        addMetaDataSet(new MetaDataSet(), METADATASET_STRING);
-        addMetaDataSet(new MetaDataSet(), MODIFIED_METADATASET_STRING);
+        addMetaDataSet(new MetaDataSet(), ORIGINAL_METADATASET);
+        addMetaDataSet(new MetaDataSet(), MODIFIED_METADATASET);
 
     }
 
@@ -110,8 +108,8 @@ public class PlaneDBInMemory implements PlaneDB {
             /*ImageJFX.getLogger()
              .log(Level.WARNING, "overriding a metadataset");*/
         }
-        metaDataSets.put(identifier, new ReadOnlyMapWrapper<>(this, identifier, FXCollections.observableMap(metaDataSet)));
-
+        //metaDataSets.put(identifier, new ReadOnlyMapWrapper<>(this, identifier, FXCollections.observableMap(metaDataSet)));
+        metaDataSets.put(identifier, metaDataSet);
     }
 
     @Override
@@ -155,12 +153,14 @@ public class PlaneDBInMemory implements PlaneDB {
      */
     @Override
     public void resetModifiedMetaDataSet() {
-        metaDataSets.get(MODIFIED_METADATASET_STRING).clear();
-        HashMap<String, String> metaMap = MetaData.metaDataSetToMap(metaDataSets.get(METADATASET_STRING).get());
-        for (String key : metaMap.keySet()) {
-            addMetaData(new GenericMetaData(key, metaMap.get(key)), MODIFIED_METADATASET_STRING);
+        metaDataSets.get(MODIFIED_METADATASET).clear();
+        metaDataSets.get(MODIFIED_METADATASET).merge(metaDataSets.get(ORIGINAL_METADATASET));
+        
+        //HashMap<String, String> metaMap = MetaData.metaDataSetToMap(metaDataSets.get(ORIGINAL_METADATASET).get());
+       // for (String key : metaMap.keySet()) {
+           // addMetaData(new GenericMetaData(key, metaMap.get(key)), MODIFIED_METADATASET);
 
-        }
+        //}
 
     }
 
@@ -214,7 +214,7 @@ public class PlaneDBInMemory implements PlaneDB {
 
     @Override
     public void modifyMetaData(String key, Object newValue, String identifier) {
-        ReadOnlyMapWrapper<String, MetaData> metaDataSet = metaDataSets.get(identifier);
+        MetaDataSet metaDataSet = metaDataSets.get(identifier);
         if (metaDataSet != null && metaDataSet.containsKey(key)) {
             MetaData newVal = new GenericMetaData(key, newValue);
             metaDataSet.put(key, newVal);
@@ -233,38 +233,40 @@ public class PlaneDBInMemory implements PlaneDB {
 
     @Override
     public void addMetaData(MetaData metaData) {
-        addMetaData(metaData, MODIFIED_METADATASET_STRING);
+        addMetaData(metaData, MODIFIED_METADATASET);
     }
 
     @Override
     public void modifyMetaData(String key, Object newValue) {
-        modifyMetaData(key, newValue, MODIFIED_METADATASET_STRING);
+        modifyMetaData(key, newValue, MODIFIED_METADATASET);
     }
 
     @Override
     public MetaData removeMetaData(String key, String identifier) {
         if (metaDataSetAndKeyExist(identifier, key)) {
-            ReadOnlyMapWrapper<String, MetaData> metaDataSet = metaDataSets.get(identifier);
+            MetaDataSet metaDataSet = metaDataSets.get(identifier);
             return metaDataSet.remove(key);
         }
         return null;
     }
 
     private boolean metaDataSetAndKeyExist(String metadataSet, String key) {
-        ReadOnlyMapWrapper<String, MetaData> metaDataSet = metaDataSets.get(metadataSet);
+        //ReadOnlyMapWrapper<String, MetaData> metaDataSet = metaDataSets.get(metadataSet);
+        MetaDataSet metaDataSet = getMetaDataSet();
         return (metaDataSet != null && metaDataSet.containsKey(key));
     }
 
     @Override
     public MetaData removeMetaData(String key) {
-        return removeMetaData(key, MODIFIED_METADATASET_STRING);
+        return removeMetaData(key, MODIFIED_METADATASET);
     }
 
     @Override
     public MetaData removeMetaData(MetaData metaData, String identifier) {
         String key = metaData.getName();
         if (metaDataSetAndKeyExist(identifier, key)) {
-            ReadOnlyMapWrapper<String, MetaData> metaDataSet = metaDataSets.get(identifier);
+            //ReadOnlyMapWrapper<String, MetaData> metaDataSet = metaDataSets.get(identifier);
+            MetaDataSet metaDataSet  = getMetaDataSet();
             if (metaDataSet.get(key).getStringValue().equals(metaData.getStringValue())) {
                 return metaDataSet.remove(key);
             }
@@ -274,21 +276,22 @@ public class PlaneDBInMemory implements PlaneDB {
 
     @Override
     public MetaData removeMetaData(MetaData metaData) {
-        return removeMetaData(metaData, MODIFIED_METADATASET_STRING);
+        return removeMetaData(metaData, MODIFIED_METADATASET);
     }
 
     @Override
-    public ReadOnlyMapProperty<String, MetaData> getMetaDataSet() {
-        return getMetaDataSetProperty(MODIFIED_METADATASET_STRING);
+    public ReadOnlyMapProperty<String, MetaData> metaDataSetProperty() {
+        return new ReadOnlyMapWrapper(FXCollections.observableMap(metaDataSets));
     }
-
+    
+    /*
     @Override
     public ReadOnlyMapProperty<String, MetaData> getMetaDataSetProperty(String identifier) {
         if (metaDataSets.containsKey(identifier)) {
             return metaDataSets.get(identifier).getReadOnlyProperty();
         }
         return null;
-    }
+    }*/
 
     @Override
     public ReadOnlyListProperty<String> getTags() {
@@ -305,7 +308,15 @@ public class PlaneDBInMemory implements PlaneDB {
         return selectedProperty;
     }
 
-    
+    @Override
+    public MetaDataSet getOriginalMetaDataSet() {
+        return metaDataSets.get(ORIGINAL_METADATASET);
+    }
+
+    @Override
+    public MetaDataSet getMetaDataSet() {
+        return metaDataSets.get(MODIFIED_METADATASET);
+    }
     
     
 

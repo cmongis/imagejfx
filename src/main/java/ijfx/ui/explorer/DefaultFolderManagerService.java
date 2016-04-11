@@ -61,6 +61,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     
     Logger logger = ImageJFX.getLogger();
     
+    ExplorationMode currentExplorationMode;
+    
+    
     @Override
     public Folder addFolder(File file) {
         Folder f = new DefaultFolder(file);
@@ -109,6 +112,27 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         if(currentFolder == event.getObject()) {
             explorerService.setItems(event.getObject().getItemList());
         }
+    }
+
+    @Override
+    public void setExplorationMode(ExplorationMode mode) {
+        currentExplorationMode = mode;
+    }
+
+    @Override
+    public ExplorationMode getCurrentExplorationMode() {
+        return currentExplorationMode;
+    }
+    
+    
+    
+    private List<Explorable> getPlanes(Folder folder) {
+        
+        
+    }
+    
+    private List<Explorable> getObjects(Folder folder) {
+        
     }
 
 }

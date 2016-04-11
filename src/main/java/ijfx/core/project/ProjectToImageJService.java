@@ -124,8 +124,8 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         PlaneDB leaf = getALeaf(root).getValue().getPlaneDB();
         logger.info("Leaf found  :" + leaf);
         // preparing X and Y axis
-        int width = leaf.getMetaDataSet().get(MetaData.WIDTH).getIntegerValue();
-        int height = leaf.getMetaDataSet().get(MetaData.HEIGHT).getIntegerValue();
+        int width = leaf.metaDataSetProperty().get(MetaData.WIDTH).getIntegerValue();
+        int height = leaf.metaDataSetProperty().get(MetaData.HEIGHT).getIntegerValue();
 
         dims[0] = width;
         dims[1] = height;
@@ -133,7 +133,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         axes[0] = Axes.X;
         axes[1] = Axes.Y;
 
-        final int pixelType = leaf.getMetaDataSet().get(MetaData.PIXEL_TYPE).getIntegerValue();
+        final int pixelType = leaf.metaDataSetProperty().get(MetaData.PIXEL_TYPE).getIntegerValue();
 
         // feeling the other dimensions size
         if (deepest != 0) {

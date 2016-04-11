@@ -43,7 +43,7 @@ public class MissingHierarchyMetaData implements Predicate<PlaneDB>{
     @Override
     public boolean test(PlaneDB t) {
         
-        Set<MetaData> containMetaData = hierarchy.stream().map(key->t.getMetaDataSet().get(key)).collect(Collectors.toSet());
+        Set<MetaData> containMetaData = hierarchy.stream().map(key->t.metaDataSetProperty().get(key)).collect(Collectors.toSet());
         
         return containMetaData.size() != hierarchy.size();
                

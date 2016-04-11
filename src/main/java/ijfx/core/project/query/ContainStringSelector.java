@@ -21,9 +21,9 @@ package ijfx.core.project.query;
 
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.imageDBService.PlaneDB;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javafx.beans.property.ReadOnlyMapProperty;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -67,7 +67,7 @@ public class ContainStringSelector implements Selector{
 
     @Override
     public boolean matches(PlaneDB planeDB, String metadataSetName) {
-        ReadOnlyMapProperty<String, MetaData> metaDataSetProperty = planeDB.getMetaDataSetProperty(metadataSetName);
+        Map<String, MetaData> metaDataSetProperty = planeDB.getMetaDataSet();
         String keyName = Selector.findKey(metaDataSetProperty, metadataKey);
         
         

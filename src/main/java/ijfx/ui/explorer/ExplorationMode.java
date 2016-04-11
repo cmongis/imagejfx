@@ -19,27 +19,12 @@
  */
 package ijfx.ui.explorer;
 
-import ijfx.service.IjfxService;
-import java.io.File;
-import java.util.List;
-
 /**
  *
  * @author cyril
  */
-public interface FolderManagerService extends IjfxService{
-    
-    public Folder addFolder(File file);
-    
-    public List<Folder> getFolderList();
-    
-    public Folder getCurrentFolder();
-    
-    public void setCurrentFolder(Folder folder);
-    
-    
-    public void setExplorationMode(ExplorationMode mode);
-    
-    public ExplorationMode getCurrentExplorationMode();
-    
+public enum ExplorationMode {
+    FILE,
+    PLANE,
+    OBJECT
 }

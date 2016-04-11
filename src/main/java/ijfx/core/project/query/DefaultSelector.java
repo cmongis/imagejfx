@@ -22,13 +22,13 @@ package ijfx.core.project.query;
 
 import ijfx.core.metadata.MetaData;
 import ijfx.core.project.MetaDataPosition;
+import ijfx.core.project.Project;
 import ijfx.core.project.ReplaceStringPosition;
 import ijfx.core.project.ReplaceStringPositionImpl;
 import ijfx.core.project.StringPosition;
 import ijfx.core.project.TagPosition;
 import ijfx.core.project.WordPosition;
 import ijfx.core.project.imageDBService.PlaneDB;
-import static ijfx.core.project.imageDBService.PlaneDB.METADATASET_STRING;
 import static ijfx.core.project.imageDBService.PlaneDB.TAG_STRING;
 import ijfx.core.project.imageDBService.PlaneDBInMemory;
 import ijfx.ui.main.ImageJFX;
@@ -44,10 +44,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyMapProperty;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import static ijfx.core.project.imageDBService.PlaneDB.ORIGINAL_METADATASET;
+import java.util.Map;
 
 /**
  * This class performs query parsing. it generates javaScript styled queries
@@ -75,7 +76,7 @@ public class DefaultSelector implements  QueryParser {
     
     public DefaultSelector() {
         testScriptEngine = getEngine();
-        testScriptEngine.put(METADATASET_STRING, new HashMap<String, MetaData>());
+        testScriptEngine.put(ORIGINAL_METADATASET, new HashMap<String, MetaData>());
         testScriptEngine.put(TAG_STRING, new ArrayList<String>());
         nonParsedString = new String();
 
@@ -83,7 +84,7 @@ public class DefaultSelector implements  QueryParser {
 
     public DefaultSelector(String nonParsedString) {
         testScriptEngine = getEngine();
-        testScriptEngine.put(METADATASET_STRING, new HashMap<String, MetaData>());
+        testScriptEngine.put(ORIGINAL_METADATASET, new HashMap<String, MetaData>());
         testScriptEngine.put(TAG_STRING, new ArrayList<String>());
         parse(nonParsedString);
     }
@@ -173,7 +174,7 @@ public class DefaultSelector implements  QueryParser {
     }
 
     public static String formatGetKey(String key) {
-        return PlaneDBInMemory.METADATASET_STRING + "[\""
+        return PlaneDBInMemory.ORIGINAL_METADATASET + "[\""
                 + key + "\"]";
     }
 
@@ -355,8 +356,8 @@ public class DefaultSelector implements  QueryParser {
         
         //String metaDataSetName = null;
         
-        ReadOnlyMapProperty<String, MetaData> set = metaDataSetName != null ? plane.getMetaDataSetProperty(metaDataSetName) : plane.getMetaDataSet();
-        QueryService.putVariableInScriptEngine(scriptEngine, plane.getTags().get(), set.get());
+        Map<String, MetaData> set = plane.getMetaDataSet();
+        QueryService.putVariableInScriptEngine(scriptEngine, plane.getTags().get(), set);
         try {
             logger.info("Executing the following script : "+getParsedSelector());
             response = scriptEngine.eval(getParsedSelector());

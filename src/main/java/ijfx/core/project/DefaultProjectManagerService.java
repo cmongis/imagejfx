@@ -196,7 +196,7 @@ public class DefaultProjectManagerService extends AbstractService implements Pro
         Set<String> keys = new HashSet<>();
         if(project == null) return keys;
         project.getImages().stream().parallel().forEach(image -> {
-            image.getMetaDataSet().keySet().forEach(key -> {
+            image.metaDataSetProperty().keySet().forEach(key -> {
                 if (!keys.contains(key)) {
                     keys.add(key);
                 }
