@@ -5,24 +5,33 @@
  */
 package ijfx.ui.previewToolbar;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.service.preview.PreviewService;
+import ijfx.ui.utils.FontAwesomeIconUtils;
 import java.util.Map;
+import javafx.application.Platform;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import mongis.utils.panecell.PaneIconCell;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class DefaultWidget implements ItemWidget{
-private String type;
-private String label;
-private String action;
-private String icon;
-private String context ;
-private Map<String,Object> parameters;  
+public class DefaultWidget implements ItemWidget {
+
+    private String type;
+    private String label;
+    private String action;
+    private String icon;
+    private String context;
+    private Map<String, Object> parameters;
 
     public DefaultWidget() {
     }
 
-    public DefaultWidget(String type, String label, String action, String icon, String context, Map<String,Object> parameters) {
+    public DefaultWidget(String type, String label, String action, String icon, String context, Map<String, Object> parameters) {
         this.type = type;
         this.label = label;
         this.action = action;
@@ -38,7 +47,6 @@ private Map<String,Object> parameters;
         this.icon = icon;
         this.context = context;
         this.parameters = null;
-
 
     }
 
@@ -63,7 +71,7 @@ private Map<String,Object> parameters;
     }
 
     @Override
-    public Map<String,Object> getParameters() {
+    public Map<String, Object> getParameters() {
         return parameters;
     }
 
@@ -71,10 +79,10 @@ private Map<String,Object> parameters;
     public String getContext() {
         return context;
     }
-    
+
     @Override
-    public void addContext(String s){
-        context = context +s;
+    public void addContext(String s) {
+        context = context + s;
     }
 
     @Override
@@ -86,6 +94,26 @@ private Map<String,Object> parameters;
     public Item getValue() {
         return this;
     }
-    
-    
+
+    @Override
+    public Image getImage(PreviewService previewService) {
+
+        if (this.getIcon().equals("preview")) {
+            try {
+            previewService.setParameters(0, 0, 120, 120);
+            return previewService.getImageDisplay(action, this.getParameters());
+                
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
+            fontAwesomeIconView.getStyleClass().add("icon-toolbar");
+                    WritableImage wi = new WritableImage(120, 120);
+
+            FontAwesomeIconUtils.getImageFromFAI(fontAwesomeIconView, 120, wi);
+            return wi;
+        }
+    }
+
 }

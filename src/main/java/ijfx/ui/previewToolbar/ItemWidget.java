@@ -20,7 +20,9 @@
 package ijfx.ui.previewToolbar;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import ijfx.service.preview.PreviewService;
 import java.util.Map;
+import javafx.scene.image.Image;
 
 /**
  *
@@ -34,5 +36,6 @@ public interface ItemWidget extends Item{
     public void addContext(String s);
     public void removeSpaceContext();
     public Map<String, Object> getParameters();
+    public Image getImage(PreviewService previewService);
     
 }
