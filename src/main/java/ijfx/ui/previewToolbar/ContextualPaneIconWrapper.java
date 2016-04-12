@@ -34,9 +34,10 @@ public class ContextualPaneIconWrapper  implements ContextualWidget, ContextualP
     private final Node node;
     private final Pane parentPane;
 
-    public ContextualPaneIconWrapper(Pane parentPane, Node node) {
+    public ContextualPaneIconWrapper(Pane parentPane, Node node, String context) {
         this.node = node;
         this.parentPane = parentPane;
+        this.context = context;
     }
 
     @Override

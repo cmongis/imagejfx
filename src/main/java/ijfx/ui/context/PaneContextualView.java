@@ -33,6 +33,8 @@ import javafx.scene.layout.Pane;
 public class PaneContextualView implements ContextualView<Node> {
 
     final Pane pane;
+
+
     final String name;
 
     final UiContextManager manager;
@@ -47,7 +49,7 @@ public class PaneContextualView implements ContextualView<Node> {
     }
 
     public void registerNode(Node node, String context) {
-        ContextualPaneIconWrapper wrapper = new ContextualPaneIconWrapper(pane, node);
+        ContextualPaneIconWrapper wrapper = new ContextualPaneIconWrapper(pane, node, context);
         manager.link(wrapper.getName(), context);
         wrapperList.add(wrapper);
     }
@@ -69,6 +71,9 @@ public class PaneContextualView implements ContextualView<Node> {
         pane.getChildren().addAll(toShow.stream().map(widget -> widget.getObject()).collect(Collectors.toList()));
 
         return this;
+    }
+        public Pane getPane() {
+        return pane;
     }
 /*
     // widget that show itself by adding itself itside a pane
