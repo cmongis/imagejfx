@@ -23,6 +23,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
+import javafx.scene.control.Label;
 import mongis.utils.panecell.PaneIconCell;
 import mongis.utils.panecell.PaneLabelCell;
 
@@ -34,7 +35,7 @@ public class FactoryPaneCell {
 
     public static LabelCategory generateLabel (ItemCategory itemCategory, UiContextService contextService)
     {
-        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(), contextService);
+        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(), contextService,itemCategory.getIcon());
         return labelCategory;
     }
     public static PaneLabelCell generate(ItemCategory itemCategory) {
@@ -44,7 +45,6 @@ public class FactoryPaneCell {
         paneLabelCell.setTitleFactory(f -> f.getName());
         paneLabelCell.setLoadImageOnlyWhenVisible(false);
         paneLabelCell.setItem(itemCategory);
-
         return paneLabelCell;
     }
 

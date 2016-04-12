@@ -69,6 +69,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     public PreviewToolBar() {
         super();
         fakeToolBar = new HBox();
+        fakeToolBar.setSpacing(10);
         this.setTop(fakeToolBar);
 
     }
@@ -93,7 +94,6 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         jsonReader.separate();
         popOver = new PopOver();
         generateItems(jsonReader, hbox);
-        System.out.println("ijfx.examples.context.AlgorithmsToolBar.createToolBar()");
     }
 
     /**
@@ -200,8 +200,6 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
                 {
                     labelCategory.getContextualView().registerNode(paneIconCell, itemContext.substring(0,itemContext.lastIndexOf("+")));
 
-                    System.out.println(labelCategory.getText());
-                    System.out.println(itemContext);
                 }
             }
 

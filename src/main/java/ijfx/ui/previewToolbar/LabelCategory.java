@@ -19,6 +19,8 @@
  */
 package ijfx.ui.previewToolbar;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.context.PaneContextualView;
 import javafx.scene.control.Label;
@@ -31,11 +33,14 @@ import javafx.scene.layout.Pane;
  */
 public class LabelCategory extends Label {
     private final PaneContextualView contextualView;
-
+    private final FontAwesomeIconView fontAwesomeIconView;
     private Pane pane;
-    public LabelCategory (String s, UiContextService contextService)
+    public LabelCategory (String s, UiContextService contextService, String icon)
     {
         super (s);
+        this.getStyleClass().add("menu-bar");
+        fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
+        this.setGraphic(fontAwesomeIconView);
         pane = new FlowPane();
         contextualView = new PaneContextualView(contextService, pane, this.getText());
     }
