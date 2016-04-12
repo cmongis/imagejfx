@@ -17,14 +17,43 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
-
+package ijfx.ui.previewToolbar;
 /**
- *
+ * 
  * @author Tuan anh TRINH
  */
-public interface WidgetGroup {
-    public ItemWidget[] getItems();
-    public String getName();
-    public String getContext();
+
+public class DefaultWidgetGroup implements WidgetGroup {
+    private ItemWidget[] items;
+    private String name;
+    private String context;
+    private String icon;
+    public DefaultWidgetGroup(ItemWidget[] items, String name, String context) {
+        this.items = items;
+        this.name = name;
+        this.context = context;
+    }
+    public DefaultWidgetGroup(){
+        
+    }
+    @Override
+    public ItemWidget[] getItems() {
+        return items;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getContext() {
+        return context;
+    }
+
+    @Override
+    public String getIcon() {
+        return icon;
+    }
+    
 }

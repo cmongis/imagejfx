@@ -17,23 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+package ijfx.ui.explorer;
 
 /**
  *
- * @author Tuan anh TRINH
+ * @author cyril
  */
-@JsonDeserialize(as=DefaultWidget.class)
-public interface ItemWidget {
-    public String getType();
-    public String getAction();
-    public String getLabel();
-    public String getIcon();
-    public String getContext();
-    public void addContext(String s);
-    public void removeSpaceContext();
-    public Parameters getParameters();
-    
+public enum ExplorationMode {
+    FILE,
+    PLANE,
+    OBJECT
 }

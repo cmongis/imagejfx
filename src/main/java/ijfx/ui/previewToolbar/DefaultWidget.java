@@ -3,24 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
+
+import java.util.Map;
 
 /**
  *
  * @author Tuan anh TRINH
  */
 public class DefaultWidget implements ItemWidget{
-public String type;
-public String label;
-public String action;
-public String icon;
-public String context ;
-public Parameters parameters;  
+private String type;
+private String label;
+private String action;
+private String icon;
+private String context ;
+private Map<String,Object> parameters;  
 
     public DefaultWidget() {
     }
 
-    public DefaultWidget(String type, String label, String action, String icon, String context, Parameters parameters) {
+    public DefaultWidget(String type, String label, String action, String icon, String context, Map<String,Object> parameters) {
         this.type = type;
         this.label = label;
         this.action = action;
@@ -61,7 +63,7 @@ public Parameters parameters;
     }
 
     @Override
-    public Parameters getParameters() {
+    public Map<String,Object> getParameters() {
         return parameters;
     }
 
@@ -78,6 +80,11 @@ public Parameters parameters;
     @Override
     public void removeSpaceContext() {
         this.context = this.context.replaceAll("\\s", "+");
+    }
+
+    @Override
+    public Item getValue() {
+        return this;
     }
     
     

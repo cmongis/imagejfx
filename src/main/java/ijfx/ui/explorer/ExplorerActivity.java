@@ -19,7 +19,6 @@
  */
 package ijfx.ui.explorer;
 
-import com.sun.javafx.scene.DirtyBits;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.activity.Activity;
@@ -48,6 +47,7 @@ import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -58,6 +58,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.AsyncCallback;
@@ -89,6 +90,18 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     Accordion filterVBox;
 
+    @FXML
+    ToggleButton fileModeToggleButton;
+    
+    @FXML
+    ToggleButton planeModeToggleButton;
+    
+    @FXML
+    ToggleButton objectModeToggleButton;
+    
+    ToggleGroup toggleGroup;
+    
+    
     @Parameter
     FolderManagerService folderManagerService;
 
@@ -101,10 +114,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @Parameter
     StatusService statusService;
     
+    
+    
+    
     ExplorerView view = new IconView();
 
     List<Runnable> folderUpdateHandler = new ArrayList<>();
 
+    Property<ExplorationMode> explorationModeProperty = new SimpleObjectProperty<>();
     
     
     public ExplorerActivity() {
@@ -120,6 +137,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             binding.showProperty().bind(filterToggleButton.selectedProperty());
             filterVBox.setTranslateX(-250);
 
+            toggleGroup = new ToggleGroup();
+            toggleGroup.getToggles().addAll(fileModeToggleButton,planeModeToggleButton,objectModeToggleButton);
+            toggleGroup.selectToggle(fileModeToggleButton);
+            
+                        
+            
         } catch (IOException ex) {
             Logger.getLogger(ExplorerActivity.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -246,7 +269,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         }
 
         public void update() {
-            System.out.println("updating cell");
+          
             Platform.runLater(ctrl::forceUpdate);
         }
     }

@@ -27,7 +27,6 @@ import ijfx.core.project.command.Command;
 import ijfx.core.project.command.Invoker;
 import ijfx.core.project.imageDBService.ImageReferenceImpl;
 import ijfx.core.project.imageDBService.PlaneDB;
-import static ijfx.core.project.imageDBService.PlaneDB.METADATASET_STRING;
 import ijfx.core.project.imageDBService.PlaneDBInMemory;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
@@ -43,6 +42,7 @@ import ijfx.core.metadata.extraction.MetaDataExtractorService;
 import ijfx.core.metadata.extraction.PlaneList;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
+import static ijfx.core.project.imageDBService.PlaneDB.ORIGINAL_METADATASET;
 
 /**
  *
@@ -166,7 +166,7 @@ public class ImportImageFileTask extends Task<Command> {
                             for (ImagePlane plane : planeList) {
                                 PlaneDB planeDB = new PlaneDBInMemory();
                                 planeDB.setImageReference(imageReference);
-                                planeDB.addMetaDataSet(plane.getMetaDataSet(), METADATASET_STRING);
+                                planeDB.addMetaDataSet(plane.getMetaDataSet(), ORIGINAL_METADATASET);
 
                                 planeDB.resetModifiedMetaDataSet();
 

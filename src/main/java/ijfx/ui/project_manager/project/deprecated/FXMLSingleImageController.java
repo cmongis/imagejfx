@@ -118,8 +118,8 @@ public class FXMLSingleImageController extends ImageLoadedControllerAbs implemen
         this.loadedProperty = new SimpleBooleanProperty(false);
         this.loadingProperty = new SimpleBooleanProperty(false);
         List<MetaData> metaDataList = new ArrayList<>();
-        for (String key : image.getMetaDataSet().keySet()) {
-            metaDataList.add(image.getMetaDataSet().get(key));
+        for (String key : image.metaDataSetProperty().keySet()) {
+            metaDataList.add(image.metaDataSetProperty().get(key));
         }
         metaList = FXCollections.observableArrayList(metaDataList);
         tagList = image.getTags();
@@ -133,7 +133,7 @@ public class FXMLSingleImageController extends ImageLoadedControllerAbs implemen
                 metaList.remove(change.getValueRemoved());
             }
         };
-        image.getMetaDataSet().addListener(metaDataListener);
+        image.metaDataSetProperty().addListener(metaDataListener);
         
         rb = FXUtilities.getResourceBundle();
         contextMenu = new ImageContextMenu(image, project, context);
@@ -212,7 +212,7 @@ public class FXMLSingleImageController extends ImageLoadedControllerAbs implemen
 
     @Override
     public void stopListening() {
-        image.getMetaDataSet().removeListener(metaDataListener);
+        image.metaDataSetProperty().removeListener(metaDataListener);
     }
 
     @Override

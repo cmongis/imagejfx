@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -62,7 +63,7 @@ import javafx.collections.FXCollections;
  */
 public class DefaultProject implements Project {
 
-    private String currentMetaDataDB = PlaneDB.MODIFIED_METADATASET_STRING;
+    private String currentMetaDataDB = PlaneDB.MODIFIED_METADATASET;
 
     private MetaDataSet settings;
 
@@ -104,7 +105,7 @@ public class DefaultProject implements Project {
      * ImageDBService object when applying rules. It should be
      * {@link Image#MODIFIED_METADATASET_STRING}.
      */
-    private String modifyDataBase = PlaneDB.MODIFIED_METADATASET_STRING;
+    private String modifyDataBase = PlaneDB.MODIFIED_METADATASET;
     private final List<PlaneDB> selection = new ArrayList<>();
     private final InvokerImpl invoker;
     private File file;
@@ -176,7 +177,7 @@ public class DefaultProject implements Project {
         Predicate<PlaneDB> p = (PlaneDB t) -> true;
         Set<String> values = new HashSet<>();
         Consumer<PlaneDB> getValues = (PlaneDB t) -> {
-            ReadOnlyMapProperty<String, MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
+            Map<String, MetaData> metaDataSet = t.getMetaDataSet();
             if (metaDataSet != null && metaDataSet.containsKey(key)) {
                 String value = metaDataSet.get(key).getStringValue();
 
@@ -191,7 +192,7 @@ public class DefaultProject implements Project {
     @Override
     public boolean containMetaDataKey(String key) {
         return check((PlaneDB t) -> {
-            ReadOnlyMapProperty<String, MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
+            Map<String, MetaData> metaDataSet = t.getMetaDataSet();
             return metaDataSet != null && metaDataSet.containsKey(key);
         });
     }
@@ -200,7 +201,7 @@ public class DefaultProject implements Project {
     public List<String> getMetaDataKeys() {
         List<String> keys = new ArrayList<>();
         Consumer<PlaneDB> consumer = (PlaneDB t) -> {
-            ReadOnlyMapProperty<String, MetaData> metaDataSet = t.getMetaDataSetProperty(currentMetaDataDB);
+            Map<String, MetaData> metaDataSet = t.getMetaDataSet();
             if (metaDataSet != null) {
                 metaDataSet.keySet().stream().filter((key) -> (!keys.contains(key))).forEach((key) -> {
                     keys.add(key);

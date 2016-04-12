@@ -54,11 +54,9 @@ public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
             rectangle = new Rectangle();
         }
         
-          System.out.println("updating");
-        double minX = overlay.getOrigin(0);
-        double minY = overlay.getOrigin(1);
-        double maxX = minX + overlay.getExtent(0);
-        double maxY = minY + overlay.getExtent(1);
+         
+      
+       
         RectangleOverlayHelper helper = new RectangleOverlayHelper(overlay);
         Point2D a = helper.getMinEdge();
         Point2D b = helper.getMaxEdge();

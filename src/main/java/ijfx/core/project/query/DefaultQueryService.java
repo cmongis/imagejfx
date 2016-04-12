@@ -74,7 +74,7 @@ public class DefaultQueryService extends AbstractService implements QueryService
     EventService eventService;
 
     private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-    private String defaultMetaSetName = PlaneDB.MODIFIED_METADATASET_STRING;
+    private String defaultMetaSetName = PlaneDB.MODIFIED_METADATASET;
     private final ResourceBundle rb;
     private int nbAutamaticallyAnnotatedPlane = 0;
 
@@ -284,9 +284,9 @@ public class DefaultQueryService extends AbstractService implements QueryService
         MetaDataSet metaDataSet = request.getAddMetaData();
         for (String key : metaDataSet.keySet()) {
             MetaData metaData = metaDataSet.get(key);
-            if (plane.getMetaDataSet().containsKey(key)) {
+            if (plane.metaDataSetProperty().containsKey(key)) {
                 //check if the existing metadata is the same as the new one
-                if (!plane.getMetaDataSet().get(key).equals(metaData)) {
+                if (!plane.metaDataSetProperty().get(key).equals(metaData)) {
                     cmds.add(new ModifyMetaDataCommand(plane, metaData));
                 }
             } else {
@@ -295,12 +295,12 @@ public class DefaultQueryService extends AbstractService implements QueryService
         }
         metaDataSet = request.getRemoveMetaData();
         for (String key : metaDataSet.keySet()) {
-            if (plane.getMetaDataSet().get(key) != null) {
+            if (plane.metaDataSetProperty().get(key) != null) {
                 cmds.add(new RemoveMetaDataCommand(plane, metaDataSet.get(key)));
             }
         }
         for (String key : request.getRemoveKey()) {
-            if (plane.getMetaDataSet().get(key) != null) {
+            if (plane.metaDataSetProperty().get(key) != null) {
                 cmds.add(new RemoveMetaDataCommand(plane, key));
             }
         }

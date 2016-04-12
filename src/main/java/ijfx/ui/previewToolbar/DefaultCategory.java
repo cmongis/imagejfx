@@ -17,42 +17,41 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
-
+package ijfx.ui.previewToolbar;
 /**
- *
+ * 
  * @author Tuan anh TRINH
  */
-class Category {
-public String name;
-public String context;
-public DefaultWidget [] items;
+public class DefaultCategory implements ItemCategory{
 
-    public Category() {
+    private final String name;
+    private final String context;
+    private final String icon;
+   
+    public DefaultCategory(String n, String c, String icon)
+    {
+        this.name = n;
+        this.context = c;
+        this.icon = icon;
     }
-    
-    public Category(String name, String context, DefaultWidget [] items) {
-        this.name = name;
-        this.context = context;
-        this.items = items;
-    }
-
-    public Category(String name) {
-        this.name = name;
-    }
-
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getContext() {
         return context;
     }
 
-    public DefaultWidget[] getItems() {
-        return items;
+    @Override
+    public Item getValue() {
+        return this;
+    }
+
+    @Override
+    public String getIcon() {
+        return icon;
     }
     
-
-
 }

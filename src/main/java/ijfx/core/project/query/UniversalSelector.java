@@ -66,13 +66,13 @@ public class UniversalSelector implements Selector {
     @Override
     public boolean matches(PlaneDB t, String metadataSetName) {
 
-       if (t.getMetaDataSet() == null) {
+       if (t.metaDataSetProperty() == null) {
                 return false;
             }
             boolean onMatch = false;
-            final ConditionList conditionList = new ConditionList(t.getMetaDataSet().size());
+            final ConditionList conditionList = new ConditionList(t.metaDataSetProperty().size());
 
-            t.getMetaDataSet().forEach((key, value) -> {
+            t.metaDataSetProperty().forEach((key, value) -> {
                 if (value.getStringValue().toLowerCase().contains(queryString.toLowerCase())) {
                     conditionList.add(true);
                 }

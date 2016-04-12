@@ -104,7 +104,7 @@ public class StatisticCard extends BorderPane implements ProjectCard{
     }
     
     public Boolean updateValues(Project project) {
-            System.out.println("Updating statistics");
+            
              Platform.runLater(()->updatePlaneAndFileNumbers(project));
            bindSaveFolder(project);
           

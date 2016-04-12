@@ -17,32 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
-
-import mongis.utils.panecell.PaneIconCell;
+package ijfx.ui.previewToolbar;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class FactoryPaneIconCell {
-
-    public static PaneIconCell generate(ItemCategory itemCategory) {
-        PaneIconCell<ItemCategory> paneIconCell = new PaneIconCell();
-        paneIconCell.setTitleFactory(f -> f.getName());
-        paneIconCell.setLoadImageOnlyWhenVisible(false);
-        paneIconCell.setItem(itemCategory);
-
-        return paneIconCell;
-    }
-
-    public static PaneIconCell generate(ItemWidget itemWidget) {
-        PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        paneIconCell.setTitleFactory(f -> f.getLabel());
-        paneIconCell.setLoadImageOnlyWhenVisible(false);
-        paneIconCell.setItem(itemWidget);
-
-        return paneIconCell;
-
-    }
+public interface Item {
+    public String getContext();
+    public Item getValue();
+    public String getIcon();
 }

@@ -83,10 +83,10 @@ public class MetaDataSelector implements Selector {
 
         Matcher m = SIMPLE_QUERY_PATTERN.matcher(queryString);
         if (metadataSetName == null) {
-            metadataSetName = PlaneDB.MODIFIED_METADATASET_STRING;
+            metadataSetName = PlaneDB.MODIFIED_METADATASET;
         }
 
-        Map<String, MetaData> metadataSet = planeDB.getMetaDataSet();
+        Map<String, MetaData> metadataSet = planeDB.metaDataSetProperty();
 
         if (m.matches()) {
 
@@ -101,7 +101,7 @@ public class MetaDataSelector implements Selector {
             valueName = valueName.trim();
             valueString = valueName;
             try {
-                String metadataValue = planeDB.getMetaDataSetProperty(metadataSetName).get(keyName).getStringValue();
+                String metadataValue = planeDB.getMetaDataSet().get(valueName).getStringValue();
 
                 return metadataValue.toLowerCase().equals(valueName.toLowerCase());
             } catch (NullPointerException e) {

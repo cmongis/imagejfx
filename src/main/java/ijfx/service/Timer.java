@@ -27,8 +27,8 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
  * @author cyril
  */
 public interface Timer {
-    
-    
+
+    String getName();
     void start();
     long elapsed(String id);
     SummaryStatistics getStats(String id);

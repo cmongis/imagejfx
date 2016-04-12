@@ -22,6 +22,8 @@ package ijfx.core.imagedb;
 import ijfx.core.metadata.FileSizeMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.ui.main.ImageJFX;
 import io.scif.FormatException;
 import io.scif.Metadata;
@@ -35,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.axis.Axes;
 import org.scijava.Priority;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
@@ -54,6 +57,9 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
     private final String WRONG_FORMAT = "Couldn't find an appropriate format for the file : %s";
     private final String ACCESS_PROBLEM = "Could'nt access file : %s";
 
+    @Parameter
+    TimerService timerService;
+    
     public DefaultMetaDataExtractionService() {
         super();
 
@@ -83,15 +89,14 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
     public MetaDataSet extractMetaData(File file) {
 
         MetaDataSet metadataset = new MetaDataSet();
-
+        Timer t = timerService.getTimer("MetaData Extraction");
         try {
             // ReaderFilter reader = getReaderFilter(file);
-
+            t.start();
             Metadata metadata = getSCIFIO().format().getFormat(file.getAbsolutePath()).createParser().parse(file.getAbsolutePath());
-
+            t.elapsed("Metadata parser creation");
             long serieCount, timeCount, zCount, channelCount, width, height, imageSize, bitsPerPixel;
-            System.out.println(metadata);
-            System.out.println(Arrays.toString(metadata.get(0).getAxesLengths()));
+            String dimensionOrder;
 
             serieCount = metadata.getImageCount();
             width = metadata.get(0).getAxisLength(Axes.X);
@@ -101,6 +106,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             channelCount = metadata.get(0).getAxisLength(Axes.CHANNEL);
             bitsPerPixel = metadata.get(0).getBitsPerPixel();
             imageSize = metadata.getDatasetSize();
+            //dimensionOrder = metadata.get
             
             metadataset.putGeneric(MetaData.WIDTH, width);
             metadataset.putGeneric(MetaData.HEIGHT, height);
@@ -111,7 +117,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             metadataset.putGeneric(MetaData.SERIE_COUNT, serieCount);
             metadataset.putGeneric(MetaData.CHANNEL_COUNT, channelCount);
             metadataset.putGeneric(MetaData.FILE_NAME, file.getName());
-            
+            //metadataset.putGeneric(MetaData.DIMENSION_ORDER)
             return metadataset;
 
         } catch (FormatException ex) {

@@ -101,7 +101,7 @@ public class MissingMetadataCheckCard extends MessageActionCardBase {
             getProject()
                     .getHierarchy()
                     .stream()
-                    .filter(key -> plane.getMetaDataSet().get(key) == null)
+                    .filter(key -> plane.metaDataSetProperty().get(key) == null)
                     .forEach(key -> {
                         commands.add(new AddMetaDataCommand(plane, key, 0));
                     });

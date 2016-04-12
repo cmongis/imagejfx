@@ -46,7 +46,7 @@ public class ModifyMetaDataCommand extends ImageCommand  {
 
     @Override
     public void execute() {
-        metaDataBU = image.getMetaDataSet().get(key);
+        metaDataBU = image.metaDataSetProperty().get(key);
         image.addMetaData(metaData);
     }
 

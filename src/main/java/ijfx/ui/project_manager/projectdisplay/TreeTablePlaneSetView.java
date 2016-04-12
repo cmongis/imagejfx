@@ -162,7 +162,7 @@ public class TreeTablePlaneSetView extends BorderPane implements PlaneSetView {
                 return new SimpleStringProperty(data.getMetaData().getStringValue());
             }
         } else {
-            return new SimpleStringProperty(data.getPlaneDB().getMetaDataSet().get(obs.getTreeTableColumn().getId()).getStringValue());
+            return new SimpleStringProperty(data.getPlaneDB().metaDataSetProperty().get(obs.getTreeTableColumn().getId()).getStringValue());
         }
 
     }

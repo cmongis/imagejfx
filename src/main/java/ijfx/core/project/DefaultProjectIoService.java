@@ -20,7 +20,6 @@
  */
 package ijfx.core.project;
 
-import ijfx.core.project.query.DefaultModifier;
 import ijfx.core.project.query.Selector;
 import ijfx.core.project.query.QueryParser;
 import ijfx.core.project.query.Modifier;
@@ -37,8 +36,6 @@ import static ijfx.core.project.Project.IMAGE_STRING;
 import static ijfx.core.project.Project.RULE_STRING;
 import ijfx.core.project.imageDBService.PlaneDB;
 import static ijfx.core.project.imageDBService.PlaneDB.IMAGE_REFERENCE_STRING;
-import static ijfx.core.project.imageDBService.PlaneDB.METADATASET_STRING;
-import static ijfx.core.project.imageDBService.PlaneDB.MODIFIED_METADATASET_STRING;
 import static ijfx.core.project.imageDBService.PlaneDB.PLANE_INDEX_STRING;
 import static ijfx.core.project.imageDBService.PlaneDB.TAG_STRING;
 import ijfx.core.project.imageDBService.PlaneDBInMemory;
@@ -50,7 +47,6 @@ import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.zip.DataFormatException;
@@ -65,8 +61,10 @@ import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 import static ijfx.core.project.Project.SETTINGS_STRING;
 import ijfx.core.project.modifier.ModifierPlugin;
-import ijfx.core.project.query.ModifierFactory;
 import ijfx.core.project.query.QueryService;
+import static ijfx.core.project.imageDBService.PlaneDB.ORIGINAL_METADATASET;
+import static ijfx.core.project.imageDBService.PlaneDB.MODIFIED_METADATASET;
+import java.util.Map;
 
 /**
  *
@@ -313,8 +311,8 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
     private JsonNode planeToJsonNode(PlaneDB planeDB) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();
-        HashMap<String, String> mapMetaData = MetaData.metaDataSetToMap(planeDB.getMetaDataSetProperty(METADATASET_STRING));
-        HashMap<String, String> mapModifiedMetaData = metaDataSetToMap(planeDB.getMetaDataSetProperty(MODIFIED_METADATASET_STRING));
+        Map<String, String> mapMetaData =  MetaData.metaDataSetToMap(planeDB.getOriginalMetaDataSet());
+        Map<String, String> mapModifiedMetaData = metaDataSetToMap(planeDB.getMetaDataSet());
         JsonNode metaNode = mapper.valueToTree(mapMetaData);
         JsonNode modifiedMetaNode = mapper.valueToTree(mapModifiedMetaData);
 
@@ -324,8 +322,8 @@ public class DefaultProjectIoService extends AbstractService implements ProjectI
         imageRefNode.put(ijfx.core.project.imageDBService.ImageReference.PATH_STRING, path);
         imageRefNode.put(ijfx.core.project.imageDBService.ImageReference.ID_STRING, id);
         ArrayNode tagNode = mapper.valueToTree(planeDB.getTags());
-        root.put(METADATASET_STRING, metaNode);
-        root.put(MODIFIED_METADATASET_STRING, modifiedMetaNode);
+        root.put(ORIGINAL_METADATASET, metaNode);
+        root.put(MODIFIED_METADATASET, modifiedMetaNode);
         root.put(IMAGE_REFERENCE_STRING, imageRefNode);
         root.put(PLANE_INDEX_STRING, planeDB.getPlaneIndex());
         root.putArray(TAG_STRING).addAll(tagNode);

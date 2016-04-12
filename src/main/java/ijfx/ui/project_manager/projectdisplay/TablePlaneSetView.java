@@ -159,13 +159,13 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
         @Override
         public boolean test(PlaneDB t) {
 
-            if (t.getMetaDataSet() == null) {
+            if (t.metaDataSetProperty() == null) {
                 return false;
             }
             boolean onMatch = false;
-            final ConditionList conditionList = new ConditionList(t.getMetaDataSet().size());
+            final ConditionList conditionList = new ConditionList(t.metaDataSetProperty().size());
 
-            t.getMetaDataSet().forEach((key, value) -> {
+            t.metaDataSetProperty().forEach((key, value) -> {
                 if (value.getStringValue().toLowerCase().contains(filter.toLowerCase())) {
                     conditionList.add(true);
                 }
@@ -195,15 +195,15 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
         @Override
         public boolean test(PlaneDB t) {
 
-            if (t.getMetaDataSet() == null) {
+            if (t.metaDataSetProperty() == null) {
                 return false;
             }
-            String key = findKey(t.getMetaDataSet(), this.key);
+            String key = findKey(t.metaDataSetProperty(), this.key);
             if (key == null) {
                 return false;
             }
             System.out.println(key);
-            return t.getMetaDataSet().get(key).getStringValue().toLowerCase().contains(value.toLowerCase());
+            return t.metaDataSetProperty().get(key).getStringValue().toLowerCase().contains(value.toLowerCase());
 
         }
     }
@@ -350,7 +350,7 @@ public class TablePlaneSetView extends BorderPane implements PlaneSetView {
 
     public ObservableValue<String> getCellData(CellDataFeatures<PlaneDB, String> features) {
         try {
-            return new SimpleStringProperty(features.getValue().getMetaDataSet().get(features.getTableColumn().getId()).getStringValue());
+            return new SimpleStringProperty(features.getValue().metaDataSetProperty().get(features.getTableColumn().getId()).getStringValue());
         } catch (Exception e) {
             //logger.log(Level.SEVERE, "Damn", e);
 

@@ -92,7 +92,7 @@ public class MapDimensionsModifier implements ModifierPlugin{
     }
     
     private MetaData getPlaneProperty(PlaneDB db, Dimension d) {
-        return db.getMetaDataSet().get(getPropertyName(d));
+        return db.metaDataSetProperty().get(getPropertyName(d));
     }
     
     private String getPropertyName(Dimension d) {
@@ -124,7 +124,7 @@ public class MapDimensionsModifier implements ModifierPlugin{
         
         // getting the original index of the plane (some planes could be swappared with modified plane
         // where the actual index is 0. By requesting the original, we make sure no mistake is made.
-        int index = planeDB.getMetaDataSet().get(MetaData.PLANE_INDEX).getIntegerValue();
+        int index = planeDB.metaDataSetProperty().get(MetaData.PLANE_INDEX).getIntegerValue();
         
         long[] indexSet = possibilities[index];
         
@@ -146,7 +146,7 @@ public class MapDimensionsModifier implements ModifierPlugin{
         ConditionList areMetadataRight = new ConditionList();
         
         getCalculatedIndexesMap(planeDB).forEach((propertyName,index)->{
-            areMetadataRight.add(planeDB.getMetaDataSet().get(propertyName).getIntegerValue().equals(index));
+            areMetadataRight.add(planeDB.metaDataSetProperty().get(propertyName).getIntegerValue().equals(index));
         });
         
         

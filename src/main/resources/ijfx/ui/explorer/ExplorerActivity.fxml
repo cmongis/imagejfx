@@ -10,7 +10,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="600.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="800.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane maxHeight="1.7976931348623157E308" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -72,13 +72,21 @@
                   <FontAwesomeIconView glyphName="PLUS" styleClass="h4" />
                </graphic>
             </Button>
-            <Rectangle fill="#1f96ff00" height="10.0" smooth="false" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="150.0" />
+            <Rectangle fill="#1f96ff00" height="10.0" smooth="false" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="130.0" />
             <TextField fx:id="filterTextField" maxWidth="1.7976931348623157E308" promptText="Quick filter..." />
             <ToggleButton fx:id="filterToggleButton" mnemonicParsing="false">
                <graphic>
                   <FontAwesomeIconView glyphName="FILTER" styleClass="icon" />
                </graphic>
             </ToggleButton>
+            <Label text="Explore" />
+            <HBox styleClass="toggle-group">
+               <children>
+                  <ToggleButton fx:id="fileModeToggleGroup" mnemonicParsing="false" styleClass="first" text="Files" />
+                  <ToggleButton fx:id="planeModeToggleButton" mnemonicParsing="false" text="Planes" />
+                  <ToggleButton fx:id="objectModeToggleGroup" mnemonicParsing="false" styleClass="last" text="Object" />
+               </children>
+            </HBox>
          </items>
       </ToolBar>
       <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="50.0" />

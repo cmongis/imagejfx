@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <SplitPane dividerPositions="0.2842809364548495" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <items>
+            <ListView fx:id="timerListView" prefHeight="200.0" prefWidth="200.0" />
+            <TableView fx:id="timerEntryTableView" minWidth="500.0">
+              <columns>
+                <TableColumn fx:id="idColumn" prefWidth="-1.0" text="Action" />
+                <TableColumn fx:id="meanColumn" prefWidth="20.0" text="Mean" />
+                  <TableColumn fx:id="stdDevColumn" prefWidth="20.0" text="Std. Dev" />
+                  <TableColumn fx:id="minColumn" prefWidth="20.0" text="Min" />
+                  <TableColumn fx:id="maxColumn" prefWidth="20.0" text="Max" />
+                  <TableColumn fx:id="countColumn" prefWidth="75.0" text="Count" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </items>
+      </SplitPane>
+   </center>
+</fx:root>

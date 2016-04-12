@@ -17,12 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
+package ijfx.ui.previewToolbar;
+
+import ijfx.ui.context.ContextualWidget;
+import javafx.event.Event;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface ItemCategory extends Item  {
-    public String getName();
+interface ContextualPaneIcon extends ContextualWidget{
+    public String getContext();
+    public Event getOnAction();
 }

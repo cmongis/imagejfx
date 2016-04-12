@@ -196,7 +196,7 @@ public class MetaDataHierarchyImpl implements MetaDataHierarchy {
                 if (childObject instanceof TreeItem) {
                     TreeItem child = (TreeItem) childObject;
                     // if the metadata contained in the TreeItem is also contained in image metaDataset
-                    if (child.getValue().equals(image.getMetaDataSet().get(hierarchy.get(i)))) {
+                    if (child.getValue().equals(image.metaDataSetProperty().get(hierarchy.get(i)))) {
                         item = child;
                         goNext = true;
                         break;
@@ -220,7 +220,7 @@ public class MetaDataHierarchyImpl implements MetaDataHierarchy {
         TreeItem currentNode = root;
         while (hierarchyIndex < hierarchy.size() && imageContainsKey(image, hierarchy.get(hierarchyIndex))) {
             String currentKey = hierarchy.get(hierarchyIndex);
-            TreeItem metaItem = new CheckBoxTreeItem(image.getMetaDataSet().get(currentKey));
+            TreeItem metaItem = new CheckBoxTreeItem(image.metaDataSetProperty().get(currentKey));
             addGraphicToItem(metaItem, ItemType.METADATA);
             currentNode.getChildren().add(metaItem);
             currentNode = metaItem;
@@ -253,7 +253,7 @@ public class MetaDataHierarchyImpl implements MetaDataHierarchy {
     }
 
     private boolean imageContainsKey(PlaneDB image, String key) {
-        return image.getMetaDataSetProperty(PlaneDB.MODIFIED_METADATASET_STRING).containsKey(key);
+        return image.getMetaDataSet().containsKey(key);
     }
 
     private void addImage(PlaneDB newPlane) {
@@ -361,12 +361,12 @@ public class MetaDataHierarchyImpl implements MetaDataHierarchy {
         private void setMetaDataListener(MapChangeListener listener) {
             stopListeningMetaData();
             this.metaDataListener = listener;
-            image.getMetaDataSet().addListener(listener);
+            image.metaDataSetProperty().addListener(listener);
         }
 
         private void stopListeningMetaData() {
             if (metaDataListener != null) {
-                image.getMetaDataSet().removeListener(metaDataListener);
+                image.metaDataSetProperty().removeListener(metaDataListener);
             }
         }
 

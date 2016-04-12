@@ -2,12 +2,13 @@
   {
     "name":"Colors"
     ,"context":"image-open"
+    ,"icon":"BITCOIN"
     ,"items":[
         {
           "type":"Command"
           ,"label":"Merge channels"
           ,"action":"net.imagej.plugins.commands.MergeChannels"
-          ,"icon":"/something.svg"
+          ,"icon":"ANDROID"
           ,"context":"multichannel"
           
         }
@@ -16,33 +17,35 @@
           "type":"Command"
           ,"label":"Separate channels"
           ,"action":"net.imagej.plugins.commands.SeparateChannel"
-          ,"icon":"/somethingelse.svg"
+          ,"icon":"ANDROID"
           ,"context":"multichannel rgb-image"
         }
       ]
   }
   ,{
     "name":"Stacks"
-    ,"context":"image-open multi-z"
+    ,"context":"image-open multi-z-img"
+    ,"icon":"BITCOIN"
     ,"items":[
         {
           "type":"Command"
           ,"label":"Merge stacks"
           ,"action":"net.imagej.plugins.command.MergeStacks"
-          ,"icon":"/something.svg"
-          ,"context":"multi-z"
+          ,"icon":"ANDROID"
+          ,"context":"multi-z-img"
         }
         ,{
           "type":"Command"
           ,"label":"Separate stacks"
           ,"action":"net.imagej.plugins.commands.SeparateStacks"
-          ,"icon":"/somthingelse.svg"
+          ,"icon":"ANDROID"
           ,"context":"multi-z"
         }
       ]
   },
   {"name":"Filters"
   ,"context":"image-open"
+  ,"icon":"BITCOIN"
   ,"items":[
         {
           "type":"Command"
@@ -51,8 +54,8 @@
           ,"icon":"preview"
           ,"context":"image-open"
           ,"parameters":{
-            "radius":3
-            ,"usePixels":false
+            "sigma":3
+            ,"useUnits":false
           }
         }
       ]

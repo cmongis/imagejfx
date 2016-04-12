@@ -23,9 +23,8 @@ package ijfx.core.project.imageDBService;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.project.ImageFormatProvider;
-import ijfx.core.listenableSystem.Listenable;
+import ijfx.core.metadata.MetaDataOwner;
 import java.io.File;
-import java.util.List;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyMapProperty;
@@ -35,17 +34,17 @@ import net.imglib2.img.Img;
  *
  * @author Cyril Quinton
  */
-public interface PlaneDB extends Selectable, ImageFormatProvider {
+public interface PlaneDB extends Selectable, ImageFormatProvider, MetaDataOwner {
 
    
     /**
      * value: {@value}
      */
-    public static final String METADATASET_STRING = "metaDataSet";
+    public static final String ORIGINAL_METADATASET = "metaDataSet";
     /**
      * value: {@value}
      */
-    public static final String MODIFIED_METADATASET_STRING = "ModifiedMetaDataSet";
+    public static final String MODIFIED_METADATASET = "ModifiedMetaDataSet";
     /**
      * value: {@value}
      */
@@ -80,9 +79,9 @@ public interface PlaneDB extends Selectable, ImageFormatProvider {
      */
     public File getFile();
 
-    public ReadOnlyMapProperty<String, MetaData> getMetaDataSetProperty(String identifier);
+    //public ReadOnlyMapProperty<String, MetaData> getMetaDataSetProperty(String identifier);
 
-    public ReadOnlyMapProperty<String, MetaData> getMetaDataSet();
+    public ReadOnlyMapProperty<String, MetaData> metaDataSetProperty();
 
     public ReadOnlyListProperty<String> getTags();
 
@@ -130,4 +129,6 @@ public interface PlaneDB extends Selectable, ImageFormatProvider {
     
     public ReadOnlyBooleanProperty destructedProperty();
 
+    public MetaDataSet getOriginalMetaDataSet();
+    
 }

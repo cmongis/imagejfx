@@ -19,6 +19,7 @@
  */
 package ijfx.service;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.scijava.plugin.Plugin;
@@ -32,7 +33,7 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class DefaultTimerService extends AbstractService implements TimerService {
 
-    private Map<String, Timer> timerMap = new HashMap<>();
+    private final Map<String, Timer> timerMap = new HashMap<>();
 
     @Override
     public Timer getTimer(Class<?> clazz) {
@@ -43,6 +44,12 @@ public class DefaultTimerService extends AbstractService implements TimerService
     public Timer getTimer(String id) {
         timerMap.putIfAbsent(id, new DefaultTimer(id));
         return timerMap.get(id);
+    }
+    
+   
+    @Override
+    public Collection<? extends Timer> getTimers() {
+        return timerMap.values();
     }
 
 }

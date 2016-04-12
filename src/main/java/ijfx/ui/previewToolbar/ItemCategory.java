@@ -17,16 +17,12 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.examples.context;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+package ijfx.ui.previewToolbar;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-@JsonDeserialize(as=DefaultParameter.class)
-public interface Parameters {
-    public double getRadius();
-    public boolean getUsePixels();
+public interface ItemCategory extends Item  {
+    public String getName();
 }

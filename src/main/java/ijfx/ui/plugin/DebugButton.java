@@ -23,7 +23,6 @@ package ijfx.ui.plugin;
 import ijfx.ui.UiPlugin;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import ijfx.ui.batch.BatchProcessorConfigurator;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.notification.NotificationService;
@@ -39,55 +38,64 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.FileBatchProcessorPanel;
+import ijfx.ui.main.PerformanceActivity;
+import java.util.List;
+import java.util.stream.Collectors;
+import javafx.event.Event;
+import javafx.scene.control.Menu;
+import javafx.scene.input.MouseEvent;
 
-import ijfx.ui.project_manager.ProjectManager;
 import org.scijava.event.EventService;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id="debug-button",context="debug",order=4.0,localization=Localization.TOP_RIGHT)
-public class DebugButton extends MenuButton implements UiPlugin{
+@UiConfiguration(id = "debug-button", context = "debug", order = 4.0, localization = Localization.TOP_RIGHT)
+public class DebugButton extends MenuButton implements UiPlugin {
 
     @Parameter
-    UiPluginService widgetService;
-    
+    private UiPluginService uiPluginService;
+
     @Parameter
-    NotificationService notificationService;
-    
+    private NotificationService notificationService;
+
     @Parameter
-    EventService eventService;
-    
+    private EventService eventService;
+
     @Parameter
-    AppService appService;
-    
+    private AppService appService;
+
     @Parameter
-    HintService hintService;
-    
+    private HintService hintService;
+
+    @Parameter
+    private ActivityService activityService;
+
+    Menu reloadMenu = new Menu("Reload UiPlugin");
+    Menu activityMenu = new Menu("Show activity");
+
     public DebugButton() {
-        super("D",GlyphsDude.createIcon(FontAwesomeIcon.BUG));
+        super("D", GlyphsDude.createIcon(FontAwesomeIcon.BUG));
         getStyleClass().add("icon");
-        addItem("Reload CSS",this::reloadCss);
-        addItem("Reload Debug Button",event->widgetService.reload(DebugButton.class));
-        addItem("Reload App Browser",event->appService.reloadCurrentView());
-        //addItem("Reload Batch Processing Screen",event->widgetService.reload(BatchProcessorConfigurator.class));
-        addItem("Reload an other",this::reloadAnOther);
-        addItem("Test hints",this::testHints);
-        addItem("Show/Hide sideMenu",this::triggerDebugEvent);
-        
+        addItem("Reload CSS", this::reloadCss);
+        addItem("Reload Debug Button", event -> uiPluginService.reload(DebugButton.class));
+        addItem("Reload App Browser", event -> appService.reloadCurrentView());
+        addItem("Test hints", this::testHints);
+        getItems().add(reloadMenu);
+        addEventHandler(MouseEvent.MOUSE_ENTERED,this::updateReloadMenu);
+        System.out.println("Added");
     }
-    
-    
+
     @Override
     public Node getUiElement() {
-        
+
         return this;
     }
-    
+
     public void addItem(String label, EventHandler<ActionEvent> handler) {
         MenuItem item = new MenuItem(label);
         item.setOnAction(handler);
@@ -96,50 +104,62 @@ public class DebugButton extends MenuButton implements UiPlugin{
 
     @Override
     public UiPlugin init() {
-        
-        
-        
+
         return this;
     }
-    
+
     public void triggerDebugEvent(ActionEvent event) {
         eventService.publish(new DebugEvent("sideMenu"));
     }
-    
-    
+
     public void reloadCss(ActionEvent event) {
-        
+
         String debugStyleSheet = "file:./src/main/resources/ijfx/ui/main/flatterfx.css";
-        
-         if(new File(debugStyleSheet.replace("file:","")).exists() == false) {
+
+        if (new File(debugStyleSheet.replace("file:", "")).exists() == false) {
+
+        } else {
 
         }
-        else {
 
-        }
-        
         getScene().getStylesheets().removeAll(ImageJFX.STYLESHEET_ADDR, debugStyleSheet);
 
         getScene().getStylesheets().add(debugStyleSheet);
-        
-        
+
         //eventService.publish(new DebugEvent("reloadSideMenu"));
     }
-    
+
     public void reloadAnOther(ActionEvent event) {
-         //  widgetService.reload(FXMLBrowserController.class);
-      
-        //widgetService.reload(OverlayManagerPanel.class);
-        //widgetService.reload(OverlayPanel.class);
-        //widgetService.reload(ProjectManager.class);
-        //widgetService.reload(RuleEditor.class);
-        //widgetService.reload(RuleListViewer.class);
-        //notificationService.publish(new DefaultNotification("It works !","perfectly !").addAction("Tell him",()->System.out.println("Yeah")));
-        
+        activityService.openByType(PerformanceActivity.class);
     }
-    
+
     public void testHints(ActionEvent event) {
         hintService.displayHints(FileBatchProcessorPanel.class, true);
     }
-    
+
+    private void reloadPlugin(ActionEvent event) {
+        MenuItem mi = (MenuItem) event.getTarget();
+        UiPlugin ui = (UiPlugin) mi.getUserData();
+        uiPluginService.reload(ui.getClass());
+    }
+
+    private void updateReloadMenu(MouseEvent event) {
+        System.out.println("Showing");
+        if (reloadMenu.getItems().size() <= 0) {
+            System.out.println("Reloading");
+            List<MenuItem> items = uiPluginService
+                    .getUiPluginList()
+                    .parallelStream()
+                    .map(p -> {
+                        MenuItem mi = new MenuItem(p.getClass().getSimpleName());
+                        mi.setUserData(p);
+                        mi.setOnAction(this::reloadPlugin);
+                        return mi;
+                    })
+                    .sorted((o1, o2) -> o1.getText().compareTo(o2.getText()))
+                    .collect(Collectors.toList());
+            reloadMenu.getItems().addAll(items);
+        }
+    }
+
 }

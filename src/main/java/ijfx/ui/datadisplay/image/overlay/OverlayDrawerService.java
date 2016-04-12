@@ -36,51 +36,38 @@ import org.scijava.service.SciJavaService;
  * @author cyril
  */
 @Plugin(type = SciJavaService.class)
-public class OverlayDrawerService extends AbstractService implements IjfxService{
+public class OverlayDrawerService extends AbstractService implements IjfxService {
 
-    HashMap<Overlay, OverlayDrawer> drawerMap = new HashMap<>();
-    HashMap<Overlay, OverlayModifier> modifierMap = new HashMap<>();
-
+    //HashMap<Overlay, OverlayDrawer> drawerMap = new HashMap<>();
+    //HashMap<Overlay, OverlayModifier> modifierMap = new HashMap<>();
     @Parameter
     PluginService pluginService;
 
     @Parameter
     Context context;
-    
-    public OverlayModifier getModifier(Overlay overlay) {
-       return findPluginFor(OverlayModifier.class, overlay, modifierMap);
+
+    public OverlayModifier createModifier(Overlay overlay) {
+        return findPluginFor(OverlayModifier.class, overlay);
     }
 
-    public OverlayDrawer getDrawer(Overlay overlay) {
-        return findPluginFor(OverlayDrawer.class, overlay, drawerMap);
+    public OverlayDrawer createDrawer(Overlay overlay) {
+        return findPluginFor(OverlayDrawer.class, overlay);
     }
 
-    @EventHandler
-    public void onOverlayDeleted(OverlayDeletedEvent d) {
-        drawerMap.remove(d.getObject());
-        modifierMap.remove(d.getObject());
-    }
-    
-   //TODO: handling closing of dataset @EventHandler
-    public void onDatasetClosed() {
-        
-    }
-    
-    
-    private <T extends ClassHandler, C> T findPluginFor(Class<? extends T> handlerType, C overlay, HashMap<C, T> map) {
-       
-        if (map.containsKey(overlay) == false || map.get(overlay) == null) {
-            for (T plugin : pluginService.createInstancesOfType(handlerType)) {
-                if (plugin.canHandle(overlay)) {
-                    
-                   
-                    map.put(overlay, plugin);
-                    break;
-                }
+    private <T extends ClassHandler, C> T findPluginFor(Class<? extends T> handlerType, C overlay) {
+
+        // if (map.containsKey(overlay) == false || map.get(overlay) == null) {
+        for (T plugin : pluginService.createInstancesOfType(handlerType)) {
+            if (plugin.canHandle(overlay)) {
+
+                return plugin;
+                // map.put(overlay, plugin);
+
             }
         }
+        // }
 
-        return map.get(overlay);
+        return null;
     }
 
 }
