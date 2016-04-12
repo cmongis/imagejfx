@@ -47,10 +47,11 @@ public class MetaDataSet extends HashMap<String, MetaData> {
     
     
     
-    public void merge(MetaDataSet set) {
+    public MetaDataSet merge(MetaDataSet set) {
         for(MetaData data : set.values()) {
             put(data);
         }
+        return this;
     }
     
     
