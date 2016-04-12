@@ -22,6 +22,7 @@ package mongis.utils.panecell;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
+import ijfx.ui.context.PaneContextualView;
 import ijfx.ui.main.LoadingIcon;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -48,8 +49,7 @@ import org.scijava.plugin.Parameter;
  *
  * @author Tuan anh TRINH
  */
-public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
-
+public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
 
     @FXML
     private FontAwesomeIconView titleIconView;
@@ -59,7 +59,11 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
 
     @FXML
     private Label subtitleLabel;
-    
+
+    private PaneContextualView contextualView;
+
+
+
     private final ObjectProperty<T> item = new SimpleObjectProperty<T>();
 
     // Callback 
@@ -74,61 +78,58 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
     private Task currentImageSearch;
 
     private boolean loadImageOnlyWhenVisible = true;
-    
+
     private boolean isInsideScrollWindow = false;
-        private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
 
     Image currentImage = null;
-    
-    
+
     private final static FXMLLoader LOADER = new FXMLLoader(PaneLabelCell.class.getResource("/ijfx/ui/explorer/LabelIconItem.fxml"));
-    
-    
+
     boolean subtitleVisible = true;
     boolean showIcon = true;
-    
-   
+
     BooleanProperty showIconProperty;
     BooleanProperty loadImageOnlyWhenVisibleProperty;
 
+  
     public PaneLabelCell() {
-                try {
+        try {
             //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
-            
-            synchronized(LOADER) {
-                                
+
+            synchronized (LOADER) {
+
                 LOADER.setController(this);
                 LOADER.setRoot(this);
                 LOADER.load();
             }
 
             item.addListener(this::onItemChanged);
-                   // setImage(previewService.getPreview());
+            // setImage(previewService.getPreview());
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
-            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED,event->isInsideScrollWindow = false);
-            
-            
-          
-            
+            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED, event -> isInsideScrollWindow = false);
+
         } catch (IOException ex) {
             Logger.getLogger(PaneLabelCell.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-        public PaneLabelCell<T> setIcon(FontAwesomeIcon icon) {
+    public PaneLabelCell<T> setIcon(FontAwesomeIcon icon) {
         titleIconView.setIcon(icon);
         return this;
     }
-        public void onScrollWindowEntered(ScrollWindowEvent event) {
+
+    public void onScrollWindowEntered(ScrollWindowEvent event) {
         isInsideScrollWindow = true;
-        if(currentImage == null && currentImageSearch == null) {
+        if (currentImage == null && currentImageSearch == null) {
             updateImageAsync(getItem());
         }
     }
-    
+
     /**
-     * Set the Model item contained by the PaneLabelCell. The PaneCell will call the different callback to update
-     * the view.
+     * Set the Model item contained by the PaneLabelCell. The PaneCell will call
+     * the different callback to update the view.
+     *
      * @param item
      */
     @Override
@@ -137,7 +138,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
     }
 
     /**
-     * 
+     *
      * @return the item displayed the cell
      */
     @Override
@@ -154,13 +155,14 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
         return this;
     }
 
-    
     public Property<T> itemProperty() {
         return item;
     }
 
     /**
-     * Set directly the title of the Icon. The title may be overridden later by the title callback
+     * Set directly the title of the Icon. The title may be overridden later by
+     * the title callback
+     *
      * @param title
      */
     public void setTitle(String title) {
@@ -175,19 +177,13 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
 
     }
 
-
-    
-   
-    
     public void onItemChanged(Observable obs, T oldItem, T newItem) {
-        
-        
-        
+
         // cancelling the possible image search
         if (currentImageSearch != null) {
             currentImageSearch.cancel();
         }
-        
+
         // setting the current image to null
         currentImage = null;
         currentImageSearch = null;
@@ -200,8 +196,8 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
         forceUpdate(newItem);
 
     }
-    
-     public void forceUpdate(T newItem) {
+
+    public void forceUpdate(T newItem) {
         //otherwise starting to charge everything
         new AsyncCallback<T, String>()
                 .setInput(newItem)
@@ -224,9 +220,10 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
                 .then(this::setAdditionalData)
                 .start();
 
-        if(loadImageOnlyWhenVisible == false || isInsideScrollWindow) updateImageAsync(newItem);
-        
-        
+        if (loadImageOnlyWhenVisible == false || isInsideScrollWindow) {
+            updateImageAsync(newItem);
+        }
+
     }
 
     private void updateImageAsync(T newItem) {
@@ -234,8 +231,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
         if (newItem == null) {
             return;
         }
-      
-        
+
         currentImageSearch = new AsyncCallback<T, Image>()
                 .setInput(newItem)
                 .run(imageFactory)
@@ -248,8 +244,9 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
     }
 
     /**
-     * 
-     * @param titleFactory Callback that takes a model item as input and return a string representing the title of the icon
+     *
+     * @param titleFactory Callback that takes a model item as input and return
+     * a string representing the title of the icon
      * @return the PaneLabelCell for convenient reasons
      */
     public PaneLabelCell<T> setTitleFactory(Callback<T, String> titleFactory) {
@@ -257,9 +254,10 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
         return this;
     }
 
-     /**
-     * 
-     * @param subtitleFactory Callback that takes a model item as input and return a string representing the title of the icon
+    /**
+     *
+     * @param subtitleFactory Callback that takes a model item as input and
+     * return a string representing the title of the icon
      * @return the PaneIconcell for convenient reasons
      */
     public PaneLabelCell<T> setSubtitleFactory(Callback<T, String> subtitleFactory) {
@@ -267,10 +265,11 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
         return this;
     }
 
-     /**
-     * 
-     * @param imageFactory Callback that takes a model item as input and return an Image as icon for the model. The callback is always executed in a separated thread in order to
-     * avoid blocking the display of the icon.
+    /**
+     *
+     * @param imageFactory Callback that takes a model item as input and return
+     * an Image as icon for the model. The callback is always executed in a
+     * separated thread in order to avoid blocking the display of the icon.
      * @return the PaneLabelCell for convenient reasons
      */
     public PaneLabelCell<T> setImageFactory(Callback<T, Image> imageFactory) {
@@ -279,23 +278,22 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
     }
 
     /**
-     * When false, the image is loaded whenever the item is updated. When true, the image is loaded
-     * only if the Ui element appears on the scroll window.
+     * When false, the image is loaded whenever the item is updated. When true,
+     * the image is loaded only if the Ui element appears on the scroll window.
+     *
      * @param loadImageOnlyWhenVisible
      */
     public void setLoadImageOnlyWhenVisible(boolean loadImageOnlyWhenVisible) {
         this.loadImageOnlyWhenVisible = loadImageOnlyWhenVisible;
     }
 
-    
     public BooleanProperty subtibleVisibleProperty() {
-       return subtitleLabel.visibleProperty();
+        return subtitleLabel.visibleProperty();
     }
 
     public void setSubtitleVisible(boolean subtitleVisible) {
-       subtibleVisibleProperty().setValue(subtitleVisible);
-         
-       
+        subtibleVisibleProperty().setValue(subtitleVisible);
+
     }
 
     public boolean isSubtitleVisible() {
@@ -304,8 +302,12 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T>{
 
     @Override
     public BooleanProperty selectedProperty() {
-return isSelectedProperty;
+        return isSelectedProperty;
     }
-    
-    
+    public void setContextualView(PaneContextualView contextualView) {
+        this.contextualView = contextualView;
+    }
+  public PaneContextualView getContextualView() {
+        return contextualView;
+    }
 }

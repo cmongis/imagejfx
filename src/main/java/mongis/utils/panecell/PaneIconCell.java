@@ -19,10 +19,17 @@
  */
 package mongis.utils.panecell;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.GeneralPath;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -31,16 +38,25 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
 
@@ -49,15 +65,16 @@ import mongis.utils.BindingsUtils;
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons
  * with a text and subtext under. The PaneIconCell is configured by setting a
- Model object which contain the data and callback that define how to get the
- informations from the models. In this way, when the model is changed, the
- titleIconView update itself automatically using the defined callback;
-
- Example, if I want to create a PaneIconCell that display a File.
-
- PaneIconCell<File> titleIconView = new PaneIconCell(); titleIconView.setTitleCallback(f->
- f.getName()); titleIconView.setSubtitleCallback(f->f.getLength());
- titleIconView.setImageCallback(f->f.getName().endsWith(".jpg") ? new
+ * Model object which contain the data and callback that define how to get the
+ * informations from the models. In this way, when the model is changed, the
+ * titleIconView update itself automatically using the defined callback;
+ *
+ * Example, if I want to create a PaneIconCell that display a File.
+ *
+ * PaneIconCell<File> titleIconView = new PaneIconCell();
+ * titleIconView.setTitleCallback(f-> f.getName());
+ * titleIconView.setSubtitleCallback(f->f.getLength());
+ * titleIconView.setImageCallback(f->f.getName().endsWith(".jpg") ? new
  * Image(f.getAbsoluthPath()) : new Image("/path/to/file.jpg");
  *
  * The last callback will return an Image
@@ -67,12 +84,10 @@ import mongis.utils.BindingsUtils;
  */
 public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
-
     @FXML
     private FontAwesomeIconView titleIconView;
     @FXML
     private ImageView imageView;
-
 
     @FXML
     private Label titleLabel;
@@ -82,10 +97,10 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     @FXML
     private VBox titleVBox;
-    
+
     @FXML
     private BorderPane imageViewContainer;
-    
+
     private final ObjectProperty<T> item = new SimpleObjectProperty<T>();
 
     // Callback 
@@ -109,21 +124,18 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
 
-
-    
     private boolean subtitleVisible = true;
     private boolean showIcon = true;
-    
-   
+
     BooleanProperty showIconProperty;
     BooleanProperty loadImageOnlyWhenVisibleProperty;
-    
+
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
-    
+
     private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
-    
+
     private long lastClick;
-    
+
     public PaneIconCell() {
         try {
             //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
@@ -134,8 +146,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 LOADER.setRoot(this);
                 LOADER.load();
             }
-            
-            titleLabel.setPrefSize(100,100);
+
+            titleLabel.setPrefSize(100, 100);
             imageView.fitWidthProperty().bind(widthProperty());
             imageView.fitHeightProperty().bind(widthProperty());
 
@@ -146,15 +158,15 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
 
-            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED,event->isInsideScrollWindow = false);
-            
-           addEventHandler(MouseEvent.MOUSE_CLICKED,this::onClick);
+            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED, event -> isInsideScrollWindow = false);
+
+            addEventHandler(MouseEvent.MOUSE_CLICKED, this::onClick);
             BindingsUtils.bindNodeToPseudoClass(SELECTED, this, selectedProperty());
-            
+
             getStyleClass().add("pane-icon-cell");
-            
+
             subtibleVisibleProperty().addListener(this::onSubtitleVisibleChanged);
-            
+
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -314,7 +326,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     /**
      *
      * @param titleFactory Callback that takes a model item as input and return
- a string representing the title of the titleIconView
+     * a string representing the title of the titleIconView
      * @return the PaneIconCell for convenient reasons
      */
     public PaneIconCell<T> setTitleFactory(Callback<T, String> titleFactory) {
@@ -325,7 +337,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     /**
      *
      * @param subtitleFactory Callback that takes a model item as input and
- return a string representing the title of the titleIconView
+     * return a string representing the title of the titleIconView
      * @return the PaneIconcell for convenient reasons
      */
     public PaneIconCell<T> setSubtitleFactory(Callback<T, String> subtitleFactory) {
@@ -336,8 +348,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     /**
      *
      * @param imageFactory Callback that takes a model item as input and return
- an Image as titleIconView for the model. The callback is always executed in a
- separated thread in order to avoid blocking the display of the titleIconView.
+     * an Image as titleIconView for the model. The callback is always executed
+     * in a separated thread in order to avoid blocking the display of the
+     * titleIconView.
      * @return the PaneIconCell for convenient reasons
      */
     public PaneIconCell<T> setImageFactory(Callback<T, Image> imageFactory) {
@@ -366,7 +379,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     public void setSubtitleVisible(boolean subtitleVisible) {
         subtibleVisibleProperty().setValue(subtitleVisible);
-       
+
     }
 
     public boolean isSubtitleVisible() {
@@ -377,35 +390,55 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     public BooleanProperty selectedProperty() {
         return isSelectedProperty;
     }
-    
-    
+
     private void onClick(MouseEvent event) {
         long now = System.currentTimeMillis();
-        if(event.getButton() != MouseButton.PRIMARY) return;
-        if(now - lastClick <= 1000) {
-            onDoubleClick();
+        if (event.getButton() != MouseButton.PRIMARY) {
+            return;
         }
-        else {
+        if (now - lastClick <= 1000) {
+            onDoubleClick();
+        } else {
             onSimpleClick();
         }
         lastClick = now;
     }
-    
+
     protected void onSimpleClick() {
         selectedProperty().setValue(!selectedProperty().getValue());
     }
-    
+
     protected void onDoubleClick() {
-        
+
     }
-    
+
     protected void onSubtitleVisibleChanged(Observable obs, Boolean oldValue, Boolean newValue) {
-        if(newValue) {
+        if (newValue) {
             titleVBox.getChildren().add(subtitleLabel);
-        }
-        else {
+        } else {
             titleVBox.getChildren().remove(subtitleLabel);
         }
     }
-    
+
+    public Image getImageFromFAI(FontAwesomeIconView fontAwesomeIconView, double size) {
+
+        final Canvas canvas = new Canvas(size, size);
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+        Font font = new Font(fontAwesomeIconView.getFont().getFamily(), size);
+        String unicode = FontAwesomeIcon.valueOf(fontAwesomeIconView.getGlyphName()).characterToString();
+        gc.setFont(font);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setFill(Color.BLACK);
+        gc.fillText(unicode, size / 2, size / 2);
+        final SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        final WritableImage snapshot = canvas.snapshot(params, null);
+        final java.awt.image.BufferedImage bufferedImage
+                = javafx.embed.swing.SwingFXUtils.fromFXImage(snapshot, null);
+        WritableImage wi = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
+        SwingFXUtils.toFXImage(bufferedImage, wi);
+        return wi;
+    }
+
 }
