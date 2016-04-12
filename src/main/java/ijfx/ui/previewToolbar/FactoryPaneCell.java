@@ -23,7 +23,10 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javax.swing.ImageIcon;
 import mongis.utils.panecell.PaneIconCell;
 import mongis.utils.panecell.PaneLabelCell;
 
@@ -50,16 +53,17 @@ public class FactoryPaneCell {
 
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
         PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        try
-        {
+        try {
         FontAwesomeIconView fontAwesomeIconView =new FontAwesomeIconView(FontAwesomeIcon.valueOf(itemWidget.getIcon()));
         fontAwesomeIconView.getStyleClass().add("icon-toolbar");
-        paneIconCell.setIcon(fontAwesomeIconView);
+        
+        Platform.runLater(() -> paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView,120.0)));
+        //paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView));
+            
+        } catch (Exception e) {
+        }
         paneIconCell.setSubtitleVisible(false);
-        }
-        catch(Exception e)
-        {
-        }
+
      
         paneIconCell.setTitleFactory(f -> f.getLabel());
         paneIconCell.setLoadImageOnlyWhenVisible(false);

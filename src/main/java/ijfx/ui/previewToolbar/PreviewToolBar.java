@@ -68,6 +68,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     public PreviewToolBar() {
         super();
+
         fakeToolBar = new HBox();
         fakeToolBar.setSpacing(10);
         this.setTop(fakeToolBar);
@@ -89,6 +90,8 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     }
 
     private void createToolBar(HBox hbox) {
+                contextService.enter("multi-z-img");
+        contextService.update();
         jsonReader = new JsonReader();
         jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
         jsonReader.separate();
