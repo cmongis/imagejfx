@@ -32,10 +32,15 @@ import io.scif.config.SCIFIOConfig;
 import io.scif.filters.ReaderFilter;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.transform.stream.StreamSource;
+import mongis.ndarray.NDimensionalArray;
 import net.imagej.axis.Axes;
+import org.apache.commons.math3.geometry.spherical.oned.S1Point;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -46,7 +51,7 @@ import org.scijava.service.Service;
  *
  * @author cyril
  */
-@Plugin(type = Service.class, priority=Priority.VERY_LOW_PRIORITY)
+@Plugin(type = Service.class, priority = Priority.VERY_LOW_PRIORITY)
 public class DefaultMetaDataExtractionService extends AbstractService implements MetaDataExtractorService {
 
     private SCIFIO scifio;
@@ -59,11 +64,9 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
 
     @Parameter
     TimerService timerService;
-    
+
     public DefaultMetaDataExtractionService() {
         super();
-
-    
 
     }
 
@@ -107,7 +110,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             bitsPerPixel = metadata.get(0).getBitsPerPixel();
             imageSize = metadata.getDatasetSize();
             //dimensionOrder = metadata.get
-            
+
             metadataset.putGeneric(MetaData.WIDTH, width);
             metadataset.putGeneric(MetaData.HEIGHT, height);
             metadataset.putGeneric(MetaData.ZSTACK_NUMBER, zCount);
@@ -117,7 +120,22 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             metadataset.putGeneric(MetaData.SERIE_COUNT, serieCount);
             metadataset.putGeneric(MetaData.CHANNEL_COUNT, channelCount);
             metadataset.putGeneric(MetaData.FILE_NAME, file.getName());
-            //metadataset.putGeneric(MetaData.DIMENSION_ORDER)
+
+            if (metadata.get(0).getAxesNonPlanar().size() > 0) {
+                NDimensionalArray ndarray = new NDimensionalArray(metadata.get(0).getAxesLengthsNonPlanar());
+
+                String[] dimNames = metadata
+                        .get(0)
+                        .getAxesNonPlanar()
+                        .stream().map(axe -> axe.type().getLabel())
+                        .toArray(size -> new String[size]);
+
+                long[] dimLengths = metadata.get(0).getAxesLengthsNonPlanar();
+
+                metadataset.putGeneric(MetaData.DIMENSION_ORDER, String.join(",", dimNames));
+                metadataset.putGeneric(MetaData.DIMENSION_LENGHS, Arrays.toString(dimLengths));
+            }
+
             return metadataset;
 
         } catch (FormatException ex) {
@@ -133,4 +151,68 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
     private ReaderFilter getReaderFilter(File file) throws FormatException, IOException {
         return scifio.initializer().initializeReader(file.getAbsolutePath(), config);
     }
+
+    public List<MetaDataSet> extractPlaneMetaData(MetaDataSet metadataset) {
+
+        List<MetaDataSet> planes = new ArrayList<>();
+        String dimensionLengthesString = metadataset.get(MetaData.DIMENSION_LENGHS).getStringValue();
+        if (dimensionLengthesString == null) {
+
+            planes.add(new MetaDataSet().merge(metadataset));
+            return planes;
+        } else {
+           
+            long[] dimensionLengthes = readLongArray(metadataset.get(MetaData.DIMENSION_LENGHS).getStringValue());
+            
+            String[] dimensionLabelArray = metadataset.get(MetaData.DIMENSION_ORDER).getStringValue().split(",");
+            
+            NDimensionalArray array = new NDimensionalArray(dimensionLengthes);
+            int i = 0;
+            
+            // generate all the possibilities
+            for(long[] coordinate : array.get(0).generateAllPossibilities()) {
+                
+                MetaDataSet planeMetaDataSet = new MetaDataSet().merge(metadataset);
+                
+                for(int d = 0; d!= coordinate.length;d++) {
+                    String label = dimensionLabelArray[d];
+                    long value = coordinate[d];
+                    
+                    
+                    planeMetaDataSet.putGeneric(label, value);
+                    
+                }  
+                
+                planes.add(planeMetaDataSet);
+            }
+            
+        }
+        return planes;
+
+    }
+
+    public static long[] readLongArray(String str) {
+        // the string is usually a string of type "[12,324,32]
+
+        // deleting the []
+        int begin = 0;
+        int end = str.length() - 1;
+
+        str = str.substring(begin, end);
+
+        String[] numbers = str.split(",");
+        long[] longs = new long[numbers.length];
+        for(int i = 0;i!=numbers.length;i++) {
+            longs[i] = Long.decode(numbers[i]);
+        }
+        return longs;
+    }
+
+   
+
+    @Override
+    public List<MetaDataSet> extractPlaneMetaData(File file) {
+        return extractPlaneMetaData(extractMetaData(file));
+    }
+
 }
