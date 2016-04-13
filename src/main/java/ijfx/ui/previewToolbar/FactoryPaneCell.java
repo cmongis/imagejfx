@@ -38,7 +38,7 @@ public class FactoryPaneCell {
 
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
         PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        paneIconCell.setImageFactory(i -> i.getImage(previewService));
+        paneIconCell.setImageFactory(i -> i.getImage(previewService,200));
 //        Platform.runLater(() -> paneIconCell.setImage(itemWidget.getImage(previewService)));
         paneIconCell.setSubtitleVisible(false);
         paneIconCell.setTitleFactory(f -> f.getLabel());

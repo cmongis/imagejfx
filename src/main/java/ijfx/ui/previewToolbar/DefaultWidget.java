@@ -96,24 +96,29 @@ public class DefaultWidget implements ItemWidget {
     }
 
     @Override
-    public Image getImage(PreviewService previewService) {
+    public Image getImage(PreviewService previewService, int size) {
 
         if (this.getIcon().equals("preview")) {
             try {
-            previewService.setParameters(0, 0, 120, 120);
-            return previewService.getImageDisplay(action, this.getParameters());
-                
+                previewService.setParameters(0, 0, size, size);
+                return previewService.getImageDisplay(action, this.getParameters());
+
             } catch (Exception e) {
-                return null;
+                e.printStackTrace();
+                FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.AMBULANCE);
+                return FAItoImage(fontAwesomeIconView, size);
             }
         } else {
             FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
-            fontAwesomeIconView.getStyleClass().add("icon-toolbar");
-                    WritableImage wi = new WritableImage(120, 120);
-
-            FontAwesomeIconUtils.getImageFromFAI(fontAwesomeIconView, 120, wi);
-            return wi;
+            return FAItoImage(fontAwesomeIconView, size);
         }
     }
 
+    private WritableImage FAItoImage(FontAwesomeIconView fontAwesomeIconView, int size) {
+        fontAwesomeIconView.getStyleClass().add("icon-toolbar");
+        WritableImage wi = new WritableImage(size, size);
+
+        FontAwesomeIconUtils.getImageFromFAI(fontAwesomeIconView, size, wi);
+        return wi;
+    }
 }
