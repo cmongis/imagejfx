@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.File;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
  * @author cyril
  */
 public interface Folder {
+    
     
     public String getName();
     

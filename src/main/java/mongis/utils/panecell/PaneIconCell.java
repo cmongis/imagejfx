@@ -301,6 +301,10 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         }
 
     }
+    
+    public void forceImageUpdate() {
+        updateImageAsync(itemProperty().getValue());
+    }
 
     private void updateImageAsync(T newItem) {
 
