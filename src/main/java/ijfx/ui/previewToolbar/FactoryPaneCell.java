@@ -21,8 +21,6 @@ package ijfx.ui.previewToolbar;
 
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import mongis.utils.panecell.PaneIconCell;
 
 /**
@@ -38,8 +36,7 @@ public class FactoryPaneCell {
 
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
         PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        paneIconCell.setImageFactory(i -> i.getImage(previewService,200));
-//        Platform.runLater(() -> paneIconCell.setImage(itemWidget.getImage(previewService)));
+        paneIconCell.setImageFactory(i -> i.getImage(previewService,120));
         paneIconCell.setSubtitleVisible(false);
         paneIconCell.setTitleFactory(f -> f.getLabel());
         paneIconCell.setLoadImageOnlyWhenVisible(false);

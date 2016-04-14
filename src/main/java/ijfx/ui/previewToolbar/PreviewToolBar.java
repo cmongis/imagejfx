@@ -164,8 +164,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     public void onEnter(LabelCategory labelCategory) {
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCell paneIconCell = (PaneIconCell) e;
-            //ItemWidget itemWidget = ((ItemWidget) paneIconCell.getItem());
-            //paneIconCell = FactoryPaneCell.generate(itemWidget, previewService);
+
             
             //Has to use forceUpdateImage
             paneIconCell.forceUpdate(paneIconCell.getItem());
@@ -190,7 +189,6 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     public void generateItems(JsonReader jsonReader, HBox fakeToolBar) {
         jsonReader.getCategoryList().stream().forEach((e) -> {
             LabelCategory labelCategory = FactoryPaneCell.generateLabel(e, contextService);
-
             fakeToolBar.getChildren().add(labelCategory);
             setMouseAction(labelCategory);
         });

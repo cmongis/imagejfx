@@ -36,6 +36,7 @@ import net.imagej.DatasetService;
 import net.imagej.ImageJService;
 import net.imagej.ImageMetadata;
 import net.imagej.Position;
+import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
@@ -214,25 +215,23 @@ public class PreviewService extends AbstractService implements ImageJService {
         long[] dimension = new long[dataset.numDimensions() - 2];
         activePosition.localize(dimension);
 
-        
+        //Set LUT
         if (activeDataview.getData().getImgPlus().getCompositeChannelCount() == 1) {
             view.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
         } 
         
         
-//        else  {
-//            //TODO
-//            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
-//            for (int i = 0; i < colorTable.size(); i++) {
-//                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
-//                values[i] = b[i];
-//
-//            }
-//            ColorTable8 colorTable8 = new ColorTable8(values);
-//            view.setColorTable(colorTable8, 0);
-//        }
+        else  {
+            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
+            for (int i = 0; i < colorTable.size(); i++) {
+                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
+                values[i] = b[i];
 
-            //activeDataview.setComposite(true);
+            }
+            ColorTable8 colorTable8 = new ColorTable8(values);
+            view.setColorTable(colorTable8, 0);
+        }
+
 
         int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
         int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
