@@ -48,7 +48,7 @@ public class FontAwesomeIconUtils {
             gc.setFont(font);
             gc.setTextAlign(TextAlignment.CENTER);
             gc.setTextBaseline(VPos.CENTER);
-            gc.setFill(Color.BLACK);
+            //gc.setFill(Color.BLACK);
             gc.fillText(unicode, size / 2, size / 2);
             final SnapshotParameters params = new SnapshotParameters();
             params.setFill(Color.TRANSPARENT);
@@ -58,5 +58,13 @@ public class FontAwesomeIconUtils {
             SwingFXUtils.toFXImage(bufferedImage, wi);
         }
         );
+    }
+
+    public static  WritableImage FAItoImage(FontAwesomeIconView fontAwesomeIconView, int size) {
+        fontAwesomeIconView.getStyleClass().add("icon-toolbar");
+        WritableImage wi = new WritableImage(size, size);
+
+        FontAwesomeIconUtils.getImageFromFAI(fontAwesomeIconView, size, wi);
+        return wi;
     }
 }
