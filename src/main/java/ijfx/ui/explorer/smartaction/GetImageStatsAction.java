@@ -40,7 +40,7 @@ public class GetImageStatsAction implements FolderSmartAction {
     @Override
     public boolean check(Folder folder) {
         long itemWithoutStats = folder
-                .getItemList()
+                .getFileList()
                 .stream()
                 .map(explorable -> explorable.getMetaDataSet())
                 .filter(m -> m.containsKey(MetaData.STATS_PIXEL_MIN) == false)

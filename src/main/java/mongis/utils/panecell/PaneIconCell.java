@@ -160,7 +160,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED, event -> isInsideScrollWindow = false);
 
-            addEventHandler(MouseEvent.MOUSE_CLICKED, this::onClick);
+            addEventHandler(MouseEvent.MOUSE_PRESSED, this::onClick);
             BindingsUtils.bindNodeToPseudoClass(SELECTED, this, selectedProperty());
 
             getStyleClass().add("pane-icon-cell");
@@ -396,16 +396,12 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
 
     private void onClick(MouseEvent event) {
-        long now = System.currentTimeMillis();
-        if (event.getButton() != MouseButton.PRIMARY) {
-            return;
-        }
-        if (now - lastClick <= 1000) {
+        if(event.getClickCount() == 2) {
             onDoubleClick();
-        } else {
-            onSimpleClick();
         }
-        lastClick = now;
+       
+            onSimpleClick();
+        
     }
 
     protected void onSimpleClick() {
@@ -413,7 +409,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
 
     protected void onDoubleClick() {
-
+        
     }
 
     protected void onSubtitleVisibleChanged(Observable obs, Boolean oldValue, Boolean newValue) {

@@ -19,10 +19,13 @@
  */
 package ijfx.ui.explorer;
 
+import ijfx.bridge.ImageJContainer;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.thumb.ThumbService;
+import ijfx.ui.activity.ActivityService;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
@@ -30,7 +33,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import mongis.utils.FileUtils;
 import org.scijava.Context;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  * Wrapper class that transform an ImageRecord to an Explorable
@@ -42,6 +47,12 @@ public class ImageRecordIconizer implements Explorable {
 
     @Parameter
     ThumbService thumbService;
+    
+    @Parameter
+    CommandService commandService;
+    
+    @Parameter
+    ActivityService activityService;
     
     private BooleanProperty selectedProperty;
     
@@ -79,7 +90,13 @@ public class ImageRecordIconizer implements Explorable {
 
     @Override
     public void open() {
-        System.out.println("Open the file with ImageJ");
+        
+        HashMap<String,Object> inputs = new HashMap<>();
+        inputs.put("inputFile",imageRecord.getFile());
+        
+        commandService.run(OpenFile.class,true,inputs);
+        
+        activityService.openByType(ImageJContainer.class);
     }
 
     @Override

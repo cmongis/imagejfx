@@ -36,6 +36,10 @@ public interface Folder {
     
     public File getDirectory();
     
-    public List<Explorable> getItemList();
+    public List<Explorable> getFileList();
+    
+    public List<Explorable> getPlaneList();
+    
+    public List<Explorable> getObjectList();
     
 }

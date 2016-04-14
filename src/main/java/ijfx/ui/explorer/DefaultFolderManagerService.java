@@ -19,7 +19,8 @@
  */
 package ijfx.ui.explorer;
 
-import ijfx.core.imagedb.ImageRecordService;
+import ijfx.core.imagedb.MetaDataExtractionService;
+import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.explorer.event.FolderAddedEvent;
@@ -65,6 +66,8 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Parameter
     JsonPreferenceService jsonPrefService;
 
+    @Parameter
+    MetaDataExtractionService metaDataExtractionService;
 
     
     private static String FOLDER_PREFERENCE_FILE = "folder_db.json";
@@ -74,7 +77,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     ExplorationMode currentExplorationMode;
 
     
-   
+   List<Explorable> currentItems;
     
     @Override
     public Folder addFolder(File file) {
@@ -116,7 +119,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
         logger.info("Setting current folder " + folder.getName());
 
-        explorerService.setItems(currentFolder.getItemList());
+        explorerService.setItems(currentFolder.getFileList());
 
         uiContextService.enter("explore-files");
         uiContextService.update();
@@ -127,13 +130,28 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     public void onFolderUpdated(FolderUpdatedEvent event) {
         logger.info("Folder updated ! " + event.getObject().getName());
         if (currentFolder == event.getObject()) {
-            explorerService.setItems(event.getObject().getItemList());
+            explorerService.setItems(event.getObject().getFileList());
         }
     }
 
     @Override
     public void setExplorationMode(ExplorationMode mode) {
+        if(mode == currentExplorationMode) return;
         currentExplorationMode = mode;
+        eventService.publish(new ExplorationModeChangeEvent().setObject(mode));
+        
+        
+        if(mode == ExplorationMode.FILE) {
+            explorerService.setItems(currentFolder.getFileList());
+        }
+        else if (mode == ExplorationMode.PLANE) {
+            explorerService.setItems(currentFolder.getPlaneList());
+        }
+        else {
+            explorerService.setItems(currentFolder.getObjectList());
+        }
+        
+        logger.info("Exploration mode changed : "+mode.toString());
     }
 
     @Override
@@ -141,14 +159,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         return currentExplorationMode;
     }
 
-    private List<Explorable> getPlanes(Folder folder) {
-        return null;
-
-    }
-
-    private List<Explorable> getObjects(Folder folder) {
-        return null;
-    }
+  
 
     private void save() {
         HashMap<String,String> folderMap = new HashMap<>();
@@ -170,4 +181,6 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
             folderList.add(folder);
         });
     }
+    
+   
 }

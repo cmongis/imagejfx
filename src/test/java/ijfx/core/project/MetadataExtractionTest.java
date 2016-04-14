@@ -19,7 +19,6 @@
  */
 package ijfx.core.project;
 
-import ijfx.core.imagedb.MetaDataExtractorService;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import io.scif.util.FormatTools;
@@ -27,6 +26,7 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.plugin.Parameter;
+import ijfx.core.imagedb.MetaDataExtractionService;
 
 /**
  *
@@ -35,7 +35,7 @@ import org.scijava.plugin.Parameter;
 public class MetadataExtractionTest extends BaseSciJavaTest{
     
     @Parameter
-    MetaDataExtractorService extractorService;
+    MetaDataExtractionService extractorService;
     
     @Test
     public void testTiffFile() {

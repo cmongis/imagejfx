@@ -23,7 +23,9 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
+import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.project.Project;
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.Timer;
@@ -34,6 +36,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.image.Image;
 import mongis.utils.AsyncCallback;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.Context;
@@ -49,7 +54,9 @@ public class DefaultFolder implements Folder {
 
     private File file;
     private String name;
-    private List<Explorable> items;
+    private List<Explorable> files;
+    private List<Explorable> planes;
+    private List<Explorable> objects;
 
     @Parameter
     ImageRecordService imageRecordService;
@@ -68,7 +75,10 @@ public class DefaultFolder implements Folder {
 
     @Parameter
     StatusService statusService;
-    
+
+    @Parameter
+    MetaDataExtractionService metadataExtractionService;
+
     public DefaultFolder() {
 
     }
@@ -96,11 +106,11 @@ public class DefaultFolder implements Folder {
     }
 
     @Override
-    public List<Explorable> getItemList() {
+    public List<Explorable> getFileList() {
 
-        if (items == null) {
+        if (files == null) {
 
-            items = new ArrayList<>();
+            files = new ArrayList<>();
 
             new AsyncCallback<Void, List<Explorable>>()
                     .run(this::fetchItems)
@@ -108,7 +118,7 @@ public class DefaultFolder implements Folder {
                     .start();
 
         }
-        return items;
+        return files;
     }
 
     private List<Explorable> fetchItems(Void v) {
@@ -130,7 +140,7 @@ public class DefaultFolder implements Folder {
     @JsonSetter("path")
     public void setPath(String path) {
         file = new File(path);
-        items = null;
+        files = null;
     }
 
     @JsonGetter("path")
@@ -139,14 +149,13 @@ public class DefaultFolder implements Folder {
     }
 
     private void addItems(List<Explorable> explorables) {
-        items.addAll(explorables);
+        files.addAll(explorables);
         System.out.println("Added " + explorables.size());
         eventService.publish(new FolderUpdatedEvent().setObject(this));
 
-        
         // now we can start a second thread that will slowly get statistics from images
         new AsyncCallback<List<Explorable>, Integer>()
-                .setInput(items)
+                .setInput(files)
                 .run(this::fetchMoreStatistics)
                 .then(count -> {
                     if (count > 0) {
@@ -163,7 +172,7 @@ public class DefaultFolder implements Folder {
         int i = 0;
         for (Explorable e : explorableList) {
             statusService.showStatus(i, elements, "Fetchting min/max for more exploration.");
-            
+
             if (!e.getMetaDataSet().containsKey(MetaData.STATS_PIXEL_MIN)) {
                 if (e instanceof ImageRecordIconizer) {
                     ImageRecordIconizer iconizer = (ImageRecordIconizer) e;
@@ -174,27 +183,100 @@ public class DefaultFolder implements Folder {
                     elementAnalyzedCount++;
                 }
             }
-            i++;            
+            i++;
         }
         return elementAnalyzedCount;
     }
 
-    
     public Project getFolderProject() {
         return null;
     }
-    
-    
+
     private Project createPlaneProject() {
-        
-        
-        
+
         return null;
-        
-        
-        
     }
-    
-    
-    
+
+    @Override
+    public List<Explorable> getPlaneList() {
+
+        if (planes == null) {
+
+            List<MetaDataSet> mList = new ArrayList<>(getFileList().size() * 3);
+            for (Explorable e : getFileList()) {
+                mList.addAll(metadataExtractionService.extractPlaneMetaData(e.getMetaDataSet()));
+            }
+
+            planes = mList.stream()
+                    .map(m -> new PlaneExplorableWrapper(m))
+                    .collect(Collectors.toList());
+
+        }
+        return planes;
+    }
+
+    @Override
+    public List<Explorable> getObjectList() {
+        return new ArrayList<>();
+    }
+
+    private class PlaneExplorableWrapper implements Explorable {
+
+        private final MetaDataSet m;
+
+        BooleanProperty selectedProperty = new SimpleBooleanProperty(false);
+
+        public PlaneExplorableWrapper(MetaDataSet m) {
+            this.m = m;
+        }
+
+        @Override
+        public String getTitle() {
+            return m.get(MetaData.FILE_NAME).getStringValue();
+        }
+
+        @Override
+        public String getSubtitle() {
+            return new StringBuilder()
+                    .append(composeSubtitle(m.get(MetaData.CHANNEL), "C"))
+                    .append(composeSubtitle(m.get(MetaData.Z_POSITION), "Z"))
+                    .append(composeSubtitle(m.get(MetaData.TIME), "T"))
+                    .toString();
+        }
+
+        @Override
+        public String getInformations() {
+            return null;
+        }
+
+        @Override
+        public Image getImage() {
+            return null;
+        }
+
+        @Override
+        public void open() {
+        }
+
+        @Override
+        public BooleanProperty selectedProperty() {
+            return selectedProperty;
+        }
+
+        @Override
+        public MetaDataSet getMetaDataSet() {
+
+            return m;
+
+        }
+
+        private String composeSubtitle(MetaData m, String keyName) {
+            if (m == null || m.isNull()) {
+                return "";
+            } else {
+                return String.format("%s = %s ", keyName, m.getStringValue());
+            }
+        }
+
+    }
 }

@@ -19,25 +19,12 @@
  */
 package ijfx.ui.explorer;
 
-import ijfx.core.metadata.MetaDataOwner;
-import ijfx.service.IjfxService;
-import java.util.List;
-import java.util.function.Predicate;
+import ijfx.ui.IjfxEvent;
 
 /**
  *
  * @author cyril
  */
-public interface ExplorerService extends IjfxService{
+public class ExplorationModeChangeEvent extends IjfxEvent<ExplorationMode>{
     
-    List<Explorable> getItems();
-    
-    
-    void setItems(List<Explorable> items);
-    
-    void applyFilter(Predicate<MetaDataOwner> predicate);
-    
-    void setOptionalFilter(Predicate<MetaDataOwner> addionnalFilter);
-    
-    List<Explorable> getFilteredItems();
 }

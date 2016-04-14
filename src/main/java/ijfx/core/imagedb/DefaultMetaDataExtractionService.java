@@ -52,7 +52,7 @@ import org.scijava.service.Service;
  * @author cyril
  */
 @Plugin(type = Service.class, priority = Priority.VERY_LOW_PRIORITY)
-public class DefaultMetaDataExtractionService extends AbstractService implements MetaDataExtractorService {
+public class DefaultMetaDataExtractionService extends AbstractService implements MetaDataExtractionService {
 
     private SCIFIO scifio;
     private SCIFIOConfig config;
@@ -195,7 +195,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         // the string is usually a string of type "[12,324,32]
 
         // deleting the []
-        int begin = 0;
+        int begin = 1;
         int end = str.length() - 1;
 
         str = str.substring(begin, end);
