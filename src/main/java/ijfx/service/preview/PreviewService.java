@@ -118,7 +118,7 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     public Image getImageDisplay(String command, Map<String, Object> inputMap) {
         Dataset preview = getPreviewDataset();
-        //preview = applyCommand(preview, command, inputMap);
+        preview = applyCommand(preview, command, inputMap);
         BufferedImage bufferedImage = datasetToBufferedImage(preview);
 
         WritableImage wi = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
