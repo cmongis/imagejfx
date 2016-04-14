@@ -30,7 +30,7 @@ import mongis.utils.panecell.PaneIconCell;
 public class FactoryPaneCell {
 
     public static LabelCategory generateLabel(ItemCategory itemCategory, UiContextService contextService) {
-        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(), contextService);
+        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(),itemCategory.getIcon(), contextService);
         return labelCategory;
     }
 

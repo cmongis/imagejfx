@@ -106,19 +106,13 @@ public class DefaultWidget implements ItemWidget {
             } catch (Exception e) {
                 e.printStackTrace();
                 FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.AMBULANCE);
-                return FAItoImage(fontAwesomeIconView, size);
+                return FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, size);
             }
         } else {
             FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
-            return FAItoImage(fontAwesomeIconView, size);
+            return FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, size);
         }
     }
 
-    private WritableImage FAItoImage(FontAwesomeIconView fontAwesomeIconView, int size) {
-        fontAwesomeIconView.getStyleClass().add("icon-toolbar");
-        WritableImage wi = new WritableImage(size, size);
 
-        FontAwesomeIconUtils.getImageFromFAI(fontAwesomeIconView, size, wi);
-        return wi;
-    }
 }
