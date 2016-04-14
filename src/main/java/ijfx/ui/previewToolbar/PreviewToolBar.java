@@ -90,7 +90,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     }
 
     private void createToolBar(HBox hbox) {
-                contextService.enter("multi-z-img");
+        contextService.enter("multi-z-img");
         contextService.update();
         jsonReader = new JsonReader();
         jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
@@ -152,29 +152,32 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      */
     public void setMouseAction(LabelCategory labelCategory) {
 
-
         labelCategory.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
 
-            labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
-                PaneIconCell paneIconCell = (PaneIconCell) e;
-                ItemWidget itemWidget = (ItemWidget) paneIconCell.getItem();
-                if (itemWidget.getIcon().equals("preview")) {
-                    String action = itemWidget.getAction();
-                    previewService.setParameters(0, 0, 120, 120);
-                    paneIconCell.setImage(previewService.getImageDisplay(action, itemWidget.getParameters()));
+            this.onEnter(labelCategory);
 
-                }
-                paneIconCell.setSubtitleVisible(false);
-            });
-            System.out.println(labelCategory.getText());
-            if (!labelCategory.getPane().getChildren().isEmpty()) {
-                popOver.setOpacity(0);
-                createPopOver(labelCategory.getContextualView().getPane(), labelCategory);
-            } else if (labelCategory.getPane().getChildren().isEmpty()) {
-                popOver.setOpacity(0);
-            }
         });
+    }
+/**
+ * 
+ * @param labelCategory 
+ */
+    public void onEnter(LabelCategory labelCategory) {
+        labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
+            PaneIconCell paneIconCell = (PaneIconCell) e;
 
+            
+            //Has to use forceUpdateImage
+            paneIconCell.forceUpdate(paneIconCell.getItem());
+            
+            paneIconCell.setSubtitleVisible(false);
+        });
+        if (!labelCategory.getPane().getChildren().isEmpty()) {
+            popOver.setOpacity(0);
+            createPopOver(labelCategory.getContextualView().getPane(), labelCategory);
+        } else if (labelCategory.getPane().getChildren().isEmpty()) {
+            popOver.setOpacity(0);
+        }
     }
 
     /**
@@ -187,7 +190,6 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     public void generateItems(JsonReader jsonReader, HBox fakeToolBar) {
         jsonReader.getCategoryList().stream().forEach((e) -> {
             LabelCategory labelCategory = FactoryPaneCell.generateLabel(e, contextService);
-
             fakeToolBar.getChildren().add(labelCategory);
             setMouseAction(labelCategory);
         });
@@ -199,10 +201,8 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
             for (Node node : fakeToolBar.getChildren()) {
                 LabelCategory labelCategory = (LabelCategory) node;
-                if (itemContext.substring(itemContext.lastIndexOf("+") + 1).equals(labelCategory.getText()))
-                {
-                    labelCategory.getContextualView().registerNode(paneIconCell, itemContext.substring(0,itemContext.lastIndexOf("+")));
-
+                if (itemContext.substring(itemContext.lastIndexOf("+") + 1).equals(labelCategory.getText())) {
+                    labelCategory.getContextualView().registerNode(paneIconCell, itemContext.substring(0, itemContext.lastIndexOf("+")));
                 }
             }
 

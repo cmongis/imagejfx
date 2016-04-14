@@ -19,8 +19,6 @@
  */
 package ijfx.ui.previewToolbar;
 
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
 import javafx.application.Platform;
@@ -28,7 +26,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javax.swing.ImageIcon;
 import mongis.utils.panecell.PaneIconCell;
-import mongis.utils.panecell.PaneLabelCell;
 
 /**
  *
@@ -36,35 +33,15 @@ import mongis.utils.panecell.PaneLabelCell;
  */
 public class FactoryPaneCell {
 
-    public static LabelCategory generateLabel (ItemCategory itemCategory, UiContextService contextService)
-    {
-        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(), contextService,itemCategory.getIcon());
+    public static LabelCategory generateLabel(ItemCategory itemCategory, UiContextService contextService) {
+        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(), contextService);
         return labelCategory;
-    }
-    public static PaneLabelCell generate(ItemCategory itemCategory) {
-
-        PaneLabelCell<ItemCategory> paneLabelCell = new PaneLabelCell();
-        paneLabelCell.setIcon(FontAwesomeIcon.valueOf(itemCategory.getIcon()));
-        paneLabelCell.setTitleFactory(f -> f.getName());
-        paneLabelCell.setLoadImageOnlyWhenVisible(false);
-        paneLabelCell.setItem(itemCategory);
-        return paneLabelCell;
     }
 
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
         PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        try {
-        FontAwesomeIconView fontAwesomeIconView =new FontAwesomeIconView(FontAwesomeIcon.valueOf(itemWidget.getIcon()));
-        fontAwesomeIconView.getStyleClass().add("icon-toolbar");
-        
-        Platform.runLater(() -> paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView,120.0)));
-        //paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView));
-            
-        } catch (Exception e) {
-        }
+        paneIconCell.setImageFactory(i -> i.getImage(previewService,120));
         paneIconCell.setSubtitleVisible(false);
-
-     
         paneIconCell.setTitleFactory(f -> f.getLabel());
         paneIconCell.setLoadImageOnlyWhenVisible(false);
         paneIconCell.setItem(itemWidget);

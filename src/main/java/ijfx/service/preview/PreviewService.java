@@ -20,6 +20,7 @@
 package ijfx.service.preview;
 
 import java.awt.image.BufferedImage;
+import static java.lang.Math.toIntExact;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +34,17 @@ import javafx.scene.image.WritableImage;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.ImageJService;
+import net.imagej.ImageMetadata;
 import net.imagej.Position;
+import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable;
+import net.imglib2.display.ColorTable16;
+import net.imglib2.display.ColorTable8;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
@@ -113,7 +118,7 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     public Image getImageDisplay(String command, Map<String, Object> inputMap) {
         Dataset preview = getPreviewDataset();
-        preview = applyCommand(preview, command, inputMap);
+        //preview = applyCommand(preview, command, inputMap);
         BufferedImage bufferedImage = datasetToBufferedImage(preview);
 
         WritableImage wi = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
@@ -124,6 +129,7 @@ public class PreviewService extends AbstractService implements ImageJService {
     /**
      * Create empty dataset. The size of the dataset set from width and height.
      * All the other dimensions are set to 1.
+     *
      * @param input
      * @return output
      */
@@ -135,7 +141,7 @@ public class PreviewService extends AbstractService implements ImageJService {
         long[] dims = new long[axeArray.length];
         for (int i = 0; i < dims.length; i++) {
             axisType[i] = axeArray[i].type();
-            dims[i] = 1;//toIntExact(input.max(i) + 1);
+            dims[i] = 1;// toIntExact(input.max(i) + 1);
 
         }
         dims[0] = width;
@@ -187,6 +193,7 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     /**
      * Create an Image from the dataset and setLut
+     *
      * @param dataset
      * @return bufferedImage
      */
@@ -201,18 +208,31 @@ public class PreviewService extends AbstractService implements ImageJService {
 
         //view.setPosition(activePosition);
         view.setColorMode(activeDataview.getColorMode());
-        
-        //Has to be rebuil to 
-        //view.rebuild();
+
+        //Has to be rebuil to create colorTable
+        view.rebuild();
         List<ColorTable> colorTable = activeDataview.getColorTables();
         long[] dimension = new long[dataset.numDimensions() - 2];
         activePosition.localize(dimension);
 
-        //Set LUT if number of channel > 1
-        if (dimension[0] > 1) {
+        //Set LUT
+        if (activeDataview.getData().getImgPlus().getCompositeChannelCount() == 1) {
             view.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
-        }
+        } 
         
+        
+        else  {
+            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
+            for (int i = 0; i < colorTable.size(); i++) {
+                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
+                values[i] = b[i];
+
+            }
+            ColorTable8 colorTable8 = new ColorTable8(values);
+            view.setColorTable(colorTable8, 0);
+        }
+
+
         int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
         int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
         view.setChannelRange(0, minChannel, maxChannel);
@@ -223,11 +243,13 @@ public class PreviewService extends AbstractService implements ImageJService {
     }
 
     /**
-     * Apply the <code>command</code> to the <code>dataset</code> using <code>inputMap</code> as parameters.
+     * Apply the <code>command</code> to the <code>dataset</code> using
+     * <code>inputMap</code> as parameters.
+     *
      * @param dataset
      * @param command
      * @param inputMap
-     * @return 
+     * @return
      */
     public Dataset applyCommand(Dataset dataset, String command, Map<String, Object> inputMap) {
         try {
