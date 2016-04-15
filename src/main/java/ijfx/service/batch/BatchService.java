@@ -69,7 +69,7 @@ public class BatchService extends AbstractService implements ImageJService {
     
     
     // applies a single modules to multiple inputs and save them
-    public Task<Boolean> applyModule(List<BatchSingleInput> inputs, final Module module, HashMap<String, Object> parameters) {
+    public Task<Boolean> applyModule(List<BatchSingleInput> inputs, final Module module, boolean process, HashMap<String, Object> parameters) {
 
         return new Task<Boolean>() {
 
@@ -83,9 +83,9 @@ public class BatchService extends AbstractService implements ImageJService {
                     input.load();
                     count++;
                     final Module createdModule = moduleService.createModule(module.getInfo());
-                    if (!executeModule(input, createdModule, parameters)) {
+                    if (!executeModule(input, createdModule, process, parameters)) {
                         return false;
-                    };
+                    }
                     input.save();
                     updateProgress(count, totalOps);
                 }
@@ -156,7 +156,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
                         final Module module = moduleService.createModule(step.getModule().getInfo());
                         logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
-                        if (!executeModule(input, module, step.getParameters())) {
+                        if (!executeModule(input, module,true, step.getParameters())) {
 
                             updateMessage("Error :-(");
                             updateProgress(0, 1);
@@ -198,7 +198,7 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     // execute a module (with all the side parameters injected)
-    public boolean executeModule(BatchSingleInput input, Module module, Map<String, Object> parameters) {
+    public boolean executeModule(BatchSingleInput input, Module module, boolean process, Map<String, Object> parameters) {
 
         logger.info("Executing module " + module.getDelegateObject().getClass().getSimpleName());
         logger.info("Injecting input");
@@ -228,7 +228,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
         logger.info("Running module");
 
-        Future<Module> run = moduleService.run(module, true);
+        Future<Module> run = moduleService.run(module, process);
 
         logger.info(String.format("[%s] module started", moduleName));
 
