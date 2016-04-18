@@ -112,17 +112,17 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
     }
 
     public AsyncCallback<INPUT,OUTPUT> startIn(ExecutorService executorService) {
-        executorService.submit(this);
+        executorService.execute(this);
         return this;
     }
     
     public AsyncCallback<INPUT, OUTPUT> start() {
-        ImageJFX.getThreadPool().submit(this);
+        ImageJFX.getThreadPool().execute(this);
         return this;
     }
 
     public AsyncCallback<INPUT, OUTPUT> queue() {
-        ImageJFX.getThreadQueue().submit(this);
+        ImageJFX.getThreadQueue().execute(this);
         return this;
     }
 

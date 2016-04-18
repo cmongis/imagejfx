@@ -71,7 +71,7 @@ public class AsyncCallable<OUTPUT> extends Task<OUTPUT> {
     }
     
     public AsyncCallable<OUTPUT> start() {
-        ImageJFX.getThreadPool().submit(this);
+        ImageJFX.getThreadPool().execute(this);
         return this;
     }
     
