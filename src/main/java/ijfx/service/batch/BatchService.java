@@ -291,7 +291,7 @@ public class BatchService extends AbstractService implements ImageJService {
             return false;
         }
 
-        item = moduleService.getSingleInput(module, Dataset.class);
+        item = moduleService.getSingleOutput(module, ImageDisplay.class);
 
         if (item != null) {
             input.setDisplay((ImageDisplay) module.getOutput(item.getName()));

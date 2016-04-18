@@ -48,7 +48,7 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
       @Override
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
-        DefaultImageDisplay imageDisplay = new DefaultImageDisplay();
+        ImageDisplay imageDisplay = new SilentImageDisplay();
         context.inject(imageDisplay);
         imageDisplay.display(dataset);
         display = imageDisplay;
@@ -63,8 +63,6 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
 
     @Override
     public Dataset getDataset() {
-        
-
         return dataset;
     }
 
@@ -79,13 +77,10 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
     @Override
     public void dispose() {
         dataset = null;
-        displayService.getDisplays().remove(display);
-        imageDisplayService.getImageDisplays().remove(display);
+        display.close();
         display.close();
         display = null;
         System.gc();
-     
-        
     }
     
    
