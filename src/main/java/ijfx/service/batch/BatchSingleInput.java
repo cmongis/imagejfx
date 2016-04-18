@@ -21,6 +21,7 @@
 package ijfx.service.batch;
 
 import net.imagej.Dataset;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 
 /**
@@ -29,6 +30,10 @@ import net.imagej.display.ImageDisplay;
  */
 public interface BatchSingleInput {
 
+    public DatasetView getDatasetView();
+    
+    public void setDatasetView(DatasetView datasetView);
+    
     public void load();
 
     public void setDataset(Dataset dataset);

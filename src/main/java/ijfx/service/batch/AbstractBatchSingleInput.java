@@ -20,6 +20,9 @@
 package ijfx.service.batch;
 
 import net.imagej.Dataset;
+import net.imagej.display.DatasetView;
+import net.imagej.display.DefaultDatasetView;
+import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.display.Display;
@@ -31,25 +34,46 @@ import org.scijava.plugin.Parameter;
  * @author cyril
  */
 public abstract class AbstractBatchSingleInput implements BatchSingleInput{
+    DatasetView datasetView;
+    
     Dataset dataset;
     
     ImageDisplay display;
     
+   
     @Parameter
     protected ImageDisplayService imageDisplayService;
     
     @Parameter
     protected DisplayService displayService;
     
+    @Override
+    public void setDatasetView(DatasetView datasetView)
+    {
+        this.datasetView = datasetView;
+        dataset = this.datasetView.getData();
+    }
+    
+    @Override
+    public DatasetView getDatasetView()
+    {
+        return this.datasetView;
+    }
       @Override
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
         display = (ImageDisplay) displayService.createDisplay(dataset);
+        //display = new DefaultImageDisplay();
+        //display = (ImageDisplay) displayService.getActiveDisplay();
+        datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
+        datasetView.rebuild();
+        //datasetView = imageDisplayService.getActiveDatasetView();
+        //datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
     }
 
     @Override
     public void setDisplay(ImageDisplay display) {
-        this.display = display;
+        //this.display = display;
         dataset = imageDisplayService.getActiveDataset(display);
         
     }
@@ -63,7 +87,7 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
 
     @Override
     public ImageDisplay getDisplay() {
-        displayService.setActiveDisplay(display);
+        //displayService.setActiveDisplay(display);
       
         return display;
     }
@@ -71,7 +95,7 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
     
     @Override
     public void dispose() {
-        dataset = null;
+        dataset = null;                
         displayService.getDisplays().remove(display);
         imageDisplayService.getImageDisplays().remove(display);
         display.close();
