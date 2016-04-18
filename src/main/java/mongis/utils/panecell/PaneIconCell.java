@@ -311,7 +311,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .setInput(newItem)
                 .run(imageFactory)
                 .then(this::setImage)
-                .start();
+                .startIn(refreshThreadPool);
     }
 
     public PaneIconCell<T> setAdditionalInfoFactory(Callback<T, String> additionalInfoFactory) {
