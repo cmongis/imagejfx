@@ -19,8 +19,11 @@
  */
 package ijfx.ui.previewToolbar;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
+import javafx.application.Platform;
 import mongis.utils.panecell.PaneIconCell;
 
 /**
@@ -29,15 +32,28 @@ import mongis.utils.panecell.PaneIconCell;
  */
 public class FactoryPaneCell {
 
-    public static LabelCategory generateLabel(ItemCategory itemCategory, UiContextService contextService) {
-        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(),itemCategory.getIcon(), contextService);
+
+    public static LabelCategory generateLabel (ItemCategory itemCategory, UiContextService contextService)
+    {
+        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(), contextService,itemCategory.getIcon());
         return labelCategory;
     }
 
+
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
         PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        paneIconCell.setImageFactory(i -> i.getImage(previewService,120));
+        try {
+        FontAwesomeIconView fontAwesomeIconView =new FontAwesomeIconView(FontAwesomeIcon.valueOf(itemWidget.getIcon()));
+        fontAwesomeIconView.getStyleClass().add("icon-toolbar");
+        
+        Platform.runLater(() -> paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView,120.0)));
+        //paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView));
+            
+        } catch (Exception e) {
+        }
         paneIconCell.setSubtitleVisible(false);
+
+     
         paneIconCell.setTitleFactory(f -> f.getLabel());
         paneIconCell.setLoadImageOnlyWhenVisible(false);
         paneIconCell.setItem(itemWidget);
