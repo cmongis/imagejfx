@@ -17,17 +17,20 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.service;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import java.io.File;
+import java.io.IOException;
+import net.imagej.Dataset;
+import net.imglib2.type.numeric.RealType;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner,DatasetHolder{
-     
-   
- 
+public interface ImagePlaneService extends IjfxService{
+    
+   <T extends RealType<T>> Dataset extractPlane(File file,long [] dims) throws IOException;
+    Dataset extractPlane(File file, int planeIndex) throws IOException;
+    
 }

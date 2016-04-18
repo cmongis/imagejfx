@@ -449,6 +449,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     
     
     protected void onToggleSelectionChanged(Observable obs, Toggle oldValue, Toggle newValue) {
+        if(newValue == null) return;
         folderManagerService.setExplorationMode(getExplorationMode(newValue));
     }
     

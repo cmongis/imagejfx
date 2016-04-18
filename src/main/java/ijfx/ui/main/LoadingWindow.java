@@ -17,17 +17,24 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.ui.main;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import static java.lang.reflect.Array.set;
+import javafx.scene.control.PopupControl;
+import javafx.scene.layout.StackPane;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner,DatasetHolder{
-     
-   
- 
+public class LoadingWindow extends PopupControl{
+    LoadingIcon icon = new LoadingIcon(100);
+    StackPane pane = new StackPane();
+    
+    public LoadingWindow() {
+        super();
+        
+        
+    }
+    
 }

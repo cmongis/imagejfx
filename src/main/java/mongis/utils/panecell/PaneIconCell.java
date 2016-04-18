@@ -19,17 +19,14 @@
  */
 package mongis.utils.panecell;
 
-import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.GeneralPath;
-import java.awt.image.BufferedImage;
+import ijfx.ui.main.LoadingIcon;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -38,25 +35,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
 
@@ -134,7 +121,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
 
-    private long lastClick;
+    private static final ExecutorService refreshThreadPool = Executors.newFixedThreadPool(2);
+    
+   LoadingIcon loadingIcon = new LoadingIcon(16);
 
     public PaneIconCell() {
         try {
@@ -236,6 +225,14 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
 
     public void setImage(Image image) {
+        loadingIcon.stop();
+        
+        if(image == null) {
+            setCenter(new FontAwesomeIconView(FontAwesomeIcon.ANGELLIST));
+            return;
+        };
+        
+        
         setCenter(imageView);
         imageView.setImage(image);
 
@@ -267,25 +264,20 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .setInput(newItem)
                 .run(titleFactory)
                 .then(this::setTitle)
-                .queue();
+                .start();
 
         new AsyncCallback<T, String>()
                 .setInput(newItem)
                 .run(subtitleFactory)
                 .then(this::setSubtitle)
-                .queue();
+                .start();
 
-        new AsyncCallback<T, Image>()
-                .setInput(newItem)
-                .run(imageFactory)
-                .then(this::setImage)
-                .queue();
-
+        
         new AsyncCallback<T, FontAwesomeIconView>()
                 .setInput(newItem)
                 .run(iconFactory)
                 .then(this::setIcon)
-                .queue();
+                .start();
 
         /*
         
@@ -312,8 +304,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             return;
         }
 
-        setCenter(titleIconView);
-        //icon.play();
+        setCenter(loadingIcon);
+        loadingIcon.play();
 
         currentImageSearch = new AsyncCallback<T, Image>()
                 .setInput(newItem)

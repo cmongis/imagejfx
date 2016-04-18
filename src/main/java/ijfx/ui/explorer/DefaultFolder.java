@@ -21,6 +21,7 @@ package ijfx.ui.explorer;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import ijfx.bridge.ImageJContainer;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
@@ -28,23 +29,34 @@ import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.project.Project;
 import ijfx.core.stats.IjfxStatisticService;
+import ijfx.core.utils.DimensionUtils;
+import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.thumb.ThumbService;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
+import ijfx.ui.main.ImageJFX;
+import io.scif.services.DatasetIOService;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
+import mongis.utils.AsyncCallable;
 import mongis.utils.AsyncCallback;
+import net.imagej.Dataset;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -79,6 +91,21 @@ public class DefaultFolder implements Folder {
     @Parameter
     MetaDataExtractionService metadataExtractionService;
 
+    @Parameter
+    ImagePlaneService imagePlaneService;
+
+    @Parameter
+    UIService uiService;
+
+    @Parameter
+    ThumbService thumberService;
+
+    @Parameter
+    DatasetIOService datasetIoService;
+
+    @Parameter
+    ActivityService activityService;
+
     public DefaultFolder() {
 
     }
@@ -111,11 +138,12 @@ public class DefaultFolder implements Folder {
         if (files == null) {
 
             files = new ArrayList<>();
-
+            /*
             new AsyncCallback<Void, List<Explorable>>()
                     .run(this::fetchItems)
                     .then(this::addItems)
-                    .start();
+                    .start();*/
+            files = fetchItems(null);
 
         }
         return files;
@@ -163,7 +191,6 @@ public class DefaultFolder implements Folder {
                     }
                 })
                 .start();
-
     }
 
     private Integer fetchMoreStatistics(List<Explorable> explorableList) {
@@ -202,6 +229,7 @@ public class DefaultFolder implements Folder {
 
         if (planes == null) {
 
+            System.out.println("Fetching planes !");
             List<MetaDataSet> mList = new ArrayList<>(getFileList().size() * 3);
             for (Explorable e : getFileList()) {
                 mList.addAll(metadataExtractionService.extractPlaneMetaData(e.getMetaDataSet()));
@@ -212,6 +240,7 @@ public class DefaultFolder implements Folder {
                     .collect(Collectors.toList());
 
         }
+        System.out.println(String.format("%d planes fetched", planes.size()));
         return planes;
     }
 
@@ -251,11 +280,24 @@ public class DefaultFolder implements Folder {
 
         @Override
         public Image getImage() {
+            try {
+                return thumberService.getThumb(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue(), 100, 100);
+            } catch (Exception e) {
+                ImageJFX.getLogger().log(Level.SEVERE, "Error when loading preview for Plane", e);
+            }
             return null;
         }
 
         @Override
         public void open() {
+
+            new AsyncCallable()
+                    .run(this::getDataset)
+                    .then(dataset -> {
+                        uiService.show(dataset);
+                        activityService.openByType(ImageJContainer.class);
+                    })
+                    .start();
         }
 
         @Override
@@ -263,11 +305,13 @@ public class DefaultFolder implements Folder {
             return selectedProperty;
         }
 
+        private File getFile() {
+            return new File(getMetaDataSet().get(MetaData.ABSOLUTE_PATH).getStringValue());
+        }
+
         @Override
         public MetaDataSet getMetaDataSet() {
-
             return m;
-
         }
 
         private String composeSubtitle(MetaData m, String keyName) {
@@ -275,6 +319,42 @@ public class DefaultFolder implements Folder {
                 return "";
             } else {
                 return String.format("%s = %s ", keyName, m.getStringValue());
+            }
+        }
+
+        /*
+        @Override
+        public Dataset getDataset() {
+
+            try {
+
+                MetaData nonPlanarPosition = m.get(MetaData.PLANE_NON_PLANAR_POSITION);
+                
+                if (nonPlanarPosition == null || nonPlanarPosition.isNull()) {
+                    return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
+                } else {
+                    long[] location;
+                    System.out.println(m);
+                    location = DimensionUtils.readLongArray(nonPlanarPosition.getStringValue());
+                    return imagePlaneService.extractPlane(getFile(), location);
+                }
+
+            } catch (IOException ex) {
+                ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+            }
+            return null;
+        }
+         */
+        public Dataset getDataset() {
+            try {
+                if (m.containsKey(MetaData.PLANE_INDEX) == false) {
+                    return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
+                } else {
+                    return imagePlaneService.extractPlane(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue());
+                }
+            } catch (IOException io) {
+                ImageJFX.getLogger().log(Level.SEVERE, null, io);
+                return null;
             }
         }
 

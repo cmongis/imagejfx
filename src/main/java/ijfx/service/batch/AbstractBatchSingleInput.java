@@ -20,9 +20,10 @@
 package ijfx.service.batch;
 
 import net.imagej.Dataset;
+import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import org.scijava.display.Display;
+import org.scijava.Context;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
 
@@ -41,10 +42,16 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
     @Parameter
     protected DisplayService displayService;
     
+    @Parameter
+    Context context;
+    
       @Override
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
-        display = (ImageDisplay) displayService.createDisplay(dataset);
+        DefaultImageDisplay imageDisplay = new DefaultImageDisplay();
+        context.inject(imageDisplay);
+        imageDisplay.display(dataset);
+        display = imageDisplay;
     }
 
     @Override

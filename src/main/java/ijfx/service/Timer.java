@@ -30,6 +30,21 @@ public interface Timer {
 
     String getName();
     void start();
+    
+    
+    /**
+     * Measures the time since the last elapsed() or measure() call.
+     * Doesn't display anything
+     * @param id
+     * @return 
+     */
+    long measure(String id);
+    
+    /**
+     * Measure the time between the last elapsed() or measure command and displays it
+     * @param id
+     * @return return the time
+     */
     long elapsed(String id);
     SummaryStatistics getStats(String id);
     Map<String,SummaryStatistics> getStats();

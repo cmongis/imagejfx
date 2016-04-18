@@ -22,6 +22,7 @@ package ijfx.core.imagedb;
 import ijfx.core.metadata.FileSizeMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.utils.DimensionUtils;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.ui.main.ImageJFX;
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
 import javax.xml.transform.stream.StreamSource;
 import mongis.ndarray.NDimensionalArray;
 import net.imagej.axis.Axes;
+import net.imagej.axis.CalibratedAxis;
 import org.apache.commons.math3.geometry.spherical.oned.S1Point;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
@@ -120,22 +122,29 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             metadataset.putGeneric(MetaData.SERIE_COUNT, serieCount);
             metadataset.putGeneric(MetaData.CHANNEL_COUNT, channelCount);
             metadataset.putGeneric(MetaData.FILE_NAME, file.getName());
+            metadataset.putGeneric(MetaData.ABSOLUTE_PATH,file.getAbsolutePath());
+           
+            // creating array containing the axes and axe lengths other than x an y
+           long[] dims = new long[metadata.get(0).getAxesLengths().length - 2];
+           CalibratedAxis[] axes = new CalibratedAxis[dims.length];
+             if (dims.length > 0) {
+            System.arraycopy(metadata.get(0).getAxes().toArray(new CalibratedAxis[metadata.get(0).getAxes().size()]), 2, axes, 0, axes.length);
+            System.arraycopy(metadata.get(0).getAxesLengths(),2,dims,0,dims.length);
+            
+           
+                NDimensionalArray ndarray = new NDimensionalArray(dims);
 
-            if (metadata.get(0).getAxesNonPlanar().size() > 0) {
-                NDimensionalArray ndarray = new NDimensionalArray(metadata.get(0).getAxesLengthsNonPlanar());
-
-                String[] dimNames = metadata
-                        .get(0)
-                        .getAxesNonPlanar()
-                        .stream().map(axe -> axe.type().getLabel())
-                        .toArray(size -> new String[size]);
-
-                long[] dimLengths = metadata.get(0).getAxesLengthsNonPlanar();
+                String[] dimNames = new String[dims.length];
+                
+                for(int i = 0; i!=dimNames.length;i++) {
+                    dimNames[i] = metadata.get(0).getAxis(i+2).type().getLabel();
+                }
+               
 
                 metadataset.putGeneric(MetaData.DIMENSION_ORDER, String.join(",", dimNames));
-                metadataset.putGeneric(MetaData.DIMENSION_LENGHS, Arrays.toString(dimLengths));
+                metadataset.putGeneric(MetaData.DIMENSION_LENGHS, Arrays.toString(dims));
             }
-
+             
             return metadataset;
 
         } catch (FormatException ex) {
@@ -154,62 +163,46 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
 
     public List<MetaDataSet> extractPlaneMetaData(MetaDataSet metadataset) {
 
-        List<MetaDataSet> planes = new ArrayList<>();
+        List<MetaDataSet> planes = new ArrayList<>(1000);
         String dimensionLengthesString = metadataset.get(MetaData.DIMENSION_LENGHS).getStringValue();
-        if (dimensionLengthesString == null) {
-
+        System.out.println(dimensionLengthesString);
+        if (dimensionLengthesString == null || dimensionLengthesString.equals("null") || dimensionLengthesString.equals("[]")) {
             planes.add(new MetaDataSet().merge(metadataset));
             return planes;
-        } else {
+        }
+        else {
            
-            long[] dimensionLengthes = readLongArray(metadataset.get(MetaData.DIMENSION_LENGHS).getStringValue());
+            long[] dimensionLengthes = DimensionUtils.readLongArray(metadataset.get(MetaData.DIMENSION_LENGHS).getStringValue());
             
             String[] dimensionLabelArray = metadataset.get(MetaData.DIMENSION_ORDER).getStringValue().split(",");
             
             NDimensionalArray array = new NDimensionalArray(dimensionLengthes);
-            int i = 0;
-            
+            int planeIndex = 0;
+            long[][] coordinateList = array.get(0).generateAllPossibilities();
             // generate all the possibilities
-            for(long[] coordinate : array.get(0).generateAllPossibilities()) {
+            for(long[] coordinate : coordinateList) {
                 
                 MetaDataSet planeMetaDataSet = new MetaDataSet().merge(metadataset);
                 
                 for(int d = 0; d!= coordinate.length;d++) {
                     String label = dimensionLabelArray[d];
                     long value = coordinate[d];
-                    
-                    
                     planeMetaDataSet.putGeneric(label, value);
                     
-                }  
+                } 
+                // putting the plane index
+                planeMetaDataSet.putGeneric(MetaData.PLANE_INDEX, planeIndex);
                 
+                // puting the non planar position
+                planeMetaDataSet.putGeneric(MetaData.PLANE_NON_PLANAR_POSITION,Arrays.toString(coordinate));
                 planes.add(planeMetaDataSet);
+                planeIndex++;
             }
             
         }
         return planes;
 
     }
-
-    public static long[] readLongArray(String str) {
-        // the string is usually a string of type "[12,324,32]
-
-        // deleting the []
-        int begin = 1;
-        int end = str.length() - 1;
-
-        str = str.substring(begin, end);
-
-        String[] numbers = str.split(",");
-        long[] longs = new long[numbers.length];
-        for(int i = 0;i!=numbers.length;i++) {
-            longs[i] = Long.decode(numbers[i]);
-        }
-        return longs;
-    }
-
-   
-
     @Override
     public List<MetaDataSet> extractPlaneMetaData(File file) {
         return extractPlaneMetaData(extractMetaData(file));

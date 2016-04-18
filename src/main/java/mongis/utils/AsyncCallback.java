@@ -20,6 +20,7 @@
 package mongis.utils;
 
 import ijfx.ui.main.ImageJFX;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import javafx.application.Platform;
@@ -110,6 +111,11 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
         return input;
     }
 
+    public AsyncCallback<INPUT,OUTPUT> startIn(ExecutorService executorService) {
+        executorService.submit(this);
+        return this;
+    }
+    
     public AsyncCallback<INPUT, OUTPUT> start() {
         ImageJFX.getThreadPool().submit(this);
         return this;

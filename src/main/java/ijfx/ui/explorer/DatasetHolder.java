@@ -19,15 +19,12 @@
  */
 package ijfx.ui.explorer;
 
-import ijfx.core.metadata.MetaDataOwner;
-import javafx.beans.property.BooleanProperty;
+import net.imagej.Dataset;
 
 /**
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner,DatasetHolder{
-     
-   
- 
+public interface DatasetHolder {
+        Dataset getDataset();
 }

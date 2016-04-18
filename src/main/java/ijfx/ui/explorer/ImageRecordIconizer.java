@@ -24,6 +24,7 @@ import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.thumb.ThumbService;
 import ijfx.ui.activity.ActivityService;
+import io.scif.services.DatasetIOService;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import mongis.utils.FileUtils;
+import net.imagej.Dataset;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
@@ -53,6 +55,9 @@ public class ImageRecordIconizer implements Explorable {
     
     @Parameter
     ActivityService activityService;
+    
+    @Parameter
+    DatasetIOService datasetIoService;
     
     private BooleanProperty selectedProperty;
     
@@ -123,6 +128,16 @@ public class ImageRecordIconizer implements Explorable {
            selectedProperty = new SimpleBooleanProperty(this, "selected", selected);
         }
         return  selectedProperty;
+    }
+
+    @Override
+    public Dataset getDataset() {
+        try {
+            return datasetIoService.open(getImageRecord().getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            Logger.getLogger(ImageRecordIconizer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     

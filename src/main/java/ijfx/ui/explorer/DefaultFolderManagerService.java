@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import mongis.utils.AsyncCallable;
 import org.scijava.Context;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -69,22 +70,21 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Parameter
     MetaDataExtractionService metaDataExtractionService;
 
-    
     private static String FOLDER_PREFERENCE_FILE = "folder_db.json";
-    
+
     Logger logger = ImageJFX.getLogger();
 
     ExplorationMode currentExplorationMode;
 
-    
-   List<Explorable> currentItems;
-    
+    List<Explorable> currentItems;
+
     @Override
     public Folder addFolder(File file) {
         Folder f = new DefaultFolder(file);
         context.inject(f);
         return addFolder(f);
     }
+
     protected Folder addFolder(Folder f) {
         folderList.add(f);
 
@@ -99,12 +99,12 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
     @Override
     public List<Folder> getFolderList() {
-        
-        if(folderList == null) {
+
+        if (folderList == null) {
             folderList = new ArrayList<>();
             load();
         }
-        
+
         return folderList;
     }
 
@@ -136,22 +136,30 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
     @Override
     public void setExplorationMode(ExplorationMode mode) {
-        if(mode == currentExplorationMode) return;
+        if (mode == currentExplorationMode) {
+            return;
+        }
         currentExplorationMode = mode;
         eventService.publish(new ExplorationModeChangeEvent().setObject(mode));
+
+        AsyncCallable<List<Explorable>> task = new AsyncCallable<>();
         
         
-        if(mode == ExplorationMode.FILE) {
-            explorerService.setItems(currentFolder.getFileList());
+        if (null != mode) switch (mode) {
+            case FILE:
+                task.run(currentFolder::getFileList);
+                break;
+            case PLANE:
+                task.run(currentFolder::getPlaneList);
+                break;
+            default:
+                task.run(currentFolder::getObjectList);
+                break;
         }
-        else if (mode == ExplorationMode.PLANE) {
-            explorerService.setItems(currentFolder.getPlaneList());
-        }
-        else {
-            explorerService.setItems(currentFolder.getObjectList());
-        }
-        
-        logger.info("Exploration mode changed : "+mode.toString());
+        task.then(explorerService::setItems);
+        task.start();
+
+        logger.info("Exploration mode changed : " + mode.toString());
     }
 
     @Override
@@ -159,28 +167,24 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         return currentExplorationMode;
     }
 
-  
-
     private void save() {
-        HashMap<String,String> folderMap = new HashMap<>();
-        for(Folder f : getFolderList()) {
-            folderMap.put(f.getName(),f.getDirectory().getAbsolutePath());
+        HashMap<String, String> folderMap = new HashMap<>();
+        for (Folder f : getFolderList()) {
+            folderMap.put(f.getName(), f.getDirectory().getAbsolutePath());
         }
-        
-        
-        jsonPrefService.savePreference(folderMap,FOLDER_PREFERENCE_FILE);
-        
+
+        jsonPrefService.savePreference(folderMap, FOLDER_PREFERENCE_FILE);
+
     }
 
     private synchronized void load() {
-        Map<String,String> folderMap  = jsonPrefService.loadMapFromJson(FOLDER_PREFERENCE_FILE,String.class,String.class);
-        folderMap.forEach((name,folderPath)->{
+        Map<String, String> folderMap = jsonPrefService.loadMapFromJson(FOLDER_PREFERENCE_FILE, String.class, String.class);
+        folderMap.forEach((name, folderPath) -> {
             DefaultFolder folder = new DefaultFolder(new File(folderPath));
             context.inject(folder);
             folder.setName(name);
             folderList.add(folder);
         });
     }
-    
-   
+
 }
