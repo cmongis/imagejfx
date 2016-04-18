@@ -421,25 +421,4 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
 
 
-    public Image getImageFromFAI(FontAwesomeIconView fontAwesomeIconView, double size) {
-
-        final Canvas canvas = new Canvas(size, size);
-        final GraphicsContext gc = canvas.getGraphicsContext2D();
-        Font font = new Font(fontAwesomeIconView.getFont().getFamily(), size);
-        String unicode = FontAwesomeIcon.valueOf(fontAwesomeIconView.getGlyphName()).characterToString();
-        gc.setFont(font);
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.CENTER);
-        gc.setFill(Color.BLACK);
-        gc.fillText(unicode, size / 2, size / 2);
-        final SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
-        final WritableImage snapshot = canvas.snapshot(params, null);
-        final java.awt.image.BufferedImage bufferedImage
-                = javafx.embed.swing.SwingFXUtils.fromFXImage(snapshot, null);
-        WritableImage wi = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
-        SwingFXUtils.toFXImage(bufferedImage, wi);
-        return wi;
-    }
-
 }

@@ -41,19 +41,9 @@ public class FactoryPaneCell {
 
 
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
-        PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        try {
-        FontAwesomeIconView fontAwesomeIconView =new FontAwesomeIconView(FontAwesomeIcon.valueOf(itemWidget.getIcon()));
-        fontAwesomeIconView.getStyleClass().add("icon-toolbar");
-        
-        Platform.runLater(() -> paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView,120.0)));
-        //paneIconCell.setImage(paneIconCell.getImageFromFAI(fontAwesomeIconView));
-            
-        } catch (Exception e) {
-        }
+       PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
+        paneIconCell.setImageFactory(i -> i.getImage(previewService,120));
         paneIconCell.setSubtitleVisible(false);
-
-     
         paneIconCell.setTitleFactory(f -> f.getLabel());
         paneIconCell.setLoadImageOnlyWhenVisible(false);
         paneIconCell.setItem(itemWidget);
