@@ -24,21 +24,18 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
-import ijfx.ui.context.PaneContextualView;
 import ijfx.ui.main.Localization;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
+import java.util.HashMap;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import mongis.utils.panecell.PaneIconCell;
-import mongis.utils.panecell.PaneLabelCell;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
+import org.scijava.command.CommandInfo;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
@@ -55,7 +52,8 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     PreviewService previewService;
     @Parameter
     Context context;
-
+    @Parameter
+    CommandService commandService;
     @Parameter
     UiPluginService loaderService;
     @Parameter
@@ -206,6 +204,8 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
             }
 
             paneIconCell.setOnMouseClicked(event -> {
+                //TODO set 
+                commandService.run(new CommandInfo(paneIconCell.getItem().getAction()), true, "");
                 System.out.println("Click Action " + paneIconCell.getItem().getLabel() + paneIconCell.getItem().getContext());
 
             });
