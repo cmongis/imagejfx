@@ -227,7 +227,6 @@ public class PreviewService extends AbstractService implements ImageJService {
 
             //Has to be rebuil to create colorTable
             view.rebuild();
-            List<ColorTable> colorTable = activeDataview.getColorTables();
             long[] dimension = new long[dataset.numDimensions() - 2];
             activePosition.localize(dimension);
 

@@ -226,7 +226,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
         logger.info("Running module");
 
-        Future<Module> run = moduleService.run(module, process);
+        Future<Module> run = moduleService.run(module, process, parameters);
 
         logger.info(String.format("[%s] module started", moduleName));
 
@@ -288,35 +288,21 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     // extract the outpu from an executed module
-    public boolean extractOutput(BatchSingleInput input, Module module) {
+    public void extractOutput(BatchSingleInput input, Module module) {
+        Map<String, Object> outputs = module.getOutputs();
+        outputs.forEach((s, o) -> {
+            if (o instanceof Dataset) {
+                logger.info("Extracting Dataset !");
+                input.setDataset((Dataset) module.getOutput(s));
+            } else if (o instanceof ImageDisplay) {
+                logger.info("Extracting ImageDisplay !");
+                input.setDisplay((ImageDisplay) module.getOutput(s));
+            } else if (o instanceof DatasetView) {
+                logger.info("Extracting DatasetView !");
+                input.setDatasetView((DatasetView) module.getOutput(s));
+            }
+        });
 
-        // testing if it takes a Display as outpu
-        ModuleItem item = moduleService.getSingleOutput(module, Dataset.class);
-        if (item != null) {
-            // if yes, extracting the display
-            logger.info("Extracting Dataset !");
-            input.setDataset((Dataset) module.getOutput(item.getName()));
-            return false;
-        }
-
-        item = moduleService.getSingleOutput(module, ImageDisplay.class);
-
-        if (item != null) {
-            logger.info("Extracting ImageDisplay !");
-            input.setDisplay((ImageDisplay) module.getOutput(item.getName()));
-            return true;
-        }
-
-        item = moduleService.getSingleOutput(module, DatasetView.class);
-        if (item != null) {
-            logger.info("Extracting DatasetView !");
-            input.setDatasetView((DatasetView) module.getOutput(item.getName()));
-            return true;
-        }
-
-        logger.info("Error when extracting output !");
-
-        return false;
     }
 
     public boolean isRunning() {

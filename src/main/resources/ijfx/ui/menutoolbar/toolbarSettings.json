@@ -19,8 +19,6 @@
                 "context": "image-open"
 
             },
-
-
             {
                 "type": "Command"
                 ,
@@ -140,9 +138,7 @@
             }
         ]
     },
-    
-    
-        {
+    {
         "name": "Noises"
         ,
         "context": "image-open"
@@ -161,16 +157,16 @@
                 ,
                 "context": "image-open"
                 ,
-                                "parameters": {
+                "parameters": {
                     "allPlanes": false
-                
+
                 }
-                
+
 
             }
         ]
     },
-           {
+    {
         "name": "Image"
         ,
         "context": "image-open"
@@ -189,26 +185,110 @@
                 ,
                 "context": "image-open"
 
-                
+
 
             },
-                        {
+            {
                 "type": "Command"
                 ,
                 "label": "Auto contrast"
                 ,
                 "action": "net.imagej.plugins.commands.display.AutoContrast"
                 ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Resize Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.ResizeImage"
+                ,
                 "icon": "ANDROID"
                 ,
                 "context": "image-open"
 
-                
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Rotate Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.RotateImageXY"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "angle": 90
+
+                }
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Rotate 90 degrees Right"
+                ,
+                "action": "net.imagej.plugins.commands.rotate.Rotate90DegreesRight"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Rotate 90 degrees Left"
+                ,
+                "action": "net.imagej.plugins.commands.rotate.Rotate90DegreesLeft"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Translate Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.TranslateImage"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "deltasString": "0 = 100.0, 1 = 100.0"
+
+                }
+
 
             }
         ]
     }
-    
-    
+
+
 
 ]
