@@ -236,7 +236,7 @@ public class DefaultFolder implements Folder {
             }
 
             planes = mList.stream()
-                    .map(m -> new PlaneExplorableWrapper(m))
+                    .map(m -> new PlaneMetaDataSetWrapper(context,m))
                     .collect(Collectors.toList());
 
         }
@@ -247,116 +247,5 @@ public class DefaultFolder implements Folder {
     @Override
     public List<Explorable> getObjectList() {
         return new ArrayList<>();
-    }
-
-    private class PlaneExplorableWrapper implements Explorable {
-
-        private final MetaDataSet m;
-
-        BooleanProperty selectedProperty = new SimpleBooleanProperty(false);
-
-        public PlaneExplorableWrapper(MetaDataSet m) {
-            this.m = m;
-        }
-
-        @Override
-        public String getTitle() {
-            return m.get(MetaData.FILE_NAME).getStringValue();
-        }
-
-        @Override
-        public String getSubtitle() {
-            return new StringBuilder()
-                    .append(composeSubtitle(m.get(MetaData.CHANNEL), "C"))
-                    .append(composeSubtitle(m.get(MetaData.Z_POSITION), "Z"))
-                    .append(composeSubtitle(m.get(MetaData.TIME), "T"))
-                    .toString();
-        }
-
-        @Override
-        public String getInformations() {
-            return null;
-        }
-
-        @Override
-        public Image getImage() {
-            try {
-                return thumberService.getThumb(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue(), 100, 100);
-            } catch (Exception e) {
-                ImageJFX.getLogger().log(Level.SEVERE, "Error when loading preview for Plane", e);
-            }
-            return null;
-        }
-
-        @Override
-        public void open() {
-
-            new AsyncCallable()
-                    .run(this::getDataset)
-                    .then(dataset -> {
-                        uiService.show(dataset);
-                        activityService.openByType(ImageJContainer.class);
-                    })
-                    .start();
-        }
-
-        @Override
-        public BooleanProperty selectedProperty() {
-            return selectedProperty;
-        }
-
-        private File getFile() {
-            return new File(getMetaDataSet().get(MetaData.ABSOLUTE_PATH).getStringValue());
-        }
-
-        @Override
-        public MetaDataSet getMetaDataSet() {
-            return m;
-        }
-
-        private String composeSubtitle(MetaData m, String keyName) {
-            if (m == null || m.isNull()) {
-                return "";
-            } else {
-                return String.format("%s = %s ", keyName, m.getStringValue());
-            }
-        }
-
-        /*
-        @Override
-        public Dataset getDataset() {
-
-            try {
-
-                MetaData nonPlanarPosition = m.get(MetaData.PLANE_NON_PLANAR_POSITION);
-                
-                if (nonPlanarPosition == null || nonPlanarPosition.isNull()) {
-                    return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
-                } else {
-                    long[] location;
-                    System.out.println(m);
-                    location = DimensionUtils.readLongArray(nonPlanarPosition.getStringValue());
-                    return imagePlaneService.extractPlane(getFile(), location);
-                }
-
-            } catch (IOException ex) {
-                ImageJFX.getLogger().log(Level.SEVERE, null, ex);
-            }
-            return null;
-        }
-         */
-        public Dataset getDataset() {
-            try {
-                if (m.containsKey(MetaData.PLANE_INDEX) == false) {
-                    return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
-                } else {
-                    return imagePlaneService.extractPlane(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue());
-                }
-            } catch (IOException io) {
-                ImageJFX.getLogger().log(Level.SEVERE, null, io);
-                return null;
-            }
-        }
-
-    }
+    } 
 }

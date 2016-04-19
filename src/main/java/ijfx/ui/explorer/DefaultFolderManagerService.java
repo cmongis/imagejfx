@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.ui.JsonPreferenceService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.explorer.event.FolderAddedEvent;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
@@ -70,6 +71,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Parameter
     MetaDataExtractionService metaDataExtractionService;
 
+    @Parameter
+    LoadingScreenService loadingScreenService;
+    
     private static String FOLDER_PREFERENCE_FILE = "folder_db.json";
 
     Logger logger = ImageJFX.getLogger();
@@ -123,14 +127,14 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
         uiContextService.enter("explore-files");
         uiContextService.update();
-
+        updateExploredElements();
     }
 
     @EventHandler
     public void onFolderUpdated(FolderUpdatedEvent event) {
         logger.info("Folder updated ! " + event.getObject().getName());
         if (currentFolder == event.getObject()) {
-            explorerService.setItems(event.getObject().getFileList());
+            updateExploredElements();
         }
     }
 
@@ -141,24 +145,37 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         }
         currentExplorationMode = mode;
         eventService.publish(new ExplorationModeChangeEvent().setObject(mode));
+        updateExploredElements();
+    }
+
+    private void updateExploredElements() {
+
+        ExplorationMode mode = currentExplorationMode;
 
         AsyncCallable<List<Explorable>> task = new AsyncCallable<>();
-        
-        
-        if (null != mode) switch (mode) {
-            case FILE:
-                task.run(currentFolder::getFileList);
-                break;
-            case PLANE:
-                task.run(currentFolder::getPlaneList);
-                break;
-            default:
-                task.run(currentFolder::getObjectList);
-                break;
-        }
-        task.then(explorerService::setItems);
-        task.start();
+        task.setTitle("Fetching elements...");
 
+        if (currentFolder == null) {
+            return;
+        } else {
+
+            if (null != mode) {
+                switch (mode) {
+                    case FILE:
+                        task.run(currentFolder::getFileList);
+                        break;
+                    case PLANE:
+                        task.run(currentFolder::getPlaneList);
+                        break;
+                    default:
+                        task.run(currentFolder::getObjectList);
+                        break;
+                }
+            }
+            task.then(explorerService::setItems);
+            task.start();
+            loadingScreenService.frontEndTask(task, false);
+        }
         logger.info("Exploration mode changed : " + mode.toString());
     }
 

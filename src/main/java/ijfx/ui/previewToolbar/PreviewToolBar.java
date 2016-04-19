@@ -71,6 +71,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
         fakeToolBar = new HBox();
         fakeToolBar.setSpacing(10);
+        fakeToolBar.getStyleClass().add("imagej-top-toolbar-bar");
         this.setTop(fakeToolBar);
 
     }

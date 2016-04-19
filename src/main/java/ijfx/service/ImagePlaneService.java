@@ -30,7 +30,7 @@ import net.imglib2.type.numeric.RealType;
  */
 public interface ImagePlaneService extends IjfxService{
     
-   <T extends RealType<T>> Dataset extractPlane(File file,long [] dims) throws IOException;
+   <T extends RealType<T>> Dataset extractPlane(File file,long [] dims,long[] dimsLength) throws IOException;
     Dataset extractPlane(File file, int planeIndex) throws IOException;
     
 }
