@@ -72,7 +72,7 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     @Parameter
     DisplayService displayService;
-    
+
     @Parameter
     ImageDisplayService imageDisplayService;
 
@@ -216,25 +216,30 @@ public class PreviewService extends AbstractService implements ImageJService {
         DatasetView activeDataview = imageDisplayService.getActiveDatasetView();
         final DatasetView view = (DatasetView) imageDisplayService.createDataView(dataset);
         Position activePosition = imageDisplayService.getActivePosition();
-        view.getData().setChannelMaximum(0, activeDataview.getChannelMax(activePosition.getIntPosition(0)));
-        view.getData().setChannelMinimum(0, activeDataview.getChannelMin(activePosition.getIntPosition(0)));
+        
+        //Sometimes activePosition is invalid
+        try {
+            view.getData().setChannelMaximum(0, activeDataview.getChannelMax(activePosition.getIntPosition(0)));
+            view.getData().setChannelMinimum(0, activeDataview.getChannelMin(activePosition.getIntPosition(0)));
 
-        //view.setPosition(activePosition);
-        view.setColorMode(activeDataview.getColorMode());
+            //view.setPosition(activePosition);
+            view.setColorMode(activeDataview.getColorMode());
 
-        //Has to be rebuil to create colorTable
-        view.rebuild();
-        List<ColorTable> colorTable = activeDataview.getColorTables();
-        long[] dimension = new long[dataset.numDimensions() - 2];
-        activePosition.localize(dimension);
+            //Has to be rebuil to create colorTable
+            view.rebuild();
+            List<ColorTable> colorTable = activeDataview.getColorTables();
+            long[] dimension = new long[dataset.numDimensions() - 2];
+            activePosition.localize(dimension);
 
-        //Set LUT
-        setLUT(activeDataview, view);
+            //Set LUT
+            setLUT(activeDataview, view);
 
-        int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
-        int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
-        view.setChannelRange(0, minChannel, maxChannel);
+            int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
+            int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
+            view.setChannelRange(0, minChannel, maxChannel);
+        } catch (Exception e) {
 
+        }
         view.rebuild();
         BufferedImage bufferedImage = view.getScreenImage().image();
         return bufferedImage;
@@ -251,14 +256,11 @@ public class PreviewService extends AbstractService implements ImageJService {
      */
     public Dataset applyCommand(Dataset dataset, String command, Map<String, Object> inputMap) {
         try {
-            BatchSingleInput batchSingleInput = new DisplayBatchInput(this.context());
-            //this.context().inject(batchSingleInput);
+            BatchSingleInput batchSingleInput = new DisplayBatchInput();
+            this.context().inject(batchSingleInput);
             batchSingleInput.setDataset(dataset);
-            //setLUT(imageDisplayService.getActiveDatasetView(),batchSingleInput.getDatasetView());
             CommandInfo commandInfo = new CommandInfo(command);
-            //this.context().inject(commandInfo);
             Module module = new CommandModule(commandInfo);
-            //this.context().inject(module);
             this.context().inject(module.getDelegateObject());
             batchService.executeModule(batchSingleInput, module, false, inputMap);
             Dataset result = batchSingleInput.getDataset();

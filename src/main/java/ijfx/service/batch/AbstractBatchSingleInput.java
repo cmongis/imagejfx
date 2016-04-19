@@ -19,10 +19,8 @@
  */
 package ijfx.service.batch;
 
-
 import net.imagej.Dataset;
 import net.imagej.display.DatasetView;
-import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
@@ -33,94 +31,70 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public abstract class AbstractBatchSingleInput implements BatchSingleInput{
+public abstract class AbstractBatchSingleInput implements BatchSingleInput {
+
     DatasetView datasetView;
-    
+
     Dataset dataset;
-    
+
     ImageDisplay display;
-    
-   
+
     @Parameter
     protected ImageDisplayService imageDisplayService;
-    
+
     @Parameter
     protected DisplayService displayService;
-    
+
     @Override
-    public void setDatasetView(DatasetView datasetView)
-    {
+    public void setDatasetView(DatasetView datasetView) {
         this.datasetView = datasetView;
         dataset = this.datasetView.getData();
     }
-    
+
     @Override
-    public DatasetView getDatasetView()
-    {
+    public DatasetView getDatasetView() {
         return this.datasetView;
     }
     @Parameter
     Context context;
-    
-      @Override
+
+    @Override
     public void setDataset(Dataset dataset) {
-        //ImageDisplay activeDisplay = (ImageDisplay) displayService.getActiveDisplay();
         this.dataset = dataset;
-        //display = (DefaultImageDisplay) displayService.createDisplay(dataset);
-
-        //imageDisplayService.getImageDisplays().remove(display);
-
-       //boolean b = display.isDisplaying(dataset);
-        
-        //display = new DefaultImageDisplay();
-        //display = (ImageDisplay) displayService.getActiveDisplay();
-        datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
-        datasetView.rebuild();
-        imageDisplayService.context().inject(display);
-        //display.display(dataset);
-        //datasetView = imageDisplayService.getActiveDatasetView();
-        //datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
         ImageDisplay imageDisplay = new SilentImageDisplay();
         context.inject(imageDisplay);
         imageDisplay.display(dataset);
         display = imageDisplay;
+        datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
+        datasetView.rebuild();
     }
 
     @Override
     public void setDisplay(ImageDisplay display) {
-        this.display = (DefaultImageDisplay) display;
+        this.display = display;
         dataset = imageDisplayService.getActiveDataset(display);
-        
+
     }
 
     @Override
     public Dataset getDataset() {
-
         return dataset;
     }
 
     @Override
     public ImageDisplay getDisplay() {
-        //displayService.setActiveDisplay(display);
-      
         return display;
     }
-    
-    
+
     @Override
     public void dispose() {
-        dataset = null;                
+        dataset = null;
         displayService.getDisplays().remove(display);
         imageDisplayService.getImageDisplays().remove(display);
         display.clear();
-        dataset = null;
         display.close();
         display = null;
         System.gc();
     }
-    
-   
-            
-            
-            
+
 }
