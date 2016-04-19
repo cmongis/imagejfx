@@ -302,7 +302,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     }
 
-    private void updateImageAsync(T newItem) {
+    public void updateImageAsync(T newItem) {
 
         if (newItem == null) {
             return;
