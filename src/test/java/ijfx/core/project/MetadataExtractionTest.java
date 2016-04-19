@@ -81,7 +81,7 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
     @Test
     public void testTransformation() {
         init();
-        File f = new File("/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif");//testFile;
+        File f = testFile;//OMG!!!!new File("/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif");//testFile;
         MetaDataSet m = extractorService.extractMetaData(f);
         int channelCount = m.get(MetaData.CHANNEL_COUNT).getIntegerValue();
         int tCount = m.get(MetaData.TIME_COUNT).getIntegerValue();
