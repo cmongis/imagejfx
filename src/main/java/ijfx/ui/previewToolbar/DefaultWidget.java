@@ -9,6 +9,8 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
 import ijfx.ui.utils.FontAwesomeIconUtils;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -72,6 +74,7 @@ public class DefaultWidget implements ItemWidget {
 
     @Override
     public Map<String, Object> getParameters() {
+        if (parameters == null) parameters = new HashMap<>();
         return parameters;
     }
 
@@ -108,11 +111,15 @@ public class DefaultWidget implements ItemWidget {
                 FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.AMBULANCE);
                 return FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, size);
             }
-        } else {
+        } 
+        //Check if icon exist in Enumeration
+        else if (Arrays.stream(FontAwesomeIcon.values()).filter(e -> e.name().equals(icon)).count() > 0) {
+
             FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
             return FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, size);
+        } else {
+            Image image = new Image(getClass().getResource(icon).toExternalForm(), size, size, true, true);
+            return image;
         }
     }
-
-
 }

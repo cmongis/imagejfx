@@ -40,6 +40,7 @@ public class LabelCategory extends Label {
     private final FontAwesomeIconView fontAwesomeIconView;
     private Pane pane;
 
+
     public LabelCategory(String s, String icon, UiContextService contextService) {
         super(s);
         fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
