@@ -19,7 +19,11 @@
  */
 package ijfx.service.batch;
 
+import com.sun.javafx.geom.transform.BaseTransform;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.imagej.Dataset;
+import net.imagej.display.DataView;
 import net.imagej.display.DatasetView;
 import net.imagej.display.DefaultDatasetView;
 import net.imagej.display.DefaultImageDisplay;
@@ -38,7 +42,7 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
     
     Dataset dataset;
     
-    ImageDisplay display;
+    DefaultImageDisplay display;
     
    
     @Parameter
@@ -61,26 +65,35 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
     }
       @Override
     public void setDataset(Dataset dataset) {
+        //ImageDisplay activeDisplay = (ImageDisplay) displayService.getActiveDisplay();
         this.dataset = dataset;
-        display = (ImageDisplay) displayService.createDisplay(dataset);
-        //display = new DefaultImageDisplay();
+        //display = (DefaultImageDisplay) displayService.createDisplay(dataset);
+
+        //imageDisplayService.getImageDisplays().remove(display);
+
+       //boolean b = display.isDisplaying(dataset);
+        
+        display = new DefaultImageDisplay();
         //display = (ImageDisplay) displayService.getActiveDisplay();
         datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
         datasetView.rebuild();
+        imageDisplayService.context().inject(display);
+        //display.display(dataset);
         //datasetView = imageDisplayService.getActiveDatasetView();
         //datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
     }
 
     @Override
     public void setDisplay(ImageDisplay display) {
-        //this.display = display;
+        this.display = (DefaultImageDisplay) display;
         dataset = imageDisplayService.getActiveDataset(display);
         
     }
 
     @Override
     public Dataset getDataset() {
-        
+
+        dataset = datasetView.getData();
 
         return dataset;
     }
@@ -98,6 +111,7 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput{
         dataset = null;                
         displayService.getDisplays().remove(display);
         imageDisplayService.getImageDisplays().remove(display);
+        display.clear();
         display.close();
         display = null;
         System.gc();
