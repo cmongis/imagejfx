@@ -17,27 +17,24 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.ui.main;
 
-import ijfx.core.metadata.MetaDataOwner;
-import ijfx.service.IjfxService;
-import java.util.List;
-import java.util.function.Predicate;
+import static java.lang.reflect.Array.set;
+import javafx.scene.control.PopupControl;
+import javafx.scene.layout.StackPane;
 
 /**
  *
  * @author cyril
  */
-public interface ExplorerService extends IjfxService{
+public class LoadingWindow extends PopupControl{
+    LoadingIcon icon = new LoadingIcon(100);
+    StackPane pane = new StackPane();
     
-    List<Explorable> getItems();
+    public LoadingWindow() {
+        super();
+        
+        
+    }
     
-    
-    void setItems(List<Explorable> items);
-    
-    void applyFilter(Predicate<MetaDataOwner> predicate);
-    
-    void setOptionalFilter(Predicate<MetaDataOwner> addionnalFilter);
-    
-    List<Explorable> getFilteredItems();
 }

@@ -34,6 +34,7 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
         setTitleFactory(this::getTitle);
         setSubtitleFactory(this::getSubtitle);
         setImageFactory(this::getImage);
+        setLoadImageOnlyWhenVisible(true);
         
     }
     
@@ -46,7 +47,9 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
         }
         
         super.setItem(icon);
-        icon.selectedProperty().bindBidirectional(selectedProperty());
+        if(icon != null) {
+            icon.selectedProperty().bindBidirectional(selectedProperty());
+        }
     }
     
     public String getTitle(Iconazable iconazable) {

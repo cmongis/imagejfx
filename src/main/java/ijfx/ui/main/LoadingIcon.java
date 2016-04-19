@@ -36,6 +36,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import ijfx.ui.context.animated.Animations;
+import javafx.animation.Animation;
+import javafx.animation.Animation.Status;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 
 /**
@@ -52,6 +55,8 @@ public class LoadingIcon extends StackPane {
     public static final String CSS_CLASS_GLYPH = "glyph";
      private final DoubleProperty size = new SimpleDoubleProperty();
     protected final double  circleGrowth = 0.1;
+    
+    Transition iconTransition;
     
     public LoadingIcon(double size) {
         super();
@@ -90,10 +95,23 @@ public class LoadingIcon extends StackPane {
         getChildren().addAll(circle,iconNode);
         
         sizeProperty().bind(prefWidthProperty());
-        
 
+        opacityProperty().addListener(this::onOpacityChanged);
+        
     }
    
+    public void onOpacityChanged(Observable obs, Number oldValue, Number newValue) {
+        
+        Status now = iconTransition.getStatus();
+        if(newValue.doubleValue() == 0.0) {
+            iconTransition.stop();
+        }
+        
+        
+        else if(now == Status.STOPPED || now == Status.PAUSED) {
+            iconTransition.play();
+        }
+    }
 
     
     
@@ -118,16 +136,10 @@ public class LoadingIcon extends StackPane {
         System.out.println(getSize());
         return sizeProperty().doubleValue() * (1. - circleGrowth) - circle.getStrokeWidth();
     }
-    
-    
-    
-    
-    Transition iconTransition;
-
-    public void play() {
-        if (iconTransition == null) {
+        
+    public Animation getIconAnimation() {
+        if(iconTransition == null) {
             RotateTransition rotateTransition;
-
             // animating the loading thing
             rotateTransition = new RotateTransition(Duration.millis(1000), iconNode);
             rotateTransition.setByAngle(360);
@@ -150,13 +162,17 @@ public class LoadingIcon extends StackPane {
             pt.setCycleCount(300);
             iconTransition = pt;
         }
+        return iconTransition;
+    }
+    
+    public void play() {
         Animations.FADEIN.configure(this, ImageJFX.getAnimationDurationAsDouble());
-        iconTransition.play();
+        getIconAnimation().play();
     }
     
     public void stop() {
         Animations.FADEOUT.configure(this, ImageJFX.getAnimationDurationAsDouble());
-        if(iconTransition != null) iconTransition.stop();
+        getIconAnimation().stop();
     }
     
 

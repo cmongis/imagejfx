@@ -64,6 +64,7 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.project_manager.search.PopoverToggleButton;
 import javafx.beans.Observable;
 import mongis.utils.FXUtilities;
+import net.imagej.display.DataView;
 
 /**
  *
@@ -306,17 +307,21 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     @EventHandler
     public void handleEvent(DisplayActivatedEvent event) {
-
+        
         updateViewRangeFromModel();
         updateLabel();
     }
 
     @EventHandler
     public void handleEvent(DataViewUpdatedEvent event) {
-
+        if(event.getView() != getCurrentDataView()) return;
         updateLabel();
         updateViewRangeFromModel();
 
+    }
+    
+    private DataView getCurrentDataView() {
+        return imageDisplayService.getActiveDatasetView();
     }
 
     private void onHighValueChanging() {

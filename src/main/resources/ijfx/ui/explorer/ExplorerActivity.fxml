@@ -82,9 +82,9 @@
             <Label text="Explore" />
             <HBox styleClass="toggle-group">
                <children>
-                  <ToggleButton fx:id="fileModeToggleGroup" mnemonicParsing="false" styleClass="first" text="Files" />
+                  <ToggleButton fx:id="fileModeToggleButton" mnemonicParsing="false" styleClass="first" text="Files" />
                   <ToggleButton fx:id="planeModeToggleButton" mnemonicParsing="false" text="Planes" />
-                  <ToggleButton fx:id="objectModeToggleGroup" mnemonicParsing="false" styleClass="last" text="Object" />
+                  <ToggleButton fx:id="objectModeToggleButton" mnemonicParsing="false" styleClass="last" text="Object" />
                </children>
             </HBox>
          </items>

@@ -17,27 +17,20 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.service;
 
-import ijfx.core.metadata.MetaDataOwner;
-import ijfx.service.IjfxService;
-import java.util.List;
-import java.util.function.Predicate;
+import java.io.File;
+import java.io.IOException;
+import net.imagej.Dataset;
+import net.imglib2.type.numeric.RealType;
 
 /**
  *
  * @author cyril
  */
-public interface ExplorerService extends IjfxService{
+public interface ImagePlaneService extends IjfxService{
     
-    List<Explorable> getItems();
+   <T extends RealType<T>> Dataset extractPlane(File file,long [] dims) throws IOException;
+    Dataset extractPlane(File file, int planeIndex) throws IOException;
     
-    
-    void setItems(List<Explorable> items);
-    
-    void applyFilter(Predicate<MetaDataOwner> predicate);
-    
-    void setOptionalFilter(Predicate<MetaDataOwner> addionnalFilter);
-    
-    List<Explorable> getFilteredItems();
 }

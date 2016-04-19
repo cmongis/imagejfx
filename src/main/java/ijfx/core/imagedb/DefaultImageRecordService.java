@@ -66,7 +66,7 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
     Queue<File> fileQueue = new LinkedList<>();
 
     @Parameter
-    MetaDataExtractorService metadataExtractorService;
+    MetaDataExtractionService metadataExtractorService;
 
     @Parameter
     ImageLoaderService imageLoaderService;

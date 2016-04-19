@@ -35,24 +35,25 @@ import javafx.scene.layout.Pane;
  * @author Tuan anh TRINH
  */
 public class LabelCategory extends Label {
+
     private final PaneContextualView contextualView;
     private final FontAwesomeIconView fontAwesomeIconView;
     private Pane pane;
 
-    public LabelCategory (String s, UiContextService contextService, String icon)
-    {
-        super (s);
-        this.getStyleClass().add("menu-bar");
+
+    public LabelCategory(String s, String icon, UiContextService contextService) {
+        super(s);
         fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
-        this.setGraphic(fontAwesomeIconView);
+        WritableImage wi = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, (int) Double.parseDouble(fontAwesomeIconView.getSize()));
+        this.setGraphic(new ImageView(wi));
         pane = new FlowPane();
         contextualView = new PaneContextualView(contextService, pane, this.getText());
     }
 
-
     public PaneContextualView getContextualView() {
         return contextualView;
     }
+
     public void setPane(Pane p) {
         pane = p;
     }
@@ -60,5 +61,5 @@ public class LabelCategory extends Label {
     public Pane getPane() {
         return pane;
     }
-    
+
 }

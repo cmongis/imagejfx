@@ -26,8 +26,10 @@ import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,6 +126,16 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
             return new HashSet<K>();
         }
         
+    }
+    
+    public <K,O> Map<K,O> loadMapFromJson(String filename, Class< ? extends K> keyType, Class<? extends O> valueType) {
+        try {
+            return getMapper().readValue(new File(configDirectory,addExtension(filename)), getMapper().getTypeFactory().constructMapLikeType(Map.class, keyType, valueType));
+        }
+        catch(Exception e) {
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when loading the configuration file"+filename,e);
+            return new HashMap<>();
+        }
     }
     
     

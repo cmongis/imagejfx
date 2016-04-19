@@ -38,59 +38,70 @@ import org.scijava.service.Service;
  * @author cyril
  */
 @Plugin(type = Service.class)
-public class DefaultExplorerService extends AbstractService implements ExplorerService{
+public class DefaultExplorerService extends AbstractService implements ExplorerService {
 
-    
     List<Explorable> explorableList = new ArrayList<>();
-    
+
     List<Explorable> filteredList = new ArrayList<>();
-    
+
     @Parameter
     EventService eventService;
-    
+
     Predicate<MetaDataOwner> lastFilter;
-    
+    Predicate<MetaDataOwner> optionalFilter;
+
     @Override
     public void setItems(List<Explorable> items) {
-        
+
         explorableList = items;
         eventService.publish(new ExploredListChanged().setObject(items));
         applyFilter(lastFilter);
-        
+
     }
 
     @Override
     public void applyFilter(Predicate<MetaDataOwner> predicate) {
-        
+
         new AsyncCallback<Predicate<MetaDataOwner>, List<Explorable>>(predicate)
                 .run(this::filter)
                 .then(this::setFilteredItems)
                 .start();
-        
+
     }
 
     protected List<Explorable> filter(Predicate<MetaDataOwner> predicate) {
-        
-        if(predicate == null) return getItems();
+
+        if (predicate == null && optionalFilter == null) {
+            return getItems();
+        }
+        else if(predicate == null && optionalFilter != null) {
+            predicate = optionalFilter;
+        }
+        else if (optionalFilter != null) {
+            predicate = predicate.and(optionalFilter);
+        }
         return getItems().parallelStream().filter(predicate).collect(Collectors.toList());
     }
 
-    
     @Override
     public List<Explorable> getItems() {
         return explorableList;
     }
-    
+
     @Override
     public List<Explorable> getFilteredItems() {
         return filteredList;
     }
-    
+
     protected void setFilteredItems(List<Explorable> filteredItems) {
         this.filteredList = filteredItems;
         eventService.publishLater(new DisplayedListChanged().setObject(filteredItems));
     }
-    
-  
-    
+
+    @Override
+    public void setOptionalFilter(Predicate<MetaDataOwner> additionalFilter) {
+       this.optionalFilter = additionalFilter;
+       applyFilter(lastFilter);
+    }
+
 }

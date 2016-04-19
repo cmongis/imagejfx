@@ -22,15 +22,17 @@ package ijfx.core.imagedb;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.IjfxService;
 import java.io.File;
+import java.util.List;
 
 /**
  *
  * @author cyril
  */
-public interface MetaDataExtractorService extends IjfxService {
+public interface MetaDataExtractionService extends IjfxService {
     
     
     public MetaDataSet extractMetaData(File file);
-    
+    public List<MetaDataSet> extractPlaneMetaData(MetaDataSet metadataset);
+    public List<MetaDataSet> extractPlaneMetaData(File file); 
     
 }
