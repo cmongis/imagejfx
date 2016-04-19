@@ -56,6 +56,7 @@ import net.imglib2.type.numeric.RealType;
 import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
+import org.scijava.display.DisplayService;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -69,6 +70,9 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class PreviewService extends AbstractService implements ImageJService {
 
+    @Parameter
+    DisplayService displayService;
+    
     @Parameter
     ImageDisplayService imageDisplayService;
 
@@ -225,18 +229,7 @@ public class PreviewService extends AbstractService implements ImageJService {
         activePosition.localize(dimension);
 
         //Set LUT
-        if (activeDataview.getData().getImgPlus().getCompositeChannelCount() == 1) {
-            view.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
-        } else {
-            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
-            for (int i = 0; i < colorTable.size(); i++) {
-                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
-                values[i] = b[i];
-
-            }
-            ColorTable8 colorTable8 = new ColorTable8(values);
-            view.setColorTable(colorTable8, 0);
-        }
+        setLUT(activeDataview, view);
 
         int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
         int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
@@ -258,9 +251,10 @@ public class PreviewService extends AbstractService implements ImageJService {
      */
     public Dataset applyCommand(Dataset dataset, String command, Map<String, Object> inputMap) {
         try {
-            BatchSingleInput batchSingleInput = new DisplayBatchInput();
-            this.context().inject(batchSingleInput);
+            BatchSingleInput batchSingleInput = new DisplayBatchInput(this.context());
+            //this.context().inject(batchSingleInput);
             batchSingleInput.setDataset(dataset);
+            //setLUT(imageDisplayService.getActiveDatasetView(),batchSingleInput.getDatasetView());
             CommandInfo commandInfo = new CommandInfo(command);
             //this.context().inject(commandInfo);
             Module module = new CommandModule(commandInfo);
@@ -268,13 +262,33 @@ public class PreviewService extends AbstractService implements ImageJService {
             this.context().inject(module.getDelegateObject());
             batchService.executeModule(batchSingleInput, module, false, inputMap);
             Dataset result = batchSingleInput.getDataset();
-            batchSingleInput.getDisplay().close();
-            batchSingleInput.dispose();
             return result;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setLUT(DatasetView input, DatasetView output) {
+        Position activePosition = imageDisplayService.getActivePosition();
+        List<ColorTable> colorTable = input.getColorTables();
+
+        long[] dimension = new long[output.getData().numDimensions() - 2];
+        activePosition.localize(dimension);
+
+        //Set LUT
+        if (input.getData().getImgPlus().getCompositeChannelCount() == 1) {
+            output.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
+        } else {
+            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
+            for (int i = 0; i < colorTable.size(); i++) {
+                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
+                values[i] = b[i];
+
+            }
+            ColorTable8 colorTable8 = new ColorTable8(values);
+            output.setColorTable(colorTable8, 0);
+        }
     }
 
 }

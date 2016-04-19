@@ -226,7 +226,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
         logger.info("Running module");
 
-        Future<Module> run = moduleService.run(module, process, "");
+        Future<Module> run = moduleService.run(module, process);
 
         logger.info(String.format("[%s] module started", moduleName));
 
