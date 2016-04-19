@@ -167,7 +167,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
             
             //Has to use forceUpdateImage
-            paneIconCell.forceUpdate(paneIconCell.getItem());
+            paneIconCell.updateImageAsync(paneIconCell.getItem());
             
             paneIconCell.setSubtitleVisible(false);
         });
