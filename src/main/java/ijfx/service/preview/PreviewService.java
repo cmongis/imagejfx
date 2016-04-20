@@ -19,8 +19,14 @@
  */
 package ijfx.service.preview;
 
+import ijfx.service.batch.BatchService;
+import ijfx.service.batch.BatchSingleInput;
+import ijfx.service.batch.DisplayBatchInput;
+import ijfx.service.batch.FileBatchInput;
+import ijfx.service.batch.ImagePlaneBatchInput;
 import java.awt.image.BufferedImage;
 import static java.lang.Math.toIntExact;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,14 +46,18 @@ import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
+import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable;
 import net.imglib2.display.ColorTable16;
 import net.imglib2.display.ColorTable8;
 import net.imglib2.type.numeric.RealType;
+import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
+import org.scijava.display.DisplayService;
+import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -61,6 +71,9 @@ import org.scijava.service.Service;
 public class PreviewService extends AbstractService implements ImageJService {
 
     @Parameter
+    DisplayService displayService;
+
+    @Parameter
     ImageDisplayService imageDisplayService;
 
     @Parameter
@@ -69,6 +82,8 @@ public class PreviewService extends AbstractService implements ImageJService {
     @Parameter
     CommandService commandService;
 
+    @Parameter
+    BatchService batchService;
     private int width;
     private int height;
     private int x;
@@ -199,44 +214,31 @@ public class PreviewService extends AbstractService implements ImageJService {
      */
     public BufferedImage datasetToBufferedImage(Dataset dataset) {
         DatasetView activeDataview = imageDisplayService.getActiveDatasetView();
-
         final DatasetView view = (DatasetView) imageDisplayService.createDataView(dataset);
         Position activePosition = imageDisplayService.getActivePosition();
-
-        view.getData().setChannelMaximum(0, activeDataview.getChannelMax(activePosition.getIntPosition(0)));
-        view.getData().setChannelMinimum(0, activeDataview.getChannelMin(activePosition.getIntPosition(0)));
-
-        //view.setPosition(activePosition);
-        view.setColorMode(activeDataview.getColorMode());
-
-        //Has to be rebuil to create colorTable
-        view.rebuild();
-        List<ColorTable> colorTable = activeDataview.getColorTables();
-        long[] dimension = new long[dataset.numDimensions() - 2];
-        activePosition.localize(dimension);
-
-        //Set LUT
-        if (activeDataview.getData().getImgPlus().getCompositeChannelCount() == 1) {
-            view.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
-        } 
         
-        
-        else  {
-            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
-            for (int i = 0; i < colorTable.size(); i++) {
-                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
-                values[i] = b[i];
+        //Sometimes activePosition is invalid
+        try {
+            view.getData().setChannelMaximum(0, activeDataview.getChannelMax(activePosition.getIntPosition(0)));
+            view.getData().setChannelMinimum(0, activeDataview.getChannelMin(activePosition.getIntPosition(0)));
 
-            }
-            ColorTable8 colorTable8 = new ColorTable8(values);
-            view.setColorTable(colorTable8, 0);
+            //view.setPosition(activePosition);
+            view.setColorMode(activeDataview.getColorMode());
+
+            //Has to be rebuil to create colorTable
+            view.rebuild();
+            long[] dimension = new long[dataset.numDimensions() - 2];
+            activePosition.localize(dimension);
+
+            //Set LUT
+            setLUT(activeDataview, view);
+
+            int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
+            int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
+            view.setChannelRange(0, minChannel, maxChannel);
+        } catch (Exception e) {
+
         }
-
-
-        int maxChannel = (int) activeDataview.getChannelMax(activePosition.getIntPosition(0));
-        int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
-        view.setChannelRange(0, minChannel, maxChannel);
-
         view.rebuild();
         BufferedImage bufferedImage = view.getScreenImage().image();
         return bufferedImage;
@@ -253,18 +255,41 @@ public class PreviewService extends AbstractService implements ImageJService {
      */
     public Dataset applyCommand(Dataset dataset, String command, Map<String, Object> inputMap) {
         try {
-            Map<String, Object> parameters = new HashMap<>(inputMap);
-            parameters.put("dataset", dataset);
-            final Future<CommandModule> futur = commandService.run(command, false, parameters);
-            Map<String, Object> outMap = futur.get().getOutputs();
-            return (Dataset) outMap.get("dataset");
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PreviewService.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
-            Logger.getLogger(PreviewService.class.getName()).log(Level.SEVERE, null, ex);
+            BatchSingleInput batchSingleInput = new DisplayBatchInput();
+            this.context().inject(batchSingleInput);
+            batchSingleInput.setDataset(dataset);
+            CommandInfo commandInfo = new CommandInfo(command);
+            Module module = new CommandModule(commandInfo);
+            this.context().inject(module.getDelegateObject());
+            batchService.executeModule(batchSingleInput, module, false, inputMap);
+            Dataset result = batchSingleInput.getDataset();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
+    }
 
+    public void setLUT(DatasetView input, DatasetView output) {
+        Position activePosition = imageDisplayService.getActivePosition();
+        List<ColorTable> colorTable = input.getColorTables();
+
+        long[] dimension = new long[output.getData().numDimensions() - 2];
+        activePosition.localize(dimension);
+
+        //Set LUT
+        if (input.getData().getImgPlus().getCompositeChannelCount() == 1) {
+            output.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
+        } else {
+            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
+            for (int i = 0; i < colorTable.size(); i++) {
+                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
+                values[i] = b[i];
+
+            }
+            ColorTable8 colorTable8 = new ColorTable8(values);
+            output.setColorTable(colorTable8, 0);
+        }
     }
 
 }

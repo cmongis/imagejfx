@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.display.DisplayService;
@@ -54,6 +55,8 @@ public class ImagePlaneBatchInput implements BatchSingleInput {
     @Parameter
     DatasetIOService datasetIOService;
     
+    @Parameter
+    DatasetView datasetView;
     Logger logger = ImageJFX.getLogger();
     
     public ImagePlaneBatchInput() {
@@ -147,6 +150,16 @@ public class ImagePlaneBatchInput implements BatchSingleInput {
         dataset = null;
         display.close();
         display = null;
+    }
+
+    @Override
+    public DatasetView getDatasetView() {
+        return this.datasetView;
+    }
+
+    @Override
+    public void setDatasetView(DatasetView datasetView) {
+        this.datasetView = datasetView;
     }
     
 }

@@ -19,12 +19,11 @@
  */
 package ijfx.ui.previewToolbar;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
 import javafx.application.Platform;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javax.swing.ImageIcon;
 import mongis.utils.panecell.PaneIconCell;
 
 /**
@@ -39,7 +38,7 @@ public class FactoryPaneCell {
     }
 
     public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
-        PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
+       PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
         paneIconCell.setImageFactory(i -> i.getImage(previewService,120));
         paneIconCell.setSubtitleVisible(false);
         paneIconCell.setTitleFactory(f -> f.getLabel());

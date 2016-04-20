@@ -1,64 +1,294 @@
- [
-  {
-    "name":"Colors"
-    ,"context":"image-open"
-    ,"icon":"BITCOIN"
-    ,"items":[
-        {
-          "type":"Command"
-          ,"label":"Merge channels"
-          ,"action":"net.imagej.plugins.commands.MergeChannels"
-          ,"icon":"ANDROID"
-          ,"context":"multichannel"
-          
-        }
+[
+    {
+        "name": "Math"
         ,
-        {
-          "type":"Command"
-          ,"label":"Separate channels"
-          ,"action":"net.imagej.plugins.commands.SeparateChannel"
-          ,"icon":"ANDROID"
-          ,"context":"multichannel rgb-image"
-        }
-      ]
-  }
-  ,{
-    "name":"Stacks"
-    ,"context":"image-open multi-z-img"
-    ,"icon":"BITCOIN"
-    ,"items":[
-        {
-          "type":"Command"
-          ,"label":"Merge stacks"
-          ,"action":"net.imagej.plugins.command.MergeStacks"
-          ,"icon":"ANDROID"
-          ,"context":"multi-z-img"
-        }
-        ,{
-          "type":"Command"
-          ,"label":"Separate stacks"
-          ,"action":"net.imagej.plugins.commands.SeparateStacks"
-          ,"icon":"ANDROID"
-          ,"context":"multi-z"
-        }
-      ]
-  },
-  {"name":"Filters"
-  ,"context":"image-open"
-  ,"icon":"BITCOIN"
-  ,"items":[
-        {
-          "type":"Command"
-          ,"label":"Gaussian"
-          ,"action":"net.imagej.plugins.commands.imglib.GaussianBlur"
-          ,"icon":"preview"
-          ,"context":"image-open"
-          ,"parameters":{
-            "sigma":3
-            ,"useUnits":false
-          }
-        }
-      ]
-  }
+        "context": "image-open"
+        ,
+        "icon": "BITCOIN"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Divide"
+                ,
+                "action": "net.imagej.plugins.commands.assign.DivideDataValuesBy"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "image-open"
 
- ]
+            },
+            {
+                "type": "Command"
+                ,
+                "label": "Divide"
+                ,
+                "action": "net.imagej.plugins.commands.assign.DivideDataValuesBy"
+                ,
+                "icon": "/logo.png"
+                ,
+                "context": "image-open"
+
+            }
+        ]
+    },
+    {
+        "name": "Colors"
+        ,
+        "context": "image-open"
+        ,
+        "icon": "BITCOIN"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Merge channels"
+                ,
+                "action": "net.imagej.plugins.commands.MergeChannels"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "multichannel"
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Separate channels"
+                ,
+                "action": "net.imagej.plugins.commands.SeparateChannel"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "multichannel rgb-image"
+            }
+        ]
+    }
+    , {
+        "name": "Stacks"
+        ,
+        "context": "image-open multi-z-img"
+        ,
+        "icon": "BITCOIN"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Add Data..."
+                ,
+                "action": "net.imagej.plugins.commands.restructure.AddData"
+                ,
+                "icon": "preview"
+                ,
+                "context": "multi-z-img"
+            }
+            , {
+                "type": "Command"
+                ,
+                "label": "Delete Data"
+                ,
+                "action": "net.imagej.plugins.commands.restructure.DeleteData"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "multi-z-img"
+            }
+            , {
+                "type": "Command"
+                ,
+                "label": "Reorder Data"
+                ,
+                "action": "net.imagej.plugins.commands.restructure.ReorderData"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "multi-z-img"
+            }
+        ]
+    },
+    {
+        "name": "Filters"
+        ,
+        "context": "image-open"
+        ,
+        "icon": "BITCOIN"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Gaussian"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.GaussianBlur"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "sigma": 3
+                    ,
+                    "useUnits": false
+
+                }
+            }
+        ]
+    },
+    {
+        "name": "Noises"
+        ,
+        "context": "image-open"
+        ,
+        "icon": "BITCOIN"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Add noise..."
+                ,
+                "action": "net.imagej.plugins.commands.assign.AddNoiseToDataValues"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "allPlanes": false
+
+                }
+
+
+            }
+        ]
+    },
+    {
+        "name": "Image"
+        ,
+        "context": "image-open"
+        ,
+        "icon": "BITCOIN"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Threshold"
+                ,
+                "action": "net.imagej.plugins.commands.display.interactive.Threshold"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
+            },
+            {
+                "type": "Command"
+                ,
+                "label": "Auto contrast"
+                ,
+                "action": "net.imagej.plugins.commands.display.AutoContrast"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Resize Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.ResizeImage"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "image-open"
+
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Rotate Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.RotateImageXY"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "angle": 90
+
+                }
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Rotate 90 degrees Right"
+                ,
+                "action": "net.imagej.plugins.commands.rotate.Rotate90DegreesRight"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Rotate 90 degrees Left"
+                ,
+                "action": "net.imagej.plugins.commands.rotate.Rotate90DegreesLeft"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Translate Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.TranslateImage"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "deltasString": "0 = 100.0, 1 = 100.0"
+
+                }
+
+
+            }
+        ]
+    }
+
+
+
+]
