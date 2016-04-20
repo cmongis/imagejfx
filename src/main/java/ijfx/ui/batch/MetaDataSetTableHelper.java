@@ -130,27 +130,23 @@ public class MetaDataSetTableHelper {
                 .collect(Collectors.toSet());
     }
 
-    public int comparePriority(String s1, String s2) {
+    protected int comparePriority(String s1, String s2) {
+
+        Integer is1 = priorityIndex(priority,s1) ;
+        Integer is2 = priorityIndex(priority,s2);
         
+        Integer c = s1.compareTo(s2);
         
-        Integer is1 = -1000+priorityIndex(priority,s1);
-        Integer is2 = -1000+priorityIndex(priority,s2);
-        
-        if(is1 == is2) {
-            return s1.compareTo(s2);
-        }
-        else {
-            return is1.compareTo(is2);
-        }
+        return 100 * (is2-is1) + c;
     }
     
     public int priorityIndex(Set<String> set, String element) {
         int i = 0;
         for(String s : set) {
-            if(s.equals(element)) return i;
+            if(s.equals(element)) return 100-i;
             i++;
         }
-        return -1;
+        return 0;
     }
     
     protected ObservableValue<String> getCellValueFactory(TableColumn.CellDataFeatures<MetaDataSet, String> cell) {

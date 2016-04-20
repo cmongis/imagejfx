@@ -134,5 +134,12 @@ public interface MetaData {
         return data.isNull();
     }
     
+    public static boolean canDisplay(String metadataKey) {
+        return metadataKey.startsWith("*");
+    }
+    public static boolean canDisplay(MetaData m) {
+        return canDisplay(m.getName());
+    }
+    
     // addedd an other useful comment
 }
