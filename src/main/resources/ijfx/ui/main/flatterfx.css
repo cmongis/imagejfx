@@ -495,6 +495,11 @@
 .menu-button .arrow {
     -fx-background-color:-txt-normal;
 }
+
+.menu-button.normal {
+    -fx-padding:0.02em;
+}
+
 .menu-item:focused{
     -fx-background-color: -flatter-primary;
 }
@@ -1782,7 +1787,6 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 /*
     Number filter related classes
-
 */ 
 
 .text-field.number {
@@ -1792,3 +1796,15 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .number-filter #valueCountLabel{
     -fx-font-size:0.7em;
 }
+
+/*
+     Explorer Activity
+ */
+ 
+ #toolbarBorderPane {
+     -fx-padding:10px;
+     -fx-background-color:-bg-darker;
+ }
+ #viewHBox .toggle-button {
+     -fx-padding:0.5em;
+ }
