@@ -17,27 +17,33 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.ui.explorer.view;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.ui.batch.MetaDataSetTableHelper;
+import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerView;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-public class ExplorerTableView implements ExplorerView{
+@Plugin(type = ExplorerView.class)
+public class ExplorerTableVie implements ExplorerView{
 
     TableView<MetaDataSet> tableView = new TableView<>();
     
     MetaDataSetTableHelper helper = new MetaDataSetTableHelper(tableView);
-    
-    public ExplorerTableView() {
+     
+    public ExplorerTableVie() {
         
        helper.setPriority(MetaData.FILE_NAME,MetaData.FILE_SIZE);
         
@@ -46,7 +52,7 @@ public class ExplorerTableView implements ExplorerView{
     @Override
     public Node getNode() {
         return tableView;
-    }
+    } 
 
     @Override
     public void setItem(List<? extends Explorable> items) {
@@ -58,6 +64,11 @@ public class ExplorerTableView implements ExplorerView{
     @Override
     public List<? extends Explorable> getSelectedItems() {
         return null;
+    }
+
+    @Override
+    public Node getIcon() {
+        return new FontAwesomeIconView(FontAwesomeIcon.TABLE);
     }
     
 }

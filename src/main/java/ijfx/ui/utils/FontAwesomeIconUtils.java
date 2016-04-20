@@ -24,10 +24,10 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -66,5 +66,9 @@ public class FontAwesomeIconUtils {
 
         FontAwesomeIconUtils.getImageFromFAI(fontAwesomeIconView, size, wi);
         return wi;
+    }
+    
+    public static Node getIconView(FontAwesomeIcon icon) {
+        return new FontAwesomeIconView(icon);
     }
 }
