@@ -163,6 +163,20 @@
                 }
 
 
+            },
+                        {
+                "type": "Command"
+                ,
+                "label": "Salt and Pepper"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.SaltAndPepper"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
             }
         ]
     },
@@ -171,7 +185,7 @@
         ,
         "context": "image-open"
         ,
-        "icon": "BITCOIN"
+        "icon": "FILE_IMAGE_ALT"
         ,
         "items": [
             {
@@ -195,7 +209,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.display.AutoContrast"
                 ,
-                "icon": "preview"
+                "icon": "ADJUST"
                 ,
                 "context": "image-open"
 
@@ -275,12 +289,12 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.TranslateImage"
                 ,
-                "icon": "preview"
+                "icon": "ANDROID"
                 ,
                 "context": "image-open"
                 ,
                 "parameters": {
-                    "deltasString": "0 = 100.0, 1 = 100.0"
+                    "deltasString": "0=100.0, 1=0.0, 2=0.0"
 
                 }
 
