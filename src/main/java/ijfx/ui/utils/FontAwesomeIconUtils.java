@@ -48,7 +48,7 @@ public class FontAwesomeIconUtils {
             gc.setFont(font);
             gc.setTextAlign(TextAlignment.CENTER);
             gc.setTextBaseline(VPos.CENTER);
-            //gc.setFill(Color.BLACK);
+            gc.setFill(Color.WHITE);
             gc.fillText(unicode, size / 2, size / 2);
             final SnapshotParameters params = new SnapshotParameters();
             params.setFill(Color.TRANSPARENT);
