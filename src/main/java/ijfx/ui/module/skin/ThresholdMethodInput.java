@@ -50,6 +50,8 @@ public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMetho
     @Parameter
     PluginService pluginService;
     
+    
+    
     @Override
     public Property valueProperty() {
         return methodProperty;
@@ -75,6 +77,9 @@ public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMetho
     public void init(Input<ThresholdMethod> input) {
         System.out.println("Initiliazing");
         thresholdMethodComboBox.getItems().addAll(getMethodsList());
+        
+        thresholdMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->methodProperty.setValue(newValue));
+        
     }
     
     public List<ThresholdMethod> getMethodsList() {
