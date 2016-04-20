@@ -216,7 +216,7 @@ public class PreviewService extends AbstractService implements ImageJService {
         DatasetView activeDataview = imageDisplayService.getActiveDatasetView();
         final DatasetView view = (DatasetView) imageDisplayService.createDataView(dataset);
         Position activePosition = imageDisplayService.getActivePosition();
-        
+
         //Sometimes activePosition is invalid
         try {
             view.getData().setChannelMaximum(0, activeDataview.getChannelMax(activePosition.getIntPosition(0)));
@@ -255,6 +255,7 @@ public class PreviewService extends AbstractService implements ImageJService {
      */
     public Dataset applyCommand(Dataset dataset, String command, Map<String, Object> inputMap) {
         try {
+            stringToObject(inputMap);
             BatchSingleInput batchSingleInput = new DisplayBatchInput();
             this.context().inject(batchSingleInput);
             batchSingleInput.setDataset(dataset);
@@ -268,6 +269,25 @@ public class PreviewService extends AbstractService implements ImageJService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private Map<String, Object> stringToObject(Map<String, Object> inputMap) {
+        String keyword = "ToObject:";
+        inputMap.forEach((s, o) -> {
+            try {
+            String valueString = (String) o;
+                if (valueString.contains(keyword)) {
+
+                    valueString = valueString.replaceFirst(keyword, "");
+                    Object object = Class.forName(valueString).getConstructor().newInstance();
+                    inputMap.put(s, object);
+                    Logger.getLogger("Create new instance of " + object.getClass().toString());
+                }
+            } catch (Exception e) {
+                Logger.getLogger(PreviewService.class.getName()).log(Level.SEVERE, null, e);
+            }
+        });
+        return inputMap;
     }
 
     public void setLUT(DatasetView input, DatasetView output) {
