@@ -17,20 +17,23 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
+package ijfx.core.listenableSystem;
 
-import java.io.File;
-import java.io.IOException;
-import net.imagej.Dataset;
-import net.imglib2.type.numeric.RealType;
+import ijfx.core.metadata.MetaDataSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
  * @author cyril
  */
-public interface ImagePlaneService extends IjfxService{
-    
-   <T extends RealType<T>> Dataset extractPlane(File file,long [] dims,long[] dimsLength) throws IOException;
-    Dataset extractPlane(File file, int planeIndex) throws IOException;
-    
+public class MetaDataSetUtils {
+    public static Set<String> getAllPossibleKeys(List<MetaDataSet> setList) {
+        Set<String> possibleKeys = new HashSet<>();
+        setList.forEach(set->{
+            possibleKeys.addAll(set.keySet());
+        });
+        return possibleKeys;
+    }
 }

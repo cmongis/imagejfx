@@ -19,11 +19,10 @@
  */
 package ijfx.service;
 
-import edu.mines.jtk.sgl.Axis;
 import ijfx.core.metadata.MetaDataSet;
-import ijfx.core.utils.DimensionUtils;
 import io.scif.MetadataLevel;
 import io.scif.config.SCIFIOConfig;
+import io.scif.img.ImageRegion;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +58,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     }
 
     @Override
-    public <T extends RealType<T>> Dataset extractPlane(File file, long[] dims) throws IOException {
+    public <T extends RealType<T>> Dataset extractPlane(File file, long[] dims, long[] dimLengths) throws IOException {
 
         final SCIFIOConfig config = new SCIFIOConfig();
 
@@ -69,7 +68,16 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         // prefer planar array structure, for ImageJ1 and ImgSaver compatibility
         config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
         config.parserSetLevel(MetadataLevel.ALL);
-
+        
+        long[] position = new long[dims.length+2];
+        long[] dimemsions = new long[dims.length+2];
+         
+        System.arraycopy(dims, 0, position, 2, dims.length);
+        System.arraycopy(dimLengths,0,dimemsions,2,dims.length);
+        
+        
+        config.imgOpenerSetRange("0");
+        
         Dataset virtualDataset = datasetIoService.open(file.getAbsolutePath(), config);
         Dataset outputDataset = getEmptyPlaneDataset(virtualDataset);
 
@@ -78,8 +86,8 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         System.out.println("dims before");
         System.out.println(ArrayUtils.toString(dims));
 
-        long[] position = new long[virtualDataset.numDimensions()];
-
+        
+        
         System.out.println(ArrayUtils.toString(position));
         System.arraycopy(dims, 0, position, 2, dims.length);
         System.out.println(ArrayUtils.toString(position));
@@ -91,6 +99,8 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         Timer lineTimer = timerService.getTimer("LineTimer");
         Timer pixelTimer = timerService.getTimer("PixelTimer");
         long[] outputPosition = new long[2];
+        
+        
         
         for (long x = 0; x != width; x++) {
             for (long y = 0; y != height; y++) {
@@ -106,10 +116,12 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
                 outputCursor.get().set(inputCursor.get());
                 pixelTimer.measure("pixel reading");
             }
-            lineTimer.elapsed("reading one line");
-            pixelTimer.logAll();
+            lineTimer.measure("reading one line");
+            
             System.out.println("line " + x);
         }
+        pixelTimer.logAll();
+        lineTimer.logAll();
 
         System.out.println("Dataset on the track !");
         return outputDataset;
@@ -122,10 +134,14 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         config.imgOpenerSetComputeMinMax(false);
 
         // prefer planar array structure, for ImageJ1 and ImgSaver compatibility
-        config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
+        config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.AUTO);
+        config.imgOpenerSetRange(String.format("%d-%d",planeIndex,planeIndex));
         config.parserSetLevel(MetadataLevel.ALL);
-
+        
+        config.forEach((key,value)->String.format("%s = %s",key,value.toString()));
+        
         Dataset virtualDataset = datasetIoService.open(file.getAbsolutePath(), config);
+        if(true) return virtualDataset;
         Dataset outputDataset = getEmptyPlaneDataset(virtualDataset);
         
         outputDataset.setPlane(0, virtualDataset.getPlane(planeIndex));

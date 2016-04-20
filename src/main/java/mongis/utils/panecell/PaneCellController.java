@@ -32,7 +32,6 @@ import java.util.stream.IntStream;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
@@ -40,6 +39,7 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import mercury.core.MercuryTimer;
+import mongis.utils.AsyncCallback;
 import mongis.utils.properties.ServiceProperty;
 
 /**
@@ -87,8 +87,44 @@ public class PaneCellController<T extends Object> {
      *  Give it a list of items coming from the model and the controller will update
      *  the pane. If necessary, new PanelCell will be created. Unnecessary PaneCells
      *  will be cached.
-     * @param List of items coming from the model
+     * @param items List of items coming from the model
      */
+    public synchronized void update(List<T> items) {
+        
+        new AsyncCallback<Integer,List<PaneCell<T>>>()
+                .setInput(items.size())
+                .run(this::retrieve)
+                .then(controllers->{
+                     MercuryTimer timer = new MercuryTimer("Browser view");
+                     timer.start();
+                    pane.getChildren().clear();
+                    pane.getChildren().addAll(getContent(controllers));
+                    timer.elapsed("Adding all the controllers");
+                    for(int i = 0;i!=items.size();i++) {
+                        controllers.get(i).setItem(items.get(i));
+                    }
+                    timer.elapsed("Updating all the controllers");
+                    
+                })
+                .start();
+         
+    }
+
+    
+    private List<PaneCell<T>> retrieve(Integer number) {
+        
+         MercuryTimer timer = new MercuryTimer("Browser view");
+         int cacheSize = cachedControllerList.size();
+         int missingControllers = number-cacheSize;
+         timer.start();
+        if(missingControllers > 0) {  
+            fillCache(missingControllers);
+        }
+        timer.elapsed("Time to fetch controllers");
+        return cachedControllerList.subList(0, number);
+    }
+    
+    /*
     public synchronized void update(List<T> items) {
 
         try {
@@ -178,7 +214,7 @@ public class PaneCellController<T extends Object> {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Couln't update the controllers", e);
         }
-    }
+    }*/
 
     // get the list of cells
     protected Collection<Node> getContent(Collection<PaneCell<T>> cellList) {
@@ -190,7 +226,7 @@ public class PaneCellController<T extends Object> {
     // fills the cache by creating a certain number of cells
     private void fillCache(int number) {
 
-        cachedControllerList.addAll(IntStream.range(0, number).parallel().mapToObj(n -> createPaneCell()).collect(Collectors.toList()));
+        cachedControllerList.addAll(IntStream.range(0, number+1).parallel().mapToObj(n -> createPaneCell()).collect(Collectors.toList()));
 
     }
     

@@ -1060,10 +1060,17 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-padding:10;
 }
 
-.popoverToolBar{
-    -fx-fill:-bg-light!important;
+.imagej-top-toolbar-bar {
     -fx-background-color:-bg-darker;
-    -fx-stroke:-bg-darker!important;
+      -fx-padding:0.7em;
+}
+.popoverToolBar{
+    
+    -fx-background-color:-bg-darker;
+    -fx-stroke-fill:null;
+}
+.popoverToolBar > * {
+    -fx-stroke:null;
 }
 
 .icon-toolbar{

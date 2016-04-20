@@ -28,17 +28,26 @@ import javafx.event.Event;
 /**
  *
  * @author cyril
+ * @param <OUTPUT> The type of object the callable should output and handle
  */
 public class AsyncCallable<OUTPUT> extends Task<OUTPUT> {
 
-    Callable<OUTPUT> callable;
+    private Callable<OUTPUT> callable;
     
-    Consumer<OUTPUT> consumer;
+    private Consumer<OUTPUT> consumer;
     
+    private String name;
     
     public AsyncCallable() {
         super();
         setOnSucceeded(this::onSucceed);
+    }
+    
+    public AsyncCallable<OUTPUT> setTitle(String name) {
+        
+        updateTitle(name);
+        updateMessage(name);
+        return this;
     }
     
     public void onSucceed(Event event) {

@@ -116,7 +116,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @Parameter
     StatusService statusService;
 
-    ExplorerView view = new IconView();
+    ExplorerView view = new ExplorerTableView();
 
     List<Runnable> folderUpdateHandler = new ArrayList<>();
 

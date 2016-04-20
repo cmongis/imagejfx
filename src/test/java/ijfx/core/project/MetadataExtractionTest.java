@@ -93,7 +93,7 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
         Assert.assertEquals(tCount * zCount*channelCount, mList.size());
     }
 
-   @Test
+   
     public void testPlaneExtraction() throws IOException {
         init();
 
@@ -102,7 +102,7 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
         String testFile = MetadataExtractionTest.testFile.getPath();//OMG!!!!"/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
         for (int i = 0; i != 100; i++) {
             t.start();
-            Dataset dataset = imagePlaneService.extractPlane(new File(testFile), new long[]{0});
+            Dataset dataset = imagePlaneService.extractPlane(new File(testFile), new long[]{0},new long[]{3});
             t.elapsed("Dataset reading"); 
         }
         t.logAll();
