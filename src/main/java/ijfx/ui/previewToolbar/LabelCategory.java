@@ -34,7 +34,7 @@ import javafx.scene.layout.Pane;
  *
  * @author Tuan anh TRINH
  */
-public class LabelCategory extends Label implements ContextualViewWrapper{
+public class LabelCategory extends Label {
 
     private final PaneContextualView contextualView;
     private final FontAwesomeIconView fontAwesomeIconView;
@@ -51,7 +51,6 @@ public class LabelCategory extends Label implements ContextualViewWrapper{
         this.context = context;
     }
 
-    @Override
     public PaneContextualView getContextualView() {
         return contextualView;
     }
