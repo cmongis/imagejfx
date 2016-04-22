@@ -19,33 +19,16 @@
  */
 package ijfx.ui.previewToolbar;
 
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
-import javafx.application.Platform;
-import mongis.utils.panecell.PaneIconCell;
+import mongis.utils.panecell.PaneIconCellPreview;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class FactoryPaneCell {
+interface FactoryPaneCell {
+        public LabelCategory generateLabel(ItemCategory itemCategory, UiContextService contextService);
+            public PaneIconCellPreview generate(ItemWidget itemWidget, PreviewService previewService);
 
-    public static LabelCategory generateLabel(ItemCategory itemCategory, UiContextService contextService) {
-        LabelCategory labelCategory = new LabelCategory(itemCategory.getName(),itemCategory.getIcon(), contextService, itemCategory.getContext());
-        return labelCategory;
-    }
-
-    public static PaneIconCell generate(ItemWidget itemWidget, PreviewService previewService) {
-       PaneIconCell<ItemWidget> paneIconCell = new PaneIconCell();
-        paneIconCell.setImageFactory(i -> i.getImage(previewService,120));
-        paneIconCell.setSubtitleVisible(false);
-        paneIconCell.setTitleFactory(f -> f.getLabel());
-        paneIconCell.setLoadImageOnlyWhenVisible(false);
-        paneIconCell.setItem(itemWidget);
-
-        return paneIconCell;
-
-    }
 }
