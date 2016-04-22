@@ -1067,7 +1067,8 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 .imagej-top-toolbar-bar {
     -fx-background-color:-bg-darker;
-      -fx-padding:0.7em;
+    -fx-spacing: 20;
+    -fx-padding: 20 10 20 10;
 }
 .popoverToolBar{
     
