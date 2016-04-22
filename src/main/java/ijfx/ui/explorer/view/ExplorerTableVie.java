@@ -22,13 +22,16 @@ package ijfx.ui.explorer.view;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaData;
-import ijfx.core.metadata.MetaDataSet;
-import ijfx.ui.batch.MetaDataSetTableHelper;
+import ijfx.core.metadata.MetaDataOwner;
+import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerView;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.beans.Observable;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 import org.scijava.plugin.Plugin;
 
@@ -39,12 +42,18 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = ExplorerView.class)
 public class ExplorerTableVie implements ExplorerView{
 
-    TableView<MetaDataSet> tableView = new TableView<>();
+    TableView<MetaDataOwner> tableView = new TableView<>();
     
-    MetaDataSetTableHelper helper = new MetaDataSetTableHelper(tableView);
+    MetaDataSetOwnerHelper helper = new MetaDataSetOwnerHelper(tableView);
      
+    
+    List<? extends Explorable> currentItems;
     public ExplorerTableVie() {
         
+        System.out.println("Listening now");
+       tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+       tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
+       tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
        helper.setPriority(MetaData.FILE_NAME,MetaData.FILE_SIZE);
         
     }
@@ -56,19 +65,64 @@ public class ExplorerTableVie implements ExplorerView{
 
     @Override
     public void setItem(List<? extends Explorable> items) {
-        List<MetaDataSet> mList = items.stream().map(e->e.getMetaDataSet()).collect(Collectors.toList());
-        helper.setColumnsFromItems(mList);
-        helper.setItem(mList);
+        
+        helper.setColumnsFromItems(items);
+        helper.setItem(items);
+        currentItems = items;
     }
 
     @Override
     public List<? extends Explorable> getSelectedItems() {
-        return null;
+        return tableView
+                .getSelectionModel()
+                .getSelectedItems()
+                .stream()
+                .map(i->(Explorable)i)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Node getIcon() {
         return new FontAwesomeIconView(FontAwesomeIcon.TABLE);
     }
+
+    @Override
+    public void setSelectedItem(List<? extends Explorable> items) {
+        items.forEach(tableView.getSelectionModel()::select);
+    }
     
+    private void onListChange(ListChangeListener.Change<? extends MetaDataOwner> changes) {
+        
+        while(changes.next()) {
+          
+            changes.getAddedSubList()
+                    .stream()
+                    .map(owner->(Explorable)owner)
+                    .forEach(explo->explo.selectedProperty().setValue(true));
+            
+            changes.getRemoved()
+                    .stream()
+                    .map(owner->(Explorable)owner)
+                    .forEach(explo->explo.selectedProperty().setValue(false));
+        }
+    }
+    
+    private void onSelectedItemChanged(Observable obs, MetaDataOwner oldValue, MetaDataOwner newValue) {
+        currentItems.forEach(item->{
+            item.selectedProperty().setValue(tableView.getSelectionModel().getSelectedItems().contains(item));
+        });
+    }
+    
+    
+   
+    
+    private void select(MetaDataOwner owner) {
+        if(owner==null)return;
+        ((Explorable)owner).selectedProperty().setValue(true);
+    }
+    
+    private void unselect(MetaDataOwner owner) {
+        if(owner == null) return;
+        ((Explorable)owner).selectedProperty().setValue(false);
+    }
 }

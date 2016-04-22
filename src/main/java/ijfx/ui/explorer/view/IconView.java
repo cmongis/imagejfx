@@ -110,5 +110,10 @@ public class IconView extends ScrollPane implements ExplorerView {
     public Node getIcon() {
         return new FontAwesomeIconView(FontAwesomeIcon.CUBES);
     }
+
+    @Override
+    public void setSelectedItem(List<? extends Explorable> items) {
+      
+    }
     
 }
