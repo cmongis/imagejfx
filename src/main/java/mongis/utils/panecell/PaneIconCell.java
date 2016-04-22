@@ -78,7 +78,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     private ImageView imageView;
 
     @FXML
-    private Label titleLabel;
+    protected Label titleLabel;
 
     @FXML
     private Label subtitleLabel;

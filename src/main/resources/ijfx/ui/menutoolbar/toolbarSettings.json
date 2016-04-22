@@ -221,7 +221,7 @@
             {
                 "type": "Command"
                 ,
-                "label": "NoiseReductionAdaptiveMedian"
+                "label": "Noise Reduction Adaptive Median"
                 ,
                 "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAdaptiveMedian"
                 ,
@@ -236,7 +236,7 @@
             {
                 "type": "Command"
                 ,
-                "label": "NoiseReductionAlphaTrimmedMean"
+                "label": "Noise Reduction Alpha Trimmed Mean"
                 ,
                 "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAlphaTrimmedMean"
                 ,
@@ -256,7 +256,7 @@
             {
                 "type": "Command"
                 ,
-                "label": "NoiseReductionGeometricMean"
+                "label": "Noise Reduction Geometric Mean"
                 ,
                 "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionGeometricMean"
                 ,
@@ -276,7 +276,7 @@
             {
                 "type": "Command"
                 ,
-                "label": "NoiseReductionHarmonicMean"
+                "label": "Noise Reduction Harmonic Mean"
                 ,
                 "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionHarmonicMean"
                 ,

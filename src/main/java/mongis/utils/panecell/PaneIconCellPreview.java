@@ -17,18 +17,18 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.previewToolbar;
-
-import ijfx.service.preview.PreviewService;
-import ijfx.service.uicontext.UiContextService;
-import mongis.utils.panecell.PaneIconCellPreview;
+package mongis.utils.panecell;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-interface FactoryPaneCell {
-        public LabelCategory generateLabel(ItemCategory itemCategory, UiContextService contextService);
-            public PaneIconCellPreview generate(ItemWidget itemWidget, PreviewService previewService);
+public class PaneIconCellPreview<T> extends PaneIconCell<T>{
 
+    public PaneIconCellPreview() {
+    super();
+            titleLabel.setPrefSize(200, 200);
+    }
+    
+    
 }
