@@ -1,4 +1,5 @@
 [
+
     {
         "name": "Math"
         ,
@@ -22,9 +23,33 @@
             {
                 "type": "Command"
                 ,
-                "label": "Divide"
+                "label": "Multiply"
                 ,
-                "action": "net.imagej.plugins.commands.assign.DivideDataValuesBy"
+                "action": "net.imagej.plugins.commands.assign.MultiplyDataValuesBy"
+                ,
+                "icon": "/logo.png"
+                ,
+                "context": "image-open"
+
+            },
+            {
+                "type": "Command"
+                ,
+                "label": "Add"
+                ,
+                "action": "net.imagej.plugins.commands.assign.AddToDataValues"
+                ,
+                "icon": "/logo.png"
+                ,
+                "context": "image-open"
+
+            },
+            {
+                "type": "Command"
+                ,
+                "label": "Subtract"
+                ,
+                "action": "net.imagej.plugins.commands.assign.SubtractFromDataValues"
                 ,
                 "icon": "/logo.png"
                 ,
@@ -36,7 +61,7 @@
     {
         "name": "Colors"
         ,
-        "context": "image-open"
+        "context": "multichannel+image-open"
         ,
         "icon": "BITCOIN"
         ,
@@ -65,12 +90,25 @@
                 ,
                 "context": "multichannel rgb-image"
             }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Auto contrast"
+                ,
+                "action": "net.imagej.plugins.commands.display.AutoContrast"
+                ,
+                "icon": "ADJUST"
+                ,
+                "context": "Image-Colors"
+
+            }
         ]
     }
     , {
         "name": "Stacks"
         ,
-        "context": "image-open multi-z-img"
+        "context": "multi-z-img"
         ,
         "icon": "BITCOIN"
         ,
@@ -163,7 +201,98 @@
                 }
 
 
+            },
+            {
+                "type": "Command"
+                ,
+                "label": "Salt and Pepper"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.SaltAndPepper"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+
             }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "NoiseReductionAdaptiveMedian"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAdaptiveMedian"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "NoiseReductionAlphaTrimmedMean"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAlphaTrimmedMean"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "neighTypeString": "RECTANGULAR_STRING"
+
+                }
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "NoiseReductionGeometricMean"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionGeometricMean"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "neighTypeString": "RECTANGULAR_STRING"
+
+                }
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "NoiseReductionHarmonicMean"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionHarmonicMean"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "neighTypeString": "RECTANGULAR_STRING"
+
+                }
+
+
+            }
+
+
         ]
     },
     {
@@ -171,7 +300,7 @@
         ,
         "context": "image-open"
         ,
-        "icon": "BITCOIN"
+        "icon": "FILE_IMAGE_ALT"
         ,
         "items": [
             {
@@ -180,20 +309,6 @@
                 "label": "Threshold"
                 ,
                 "action": "net.imagej.plugins.commands.display.interactive.Threshold"
-                ,
-                "icon": "preview"
-                ,
-                "context": "image-open"
-
-
-
-            },
-            {
-                "type": "Command"
-                ,
-                "label": "Auto contrast"
-                ,
-                "action": "net.imagej.plugins.commands.display.AutoContrast"
                 ,
                 "icon": "preview"
                 ,
@@ -275,19 +390,135 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.TranslateImage"
                 ,
-                "icon": "preview"
+                "icon": "ANDROID"
                 ,
                 "context": "image-open"
                 ,
                 "parameters": {
-                    "deltasString": "0 = 100.0, 1 = 100.0"
+                    "deltasString": "0=100.0, 1=0.0, 2=0.0"
 
                 }
 
 
             }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Crop Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.CropImage"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "image-open"
+
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Duplicate Image"
+                ,
+                "action": "net.imagej.plugins.commands.imglib.DuplicateImage"
+                ,
+                "icon": "ANDROID"
+                ,
+                "context": "image-open"
+
+
+
+            }
         ]
     }
+
+    ,
+    {
+        "name": "Binary"
+        ,
+        "context": "image-open"
+        ,
+        "icon": "BITCOIN"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Binarize"
+                ,
+                "action": "net.imagej.plugins.commands.binary.Binarize"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "method": "ToObject:net.imagej.threshold.DefaultThresholdMethod",
+                    "maskColor" : "Black"
+                }
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "ErodeBinaryImage"
+                ,
+                "action": "net.imagej.plugins.commands.binary.ErodeBinaryImage"
+                ,
+                "icon": "preview"
+                ,
+                "context": "binary"
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "DilateBinaryImage"
+                ,
+                "action": "net.imagej.plugins.commands.binary.DilateBinaryImage"
+                ,
+                "icon": "preview"
+                ,
+                "context": "binary"
+  
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Open binary image"
+                ,
+                "action": "net.imagej.plugins.commands.binary.OpenBinaryImage"
+                ,
+                "icon": "preview"
+                ,
+                "context": "binary"
+
+
+            }
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Close binary image"
+                ,
+                "action": "net.imagej.plugins.commands.binary.CloseBinaryImage"
+                ,
+                "icon": "preview"
+                ,
+                "context": "binary"
+
+            }
+        ]
+    }
+
 
 
 
