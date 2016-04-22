@@ -61,7 +61,7 @@
     {
         "name": "Colors"
         ,
-        "context": "image-open"
+        "context": "multichannel+image-open"
         ,
         "icon": "BITCOIN"
         ,
@@ -100,7 +100,7 @@
                 ,
                 "icon": "ADJUST"
                 ,
-                "context": "image-open"
+                "context": "Image-Colors"
 
             }
         ]
@@ -108,7 +108,7 @@
     , {
         "name": "Stacks"
         ,
-        "context": "image-open multi-z-img"
+        "context": "multi-z-img"
         ,
         "icon": "BITCOIN"
         ,

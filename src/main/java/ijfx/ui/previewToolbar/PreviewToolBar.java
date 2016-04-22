@@ -24,11 +24,14 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
+import ijfx.ui.context.ContextualWidget;
+import ijfx.ui.context.PaneContextualView;
 import ijfx.ui.main.Localization;
 import java.util.HashMap;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import mongis.utils.panecell.PaneIconCell;
@@ -60,17 +63,11 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     PluginService pluginService;
     @Parameter
     UiContextService contextService;
-    private HBox fakeToolBar;
     private PopOver popOver;
     private JsonReader jsonReader;
 
     public PreviewToolBar() {
         super();
-
-        fakeToolBar = new HBox();
-        fakeToolBar.setSpacing(10);
-        fakeToolBar.getStyleClass().add("imagej-top-toolbar-bar");
-        this.setTop(fakeToolBar);
 
     }
 
@@ -81,19 +78,22 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     @Override
     public UiPlugin init() {
-//                context.inject(this);
-
-        createToolBar(fakeToolBar);
+        createToolBar();
 
         return this;
     }
 
-    private void createToolBar(HBox hbox) {
+    private void createToolBar() {
+        Pane fakeToolBar;
+        fakeToolBar = new FlowPane();
+        PaneContextualView paneContextualView = new PaneContextualView(contextService, fakeToolBar, "ToolBar-Context-Dependant");
+        fakeToolBar.getStyleClass().add("imagej-top-toolbar-bar");
+        this.setTop(fakeToolBar);
         jsonReader = new JsonReader();
         jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
         jsonReader.separate();
         popOver = new PopOver();
-        generateItems(jsonReader, hbox);
+        generateItems(jsonReader, paneContextualView);
     }
 
     /**
@@ -155,18 +155,18 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
         });
     }
-/**
- * 
- * @param labelCategory 
- */
+
+    /**
+     *
+     * @param labelCategory
+     */
     public void onEnter(LabelCategory labelCategory) {
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCell paneIconCell = (PaneIconCell) e;
 
-            
             //Has to use forceUpdateImage
             paneIconCell.updateImageAsync(paneIconCell.getItem());
-            
+
             paneIconCell.setSubtitleVisible(false);
         });
         if (!labelCategory.getPane().getChildren().isEmpty()) {
@@ -180,14 +180,15 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     /**
      * Generate ItemCategory and ItemWidget with FactoryPaneCell
      *
+     * @param paneContextualView
      * @see ijfx.ui.previewToolbar.FactoryPaneCell
      * @param jsonReader
-     * @param fakeToolBar
      */
-    public void generateItems(JsonReader jsonReader, HBox fakeToolBar) {
+    public void generateItems(JsonReader jsonReader, PaneContextualView paneContextualView) {
         jsonReader.getCategoryList().stream().forEach((e) -> {
             LabelCategory labelCategory = FactoryPaneCell.generateLabel(e, contextService);
-            fakeToolBar.getChildren().add(labelCategory);
+            labelCategory.setId(labelCategory.getText());
+            paneContextualView.registerNode(labelCategory, labelCategory.getContext());
             setMouseAction(labelCategory);
         });
 
@@ -196,18 +197,15 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
             String itemContext = ((ItemWidget) paneIconCell.getItem()).getContext();
             paneIconCell.setId(((ItemWidget) paneIconCell.getItem()).getLabel());
 
-            for (Node node : fakeToolBar.getChildren()) {
-                LabelCategory labelCategory = (LabelCategory) node;
+            for (ContextualWidget<Node> node : paneContextualView.getWidgetList()) {
+                LabelCategory labelCategory = (LabelCategory) node.getObject();
 
-                if (itemContext.substring(itemContext.lastIndexOf("+") + 1).equals(labelCategory.getText()))
-                {
-                    labelCategory.getContextualView().registerNode(paneIconCell, itemContext.substring(0,itemContext.lastIndexOf("+")));
-
+                if (itemContext.substring(itemContext.lastIndexOf("+") + 1).equals(labelCategory.getText())) {
+                    labelCategory.getContextualView().registerNode(paneIconCell, itemContext.substring(0, itemContext.lastIndexOf("+")));
                 }
             }
 
             paneIconCell.setOnMouseClicked(event -> {
-                //TODO set 
                 CommandInfo commandInfo = new CommandInfo(paneIconCell.getItem().getAction());
                 commandService.run(commandInfo, true);
                 System.out.println("Click Action " + paneIconCell.getItem().getLabel() + paneIconCell.getItem().getContext());

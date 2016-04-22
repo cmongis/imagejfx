@@ -34,22 +34,24 @@ import javafx.scene.layout.Pane;
  *
  * @author Tuan anh TRINH
  */
-public class LabelCategory extends Label {
+public class LabelCategory extends Label implements ContextualViewWrapper{
 
     private final PaneContextualView contextualView;
     private final FontAwesomeIconView fontAwesomeIconView;
     private Pane pane;
+    private final String context;
 
-
-    public LabelCategory(String s, String icon, UiContextService contextService) {
+    public LabelCategory(String s, String icon, UiContextService contextService, String context) {
         super(s);
         fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
         WritableImage wi = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, (int) Double.parseDouble(fontAwesomeIconView.getSize()));
         this.setGraphic(new ImageView(wi));
         pane = new FlowPane();
         contextualView = new PaneContextualView(contextService, pane, this.getText());
+        this.context = context;
     }
 
+    @Override
     public PaneContextualView getContextualView() {
         return contextualView;
     }
@@ -60,6 +62,11 @@ public class LabelCategory extends Label {
 
     public Pane getPane() {
         return pane;
+    }
+    
+    public String getContext()
+    {
+        return context;
     }
 
 }
