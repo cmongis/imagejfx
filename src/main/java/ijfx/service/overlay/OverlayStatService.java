@@ -44,7 +44,6 @@ import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.scijava.Context;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -79,7 +78,21 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public final static String LBL_AREA = "Area";
     public final static String LBL_MAX = "Max";
     public final static String LBL_MIN = "Min";
-    public final static String LBL_ = "";
+    public final static String LBL_SD = "Std. Dev.";
+    public final static String LBL_VARIANCE = "Variance";
+    public final static String LBL_PIXEL_COUNT = "Pixel count";
+    
+    public final static String LBL_MBR = "Minimum Bounding Rectangle";
+    public final static String LBL_CENTROID = "Center of Gravity";
+    public final static String LBL_MAX_FERET_DIAMETER = "Feret Diameter";
+    public final static String LBL_MIN_FERET_DIAMETER = "Min. Feret Diameter";
+    public final static String LBL_LONG_SIDE_MBR = "Long Side MBR";
+    public final static String LBL_SHORT_SIDE_MBR = "Short Side MBR";
+    public final static String LBL_ASPECT_RATIO ="Aspect ratio";
+    public final static String LBL_CONVEXITY = "Convexity";
+    public final static String LBL_SOLIDITY = "Solidity";
+    public final static String LBL_CIRCULARITY = "Circularity";
+    public final static String LBL_THINNES_RATIO = "Thinnes ratio";
 
     public HashMap<String, Double> getStat(ImageDisplay imageDisplay, Overlay overlay) {
 
@@ -259,5 +272,32 @@ public class OverlayStatService extends AbstractService implements ImageJService
             overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());
         
         return overlayStatistics;
+    }
+    
+    
+    public HashMap<String, Double> getStatistics(OverlayStatistics overlayStats) {
+        
+        HashMap<String, Double> statistics = new HashMap<>();
+        
+        statistics.put(LBL_MEAN, overlayStats.getMean());
+        statistics.put(LBL_MIN, overlayStats.getMin());
+        statistics.put(LBL_MAX, overlayStats.getMax());
+        statistics.put(LBL_SD, overlayStats.getStandardDeviation());
+        statistics.put(LBL_VARIANCE, overlayStats.getVariance());
+        statistics.put(LBL_MEDIAN, overlayStats.getMedian());
+        statistics.put(LBL_AREA, overlayStats.getArea());
+        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelCount());
+        
+        statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
+        statistics.put(LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
+        statistics.put(LBL_LONG_SIDE_MBR, overlayStats.getLongSideMBR());
+        statistics.put(LBL_SHORT_SIDE_MBR, overlayStats.getShortSideMBR());
+        statistics.put(LBL_ASPECT_RATIO, overlayStats.getAspectRatio());
+        statistics.put(LBL_CONVEXITY, overlayStats.getConvexity());
+        statistics.put(LBL_SOLIDITY, overlayStats.getSolidity());
+        statistics.put(LBL_CIRCULARITY, overlayStats.getCircularity());
+        statistics.put(LBL_THINNES_RATIO, overlayStats.getThinnesRatio());
+        
+        return statistics;
     }
 }

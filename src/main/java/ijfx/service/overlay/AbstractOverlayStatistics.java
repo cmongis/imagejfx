@@ -229,8 +229,8 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
                 +"\n\t Median : "+this.median
                 +"\n\t Area : "+this.area
                 +"\n\t PixelCount : "+this.pixelCount
-                +"\n\t Minimum Bounding Rectangle : "+ this.minimumBoundingRectangle
-                +"\n\t Center of gravity : "+ this.centerOfGravity
+                +"\n\t Minimum Bounding Rectangle : "+ this.minimumBoundingRectangle.toString()
+                +"\n\t Center of gravity : "+ this.centerOfGravity.toString()
                 +"\n\t Maximum Feret's diameter : "+ this.feretDiameter
                 +"\n\t Minimum Feret's diameter : "+ this.minFeretDiameter
                 +"\n\t Long Side MBR : "+ this.longSideMBR
