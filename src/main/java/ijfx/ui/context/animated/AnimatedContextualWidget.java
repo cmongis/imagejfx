@@ -35,6 +35,8 @@ public class AnimatedContextualWidget implements ContextualWidget<Node> {
     String name;
     Node component;
 
+    double priority = 0;
+    
     HashMap<String, Animations> transitionMap = new HashMap<>();
 
     Runnable onAnimationEnded;
@@ -184,6 +186,11 @@ public class AnimatedContextualWidget implements ContextualWidget<Node> {
     @Override
     public Node getObject() {
         return component;
+    }
+
+    @Override
+    public double getPriority() {
+        return priority;
     }
 
 }

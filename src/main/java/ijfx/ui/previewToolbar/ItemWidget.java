@@ -37,5 +37,5 @@ public interface ItemWidget extends Item{
     public void removeSpaceContext();
     public Map<String, Object> getParameters();
     public Image getImage(PreviewService previewService, int size);
-    
+  
 }

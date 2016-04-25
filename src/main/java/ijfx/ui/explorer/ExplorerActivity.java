@@ -483,6 +483,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void process() {
 
     }
+    @FXML
+    public void openSelection() {
+        explorerService.getSelectedItems().forEach(System.out::println);
+    }
 
     public boolean isEverythingSelected() {
         if (explorerService == null) {

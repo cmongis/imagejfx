@@ -51,6 +51,7 @@ public class LabelCategory extends Label {
         this.context = context;
     }
 
+   
     public PaneContextualView getContextualView() {
         return contextualView;
     }

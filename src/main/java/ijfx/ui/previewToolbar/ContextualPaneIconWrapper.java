@@ -34,6 +34,8 @@ public class ContextualPaneIconWrapper  implements ContextualWidget, ContextualP
     private final Node node;
     private final Pane parentPane;
 
+    double order = 0.0;
+    
     public ContextualPaneIconWrapper(Pane parentPane, Node node, String context) {
         this.node = node;
         this.parentPane = parentPane;
@@ -94,11 +96,23 @@ public class ContextualPaneIconWrapper  implements ContextualWidget, ContextualP
     @Override
     public Node getObject() {
         System.out.println("Node "+node);
+        
         return node;
     }
 
     public String toString() {
         return node.toString();
     }
+
+    @Override
+    public double getPriority() {
+        return order;
+    }
+
+    public void setOrder(double order) {
+        this.order = order;
+    }
+    
+    
 
 }

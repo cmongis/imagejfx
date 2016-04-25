@@ -27,7 +27,7 @@
          <bottom>
             <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
                <children>
-                  <Button mnemonicParsing="false" text="Open">
+                  <Button mnemonicParsing="false" onAction="#openSelection" text="Open">
                      <graphic>
                         <FontAwesomeIconView glyphName="IMAGE" />
                      </graphic>

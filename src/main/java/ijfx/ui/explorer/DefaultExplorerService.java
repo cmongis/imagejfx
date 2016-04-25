@@ -104,4 +104,17 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
        applyFilter(lastFilter);
     }
 
+    @Override
+    public List<? extends Explorable> getSelectedItems() {
+        return filteredList
+                .stream()
+                .filter(item->item.selectedProperty().getValue())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void selectItem(Explorable explorable) {
+        explorable.selectedProperty().setValue(true);
+    }
+
 }

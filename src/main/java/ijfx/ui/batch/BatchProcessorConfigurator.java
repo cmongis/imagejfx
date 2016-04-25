@@ -420,7 +420,6 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
         List<BatchSingleInput> inputs = new ArrayList<>();
         PlaneSet<PlaneDB> planeSet = planeSetComboBox.getSelectionModel().getSelectedItem();
         for (PlaneDB plane : planeSet.getPlaneList()) {
-
             PlaneDBBatchInput input = new PlaneDBBatchInput(planeSet.getProjectDisplay().getProject(),plane,PlaneDBBatchInput.SaveMode.REPLACE_ENTRY);
 
             //context.inject(input);

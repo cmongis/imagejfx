@@ -185,10 +185,12 @@ public class LoadingScreen extends StackPane {
         }
         
         Bounds boundsInParent = node.getBoundsInParent();
-        double with = boundsInParent.getWidth();
+        double width = boundsInParent.getWidth();
         double height = boundsInParent.getHeight();
-        rectangle.setWidth(with);
-        rectangle.setHeight(height);
+        rectangle.setWidth(300);
+        rectangle.setHeight(300);
+        setTranslateX(width/2-150);
+        setTranslateY(height/2-150);
         //MainWindowController.logger.info("" + node.getWidth());
         
         if(node.getChildren().contains(this) == false)   {

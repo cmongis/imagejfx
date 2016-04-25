@@ -20,6 +20,7 @@
 package ijfx.ui.batch;
 
 import ijfx.core.listenableSystem.MetaDataSetUtils;
+import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,19 +40,19 @@ import javafx.scene.control.TableView;
  *
  * @author cyril
  */
-public class MetaDataSetTableHelper {
+public class MetaDataSetOwnerHelper {
 
-    final TableView<MetaDataSet> tableView;
+    final TableView<MetaDataOwner> tableView;
 
     Set<String> currentColumns = new HashSet<>();
 
     LinkedHashSet<String> priority = new LinkedHashSet();
     
-    public MetaDataSetTableHelper(TableView<MetaDataSet> tableView) {
+    public MetaDataSetOwnerHelper(TableView<MetaDataOwner> tableView) {
         this.tableView = tableView;
     }
 
-    public void setItem(List<MetaDataSet> mList) {
+    public void setItem(List<? extends MetaDataOwner> mList) {
         tableView.getItems().clear();
         tableView.getItems().addAll(mList);
     }
@@ -69,7 +70,11 @@ public class MetaDataSetTableHelper {
         updateColumns(columnList);
     }
 
-    public void setColumnsFromItems(List<MetaDataSet> mList) {
+    public void setColumnsFromItems(List<? extends MetaDataOwner> items) {
+        List<MetaDataSet> mList = items
+                .stream()
+                .map(i->i.getMetaDataSet())
+                .collect(Collectors.toList());
         updateColumns(MetaDataSetUtils.getAllPossibleKeys(mList).stream().collect(Collectors.toList()));
     }
 
@@ -106,8 +111,8 @@ public class MetaDataSetTableHelper {
         }
     }
 
-    private TableColumn<MetaDataSet, String> generateColumn(String key) {
-        TableColumn<MetaDataSet, String> column = new TableColumn<>();
+    private TableColumn<MetaDataOwner, String> generateColumn(String key) {
+        TableColumn<MetaDataOwner, String> column = new TableColumn<>();
         column.setUserData(key);
         column.setCellValueFactory(this::getCellValueFactory);
         return column;
@@ -149,9 +154,9 @@ public class MetaDataSetTableHelper {
         return 0;
     }
     
-    protected ObservableValue<String> getCellValueFactory(TableColumn.CellDataFeatures<MetaDataSet, String> cell) {
+    protected ObservableValue<String> getCellValueFactory(TableColumn.CellDataFeatures<MetaDataOwner, String> cell) {
         String key = cell.getTableColumn().getUserData().toString();
-        String value = cell.getValue().get(key).getStringValue();
+        String value = cell.getValue().getMetaDataSet().get(key).getStringValue();
         return new ReadOnlyObjectWrapper<>(value);
     }
 

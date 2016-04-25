@@ -30,7 +30,7 @@ public class DefaultWidget implements ItemWidget {
     public DefaultWidget() {
     }
 
-    public DefaultWidget(String type, String label, String action, String icon, String context, Map<String, Object> parameters) {
+    public DefaultWidget(String type, String label, String action, String icon, String context, Map<String, Object> parameters,double order) {
         this.type = type;
         this.label = label;
         this.action = action;

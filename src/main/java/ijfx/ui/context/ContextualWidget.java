@@ -107,4 +107,5 @@ public interface ContextualWidget<T> {
     
     public T getObject();
 
+    public double getPriority();
 }
