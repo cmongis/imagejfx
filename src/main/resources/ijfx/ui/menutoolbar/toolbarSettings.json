@@ -313,7 +313,10 @@
                 "icon": "preview"
                 ,
                 "context": "image-open"
-
+                ,
+                "parameters": {
+                    "method": "ToObject:net.imagej.threshold.DefaultThresholdMethod"
+                }
 
 
             }
