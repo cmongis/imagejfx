@@ -95,7 +95,7 @@ public class IntegerInputSkin extends AbstractInputSkinPlugin<Integer> {
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        return clazz == double.class || clazz == Double.class;
+        return clazz == int.class || clazz == Integer.class;
     }
 
     @Override
