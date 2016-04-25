@@ -20,10 +20,8 @@
  */
 package ijfx.service.overlay;
 
-import ij.blob.Blob;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -37,7 +35,7 @@ import net.imagej.measure.StatisticsService;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
-import net.imglib2.Cursor;
+import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
@@ -46,7 +44,7 @@ import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.scijava.plugin.Attr;
+import org.scijava.Context;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -99,7 +97,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         //measures.put(LBL_AREA, () -> statService.geometricMean(ds, rps));
         
-
         
         for (String key : measures.keySet()) {
 
@@ -116,8 +113,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
    
     
     public Double[] getValueList(ImageDisplay imageDisplay, Overlay overlay) {
-        
-        
         
          if(overlay instanceof LineOverlay) return getValueList(imageDisplay,(LineOverlay)overlay);
          
@@ -160,10 +155,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
     }
     
-   
-    
     protected Double[] getValueList(ImageDisplay imageDisplay, LineOverlay overlay) {
-        
         
         
         final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
@@ -171,8 +163,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
         System.out.printf("Num dimensions %d\n",overlay.numDimensions());
         
          RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
-         
-         
          
          int x0 = new Double(overlay.getLineStart(0)).intValue();
          int y0 = new Double(overlay.getLineStart(1)).intValue();
@@ -195,8 +185,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
              i++;
          }
          
-        
-        
         return values;
     }
 
@@ -226,10 +214,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
         return new HyperVolumePointSet(pt1, pt2);
     }
 
-    
-    
-   
-    
     /*
     
     TODO: for Pierre
@@ -262,10 +246,18 @@ public class OverlayStatService extends AbstractService implements ImageJService
     
    
     public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
-        return null;
+        
+        OverlayStatistics overlayStatistics;
+        
+        if(overlay instanceof LineOverlay)
+            overlayStatistics = new LineOverlayStatistics(display, overlay, this.context());
+            
+        else if(overlay instanceof RectangleOverlay)
+            overlayStatistics = new RectangleOverlayStatistics(display, overlay, this.context());
+        
+        else
+            overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());
+        
+        return overlayStatistics;
     }
-    
-    
-    
-    
 }
