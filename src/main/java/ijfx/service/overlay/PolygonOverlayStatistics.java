@@ -64,8 +64,6 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         super.solidity = setSolidity();
         super.circularity = setCircularity();
         super.thinnesRatio = setThinnesRatio();
-
-
     }
     
     
@@ -135,13 +133,19 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         int[] y = shape.ypoints;
         int sumx = 0;
         int sumy = 0;
-        double A = 0;
+        double A = 0.0;
         
-        for(int i = 0; i < shape.npoints-1; i++){
-            int cross = (x[i]*y[i+1]-x[i+1]*y[i]);
-            sumx = sumx + (x[i]+x[i+1])*cross;
-            sumy = sumy + (y[i]+y[i+1])*cross;
-            A = A + x[i]*y[i+1]-x[i+1]*y[i];
+        int iplus1;
+        
+        for(int i = 0; i < shape.npoints; i++){
+            iplus1 = i + 1;
+            if (iplus1 == shape.npoints)
+                iplus1 = 0;
+            
+            int cross = (x[i]*y[iplus1]-x[iplus1]*y[i]);
+            sumx = sumx + (x[i]+x[iplus1])*cross;
+            sumy = sumy + (y[i]+y[iplus1])*cross;
+            A = A + cross;
         }
         A = 0.5*A;
         Point2D centerOfGravity = new Point2D(sumx/(6*A), sumy/(6*A));
@@ -357,19 +361,6 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
     public Point2D toPoint2D(int i){
         return new Point2D(this.shape.xpoints[i], this.shape.ypoints[i]);
     }
-    
-    
-//    public boolean allColinear(){
-//        boolean colinear = true;
-//        for(int i = 0; i < this.shape.npoints-2; i++){
-//            if(position(toPoint2D(i), toPoint2D(i+1), toPoint2D(i+2)) != 0){
-//                colinear = false;
-//                break;
-//            }
-//        }
-//        
-//        return colinear;
-//    }
     
     
     public double setConvexity(){

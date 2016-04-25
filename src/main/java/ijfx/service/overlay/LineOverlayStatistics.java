@@ -67,11 +67,9 @@ public class LineOverlayStatistics extends AbstractOverlayStatistics{
         double ystart = overlay.getLineStart(1);
         double xend = overlay.getLineEnd(0);
         double yend = overlay.getLineEnd(1);
-
-        double x = Math.abs((xend + xstart)/2);
-        double y = Math.abs((yend + ystart)/2);
-
-
+        
+        double x = xstart + ((xend - xstart)/2);
+        double y = ystart + ((yend - ystart)/2);
         return new Point2D(x, y);
     }
     

@@ -56,9 +56,7 @@ public class RectangleOverlayStatistics extends AbstractOverlayStatistics{
         super.convexity = setConvexity();
         super.solidity = setSolidity();
         super.circularity = setCircularity();
-        super.thinnesRatio = setThinnesRatio();
-
-        
+        super.thinnesRatio = setThinnesRatio();    
     }
     
     
@@ -99,8 +97,9 @@ public class RectangleOverlayStatistics extends AbstractOverlayStatistics{
         
         double xc, yc;
         
-        xc = this.shape.getX() + Math.abs((this.shape.getX() + this.shape.getWidth()) - this.shape.getX());
-        yc = this.shape.getY() + Math.abs((this.shape.getY() + this.shape.getHeight()) - this.shape.getY());
+        xc = this.shape.getX() + this.shape.getWidth()/2;
+        yc = this.shape.getY() + this.shape.getHeight()/2;
+        
         return new Point2D(xc, yc);
     }
     
