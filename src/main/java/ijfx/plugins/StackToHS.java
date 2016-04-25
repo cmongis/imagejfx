@@ -45,7 +45,6 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.ui.UIService;
 
 /**
  *
@@ -60,27 +59,24 @@ import org.scijava.ui.UIService;
     @Attr(name = "no-legacy")})
 public class StackToHS implements Command {
 
-    @Parameter
-    UIService uiService;
+    public final static String CZT = "CZT";
+    public final static String CTZ = "CTZ";
+    public final static String ZCT = "ZCT";
+    public final static String ZTC = "ZTC";
+    public final static String TZC = "TZC";
+    public final static String TCZ = "TCZ";
 
-    /**
-     *
-     */
     @Parameter(type = ItemIO.INPUT)
     protected Dataset dataset;
 
-    /**
-     *
-     */
     @Parameter(type = ItemIO.OUTPUT)
     protected Dataset datasetOutput;
 
     @Parameter
     DatasetService datasetService;
 
-    @Parameter
-    ImageDisplayService imageDisplayService;
-
+    @Parameter(required = true, label = "Order", choices = {CZT, CTZ, ZCT, ZTC, TZC, TCZ})
+    String order;
     @Parameter(label = "Channels (c)")
     Integer channels;
     @Parameter(label = "Slices (z)")
@@ -94,18 +90,60 @@ public class StackToHS implements Command {
         AxisType[] axisType = new AxisType[5];
         axisType[0] = Axes.X;
         axisType[1] = Axes.Y;
-        axisType[2] = Axes.CHANNEL;
-        axisType[3] = Axes.TIME;
-        axisType[4] = Axes.Z;
-        long[] dims = new long[axisType.length];
-        dims[0] = dataset.max(0)+1;
-        dims[1] = dataset.max(1)+1;
-        dims[2] = channels;
-        dims[3] = frames;
-        dims[4] = slices;
 
+        long[] dims = new long[axisType.length];
+        dims[0] = dataset.max(0) + 1;
+        dims[1] = dataset.max(1) + 1;
+        applyOrder(axisType, dims);
         datasetOutput = emptyDataset(dims, axisType, dataset);
         copyDataset(dataset, datasetOutput);
+    }
+
+    public void applyOrder(AxisType[] axisType, long[] dims) {
+        switch (order) {
+            case CZT:
+                axisType[2] = Axes.CHANNEL;
+                axisType[3] = Axes.Z;
+                axisType[4] = Axes.TIME;
+                dims[2] = channels;
+                dims[3] = slices;
+                dims[4] = frames;
+            case CTZ:
+                axisType[2] = Axes.CHANNEL;
+                axisType[3] = Axes.TIME;
+                axisType[4] = Axes.Z;
+                dims[2] = channels;
+                dims[3] = frames;
+                dims[4] = slices;
+            case ZCT:
+                axisType[2] = Axes.Z;
+                axisType[3] = Axes.CHANNEL;
+                axisType[4] = Axes.TIME;
+                dims[2] = slices;
+                dims[3] = channels;
+                dims[4] = frames;
+            case ZTC:
+                axisType[2] = Axes.Z;
+                axisType[3] = Axes.TIME;
+                axisType[4] = Axes.CHANNEL;
+                dims[2] = slices;
+                dims[3] = frames;
+                dims[4] = channels;
+            case TZC:
+                axisType[2] = Axes.TIME;
+                axisType[3] = Axes.Z;
+                axisType[4] = Axes.CHANNEL;
+                dims[2] = frames;
+                dims[3] = slices;
+                dims[4] = channels;
+            case TCZ:
+                axisType[2] = Axes.TIME;
+                axisType[3] = Axes.CHANNEL;
+                axisType[4] = Axes.Z;
+                dims[2] = frames;
+                dims[3] = channels;
+                dims[4] = slices;
+        }
     }
 
     private Dataset emptyDataset(long[] dims, AxisType[] axisType, Dataset input) {
@@ -123,31 +161,23 @@ public class StackToHS implements Command {
             cursorInput.fwd();
             cursorInput.localize(position);
             System.arraycopy(position, 0, positionOutput, 0, position.length);
-
-            positionOutput = conversionDimension(positionOutput, position, output);
-           // System.out.println(Arrays.toString(positionOutput));
-
+            conversionDimension(positionOutput, position, output);
             randomAccessOutput.setPosition(positionOutput);
-            try {
-                
             randomAccessOutput.get().set(cursorInput.get());
-            } catch (Exception e) {
-                System.out.println(Arrays.toString(positionOutput));
-            }
 
         }
     }
 
     private long[] conversionDimension(long[] positionOutput, long[] position, Dataset output) {
         int rest;
+        int coorOrigin = (int) position[2];
         for (int i = 2; i < positionOutput.length; i++) {
-            positionOutput[i] = position[2] / output.max(i);
+            positionOutput[i] = coorOrigin / (output.max(i) + 1);
             rest = (int) (position[2] % output.max(i));
             if (positionOutput[i] == 0.0) {
                 positionOutput[i] = rest;
-                rest = 0;
             } else if (rest != 0) {
-                positionOutput[i + 1] = rest;
+                coorOrigin = rest;
             }
         }
         return positionOutput;
