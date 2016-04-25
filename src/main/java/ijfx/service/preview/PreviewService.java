@@ -126,6 +126,13 @@ public class PreviewService extends AbstractService implements ImageJService {
         this.y = y;
         this.width = w;
         this.height = h;
+        if (x < 0 || y < 0) {
+            int widthDataset = (int) imageDisplayService.getActiveDataset().max(0);
+            int heightDataset = (int) imageDisplayService.getActiveDataset().max(1);
+            this.x = (int) (widthDataset/2.0 -width/2.0);
+            this.y = (int) (heightDataset/2.0 -height/2.0);
+            
+        }
     }
 
     public PreviewService() {
@@ -275,7 +282,7 @@ public class PreviewService extends AbstractService implements ImageJService {
         String keyword = "ToObject:";
         inputMap.forEach((s, o) -> {
             try {
-            String valueString = (String) o;
+                String valueString = (String) o;
                 if (valueString.contains(keyword)) {
 
                     valueString = valueString.replaceFirst(keyword, "");

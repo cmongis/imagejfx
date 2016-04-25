@@ -103,7 +103,7 @@ public class DefaultWidget implements ItemWidget {
 
         if (this.getIcon().equals("preview")) {
             try {
-                previewService.setParameters(0, 0, size, size);
+                previewService.setParameters(-1, -1, size, size);
                 return previewService.getImageDisplay(action, this.getParameters());
 
             } catch (Exception e) {
