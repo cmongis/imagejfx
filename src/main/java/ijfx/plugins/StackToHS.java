@@ -75,17 +75,17 @@ public class StackToHS implements Command {
     protected Dataset datasetOutput;
 
     @Parameter
-    DatasetService datasetService;
+    private DatasetService datasetService;
 
     @Parameter(required = true, label = "Order", choices = {CZT, CTZ, ZCT, ZTC, TZC, TCZ})
-    String order;
+    private String order;
     @Parameter(label = "Channels (c)")
-    Integer channels;
+    private Integer channels;
     @Parameter(label = "Slices (z)")
-    Integer slices;
+    private Integer slices;
 
     @Parameter(label = "Frames (t)")
-    Integer frames;
+    private Integer frames;
 
     @Override
     public void run() {
@@ -104,7 +104,7 @@ public class StackToHS implements Command {
             return;
         }
         datasetOutput = emptyDataset(dims, axisType, dataset);
-        copyDataset(dataset, datasetOutput);
+        HyperStackConverter.copyDataset(dataset, datasetOutput, new OneToMultiDimensions());
     }
 
     public void applyOrder(AxisType[] axisType, long[] dims) {
@@ -158,36 +158,20 @@ public class StackToHS implements Command {
         return datasetService.create(dims, input.getName(), axisType, input.getValidBits(), input.isSigned(), false);
     }
 
-    private < T extends RealType< T>> void copyDataset(Dataset input, Dataset output) {
-        Img<?> inputImg = input.getImgPlus().getImg();
-        Cursor<T> cursorInput = (Cursor<T>) inputImg.localizingCursor();
-        RandomAccess<T> randomAccessOutput = (RandomAccess<T>) output.randomAccess();
-        long[] position = new long[input.numDimensions()];
-        long[] positionOutput = new long[output.numDimensions()];
 
-        while (cursorInput.hasNext()) {
-            cursorInput.fwd();
-            cursorInput.localize(position);
-            System.arraycopy(position, 0, positionOutput, 0, position.length);
-            conversionDimension(positionOutput, position, output);
-            randomAccessOutput.setPosition(positionOutput);
-            randomAccessOutput.get().set(cursorInput.get());
-
-        }
-    }
-
-    private long[] conversionDimension(long[] positionOutput, long[] position, Dataset output) {
-        int rest;
-        int coorOrigin = (int) position[2];
-        for (int i = 2; i < positionOutput.length; i++) {
-            positionOutput[i] = coorOrigin / (output.max(i) + 1);
-            rest = (int) (position[2] % (output.max(i)+1));
-            if (positionOutput[i] == 0.0) {
-                positionOutput[i] = rest;
-            } else if (rest != 0) {
-                coorOrigin = rest;
-            }
-        }
-        return positionOutput;
-    }
+//
+//    private long[] conversionDimension(long[] positionOutput, long[] position, Dataset output) {
+//        int rest;
+//        int coorOrigin = (int) position[2];
+//        for (int i = 2; i < positionOutput.length; i++) {
+//            positionOutput[i] = coorOrigin / (output.max(i) + 1);
+//            rest = (int) (position[2] % (output.max(i)+1));
+//            if (positionOutput[i] == 0.0) {
+//                positionOutput[i] = rest;
+//            } else if (rest != 0) {
+//                coorOrigin = rest;
+//            }
+//        }
+//        return positionOutput;
+//    }
 }
