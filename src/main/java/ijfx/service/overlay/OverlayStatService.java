@@ -20,10 +20,8 @@
  */
 package ijfx.service.overlay;
 
-import ij.blob.Blob;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -37,7 +35,7 @@ import net.imagej.measure.StatisticsService;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
-import net.imglib2.Cursor;
+import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
@@ -46,7 +44,6 @@ import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.scijava.plugin.Attr;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -81,7 +78,21 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public final static String LBL_AREA = "Area";
     public final static String LBL_MAX = "Max";
     public final static String LBL_MIN = "Min";
-    public final static String LBL_ = "";
+    public final static String LBL_SD = "Std. Dev.";
+    public final static String LBL_VARIANCE = "Variance";
+    public final static String LBL_PIXEL_COUNT = "Pixel count";
+    
+    public final static String LBL_MBR = "Minimum Bounding Rectangle";
+    public final static String LBL_CENTROID = "Center of Gravity";
+    public final static String LBL_MAX_FERET_DIAMETER = "Feret Diameter";
+    public final static String LBL_MIN_FERET_DIAMETER = "Min. Feret Diameter";
+    public final static String LBL_LONG_SIDE_MBR = "Long Side MBR";
+    public final static String LBL_SHORT_SIDE_MBR = "Short Side MBR";
+    public final static String LBL_ASPECT_RATIO ="Aspect ratio";
+    public final static String LBL_CONVEXITY = "Convexity";
+    public final static String LBL_SOLIDITY = "Solidity";
+    public final static String LBL_CIRCULARITY = "Circularity";
+    public final static String LBL_THINNES_RATIO = "Thinnes ratio";
 
     public HashMap<String, Double> getStat(ImageDisplay imageDisplay, Overlay overlay) {
 
@@ -99,7 +110,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         //measures.put(LBL_AREA, () -> statService.geometricMean(ds, rps));
         
-
         
         for (String key : measures.keySet()) {
 
@@ -116,8 +126,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
    
     
     public Double[] getValueList(ImageDisplay imageDisplay, Overlay overlay) {
-        
-        
         
          if(overlay instanceof LineOverlay) return getValueList(imageDisplay,(LineOverlay)overlay);
          
@@ -160,10 +168,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
     }
     
-   
-    
     protected Double[] getValueList(ImageDisplay imageDisplay, LineOverlay overlay) {
-        
         
         
         final Dataset ds = datasetService.getDatasets(imageDisplay).get(0);
@@ -171,8 +176,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
         System.out.printf("Num dimensions %d\n",overlay.numDimensions());
         
          RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
-         
-         
          
          int x0 = new Double(overlay.getLineStart(0)).intValue();
          int y0 = new Double(overlay.getLineStart(1)).intValue();
@@ -195,8 +198,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
              i++;
          }
          
-        
-        
         return values;
     }
 
@@ -226,10 +227,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
         return new HyperVolumePointSet(pt1, pt2);
     }
 
-    
-    
-   
-    
     /*
     
     TODO: for Pierre
@@ -262,10 +259,45 @@ public class OverlayStatService extends AbstractService implements ImageJService
     
    
     public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
-        return null;
+        
+        OverlayStatistics overlayStatistics;
+        
+        if(overlay instanceof LineOverlay)
+            overlayStatistics = new LineOverlayStatistics(display, overlay, this.context());
+            
+        else if(overlay instanceof RectangleOverlay)
+            overlayStatistics = new RectangleOverlayStatistics(display, overlay, this.context());
+        
+        else
+            overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());
+        
+        return overlayStatistics;
     }
     
     
-    
-    
+    public HashMap<String, Double> getStatistics(OverlayStatistics overlayStats) {
+        
+        HashMap<String, Double> statistics = new HashMap<>();
+        
+        statistics.put(LBL_MEAN, overlayStats.getMean());
+        statistics.put(LBL_MIN, overlayStats.getMin());
+        statistics.put(LBL_MAX, overlayStats.getMax());
+        statistics.put(LBL_SD, overlayStats.getStandardDeviation());
+        statistics.put(LBL_VARIANCE, overlayStats.getVariance());
+        statistics.put(LBL_MEDIAN, overlayStats.getMedian());
+        statistics.put(LBL_AREA, overlayStats.getArea());
+        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelCount());
+        
+        statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
+        statistics.put(LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
+        statistics.put(LBL_LONG_SIDE_MBR, overlayStats.getLongSideMBR());
+        statistics.put(LBL_SHORT_SIDE_MBR, overlayStats.getShortSideMBR());
+        statistics.put(LBL_ASPECT_RATIO, overlayStats.getAspectRatio());
+        statistics.put(LBL_CONVEXITY, overlayStats.getConvexity());
+        statistics.put(LBL_SOLIDITY, overlayStats.getSolidity());
+        statistics.put(LBL_CIRCULARITY, overlayStats.getCircularity());
+        statistics.put(LBL_THINNES_RATIO, overlayStats.getThinnesRatio());
+        
+        return statistics;
+    }
 }

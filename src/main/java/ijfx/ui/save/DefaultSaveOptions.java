@@ -21,23 +21,28 @@ package ijfx.ui.save;
 
 import ijfx.ui.messageBox.DefaultMessageBox;
 import ijfx.ui.messageBox.MessageBox;
+
 import java.io.File;
 import java.io.IOException;
-import javafx.animation.Timeline;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
+
 import mongis.utils.FileButtonBinding;
 
 /**
@@ -50,7 +55,7 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     private Property<String>  suffix;
     private Property<File> folder;
     
-    private String CSS_FILE = getClass().getResource("../main/flatterfx.css").toExternalForm();
+    private String CSS_FILE = getClass().getResource("/ijfx/ui/main/flatterfx.css").toExternalForm();
     
     @FXML
     private Label title;
@@ -94,20 +99,7 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
         replaceFilesBtn.selectedProperty().setValue(Boolean.TRUE);
         
         
-        ObjectBinding<SaveType> obinding = Bindings.createObjectBinding(() -> {
-            
-            SaveType newSaveType = SaveType.NEW;
-            
-            if(replaceFilesBtn.selectedProperty().getValue()){
-                newSaveType = SaveType.REPLACE;
-            }
-            
-            else if(newFilesBtn.selectedProperty().getValue()){
-                newSaveType = SaveType.NEW;
-            }
-            
-            return newSaveType;
-        },
+        ObjectBinding<SaveType> obinding = Bindings.createObjectBinding(this::updateSaveType,
                 toggleGroup.selectedToggleProperty()
         );
         
@@ -146,5 +138,25 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     @Override
     public Property<File> folder(){
         return this.folder;
+    }
+    
+    @Override
+    public Node getContent(){
+        return this;
+    }
+    
+    
+    public SaveType updateSaveType(){
+        
+        SaveType newSaveType = SaveType.NEW;
+        
+        if(replaceFilesBtn.selectedProperty().getValue()){
+            newSaveType = SaveType.REPLACE;
+        }
+        else if(newFilesBtn.selectedProperty().getValue()){
+            newSaveType = SaveType.NEW;
+        }
+        
+        return newSaveType;
     }
 }

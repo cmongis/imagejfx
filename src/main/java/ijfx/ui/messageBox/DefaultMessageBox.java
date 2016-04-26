@@ -27,11 +27,8 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 import javafx.geometry.Insets;
 
@@ -52,8 +49,7 @@ import javafx.util.Duration;
  */
 public class DefaultMessageBox extends HBox implements MessageBox {
 
-    private Property<String> message;
-    private Property<MessageType> type;
+    private Property<Message> message;
 
     private Label label;
 
@@ -75,7 +71,7 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     private final double TIMELINE_DURATION = 300.0;
     private final double FADE_DURATION = 300.0;
     
-    private final double LINE_HEIGHT = 20.0;
+    private final double LINE_HEIGHT = 24.0;
 
     public DefaultMessageBox() {
         
@@ -83,26 +79,19 @@ public class DefaultMessageBox extends HBox implements MessageBox {
         this.setMaxHeight(MAX_HEIGHT);
         this.setPadding(new Insets(PADDING));
 
-        message = new SimpleStringProperty();
-        type = new SimpleObjectProperty();
+        message = new SimpleObjectProperty<>(new DefaultMessage());
 
-        messageProperty().setValue(null);
-        typeProperty().setValue(null);
 
-        messageProperty().addListener(this::playAnimation);
-        typeProperty().addListener(this::setBgColor);
+        getMessage().textProperty().addListener(this::playAnimation);
+        getMessage().typeProperty().addListener(this::setBgColor);
 
 
         label = new Label();
         label.setWrapText(true);
         label.setOpacity(0.0);
         label.setMinHeight(0.0);
-        
-        StringBinding sbinding = Bindings.createStringBinding(() -> {
-            return messageProperty().getValue();
-        }, messageProperty());
 
-        label.textProperty().bind(sbinding);
+        label.textProperty().bind(getMessage().textProperty());
         
         
         openTimeline = new Timeline();
@@ -122,18 +111,19 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     }
 
     @Override
-    public Property<String> messageProperty() {
+    public Property<Message> messageProperty() {
         return this.message;
     }
-
+    
     @Override
-    public Property<MessageType> typeProperty() {
-        return this.type;
+    public Message getMessage(){
+        return messageProperty().getValue();
     }
+
     
     
     public void playAnimation(Observable obs) {
-        if (messageProperty().getValue() == null){
+        if (messageProperty().getValue().getText() == null){
             label.setOpacity(0.0);
             closeTimeline.playFromStart();
         }
@@ -148,7 +138,7 @@ public class DefaultMessageBox extends HBox implements MessageBox {
 
             String bgColor = null;
 
-            switch (typeProperty().getValue()) {
+            switch (messageProperty().getValue().getType()){
                 case SUCCESS:
                     bgColor = GREEN; break;
                 case WARNING:
@@ -189,17 +179,15 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     public double computeTextHeight(){
         
         double computedHeight;
-
-        int lineCount = 0;
         
-        String[] subString = messageProperty().getValue().split("\n");
-
+        String[] subString = messageProperty().getValue().getText().split("\n");
+        int lineCount = 0;
         double subStringLenght;
         int lineToAdd;
         
         for(String s : subString){
-            if(s != null){
-                Text text = new Text(messageProperty().getValue());
+            if(s != null && !s.equals("")){
+                Text text = new Text(s);
                 subStringLenght = text.getLayoutBounds().getWidth();
                 lineToAdd = (int)Math.ceil(subStringLenght/this.getBoundsInParent().getWidth());
                 lineCount = lineCount + lineToAdd;
@@ -209,7 +197,6 @@ public class DefaultMessageBox extends HBox implements MessageBox {
         }
         
         computedHeight = lineCount * LINE_HEIGHT;
-
         return computedHeight;
     }
 }

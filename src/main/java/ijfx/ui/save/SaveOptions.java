@@ -21,6 +21,7 @@ package ijfx.ui.save;
 
 import java.io.File;
 import javafx.beans.property.Property;
+import javafx.scene.Node;
 
 /**
  *
@@ -31,5 +32,6 @@ public interface SaveOptions {
     public Property<SaveType> saveType();
     public Property<String> suffix();
     public Property<File> folder();
+    public Node getContent();
     
 }
