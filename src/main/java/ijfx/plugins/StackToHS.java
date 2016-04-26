@@ -26,6 +26,8 @@ import ij.gui.GenericDialog;
 import ij.plugin.CompositeConverter;
 import ij.plugin.frame.Recorder;
 import ij.process.LUT;
+import ijfx.ui.messageBox.DefaultMessageBox;
+import ijfx.ui.messageBox.MessageBox;
 import static java.lang.Math.toIntExact;
 import java.util.Arrays;
 import net.imagej.Dataset;
@@ -45,17 +47,15 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.UIService;
 
 /**
  *
  * @author tuananh
  */
 //@Plugin(type = Command.class, menuPath = "Plugins>StacktoHS", label = "Test plugin")
-@Plugin(type = Command.class, menu = {
-    @Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
-            mnemonic = MenuConstants.IMAGE_MNEMONIC),
-    @Menu(label = "Plugins", mnemonic = 't'),
-    @Menu(label = "Rotate...", mnemonic = 'r')}, attrs = {
+@Plugin(type = Command.class, menuPath = "Plugins>Stack to HS", attrs = {
     @Attr(name = "no-legacy")})
 public class StackToHS implements Command {
 
@@ -66,6 +66,8 @@ public class StackToHS implements Command {
     public final static String TZC = "TZC";
     public final static String TCZ = "TCZ";
 
+    @Parameter
+    UIService uIService;
     @Parameter(type = ItemIO.INPUT)
     protected Dataset dataset;
 
@@ -95,6 +97,12 @@ public class StackToHS implements Command {
         dims[0] = dataset.max(0) + 1;
         dims[1] = dataset.max(1) + 1;
         applyOrder(axisType, dims);
+        if (slices*channels*frames!=dataset.max(2)+1)
+        {
+            String message = "slices*channels*frames is not equal to the number of slices";
+            uIService.showDialog(message, DialogPrompt.MessageType.ERROR_MESSAGE);
+            return;
+        }
         datasetOutput = emptyDataset(dims, axisType, dataset);
         copyDataset(dataset, datasetOutput);
     }
@@ -173,7 +181,7 @@ public class StackToHS implements Command {
         int coorOrigin = (int) position[2];
         for (int i = 2; i < positionOutput.length; i++) {
             positionOutput[i] = coorOrigin / (output.max(i) + 1);
-            rest = (int) (position[2] % output.max(i));
+            rest = (int) (position[2] % (output.max(i)+1));
             if (positionOutput[i] == 0.0) {
                 positionOutput[i] = rest;
             } else if (rest != 0) {
