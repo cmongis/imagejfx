@@ -293,7 +293,7 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
     public Task updateOnShow() {
        
         
-        stepListView.setCellFactory(newCell -> new DraggableStepCell(context, s -> execute(s)));
+        stepListView.setCellFactory(newCell -> new DraggableStepCell(context, s -> consume(s)));
 
         stepListView.setItems(steps);
 
@@ -402,7 +402,7 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
     
 
     @Override
-    public void execute(WorkflowStep t) {
+    public void consume(WorkflowStep t) {
 
         stepListView.getItems().remove(t);
 

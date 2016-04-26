@@ -20,6 +20,7 @@
 package ijfx.ui.batch;
 
 import ijfx.service.workflow.WorkflowStep;
+import java.util.function.Consumer;
 import mongis.utils.DraggableListCell;
 import org.scijava.Context;
 
@@ -30,10 +31,10 @@ import org.scijava.Context;
 public class DraggableStepCell extends DraggableListCell<WorkflowStep> {
     
     WorkflowStepController ctrl = new WorkflowStepController();
-    ActionHandler<WorkflowStep> deleteHandler;
+    Consumer<WorkflowStep> deleteHandler;
   
 
-    public DraggableStepCell(Context context, ActionHandler<WorkflowStep> deleteHandler) {
+    public DraggableStepCell(Context context, Consumer<WorkflowStep> deleteHandler) {
         super();
        
         // functionnal interface that call the delete function of this object

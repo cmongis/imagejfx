@@ -24,5 +24,9 @@
         "name":"project-rule-edition"
         ,"incompatibleWith":["project-rule-list","project-manager"]
     }
+    ,{
+        "name":"segmentation"
+        ,"incompatibleWith":["imagej","webapp"]
+    }
 
 ]

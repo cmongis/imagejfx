@@ -163,4 +163,33 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         return output;
     }
 
+    @Override
+    public <T extends RealType<T>> Dataset isolatePlane(Dataset dataset, long[] position) {
+        Dataset emptyDataset = getEmptyPlaneDataset(dataset);
+        
+        RandomAccess<T> randomAccessOrigin = (RandomAccess<T>) dataset.randomAccess();
+        RandomAccess<T> randomAccessOutput = (RandomAccess<T>) emptyDataset.randomAccess();
+        randomAccessOrigin.setPosition(position);
+
+        randomAccessOrigin.setPosition(position);
+        
+        
+        long width = dataset.max(0);
+        long height = dataset.max(1);
+        
+        
+        for (int i = 0; i < width; i++) {
+            randomAccessOrigin.setPosition(i, 0);
+            randomAccessOutput.setPosition(i, 0);
+
+            for (int j = 0; j < height; j++) {
+                randomAccessOrigin.setPosition(j, 1);
+                randomAccessOutput.setPosition(j, 1);
+                randomAccessOutput.get().set(randomAccessOrigin.get());
+            }
+        }
+        
+        return emptyDataset;
+    }
+
 }

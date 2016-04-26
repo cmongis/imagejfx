@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <VBox fx:id="inputHBox" alignment="CENTER">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" styleClass="h4" text="Input" />
+                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Current plane" />
+                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="All planes" />
+               </children>
+               <styleClass>
+                  <String fx:value="toggle-group" />
+                  <String fx:value="vertical" />
+               </styleClass>
+            </VBox>
+            <FontAwesomeIconView glyphName="ARROW_DOWN" size="30" styleClass="down-arrow" />
+            <VBox fx:id="workflowVBox" />
+            <FontAwesomeIconView glyphName="ARROW_DOWN" layoutX="46.0" layoutY="104.0" size="30" styleClass="down-arrow" />
+            <VBox fx:id="resultbox">
+               <children>
+                  <Button fx:id="testButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="(re) Test" />
+                  <MenuButton fx:id="applyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text="Apply to...">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
+                  </MenuButton>
+               </children>
+               <styleClass>
+                  <String fx:value="darker-background" />
+                  <String fx:value="with-padding" />
+                  <String fx:value="vbox" />
+               </styleClass>
+            </VBox>
+         </children>
+      </VBox>
+   </center>
+</fx:root>

@@ -28,6 +28,7 @@ import ijfx.ui.main.Localization;
 import ijfx.ui.notification.NotificationService;
 import ijfx.service.ui.AppService;
 import ijfx.service.ui.HintService;
+import ijfx.service.uicontext.UiContextService;
 import java.io.File;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -43,7 +44,6 @@ import ijfx.ui.batch.FileBatchProcessorPanel;
 import ijfx.ui.main.PerformanceActivity;
 import java.util.List;
 import java.util.stream.Collectors;
-import javafx.event.Event;
 import javafx.scene.control.Menu;
 import javafx.scene.input.MouseEvent;
 
@@ -60,6 +60,9 @@ public class DebugButton extends MenuButton implements UiPlugin {
     @Parameter
     private UiPluginService uiPluginService;
 
+    @Parameter
+    private UiContextService contextService;
+    
     @Parameter
     private NotificationService notificationService;
 
@@ -85,6 +88,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Reload Debug Button", event -> uiPluginService.reload(DebugButton.class));
         addItem("Reload App Browser", event -> appService.reloadCurrentView());
         addItem("Test hints", this::testHints);
+        addItem("Switch context",event->setContext());
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED,this::updateReloadMenu);
         System.out.println("Added");
@@ -119,14 +123,10 @@ public class DebugButton extends MenuButton implements UiPlugin {
         if (new File(debugStyleSheet.replace("file:", "")).exists() == false) {
 
         } else {
-
         }
-
         getScene().getStylesheets().removeAll(ImageJFX.STYLESHEET_ADDR, debugStyleSheet);
-
         getScene().getStylesheets().add(debugStyleSheet);
 
-        //eventService.publish(new DebugEvent("reloadSideMenu"));
     }
 
     public void reloadAnOther(ActionEvent event) {
@@ -160,6 +160,11 @@ public class DebugButton extends MenuButton implements UiPlugin {
                     .collect(Collectors.toList());
             reloadMenu.getItems().addAll(items);
         }
+    }
+    
+    private void setContext() {
+        contextService.enter("segmentation");
+        contextService.update();
     }
 
 }

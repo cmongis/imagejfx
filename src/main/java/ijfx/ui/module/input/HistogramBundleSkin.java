@@ -89,7 +89,7 @@ public class HistogramBundleSkin extends AbstractInputSkinPlugin<HistogramBundle
         
         timer.elapsed("Clearing");
         
-        
+        if(getBundle() == null) return;
         
         for (int h = 0; h < getBundle().getHistogramCount(); h++) {
             System.out.printf("h = %d\n",h);

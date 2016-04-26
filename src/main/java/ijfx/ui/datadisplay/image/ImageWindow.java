@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -183,18 +183,23 @@ public class ImageWindow extends Window {
     private Color selectedOverlayColor = Color.BLUE;
     private Color overlayColor = Color.YELLOW;
 
-    private Executor refreshQueue = Executors.newFixedThreadPool(1);
+    private final ExecutorService refreshQueue = Executors.newFixedThreadPool(1);
 
     HashMap<Overlay,Node> shapeMap = new HashMap<>();
     
    HashMap<Overlay,OverlayDrawer> drawerMap = new HashMap();
    HashMap<Overlay,OverlayModifier> modifierMap = new HashMap();
     
-    public ImageWindow() {
+   
+   
+   
+   public ImageWindow() {
         super();
         logger.info("Creating window.");
         setContentPane(borderPane);
-
+        
+        
+        
         getStyleClass().add(WINDOW_CLASS_NAME);
         setTitleBarStyleClass(TITLE_CLASS_NAME);
 
@@ -429,6 +434,7 @@ public class ImageWindow extends Window {
     public synchronized void refreshSourceImage() {
 
         if (checkServices()) {
+           
             refreshQueue.execute(new AsyncCallback<Void, Void>()
                     .run(this::transformImage)
                     .then(this::updateImageAndOverlays)
@@ -675,7 +681,7 @@ public class ImageWindow extends Window {
     @EventHandler
     protected void onEvent(DatasetUpdatedEvent event) {
         //imageDisplay.update();
-
+        if(event.getObject() != imageDisplayService.getActiveDataset(imageDisplay)) return;
         logger.info("DatasetChangedEvent : " + event.getObject());
         refreshSourceImage();
     }
@@ -701,6 +707,7 @@ public class ImageWindow extends Window {
 
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
+        if(event.getDisplay() != imageDisplay) return;
         Platform.runLater(() -> setEdited(event.getOverlay()));
     }
     
@@ -722,15 +729,17 @@ public class ImageWindow extends Window {
     @EventHandler
     protected void onOverlayDeleted(OverlayDeletedEvent event) {
         
-        if(getOverlays().contains(event.getObject()) == false) return;
+        if(drawerMap.keySet().contains(event.getObject()) == false) return;
         setEdited(null);
         
+        
+        /*
         // removing the associated node
         anchorPane.getChildren()
                 .stream()
                 .filter(node->node.getUserData() == event.getObject())
                 .forEach(node->Platform.runLater(()->anchorPane.getChildren().remove(node)));
-        
+               */
         //updateOverlays();
         Platform.runLater(()->deleteOverlay(event.getObject()));
     }

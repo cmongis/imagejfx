@@ -40,19 +40,19 @@ import javafx.scene.control.TableView;
  *
  * @author cyril
  */
-public class MetaDataSetOwnerHelper {
+public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
 
-    final TableView<MetaDataOwner> tableView;
+    final TableView<T> tableView;
 
     Set<String> currentColumns = new HashSet<>();
 
     LinkedHashSet<String> priority = new LinkedHashSet();
     
-    public MetaDataSetOwnerHelper(TableView<MetaDataOwner> tableView) {
+    public MetaDataSetOwnerHelper(TableView<T> tableView) {
         this.tableView = tableView;
     }
 
-    public void setItem(List<? extends MetaDataOwner> mList) {
+    public void setItem(List<? extends T> mList) {
         tableView.getItems().clear();
         tableView.getItems().addAll(mList);
     }
@@ -70,7 +70,7 @@ public class MetaDataSetOwnerHelper {
         updateColumns(columnList);
     }
 
-    public void setColumnsFromItems(List<? extends MetaDataOwner> items) {
+    public void setColumnsFromItems(List<? extends T> items) {
         List<MetaDataSet> mList = items
                 .stream()
                 .map(i->i.getMetaDataSet())
@@ -111,8 +111,8 @@ public class MetaDataSetOwnerHelper {
         }
     }
 
-    private TableColumn<MetaDataOwner, String> generateColumn(String key) {
-        TableColumn<MetaDataOwner, String> column = new TableColumn<>();
+    private TableColumn<T, String> generateColumn(String key) {
+        TableColumn<T, String> column = new TableColumn<>();
         column.setUserData(key);
         column.setCellValueFactory(this::getCellValueFactory);
         return column;
@@ -154,7 +154,7 @@ public class MetaDataSetOwnerHelper {
         return 0;
     }
     
-    protected ObservableValue<String> getCellValueFactory(TableColumn.CellDataFeatures<MetaDataOwner, String> cell) {
+    protected ObservableValue<String> getCellValueFactory(TableColumn.CellDataFeatures<T, String> cell) {
         String key = cell.getTableColumn().getUserData().toString();
         String value = cell.getValue().getMetaDataSet().get(key).getStringValue();
         return new ReadOnlyObjectWrapper<>(value);

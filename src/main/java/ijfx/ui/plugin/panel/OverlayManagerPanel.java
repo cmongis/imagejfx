@@ -55,8 +55,8 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "overlay-manager-panel", context = "imagej+overlay-selected", localization = Localization.RIGHT)
+
+@UiConfiguration(id = "overlay-manager-panel", context = "image-open+imagej+overlay-selected", localization = Localization.RIGHT)
 public class OverlayManagerPanel extends TitledPane implements UiPlugin {
 
     Logger logger = ImageJFX.getLogger();

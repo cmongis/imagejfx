@@ -53,9 +53,7 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public class WorkflowPanel extends GridPane{
-
-  
+public class WorkflowPanel extends GridPane {
 
     @Parameter
     MenuService menuService;
@@ -82,24 +80,20 @@ public class WorkflowPanel extends GridPane{
     private MenuButton menuButton;
 
     Logger logger = ImageJFX.getLogger();
-    
-    public WorkflowPanel(Context context)  {
+
+    public WorkflowPanel(Context context) {
         try {
             FXUtilities.injectFXML(this);
-            
-            
+
             context.inject(this);
             init();
-            
-            
+
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Couldn't initiate the WorkflowPanel", ex);
         }
-        
-        
-        
+
     }
-    
+
     /*
      Properties
      */
@@ -110,10 +104,10 @@ public class WorkflowPanel extends GridPane{
     private HashMap<String, Runnable> modules = new HashMap<>();
 
     public void init() {
-        
+
         // instanciating a menu creator
         ChoiceBoxMenuCreator menuCreator = new ChoiceBoxMenuCreator(this::onAddStepButtonClicked);
-        
+
         // setting the cell factory for the list that will display the indiviual staps
         stepListView.setCellFactory(newCell -> new DraggableStepCell(context, this::delete));
 
@@ -121,17 +115,18 @@ public class WorkflowPanel extends GridPane{
 
         stepListView.setEditable(true);
 
-        
         // registering the actions from the menu so it can be used with the autocompletion text field.
         // it will fill the modules hash map with runnables.
         registerAction(menuService.getMenu());
-        
+
         // binding the autocompletion to the hashmap
         TextFields.bindAutoCompletion(moduleSearchTextField, modules.keySet());
 
         // adding the event handler that will add the step
         moduleSearchTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if(modules == null) return;
+            if (modules == null) {
+                return;
+            }
             if (event.getCode() == KeyCode.ENTER) {
                 modules.get(moduleSearchTextField.getText()).run();
                 moduleSearchTextField.setText("");
@@ -142,7 +137,7 @@ public class WorkflowPanel extends GridPane{
             isModuleNameValidProperty.setValue(modules.containsKey(newValue));
         });
 
-        menuService.createMenus(menuCreator,menuButton);
+        menuService.createMenus(menuCreator, menuButton);
 
     }
 
@@ -150,7 +145,7 @@ public class WorkflowPanel extends GridPane{
     private void onAddStepButtonClicked(ShadowMenu shadowMenu) {
         addStep(shadowMenu.getModuleInfo());
     }
-    
+
     public void delete(WorkflowStep step) {
         stepList.remove(step);
     }
@@ -170,10 +165,14 @@ public class WorkflowPanel extends GridPane{
         stepList.add(new DefaultWorkflowStep(moduleInfo.getDelegateClassName()).createModule(commandService, moduleService));
     }
 
-    public void addStep(Class<? extends Module> moduleClass) {
-        
+    public void addStep(Class<?> moduleClass) {
+        try {
+            stepList.add(new DefaultWorkflowStep(moduleClass.getName()).createModule(commandService, moduleService));
+        } catch (Exception e) {
+            ImageJFX.getLogger().log(Level.SEVERE, "Couldn't create plugin from class :"+moduleClass.getSimpleName(), e);
+        }
     }
-    
+
     public ObservableList<WorkflowStep> stepListProperty() {
         return stepList;
     }

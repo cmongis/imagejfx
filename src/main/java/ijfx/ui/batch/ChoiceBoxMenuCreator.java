@@ -50,7 +50,7 @@ public class ChoiceBoxMenuCreator extends AbstractMenuCreator<MenuButton, Menu> 
     protected void addLeafToMenu(ShadowMenu sm, Menu m) {
         MenuItem item = new MenuItem(sm.getName());
         item.setOnAction((javafx.event.ActionEvent event) -> {
-            clickHandler.execute(sm);
+            clickHandler.consume(sm);
         });
         m.getItems().add(item);
     }
