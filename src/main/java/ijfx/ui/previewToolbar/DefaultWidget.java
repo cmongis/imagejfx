@@ -12,10 +12,7 @@ import ijfx.ui.utils.FontAwesomeIconUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.application.Platform;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import mongis.utils.panecell.PaneIconCell;
 
 /**
  *
@@ -100,10 +97,13 @@ public class DefaultWidget implements ItemWidget {
 
     @Override
     public Image getImage(PreviewService previewService, int size) {
-
-        if (this.getIcon().equals("preview")) {
+        if (previewService.getImageDisplayService().getActiveDataset()==null)
+        {
+            return null;
+        }
+        else if (this.getIcon().equals("preview")) {
             try {
-                previewService.setParameters(0, 0, size, size);
+                previewService.setParameters(-1, -1, size, size);
                 return previewService.getImageDisplay(action, this.getParameters());
 
             } catch (Exception e) {
