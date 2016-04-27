@@ -79,6 +79,7 @@ public class Dimension {
             }
             return possibilities;
         }
+        else {
         int i = 0;
         long[][] subPossibilities = subDimension.generateAllPossibilities();
         for (int j = 0; j != getSize(); j++) {
@@ -88,6 +89,7 @@ public class Dimension {
             }
         }
         return possibilities;
+        }
     }
 
     // incorporate a number in front of a set of number e.g (3,[0,3,5]) -> [3,0,3,5]

@@ -21,25 +21,42 @@ package ijfx.ui.explorer;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import ijfx.bridge.ImageJContainer;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
+import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.project.Project;
 import ijfx.core.stats.IjfxStatisticService;
+import ijfx.core.utils.DimensionUtils;
+import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.thumb.ThumbService;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
+import ijfx.ui.main.ImageJFX;
+import io.scif.services.DatasetIOService;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.image.Image;
+import mongis.utils.AsyncCallable;
 import mongis.utils.AsyncCallback;
+import net.imagej.Dataset;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -49,7 +66,9 @@ public class DefaultFolder implements Folder {
 
     private File file;
     private String name;
-    private List<Explorable> items;
+    private List<Explorable> files;
+    private List<Explorable> planes;
+    private List<Explorable> objects;
 
     @Parameter
     ImageRecordService imageRecordService;
@@ -68,7 +87,25 @@ public class DefaultFolder implements Folder {
 
     @Parameter
     StatusService statusService;
-    
+
+    @Parameter
+    MetaDataExtractionService metadataExtractionService;
+
+    @Parameter
+    ImagePlaneService imagePlaneService;
+
+    @Parameter
+    UIService uiService;
+
+    @Parameter
+    ThumbService thumberService;
+
+    @Parameter
+    DatasetIOService datasetIoService;
+
+    @Parameter
+    ActivityService activityService;
+
     public DefaultFolder() {
 
     }
@@ -96,19 +133,20 @@ public class DefaultFolder implements Folder {
     }
 
     @Override
-    public List<Explorable> getItemList() {
+    public List<Explorable> getFileList() {
 
-        if (items == null) {
+        if (files == null) {
 
-            items = new ArrayList<>();
-
+            files = new ArrayList<>();
+            /*
             new AsyncCallback<Void, List<Explorable>>()
                     .run(this::fetchItems)
                     .then(this::addItems)
-                    .start();
+                    .start();*/
+            files = fetchItems(null);
 
         }
-        return items;
+        return files;
     }
 
     private List<Explorable> fetchItems(Void v) {
@@ -130,7 +168,7 @@ public class DefaultFolder implements Folder {
     @JsonSetter("path")
     public void setPath(String path) {
         file = new File(path);
-        items = null;
+        files = null;
     }
 
     @JsonGetter("path")
@@ -139,14 +177,13 @@ public class DefaultFolder implements Folder {
     }
 
     private void addItems(List<Explorable> explorables) {
-        items.addAll(explorables);
+        files.addAll(explorables);
         System.out.println("Added " + explorables.size());
         eventService.publish(new FolderUpdatedEvent().setObject(this));
 
-        
         // now we can start a second thread that will slowly get statistics from images
         new AsyncCallback<List<Explorable>, Integer>()
-                .setInput(items)
+                .setInput(files)
                 .run(this::fetchMoreStatistics)
                 .then(count -> {
                     if (count > 0) {
@@ -154,7 +191,6 @@ public class DefaultFolder implements Folder {
                     }
                 })
                 .start();
-
     }
 
     private Integer fetchMoreStatistics(List<Explorable> explorableList) {
@@ -163,7 +199,7 @@ public class DefaultFolder implements Folder {
         int i = 0;
         for (Explorable e : explorableList) {
             statusService.showStatus(i, elements, "Fetchting min/max for more exploration.");
-            
+
             if (!e.getMetaDataSet().containsKey(MetaData.STATS_PIXEL_MIN)) {
                 if (e instanceof ImageRecordIconizer) {
                     ImageRecordIconizer iconizer = (ImageRecordIconizer) e;
@@ -174,27 +210,42 @@ public class DefaultFolder implements Folder {
                     elementAnalyzedCount++;
                 }
             }
-            i++;            
+            i++;
         }
         return elementAnalyzedCount;
     }
 
-    
     public Project getFolderProject() {
         return null;
     }
-    
-    
+
     private Project createPlaneProject() {
-        
-        
-        
+
         return null;
-        
-        
-        
     }
-    
-    
-    
+
+    @Override
+    public List<Explorable> getPlaneList() {
+
+        if (planes == null) {
+
+            System.out.println("Fetching planes !");
+            List<MetaDataSet> mList = new ArrayList<>(getFileList().size() * 3);
+            for (Explorable e : getFileList()) {
+                mList.addAll(metadataExtractionService.extractPlaneMetaData(e.getMetaDataSet()));
+            }
+
+            planes = mList.stream()
+                    .map(m -> new PlaneMetaDataSetWrapper(context,m))
+                    .collect(Collectors.toList());
+
+        }
+        System.out.println(String.format("%d planes fetched", planes.size()));
+        return planes;
+    }
+
+    @Override
+    public List<Explorable> getObjectList() {
+        return new ArrayList<>();
+    } 
 }

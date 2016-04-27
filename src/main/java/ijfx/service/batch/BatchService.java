@@ -23,6 +23,9 @@ package ijfx.service.batch;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowStep;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
+import net.imagej.display.DatasetView;
+import net.imagej.display.DefaultDatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.display.DisplayService;
@@ -63,13 +68,10 @@ public class BatchService extends AbstractService implements ImageJService {
     @Parameter
     private DisplayService displayService;
 
-   
-
     boolean running = false;
-    
-    
+
     // applies a single modules to multiple inputs and save them
-    public Task<Boolean> applyModule(List<BatchSingleInput> inputs, final Module module, HashMap<String, Object> parameters) {
+    public Task<Boolean> applyModule(List<BatchSingleInput> inputs, final Module module, boolean process, HashMap<String, Object> parameters) {
 
         return new Task<Boolean>() {
 
@@ -83,9 +85,9 @@ public class BatchService extends AbstractService implements ImageJService {
                     input.load();
                     count++;
                     final Module createdModule = moduleService.createModule(module.getInfo());
-                    if (!executeModule(input, createdModule, parameters)) {
+                    if (!executeModule(input, createdModule, process, parameters)) {
                         return false;
-                    };
+                    }
                     input.save();
                     updateProgress(count, totalOps);
                 }
@@ -107,9 +109,7 @@ public class BatchService extends AbstractService implements ImageJService {
             protected Boolean call() throws Exception {
                 int totalOps = inputs.size() * workflow.getStepList().size();
                 int count = 0;
-                
-               
-                
+
                 updateMessage("Starting batch processing...");
 
                 boolean success = true;
@@ -117,8 +117,8 @@ public class BatchService extends AbstractService implements ImageJService {
                 Exception error = null;
                 setRunning(true);
 
-               for (BatchSingleInput input : inputs) {
-               //inputs.parallelStream().forEach(input->{
+                for (BatchSingleInput input : inputs) {
+                    //inputs.parallelStream().forEach(input->{
                     logger.info("Running...");
 
                     if (isCancelled()) {
@@ -133,8 +133,7 @@ public class BatchService extends AbstractService implements ImageJService {
                         logger.info("Loading input...");
                         try {
                             getContext().inject(input);
-                        }
-                        catch(IllegalStateException ise) {
+                        } catch (IllegalStateException ise) {
                             logger.warning("Context already injected");
                         }
                         try {
@@ -156,7 +155,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
                         final Module module = moduleService.createModule(step.getModule().getInfo());
                         logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
-                        if (!executeModule(input, module, step.getParameters())) {
+                        if (!executeModule(input, module, true, step.getParameters())) {
 
                             updateMessage("Error :-(");
                             updateProgress(0, 1);
@@ -188,7 +187,7 @@ public class BatchService extends AbstractService implements ImageJService {
                     updateMessage("An error happend during the process.");
                     updateProgress(1, 1);
                 }
-                
+
                 setRunning(false);
                 return success;
             }
@@ -198,8 +197,7 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     // execute a module (with all the side parameters injected)
-    public boolean executeModule(BatchSingleInput input, Module module, Map<String, Object> parameters) {
-
+    public boolean executeModule(BatchSingleInput input, Module module, boolean process, Map<String, Object> parameters) {
         logger.info("Executing module " + module.getDelegateObject().getClass().getSimpleName());
         logger.info("Injecting input");
         boolean inputInjectionSuccess = injectInput(input, module);
@@ -228,7 +226,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
         logger.info("Running module");
 
-        Future<Module> run = moduleService.run(module, true);
+        Future<Module> run = moduleService.run(module, process, parameters);
 
         logger.info(String.format("[%s] module started", moduleName));
 
@@ -237,7 +235,7 @@ public class BatchService extends AbstractService implements ImageJService {
             logger.info(String.format("[%s] module finished", moduleName));
             extractOutput(input, module);
         } catch (Exception ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,"Error when running module "+moduleName,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, "Error when running module " + moduleName, ex);;
             return false;
 
         }
@@ -273,6 +271,15 @@ public class BatchService extends AbstractService implements ImageJService {
             // if yes, injecting the display
             module.setInput(item.getName(), input.getDisplay());
             return true;
+        }
+        item = moduleService.getSingleInput(module, DatasetView.class);
+        if (item != null) {
+            logger.info("DatasetView found !");
+            // if yes, injecting the display
+            DatasetView datasetView = input.getDatasetView();
+
+            module.setInput(item.getName(), datasetView);
+            return true;
         } else {
             logger.info("Error when injecting input !");
             return false;
@@ -280,25 +287,22 @@ public class BatchService extends AbstractService implements ImageJService {
 
     }
 
-    // extract the input from an executed module
-    public boolean extractOutput(BatchSingleInput input, Module module) {
+    // extract the outpu from an executed module
+    public void extractOutput(BatchSingleInput input, Module module) {
+        Map<String, Object> outputs = module.getOutputs();
+        outputs.forEach((s, o) -> {
+            if (o instanceof Dataset) {
+                logger.info("Extracting Dataset !");
+                input.setDataset((Dataset) module.getOutput(s));
+            } else if (o instanceof ImageDisplay) {
+                logger.info("Extracting ImageDisplay !");
+                input.setDisplay((ImageDisplay) module.getOutput(s));
+            } else if (o instanceof DatasetView) {
+                logger.info("Extracting DatasetView !");
+                input.setDatasetView((DatasetView) module.getOutput(s));
+            }
+        });
 
-        // testing if it takes a Display as input
-        ModuleItem item = moduleService.getSingleOutput(module, Dataset.class);
-        if (item != null) {
-            // if yes, injecting the display
-            input.setDataset((Dataset) module.getOutput(item.getName()));
-            return false;
-        }
-
-        item = moduleService.getSingleInput(module, Dataset.class);
-
-        if (item != null) {
-            input.setDisplay((ImageDisplay) module.getOutput(item.getName()));
-            return true;
-        }
-
-        return false;
     }
 
     public boolean isRunning() {
@@ -308,8 +312,5 @@ public class BatchService extends AbstractService implements ImageJService {
     public void setRunning(boolean running) {
         this.running = running;
     }
-    
-    
-    
 
 }

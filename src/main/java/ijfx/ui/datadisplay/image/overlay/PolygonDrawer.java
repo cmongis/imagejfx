@@ -48,6 +48,7 @@ public class PolygonDrawer implements OverlayDrawer<PolygonOverlay> {
         shape.getPoints().clear();
 
         PolygonRegionOfInterest roi = overlay.getRegionOfInterest();
+       
         Double[] points = new Double[roi.getVertexCount() * 2];
         for (int i = 0; i != roi.getVertexCount(); i++) {
             

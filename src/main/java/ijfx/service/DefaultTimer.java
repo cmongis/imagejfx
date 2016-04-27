@@ -69,12 +69,19 @@ public class DefaultTimer implements Timer {
     public long now() {
         return System.currentTimeMillis();
     }
-
-    public long elapsed(String text) {
+    
+    @Override
+    public long measure(String text) {
         long now = System.currentTimeMillis();
         long elapsed = (now - last);
         last = now;
         getStats(text).addValue(elapsed);
+        return elapsed;
+    }
+
+    @Override
+    public long elapsed(String text) {
+        long elapsed = measure(text);
         logger.info(String.format("[%s] %s : %dms",id,text,elapsed));
         return elapsed;
     }

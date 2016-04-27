@@ -19,40 +19,108 @@
  */
 package ijfx.core.project;
 
-import ijfx.core.imagedb.MetaDataExtractorService;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
-import io.scif.util.FormatTools;
 import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.plugin.Parameter;
+import ijfx.core.imagedb.MetaDataExtractionService;
+import ijfx.service.ImagePlaneService;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
+import io.scif.MetadataLevel;
+import io.scif.config.SCIFIOConfig;
+import io.scif.services.DatasetIOService;
+import java.io.IOException;
+import java.util.List;
+import net.imagej.Dataset;
+import net.imagej.DatasetService;
 
 /**
  *
  * @author cyril
  */
-public class MetadataExtractionTest extends BaseSciJavaTest{
-    
+public class MetadataExtractionTest extends BaseSciJavaTest {
+
     @Parameter
-    MetaDataExtractorService extractorService;
+    MetaDataExtractionService extractorService;
+
+    @Parameter
+    DatasetIOService datasetIoService;
+
+    @Parameter
+    DatasetService datasetService;
+
+    @Parameter
+    TimerService timerService;
+
+    @Parameter
+    ImagePlaneService imagePlaneService;
+    
+    private static File testFile = new File("./src/test/resources/multidim.tif");
     
     @Test
     public void testTiffFile() {
-       
+
         init();
-        File f = new File("./src/test/resources/multidim.tif");
-        if(f.exists() == false) {
+        File f = testFile;
+        if (f.exists() == false) {
             System.out.println("File doesn't exist... skipping test");
             return;
-        }
-        else {
+        } else {
             System.out.println("File exists, beginning test.");
         }
         MetaDataSet metadataset = extractorService.extractMetaData(f);
+        System.out.println(metadataset);
+        Assert.assertSame("Channel number", metadataset.get(MetaData.CHANNEL_COUNT).getIntegerValue(), 3);
         
-        Assert.assertSame("Channel number",metadataset.get(MetaData.CHANNEL_COUNT).getIntegerValue(),3);
-        
+      
     }
     
+    @Test
+    public void testTransformation() {
+        init();
+        File f = testFile;//OMG!!!!new File("/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif");//testFile;
+        MetaDataSet m = extractorService.extractMetaData(f);
+        int channelCount = m.get(MetaData.CHANNEL_COUNT).getIntegerValue();
+        int tCount = m.get(MetaData.TIME_COUNT).getIntegerValue();
+        int zCount = m.get(MetaData.ZSTACK_NUMBER).getIntegerValue();
+        System.out.println(m);
+        List<MetaDataSet> mList = extractorService.extractPlaneMetaData(m);
+        System.out.println(mList.get(0));
+        
+        Assert.assertEquals(tCount * zCount*channelCount, mList.size());
+    }
+
+   
+    public void testPlaneExtraction() throws IOException {
+        init();
+
+        Timer t = timerService.getTimer("Dataset open benchmarking");
+        //String testFile = "/Users/cyril/test_img/psfj/gfp_nikon/gfp_nikon1_2048x2048.tif";
+        String testFile = MetadataExtractionTest.testFile.getPath();//OMG!!!!"/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
+        for (int i = 0; i != 100; i++) {
+            t.start();
+            Dataset dataset = imagePlaneService.extractPlane(new File(testFile), new long[]{0},new long[]{3});
+            t.elapsed("Dataset reading"); 
+        }
+        t.logAll();
+
+    }
+    
+    private  Dataset openVirtualDataset(String file) throws IOException{
+        final SCIFIOConfig config = new SCIFIOConfig();
+	
+		// skip min/max computation
+		config.imgOpenerSetComputeMinMax(false);
+                
+		// prefer planar array structure, for ImageJ1 and ImgSaver compatibility
+		config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
+                config.parserSetLevel(MetadataLevel.MINIMUM);
+                
+                return datasetIoService.open(file, config);
+                
+    }
+
 }

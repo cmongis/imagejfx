@@ -26,7 +26,7 @@ import javafx.beans.property.BooleanProperty;
  *
  * @author cyril
  */
-public interface Explorable extends Iconazable,MetaDataOwner{
+public interface Explorable extends Iconazable,MetaDataOwner,DatasetHolder{
      
    
  

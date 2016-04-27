@@ -291,6 +291,7 @@ public class ProjectToImageJService extends AbstractService implements ImageJSer
         if (r != null) {
             logger.info("Opening plane 0");
             Plane plane = r.openPlane(0, planeIndex);
+            
             logger.info("Plane opened. Returning plane");
             return plane;
         }

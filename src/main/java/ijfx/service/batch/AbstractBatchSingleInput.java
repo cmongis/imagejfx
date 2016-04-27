@@ -20,9 +20,10 @@
 package ijfx.service.batch;
 
 import net.imagej.Dataset;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import org.scijava.display.Display;
+import org.scijava.Context;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
 
@@ -30,59 +31,70 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public abstract class AbstractBatchSingleInput implements BatchSingleInput{
+public abstract class AbstractBatchSingleInput implements BatchSingleInput {
+
+    DatasetView datasetView;
+
     Dataset dataset;
-    
+
     ImageDisplay display;
-    
+
     @Parameter
     protected ImageDisplayService imageDisplayService;
-    
+
     @Parameter
     protected DisplayService displayService;
-    
-      @Override
+
+    @Override
+    public void setDatasetView(DatasetView datasetView) {
+        this.datasetView = datasetView;
+        dataset = this.datasetView.getData();
+    }
+
+    @Override
+    public DatasetView getDatasetView() {
+        return this.datasetView;
+    }
+    @Parameter
+    Context context;
+
+    @Override
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
-        display = (ImageDisplay) displayService.createDisplay(dataset);
+        ImageDisplay imageDisplay = new SilentImageDisplay();
+        context.inject(imageDisplay);
+        imageDisplay.display(dataset);
+        display = imageDisplay;
+        datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
+        datasetView.rebuild();
     }
 
     @Override
     public void setDisplay(ImageDisplay display) {
         this.display = display;
         dataset = imageDisplayService.getActiveDataset(display);
-        
+
     }
 
     @Override
     public Dataset getDataset() {
-        
-
         return dataset;
     }
 
     @Override
     public ImageDisplay getDisplay() {
-        displayService.setActiveDisplay(display);
-      
         return display;
     }
-    
-    
+
     @Override
     public void dispose() {
         dataset = null;
         displayService.getDisplays().remove(display);
         imageDisplayService.getImageDisplays().remove(display);
+        display.clear();
         display.close();
         display = null;
         System.gc();
-     
-        
     }
-    
-   
-            
-            
-            
+
 }

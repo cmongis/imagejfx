@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author cyril
  */
-public interface MetaDataExtractorService extends IjfxService {
+public interface MetaDataExtractionService extends IjfxService {
     
     
     public MetaDataSet extractMetaData(File file);

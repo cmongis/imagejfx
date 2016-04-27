@@ -19,6 +19,8 @@
  */
 package ijfx.ui.explorer.view;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
 import ijfx.ui.explorer.ExplorerView;
@@ -34,11 +36,13 @@ import javafx.scene.layout.TilePane;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
 import mongis.utils.panecell.ScrollBinder;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = ExplorerView.class)
 public class IconView extends ScrollPane implements ExplorerView {
 
     private final TilePane tilePane = new TilePane();
@@ -100,6 +104,16 @@ public class IconView extends ScrollPane implements ExplorerView {
     public void onMouseDrag(DragEvent event) {
         System.out.println(event);
         
+    }
+
+    @Override
+    public Node getIcon() {
+        return new FontAwesomeIconView(FontAwesomeIcon.CUBES);
+    }
+
+    @Override
+    public void setSelectedItem(List<? extends Explorable> items) {
+      
     }
     
 }

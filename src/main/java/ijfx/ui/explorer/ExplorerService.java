@@ -37,6 +37,12 @@ public interface ExplorerService extends IjfxService{
     
     void applyFilter(Predicate<MetaDataOwner> predicate);
     
+    void setOptionalFilter(Predicate<MetaDataOwner> addionnalFilter);
     
     List<Explorable> getFilteredItems();
+    
+    List<? extends Explorable> getSelectedItems();
+    
+    void selectItem(Explorable explorable);
+    
 }

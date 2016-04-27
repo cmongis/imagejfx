@@ -501,7 +501,9 @@ public class ImageWindow extends Window {
 
     // add the MoveablePoints of a overlay in order to edit it
     private void setEdited(Overlay overlay) {
-
+        
+        if(getOverlays().contains(overlay) == false) return;
+        
         // delete all the moveable points
         Node[] nodes = anchorPane.getChildren().stream().filter(node -> MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size -> new Node[size]);
         anchorPane.getChildren().removeAll(nodes);
@@ -519,7 +521,6 @@ public class ImageWindow extends Window {
 
             modifiers.forEach(m -> m.positionOnImageProperty().addListener(this::onMoveablePointMoved));
             anchorPane.getChildren().addAll(modifiers);
-
         }
 
     }

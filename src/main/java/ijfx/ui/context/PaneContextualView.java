@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javafx.scene.Node;
 import ijfx.ui.previewToolbar.ContextualPaneIconWrapper;
+import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 
 /**
@@ -33,7 +34,6 @@ import javafx.scene.layout.Pane;
 public class PaneContextualView implements ContextualView<Node> {
 
     final Pane pane;
-
 
     final String name;
 
@@ -50,6 +50,7 @@ public class PaneContextualView implements ContextualView<Node> {
 
     public void registerNode(Node node, String context) {
         ContextualPaneIconWrapper wrapper = new ContextualPaneIconWrapper(pane, node, context);
+        wrapper.setOrder(wrapperList.size());
         manager.link(wrapper.getName(), context);
         wrapperList.add(wrapper);
     }
@@ -67,15 +68,54 @@ public class PaneContextualView implements ContextualView<Node> {
     @Override
     public ContextualView<Node> onContextChanged(List<? extends ContextualWidget<Node>> toShow, List<? extends ContextualWidget<Node>> toHide) {
 
-        pane.getChildren().removeAll(toHide.stream().map(widget -> widget.getObject()).collect(Collectors.toList()));
-        pane.getChildren().addAll(toShow.stream().map(widget -> widget.getObject()).collect(Collectors.toList()));
+        final List<Node> actual = new ArrayList();
+        actual.addAll(pane.getChildren());
+
+        actual.removeAll(toHide.stream().map(widget -> widget.getObject()).collect(Collectors.toList()));
+        actual.addAll(toShow.stream().map(widget -> widget.getObject()).collect(Collectors.toList()));
+        actual.sort(this::compare);
+
+        System.out.println("sorting");
+
+        Platform.runLater(() -> {
+            pane.getChildren().clear();
+            pane.getChildren().addAll(actual);
+
+        });
 
         return this;
     }
-        public Pane getPane() {
+
+    public Pane getPane() {
         return pane;
     }
-/*
+
+    public int compare(Node node1, Node node2) {
+
+        ContextualWidget<Node> w1 = getWrapperFromNode(node1);
+        ContextualWidget<Node> w2 = getWrapperFromNode(node2);
+
+        if (w1 == null && w2 == null) {
+            return 0;
+        }
+        if (w1 == null) {
+            return -100;
+        }
+        if (w2 == null) {
+            return 100;
+        }
+
+        return Double.compare(w1.getPriority(), w2.getPriority());
+
+    }
+
+    private ContextualWidget<Node> getWrapperFromNode(Node node) {
+        return wrapperList
+                .stream().filter(wrapper -> wrapper.getObject() == node).findFirst().orElse(null);
+    }
+    /*
+       
+        
     // widget that show itself by adding itself itside a pane
     private class ContextualPaneNodeWrapper implements ContextualWidget<Node> {
 

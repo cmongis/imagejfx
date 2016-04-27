@@ -23,7 +23,10 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.context.PaneContextualView;
+import ijfx.ui.utils.FontAwesomeIconUtils;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 
@@ -32,23 +35,27 @@ import javafx.scene.layout.Pane;
  * @author Tuan anh TRINH
  */
 public class LabelCategory extends Label {
+
     private final PaneContextualView contextualView;
     private final FontAwesomeIconView fontAwesomeIconView;
     private Pane pane;
-    public LabelCategory (String s, UiContextService contextService, String icon)
-    {
-        super (s);
-        this.getStyleClass().add("menu-bar");
+    private final String context;
+
+    public LabelCategory(String s, String icon, UiContextService contextService, String context) {
+        super(s);
         fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
-        this.setGraphic(fontAwesomeIconView);
+        WritableImage wi = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, (int) Double.parseDouble(fontAwesomeIconView.getSize()));
+        this.setGraphic(new ImageView(wi));
         pane = new FlowPane();
         contextualView = new PaneContextualView(contextService, pane, this.getText());
+        this.context = context;
     }
 
-
+   
     public PaneContextualView getContextualView() {
         return contextualView;
     }
+
     public void setPane(Pane p) {
         pane = p;
     }
@@ -57,4 +64,9 @@ public class LabelCategory extends Label {
         return pane;
     }
     
+    public String getContext()
+    {
+        return context;
+    }
+
 }

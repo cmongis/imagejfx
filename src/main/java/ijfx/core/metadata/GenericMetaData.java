@@ -124,6 +124,9 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
         return new DecimalFormat("#.####").format(d);
     }
     
+    public String toString() {
+        return String.format("[MetaData Type = %s] %s = %s",(getType() == MetaData.TYPE_STRING ? "String" : "Number"),getName(),getStringValue());
+    }
     
     @Override
     public boolean equals(Object o) {

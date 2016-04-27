@@ -21,18 +21,22 @@ package ijfx.ui.explorer;
 
 import java.util.List;
 import javafx.scene.Node;
+import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
  * @author cyril
  */
-public interface ExplorerView {
+public interface ExplorerView extends SciJavaPlugin {
     
     public Node getNode();
     
+    public Node getIcon();
+    
     public void setItem(List<? extends Explorable> items);
-    
-    
+     
     public List<? extends Explorable> getSelectedItems();
+    
+    public void setSelectedItem(List<? extends Explorable> items);
     
 }

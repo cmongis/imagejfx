@@ -28,6 +28,9 @@ import javafx.scene.Node;
  */
 public class NodeContextualWidget implements ContextualWidget<Node>{
 
+    
+    double priority = 0;
+    
     /**
      *
      * @param name
@@ -151,6 +154,11 @@ public class NodeContextualWidget implements ContextualWidget<Node>{
     @Override
     public Node getObject() {
         return node;
+    }
+
+    @Override
+    public double getPriority() {
+        return priority;
     }
 
 }

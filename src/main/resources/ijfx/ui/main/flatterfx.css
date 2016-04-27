@@ -495,6 +495,11 @@
 .menu-button .arrow {
     -fx-background-color:-txt-normal;
 }
+
+.menu-button.normal {
+    -fx-padding:0.02em;
+}
+
 .menu-item:focused{
     -fx-background-color: -flatter-primary;
 }
@@ -1060,10 +1065,18 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-padding:10;
 }
 
-.popoverToolBar{
-    -fx-fill:-bg-light!important;
+.imagej-top-toolbar-bar {
     -fx-background-color:-bg-darker;
-    -fx-stroke:-bg-darker!important;
+    -fx-spacing: 20;
+    -fx-padding: 20 10 20 10;
+}
+.popoverToolBar{
+    
+    -fx-background-color:-bg-darker;
+    -fx-stroke-fill:null;
+}
+.popoverToolBar > * {
+    -fx-stroke:null;
 }
 
 .icon-toolbar{
@@ -1775,7 +1788,6 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 /*
     Number filter related classes
-
 */ 
 
 .text-field.number {
@@ -1785,3 +1797,15 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .number-filter #valueCountLabel{
     -fx-font-size:0.7em;
 }
+
+/*
+     Explorer Activity
+ */
+ 
+ #toolbarBorderPane {
+     -fx-padding:10px;
+     -fx-background-color:-bg-darker;
+ }
+ #viewHBox .toggle-button {
+     -fx-padding:0.5em;
+ }

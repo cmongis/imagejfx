@@ -38,12 +38,14 @@ public class FakeTask<T> extends Task<T> {
     private long totalTime = 3000;
 
     
+    
     public FakeTask() {
         super();
     }
     
     public FakeTask(int totalTime) {
         this();
+        
         this.totalTime = totalTime;
     }
     
@@ -72,7 +74,18 @@ public class FakeTask<T> extends Task<T> {
 
              updateMessage(message);
         }
+        System.out.println("Fake task stopped");
        return fakeResult;
     }
     
+    
+    public FakeTask<T> start() {
+        new Thread(this).start();
+        return this;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("Fake Task of %dms",totalTime);
+    }
 }

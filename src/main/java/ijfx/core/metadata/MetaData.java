@@ -118,6 +118,7 @@ public interface MetaData {
 
     public final static String DIMENSION_ORDER = "Dimension order";
     public final static String DIMENSION_LENGHS = "Dimension lengths";
+    public final static String PLANE_NON_PLANAR_POSITION = "*Non planar position";
     
     public final static String STATS_PIXEL_MIN = "Min";
     public final static String STATS_PIXEL_MAX = "Max";
@@ -131,6 +132,13 @@ public interface MetaData {
     
     public static boolean isNull(MetaData data) {
         return data.isNull();
+    }
+    
+    public static boolean canDisplay(String metadataKey) {
+        return metadataKey.startsWith("*");
+    }
+    public static boolean canDisplay(MetaData m) {
+        return canDisplay(m.getName());
     }
     
     // addedd an other useful comment

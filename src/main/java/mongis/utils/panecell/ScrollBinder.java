@@ -59,6 +59,8 @@ public class ScrollBinder {
 
     }
 
+    
+    
     private void onListChange(ListChangeListener.Change<? extends Node> change) {
         while (change.next()) {
             for (Node added : change.getAddedSubList()) {
@@ -71,14 +73,16 @@ public class ScrollBinder {
 
     }
 
+    
+    
     public void onScroll(Observable observable, Number oldValue, Number newValue) {
 
         double minX = scrollPane.getHvalue() * scrollPane.getContent().getBoundsInLocal().getWidth();
         double minY = scrollPane.getVvalue() * scrollPane.getContent().getBoundsInLocal().getHeight();
         Bounds scrollWindow = new BoundingBox(minX, minY, scrollPane.getWidth(), scrollPane.getHeight());
 
-        Parent node = (Parent) scrollPane.getContent();
-        node.getChildrenUnmodifiable().forEach(child -> {
+        Parent parentNode = (Parent) scrollPane.getContent();
+        parentNode.getChildrenUnmodifiable().forEach(child -> {
             Bounds boundsInParent = child.getBoundsInParent();
 
             // if the child is inside the scroll window then we add it
