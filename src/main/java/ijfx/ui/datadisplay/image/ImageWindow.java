@@ -432,7 +432,7 @@ public class ImageWindow extends Window {
     }
 
     public synchronized void refreshSourceImage() {
-
+        
         if (checkServices()) {
            
             refreshQueue.execute(new AsyncCallback<Void, Void>()
@@ -443,7 +443,7 @@ public class ImageWindow extends Window {
     }
 
     private void transformImage() {
-        logger.info("Refreshing source image");
+        logger.info("Refreshing source image "+imageDisplay.getName());
 
         //Retrieving buffered image from the dataset view
         BufferedImage bf = getDatasetview().getScreenImage().image();

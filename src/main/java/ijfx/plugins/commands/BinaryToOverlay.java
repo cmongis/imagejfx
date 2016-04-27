@@ -24,7 +24,6 @@ import ij.blob.Blob;
 import ij.blob.ManyBlobs;
 import ij.process.ByteProcessor;
 import ijfx.service.ImagePlaneService;
-import ijfx.service.log.LogService;
 import ijfx.ui.main.ImageJFX;
 import java.awt.Polygon;
 import java.util.ArrayList;
@@ -98,11 +97,26 @@ public class BinaryToOverlay implements Command {
     }
 
     private <T extends RealType<T>> void perform(Dataset dataset) {
-
+        
+        overlays = transform(context, dataset, USE_WHITE_PIXEL.equals(objectColor));
+        
+        if (overlays != null && display != null) {
+            logger.info(String.format("%d overlays added to %s", overlays.length, display.toString()));
+        }
+        else {
+            logger.info("No overlay added");
+        }
+        
+        
+    }
+    
+    
+    public static <T> Overlay[] transform(Context context, Dataset dataset,boolean recognizeWhiteObject) {
+        // converting 
+        
         int width = (int) dataset.max(0);
         int height = (int) dataset.max(1);
-        int j = 0;
-        byte[] pixels = new byte[(int) (width * height)];
+       
         RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
         Cursor<T> cursor = (Cursor<T>) dataset.cursor();
         cursor.reset();
@@ -122,25 +136,15 @@ public class BinaryToOverlay implements Command {
 
             }
         }
-        /*
-        while(cursor.hasNext()) {
-            cursor.fwd();
-            if(j+1 == pixels.length)break;
-            if(j % 100 == 0) System.out.println(cursor.get().getRealDouble());
-            pixels[j] = cursor.get().getRealDouble() == 0.0 ? Byte.MIN_VALUE : Byte.MAX_VALUE;
-            j++;
-        }*/
+      
+        ImagePlus imp = new ImagePlus("Temporary mask", byteProcessor);
 
-        //ByteProcessor byteProcessor = new ByteProcessor(width, height, pixels);
-        //RandomAccessibleInterval<T> r = (RandomAccessibleInterval <T>)dataset.getImgPlus();
-        ImagePlus imp = new ImagePlus(objectColor, byteProcessor);
-
-        //imp.setProcessor(imp.getProcessor().convertToByte(true));
+       
         ManyBlobs blobs = new ManyBlobs(imp);
 
         // inverting if necessary because the
         // CC algorithm recognise black objects
-        if (objectColor == USE_WHITE_PIXEL) {
+        if (recognizeWhiteObject) {
             imp.getProcessor().invert();
         }
         //launching the search
@@ -181,12 +185,7 @@ public class BinaryToOverlay implements Command {
 
         }
 
-        overlays = listOverlays.toArray(new Overlay[listOverlays.size()]);
-        if (overlays != null && display != null) {
-            logger.info(String.format("%d overlays added to %s", overlays.length, display.toString()));
-        }
-        else {
-            logger.info("No overlay added");
-        }
+        return listOverlays.toArray(new Overlay[listOverlays.size()]);
     }
+    
 }

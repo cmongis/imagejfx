@@ -17,63 +17,52 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.batch;
+package ijfx.service.batch.input;
 
+import ijfx.service.batch.BatchSingleInput;
 import net.imagej.Dataset;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import org.scijava.Context;
-import org.scijava.display.DisplayService;
-import org.scijava.plugin.Parameter;
 
 /**
+ * Naive implementation of the Batch Input
  *
  * @author cyril
  */
-public abstract class AbstractBatchSingleInput implements BatchSingleInput {
-
-    private DatasetView datasetView;
+public class NaiveBatchInput implements BatchSingleInput {
 
     private Dataset dataset;
 
-    private ImageDisplay display;
+   private ImageDisplay imageDisplay;
+    
+    private DatasetView datasetView;
 
-    @Parameter
-    protected ImageDisplayService imageDisplayService;
 
-    @Parameter
-    protected DisplayService displayService;
+
+    private String name;
+
+    @Override
+    public DatasetView getDatasetView() {
+        return datasetView;
+    }
 
     @Override
     public void setDatasetView(DatasetView datasetView) {
         this.datasetView = datasetView;
-        dataset = this.datasetView.getData();
     }
 
     @Override
-    public DatasetView getDatasetView() {
-        return this.datasetView;
+    public void load() {
     }
-    @Parameter
-    Context context;
 
     @Override
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
-        ImageDisplay imageDisplay = new SilentImageDisplay();
-        context.inject(imageDisplay);
-        imageDisplay.display(dataset);
-        display = imageDisplay;
-       // datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
-        //datasetView.rebuild();
     }
 
     @Override
     public void setDisplay(ImageDisplay display) {
-        this.display = display;
-        dataset = imageDisplayService.getActiveDataset(display);
-
+        this.imageDisplay = display;
     }
 
     @Override
@@ -83,18 +72,20 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput {
 
     @Override
     public ImageDisplay getDisplay() {
-        return display;
+        return imageDisplay;
+    }
+
+    @Override
+    public void save() {
     }
 
     @Override
     public void dispose() {
-        dataset = null;
-        displayService.getDisplays().remove(display);
-        imageDisplayService.getImageDisplays().remove(display);
-        display.clear();
-        display.close();
-        display = null;
-        System.gc();
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
 }

@@ -60,21 +60,21 @@ public class OverlayPostProcessor extends AbstractPostprocessorPlugin implements
         Map<String, Object> inputs = module.getInputs();
         for (String key : inputs.keySet()) {
             Object value = inputs.get(key);
+            if(value == null) continue;
             if (ImageDisplay.class.isAssignableFrom(value.getClass())) {
                 display = (ImageDisplay) value;
             }
         }
-
-       
-
+        
         // aborting if no singleinput is a list of overlay
         if (singleOutput == null || display == null) {
+            System.out.println("Aborting post processing");
             return;
         }
-        
+       
          // checking the output
         overlays = singleOutput.getValue(module);
-
+         if(overlays.length == 0) return;
         overlayService.addOverlays(display, Arrays.asList(overlays));
 
     }

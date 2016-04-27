@@ -159,8 +159,11 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         axisTypeList[0] = input.getImgPlus().axis(0).type();
         axisTypeList[1] = input.getImgPlus().axis(1).type();
 
-        Dataset output = datasetService.create(dims, input.getName(), axisTypeList, input.getValidBits(), input.isSigned(), false);
-        return output;
+       Dataset output = datasetService.create(dims, input.getName(), axisTypeList, input.getValidBits(), input.isSigned(), false);
+        
+     
+       
+       return output;
     }
 
     @Override

@@ -20,33 +20,36 @@
  */
 package ijfx.service.batch;
 
+import ijfx.bridge.FxUIPreprocessor;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowStep;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.display.DatasetView;
-import net.imagej.display.DefaultDatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import org.scijava.display.DisplayPostprocessor;
 import org.scijava.display.DisplayService;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleItem;
 import org.scijava.module.ModuleService;
+import org.scijava.module.process.PostprocessorPlugin;
+import org.scijava.module.process.PreprocessorPlugin;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.plugin.PluginService;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 
@@ -68,7 +71,19 @@ public class BatchService extends AbstractService implements ImageJService {
     @Parameter
     private DisplayService displayService;
 
-    boolean running = false;
+    @Parameter
+    private PluginService pluginService;
+
+    private boolean running = false;
+
+    private List<Class<?>> processorBlackList = new ArrayList<>();
+
+    public BatchService() {
+        super();
+        processorBlackList.add(FxUIPreprocessor.class);
+        processorBlackList.add(DisplayPostprocessor.class);
+
+    }
 
     // applies a single modules to multiple inputs and save them
     public Task<Boolean> applyModule(List<BatchSingleInput> inputs, final Module module, boolean process, HashMap<String, Object> parameters) {
@@ -226,7 +241,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
         logger.info("Running module");
 
-        Future<Module> run = moduleService.run(module, process, parameters);
+        Future<Module> run = moduleService.run(module, getPreProcessors(), getPostprocessors(), parameters);
 
         logger.info(String.format("[%s] module started", moduleName));
 
@@ -252,7 +267,7 @@ public class BatchService extends AbstractService implements ImageJService {
         item = moduleService.getSingleInput(module, Dataset.class);
 
         if (item != null) {
-            logger.info("Dataset input found !");
+            logger.info("Dataset input field found : " + item.getName());
             Dataset dataset = input.getDataset();
 
             if (dataset == null) {
@@ -267,14 +282,14 @@ public class BatchService extends AbstractService implements ImageJService {
         // testing if it takes a Display as input
         item = moduleService.getSingleInput(module, ImageDisplay.class);
         if (item != null) {
-            logger.info("ImageDisplay found !");
+            logger.info("ImageDisplay input field found : " + item.getName());
             // if yes, injecting the display
             module.setInput(item.getName(), input.getDisplay());
             return true;
         }
         item = moduleService.getSingleInput(module, DatasetView.class);
         if (item != null) {
-            logger.info("DatasetView found !");
+            logger.info("DatasetView field found : " + item.getName());
             // if yes, injecting the display
             DatasetView datasetView = input.getDatasetView();
 
@@ -291,10 +306,10 @@ public class BatchService extends AbstractService implements ImageJService {
     public void extractOutput(BatchSingleInput input, Module module) {
         Map<String, Object> outputs = module.getOutputs();
         outputs.forEach((s, o) -> {
-            if (o instanceof Dataset) {
+            if (Dataset.class.isAssignableFrom(o.getClass())) {
                 logger.info("Extracting Dataset !");
                 input.setDataset((Dataset) module.getOutput(s));
-            } else if (o instanceof ImageDisplay) {
+            } else if (ImageDisplay.class.isAssignableFrom(o.getClass())) {
                 logger.info("Extracting ImageDisplay !");
                 input.setDisplay((ImageDisplay) module.getOutput(s));
             } else if (o instanceof DatasetView) {
@@ -311,6 +326,37 @@ public class BatchService extends AbstractService implements ImageJService {
 
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    Class<? extends PreprocessorPlugin>[] preProcessorBlackList;
+
+    private <T> T injectPlugin(T p) {
+        try {
+            getContext().inject(p);
+        }
+        finally {
+            return p;
+        }
+    }
+    
+    private List<PreprocessorPlugin> getPreProcessors() {
+        return pluginService
+                .createInstancesOfType(PreprocessorPlugin.class)
+                .stream()
+                .sequential()
+                .filter(p -> !processorBlackList.contains(p.getClass()))
+                .map(this::injectPlugin)
+                .collect(Collectors.toList());
+    }
+
+    private List<PostprocessorPlugin> getPostprocessors() {
+        return pluginService
+                .createInstancesOfType(PostprocessorPlugin.class)
+                .stream()
+                .sequential()
+                .filter(p -> !processorBlackList.contains(p.getClass()))
+                .map(this::injectPlugin)
+                .collect(Collectors.toList());
     }
 
 }

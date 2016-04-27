@@ -19,25 +19,44 @@
  */
 package ijfx.ui.plugin.panel;
 
+import ijfx.plugins.commands.BinaryToOverlay;
+import ijfx.service.batch.BatchInputWrapper;
+import ijfx.service.batch.BatchService;
+import ijfx.service.batch.BatchSingleInput;
+import ijfx.service.batch.ImageDisplayBatchInput;
+import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.batch.WorkflowPanel;
 import ijfx.ui.main.Localization;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
-import net.imagej.ops.Ops.Threshold;
+import mongis.utils.TaskButtonBinding;
+import net.imagej.Dataset;
+import net.imagej.display.DefaultImageDisplay;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
+import net.imagej.display.OverlayService;
+import net.imagej.overlay.Overlay;
 import net.imagej.plugins.commands.binary.Binarize;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
-import net.imglib2.algorithm.binary.Thresholder;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -53,12 +72,35 @@ public class SegmentationPanel extends BorderPane implements UiPlugin{
     @FXML
     private VBox workflowVBox;
     
+    @FXML
+    private Button testButton;
+    
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
+    @Parameter
+    BatchService batchService;
+    
+    @Parameter
+    UIService uiService;
+    
+    @Parameter
+    OverlayService overlayService;
+    
+    @Parameter
+    LoadingScreenService loadingScreenService;
+    
+    TaskButtonBinding taskButtonBinding;
     
     WorkflowPanel workflowPanel;
     
     public SegmentationPanel() {
         try {
             FXUtilities.injectFXML(this);
+            
+            taskButtonBinding = new TaskButtonBinding(testButton);
+            taskButtonBinding.runTaskOnClick(this::createTaskButtonBinding);
+            
         } catch (IOException ex) {
             Logger.getLogger(SegmentationPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -83,5 +125,44 @@ public class SegmentationPanel extends BorderPane implements UiPlugin{
         return this;
     }
     
+    public Task createTaskButtonBinding(TaskButtonBinding b) {
+       return runTask();
+    }
+    
+    public Task<Boolean> runTask() {
+        
+        List<BatchSingleInput> inputs = new ArrayList<>();
+        BatchSingleInput input = new ImageDisplayBatchInput(imageDisplayService.getActiveImageDisplay(), true);
+        input = new BatchInputWrapper(input)
+                .then(this::onTestFinished);
+        inputs.add(input);
+        Task<Boolean> task = batchService.applyWorkflow(inputs, new DefaultWorkflow(workflowPanel.stepListProperty()));
+        loadingScreenService.frontEndTask(task, false);
+        return task;
+    }
+    
+    public void onTestFinished(BatchSingleInput output) {
+        System.out.println("test is finished !");
+       
+        Task task = new AsyncCallback<Dataset,ImageDisplay>()
+                .setInput(output.getDataset())
+                .run(dataset->{
+                    Overlay[] overlay = BinaryToOverlay.transform(context, dataset, false);
+                    ImageDisplay imageDisplay = new DefaultImageDisplay();
+                    
+                    context.inject(imageDisplay);
+                    
+                    imageDisplay.display(dataset);
+                    overlayService.addOverlays(imageDisplay, Arrays.asList(overlay));
+                    
+                    return imageDisplay;
+                })
+                .then(uiService::show)
+                .setName("Converting mask to overlay...")
+                .start();
+        
+        loadingScreenService.frontEndTask(task, false);
+        
+    }
     
 }

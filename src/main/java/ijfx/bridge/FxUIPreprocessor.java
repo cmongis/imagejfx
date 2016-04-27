@@ -79,11 +79,7 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
     @Override
     public void process(Module module) {
 
-        //legacyService.syncActiveImage();
-        //legacyService.getImageMap().getImageDisplays().forEach(display -> System.out.println(display));
-        ImageDisplay imgDisplay = displayService.getActiveDisplay(ImageDisplay.class);
-
-       // legacyService.getIJ1Helper().syncActiveImage(imgDisplay);
+        
 
         logger.info("Preprocessing : " + module.getDelegateObject().getClass().getSimpleName());
         logger.info(module.getDelegateObject().getClass().getName());

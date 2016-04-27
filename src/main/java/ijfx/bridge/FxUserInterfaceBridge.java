@@ -178,10 +178,7 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     @Override
     public void show(final Display<?> dspl) {
         
-        if(batchService.isRunning()) {
-            logger.info("BatchService is running... skipping display");
-            return;
-        }
+       
         
         logger.info("Showing display");
         

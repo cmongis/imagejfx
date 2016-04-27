@@ -52,6 +52,12 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
         this.callback = callback;
     }
 
+    public AsyncCallback setName(String name) {
+        updateTitle(name);
+        updateMessage(name);
+        return this;
+    }
+    
     public AsyncCallback<INPUT, OUTPUT> run(Callback<INPUT, OUTPUT> callback) {
         this.callback = callback;
         return this;
