@@ -326,10 +326,8 @@ public class OverlayStatService extends AbstractService implements ImageJService
     
     public ColorRGB hsvtoRGB(double hue, double saturation, double value){
         
-        double normalizedHue = hue;
-//        double normalizedHue = (hue - (double) Math.floor(hue));
-        int h = (int) (normalizedHue * 6);
-        double f = normalizedHue * 6 - h;
+         int h = (int) (hue * 6);
+        double f = hue * 6 - h;
         double p = value * (1 - saturation);
         double q = value * (1 - f * saturation);
         double t = value * (1 - (1 - f) * saturation);
@@ -345,7 +343,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
             case 4: r1 = t; g1 = p; b1 = value; break;
             case 5: r1 = value; g1 = p; b1 = q; break;
             default: throw new RuntimeException(
-                    String.format("Could not convert from HSV (%f, %f, %f) to RGB", normalizedHue, saturation, value));
+                    String.format("Could not convert from HSV (%f, %f, %f) to RGB", hue, saturation, value));
         }
         r = (int)(r1*256);
         g = (int)(g1*256);
