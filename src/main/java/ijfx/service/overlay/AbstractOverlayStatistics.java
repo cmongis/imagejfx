@@ -36,24 +36,12 @@ import org.scijava.plugin.Parameter;
  * @author Pierre BONNEAU
  */
 abstract class AbstractOverlayStatistics implements OverlayStatistics{
-    
-    @Parameter
-    public OverlayStatService overlayStatService;
-    
-    
-    private final int MEDIAN_PERCENTILE = 50;
-    
+        
     private final Overlay overlay;
     
-    private final double mean;
-    private final double max;
-    private final double min;
-    private final double standardDeviation;
-    private final double variance;
-    private final double median;
-    private final long pixelCount;
-    protected double area;
+    PixelStatistics pixelStatistics;
     
+    protected double area;
     protected Polygon minimumBoundingRectangle;
     protected Point2D centerOfGravity;
     protected double feretDiameter;
@@ -67,26 +55,13 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
     protected double thinnesRatio;
     
     
-    
     public AbstractOverlayStatistics(ImageDisplay display, Overlay overlay, Context context){
         
         context.inject(this);
         
         this.overlay = overlay;
+        this.pixelStatistics = new DefaultPixelStatistics(display, overlay, context);
 
-        Double[] valueList = overlayStatService.getValueList(display, overlay);
-        
-        DescriptiveStatistics statistics = new DescriptiveStatistics(ArrayUtils.toPrimitive(valueList));
-        
-        this.mean = statistics.getMean();
-        this.max = statistics.getMax();
-        this.min = statistics.getMin();
-        this.standardDeviation = statistics.getStandardDeviation();
-        this.variance = statistics.getVariance();
-        this.median = statistics.getPercentile(MEDIAN_PERCENTILE);
-        this.pixelCount = valueList.length;
-        
-        
     }
     
     @Override
@@ -96,43 +71,8 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
     
     
     @Override
-    public double getMean(){
-        return this.mean;
-    }
-    
-    @Override
-    public double getMax(){
-        return this.max;
-    }
-    
-    
-    @Override
-    public double getMin(){
-        return this.min;
-    }
-    
-    
-    @Override
-    public double getStandardDeviation(){
-        return this.standardDeviation;
-    }
-    
-    
-    @Override
-    public double getVariance(){
-        return this.variance;
-    }
-    
-    
-    @Override
-    public double getMedian(){
-        return this.median;
-    }
-    
-    
-    @Override
-    public long getPixelCount(){
-        return this.pixelCount;
+    public PixelStatistics getPixelStatistics(){
+        return this.pixelStatistics;
     }
     
     @Override
@@ -221,14 +161,8 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
     
     public String toString(){
         return "\nSTATISTICS"
-                +"\n\t Mean : "+this.mean
-                +"\n\t Max : "+this.max
-                +"\n\t Min : "+this.min
-                +"\n\t SD : "+this.standardDeviation
-                +"\n\t Variance : "+this.variance
-                +"\n\t Median : "+this.median
-                +"\n\t Area : "+this.area
-                +"\n\t PixelCount : "+this.pixelCount
+                +"\n\t Pixels Statistics : "+this.pixelStatistics.toString()
+                +"\n\t Area : "+this.area                
                 +"\n\t Minimum Bounding Rectangle : "+ this.minimumBoundingRectangle.toString()
                 +"\n\t Center of gravity : "+ this.centerOfGravity.toString()
                 +"\n\t Maximum Feret's diameter : "+ this.feretDiameter

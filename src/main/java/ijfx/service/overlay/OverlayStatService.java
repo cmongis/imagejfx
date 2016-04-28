@@ -279,14 +279,14 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         HashMap<String, Double> statistics = new HashMap<>();
         
-        statistics.put(LBL_MEAN, overlayStats.getMean());
-        statistics.put(LBL_MIN, overlayStats.getMin());
-        statistics.put(LBL_MAX, overlayStats.getMax());
-        statistics.put(LBL_SD, overlayStats.getStandardDeviation());
-        statistics.put(LBL_VARIANCE, overlayStats.getVariance());
-        statistics.put(LBL_MEDIAN, overlayStats.getMedian());
-        statistics.put(LBL_AREA, overlayStats.getArea());
-        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelCount());
+        statistics.put(LBL_MEAN, overlayStats.getPixelStatistics().getMean());
+        statistics.put(LBL_MIN, overlayStats.getPixelStatistics().getMin());
+        statistics.put(LBL_MAX, overlayStats.getPixelStatistics().getMax());
+        statistics.put(LBL_SD, overlayStats.getPixelStatistics().getStandardDeviation());
+        statistics.put(LBL_VARIANCE, overlayStats.getPixelStatistics().getVariance());
+        statistics.put(LBL_MEDIAN, overlayStats.getPixelStatistics().getMedian());
+        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelStatistics().getPixelCount());
+        statistics.put(LBL_AREA, overlayStats.getArea());        
         
         statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
         statistics.put(LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
