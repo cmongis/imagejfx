@@ -67,6 +67,28 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
     }
     
     
+    public PolygonOverlayStatistics(Overlay overlay, Context context){
+        
+        super(overlay, context);
+        
+        this.shape = getShape(getOverlay());
+        this.convexHull = getConvexHull();
+        
+        super.area = setArea();
+        super.minimumBoundingRectangle = setMinimumBoundingRectangle();
+        super.centerOfGravity = setCenterOfGravity();
+        super.feretDiameter = setFeretDiameter();
+        super.minFeretDiameter = setMinFeretDiameter();
+        super.longSideMBR = setLongSideMBR();
+        super.shortSideMBR = setShortSideMBR();
+        super.aspectRatio = super.setAspectRatio();
+        super.convexity = setConvexity();
+        super.solidity = setSolidity();
+        super.circularity = setCircularity();
+        super.thinnesRatio = setThinnesRatio();
+    }    
+    
+    
     public java.awt.Polygon getShape(Overlay overlay){
         
         PolygonRegionOfInterest roi = (PolygonRegionOfInterest) overlay.getRegionOfInterest();

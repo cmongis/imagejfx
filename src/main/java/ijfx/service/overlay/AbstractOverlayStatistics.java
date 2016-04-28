@@ -25,11 +25,8 @@ import javafx.scene.shape.Polygon;
 import net.imagej.display.ImageDisplay;
 import net.imagej.overlay.Overlay;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.scijava.Context;
 
-import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -63,6 +60,16 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
         this.pixelStatistics = new DefaultPixelStatistics(display, overlay, context);
 
     }
+    
+    
+    public AbstractOverlayStatistics(Overlay overlay, Context context){
+        
+        context.inject(this);
+        
+        this.overlay = overlay;
+        this.pixelStatistics = null;
+
+    }    
     
     @Override
     public Overlay getOverlay(){

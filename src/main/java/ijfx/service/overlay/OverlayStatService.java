@@ -43,12 +43,14 @@ import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import org.scijava.util.ColorRGB;
 
 /**
  *
@@ -300,4 +302,22 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         return statistics;
     }
+    
+    
+//    public void setRandomColor(List<Overlay> overlays){
+//        int GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
+//        RandomDataGenerator generator = new RandomDataGenerator();
+//
+//        generator.nextInt(0, 2200);
+//        }
+//        
+//        int hue = 
+//gen_html {
+//  h += golden_ratio_conjugate
+//  h %= 1
+//  hsv_to_rgb(h, 0.5, 0.95)
+//        ColorRGB newColor;
+//        
+//        
+//    }
 }
