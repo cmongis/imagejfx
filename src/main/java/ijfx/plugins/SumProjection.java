@@ -22,27 +22,29 @@ package ijfx.plugins;
 import java.util.List;
 import net.imglib2.Sampler;
 import net.imglib2.type.numeric.RealType;
+import org.scijava.plugin.Plugin;
 
-public class MaxProjection implements ProjectionMethod {
+/**
+ *
+ * @author Tuan anh TRINH
+ */
+@Plugin(type = ProjectionMethod.class)
+public class SumProjection implements ProjectionMethod {
 
-    private final String name = "Max";
+    private final String name = "Sum";
 
     @Override
+
     public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
-        T max = null;
-        for (T t : list) {
-            if (max == null) {
-                max = t;
-            } else if (t.compareTo(max) > 0) {
-                max = t;
-            }
-        }
-        sampler.get().set(max);
+        T result = list.get(0).createVariable();
+        list.stream()
+                .forEach((t) -> result.add(t));
+
+        sampler.get().add(result);
     }
 
     @Override
     public String toString() {
         return this.name;
     }
-
 }

@@ -20,43 +20,35 @@
 package ijfx.plugins;
 
 import java.util.List;
+import net.imglib2.Sampler;
 import net.imglib2.type.numeric.RealType;
+import org.scijava.plugin.Plugin;
 
-
+@Plugin(type = ProjectionMethod.class, name = "Min", label = "Minimum")
 public class MinProjection implements ProjectionMethod {
 
-    public static int cpt =0;
     private final String name = "Min";
+
     @Override
-    
-    public <T extends RealType<T>> T process(List<T> list) {
+    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
+
         T min = null;
-        for (T t : list)
-        {
-//            System.out.println(t.toString());
-//            try {
-//            System.out.println(min.toString());
-//                
-//            } catch (Exception e) {
-//            }
+
+        for (T t : list) {
             if (min == null) {
+
                 min = t.copy();
-            }
-            else if (t.compareTo(min) == 0)
-            {
-               cpt++; 
-            }
-            else if (t.compareTo(min) < 0)
-            {
+            } else if (t.compareTo(min) < 0) {
                 min = t.copy();
             }
         }
-        return min;
+        sampler.get().set(min);
+
     }
 
     @Override
-    public String getName() {
+    public String toString() {
         return this.name;
     }
-    
+
 }

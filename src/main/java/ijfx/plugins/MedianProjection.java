@@ -22,22 +22,26 @@ package ijfx.plugins;
 import java.util.List;
 import net.imglib2.Sampler;
 import net.imglib2.type.numeric.RealType;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.scijava.plugin.Plugin;
 
-public class MaxProjection implements ProjectionMethod {
+/**
+ *
+ * @author Tuan anh TRINH
+ */
+@Plugin(type = ProjectionMethod.class)
+public class MedianProjection implements ProjectionMethod {
 
-    private final String name = "Max";
+    private final String name = "Median";
 
     @Override
     public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
-        T max = null;
-        for (T t : list) {
-            if (max == null) {
-                max = t;
-            } else if (t.compareTo(max) > 0) {
-                max = t;
-            }
-        }
-        sampler.get().set(max);
+        DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+        list.stream()
+                .forEach((t) -> descriptiveStatistics.addValue(t.getRealDouble()));
+
+        //Set result
+        sampler.get().setReal(descriptiveStatistics.getPercentile(50));
     }
 
     @Override

@@ -20,15 +20,16 @@
 package ijfx.plugins;
 
 import java.util.List;
+import net.imagej.ImageJPlugin;
+import net.imglib2.Sampler;
 import net.imglib2.type.numeric.RealType;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface ProjectionMethod {
+public interface ProjectionMethod extends ImageJPlugin{
     
-    public < T extends RealType< T>> T process(List<T> list);
-    public String getName();
+    public < T extends RealType< T>> void process(List<T> list, Sampler<T> sampler);
     
 }
