@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.stackconverter;
 
 import ij.CompositeImage;
 import ij.IJ;

@@ -17,15 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.stackconverter;
 
 import net.imagej.Dataset;
 
-/**
- *
- * @author Tuan anh TRINH
- */
-public interface DimensionConverter {
-    public void convert(long[] positionOutput, long[] position, Dataset output, Dataset input);
+
+public class OneToMultiDimensions implements DimensionConverter {
+
+    @Override
+    public void convert(long[] positionOutput, long[] position, Dataset output, Dataset input) {
+        int rest;
+        int coorOrigin = (int) position[2];
+        for (int i = 2; i < positionOutput.length; i++) {
+            positionOutput[i] = coorOrigin / (output.max(i) + 1);
+            rest = (int) (position[2] % (output.max(i)+1));
+            if (positionOutput[i] == 0.0) {
+                positionOutput[i] = rest;
+            } else if (rest != 0) {
+                coorOrigin = rest;
+            }
+        }
+    }
     
 }
