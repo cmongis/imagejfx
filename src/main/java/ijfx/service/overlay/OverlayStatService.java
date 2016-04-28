@@ -43,7 +43,6 @@ import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
@@ -304,20 +303,54 @@ public class OverlayStatService extends AbstractService implements ImageJService
     }
     
     
-//    public void setRandomColor(List<Overlay> overlays){
-//        int GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
-//        RandomDataGenerator generator = new RandomDataGenerator();
-//
-//        generator.nextInt(0, 2200);
-//        }
-//        
-//        int hue = 
-//gen_html {
-//  h += golden_ratio_conjugate
-//  h %= 1
-//  hsv_to_rgb(h, 0.5, 0.95)
-//        ColorRGB newColor;
-//        
-//        
-//    }
+    public void setRandomColor(List<Overlay> overlays){
+        
+        double GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
+        double SATURATION = 0.99;
+        double VALUE = 0.99;
+        
+        double hue = Math.random();
+        
+        for(int i = 0; i < overlays.size(); i++){
+            
+            hue = hue + GOLDEN_RATIO_CONJUGATE;
+            hue = hue % 1;
+            ColorRGB randomColor = hsvtoRGB(hue, SATURATION, VALUE);
+            
+            overlays.get(i).setFillColor(randomColor);
+            overlays.get(i).setLineColor(randomColor);
+            overlays.get(i).update();
+        }
+    }
+    
+    
+    public ColorRGB hsvtoRGB(double hue, double saturation, double value){
+        
+        double normalizedHue = hue;
+//        double normalizedHue = (hue - (double) Math.floor(hue));
+        int h = (int) (normalizedHue * 6);
+        double f = normalizedHue * 6 - h;
+        double p = value * (1 - saturation);
+        double q = value * (1 - f * saturation);
+        double t = value * (1 - (1 - f) * saturation);
+
+        double r1, g1, b1;
+        int r, g, b;
+        
+        switch (h){
+            case 0: r1 = saturation; g1 = t; b1 = p; break;
+            case 1: r1 = q; g1 = value; b1 = p; break;
+            case 2: r1 = p; g1 = value; b1 = t; break;
+            case 3: r1 = p; g1 = q; b1 = value; break;
+            case 4: r1 = t; g1 = p; b1 = value; break;
+            case 5: r1 = value; g1 = p; b1 = q; break;
+            default: throw new RuntimeException(
+                    String.format("Could not convert from HSV (%f, %f, %f) to RGB", normalizedHue, saturation, value));
+        }
+        r = (int)(r1*256);
+        g = (int)(g1*256);
+        b = (int)(b1*256);
+
+        return new ColorRGB(r, g, b);          
+    }
 }
