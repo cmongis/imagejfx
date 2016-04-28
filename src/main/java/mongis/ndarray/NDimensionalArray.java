@@ -82,6 +82,11 @@ public class NDimensionalArray extends ArrayList<Dimension> {
     public long[] getIndexes(int flatIndex) {
             return get(0).generateAllPossibilities()[flatIndex];
         }
+    
+    public long[][] getPossibilities(){
+            return get(0).generateAllPossibilities();
+        
+    }
 
         
 
