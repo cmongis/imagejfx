@@ -248,4 +248,12 @@ public class DefaultFolder implements Folder {
     public List<Explorable> getObjectList() {
         return new ArrayList<>();
     } 
+    
+    
+    public void onFileAdded(List<Explorable> files) {
+        new AsyncCallback<>(files)
+                .run(this::fetchMoreStatistics)
+                .startIn(ImageJFX.getThreadQueue());
+                
+    }
 }

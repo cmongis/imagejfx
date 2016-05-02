@@ -1,7 +1,7 @@
 [
     {
         "name": "imagej",
-        "incompatibleWith": ["webapp", "image-browser"]
+        "incompatibleWith": ["webapp", "image-browser","segmentation"]
     }
     ,{
         "name":"project-manager"

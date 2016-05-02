@@ -96,7 +96,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
 
     public HashMap<String, Double> getStat(ImageDisplay imageDisplay, Overlay overlay) {
 
-       
+       /*
          HashMap<String, ParallelMeasurement> measures = new HashMap<>();
           HashMap<String, Double> stats = new HashMap<>();
          DescriptiveStatistics statistics = new DescriptiveStatistics(ArrayUtils.toPrimitive(getValueList(imageDisplay, overlay)));
@@ -120,8 +120,11 @@ public class OverlayStatService extends AbstractService implements ImageJService
             logger.fine(String.format("Calculated %s = %.0f", key, value));
             stats.put(key, value);
         };
-        logger.fine("finished");
-        return stats;
+        logger.fine("finished");*/
+       
+       
+       
+        return getStatistics(getOverlayStatistics(imageDisplay, overlay));
     }
    
     

@@ -78,7 +78,6 @@ import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
-import ijfx.ui.UiPlugin;
 import ijfx.ui.UiContexts;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.project_manager.projectdisplay.PlaneSet;
@@ -89,6 +88,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.ComboBox;
 import ijfx.ui.context.animated.Animations;
+import mongis.utils.AsyncCallback;
 
 /**
  *
@@ -429,7 +429,10 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
         }
 
         
-        Task fakeTask = batchService.applyWorkflow(inputs, new DefaultWorkflow(steps));
+        Task fakeTask = new AsyncCallback<List<BatchSingleInput>,Boolean>(inputs)
+        .run((progress,input)->{
+            return batchService.applyWorkflow(progress,inputs, new DefaultWorkflow(steps));
+        });
         
         EventHandler<WorkerStateEvent> onFinished = event->{
             currentTaskProperty.setValue(null);

@@ -33,7 +33,7 @@ public class UiContext implements Comparable<UiContext> {
 
     private String id;
 
-    private ArrayList<String> incompatibles = new ArrayList<>();
+    private List<String> incompatibles = new ArrayList<>();
 
     public static final String INCOMPATIBLE_WITH = "incompatibleWith";
     public static final String ID = "name";

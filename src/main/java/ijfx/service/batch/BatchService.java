@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
+import mongis.utils.AsyncCallback;
+import mongis.utils.ProgressHandler;
+import mongis.utils.SilentProgressHandler;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.display.DatasetView;
@@ -86,129 +89,130 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     // applies a single modules to multiple inputs and save them
-    public Task<Boolean> applyModule(List<BatchSingleInput> inputs, final Module module, boolean process, HashMap<String, Object> parameters) {
+    public Boolean applyModule(ProgressHandler progress, List<BatchSingleInput> inputs, final Module module, boolean process, HashMap<String, Object> parameters) {
 
-        return new Task<Boolean>() {
+        int totalOps = inputs.size();
+        int count = 0;
 
-            @Override
-            protected Boolean call() throws Exception {
-
-                int totalOps = inputs.size();
-                int count = 0;
-
-                for (BatchSingleInput input : inputs) {
-                    input.load();
-                    count++;
-                    final Module createdModule = moduleService.createModule(module.getInfo());
-                    if (!executeModule(input, createdModule, process, parameters)) {
-                        return false;
-                    }
-                    input.save();
-                    updateProgress(count, totalOps);
-                }
-
-                return true;
+        for (BatchSingleInput input : inputs) {
+            input.load();
+            count++;
+            final Module createdModule = moduleService.createModule(module.getInfo());
+            if (!executeModule(input, createdModule, process, parameters)) {
+                return false;
             }
+            input.save();
+            progress.setProgress(count, totalOps);
+        }
 
-        };
+        return true;
+
     }
 
-    // applies a workflow to a list of inputs
     public Task<Boolean> applyWorkflow(List<BatchSingleInput> inputs, Workflow workflow) {
+        return new AsyncCallback<List<BatchSingleInput>,Boolean>()
+                .setInput(inputs)
+                .run((progress,input)->applyWorkflow(progress,inputs,workflow));
+    }
+    
+    
+    public Boolean applyWorkflow(ProgressHandler handler, BatchSingleInput input, Workflow workflow) {
+        List<BatchSingleInput> inputList = new ArrayList<>();
+        inputList.add(input);
+        return applyWorkflow(handler, inputList, workflow);
+    }
+    
+    // applies a workflow to a list of inputs
+    public Boolean applyWorkflow(ProgressHandler progress, List<BatchSingleInput> inputs, Workflow workflow) {
 
-        Task<Boolean> task = new Task<Boolean>() {
+        if (progress == null) {
+            progress = new SilentProgressHandler();
+        }
 
-            Boolean lock = new Boolean(true);
+        Boolean lock = new Boolean(true);
+        int totalOps = inputs.size() * workflow.getStepList().size();
+        int count = 0;
 
-            @Override
-            protected Boolean call() throws Exception {
-                int totalOps = inputs.size() * workflow.getStepList().size();
-                int count = 0;
+        progress.setStatus("Starting batch processing...");
 
-                updateMessage("Starting batch processing...");
+        boolean success = true;
+        BooleanProperty successProperty = new SimpleBooleanProperty();
+        Exception error = null;
+        setRunning(true);
 
-                boolean success = true;
-                BooleanProperty successProperty = new SimpleBooleanProperty();
-                Exception error = null;
-                setRunning(true);
+        for (BatchSingleInput input : inputs) {
+            //inputs.parallelStream().forEach(input->{
+            logger.info("Running...");
 
-                for (BatchSingleInput input : inputs) {
-                    //inputs.parallelStream().forEach(input->{
-                    logger.info("Running...");
+            if (progress.isCancelled()) {
+                progress.setStatus("Batch Processing cancelled");
+                success = false;
+                //return;
+                break;
 
-                    if (isCancelled()) {
-                        updateMessage("Batch Processing cancelled");
-                        success = false;
-                        //return;
-                        break;
-
-                    }
-
-                    synchronized (lock) {
-                        logger.info("Loading input...");
-                        try {
-                            getContext().inject(input);
-                        } catch (IllegalStateException ise) {
-                            logger.warning("Context already injected");
-                        }
-                        try {
-                            input.load();
-                        } catch (Exception e) {
-                            logger.log(Level.SEVERE, "Couldn't load input", e);
-                            error = e;
-                            continue;
-
-                        }
-                        logger.info("Input loaded");
-                    }
-
-                    for (WorkflowStep step : workflow.getStepList()) {
-                        logger.info("Executing step : " + step.getId());
-                        updateMessage(String.format("Processing %s with %s", input.getName(), step.getModule().getInfo().getTitle()));
-
-                        updateProgress(count++, totalOps);
-
-                        final Module module = moduleService.createModule(step.getModule().getInfo());
-                        logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
-                        if (!executeModule(input, module, true, step.getParameters())) {
-
-                            updateMessage("Error :-(");
-                            updateProgress(0, 1);
-                            success = false;
-                            break;
-                        };
-
-                    }
-
-                    if (success == false) {
-                        break;
-                    }
-
-                    synchronized (lock) {
-                        input.save();
-                    }
-                    input.dispose();
-                }
-
-                if (success) {
-
-                    updateMessage("Batch processing completed.");
-                    updateProgress(1, 1);
-
-                } else if (isCancelled()) {
-                    updateMessage("Batch processing cancelled");
-                } else {
-
-                    updateMessage("An error happend during the process.");
-                    updateProgress(1, 1);
-                }
-
-                setRunning(false);
-                return success;
             }
-        };
 
-        return task;
+            synchronized (lock) {
+                logger.info("Loading input...");
+                try {
+                    getContext().inject(input);
+                } catch (IllegalStateException ise) {
+                    logger.warning("Context already injected");
+                }
+                try {
+                    input.load();
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Couldn't load input", e);
+                    error = e;
+                    continue;
+
+                }
+                logger.info("Input loaded");
+            }
+
+            for (WorkflowStep step : workflow.getStepList()) {
+                logger.info("Executing step : " + step.getId());
+                progress.setStatus(String.format("Processing %s with %s", input.getName(), step.getModule().getInfo().getTitle()));
+
+                progress.setProgress(count++, totalOps);
+
+                final Module module = moduleService.createModule(step.getModule().getInfo());
+                logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
+                if (!executeModule(input, module, true, step.getParameters())) {
+
+                    progress.setStatus("Error :-(");
+                    progress.setProgress(0, 1);
+                    success = false;
+                    break;
+                };
+
+            }
+
+            if (success == false) {
+                break;
+            }
+
+            synchronized (lock) {
+                input.save();
+            }
+            input.dispose();
+        }
+
+        if (success) {
+
+            progress.setStatus("Batch processing completed.");
+            progress.setProgress(1.0);
+
+        } else if (progress.isCancelled()) {
+            progress.setStatus("Batch processing cancelled");
+        } else {
+
+            progress.setStatus("An error happend during the process.");
+            progress.setProgress(1, 1);
+        }
+        setRunning(false);
+        return success;
+
     }
 
     // execute a module (with all the side parameters injected)
@@ -333,12 +337,11 @@ public class BatchService extends AbstractService implements ImageJService {
     private <T> T injectPlugin(T p) {
         try {
             getContext().inject(p);
-        }
-        finally {
+        } finally {
             return p;
         }
     }
-    
+
     private List<PreprocessorPlugin> getPreProcessors() {
         return pluginService
                 .createInstancesOfType(PreprocessorPlugin.class)

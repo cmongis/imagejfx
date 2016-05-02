@@ -48,6 +48,7 @@ import org.scijava.service.Service;
 import mongis.utils.ConditionList;
 import ijfx.ui.context.UiContextManager;
 import ijfx.ui.context.UiContextUpdatedEvent;
+import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.scijava.event.EventService;
@@ -76,9 +77,17 @@ public class UiContextService extends AbstractService implements UiContextManage
     @Parameter
     EventService eventService;
     
+    
+    @Override
+    public void initialize() {
+        super.initialize();
+        logger.info("Importing context configuration.");
+        importContextConfiguration();
+    }
+    
     public UiContextManager registerWidget(ContextualWidget widget) {
         widgets.put(widget.getName(), widget);
-        importContextConfiguration();
+        
         return this;
     }
 
@@ -346,7 +355,7 @@ public class UiContextService extends AbstractService implements UiContextManage
     public void importContextConfiguration() {
 
         try {
-            String json = IOUtils.toString(getClass().getResourceAsStream("ContextService.json"));
+            String json = IOUtils.toString(getClass().getResourceAsStream("/ijfx/service/uicontext/ContextService.json"));
             importContextConfiguration(json);
         } catch (IOException ex) {
             logger.log(Level.SEVERE,"Failed to load the ContextService.json file",ex);
@@ -360,7 +369,6 @@ public class UiContextService extends AbstractService implements UiContextManage
         List<UiContext> contextList = null;
 
         try {
-            
             contextList = mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, UiContext.class));
 
         } catch (IOException ex) {
@@ -368,6 +376,7 @@ public class UiContextService extends AbstractService implements UiContextManage
         }
 
         contextList.forEach(context -> {
+            logger.info(String.format("Loaded context %s which is incompatible with : %s",context.getId(),context.getIncompatibles().stream().collect(Collectors.joining(", "))));
             uiContextMap.put(context.getId(), context);
         });
 
