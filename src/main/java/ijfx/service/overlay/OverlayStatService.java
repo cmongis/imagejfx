@@ -49,6 +49,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import org.scijava.util.ColorRGB;
 
 /**
  *
@@ -282,14 +283,14 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         HashMap<String, Double> statistics = new HashMap<>();
         
-        statistics.put(LBL_MEAN, overlayStats.getMean());
-        statistics.put(LBL_MIN, overlayStats.getMin());
-        statistics.put(LBL_MAX, overlayStats.getMax());
-        statistics.put(LBL_SD, overlayStats.getStandardDeviation());
-        statistics.put(LBL_VARIANCE, overlayStats.getVariance());
-        statistics.put(LBL_MEDIAN, overlayStats.getMedian());
-        statistics.put(LBL_AREA, overlayStats.getArea());
-        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelCount());
+        statistics.put(LBL_MEAN, overlayStats.getPixelStatistics().getMean());
+        statistics.put(LBL_MIN, overlayStats.getPixelStatistics().getMin());
+        statistics.put(LBL_MAX, overlayStats.getPixelStatistics().getMax());
+        statistics.put(LBL_SD, overlayStats.getPixelStatistics().getStandardDeviation());
+        statistics.put(LBL_VARIANCE, overlayStats.getPixelStatistics().getVariance());
+        statistics.put(LBL_MEDIAN, overlayStats.getPixelStatistics().getMedian());
+        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelStatistics().getPixelCount());
+        statistics.put(LBL_AREA, overlayStats.getArea());        
         
         statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
         statistics.put(LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
@@ -302,5 +303,55 @@ public class OverlayStatService extends AbstractService implements ImageJService
         statistics.put(LBL_THINNES_RATIO, overlayStats.getThinnesRatio());
         
         return statistics;
+    }
+    
+    
+    public void setRandomColor(List<Overlay> overlays){
+        
+        double GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
+        double SATURATION = 0.99;
+        double VALUE = 0.99;
+        
+        double hue = Math.random();
+        
+        for(int i = 0; i < overlays.size(); i++){
+            
+            hue = hue + GOLDEN_RATIO_CONJUGATE;
+            hue = hue % 1;
+            ColorRGB randomColor = hsvtoRGB(hue, SATURATION, VALUE);
+            
+            overlays.get(i).setFillColor(randomColor);
+            overlays.get(i).setLineColor(randomColor);
+            overlays.get(i).update();
+        }
+    }
+    
+    
+    public ColorRGB hsvtoRGB(double hue, double saturation, double value){
+        
+         int h = (int) (hue * 6);
+        double f = hue * 6 - h;
+        double p = value * (1 - saturation);
+        double q = value * (1 - f * saturation);
+        double t = value * (1 - (1 - f) * saturation);
+
+        double r1, g1, b1;
+        int r, g, b;
+        
+        switch (h){
+            case 0: r1 = saturation; g1 = t; b1 = p; break;
+            case 1: r1 = q; g1 = value; b1 = p; break;
+            case 2: r1 = p; g1 = value; b1 = t; break;
+            case 3: r1 = p; g1 = q; b1 = value; break;
+            case 4: r1 = t; g1 = p; b1 = value; break;
+            case 5: r1 = value; g1 = p; b1 = q; break;
+            default: throw new RuntimeException(
+                    String.format("Could not convert from HSV (%f, %f, %f) to RGB", hue, saturation, value));
+        }
+        r = (int)(r1*256);
+        g = (int)(g1*256);
+        b = (int)(b1*256);
+
+        return new ColorRGB(r, g, b);          
     }
 }

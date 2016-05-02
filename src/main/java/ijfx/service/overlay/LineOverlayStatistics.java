@@ -50,6 +50,24 @@ public class LineOverlayStatistics extends AbstractOverlayStatistics{
     }
     
     
+    public LineOverlayStatistics(Overlay overlay, Context context){
+        super(overlay, context);
+        
+        super.area = setArea();
+        super.minimumBoundingRectangle = setMinimumBoundingRectangle();
+        super.centerOfGravity = setCenterOfGravity();
+        super.feretDiameter = setFeretDiameter();
+        super.minFeretDiameter = setMinFeretDiameter();
+        super.longSideMBR = setLongSideMBR();
+        super.shortSideMBR = setShortSideMBR();
+        super.aspectRatio = super.setAspectRatio();
+        super.convexity = setConvexity();
+        super.solidity = setSolidity();
+        super.circularity = setCircularity();
+        super.thinnesRatio = setThinnesRatio();        
+    }
+    
+    
     public double setArea(){
         return 0.0;
     }

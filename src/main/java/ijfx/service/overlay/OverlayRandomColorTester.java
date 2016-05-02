@@ -19,37 +19,38 @@
  */
 package ijfx.service.overlay;
 
-import javafx.geometry.Point2D;
-import javafx.scene.shape.Polygon;
+import java.util.List;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
+import net.imagej.display.OverlayService;
 import net.imagej.overlay.Overlay;
+
+import org.scijava.command.Command;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Pierre BONNEAU
  */
-public interface OverlayStatistics {
-    
-    
-    
-    Overlay getOverlay();
+@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Random Color")
 
-    PixelStatistics getPixelStatistics();
+public class OverlayRandomColorTester implements Command{
     
-    double getArea();
-    Polygon getMinimumBoundingRectangle();
-    Point2D getCenterOfGravity();
-    double getFeretDiameter();
-    double getMinFeretDiameter();
-//    double getOrientationMajorAxis();
-//    double getOrientationMinorAxis();
-    double getLongSideMBR();
-    double getShortSideMBR();
-    double getAspectRatio();
-    double getConvexity();
-    double getSolidity();
-    double getCircularity();
-    double getThinnesRatio();
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
+    @Parameter
+    OverlayService overlayService;
+    
+    @Parameter
+    OverlayStatService overlayStatService;
+    
     
     @Override
-    String toString();
+    public void run(){
+        ImageDisplay display = imageDisplayService.getActiveImageDisplay();
+        List<Overlay> overlays = overlayService.getOverlays(display);
+        overlayStatService.setRandomColor(overlays);
+    }
 }
