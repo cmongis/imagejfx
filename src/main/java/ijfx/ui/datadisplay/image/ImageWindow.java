@@ -86,6 +86,7 @@ import org.scijava.Context;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayActivatedEvent;
+import org.scijava.display.event.DisplayDeletedEvent;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -233,6 +234,10 @@ public class ImageWindow extends Window {
         CloseIcon closeIcon = new CloseIcon(this);
 
         getRightIcons().add(closeIcon);
+
+        this.setOnCloseAction((event) -> {
+            eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
+        });
 
         closeIcon.onActionProperty().addListener(event -> {
             toolService.getCurrentTool().unsubscribe(canvas);
@@ -644,7 +649,7 @@ public class ImageWindow extends Window {
         if (!wasOverlaySelected) {
             setEdited(null);
         }
-        contextCalculationService.determineContext(imageDisplay);
+        contextCalculationService.determineContext(imageDisplay, true);
         refreshSourceImage();
         updateInfoLabel();
 
@@ -776,6 +781,8 @@ public class ImageWindow extends Window {
     protected void onMoveablePointMoved(Observable obs, Point2D oldValue, Point2D newValue) {
         updateOverlays();
     }
+    
+    
 
    
     
