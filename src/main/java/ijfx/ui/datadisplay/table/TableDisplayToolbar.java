@@ -26,6 +26,7 @@ import ijfx.ui.UiPlugin;
 import ijfx.ui.main.Localization;
 import ijfx.ui.utils.FontAwesomeIconUtils;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -64,15 +65,15 @@ public class TableDisplayToolbar extends BorderPane implements UiPlugin {
 
     //To Change
     public void addElement() {
-        Label label = new Label("save");
+        Button button = new Button("save");
         FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.SAVE);
         Image image = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, 50);
-        label.setGraphic(new ImageView(image));
-        label.addEventFilter(MouseEvent.MOUSE_CLICKED, (e) -> {
+        button.setGraphic(new ImageView(image));
+        button.addEventFilter(MouseEvent.MOUSE_CLICKED, (e) -> {
             CommandInfo commandInfo = new CommandInfo(SaveCSV.class);
             commandService.run(commandInfo, true);
         });
-        this.setTop(label);
+        this.setTop(button);
     }
 
 }
