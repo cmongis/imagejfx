@@ -22,6 +22,7 @@ package ijfx.service.uicontext;
 
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlaySelectionEvent;
+import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
@@ -53,6 +54,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public final static String CTX_RGB_IMAGE = "rgb-img";
     public final static String CTX_MULTI_Z_IMAGE = "multi-z-img";
     public final static String CTX_MULTI_CHANNEL_IMG = "multi-channel-img";
+    public final static String CTX_MULTI_TIME_IMG = "multi-time-img";
     public final static String CTX_TABLE_DISPLAY = "table-open";
     public final static String CTX_IMAGE_DISPLAY = "image-open";
 
@@ -76,15 +78,19 @@ public class UiContextCalculatorService extends AbstractService implements Image
             overlayService.getContext().inject(this);
         }
         if (display instanceof ImageDisplay) {
-            contextService.toggleContext(CTX_OVERLAY_SELECTED, add && overlaySelectionService.getSelectedOverlays((ImageDisplay) display).size() > 0);
-            contextService.toggleContext(CTX_MULTI_Z_IMAGE, add && hasAxisType((ImageDisplay) display, Axes.Z));
-            contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, add && hasAxisType((ImageDisplay) display, Axes.CHANNEL));
-            contextService.toggleContext(CTX_RGB_IMAGE, add &&  imageDisplayService.getActiveDataset((ImageDisplay) display).isRGBMerged());
-            contextService.toggleContext(CTX_IMAGE_DISPLAY, add && true);
-        }
-        else
-        {
-        contextService.toggleContext(CTX_TABLE_DISPLAY, add && display instanceof TableDisplay);
+            ImageDisplay imageDisplay = (ImageDisplay) display;
+            contextService.toggleContext(CTX_OVERLAY_SELECTED, add && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
+            contextService.toggleContext(CTX_MULTI_Z_IMAGE, add && hasAxisType(imageDisplay, Axes.Z));
+            contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, add && hasAxisType(imageDisplay, Axes.CHANNEL));
+            contextService.toggleContext(CTX_MULTI_TIME_IMG, add && hasAxisType(imageDisplay, Axes.TIME));
+            contextService.toggleContext(CTX_RGB_IMAGE, add && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
+            contextService.toggleContext(CTX_IMAGE_DISPLAY, add);
+            Dataset dataset = (Dataset) imageDisplay.getActiveView().getData();
+            dataset.getValidBits();
+            contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", add);
+
+        } else {
+            contextService.toggleContext(CTX_TABLE_DISPLAY, add && display instanceof TableDisplay);
         }
         contextService.update();
     }
@@ -99,15 +105,13 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public void handleEvent(OverlaySelectionEvent event) {
         determineContext(event.getDisplay(), true);
     }
-    
-        @EventHandler
+
+    @EventHandler
     public void handleEvent(DisplayDeletedEvent event) {
         determineContext(event.getObject(), false);
-                displayService.getDisplays().stream().forEach((display) -> determineContext(display, true));
+        displayService.getDisplays().stream().forEach((display) -> determineContext(display, true));
 
     }
-
-
 
     public boolean hasAxisType(ImageDisplay display, AxisType axisType) {
         CalibratedAxis[] calibratedAxises = new CalibratedAxis[display.numDimensions()];
