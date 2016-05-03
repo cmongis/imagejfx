@@ -40,5 +40,6 @@ public class TableWindow extends Window {
     public TableWindow(TableDisplay display) {
         this();
         setContentPane(new TableDisplayView(display));
+        setTitle(display.getName());
     }
 }

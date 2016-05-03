@@ -64,6 +64,8 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public void determineContext(ImageDisplay display) {
         if(overlaySelectionService == null) overlayService.getContext().inject(this);
         contextService.toggleContext(CTX_OVERLAY_SELECTED, overlaySelectionService.getSelectedOverlays(display).size() > 0);
+        
+
         contextService.update();
     }
     
