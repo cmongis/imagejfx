@@ -118,12 +118,13 @@ public class ImageJContainer extends BorderPane implements Activity {
 
         change.next();
         if (change.getList().size() > 0) {
-            contextService.enter("image-open");
+            contextService.enter("display-open");
             contextService.update();
         } else {
-            contextService.leave("image-open");
+            contextService.leave("display-open");
             contextService.update();
         }
+
     }
 
     private void onDragEntered(DragEvent event) {

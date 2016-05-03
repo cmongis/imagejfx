@@ -20,26 +20,73 @@
  */
 package ijfx.ui.datadisplay.table;
 
+import ijfx.ui.main.ImageJFX;
+import java.util.logging.Logger;
+import javafx.event.EventType;
+import javafx.scene.input.MouseEvent;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
 import net.imagej.table.TableDisplay;
+import org.scijava.display.DisplayService;
+import org.scijava.display.event.DisplayActivatedEvent;
+import org.scijava.display.event.DisplayDeletedEvent;
+import org.scijava.event.EventHandler;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
 public class TableWindow extends Window {
-
+    Logger logger = ImageJFX.getLogger();
+    @Parameter
+    DisplayService displayService;
+    
+    @Parameter
+    EventService eventService;
+    private TableDisplay tableDisplay;
     public TableWindow() {
         super();
         CloseIcon closeIcon = new CloseIcon(this);
         getRightIcons().add(closeIcon);
-        
+
+
     }
 
     public TableWindow(TableDisplay display) {
         this();
-        setContentPane(new TableDisplayView(display));
-        setTitle(display.getName());
+        tableDisplay = display;
+        setContentPane(new TableDisplayView(tableDisplay));
+        for (EventType<? extends MouseEvent> t : new EventType[]{MouseEvent.MOUSE_CLICKED, MouseEvent.DRAG_DETECTED, MouseEvent.MOUSE_PRESSED}) {
+            addEventHandler(t, this::putInFront);
+            getContentPane().addEventHandler(t, this::putInFront);
+        }
+        display.getContext().inject(this);
+                this.setOnCloseAction(event -> {
+            eventService.publishLater(new DisplayDeletedEvent(tableDisplay));
+        });
+
     }
+    public void putInFront(MouseEvent event) {
+        putInFront();
+    }
+    public void putInFront() {
+        //  System.out.println("putting display to front");
+        logger.info("Putting in front " + tableDisplay);
+        displayService.setActiveDisplay(tableDisplay);
+        displayService.getContext().toString();
+        setMoveToFront(true);
+    }
+    
+        @EventHandler
+    protected void onActiveDisplayChanged(DisplayActivatedEvent event) {
+        if (event.getDisplay() == tableDisplay) {
+            System.out.println("I'm activated !" + tableDisplay.getName());
+            setFocused(true);
+        } else {
+            setFocused(false);
+        }
+    }
+
 }

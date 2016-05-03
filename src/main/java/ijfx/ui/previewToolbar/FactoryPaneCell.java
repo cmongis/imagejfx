@@ -27,7 +27,7 @@ import mongis.utils.panecell.PaneIconCellPreview;
  *
  * @author Tuan anh TRINH
  */
-interface FactoryPaneCell {
+public interface FactoryPaneCell {
         public LabelCategory generateLabel(ItemCategory itemCategory, UiContextService contextService);
             public PaneIconCellPreview generate(ItemWidget itemWidget, PreviewService previewService);
 
