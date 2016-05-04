@@ -49,6 +49,9 @@ public class IntegerInputSkin extends AbstractInputSkinPlugin<Integer> {
 
     public IntegerInputSkin() {
         super();
+        
+       
+        
     }
     
     
@@ -65,7 +68,7 @@ public class IntegerInputSkin extends AbstractInputSkinPlugin<Integer> {
     public void dispose() {
     }
 
-    Property<Integer> value = new SimpleObjectProperty<>();
+    Property<Integer> value = new SimpleObjectProperty<Integer>();
 
     public void onChange(String newValue) {
         try {
@@ -95,7 +98,7 @@ public class IntegerInputSkin extends AbstractInputSkinPlugin<Integer> {
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        return clazz == int.class || clazz == Integer.class;
+        return  clazz == Integer.class;
     }
 
     @Override
@@ -106,4 +109,3 @@ public class IntegerInputSkin extends AbstractInputSkinPlugin<Integer> {
     }
 
 }
-
