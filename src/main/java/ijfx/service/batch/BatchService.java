@@ -110,18 +110,17 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     public Task<Boolean> applyWorkflow(List<BatchSingleInput> inputs, Workflow workflow) {
-        return new AsyncCallback<List<BatchSingleInput>,Boolean>()
+        return new AsyncCallback<List<BatchSingleInput>, Boolean>()
                 .setInput(inputs)
-                .run((progress,input)->applyWorkflow(progress,inputs,workflow));
+                .run((progress, input) -> applyWorkflow(progress, inputs, workflow));
     }
-    
-    
+
     public Boolean applyWorkflow(ProgressHandler handler, BatchSingleInput input, Workflow workflow) {
         List<BatchSingleInput> inputList = new ArrayList<>();
         inputList.add(input);
         return applyWorkflow(handler, inputList, workflow);
     }
-    
+
     // applies a workflow to a list of inputs
     public Boolean applyWorkflow(ProgressHandler progress, List<BatchSingleInput> inputs, Workflow workflow) {
 
@@ -244,8 +243,13 @@ public class BatchService extends AbstractService implements ImageJService {
         logger.info(String.format("[%s] starting module", moduleName));
 
         logger.info("Running module");
+        Future<Module> run;
+        if (process) {
+            run = moduleService.run(module, getPreProcessors(), getPostprocessors(), parameters);
+        } else {
+            run = moduleService.run(module, process, parameters);
 
-        Future<Module> run = moduleService.run(module, getPreProcessors(), getPostprocessors(), parameters);
+        }
 
         logger.info(String.format("[%s] module started", moduleName));
 
