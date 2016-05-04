@@ -97,6 +97,9 @@ public class DefaultWidget implements ItemWidget {
 
     @Override
     public Image getImage(PreviewService previewService, int size) {
+        
+        if(previewService == null) return null;
+        
         if (previewService.getImageDisplayService().getActiveDataset()==null)
         {
             return null;

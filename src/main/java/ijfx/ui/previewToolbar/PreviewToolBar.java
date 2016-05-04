@@ -148,7 +148,11 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.setAnchorY(anchorY);
         popOver.getStyleClass().clear();
         popOver.getStyleClass().add("popoverToolBar");
-
+        popOver.showingProperty().addListener((obs,oldValue,newValue)->{
+            if(newValue) {
+                System.out.println(popOver.heightProperty().getValue());
+            }
+        });
     }
 
     /**
