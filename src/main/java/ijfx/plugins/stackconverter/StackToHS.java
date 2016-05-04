@@ -19,32 +19,13 @@
  */
 package ijfx.plugins.stackconverter;
 
-import ij.CompositeImage;
-import ij.IJ;
-import ij.ImagePlus;
-import ij.gui.GenericDialog;
-import ij.plugin.CompositeConverter;
-import ij.plugin.frame.Recorder;
-import ij.process.LUT;
-import ijfx.ui.messageBox.DefaultMessageBox;
-import ijfx.ui.messageBox.MessageBox;
-import static java.lang.Math.toIntExact;
-import java.util.Arrays;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
-import net.imagej.axis.CalibratedAxis;
-import net.imagej.display.ImageDisplayService;
-import net.imglib2.Cursor;
-import net.imglib2.RandomAccess;
-import net.imglib2.img.Img;
-import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
-import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
@@ -78,14 +59,16 @@ public class StackToHS implements Command {
     private DatasetService datasetService;
 
     @Parameter(required = true, label = "Order", choices = {CZT, CTZ, ZCT, ZTC, TZC, TCZ})
-    private String order;
+    public String order;
+    
     @Parameter(label = "Channels (c)")
-    private Integer channels;
+    public Integer channels=5;
+    
     @Parameter(label = "Slices (z)")
-    private Integer slices;
+    public Integer slices=5;
 
     @Parameter(label = "Frames (t)")
-    private Integer frames;
+    public Integer frames=5;
 
     @Override
     public void run() {
