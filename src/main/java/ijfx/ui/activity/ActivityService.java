@@ -50,7 +50,11 @@ public interface ActivityService extends IjfxService{
     
     public boolean isBackPossible();
 
-
+    public Activity getCurrentActivity();
+    
+    public String getCurrentActivityId();
+    
+    public Class<?> getCurrentActivityAsClass();
     
     
 }

@@ -20,7 +20,6 @@
 package ijfx.ui.plugin.panel;
 
 import ijfx.plugins.commands.BinaryToOverlay;
-import ijfx.service.batch.BatchInputWrapper;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.ImageDisplayBatchInput;
@@ -29,29 +28,31 @@ import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
+import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.main.Localization;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import mongis.utils.TaskButtonBinding;
-import net.imagej.Dataset;
 import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -60,7 +61,6 @@ import net.imagej.overlay.Overlay;
 import net.imagej.plugins.commands.binary.Binarize;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
 import net.imagej.table.DefaultGenericTable;
-import net.imagej.table.Table;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -101,16 +101,35 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @Parameter
     LoadingScreenService loadingScreenService;
 
+    @Parameter
+    ToggleButton allPlanesToggleButton;
+    
+    @Parameter
+    ToggleButton singlePlaneToggleButton;
+    
+    @Parameter
+    ExplorerService explorerService;
+    
+    @Parameter
+    ActivityService activityService;
+    
+    ToggleGroupValue<Boolean> toggleGroup;
+    
     TaskButtonBinding taskButtonBinding;
 
     WorkflowPanel workflowPanel;
 
+    private static final Boolean USE_ALL_PLANE = Boolean.TRUE;
+    
     public SegmentationPanel() {
         try {
             FXUtilities.injectFXML(this);
 
             taskButtonBinding = new TaskButtonBinding(testButton);
             taskButtonBinding.runTaskOnClick(this::createTaskButtonBinding);
+            
+            toggleGroup.add(allPlanesToggleButton, USE_ALL_PLANE);
+            toggleGroup.add(singlePlaneToggleButton,!USE_ALL_PLANE);
 
         } catch (IOException ex) {
             Logger.getLogger(SegmentationPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -222,5 +241,21 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         return true;
 
     }
+    
+    
+    protected Task<Boolean> generateTask(TaskButtonBinding binding) {
+        
+        if(activityService.getCurrentActivity() instanceof ExplorerActivity) {
+            
+            
+            new 
+            explorerService.getItems();
+            
+        }
+        
+        
+    }
+    
+    
 
 }

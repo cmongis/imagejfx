@@ -213,7 +213,18 @@ public class DefaultActivityService extends AbstractService implements ActivityS
         logger.info("Event published");
     }
 
+    @Override
     public Activity getCurrentActivity() {
         return currentActivity;
+    }
+    
+    @Override
+    public String getCurrentActivityId() {
+        return currentActivity.getActivityId();
+    }
+
+    @Override
+    public Class<?> getCurrentActivityAsClass() {
+        return currentActivity.getClass();
     }
 }
