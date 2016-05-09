@@ -22,9 +22,11 @@ package mongis.utils.panecell;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -37,6 +39,7 @@ import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import mercury.core.MercuryTimer;
 import mongis.utils.AsyncCallback;
@@ -53,7 +56,6 @@ import mongis.utils.properties.ServiceProperty;
  */
 public class PaneCellController<T extends Object> {
 
-   
     private List<T> currentItems;
     private LinkedList<PaneCell<T>> itemControllerList = new LinkedList<PaneCell<T>>();
     private LinkedList<PaneCell<T>> cachedControllerList = new LinkedList<>();
@@ -63,16 +65,16 @@ public class PaneCellController<T extends Object> {
     private Logger logger = ImageJFX.getLogger();
 
     private Pane pane;
-    
-   private  ObservableSet<T> selectedItems = FXCollections.observableSet();
-    
-    
+
+    private ObservableSet<T> selectedItems = FXCollections.observableSet();
+
     public PaneCellController(Pane pane) {
         setPane(pane);
     }
 
     /**
      * Set the pane that should be updated by the controller
+     *
      * @param pane
      */
     public void setPane(Pane pane) {
@@ -84,46 +86,73 @@ public class PaneCellController<T extends Object> {
     }
 
     /**
-     *  Give it a list of items coming from the model and the controller will update
-     *  the pane. If necessary, new PanelCell will be created. Unnecessary PaneCells
-     *  will be cached.
+     * Give it a list of items coming from the model and the controller will
+     * update the pane. If necessary, new PanelCell will be created. Unnecessary
+     * PaneCells will be cached.
+     *
      * @param items List of items coming from the model
      */
     public synchronized void update(List<T> items) {
-        
-        new AsyncCallback<Integer,List<PaneCell<T>>>()
+
+        new AsyncCallback<Integer, List<PaneCell<T>>>()
                 .setInput(items.size())
                 .run(this::retrieve)
-                .then(controllers->{
-                     MercuryTimer timer = new MercuryTimer("Browser view");
-                     timer.start();
+                .then(controllers -> {
+                    MercuryTimer timer = new MercuryTimer("Browser view");
+                    timer.start();
                     pane.getChildren().clear();
                     pane.getChildren().addAll(getContent(controllers));
                     timer.elapsed("Adding all the controllers");
-                    for(int i = 0;i!=items.size();i++) {
+                    for (int i = 0; i != items.size(); i++) {
                         controllers.get(i).setItem(items.get(i));
                     }
                     timer.elapsed("Updating all the controllers");
-                    
+
                 })
                 .start();
-         
+
     }
 
-    
+    public synchronized void update2DList(List<List<T>> items, int size) {
+        new AsyncCallback<Integer, List<PaneCell<T>>>()
+                .setInput(size+1)
+                .run(this::retrieve)
+                .then(controllers -> {
+                    MercuryTimer timer = new MercuryTimer("Browser view");
+                    timer.start();
+                    pane.getChildren().clear();
+
+                    for (int i = 0; i < items.size(); i++) {
+                        for (int j = 0; j < items.get(i).size(); j++) {
+
+                            ((GridPane) pane).add(controllers.get(j * items.size() + i).getContent(), i, j);
+                            controllers.get(j*items.size() +i).setItem(items.get(i).get(j));
+                        }
+                    }
+                    timer.elapsed("Updating2D all the controllers");
+//                    for (int i = 0; i < items.size(); i++) {
+//                        for (int j = 0; j < items.get(i).size(); j++) {
+//                            controllers.get(j*items.size() +i).setItem(items.get(i).get(j));
+//                        }
+//                    }
+                })
+                .start();
+
+    }
+
     private List<PaneCell<T>> retrieve(Integer number) {
-        
-         MercuryTimer timer = new MercuryTimer("Browser view");
-         int cacheSize = cachedControllerList.size();
-         int missingControllers = number-cacheSize;
-         timer.start();
-        if(missingControllers > 0) {  
+
+        MercuryTimer timer = new MercuryTimer("Browser view");
+        int cacheSize = cachedControllerList.size();
+        int missingControllers = number - cacheSize;
+        timer.start();
+        if (missingControllers > 0) {
             fillCache(missingControllers);
         }
         timer.elapsed("Time to fetch controllers");
         return cachedControllerList.subList(0, number);
     }
-    
+
     /*
     public synchronized void update(List<T> items) {
 
@@ -215,104 +244,105 @@ public class PaneCellController<T extends Object> {
             logger.log(Level.SEVERE, "Couln't update the controllers", e);
         }
     }*/
-
     // get the list of cells
     protected Collection<Node> getContent(Collection<PaneCell<T>> cellList) {
         return cellList.stream().map(PaneCell::getContent).collect(Collectors.toList());
     }
-    
-    
 
     // fills the cache by creating a certain number of cells
     private void fillCache(int number) {
 
-        cachedControllerList.addAll(IntStream.range(0, number+1).parallel().mapToObj(n -> createPaneCell()).collect(Collectors.toList()));
+        cachedControllerList.addAll(IntStream.range(0, number + 1).parallel().mapToObj(n -> createPaneCell()).collect(Collectors.toList()));
 
     }
-    
+
     PseudoClass SELECTED_PSEUDO_CLASS = new PseudoClass() {
-        private  final static String SELECTED = "selected";
+        private final static String SELECTED = "selected";
+
         @Override
         public String getPseudoClassName() {
             return SELECTED;
         }
     };
-    
+
     // creates a pane cell
     private PaneCell<T> createPaneCell() {
         try {
-            
+
             PaneCell cell = cellFactory.call();
-           
+
             return cell;
-            
+
         } catch (Exception ex) {
             Logger.getLogger(PaneCellController.class.getName()).log(Level.SEVERE, "Error when creating cell", ex);
         }
         return null;
     }
-    
+
     private class CellClickHandler implements EventHandler<MouseEvent> {
 
         PaneCell<T> cell;
         private final static long DOUBLE_CLICK_INTERVAL = 1000;
         long lastClick;
-        
+
         @Override
         public void handle(MouseEvent event) {
-            
+
             long now = System.currentTimeMillis();
-            
-            if(now - lastClick <= DOUBLE_CLICK_INTERVAL) {
-                
-            }
-            else {
+
+            if (now - lastClick <= DOUBLE_CLICK_INTERVAL) {
+
+            } else {
                 setSelected(cell.getItem(), Boolean.TRUE);
             }
-            
+
         }
-    
+
     }
-    
-    public Boolean isSelected(T item)  {
+
+    public Boolean isSelected(T item) {
         return selectedItems.contains(item);
     }
-    
+
     public void setSelected(T item, Boolean selection) {
-        if(selection)selectedItems.add(item);
-        else selectedItems.remove(item);
+        if (selection) {
+            selectedItems.add(item);
+        } else {
+            selectedItems.remove(item);
+        }
         Platform.runLater(this::updateSelection);
     }
-    
+
     public void select(List<T> items) {
         selectedItems.addAll(items);
         Platform.runLater(this::updateSelection);
     }
+
     public void unselected(List<T> items) {
         Platform.runLater(this::updateSelection);
     }
-    
+
     public Property<Boolean> getSelectedProperty(T item) {
         return new ServiceProperty<>(item, this::setSelected, this::isSelected);
     }
-    
+
     public void updateSelection() {
         itemControllerList.forEach(this::updateSelection);
     }
-    
+
     public void updateSelection(PaneCell<T> cell) {
-       cell.getContent().pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, isSelected(cell.getItem()));
+        cell.getContent().pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, isSelected(cell.getItem()));
     }
-    
+
     public List<T> getItems() {
         return currentItems;
     }
-    
+
     public List<PaneCell> getCells() {
         return pane
                 .getChildren()
                 .stream()
-                .map(child->(PaneCell)child)
+                .map(child -> (PaneCell) child)
                 .collect(Collectors.toList());
     }
 }
