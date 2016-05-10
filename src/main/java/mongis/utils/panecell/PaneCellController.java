@@ -113,7 +113,7 @@ public class PaneCellController<T extends Object> {
 
     }
 
-    public synchronized void update2DList(List<List<T>> items, int size) {
+        public synchronized void update3DList(List<List<List<T>>> items, int size) {
         new AsyncCallback<Integer, List<PaneCell<T>>>()
                 .setInput(size+1)
                 .run(this::retrieve)
@@ -122,14 +122,21 @@ public class PaneCellController<T extends Object> {
                     timer.start();
                     pane.getChildren().clear();
                        int cpt = 0;
-                    for (int i = 0; i < items.size(); i++) {
-                        for (int j = 0; j < items.get(i).size(); j++) {
+                       List<List<List<T>>> item = items;
+                    for (int x = 0; x < items.size(); x++) {
+                    GridPane gridPane = new GridPane();
+                    for (int i = 0; i < items.get(x).size(); i++) {
+                        for (int j = 0; j < items.get(x).get(i).size(); j++) {
+                            gridPane.add(controllers.get(cpt).getContent(), j, i);
+                            controllers.get(cpt).setItem(items.get(x).get(i).get(j));
                             cpt++;
-                            ((GridPane) pane).add(controllers.get(cpt).getContent(), i, j);
-                            controllers.get(cpt).setItem(items.get(i).get(j));
                                 
                         
                         }
+                    }
+                    pane.getChildren().add(gridPane);                                
+                        
+                        
                     }
                     timer.elapsed("Updating2D all the controllers");
 //                    for (int i = 0; i < items.size(); i++) {
@@ -139,6 +146,35 @@ public class PaneCellController<T extends Object> {
 //                    }
                 })
                 .start();
+
+    }
+        
+    public synchronized void update2DList(List<List<T>> items, int size) {
+        new AsyncCallback<Integer, List<PaneCell<T>>>()
+                .setInput(size+1)
+                .run(this::retrieve)
+                .then(controllers -> {
+                    MercuryTimer timer = new MercuryTimer("Browser view");
+                    timer.start();
+                    GridPane gridPane = new GridPane();
+                       int cpt = 0;
+                    for (int i = 0; i < items.size(); i++) {
+                        for (int j = 0; j < items.get(i).size(); j++) {
+                            cpt++;
+                            gridPane.add(controllers.get(cpt).getContent(), i, j);
+                            controllers.get(cpt).setItem(items.get(i).get(j));
+                                
+                        
+                        }
+                    }
+                    pane.getChildren().add(gridPane);
+                    timer.elapsed("Updating2D all the controllers");
+//                    for (int i = 0; i < items.size(); i++) {
+//                        for (int j = 0; j < items.get(i).size(); j++) {
+//                            controllers.get(j*items.size() +i).setItem(items.get(i).get(j));
+//                        }
+//                    }
+                });
 
     }
 

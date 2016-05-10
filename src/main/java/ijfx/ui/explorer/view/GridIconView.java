@@ -41,6 +41,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
 import mongis.utils.panecell.ScrollBinder;
@@ -53,35 +54,39 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = ExplorerView.class)
 public class GridIconView extends BorderPane implements ExplorerView {
 
-    private final GridPane gridPane = new GridPane();
+    private VBox vBox = new VBox();
     private ScrollPane scrollPane;
     private ScrollBinder binder;
     private HBox hBox;
-    private SortListExplorable sortExplorable;
+    private GroupExplorable groupExplorable;
     private ComboBoxMetadata comboBoxMetadata;
     private ComboBoxMetadata comboBoxMetadata2;
+    private ComboBoxMetadata comboBoxMetadata3;
 
-    private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(gridPane);
+    private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(vBox);
 
     public GridIconView() {
-        sortExplorable = new SortListExplorable();
+        groupExplorable = new GroupExplorable();
         hBox = new HBox();
         comboBoxMetadata = new ComboBoxMetadata();
         comboBoxMetadata2 = new ComboBoxMetadata();
-        sortExplorable.setFirstMetaData(comboBoxMetadata.getSelectionModel().getSelectedItem());
-        sortExplorable.setSecondMetaData(comboBoxMetadata2.getSelectionModel().getSelectedItem());
+                comboBoxMetadata3 = new ComboBoxMetadata();
+
+        groupExplorable.getSortListExplorable().setFirstMetaData(comboBoxMetadata.getSelectionModel().getSelectedItem());
+        groupExplorable.getSortListExplorable().setSecondMetaData(comboBoxMetadata2.getSelectionModel().getSelectedItem());
+                groupExplorable.setThirdMetaData(comboBoxMetadata2.getSelectionModel().getSelectedItem());
+
         initComboBox();
-        hBox.getChildren().addAll(comboBoxMetadata, comboBoxMetadata2);
+        hBox.getChildren().addAll(comboBoxMetadata, comboBoxMetadata2, comboBoxMetadata3);
         scrollPane = new ScrollPane();
-        scrollPane.setContent(gridPane);
+        scrollPane.setContent(vBox);
         this.setTop(hBox);
 
         this.setCenter(scrollPane);
 //setContent(gridPane);
         setPrefWidth(400);
         //setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        gridPane.prefWidthProperty().bind(widthProperty());
-        gridPane.prefHeightProperty().bind(heightProperty());
+
 
         cellPaneCtrl.setCellFactory(this::createIcon);
         binder = new ScrollBinder(scrollPane);
@@ -98,25 +103,25 @@ public class GridIconView extends BorderPane implements ExplorerView {
     @Override
     public void setItem(List<? extends Explorable> items) {
 
-        sortExplorable.setItems(new CopyOnWriteArrayList(items));
+        groupExplorable.setListItems(new CopyOnWriteArrayList(items));
     }
 
     public void initComboBox() {
 
         comboBoxMetadata.metaDataProperty().addListener((obs, old, newValue) -> {
-            sortExplorable.firstMetaData = newValue;
+            groupExplorable.getSortListExplorable().firstMetaData = newValue;
             sortItems();
         });
         comboBoxMetadata2.metaDataProperty().addListener((obs, old, newValue) -> {
-            sortExplorable.secondMetaData = newValue;
+            groupExplorable.getSortListExplorable().secondMetaData = newValue;
             sortItems();
         });
 
     }
 
     private void sortItems() {
-        sortExplorable.process();
-        cellPaneCtrl.update2DList(new CopyOnWriteArrayList<>(sortExplorable.getList2D()), sortExplorable.getSizeList2D());
+        groupExplorable.process();
+        cellPaneCtrl.update3DList(new CopyOnWriteArrayList<>(groupExplorable.getList3D()), groupExplorable.getSizeList3D());
     }
 
     private PaneCell<Iconazable> createIcon() {
@@ -135,7 +140,7 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     public void onMouseClick(MouseEvent event) {
         System.out.println(event);
-        if (event.getTarget() == gridPane) {
+        if (event.getTarget() == vBox) {
             cellPaneCtrl.getItems().forEach(item -> item.selectedProperty().setValue(false));
         }
     }
