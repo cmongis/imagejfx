@@ -24,6 +24,7 @@ import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.overlay.OverlaySelectionService;
+import ijfx.ui.plugin.panel.OverlayOptionsService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,7 +51,6 @@ import org.scijava.Context;
 import org.scijava.display.DisplayService;
 
 import org.scijava.plugin.Parameter;
-import org.scijava.util.ColorRGB;
 
 /**
  * Abstract class that eases creation of path based tools.
@@ -100,6 +100,9 @@ public abstract class AbstractPathTool implements FxTool {
 
     @Parameter
     Context context;
+    
+    @Parameter
+    OverlayOptionsService overlayOptionsService;
     
     private EventHandler<MouseEvent> onMouseDragged = this::onMouseDragged;
     private EventHandler<MouseEvent> onMouseReleased = this::onMouseReleased;
@@ -174,8 +177,9 @@ public abstract class AbstractPathTool implements FxTool {
          PolygonOverlay overlay = new PolygonOverlay(context);
         
         overlay.setName("new overlay");
-        overlay.setFillColor(new ColorRGB(244,14,14));
-        overlay.setLineColor(new ColorRGB(0,0,244));
+        overlay.setFillColor(overlayOptionsService.colorProperty().getValue());
+        overlay.setLineColor(overlayOptionsService.colorProperty().getValue());
+        overlay.setLineWidth(overlayOptionsService.widthProperty().getValue());
         
         ImageDisplay display = displayService.getActiveDisplay(ImageDisplay.class);
         

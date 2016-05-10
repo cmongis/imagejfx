@@ -24,7 +24,6 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import net.imagej.overlay.Overlay;
-import org.scijava.plugin.SciJavaPlugin;
 import org.scijava.util.ColorRGB;
 
 /**
@@ -36,7 +35,7 @@ import org.scijava.util.ColorRGB;
  */
 public interface OverlayDrawer<T extends Overlay> extends ClassHandler<Overlay> {
     
-   
+
     
     // returns a node updated according to the overlay parameter
     // with size and position depending on the viewport
@@ -56,7 +55,7 @@ public interface OverlayDrawer<T extends Overlay> extends ClassHandler<Overlay> 
         Color fxFillColor = toFxColor(fillColor).deriveColor(0.0, 0, 0, 0.1);
         shape.setFill(fxFillColor);
         shape.setStroke(toFxColor(overlay.getLineColor()));
-        shape.setStrokeWidth(2.0);
+        shape.setStrokeWidth(overlay.getLineWidth());
         shape.setOpacity(1.0);
     }
     

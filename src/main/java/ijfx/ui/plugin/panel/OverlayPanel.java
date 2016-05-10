@@ -20,20 +20,18 @@
  */
 package ijfx.ui.plugin.panel;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
-import ijfx.ui.main.ImageJFX;
+import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.ui.main.Localization;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlayStatService;
-import ijfx.service.overlay.OverlaySelectedEvent;
 import java.io.IOException;
-import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -41,38 +39,50 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 
 import net.imagej.DatasetService;
-import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.measure.MeasurementService;
 import org.scijava.display.DisplayService;
-import org.scijava.event.EventHandler;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
+import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
+import javafx.scene.Node;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.TitledPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
 import mongis.utils.AsyncCallback;
+import net.imagej.display.ImageDisplay;
 import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.controlsfx.control.PopOver;
+import org.scijava.Context;
 import org.scijava.display.event.DisplayActivatedEvent;
+import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
 
 /**
@@ -106,6 +116,9 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     TimerService timerService;
+    
+    @Parameter
+    Context context;
 
     @FXML
     TableView<MyEntry> tableView;
@@ -133,6 +146,17 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @FXML
     BorderPane chartBorderPane;
 
+    @FXML
+    TitledPane chartTitledPane;
+    
+    PopOver optionsPane;
+    
+    OverlayOptions overlayOptions;    
+    
+    Text gearIcon;
+    
+    int TEXT_GAP = 160;
+    double BASAL_OPACITY = 0.4;
     
     private final static String EMPTY_FIELD = "Name your overlay here :-)";
 
@@ -156,7 +180,26 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         overlayProperty.addListener(this::onOverlaySelectionChanged);
 
         chartVBox.getChildren().removeAll(areaChart, lineChart);
-
+        
+        overlayOptions = new OverlayOptions();        
+        
+        optionsPane = new PopOver(overlayOptions);
+        optionsPane.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+        optionsPane.setDetachable(true);
+        optionsPane.setAutoHide(false);
+        optionsPane.titleProperty().setValue("Overlay settings");
+        
+        gearIcon = GlyphsDude.createIcon(FontAwesomeIcon.GEAR, "15");
+        gearIcon.setOpacity(BASAL_OPACITY);
+        gearIcon.setOnMouseEntered(e-> gearIcon.setOpacity(1.0));
+        gearIcon.setOnMouseExited(e-> gearIcon.setOpacity(BASAL_OPACITY));
+        gearIcon.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onGearClicked);
+        gearIcon.addEventHandler(MouseEvent.MOUSE_PRESSED, e->{e.consume();});
+        gearIcon.addEventHandler(MouseEvent.MOUSE_RELEASED, e->{e.consume();});
+        
+        chartTitledPane.setGraphic(gearIcon);      
+        chartTitledPane.setContentDisplay(ContentDisplay.RIGHT);        
+        chartTitledPane.graphicTextGapProperty().setValue(TEXT_GAP);
     }
 
     ImageDisplay imageDisplay;
@@ -364,6 +407,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @Override
     public UiPlugin init() {
+        context.inject(overlayOptions);
         return this;
     }
 
@@ -404,6 +448,24 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         if (overlayProperty.getValue() != null) {
             overlayProperty.getValue().setName(newText);
         }
+    }
+    
+    
+    public void onGearClicked(MouseEvent e){
+        if(!optionsPane.isShowing()){
+            RotateTransition rotate = new RotateTransition(Duration.millis(500), gearIcon);
+            rotate.setByAngle(180);
+            rotate.play();
+            optionsPane.show(gearIcon);        
+        }
+        else{
+            RotateTransition rotate = new RotateTransition(Duration.millis(500), gearIcon);
+            rotate.setByAngle(-180);
+            rotate.play();
+            optionsPane.hide();            
+        }
+        
+        e.consume();
     }
 
 }

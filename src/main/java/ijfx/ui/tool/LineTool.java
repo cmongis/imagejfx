@@ -21,12 +21,12 @@ package ijfx.ui.tool;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import ijfx.service.overlay.OverlaySelectedEvent;
+import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
+import ijfx.ui.plugin.panel.OverlayOptionsService;
 import ijfx.ui.utils.Point2DUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.LineOverlay;
 import org.scijava.event.EventService;
@@ -39,6 +39,9 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = FxTool.class,priority=99.5)
 public class LineTool extends AbstractPathTool {
+    
+    @Parameter
+    OverlayOptionsService overlayOptionsService;
 
     Node icon = GlyphsDude.createIcon(FontAwesomeIcon.LONG_ARROW_LEFT);
 
@@ -72,8 +75,8 @@ public class LineTool extends AbstractPathTool {
             yList[1] = end.getY();
 
             getCanvas().repaint();
-            getCanvas().getGraphicsContext2D().setStroke(Color.YELLOW);
-            getCanvas().getGraphicsContext2D().setLineWidth(1.0);
+            getCanvas().getGraphicsContext2D().setStroke(OverlayDrawer.toFxColor(overlayOptionsService.colorProperty().getValue()));
+            getCanvas().getGraphicsContext2D().setLineWidth(overlayOptionsService.widthProperty().getValue());
             getCanvas().getGraphicsContext2D().strokePolygon(xList, yList, xList.length);
 
         }
@@ -87,6 +90,10 @@ public class LineTool extends AbstractPathTool {
         currentOverlay = new LineOverlay(context);
         currentOverlay.setLineStart(Point2DUtils.asArray(begin));
         currentOverlay.setLineEnd(Point2DUtils.asArray(end));
+        currentOverlay.setLineWidth(overlayOptionsService.widthProperty().getValue());
+        currentOverlay.setLineColor(overlayOptionsService.colorProperty().getValue());
+        currentOverlay.setFillColor(overlayOptionsService.colorProperty().getValue());
+        
         addOverlays(currentOverlay);
 
         eventService.publishLater(new OverlayUpdatedEvent(currentOverlay));
