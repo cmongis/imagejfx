@@ -23,8 +23,9 @@ import ijfx.core.metadata.MetaData;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.ComboBox;
 
@@ -32,31 +33,49 @@ import javafx.scene.control.ComboBox;
  *
  * @author Tuan anh TRINH
  */
-public class ComboBoxMetadata extends ComboBox<Field> {
+public class ComboBoxMetadata extends ComboBox<String> {
 
-    ObjectProperty<Field> metaDataProperty = new SimpleObjectProperty();
+    ObjectProperty<String> metaDataProperty = new SimpleObjectProperty();
 
-    public Property metaDataProperty() {
+    public ObjectProperty<String> metaDataProperty() {
         return metaDataProperty;
     }
 
     public ComboBoxMetadata() {
+        super();
         System.out.println("Initiliazing");
         this.getItems().addAll(getStaticStringFields());
 
-        this.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> metaDataProperty.setValue(newValue));
+        this.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+            metaDataProperty.set(newValue);
+        });
+        this.setValue(this.getItems().get(0));
 
     }
 
-    public List<Field> getStaticStringFields() {
+    public List<String> getStaticStringFields() {
         Field[] declaredFields = MetaData.class.getDeclaredFields();
-        List<Field> fields = new ArrayList<Field>();
+        List<String> fields = new ArrayList<String>();
         for (Field field : declaredFields) {
             if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) && field.getType() == String.class) {
-                fields.add(field);
+                try {
+                    fields.add((String) field.get(MetaData.class));
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(ComboBoxMetadata.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(ComboBoxMetadata.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         return fields;
+    }
+
+    public String getMetaDataPropertyValue() {
+        return metaDataProperty.getValue();
+    }
+
+    public void setMetaDataPropertyValue(String field) {
+        metaDataProperty.setValue(field);
     }
 
 }
