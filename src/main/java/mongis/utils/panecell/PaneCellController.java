@@ -121,12 +121,14 @@ public class PaneCellController<T extends Object> {
                     MercuryTimer timer = new MercuryTimer("Browser view");
                     timer.start();
                     pane.getChildren().clear();
-
+                       int cpt = 0;
                     for (int i = 0; i < items.size(); i++) {
                         for (int j = 0; j < items.get(i).size(); j++) {
-
-                            ((GridPane) pane).add(controllers.get(j * items.size() + i).getContent(), i, j);
-                            controllers.get(j*items.size() +i).setItem(items.get(i).get(j));
+                            cpt++;
+                            ((GridPane) pane).add(controllers.get(cpt).getContent(), i, j);
+                            controllers.get(cpt).setItem(items.get(i).get(j));
+                                
+                        
                         }
                     }
                     timer.elapsed("Updating2D all the controllers");
