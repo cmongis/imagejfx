@@ -30,35 +30,51 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Tuan anh TRINH
  */
-public class SortExplorable<T> {
+public class SortListExplorable<T> {
 
     List<? extends Explorable> listItems;
     List<List<? extends Explorable>> list2D;
+    String firstMetaData;
+    String secondMetaData;
 
-    public SortExplorable() {
+    public void process() {
+        sort(firstMetaData);
+        create2DList(firstMetaData);
+        sort2DList(secondMetaData);
+    }
+    
+    public String getFirstMetaData() {
+        return firstMetaData;
+    }
+
+    public void setFirstMetaData(String firstMetaData) {
+        this.firstMetaData = firstMetaData;
+    }
+
+    public String getSecondMetaData() {
+        return secondMetaData;
+    }
+
+    public void setSecondMetaData(String secondMetaData) {
+        this.secondMetaData = secondMetaData;
+    }
+
+
+    public SortListExplorable() {
         list2D = new CopyOnWriteArrayList<>();
         listItems = new CopyOnWriteArrayList<>();
     }
-    
-    public SortExplorable(List<? extends Explorable> list)
-    {
+
+    public SortListExplorable(List<? extends Explorable> list) {
         this();
         listItems = list;
         List<String> t = new ArrayList<>();
 
-
     }
 
-    
-    
-
     public void sort(String metaDataName) {
-        Comparator<Explorable> comparator = ( o1,  o2) -> {
-            String s1 = getValueMetaData(o1, metaDataName);
-            String s2 = getValueMetaData(o2, metaDataName);
-            return s1.compareToIgnoreCase(s2);
-        };
-        this.listItems.sort(comparator);
+
+        this.listItems.sort(SortExplorableUtils.MetadataComparator(metaDataName));
     }
 
     public void create2DList(String metaDataName) {
@@ -68,16 +84,14 @@ public class SortExplorable<T> {
 
         for (int i = 0; i < this.listItems.size(); i++) {
             System.out.println(i);
-         if (i == this.listItems.size()-1)
-            {
-                limits.add(i+1);
-            }
-         else if ( !getValueMetaData(this.listItems.get(i), metaDataName).equals(getValueMetaData(this.listItems.get(i + 1), metaDataName))) {
+            if (i == this.listItems.size() - 1) {
+                limits.add(i + 1);
+            } else if (!SortExplorableUtils.getValueMetaData(this.listItems.get(i), metaDataName).equals(SortExplorableUtils.getValueMetaData(this.listItems.get(i + 1), metaDataName))) {
                 limits.add(i);
             }
         }
 
-        for (int j = 0; j < limits.size()-1; j++) {
+        for (int j = 0; j < limits.size() - 1; j++) {
             List<? extends Explorable> l = new CopyOnWriteArrayList<>(this.listItems.subList(limits.get(j), limits.get(j + 1)));
             this.list2D.add(l);
         }
@@ -87,10 +101,8 @@ public class SortExplorable<T> {
         this.list2D.stream().forEach(l -> sort(metaDataName));
     }
 
-    public String getValueMetaData(Explorable ex, String metaDataName) {
-        return MetaData.metaDataSetToMap(ex.getMetaDataSet()).get(metaDataName);
-    }
-    
+
+
     public void setItems(List<? extends Explorable> list) {
         listItems = list;
     }
@@ -102,11 +114,10 @@ public class SortExplorable<T> {
     public List<List<? extends Explorable>> getList2D() {
         return list2D;
     }
-    
-    public int getSizeList2D(){
+
+    public int getSizeList2D() {
         int size = 0;
-        for (List<? extends Explorable> list: list2D)
-        {
+        for (List<? extends Explorable> list : list2D) {
             size = size + list.size();
         }
         return size;
