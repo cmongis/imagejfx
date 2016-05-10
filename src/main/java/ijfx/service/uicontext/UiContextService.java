@@ -48,6 +48,7 @@ import org.scijava.service.Service;
 import mongis.utils.ConditionList;
 import ijfx.ui.context.UiContextManager;
 import ijfx.ui.context.UiContextUpdatedEvent;
+import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.scijava.event.EventService;
@@ -65,7 +66,8 @@ public class UiContextService extends AbstractService implements UiContextManage
     private HashMap<String, ContextualWidget> widgets = new HashMap<>();
 
     final private Set<String> currentContextList = new CopyOnWriteArraySet<>();
-
+    final private Set<String> lastContextList = new CopyOnWriteArraySet<>();
+    
     private ContextLinkSet linkSet = new ContextLinkSet();
 
     private HashMap<String, ContextualView> viewMap = new HashMap<>();
@@ -75,9 +77,17 @@ public class UiContextService extends AbstractService implements UiContextManage
     @Parameter
     EventService eventService;
     
+    
+    @Override
+    public void initialize() {
+        super.initialize();
+        logger.info("Importing context configuration.");
+        importContextConfiguration();
+    }
+    
     public UiContextManager registerWidget(ContextualWidget widget) {
         widgets.put(widget.getName(), widget);
-        importContextConfiguration();
+        
         return this;
     }
 
@@ -166,12 +176,15 @@ public class UiContextService extends AbstractService implements UiContextManage
     @Override
     @AngularMethod(sync = true, description = "Update the different widgets depending on the newly created context.")
     public UiContextManager update() {
-        if (!hasChanged) {
-            return this;
-        }
+        
+        if(!hasChanged()) return this;
+        
         logger.info("Updating...");
         logger.info("Actual context : " + getActualContextListAsString());
-
+        
+        lastContextList.clear();
+        lastContextList.addAll(currentContextList);
+        
         //logger.info(linkSet.toString());
         // for each controller, update the controller by telling it which widget it should show
         // and which widget it should hide
@@ -180,6 +193,13 @@ public class UiContextService extends AbstractService implements UiContextManage
         eventService.publish(new UiContextUpdatedEvent().setObject(currentContextList));
         
         return this;
+    }
+    
+    public boolean hasChanged() {
+        
+        return !(currentContextList.containsAll(lastContextList) && lastContextList.size() == currentContextList.size());
+        
+        
     }
 
     public <T> void updateController(ContextualView<T> view) {
@@ -296,7 +316,7 @@ public class UiContextService extends AbstractService implements UiContextManage
 
     @Override
     public <T> UiContextManager addContextualView(ContextualView<T> contextualView) {
-
+        
         logger.info(String.format("Registering the contextual view : %s", contextualView.getName()));
         viewMap.put(contextualView.getName(), contextualView);
         contextualView
@@ -335,7 +355,7 @@ public class UiContextService extends AbstractService implements UiContextManage
     public void importContextConfiguration() {
 
         try {
-            String json = IOUtils.toString(getClass().getResourceAsStream("ContextService.json"));
+            String json = IOUtils.toString(getClass().getResourceAsStream("/ijfx/service/uicontext/ContextService.json"));
             importContextConfiguration(json);
         } catch (IOException ex) {
             logger.log(Level.SEVERE,"Failed to load the ContextService.json file",ex);
@@ -349,7 +369,6 @@ public class UiContextService extends AbstractService implements UiContextManage
         List<UiContext> contextList = null;
 
         try {
-            
             contextList = mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, UiContext.class));
 
         } catch (IOException ex) {
@@ -357,6 +376,7 @@ public class UiContextService extends AbstractService implements UiContextManage
         }
 
         contextList.forEach(context -> {
+            logger.info(String.format("Loaded context %s which is incompatible with : %s",context.getId(),context.getIncompatibles().stream().collect(Collectors.joining(", "))));
             uiContextMap.put(context.getId(), context);
         });
 

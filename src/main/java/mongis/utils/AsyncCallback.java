@@ -31,11 +31,12 @@ import javafx.util.Callback;
  *
  * @author cyril
  */
-public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
+public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler{
 
     INPUT input;
 
     Callback<INPUT, OUTPUT> callback;
+    LongCallback<ProgressHandler,INPUT,OUTPUT> longCallback;
     Runnable runnable;
 
     public AsyncCallback() {
@@ -52,6 +53,12 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
         this.callback = callback;
     }
 
+    public AsyncCallback setName(String name) {
+        updateTitle(name);
+        updateMessage(name);
+        return this;
+    }
+    
     public AsyncCallback<INPUT, OUTPUT> run(Callback<INPUT, OUTPUT> callback) {
         this.callback = callback;
         return this;
@@ -65,6 +72,10 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
         this.runnable = runnable;
         return this;
     }
+    public AsyncCallback<INPUT,OUTPUT> run(LongCallback<ProgressHandler,INPUT,OUTPUT> longCallback) {
+       this.longCallback = longCallback;
+        return this;
+    }
 
     public OUTPUT call() {
         try {
@@ -73,8 +84,17 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
                 return null;
             }
             try {
+               
+                if(longCallback != null) {
+                    OUTPUT output = longCallback.handle(this,input);
+                    
+                    if(isCancelled()) return null;
+                    else return output;
+                    
+                    
+                }    
                 // now if we should execute a callback
-                if (callback != null) {
+                else if (callback != null) {
                     // executing and betting the output
                     OUTPUT output = callback.call(input);
                     // if the task has been cancelled during execution,
@@ -129,6 +149,7 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
     public AsyncCallback<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
         setOnSucceeded(event -> {
             // if it wasn't cancelled and it was a callback executed
+            if(consumer == null) return;
             if (!isCancelled() && getValue() != null && runnable == null) {
                 consumer.accept(getValue());
             } else if (!isCancelled() && runnable != null) {
@@ -150,5 +171,27 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> {
 
         return this;
     }
+
+    @Override
+    public void setProgress(double progress) {
+        updateProgress(progress, 1);
+    }
+
+    @Override
+    public void setProgress(double workDone, double total) {
+        updateProgress(workDone, total);
+    }
+
+    @Override
+    public void setProgress(long workDone, long total) {
+        updateProgress(workDone, total);
+    }
+
+    @Override
+    public void setStatus(String message) {
+        updateMessage(message);
+    }
+
+  
 
 }

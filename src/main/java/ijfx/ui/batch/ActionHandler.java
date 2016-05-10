@@ -27,5 +27,5 @@ package ijfx.ui.batch;
 
 @FunctionalInterface
 public interface ActionHandler<T> {
-     public void execute(T t);
+     public void consume(T t);
 }

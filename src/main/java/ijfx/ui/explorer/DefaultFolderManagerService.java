@@ -20,7 +20,8 @@
 package ijfx.ui.explorer;
 
 import ijfx.core.imagedb.MetaDataExtractionService;
-import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaData;
+import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
@@ -32,8 +33,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import mongis.utils.AsyncCallable;
+import mongis.utils.AsyncCallback;
+import mongis.utils.ProgressHandler;
+import mongis.utils.SilentProgressHandler;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.Context;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -74,6 +81,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Parameter
     LoadingScreenService loadingScreenService;
     
+    @Parameter
+    IjfxStatisticService statsService;
+    
     private static String FOLDER_PREFERENCE_FILE = "folder_db.json";
 
     Logger logger = ImageJFX.getLogger();
@@ -82,6 +92,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
     List<Explorable> currentItems;
 
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+    
     @Override
     public Folder addFolder(File file) {
         Folder f = new DefaultFolder(file);
@@ -172,28 +185,58 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
                         break;
                 }
             }
-            task.then(explorerService::setItems);
+            task.then(this::setItems);
             task.start();
             loadingScreenService.frontEndTask(task, false);
         }
         logger.info("Exploration mode changed : " + mode.toString());
     }
-
+    private void setItems(List<Explorable> items) {
+        explorerService.setItems(items);
+        
+        new AsyncCallback<List<Explorable>,Integer>(items)
+                .run(this::fetchMoreStatistics)
+                .then(n->{
+                 if(n > 0 && explorerService.getItems() == items) 
+                     explorerService.setItems(items);
+                })
+                .start();
+        
+    }
+    private Integer fetchMoreStatistics(ProgressHandler progress,List<Explorable> explorableList) {
+        if(progress == null) progress = new SilentProgressHandler();
+        progress.setStatus("Completing statistics of the objects");
+        Integer elementAnalyzedCount = 0;
+        int elements = explorableList.size();
+        int i = 0;
+        for (Explorable e : explorableList) {
+            if (!e.getMetaDataSet().containsKey(MetaData.STATS_PIXEL_MIN)) {
+                progress.setProgress(i,elements);
+                if (e instanceof ImageRecordIconizer) {
+                    ImageRecordIconizer iconizer = (ImageRecordIconizer) e;
+                    SummaryStatistics stats = statsService.getStatistics(iconizer.getImageRecord().getFile());
+                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
+                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
+                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
+                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
+                    elementAnalyzedCount++;
+                }
+            }
+            i++;
+        }
+        return elementAnalyzedCount;
+    }
     @Override
     public ExplorationMode getCurrentExplorationMode() {
         return currentExplorationMode;
     }
-
     private void save() {
         HashMap<String, String> folderMap = new HashMap<>();
         for (Folder f : getFolderList()) {
             folderMap.put(f.getName(), f.getDirectory().getAbsolutePath());
         }
-
         jsonPrefService.savePreference(folderMap, FOLDER_PREFERENCE_FILE);
-
     }
-
     private synchronized void load() {
         Map<String, String> folderMap = jsonPrefService.loadMapFromJson(FOLDER_PREFERENCE_FILE, String.class, String.class);
         folderMap.forEach((name, folderPath) -> {

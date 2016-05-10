@@ -24,8 +24,8 @@ import ijfx.ui.module.ModuleConfigPane;
 import ijfx.service.workflow.WorkflowStep;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -65,13 +65,13 @@ public class WorkflowStepController extends BorderPane implements ListCellContro
 
     }
 
-    ActionHandler<WorkflowStep> deleteHandler;
+    Consumer<WorkflowStep> deleteHandler;
 
-    public ActionHandler getDeleteHandler() {
+    public Consumer<WorkflowStep> getDeleteHandler() {
         return deleteHandler;
     }
 
-    public void setDeleteHandler(ActionHandler<WorkflowStep> deleteHandler) {
+    public void setDeleteHandler(Consumer<WorkflowStep> deleteHandler) {
         this.deleteHandler = deleteHandler;
     }
 
@@ -108,7 +108,7 @@ public class WorkflowStepController extends BorderPane implements ListCellContro
 
     @FXML
     public void remove() {
-        deleteHandler.execute(step);
+        deleteHandler.accept(step);
     }
 
 }

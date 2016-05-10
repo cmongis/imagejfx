@@ -33,11 +33,11 @@ import org.scijava.plugin.Parameter;
  */
 public abstract class AbstractBatchSingleInput implements BatchSingleInput {
 
-    DatasetView datasetView;
+    private DatasetView datasetView;
 
-    Dataset dataset;
+    private Dataset dataset;
 
-    ImageDisplay display;
+    private ImageDisplay display;
 
     @Parameter
     protected ImageDisplayService imageDisplayService;
@@ -65,8 +65,8 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput {
         context.inject(imageDisplay);
         imageDisplay.display(dataset);
         display = imageDisplay;
-        datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
-        datasetView.rebuild();
+       // datasetView = (DatasetView) imageDisplayService.createDataView(dataset);
+        //datasetView.rebuild();
     }
 
     @Override

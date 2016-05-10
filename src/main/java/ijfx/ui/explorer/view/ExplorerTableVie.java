@@ -32,6 +32,7 @@ import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import org.scijava.plugin.Plugin;
 
@@ -42,9 +43,9 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = ExplorerView.class)
 public class ExplorerTableVie implements ExplorerView{
 
-    TableView<MetaDataOwner> tableView = new TableView<>();
+    TableView<Explorable> tableView = new TableView<>();
     
-    MetaDataSetOwnerHelper helper = new MetaDataSetOwnerHelper(tableView);
+    MetaDataSetOwnerHelper<Explorable> helper = new MetaDataSetOwnerHelper(tableView);
      
     
     List<? extends Explorable> currentItems;
@@ -54,6 +55,7 @@ public class ExplorerTableVie implements ExplorerView{
        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
        tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
        tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
+       tableView.setRowFactory(this::createRow);
        helper.setPriority(MetaData.FILE_NAME,MetaData.FILE_SIZE);
         
     }
@@ -91,7 +93,7 @@ public class ExplorerTableVie implements ExplorerView{
         items.forEach(tableView.getSelectionModel()::select);
     }
     
-    private void onListChange(ListChangeListener.Change<? extends MetaDataOwner> changes) {
+    private void onListChange(ListChangeListener.Change<? extends Explorable> changes) {
         
         while(changes.next()) {
           
@@ -107,21 +109,32 @@ public class ExplorerTableVie implements ExplorerView{
         }
     }
     
-    private void onSelectedItemChanged(Observable obs, MetaDataOwner oldValue, MetaDataOwner newValue) {
+    private void onSelectedItemChanged(Observable obs, Explorable oldValue, Explorable newValue) {
         currentItems.forEach(item->{
             item.selectedProperty().setValue(tableView.getSelectionModel().getSelectedItems().contains(item));
         });
     }
     
-    
+    private TableRow<Explorable> createRow(TableView<Explorable> explorable) {
+        
+        TableRow<Explorable> row = new TableRow<>();
+        row.setOnMouseClicked(event->{
+            if(event.getClickCount() == 2 && row.isEmpty() == false) {
+                Explorable e = row.getItem();
+                e.open();
+            }
+        });
+        
+        return row;
+    }
    
     
-    private void select(MetaDataOwner owner) {
+    private void select(Explorable owner) {
         if(owner==null)return;
         ((Explorable)owner).selectedProperty().setValue(true);
     }
     
-    private void unselect(MetaDataOwner owner) {
+    private void unselect(Explorable owner) {
         if(owner == null) return;
         ((Explorable)owner).selectedProperty().setValue(false);
     }

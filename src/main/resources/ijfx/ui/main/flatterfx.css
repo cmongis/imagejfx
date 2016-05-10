@@ -258,6 +258,13 @@
     -fx-background-color:derive(-flatter-warning,-10%);
 }
 
+.toggle-group.vertical .toggle-button.first{
+    -fx-background-radius: 2.0 2.0 0 0.0;
+}
+.toggle-group.vertical .toggle-button.last{
+    -fx-background-radius: 0.0 0 2.0 2.0;
+}
+
 /*******************************************************************************
  *                                                                             *
  * TextField & TextArea                                                        *
@@ -1808,4 +1815,18 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
  }
  #viewHBox .toggle-button {
      -fx-padding:0.5em;
+ }
+
+ /*
+    Segmentation Panel
+ */
+ 
+ #inputHBox {
+      -fx-padding:1em;
+      -fx-background-color:-bg-darker;
+ }
+ 
+ .down-arrow {
+     -fx-padding:10px;
+     -fx-font-size:20px;
  }

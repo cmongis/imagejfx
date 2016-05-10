@@ -40,6 +40,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
+import jfxtras.scene.control.window.CloseIcon;
 import net.imagej.table.Table;
 import net.imagej.table.TableDisplay;
 import mongis.utils.FXUtilities;
@@ -68,7 +69,7 @@ public class TableDisplayView extends BorderPane {
         logger.info("Injecting FXML");
         try {
             // inject TableDisplayView.fxml from the class name
-            FXUtilities.injectFXML(this);
+            FXUtilities.injectFXML(this,"/ijfx/ui/table/TableDisplayView.fxml");
             logger.info("FXML injected");
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
@@ -76,6 +77,9 @@ public class TableDisplayView extends BorderPane {
         logger.info("Creating table model");
         model = new FlexibleColumnModel(tableView);
         logger.info("Model created");
+        
+     
+        
     }
     
     public TableDisplayView(TableDisplay display) {
@@ -161,7 +165,12 @@ public class TableDisplayView extends BorderPane {
 
                 @Override
                 public ObservableValue<String> call(TableColumn.CellDataFeatures<RowModel, String> param) {
+                    try {
                     return new SimpleObjectProperty<>(param.getValue().get(number).toString());
+                    }
+                    catch(Exception e) {
+                        return null;
+                    }
                 }
             });
             return column;

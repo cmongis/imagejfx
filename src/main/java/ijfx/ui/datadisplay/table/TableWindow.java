@@ -20,7 +20,7 @@
  */
 package ijfx.ui.datadisplay.table;
 
-
+import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
 import net.imagej.table.TableDisplay;
 
@@ -29,8 +29,16 @@ import net.imagej.table.TableDisplay;
  * @author Cyril MONGIS, 2015
  */
 public class TableWindow extends Window {
-    public TableWindow(TableDisplay display) {
+
+    public TableWindow() {
         super();
+        CloseIcon closeIcon = new CloseIcon(this);
+        getRightIcons().add(closeIcon);
+        
+    }
+
+    public TableWindow(TableDisplay display) {
+        this();
         setContentPane(new TableDisplayView(display));
     }
 }

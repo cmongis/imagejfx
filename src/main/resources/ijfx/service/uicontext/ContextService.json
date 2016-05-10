@@ -1,7 +1,7 @@
 [
     {
         "name": "imagej",
-        "incompatibleWith": ["webapp", "image-browser"]
+        "incompatibleWith": ["webapp", "image-browser","segmentation"]
     }
     ,{
         "name":"project-manager"
@@ -23,6 +23,10 @@
     ,{
         "name":"project-rule-edition"
         ,"incompatibleWith":["project-rule-list","project-manager"]
+    }
+    ,{
+        "name":"segmentation"
+        ,"incompatibleWith":["imagej","webapp"]
     }
 
 ]
