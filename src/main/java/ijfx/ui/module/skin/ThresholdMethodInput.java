@@ -53,7 +53,8 @@ public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMetho
     
     
     @Override
-    public Property valueProperty() {
+    public Property<ThresholdMethod>
+         valueProperty() {
         return methodProperty;
     }
 
@@ -69,16 +70,19 @@ public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMetho
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        System.out.println("can i handle ?"+clazz);
+       
         return clazz == ThresholdMethod.class;
     }
 
     @Override
     public void init(Input<ThresholdMethod> input) {
-        System.out.println("Initiliazing");
+        System.out.println("init ?");
         thresholdMethodComboBox.getItems().addAll(getMethodsList());
-        
-        thresholdMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->methodProperty.setValue(newValue));
+        thresholdMethodComboBox.getSelectionModel().select(input.getDefaultValue());
+        thresholdMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->{
+            methodProperty.setValue(newValue);
+           
+                });
         
     }
     

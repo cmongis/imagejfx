@@ -46,10 +46,6 @@ import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageCanvas;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.display.event.AxisActivatedEvent;
-import net.imagej.display.event.AxisPositionEvent;
-import net.imagej.event.DataRestructuredEvent;
-import net.imagej.event.DataUpdatedEvent;
 import net.imagej.interval.CalibratedRealInterval;
 import net.imagej.interval.CombinedCalibratedRealInterval;
 import net.imagej.lut.LUTService;
@@ -58,15 +54,11 @@ import net.imglib2.Positionable;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPositionable;
 import net.imglib2.display.ColorTable;
+import org.scijava.Context;
 
 import org.scijava.display.AbstractDisplay;
-import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
-import org.scijava.display.event.DisplayDeletedEvent;
-import org.scijava.event.EventHandler;
-import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 import org.scijava.thread.ThreadService;
 import org.scijava.util.RealRect;
 
@@ -120,6 +112,14 @@ public class SilentImageDisplay extends AbstractDisplay<DataView> implements Ima
 	public SilentImageDisplay() {
 		super(DataView.class);
 	}
+        
+        public SilentImageDisplay(Context context, Dataset dataset) {
+            this();
+            
+            context.inject(this);
+            display(dataset);
+            
+        }
 
 	// -- AbstractDisplay methods --
 

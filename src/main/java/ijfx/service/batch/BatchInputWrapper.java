@@ -102,5 +102,13 @@ public class BatchInputWrapper implements BatchSingleInput {
     public String getName() {
         return singleInput.getName();
     }
+
+    @Override
+    public String getSourceFile() {
+        if(getDataset() != null) {
+            return getDataset().getSource();
+        }
+        return null;
+    }
     
 }

@@ -128,6 +128,20 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
         return getRecordMap().values().parallelStream().filter(query).collect(Collectors.toList());
     }
 
+    public ImageRecord getRecord(File file) {
+        
+        ImageRecord imageRecord;
+        if(getRecordMap().containsKey(file)==false) {
+            imageRecord = new DefaultImageRecord(file, metadataExtractorService.extractMetaData(file));
+            addRecord(imageRecord);
+        }
+        else {
+            imageRecord = getRecordMap().get(file);
+        }
+        
+        return imageRecord;
+    }
+    
     private void analyseQueue() {
 
         ArrayList<File> fileAdded = new ArrayList<>();

@@ -65,11 +65,9 @@ import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.IjfxCss;
 import ijfx.ui.UiContexts;
 import ijfx.ui.UiPluginSorter;
-import ijfx.ui.WebApps;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.activity.ActivityChangedEvent;
 import ijfx.ui.activity.ActivityService;
-import ijfx.ui.batch.FileBatchProcessorPanel;
 import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.plugin.DebugEvent;
 import java.util.LinkedList;
@@ -84,11 +82,9 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Separator;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -99,7 +95,6 @@ import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.explorer.ExplorerActivity;
-import ijfx.ui.project_manager.ProjectManager;
 import mongis.utils.AnimationChain;
 
 /**
@@ -144,11 +139,11 @@ public class MainWindowController implements Initializable {
     private AnchorPane mainAnchorPane;
 
     @FXML
-   private BorderPane mainBorderPane;
+    private BorderPane mainBorderPane;
 
     @FXML
     private VBox topToolBarVBox;
-    
+
     //@FXML
     //private StackPane centerStackPane;
     @FXML
@@ -326,14 +321,14 @@ public class MainWindowController implements Initializable {
         task3.setOnSucceeded(result -> {
 
             // entering the right context
-            uiContextService.enter(UiContexts.list(UiContexts.WEB_APPLICATION, UiContexts.DEBUG));
+           uiContextService.enter(UiContexts.list(UiContexts.DEBUG));
 
             // showing the intro app
-            appService.showApp(WebApps.PROJECT_WIZARD);
+            //appService.showApp(WebApps.PROJECT_WIZARD);
 
             // updating the context
-            uiContextService.update();
-
+            //uiContextService.update();
+            activityService.openByType(ExplorerActivity.class);
             // sequence over
             logger.info("Start over");
 
@@ -771,11 +766,32 @@ public class MainWindowController implements Initializable {
      */
     public void initMenuAction() {
 
+        addSideMenuButton("Explore",FontAwesomeIcon.COMPASS,ExplorerActivity.class);
+        
+        
+        addSideMenuButton("Visualize",FontAwesomeIcon.PICTURE_ALT,ImageJContainer.class);
+        addSideMenuButton("Segment",FontAwesomeIcon.EYE,null).setOnAction(event->{
+            uiContextService.enter("segment","segmentation");
+            uiContextService.update();
+        
+        });
+        
+        /*
+        
         sideMenuMainTopVBox.getChildren().addAll(
-                new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", ImageJContainer.class).setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", FileBatchProcessorPanel.class).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", ProjectManager.class).setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR)
-                ,new SideMenuButton("Explore",ExplorerActivity.class).setIcon(FontAwesomeIcon.COMPASS)
-        );
+                new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", ImageJContainer.class).setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", FileBatchProcessorPanel.class).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", ProjectManager.class).setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR), new SideMenuButton("Explore", ExplorerActivity.class).setIcon(FontAwesomeIcon.COMPASS)
+        );*/
 
+    }
+     
+    private SideMenuButton addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass) {
+        
+        SideMenuButton sideMenuButton = new SideMenuButton(title,actClass).setIcon(icon);
+        
+        
+        sideMenuTopVBox.getChildren().add(sideMenuButton);
+        
+        return sideMenuButton;
     }
 
     private class SideMenuButton extends Button {

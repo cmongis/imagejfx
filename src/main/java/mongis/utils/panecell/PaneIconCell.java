@@ -112,10 +112,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
 
-    private boolean subtitleVisible = true;
-    private boolean showIcon = true;
+  
 
-    BooleanProperty showIconProperty;
+   
     BooleanProperty loadImageOnlyWhenVisibleProperty;
 
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
@@ -129,7 +128,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     public PaneIconCell() {
         try {
             //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
-
+            
             synchronized (LOADER) {
 
                 LOADER.setController(this);
@@ -156,6 +155,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             getStyleClass().add("pane-icon-cell");
 
             subtibleVisibleProperty().addListener(this::onSubtitleVisibleChanged);
+            
 
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);
@@ -388,6 +388,10 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         return isSelectedProperty;
     }
 
+    public BooleanProperty showIconProperty() {
+        return titleIconView.visibleProperty();
+    }
+    
     private void onClick(MouseEvent event) {
         if(event.getClickCount() == 2) {
             onDoubleClick();

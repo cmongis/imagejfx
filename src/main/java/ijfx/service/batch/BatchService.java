@@ -23,7 +23,9 @@ package ijfx.service.batch;
 import ijfx.bridge.FxUIPreprocessor;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.Workflow;
+import ijfx.service.workflow.WorkflowRecorderPreprocessor;
 import ijfx.service.workflow.WorkflowStep;
+import ijfx.ui.batch.BatchPrepreprocessorPlugin;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +50,7 @@ import org.scijava.display.DisplayService;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleItem;
 import org.scijava.module.ModuleService;
+import org.scijava.module.process.InitPreprocessor;
 import org.scijava.module.process.PostprocessorPlugin;
 import org.scijava.module.process.PreprocessorPlugin;
 import org.scijava.plugin.Parameter;
@@ -85,6 +88,8 @@ public class BatchService extends AbstractService implements ImageJService {
         super();
         processorBlackList.add(FxUIPreprocessor.class);
         processorBlackList.add(DisplayPostprocessor.class);
+        processorBlackList.add(InitPreprocessor.class);
+        processorBlackList.add(WorkflowRecorderPreprocessor.class);
 
     }
 
@@ -110,18 +115,17 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     public Task<Boolean> applyWorkflow(List<BatchSingleInput> inputs, Workflow workflow) {
-        return new AsyncCallback<List<BatchSingleInput>,Boolean>()
+        return new AsyncCallback<List<BatchSingleInput>, Boolean>()
                 .setInput(inputs)
-                .run((progress,input)->applyWorkflow(progress,inputs,workflow));
+                .run((progress, input) -> applyWorkflow(progress, inputs, workflow));
     }
-    
-    
+
     public Boolean applyWorkflow(ProgressHandler handler, BatchSingleInput input, Workflow workflow) {
         List<BatchSingleInput> inputList = new ArrayList<>();
         inputList.add(input);
         return applyWorkflow(handler, inputList, workflow);
     }
-    
+
     // applies a workflow to a list of inputs
     public Boolean applyWorkflow(ProgressHandler progress, List<BatchSingleInput> inputs, Workflow workflow) {
 
@@ -177,6 +181,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 progress.setProgress(count++, totalOps);
 
                 final Module module = moduleService.createModule(step.getModule().getInfo());
+                getContext().inject(module.getDelegateObject());
                 logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
                 if (!executeModule(input, module, true, step.getParameters())) {
 
@@ -217,6 +222,8 @@ public class BatchService extends AbstractService implements ImageJService {
 
     // execute a module (with all the side parameters injected)
     public boolean executeModule(BatchSingleInput input, Module module, boolean process, Map<String, Object> parameters) {
+       
+        
         logger.info("Executing module " + module.getDelegateObject().getClass().getSimpleName());
         logger.info("Injecting input");
         boolean inputInjectionSuccess = injectInput(input, module);
@@ -240,12 +247,31 @@ public class BatchService extends AbstractService implements ImageJService {
             module.setResolved(key, true);
         });
 
+        pluginService
+                .createInstancesOfType(BatchPrepreprocessorPlugin.class)
+                .forEach(processor->processor.process(input, module,parameters));
+        
+        
         String moduleName = module.getInfo().getDelegateClassName();
         logger.info(String.format("[%s] starting module", moduleName));
 
         logger.info("Running module");
+        Future<Module> run;
+  
+        try {
+            //getContext().inject(run);
+            getContext().inject(module);
+            module.initialize();
+        }
+        catch(Exception e) {
+            logger.info("Context already injected.");
+            //   e.printStackTrace();
+        }
+            run = moduleService.run(module, getPreProcessors(), getPostprocessors(), parameters);
+       // } else {
+       //     run = moduleService.run(module, process, parameters);
 
-        Future<Module> run = moduleService.run(module, getPreProcessors(), getPostprocessors(), parameters);
+        //}
 
         logger.info(String.format("[%s] module started", moduleName));
 
@@ -310,6 +336,7 @@ public class BatchService extends AbstractService implements ImageJService {
     public void extractOutput(BatchSingleInput input, Module module) {
         Map<String, Object> outputs = module.getOutputs();
         outputs.forEach((s, o) -> {
+            logger.info(String.format("Trying to find output from %s = %s",s,o));
             if (Dataset.class.isAssignableFrom(o.getClass())) {
                 logger.info("Extracting Dataset !");
                 input.setDataset((Dataset) module.getOutput(s));
@@ -337,7 +364,11 @@ public class BatchService extends AbstractService implements ImageJService {
     private <T> T injectPlugin(T p) {
         try {
             getContext().inject(p);
-        } finally {
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
             return p;
         }
     }
@@ -348,7 +379,13 @@ public class BatchService extends AbstractService implements ImageJService {
                 .stream()
                 .sequential()
                 .filter(p -> !processorBlackList.contains(p.getClass()))
-                .map(this::injectPlugin)
+                .sequential()
+                .map(p->{
+                    System.out.println(p.getClass());
+                    return p;
+                })
+                //.map(this::injectPlugin)
+                
                 .collect(Collectors.toList());
     }
 
@@ -358,7 +395,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 .stream()
                 .sequential()
                 .filter(p -> !processorBlackList.contains(p.getClass()))
-                .map(this::injectPlugin)
+                //.map(this::injectPlugin)
                 .collect(Collectors.toList());
     }
 

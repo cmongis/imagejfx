@@ -58,124 +58,120 @@ public class TableDisplayView extends BorderPane {
     TableDisplay tableDisplay;
 
     FlexibleColumnModel model;
-    
+
     final Logger logger = ImageJFX.getLogger();
-    
+
     @Parameter
     QueryService queryService;
-    
+
     public TableDisplayView() {
-        
+
         logger.info("Injecting FXML");
         try {
             // inject TableDisplayView.fxml from the class name
-            FXUtilities.injectFXML(this,"/ijfx/ui/table/TableDisplayView.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/table/TableDisplayView.fxml");
             logger.info("FXML injected");
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         }
         logger.info("Creating table model");
         model = new FlexibleColumnModel(tableView);
         logger.info("Model created");
-        
-     
-        
+
     }
-    
+
     public TableDisplayView(TableDisplay display) {
         this();
         this.tableDisplay = display;
-        ImageJFX.getThreadPool().submit(()->renderTable());
+        ImageJFX.getThreadPool().submit(() -> renderTable());
         logger.info("table rendered");
     }
-    
+
     public void renderTable() {
-       final  Table table = tableDisplay.get(0);
-           model.display(table);
-           
-           
+        final Table table = tableDisplay.get(0);
+        model.display(table);
+
     }
 
     public class FlexibleColumnModel {
 
         private final IntegerProperty columnCount = new SimpleIntegerProperty(0);
         private final ObservableList<RowModel> rows = FXCollections.observableArrayList();
-        
+
         TableView tableView;
+
         public FlexibleColumnModel(TableView tableView) {
             this.tableView = tableView;
             tableView.setItems(rows);
         }
-        
-    
-        
-        
+
         public void display(Table table) {
-            
-              ArrayList<RowModel> rows = new ArrayList<>();
-            
-              
-              
-              for(int row = 0; row<table.getRowCount();row++) {
-                  RowModel rowModel = new RowModel();
-                  logger.info("Adding row "+row);
-                  for(int col = 0; col<table.getColumnCount();col++) {
-                      rowModel.add(table.get(col).get(row));
-                  }
-                  rows.add(rowModel);
-                  Platform.runLater(()->updateColumns(rowModel));
-              }
-              addRows(rows);
-              
-              for(int i = 0; i!=table.getColumnCount();i++) {
-                  TableColumn column = (TableColumn)tableView.getColumns().get(i);
-                  column.setText(table.get(i).getHeader());
-              }
+
+            ArrayList<RowModel> rows = new ArrayList<>();
+
+            for (int row = 0; row < table.getRowCount(); row++) {
+                RowModel rowModel = new RowModel();
+                logger.info("Adding row " + row);
+                for (int col = 0; col < table.getColumnCount(); col++) {
+                    rowModel.add(table.get(col).get(row));
+                }
+                rows.add(rowModel);
+                Platform.runLater(() -> updateColumns(rowModel));
+            }
+            addRows(rows);
+            Platform.runLater(() -> {
+                for (int i = 0; i != table.getColumnCount(); i++) {
+                    TableColumn column = (TableColumn) tableView.getColumns().get(i);
+                    column.setText(table.get(i).getHeader());
+                }
+                
+                
+                
+            });
+
         }
-        
+
         public void addRow(RowModel row) {
-             rows.add(row);  
-             Platform.runLater(()->updateColumns(row));
+            rows.add(row);
+            Platform.runLater(() -> updateColumns(row));
         }
-        
+
         public void addRows(List<RowModel> rows) {
             this.rows.addAll(rows);
         }
-        
-        
+
         public synchronized void updateColumns(RowModel row) {
-        
-            if(row.size() > getColumnCount()) {         
-                
-                for(int i = getColumnCount(); i<row.size(); i++) {
+
+            if (row.size() > getColumnCount()) {
+
+                for (int i = getColumnCount(); i < row.size(); i++) {
                     tableView.getColumns().add(generateTableColumn(i));
-                    logger.info("Adding column "+i);
-                    
+                    logger.info("Adding column " + i);
+
                 }
-                
-               
+
                 setColumnCount(row.size());
-                
+
             }
-            
+
         }
+
         public TableColumn generateTableColumn(final int number) {
-            TableColumn<RowModel,String> column = new TableColumn<RowModel,String>();
+            TableColumn<RowModel, String> column = new TableColumn<RowModel, String>();
             column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<RowModel, String>, ObservableValue<String>>() {
 
                 @Override
                 public ObservableValue<String> call(TableColumn.CellDataFeatures<RowModel, String> param) {
                     try {
-                    return new SimpleObjectProperty<>(param.getValue().get(number).toString());
-                    }
-                    catch(Exception e) {
+                        return new SimpleObjectProperty<>(param.getValue().get(number).toString());
+                    } catch (Exception e) {
                         return null;
                     }
                 }
             });
             return column;
         }
-        
+
         public int getColumnCount() {
             return columnCount.get();
         }
@@ -195,15 +191,13 @@ public class TableDisplayView extends BorderPane {
         public void setRows(List<RowModel> rows) {
             this.rows.clear();
             this.rows.addAll(rows);
-           // this.rows = rows;
+            // this.rows = rows;
         }
-        
 
     }
-    
-    
-    public class RowModel extends ArrayList<Object>{
-        
+
+    public class RowModel extends ArrayList<Object> {
+
         public RowModel() {
             super();
         }

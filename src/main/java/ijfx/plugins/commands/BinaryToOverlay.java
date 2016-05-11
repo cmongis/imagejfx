@@ -170,12 +170,12 @@ public class BinaryToOverlay implements Command {
             }
 
             int pointCount = polygon.npoints;
-            System.out.printf("Point count = %d\n",pointCount);
-            System.out.println(polygon);
+            //System.out.printf("Point count = %d\n",pointCount);
+            //System.out.println(polygon);
             for (int i = 0; i != pointCount; i++) {
                 RealLocalizable localizable = new RealPoint(polygon.xpoints[i], polygon.ypoints[i]);
                 
-                System.out.println(String.format("%.0f,%.0f",localizable.getDoublePosition(0),localizable.getDoublePosition(1)));
+                //System.out.println(String.format("%.0f,%.0f",localizable.getDoublePosition(0),localizable.getDoublePosition(1)));
                 
                 roi.addVertex(i, localizable);
 

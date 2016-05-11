@@ -21,7 +21,6 @@ package ijfx.ui.explorer;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import ijfx.bridge.ImageJContainer;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
@@ -29,11 +28,13 @@ import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.project.Project;
 import ijfx.core.stats.IjfxStatisticService;
-import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.service.thumb.ThumbService;
+import ijfx.service.watch_dir.DirectoryWatchService;
+import ijfx.service.watch_dir.FileChangeListener;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
 import ijfx.ui.main.ImageJFX;
@@ -44,13 +45,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.image.Image;
-import mongis.utils.AsyncCallable;
 import mongis.utils.AsyncCallback;
-import net.imagej.Dataset;
+import net.imagej.overlay.Overlay;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
@@ -60,16 +58,19 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS
  */
-public class DefaultFolder implements Folder {
+public class DefaultFolder implements Folder,FileChangeListener{
 
     private File file;
     private String name;
     private List<Explorable> files;
     private List<Explorable> planes;
-    private List<Explorable> objects;
+    private List<Explorable> objects = new ArrayList<>();
 
+    
+    Logger logger = ImageJFX.getLogger();
+    
     @Parameter
     ImageRecordService imageRecordService;
 
@@ -106,12 +107,20 @@ public class DefaultFolder implements Folder {
     @Parameter
     ActivityService activityService;
 
+    @Parameter
+    DirectoryWatchService dirWatchService;
+    
+    @Parameter
+    OverlayIOService overlayIOService;
+    
     public DefaultFolder() {
 
     }
 
+    
+    
     public DefaultFolder(File file) {
-        this.file = file;
+        setPath(file.getAbsolutePath());
     }
 
     @Override
@@ -144,8 +153,13 @@ public class DefaultFolder implements Folder {
                     .then(this::addItems)
                     .start();*/
             files = fetchItems(null);
+            
+            
+           
+            
 
         }
+         listenToDirectoryChange();
         return files;
     }
 
@@ -157,6 +171,13 @@ public class DefaultFolder implements Folder {
         timer.elapsed("record fetching");
         List<Explorable> explorables = records
                 .stream()
+                .map(record->{
+                    File overlayJsonFile = overlayIOService.getOverlayFileFromImageFile(record.getFile());
+                    
+                    if(overlayJsonFile.exists()) getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
+                    return record;
+                })
+                
                 .map(record -> new ImageRecordIconizer(context, record))
                 .collect(Collectors
                         .toList());
@@ -169,6 +190,12 @@ public class DefaultFolder implements Folder {
     public void setPath(String path) {
         file = new File(path);
         files = null;
+        
+        
+        
+        
+        
+        
     }
 
     @JsonGetter("path")
@@ -246,7 +273,7 @@ public class DefaultFolder implements Folder {
 
     @Override
     public List<Explorable> getObjectList() {
-        return new ArrayList<>();
+        return objects;
     } 
     
     
@@ -256,4 +283,49 @@ public class DefaultFolder implements Folder {
                 .startIn(ImageJFX.getThreadQueue());
                 
     }
+    
+    
+    private boolean registered = false;
+    
+    private void listenToDirectoryChange() {
+        
+        if(registered) return;
+        
+        try {
+            System.out.println("Listening to "+getPath());
+            dirWatchService.register(this, getPath(),"");
+            registered = true;
+        } catch (IOException ex) {
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }
+    
+    public void onFileCreate(String filePath) {
+        logger.info("File added "+filePath);
+        
+        File file = new File(filePath);
+        
+        if(file.getName().endsWith(".ovl.json")) {
+            File imageFile = overlayIOService.getImageFileFromOverlayFile(file);
+            getObjectList().addAll(loadOverlay(imageFile, file));
+        }
+    }
+    
+   
+    private List<Explorable> loadOverlay(File imageFile, File overlayJsonFile) {
+        return overlayIOService.loadOverlays(overlayJsonFile)
+                .stream()
+                .filter(o->o!=null)
+                .map(overlay->new OverlayExplorableWrapper(context, imageFile, overlay))
+                .filter(expl->expl.isValid())
+                
+                .collect(Collectors.toList());
+    }
+    
+    
+    
+    
+    
 }

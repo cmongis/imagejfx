@@ -29,7 +29,7 @@
         </VBox>
     </top>
     <center>
-        <VBox BorderPane.alignment="CENTER">
+        <VBox styleClass="content-vbox" BorderPane.alignment="CENTER">
             <children>
             <VBox fx:id="graphicsBox" />
                 <TextField fx:id="editableLabel" styleClass="editable-label" />

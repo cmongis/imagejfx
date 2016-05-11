@@ -22,11 +22,21 @@ package ijfx.service.uicontext;
 
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlaySelectionEvent;
+import net.imagej.Dataset;
 import net.imagej.ImageJService;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.table.TableDisplay;
+import org.scijava.SciJava;
+import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
+import org.scijava.display.event.DisplayActivatedEvent;
+import org.scijava.display.event.DisplayDeletedEvent;
+import org.scijava.display.event.DisplayEvent;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
@@ -45,6 +55,10 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public final static String CTX_RGB_IMAGE = "rgb-img";
     public final static String CTX_MULTI_Z_IMAGE = "multi-z-img";
     public final static String CTX_MULTI_CHANNEL_IMG = "multi-channel-img";
+    public final static String CTX_MULTI_TIME_IMG = "multi-time-img";
+    public final static String CTX_TABLE_DISPLAY = "table-open";
+    public final static String CTX_IMAGE_DISPLAY = "image-open";
+    public final static String CTX_IMAGE_BINARY = "binary";
 
     @Parameter
     DisplayService displayService;
@@ -57,29 +71,97 @@ public class UiContextCalculatorService extends AbstractService implements Image
 
     @Parameter
     OverlaySelectionService overlaySelectionService;
-    
+
     @Parameter
     UiContextService contextService;
 
-    public void determineContext(ImageDisplay display) {
-        if(overlaySelectionService == null) overlayService.getContext().inject(this);
-        contextService.toggleContext(CTX_OVERLAY_SELECTED, overlaySelectionService.getSelectedOverlays(display).size() > 0);
-        contextService.update();
+    public void determineContext(Display display, boolean add) {
+        if (overlaySelectionService == null) {
+            overlayService.getContext().inject(this);
+        }
+        if (display instanceof ImageDisplay) {
+            ImageDisplay imageDisplay = (ImageDisplay) display;
+            if (overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0) {
+                contextService.toggleContext(CTX_OVERLAY_SELECTED, true);
+            }
+            if (hasAxisType(imageDisplay, Axes.Z)) {
+                contextService.toggleContext(CTX_MULTI_Z_IMAGE, add);
+            }
+            if (hasAxisType(imageDisplay, Axes.CHANNEL)) {
+                contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, add);
+            }
+            if (hasAxisType(imageDisplay, Axes.TIME)) {
+                contextService.toggleContext(CTX_MULTI_TIME_IMG, add);
+            }
+            if (imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged()) {
+                contextService.toggleContext(CTX_RGB_IMAGE, add);
+            }
+            
+            contextService.toggleContext(CTX_IMAGE_BINARY,imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
+            
+            contextService.toggleContext(CTX_IMAGE_DISPLAY, add);
+            Dataset dataset = (Dataset) imageDisplay.getActiveView().getData();
+            contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", add);
+            
+
+        } else if (display instanceof TableDisplay) {
+            contextService.toggleContext(CTX_TABLE_DISPLAY, add);
+        }
+
     }
-    
-    
 
     @EventHandler
     public void handleEvent(DisplayUpdatedEvent event) {
-        if (event.getDisplay() instanceof ImageDisplay && displayService.getActiveDisplay(ImageDisplay.class) == event.getDisplay()) {
-            determineContext((ImageDisplay)event.getDisplay());
-        }
+//        displayService.getDisplays().stream().forEach((display) -> {
+//            if (display != event.getDisplay()) {
+//                determineContext(display, false);
+//            }
+//        });
+        determineContext(event.getDisplay(), true);
+        contextService.update();
+
     }
     
+        @EventHandler
+    public void handleEvent(DisplayActivatedEvent event) {
+        displayService.getDisplays().stream().forEach((display) -> {
+            if (display != event.getDisplay()) {
+                determineContext(display, false);
+            }
+        });
+        determineContext(event.getDisplay(), true);
+        contextService.update();
+
+    }
+
     @EventHandler
     public void handleEvent(OverlaySelectionEvent event) {
-        determineContext(event.getDisplay());
+        determineContext(event.getDisplay(), true);
+        contextService.update();
+
     }
-    
+
+    @EventHandler
+    public void handleEvent(DisplayDeletedEvent event) {
+        determineContext(event.getObject(), false);
+        displayService.getDisplays().stream().forEach((display) -> {
+            if (display != event.getObject()) {
+                determineContext(display, true);
+            }
+        });
+        contextService.update();
+
+    }
+
+    public boolean hasAxisType(ImageDisplay display, AxisType axisType) {
+        CalibratedAxis[] calibratedAxises = new CalibratedAxis[display.numDimensions()];
+        display.axes(calibratedAxises);
+        for (CalibratedAxis calibratedAxis : calibratedAxises) {
+            if (calibratedAxis.type() == axisType) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

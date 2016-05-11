@@ -50,12 +50,15 @@ public class HyperstackToStack implements Command{
 
     @Parameter
     private DatasetService datasetService;
+    
+    @Parameter
+    AxisType axisTypeParameter;
     @Override
     public void run() {
         AxisType[] axisType = new AxisType[3];
         axisType[0] = Axes.X;
         axisType[1] = Axes.Y;
-        axisType[2] = Axes.TIME;
+        axisType[2] = axisTypeParameter;
         long[] dims = new long[axisType.length];
         dims[0] = dataset.max(0) + 1;
         dims[1] = dataset.max(1) + 1;

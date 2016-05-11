@@ -42,16 +42,16 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
     @Override
     public void serialize(Overlay overlay, JsonGenerator jg, SerializerProvider sp) throws IOException, JsonProcessingException {
 
-        if(overlay instanceof LineOverlay) {
-            saveLineOverlay((LineOverlay)overlay, jg);
+        if (overlay instanceof LineOverlay) {
+            saveLineOverlay((LineOverlay) overlay, jg);
         }
-        if(overlay instanceof RectangleOverlay) {
-            saveRectangleOverlay((RectangleOverlay)overlay, jg);
+        if (overlay instanceof RectangleOverlay) {
+            saveRectangleOverlay((RectangleOverlay) overlay, jg);
         }
-        if(overlay instanceof PolygonOverlay) {
-            savePolytonOverlay((PolygonOverlay)overlay,jg);
+        if (overlay instanceof PolygonOverlay) {
+            savePolytonOverlay((PolygonOverlay) overlay, jg);
         }
-        
+
     }
 
     private void writeNumberArray(JsonGenerator jg, String arrayName, Number[] numbers) throws IOException {
@@ -68,6 +68,15 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
         jg.writeStartArray();
         for (Double n : array) {
             jg.writeNumber(n);
+        }
+        jg.writeEndArray();
+    }
+    
+    private void writeDoubleArray(JsonGenerator jg, String fieldName, double[] array) throws IOException {
+        jg.writeFieldName(fieldName);
+        jg.writeStartArray();
+        for(double d : array) {
+            jg.writeNumber(d);
         }
         jg.writeEndArray();
     }
@@ -100,19 +109,20 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
         jg.writeStringField(JsonOverlayToken.OVERLAY_TYPE, JsonOverlayToken.POLYGON_OVERLAY);
 
         // "points":[
-        jg.writeArrayFieldStart("points");
+      
+        int vertexCount = overlay.getRegionOfInterest().getVertexCount();
 
-        for (int i = 0; i != overlay.getRegionOfInterest().getVertexCount(); i++) {
-
-            // Getting the point coordinates for each dimension
-            Double[] point = Utils.extractArray(overlay.getRegionOfInterest().getVertex(i)::getDoublePosition, numDimension);
-
-            // [10,203,10394]
-            writeDoubleArray(jg, point);
-        }
-        //  ]
-        jg.writeEndArray();
-
+        double[] xpoints = IntStream
+                .range(0, vertexCount)
+                .mapToDouble(i -> overlay.getRegionOfInterest().getVertex(i).getDoublePosition(0))
+                .toArray();
+        double[] ypoints = IntStream
+                .range(0, vertexCount)
+                .mapToDouble(i -> overlay.getRegionOfInterest().getVertex(i).getDoublePosition(1))
+                .toArray();
+        
+        writeDoubleArray(jg, "xpoints", xpoints);
+        writeDoubleArray(jg, "ypoints", ypoints);
         // }
         jg.writeEndObject();
 
@@ -122,13 +132,13 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
 
         jg.writeStartObject();
         jg.writeStringField(JsonOverlayToken.OVERLAY_TYPE, JsonOverlayToken.POLYGON_OVERLAY);
-        
-        Double[] lineStart = Utils.extractArray(overlay::getLineStart,overlay.numDimensions());
+
+        Double[] lineStart = Utils.extractArray(overlay::getLineStart, overlay.numDimensions());
         Double[] lineEnd = Utils.extractArray(overlay::getLineEnd, overlay.numDimensions());
-        
+
         writeNumberArray(jg, JsonOverlayToken.BEGIN, lineStart);
-        writeNumberArray(jg, JsonOverlayToken.END,lineEnd);
-        
+        writeNumberArray(jg, JsonOverlayToken.END, lineEnd);
+
         jg.writeEndObject();
 
     }

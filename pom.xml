@@ -116,7 +116,12 @@
         <dependency>
             <groupId>org.jfxtras</groupId>
             <artifactId>jfxtras-window</artifactId>
-            <version>8.0-r3</version>
+            <version>8.0-r4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfxtras</groupId>
+            <artifactId>jfxtras-controls</artifactId>
+            <version>8.0-r4</version>
         </dependency>
         
         <dependency>
@@ -181,6 +186,11 @@
             <version>1.4.1</version>
            
         </dependency>
+        <dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>commons-csv</artifactId>
+  <version>1.2</version>
+</dependency>
     </dependencies>
     
     <build>
