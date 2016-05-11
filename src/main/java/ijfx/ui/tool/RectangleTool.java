@@ -22,12 +22,13 @@ package ijfx.ui.tool;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
+import ijfx.ui.plugin.panel.OverlayOptionsService;
 import java.util.List;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import net.imagej.display.OverlayService;
 import net.imagej.overlay.RectangleOverlay;
 import org.scijava.plugin.Parameter;
@@ -43,6 +44,9 @@ public class RectangleTool extends AbstractPathTool {
 
     @Parameter
     OverlayService overlayService;
+    
+    @Parameter
+    OverlayOptionsService overlayOptionsService;
 
     public void duringDrawing(FxPath fxPath) {
 
@@ -57,8 +61,8 @@ public class RectangleTool extends AbstractPathTool {
         
         getCanvas().repaint();
 
-        getCanvas().getGraphicsContext2D().setStroke(Color.YELLOW);
-        getCanvas().getGraphicsContext2D().setLineWidth(1);
+        getCanvas().getGraphicsContext2D().setStroke(OverlayDrawer.toFxColor(overlayOptionsService.colorProperty().getValue()));
+        getCanvas().getGraphicsContext2D().setLineWidth(overlayOptionsService.widthProperty().getValue());
 
         getCanvas().getGraphicsContext2D().strokeRect(r.getMinX(), r.getMinY(), r.getWidth(), r.getHeight());
         
@@ -80,6 +84,9 @@ public class RectangleTool extends AbstractPathTool {
         rectangleOverlay.setExtent(r.getWidth(),0);
         rectangleOverlay.setOrigin(r.getMinY(), 1);
         rectangleOverlay.setExtent(r.getHeight(), 1);
+        rectangleOverlay.setLineWidth(overlayOptionsService.widthProperty().getValue());
+        rectangleOverlay.setLineColor(overlayOptionsService.colorProperty().getValue());
+        rectangleOverlay.setFillColor(overlayOptionsService.colorProperty().getValue());
         addOverlays(rectangleOverlay);
     }
 

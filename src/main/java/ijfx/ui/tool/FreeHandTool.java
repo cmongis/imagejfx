@@ -22,18 +22,18 @@ package ijfx.ui.tool;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
+import ijfx.ui.plugin.panel.OverlayOptionsService;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.RealPoint;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.util.ColorRGB;
 
 /**
  *
@@ -50,6 +50,9 @@ public class FreeHandTool extends AbstractPathTool {
     @Parameter
     Context context;
     
+    @Parameter
+    OverlayOptionsService overlayOptionsService;
+    
     @Override
     public void beforeDrawing(FxPath path) {
     }
@@ -65,8 +68,8 @@ public class FreeHandTool extends AbstractPathTool {
         double[] yList = FxPath.yList(points);
 
         getCanvas().repaint();
-        getCanvas().getGraphicsContext2D().setStroke(Color.YELLOW);
-        getCanvas().getGraphicsContext2D().setLineWidth(1.0);
+        getCanvas().getGraphicsContext2D().setStroke(OverlayDrawer.toFxColor(overlayOptionsService.colorProperty().getValue()));
+        getCanvas().getGraphicsContext2D().setLineWidth(overlayOptionsService.widthProperty().getValue());
         getCanvas().getGraphicsContext2D().strokePolygon(xList, yList, xList.length);
 
     }
@@ -84,8 +87,9 @@ public class FreeHandTool extends AbstractPathTool {
         PolygonOverlay overlay = new PolygonOverlay(context);
         
         overlay.setName("new overlay");
-        overlay.setFillColor(new ColorRGB(244,14,14));
-        overlay.setLineColor(new ColorRGB(0,0,244));
+        overlay.setFillColor(overlayOptionsService.colorProperty().getValue());
+        overlay.setLineColor(overlayOptionsService.colorProperty().getValue());
+        overlay.setLineWidth(overlayOptionsService.widthProperty().getValue());
 
 
         

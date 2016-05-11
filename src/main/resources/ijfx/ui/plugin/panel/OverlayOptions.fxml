@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root alignment="CENTER" prefHeight="74.0" prefWidth="240.0" type="HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox fx:id="widthOptionsBox" alignment="BASELINE_CENTER" prefHeight="60.0" prefWidth="140.0">
+         <children>
+            <Label text="Line Width" />
+            <ComboBox fx:id="widthComboBox" prefHeight="25.0" prefWidth="103.0" />
+         </children>
+      </VBox>
+      <VBox fx:id="colorOptionsBox" alignment="BASELINE_CENTER" prefHeight="60.0" prefWidth="120.0">
+         <children>
+            <Label text="Line Color" />
+         </children>
+         <HBox.margin>
+            <Insets />
+         </HBox.margin>
+      </VBox>
+   </children>
+</fx:root>
