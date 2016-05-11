@@ -137,12 +137,14 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             }
 
             titleLabel.setPrefSize(100, 100);
+             imageView.setSmooth(false);
             imageView.fitWidthProperty().bind(widthProperty());
             imageView.fitHeightProperty().bind(widthProperty());
 
             imageView.fitWidthProperty().bind(imageViewContainer.widthProperty());
             imageView.fitHeightProperty().bind(imageViewContainer.widthProperty());
-
+           
+           
             item.addListener(this::onItemChanged);
 
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
@@ -233,6 +235,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             return;
         };
         
+        imageView.setSmooth(false);
+       
         
         setCenter(imageView);
         imageView.setImage(image);

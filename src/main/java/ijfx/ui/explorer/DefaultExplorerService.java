@@ -22,11 +22,18 @@ package ijfx.ui.explorer;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.ui.explorer.event.DisplayedListChanged;
 import ijfx.ui.explorer.event.ExploredListChanged;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javafx.beans.Observable;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
 import mongis.utils.AsyncCallback;
+import org.reactfx.EventStream;
+import org.reactfx.EventStreams;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -50,13 +57,31 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     Predicate<MetaDataOwner> lastFilter;
     Predicate<MetaDataOwner> optionalFilter;
 
+    private final IntegerProperty selected = new SimpleIntegerProperty(0);
+    
+    EventStream<Integer> selectEvents = EventStreams.changesOf((ObservableValue)selected);
+    
+    
+    @Override
+    public void initialize() {
+        selectEvents.successionEnds(Duration.ofSeconds(1)).subscribe(i->{
+            eventService.publish(new ExplorerSelectionChangedEvent().setObject(getSelectedItems()));
+        });
+        
+    }
+    
     @Override
     public void setItems(List<Explorable> items) {
 
+        if(explorableList != null) explorableList.forEach(this::stopListeningToExplorable);
+        
         explorableList = items;
+        
+        if(explorableList != null) explorableList.forEach(this::listenToExplorableSelection);
+        
         eventService.publish(new ExploredListChanged().setObject(items));
         applyFilter(lastFilter);
-
+        
     }
 
     @Override
@@ -116,5 +141,23 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     public void selectItem(Explorable explorable) {
         explorable.selectedProperty().setValue(true);
     }
+    
+    
+  
+    private void listenToExplorableSelection(Explorable expl) {
+        expl.selectedProperty().addListener(this::onExplorableSelected);
+    }
+    
+    private void stopListeningToExplorable(Explorable expl) {
+        expl.selectedProperty().removeListener(this::onExplorableSelected);
+    }
+    
+    private void onExplorableSelected(Observable obs, Boolean oldVAlue, Boolean newValue) {
+        if(newValue) selected.add(1);
+        else selected.add(-1);
+    }
+    
+    
 
+    
 }

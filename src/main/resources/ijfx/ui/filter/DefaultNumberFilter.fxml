@@ -10,9 +10,9 @@
 
 <fx:root minHeight="200.0" minWidth="200.0" styleClass="number-filter" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <AreaChart fx:id="areaChart" BorderPane.alignment="CENTER">
+      <AreaChart fx:id="areaChart" createSymbols="false" BorderPane.alignment="CENTER">
         <xAxis>
-          <NumberAxis fx:id="categoryAxis" minorTickCount="1" side="BOTTOM" tickLabelsVisible="false" />
+          <NumberAxis fx:id="categoryAxis" autoRanging="false" minorTickCount="1" side="BOTTOM" tickLabelsVisible="false" />
         </xAxis>
         <yAxis>
           <NumberAxis fx:id="numberAxis" side="LEFT" />

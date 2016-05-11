@@ -54,5 +54,7 @@ public interface ImageRecordService extends IjfxService{
     public Collection<? extends ImageRecord> queryRecords(Predicate<ImageRecord> query);
     
     public Collection<? extends ImageRecord> getRecordsFromDirectory(File file);
+ 
+    public void forceSave();
     
 }

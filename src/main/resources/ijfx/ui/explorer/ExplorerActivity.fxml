@@ -37,15 +37,11 @@
                         <FontAwesomeIconView glyphName="CHECK" />
                      </graphic>
                   </Button>
-                  <MenuButton mnemonicParsing="false" styleClass="normal" text="Segment">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                      <MenuItem mnemonicParsing="false" text="Action 2" />
-                    </items>
+                  <Button mnemonicParsing="false" onAction="#onSegmentButtonPressed" text="Segment">
                      <graphic>
                         <FontAwesomeIconView glyphName="THUMB_TACK" />
                      </graphic>
-                  </MenuButton>
+                  </Button>
                   <MenuButton mnemonicParsing="false" styleClass="normal" text="Process">
                     <items>
                       <MenuItem mnemonicParsing="false" text="Action 1" />

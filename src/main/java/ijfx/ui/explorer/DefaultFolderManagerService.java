@@ -28,6 +28,8 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.explorer.event.FolderAddedEvent;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.notification.DefaultNotification;
+import ijfx.ui.notification.NotificationService;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,6 +85,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     
     @Parameter
     IjfxStatisticService statsService;
+    
+    @Parameter
+    NotificationService notificationService;
     
     private static String FOLDER_PREFERENCE_FILE = "folder_db.json";
 
@@ -197,8 +202,10 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         new AsyncCallback<List<Explorable>,Integer>(items)
                 .run(this::fetchMoreStatistics)
                 .then(n->{
-                 if(n > 0 && explorerService.getItems() == items) 
+                 if(n > 0 && explorerService.getItems() == items) { 
                      explorerService.setItems(items);
+                     notificationService.publish(new DefaultNotification(getCurrentFolder().getName(), String.format("The statistics of %d images has been completed.",n)));
+                 }
                 })
                 .start();
         

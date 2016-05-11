@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.explorer.cell.FolderListCellCtrl;
 import ijfx.ui.explorer.event.DisplayedListChanged;
@@ -125,7 +126,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @Parameter
     PluginService pluginService;
     
-    
+    @Parameter
+    UiContextService uiContextService;
     
     ExplorerView view;
 
@@ -475,8 +477,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     @FXML
-    public void segment() {
-
+    public void onSegmentButtonPressed() {
+        
+        uiContextService.enter("segment");
+        uiContextService.update();
+        
+        
     }
 
     @FXML
@@ -530,5 +536,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         explorationModeToggleGroup.selectToggle(getToggleButton(event.getObject()));
     }
     
-
+    @EventHandler
+    protected void onExplorerServiceSelectionChanged(ExplorerSelectionChangedEvent event) {
+        if(event.getObject().size() == 0) {
+            System.out.println("nothing to select ?");
+        }
+        else {
+            System.out.println("there is "+event.getObject().size());
+        }
+    }
+    
 }

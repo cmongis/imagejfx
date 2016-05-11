@@ -1832,6 +1832,9 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .explorer-filter > .content{
     -fx-padding: 0.6em;
 }
+.explorer-filter .range-slider {
+    -fx-padding:0 10 0 45px;
+}
 
 
 
