@@ -37,11 +37,17 @@ public class SortListExplorable<T> {
 
     String firstMetaData;
     String secondMetaData;
-    String thirdMetaData;
+
     public SortListExplorable() {
         list2D = new CopyOnWriteArrayList<>();
         listItems = new CopyOnWriteArrayList<>();
 
+    }
+
+    public void setMetaData( String firstMetaData,String secondMetaData) {
+
+        this.secondMetaData = secondMetaData;
+        this.firstMetaData = firstMetaData;
     }
 
     public void process() {
@@ -53,8 +59,6 @@ public class SortListExplorable<T> {
     public SortListExplorable(List<? extends Explorable> list) {
         this();
         listItems = list;
-        List<String> t = new ArrayList<>();
-
     }
 
     public void create2DList(String metaDataName) {
@@ -84,8 +88,6 @@ public class SortListExplorable<T> {
         }
         return size;
     }
-
-   
 
     public String getFirstMetaData() {
         return firstMetaData;

@@ -37,7 +37,7 @@ public class SortExplorableUtils {
     }
 
     public static Comparator MetadataComparator(String metaDataName) {
-        Comparator<Explorable> comparator = (o1, o2) -> {
+        Comparator<? extends Explorable> comparator = (o1, o2) -> {
             String s1 = SortExplorableUtils.getValueMetaData(o1, metaDataName);
             String s2 = SortExplorableUtils.getValueMetaData(o2, metaDataName);
             return s1.compareToIgnoreCase(s2);
@@ -51,7 +51,6 @@ public class SortExplorableUtils {
         limits.add(0);
 
         for (int i = 0; i < listItems.size(); i++) {
-            System.out.println(i);
             if (i == listItems.size() - 1) {
                 limits.add(i + 1);
             } else if (!SortExplorableUtils.getValueMetaData(listItems.get(i), metaDataName).equals(SortExplorableUtils.getValueMetaData(listItems.get(i + 1), metaDataName))) {
@@ -66,14 +65,14 @@ public class SortExplorableUtils {
             list2D.add(l);
                 
             }
-            System.out.println("ijfx.ui.explorer.view.SortExplorableUtils.create2DList()");
         }
     }
     
     
     
-        public static void sort(String MetaDataName, List<? extends Explorable> listItems) {
-        listItems.sort(SortExplorableUtils.MetadataComparator(MetaDataName));
+        public static void sort(String metaDataName, List<? extends Explorable> listItems) {
+            //Cannot use method reference, has to give the metaDataName
+        listItems.sort(SortExplorableUtils.MetadataComparator(metaDataName));
     }
     
 }

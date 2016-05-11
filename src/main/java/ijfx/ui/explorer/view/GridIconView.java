@@ -19,32 +19,28 @@
  */
 package ijfx.ui.explorer.view;
 
+import mongis.utils.panecell.ScrollBinderChildren;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.core.metadata.MetaData;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.Iconazable;
-import ijfx.ui.module.InputEvent;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import javafx.beans.Observable;
-import javafx.beans.property.SimpleObjectProperty;
+import java.util.stream.IntStream;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
-import mongis.utils.panecell.ScrollBinder;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -56,40 +52,32 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     private VBox vBox = new VBox();
     private ScrollPane scrollPane;
-    private ScrollBinder binder;
+    private ScrollBinderChildren scrollBinderChildren;
     private HBox hBox;
     private GroupExplorable groupExplorable;
-    private ComboBoxMetadata comboBoxMetadata;
-    private ComboBoxMetadata comboBoxMetadata2;
-    private ComboBoxMetadata comboBoxMetadata3;
+    private List<ComboBox<String>> comboBoxList;
+
 
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(vBox);
 
     public GridIconView() {
         groupExplorable = new GroupExplorable();
+        comboBoxList = new ArrayList<>();
+        IntStream.rangeClosed(0, 2)
+                .forEach(i -> comboBoxList.add(new ComboBox<String>()));
+
         hBox = new HBox();
-        comboBoxMetadata = new ComboBoxMetadata();
-        comboBoxMetadata2 = new ComboBoxMetadata();
-                comboBoxMetadata3 = new ComboBoxMetadata();
 
-        groupExplorable.getSortListExplorable().setFirstMetaData(comboBoxMetadata.getSelectionModel().getSelectedItem());
-        groupExplorable.getSortListExplorable().setSecondMetaData(comboBoxMetadata2.getSelectionModel().getSelectedItem());
-                groupExplorable.setThirdMetaData(comboBoxMetadata2.getSelectionModel().getSelectedItem());
-
-        initComboBox();
-        hBox.getChildren().addAll(comboBoxMetadata, comboBoxMetadata2, comboBoxMetadata3);
+        hBox.getChildren().addAll(comboBoxList);
         scrollPane = new ScrollPane();
         scrollPane.setContent(vBox);
         this.setTop(hBox);
 
         this.setCenter(scrollPane);
-//setContent(gridPane);
         setPrefWidth(400);
-        //setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
 
         cellPaneCtrl.setCellFactory(this::createIcon);
-        binder = new ScrollBinder(scrollPane);
+        scrollBinderChildren = new ScrollBinderChildren(scrollPane);
 
         addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
 
@@ -102,21 +90,26 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     @Override
     public void setItem(List<? extends Explorable> items) {
+        List<String> metadataList = this.getMetaDataKey(items);
+        comboBoxList.stream().forEach(c -> c.getItems().addAll(metadataList));
+                initComboBox();
 
         groupExplorable.setListItems(new CopyOnWriteArrayList(items));
+        sortItems();
     }
 
     public void initComboBox() {
-
-        comboBoxMetadata.metaDataProperty().addListener((obs, old, newValue) -> {
-            groupExplorable.getSortListExplorable().firstMetaData = newValue;
-            sortItems();
-        });
-        comboBoxMetadata2.metaDataProperty().addListener((obs, old, newValue) -> {
-            groupExplorable.getSortListExplorable().secondMetaData = newValue;
-            sortItems();
-        });
-
+        IntStream.range(0, comboBoxList.size())
+                .forEach(i -> {
+                    comboBoxList.get(i)
+                            .getSelectionModel()
+                            .selectedItemProperty()
+                            .addListener((obs, old, newValue) -> {
+                                groupExplorable.getMetaDataList()
+                                        .set(i, newValue);
+                                sortItems();
+                            });
+                });
     }
 
     private void sortItems() {
@@ -160,15 +153,20 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     }
 
-    public List<Field> getStaticStringFields() {
-        Field[] declaredFields = MetaData.class.getDeclaredFields();
-        List<Field> fields = new ArrayList<Field>();
-        for (Field field : declaredFields) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) && field.getType() == String.class) {
-                fields.add(field);
-            }
-        }
-        return fields;
+    public ArrayList<String> getMetaDataKey(List<? extends Explorable> items) {
+
+        ArrayList<String> keyList = new ArrayList<String>();
+
+        items.forEach(plane -> {
+            plane.getMetaDataSet().keySet().forEach(key -> {
+
+                if (!keyList.contains(key)) {
+                    keyList.add(key);
+                }
+            });
+        });
+
+        return keyList;
     }
 
 }
