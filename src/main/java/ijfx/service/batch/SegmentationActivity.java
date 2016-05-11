@@ -17,26 +17,29 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.batch.input;
+package ijfx.service.batch;
 
-import ijfx.service.batch.BatchSingleInput;
-import java.io.File;
-import org.scijava.Context;
+import ijfx.ui.activity.Activity;
+import javafx.concurrent.Task;
+import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
 
 /**
  *
  * @author cyril
  */
-public class ReplaceOriginalFileSaver extends SaveToFileWrapper{
+public class SegmentationActivity extends BorderPane implements Activity {
 
     
     
-    public ReplaceOriginalFileSaver(Context context,BatchSingleInput input) {
-       super(context,input, new File(input.getSourceFile()));
+    @Override
+    public Node getContent() {
+        return null;
     }
 
-    
-    
-   
+    @Override
+    public Task updateOnShow() {
+        return null;
+    }
     
 }

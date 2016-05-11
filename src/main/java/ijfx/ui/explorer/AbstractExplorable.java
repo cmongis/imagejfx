@@ -17,26 +17,36 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.batch.input;
+package ijfx.ui.explorer;
 
-import ijfx.service.batch.BatchSingleInput;
-import java.io.File;
-import org.scijava.Context;
+import ijfx.core.metadata.MetaDataSet;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.image.Image;
+import net.imagej.Dataset;
 
 /**
  *
  * @author cyril
  */
-public class ReplaceOriginalFileSaver extends SaveToFileWrapper{
+public abstract class AbstractExplorable implements Explorable{
+    
+    BooleanProperty selectedProperty = new SimpleBooleanProperty();
 
-    
-    
-    public ReplaceOriginalFileSaver(Context context,BatchSingleInput input) {
-       super(context,input, new File(input.getSourceFile()));
-    }
-
-    
+    MetaDataSet metadataSet = new MetaDataSet();
     
    
+
+    @Override
+    public BooleanProperty selectedProperty() {
+        return selectedProperty;
+    }
+
+    @Override
+    public MetaDataSet getMetaDataSet() {
+        return metadataSet;
+    }
+
+  
     
 }

@@ -14,8 +14,8 @@
             <VBox fx:id="inputHBox" alignment="CENTER">
                <children>
                   <Label maxWidth="1.7976931348623157E308" styleClass="h4" text="Input" />
-                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Current plane" />
-                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="All planes" />
+                  <ToggleButton fx:id="singlePlaneToggleButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Single plane" />
+                  <ToggleButton fx:id="allPlanesToggleButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="The whole image" />
                </children>
                <styleClass>
                   <String fx:value="toggle-group" />
@@ -27,13 +27,15 @@
             <FontAwesomeIconView glyphName="ARROW_DOWN" layoutX="46.0" layoutY="104.0" size="30" styleClass="down-arrow" />
             <VBox fx:id="resultbox">
                <children>
-                  <Button fx:id="testButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="(re) Test" />
-                  <MenuButton fx:id="applyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text="Apply to...">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                      <MenuItem mnemonicParsing="false" text="Action 2" />
-                    </items>
-                  </MenuButton>
+                  <Button fx:id="testButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="warning" text="Test on one image">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="CHECK_SQUARE_O" />
+                     </graphic></Button>
+                  <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Process all">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="LIST_ALL" />
+                     </graphic>
+                  </Button>
                </children>
                <styleClass>
                   <String fx:value="darker-background" />

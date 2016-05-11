@@ -29,58 +29,87 @@ import net.imagej.display.ImageDisplay;
  * @author cyril
  */
 public abstract class AbstractSaverWrapper implements BatchSingleInput{
-    final private BatchSingleInput input;
+    final private BatchSingleInput wrappedObject;
 
+    
+    String savePath;
+        
     public AbstractSaverWrapper(BatchSingleInput input) {
-        this.input = input;
+        this.wrappedObject = input;
+        
     }
+
+    protected BatchSingleInput getWrappedObject() {
+        return wrappedObject;
+    }
+
+    
+    
+    
 
     @Override
     public DatasetView getDatasetView() {
-        return input.getDatasetView();
+        return wrappedObject.getDatasetView();
     }
 
     @Override
     public void setDatasetView(DatasetView datasetView) {
-         input.setDatasetView(datasetView);
+         wrappedObject.setDatasetView(datasetView);
     }
 
     @Override
     public void load() {
-        input.load();
+        wrappedObject.load();
     }
 
     @Override
     public void setDataset(Dataset dataset) {
-        input.setDataset(dataset);
+        wrappedObject.setDataset(dataset);
     }
 
     @Override
     public void setDisplay(ImageDisplay display) {
-        input.setDisplay(display);
+        wrappedObject.setDisplay(display);
     }
 
     @Override
     public Dataset getDataset() {
-        return input.getDataset();
+        return wrappedObject.getDataset();
     }
 
     @Override
     public ImageDisplay getDisplay() {
-        return input.getDisplay();
+        return wrappedObject.getDisplay();
     }
 
    
 
     @Override
     public void dispose() {
-        input.dispose();
+        wrappedObject.dispose();
     }
 
     @Override
     public String getName() {
-       return input.getName();
+       return wrappedObject.getName();
     }
+
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
+    }
+
+    protected String getSavePath() {
+        return savePath;
+    }
+
+    @Override
+    public String getSourceFile() {
+        return wrappedObject.getSourceFile();
+    }
+
+    
+    
+    
     
    
     

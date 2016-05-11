@@ -19,6 +19,7 @@
  */
 package ijfx.ui.previewToolbar;
 
+import ijfx.service.TimerService;
 import ijfx.service.preview.PreviewService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.uiplugin.UiPluginService;
@@ -27,16 +28,11 @@ import ijfx.ui.UiPlugin;
 import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.context.PaneContextualView;
 import ijfx.ui.main.Localization;
-import java.util.HashMap;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.util.Duration;
-import mongis.utils.panecell.PaneIconCell;
 import mongis.utils.panecell.PaneIconCellPreview;
 import org.controlsfx.control.PopOver;
 import org.reactfx.util.FxTimer;
@@ -68,9 +64,15 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     PluginService pluginService;
     @Parameter
     UiContextService contextService;
+    
+    @Parameter
+    TimerService stopWatchService;
+    
     private PopOver popOver;
     private JsonReader jsonReader;
 
+    boolean created = false;
+    
     public PreviewToolBar() {
         super();
 
@@ -83,6 +85,10 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     @Override
     public UiPlugin init() {
+        
+        if(created) return this;
+        
+        System.out.println("Creating toolbar");
         createToolBar();
 
         return this;
@@ -101,6 +107,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         jsonReader.separate();
         popOver = new PopOver();
         generateItems(jsonReader, paneContextualView);
+        created = true;
     }
 
     /**
@@ -157,7 +164,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      * @param labelCategory
      */
     public void setMouseAction(LabelCategory labelCategory) {
-            Timer timer = FxTimer.create(java.time.Duration.ofMillis(500), () -> this.onEnter(labelCategory));
+            Timer timer = FxTimer.create(java.time.Duration.ofMillis(250), () -> this.onEnter(labelCategory));
         labelCategory.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
             timer.restart();
         });
@@ -172,6 +179,9 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      * @param labelCategory
      */
     public void onEnter(LabelCategory labelCategory) {
+        
+        System.out.println("activating !");
+        
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCellPreview paneIconCellPreview = (PaneIconCellPreview) e;
 

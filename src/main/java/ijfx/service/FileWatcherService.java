@@ -17,26 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.batch.input;
+package ijfx.service;
 
-import ijfx.service.batch.BatchSingleInput;
-import java.io.File;
-import org.scijava.Context;
+import org.scijava.service.AbstractService;
 
 /**
  *
  * @author cyril
  */
-public class ReplaceOriginalFileSaver extends SaveToFileWrapper{
-
+public class FileWatcherService extends AbstractService implements IjfxService {
     
     
-    public ReplaceOriginalFileSaver(Context context,BatchSingleInput input) {
-       super(context,input, new File(input.getSourceFile()));
-    }
-
-    
-    
-   
     
 }

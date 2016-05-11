@@ -20,23 +20,25 @@
 package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
-import java.io.File;
-import org.scijava.Context;
+import java.util.function.Consumer;
 
 /**
  *
  * @author cyril
  */
-public class ReplaceOriginalFileSaver extends SaveToFileWrapper{
+public class ConsumerBatchInputWrapper extends AbstractSaverWrapper{
 
-    
-    
-    public ReplaceOriginalFileSaver(Context context,BatchSingleInput input) {
-       super(context,input, new File(input.getSourceFile()));
+    public ConsumerBatchInputWrapper(BatchSingleInput input, Consumer<BatchSingleInput> onSave) {
+        super(input);
+        this.consumer = onSave;
     }
-
     
+    Consumer<BatchSingleInput> consumer;
     
-   
+    @Override
+    public void save() {
+        this.consumer.accept(getWrappedObject());
+        getWrappedObject().save();
+    }
     
 }

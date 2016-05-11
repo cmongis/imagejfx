@@ -20,23 +20,39 @@
 package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
-import java.io.File;
 import org.scijava.Context;
+import org.scijava.plugin.Parameter;
+import org.scijava.ui.UIService;
 
 /**
  *
  * @author cyril
  */
-public class ReplaceOriginalFileSaver extends SaveToFileWrapper{
+public class DisplayDatasetWrapper extends AbstractSaverWrapper {
 
+    @Parameter
+    UIService uiService;
     
-    
-    public ReplaceOriginalFileSaver(Context context,BatchSingleInput input) {
-       super(context,input, new File(input.getSourceFile()));
+    public DisplayDatasetWrapper(Context context, BatchSingleInput input) {
+        super(input);
     }
 
     
     
-   
+    
+    @Override
+    public void save() {
+        uiService.show(getWrappedObject().getDataset());
+        getWrappedObject().save();
+    }
+    
+    @Override
+    public void dispose() {
+        
+    }
+    
+    
+    
+    
     
 }

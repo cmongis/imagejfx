@@ -17,26 +17,18 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.batch.input;
+package ijfx.ui.batch;
 
 import ijfx.service.batch.BatchSingleInput;
-import java.io.File;
-import org.scijava.Context;
+import java.util.Map;
+import org.scijava.module.Module;
+import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
  * @author cyril
  */
-public class ReplaceOriginalFileSaver extends SaveToFileWrapper{
-
+public interface BatchPrepreprocessorPlugin extends SciJavaPlugin{
     
-    
-    public ReplaceOriginalFileSaver(Context context,BatchSingleInput input) {
-       super(context,input, new File(input.getSourceFile()));
-    }
-
-    
-    
-   
-    
+    public void process(BatchSingleInput input, Module module, Map<String,Object> parameters);
 }

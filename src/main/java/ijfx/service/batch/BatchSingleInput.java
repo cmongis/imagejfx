@@ -50,4 +50,6 @@ public interface BatchSingleInput {
     
     public String getName();
     
+    public String getSourceFile();
+    
 }

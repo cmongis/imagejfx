@@ -15,7 +15,7 @@
          <children>
             <Label fx:id="titleLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="title-label" text="Some title" textAlignment="CENTER">
                <graphic>
-                  <FontAwesomeIconView fx:id="icon" styleClass="subtitle-label" />
+                  <FontAwesomeIconView fx:id="titleIconView" styleClass="subtitle-label" />
                </graphic>
             </Label>
 

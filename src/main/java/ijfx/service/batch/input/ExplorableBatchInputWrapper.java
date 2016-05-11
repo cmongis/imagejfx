@@ -19,6 +19,7 @@
  */
 package ijfx.service.batch.input;
 
+import ijfx.core.metadata.MetaData;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.ui.explorer.Explorable;
@@ -41,16 +42,21 @@ public class ExplorableBatchInputWrapper extends  AbstractLoaderWrapper<Explorab
 
     @Override
     public void load() {
-        
         setDataset(getWrappedValue().getDataset());
         setDisplay(new SilentImageDisplay(getContext(), getDataset()));
-        
-        
     }
 
     @Override
     public String getName() {
         return getWrappedValue().getTitle();
+    }
+
+    @Override
+    public String getSourceFile() {
+        return getWrappedValue()
+                .getMetaDataSet()
+                .getOrDefault(MetaData.ABSOLUTE_PATH,MetaData.NULL)
+                .getStringValue();
     }
     
     

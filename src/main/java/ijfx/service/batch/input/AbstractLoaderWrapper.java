@@ -39,6 +39,8 @@ public abstract class AbstractLoaderWrapper<T> implements BatchSingleInput {
     @Parameter
     Context context;
     
+    
+    
     public AbstractLoaderWrapper(T wrappedObject) {
         this.wrappedObject = wrappedObject;
     }

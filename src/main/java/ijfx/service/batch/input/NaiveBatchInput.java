@@ -41,6 +41,8 @@ public class NaiveBatchInput implements BatchSingleInput {
 
     private String name;
 
+    private String sourceFile;
+    
     @Override
     public DatasetView getDatasetView() {
         return datasetView;
@@ -53,6 +55,7 @@ public class NaiveBatchInput implements BatchSingleInput {
 
     @Override
     public void load() {
+        
     }
 
     @Override
@@ -77,10 +80,13 @@ public class NaiveBatchInput implements BatchSingleInput {
 
     @Override
     public void save() {
+        
+        
     }
 
     @Override
     public void dispose() {
+        
     }
 
     @Override
@@ -88,4 +94,15 @@ public class NaiveBatchInput implements BatchSingleInput {
         return name;
     }
 
+    public void setSourceFile(String sourceFile) {
+        this.sourceFile = sourceFile;
+    }
+
+    public String getSourceFile() {
+        return sourceFile;
+    }
+    
+    
+    
 }
+

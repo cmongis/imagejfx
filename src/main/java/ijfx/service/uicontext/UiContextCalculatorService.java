@@ -58,6 +58,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public final static String CTX_MULTI_TIME_IMG = "multi-time-img";
     public final static String CTX_TABLE_DISPLAY = "table-open";
     public final static String CTX_IMAGE_DISPLAY = "image-open";
+    public final static String CTX_IMAGE_BINARY = "binary";
 
     @Parameter
     DisplayService displayService;
@@ -95,9 +96,13 @@ public class UiContextCalculatorService extends AbstractService implements Image
             if (imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged()) {
                 contextService.toggleContext(CTX_RGB_IMAGE, add);
             }
+            
+            contextService.toggleContext(CTX_IMAGE_BINARY,imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
+            
             contextService.toggleContext(CTX_IMAGE_DISPLAY, add);
             Dataset dataset = (Dataset) imageDisplay.getActiveView().getData();
             contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", add);
+            
 
         } else if (display instanceof TableDisplay) {
             contextService.toggleContext(CTX_TABLE_DISPLAY, add);

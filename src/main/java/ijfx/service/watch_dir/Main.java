@@ -1,3 +1,5 @@
+package ijfx.service.watch_dir;
+
 /*
     This file is part of ImageJ FX.
 
@@ -17,26 +19,10 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.batch.input;
-
-import ijfx.service.batch.BatchSingleInput;
-import java.io.File;
-import org.scijava.Context;
-
 /**
  *
  * @author cyril
  */
-public class ReplaceOriginalFileSaver extends SaveToFileWrapper{
-
-    
-    
-    public ReplaceOriginalFileSaver(Context context,BatchSingleInput input) {
-       super(context,input, new File(input.getSourceFile()));
-    }
-
-    
-    
-   
+public class Main {
     
 }
