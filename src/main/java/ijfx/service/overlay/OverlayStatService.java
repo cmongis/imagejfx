@@ -36,6 +36,7 @@ import net.imagej.measure.StatisticsService;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
@@ -44,8 +45,6 @@ import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.roi.PolygonRegionOfInterest;
 import net.imglib2.type.numeric.RealType;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -266,7 +265,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
    
     public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
         
-        overlay = cleanOverlay(overlay);
         
         OverlayStatistics overlayStatistics;
         
@@ -276,8 +274,10 @@ public class OverlayStatService extends AbstractService implements ImageJService
         else if(overlay instanceof RectangleOverlay)
             overlayStatistics = new RectangleOverlayStatistics(display, overlay, this.context());
         
-        else
-            overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());
+        else{
+            overlay = cleanOverlay(overlay);
+            overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());        
+        }
         
         return overlayStatistics;
     }
