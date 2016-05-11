@@ -34,6 +34,9 @@ public final class JsonOverlayToken {
     public static String ORIGIN = "origin";
     public static String BEGIN = "begin";
     public static String END = "end";
+    public static String FILL_COLOR = "fill_color";
+    public static String LINE_COLOR = "line_color";    
+    public static String LINE_WIDTH = "line_width";
     
      public static final String OVERLAY_TYPE  = "ovl_type";
      

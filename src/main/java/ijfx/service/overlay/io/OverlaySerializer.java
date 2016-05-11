@@ -31,6 +31,7 @@ import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
+import org.scijava.util.ColorRGB;
 
 /**
  *
@@ -78,9 +79,13 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
 
         Double[] origin = Utils.extractArray(rectangleOverlay::getOrigin, dimensionCount);
         Double[] extent = Utils.extractArray(rectangleOverlay::getExtent, dimensionCount);
+        
+        ColorRGB fcolor = rectangleOverlay.getFillColor();
+        Integer[] fill_color = {fcolor.getRed(), fcolor.getGreen(), fcolor.getBlue()};
 
         writeNumberArray(jg, JsonOverlayToken.ORIGIN, origin);
         writeNumberArray(jg, JsonOverlayToken.EXTENT, extent);
+        writeNumberArray(jg, JsonOverlayToken.FILL_COLOR, fill_color);
 
         jg.writeEndObject();
 
