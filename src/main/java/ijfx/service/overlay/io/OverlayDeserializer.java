@@ -34,7 +34,7 @@ import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RealPoint;
 import org.scijava.Context;
-import static ucar.unidata.util.Format.l;
+import org.scijava.util.ColorRGB;
 
 /**
  *
@@ -77,6 +77,19 @@ class OverlayDeserializer extends JsonDeserializer<Overlay> {
             overlay.setExtent(extent[i], i);
         }
         
+        double[] fill_color = getArray(node, JsonOverlayToken.FILL_COLOR);
+        double[] line_color = getArray(node, JsonOverlayToken.LINE_COLOR);
+        
+        ColorRGB fcolor = new ColorRGB((int)fill_color[0], (int)fill_color[1], (int)fill_color[2]);
+        ColorRGB lcolor = new ColorRGB((int)line_color[0], (int)line_color[1], (int)line_color[2]);
+        
+        double width = node.get(JsonOverlayToken.LINE_WIDTH).doubleValue();
+        
+        overlay.setFillColor(fcolor);
+        overlay.setLineColor(lcolor);
+        
+        overlay.setLineWidth(width);
+        
         return overlay;
     }
 
@@ -99,6 +112,19 @@ class OverlayDeserializer extends JsonDeserializer<Overlay> {
         for (int p = 0; p != pointCount; p++) {
             overlay.getRegionOfInterest().addVertex(p, new RealPoint(xpoints[p],ypoints[p]));
         }
+        
+        double[] fill_color = getArray(node, JsonOverlayToken.FILL_COLOR);
+        double[] line_color = getArray(node, JsonOverlayToken.LINE_COLOR);
+        
+        ColorRGB fcolor = new ColorRGB((int)fill_color[0], (int)fill_color[1], (int)fill_color[2]);
+        ColorRGB lcolor = new ColorRGB((int)line_color[0], (int)line_color[1], (int)line_color[2]);
+        
+        double width = node.get(JsonOverlayToken.LINE_WIDTH).doubleValue();
+        
+        overlay.setFillColor(fcolor);
+        overlay.setLineColor(lcolor);
+        
+        overlay.setLineWidth(width);        
         return overlay;
         }
     }
@@ -123,6 +149,20 @@ class OverlayDeserializer extends JsonDeserializer<Overlay> {
             lineOverlay.setLineStart(begin);
             lineOverlay.setLineEnd(end);
         }
+        
+        double[] fill_color = getArray(node, JsonOverlayToken.FILL_COLOR);
+        double[] line_color = getArray(node, JsonOverlayToken.LINE_COLOR);
+        
+        ColorRGB fcolor = new ColorRGB((int)fill_color[0], (int)fill_color[1], (int)fill_color[2]);
+        ColorRGB lcolor = new ColorRGB((int)line_color[0], (int)line_color[1], (int)line_color[2]);
+        
+        double width = node.get(JsonOverlayToken.LINE_WIDTH).doubleValue();
+        
+        lineOverlay.setFillColor(fcolor);
+        lineOverlay.setLineColor(lcolor);
+        
+        lineOverlay.setLineWidth(width);
+        
         return lineOverlay;
     }
     /*

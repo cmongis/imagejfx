@@ -21,12 +21,10 @@ package ijfx.service.overlay;
 
 
 import ij.blob.RotatingCalipers;
-import ijfx.ui.main.ImageJFX;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 import javafx.scene.shape.Polygon;
 import javafx.geometry.Point2D;
@@ -34,6 +32,7 @@ import javafx.geometry.Point2D;
 
 import net.imagej.display.ImageDisplay;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.PolygonOverlay;
 
 import net.imglib2.roi.PolygonRegionOfInterest;
 import org.scijava.Context;
@@ -49,7 +48,9 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
 
     public PolygonOverlayStatistics(ImageDisplay display, Overlay overlay, Context context){
         
+        
         super(display, overlay, context);
+        
         
         this.shape = getShape(getOverlay());
         this.convexHull = getConvexHull();
@@ -96,13 +97,14 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         
         PolygonRegionOfInterest roi = (PolygonRegionOfInterest) overlay.getRegionOfInterest();
         
-        int[] xpoints = new int[roi.getVertexCount()];
-        int[] ypoints = new int[roi.getVertexCount()];
         int npoints = roi.getVertexCount();
-        for (int i = 0; i < roi.getVertexCount(); i++) {
-            Point currentPoint = new Point((int)roi.getVertex(i).getDoublePosition(0), (int)roi.getVertex(i).getDoublePosition(1));
-            xpoints[i] = (int)currentPoint.getX();
-            ypoints[i] = (int)currentPoint.getY();
+        int[] xpoints = new int[npoints];
+        int[] ypoints = new int[npoints];
+        
+        for (int i = 0; i < npoints; i++) {
+//            Point currentPoint = new Point((int)roi.getVertex(i).getDoublePosition(0), (int)roi.getVertex(i).getDoublePosition(1));
+            xpoints[i] = (int)roi.getVertex(i).getDoublePosition(0);
+            ypoints[i] = (int)roi.getVertex(i).getDoublePosition(1);
 
         }
         
@@ -482,3 +484,6 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         return thinnesRatio;        
     }
 }
+
+    
+
