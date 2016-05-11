@@ -90,11 +90,22 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
         Double[] extent = Utils.extractArray(rectangleOverlay::getExtent, dimensionCount);
         
         ColorRGB fcolor = rectangleOverlay.getFillColor();
+        ColorRGB lcolor = rectangleOverlay.getLineColor();
+        
         Integer[] fill_color = {fcolor.getRed(), fcolor.getGreen(), fcolor.getBlue()};
+        Integer[] line_color = {lcolor.getRed(), lcolor.getGreen(), lcolor.getBlue()};
+        
+        double width = rectangleOverlay.getLineWidth();
+        
 
         writeNumberArray(jg, JsonOverlayToken.ORIGIN, origin);
         writeNumberArray(jg, JsonOverlayToken.EXTENT, extent);
+        
         writeNumberArray(jg, JsonOverlayToken.FILL_COLOR, fill_color);
+        writeNumberArray(jg, JsonOverlayToken.LINE_COLOR, line_color);
+        
+        jg.writeFieldName(JsonOverlayToken.LINE_WIDTH);
+        jg.writeNumber(width);        
 
         jg.writeEndObject();
 
@@ -124,6 +135,21 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
         writeDoubleArray(jg, "xpoints", xpoints);
         writeDoubleArray(jg, "ypoints", ypoints);
         // }
+
+        ColorRGB fcolor = overlay.getFillColor();
+        ColorRGB lcolor = overlay.getLineColor();
+        
+        Integer[] fill_color = {fcolor.getRed(), fcolor.getGreen(), fcolor.getBlue()};
+        Integer[] line_color = {lcolor.getRed(), lcolor.getGreen(), lcolor.getBlue()};
+        
+        double width = overlay.getLineWidth();
+        
+        writeNumberArray(jg, JsonOverlayToken.FILL_COLOR, fill_color);
+        writeNumberArray(jg, JsonOverlayToken.LINE_COLOR, line_color);
+        
+        jg.writeFieldName(JsonOverlayToken.LINE_WIDTH);
+        jg.writeNumber(width);         
+        
         jg.writeEndObject();
 
     }
@@ -131,13 +157,27 @@ public class OverlaySerializer extends JsonSerializer<Overlay> {
     private void saveLineOverlay(LineOverlay overlay, JsonGenerator jg) throws IOException {
 
         jg.writeStartObject();
-        jg.writeStringField(JsonOverlayToken.OVERLAY_TYPE, JsonOverlayToken.POLYGON_OVERLAY);
+        jg.writeStringField(JsonOverlayToken.OVERLAY_TYPE, JsonOverlayToken.LINE_OVERLAY);
 
         Double[] lineStart = Utils.extractArray(overlay::getLineStart, overlay.numDimensions());
         Double[] lineEnd = Utils.extractArray(overlay::getLineEnd, overlay.numDimensions());
 
         writeNumberArray(jg, JsonOverlayToken.BEGIN, lineStart);
         writeNumberArray(jg, JsonOverlayToken.END, lineEnd);
+        
+        ColorRGB fcolor = overlay.getFillColor();
+        ColorRGB lcolor = overlay.getLineColor();
+        
+        Integer[] fill_color = {fcolor.getRed(), fcolor.getGreen(), fcolor.getBlue()};
+        Integer[] line_color = {lcolor.getRed(), lcolor.getGreen(), lcolor.getBlue()};
+        
+        double width = overlay.getLineWidth();
+        
+        writeNumberArray(jg, JsonOverlayToken.FILL_COLOR, fill_color);
+        writeNumberArray(jg, JsonOverlayToken.LINE_COLOR, line_color);
+        
+        jg.writeFieldName(JsonOverlayToken.LINE_WIDTH);
+        jg.writeNumber(width);          
 
         jg.writeEndObject();
 
