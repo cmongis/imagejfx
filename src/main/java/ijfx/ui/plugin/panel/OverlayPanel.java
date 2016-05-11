@@ -188,6 +188,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         optionsPane.setDetachable(true);
         optionsPane.setAutoHide(false);
         optionsPane.titleProperty().setValue("Overlay settings");
+        optionsPane.setConsumeAutoHidingEvents(false);
         
         gearIcon = GlyphsDude.createIcon(FontAwesomeIcon.GEAR, "15");
         gearIcon.setOpacity(BASAL_OPACITY);
