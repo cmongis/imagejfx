@@ -82,7 +82,7 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
                 ((OverlayView) view).setSelected(false);
             }
         }
-
+        eventService.publish(new OverlaySelectionEvent(imageDisplay, null));
     }
 
     public List<Overlay> getSelectedOverlays(ImageDisplay imageDisplay) {

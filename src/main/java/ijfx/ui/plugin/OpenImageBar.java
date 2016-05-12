@@ -78,6 +78,11 @@ public class OpenImageBar extends HBox implements UiPlugin {
         previousButton = GlyphsDude
                 .createIconButton(FontAwesomeIcon.ARROW_CIRCLE_LEFT);
         previousButton.setTooltip(new Tooltip(PREVIOUS_BUTTON_TXT));
+        
+        nextButton = GlyphsDude
+                .createIconButton(FontAwesomeIcon.ARROW_CIRCLE_LEFT);
+        nextButton.setTooltip(new Tooltip(NEXT_BUTTON_TXT));
+        
         openButton = GlyphsDude.createIconButton(FontAwesomeIcon.FOLDER_OPEN);
         openButton.setTooltip(new Tooltip(OPEN_BUTTON_TXT));
         //openButton.setText(" ");

@@ -328,7 +328,7 @@ public class MainWindowController implements Initializable {
 
             // updating the context
             //uiContextService.update();
-            activityService.openByType(ExplorerActivity.class);
+            activityService.openByType(ImageJContainer.class);
             // sequence over
             logger.info("Start over");
 

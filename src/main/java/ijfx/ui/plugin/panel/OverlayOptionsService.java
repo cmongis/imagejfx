@@ -19,6 +19,7 @@
  */
 package ijfx.ui.plugin.panel;
 
+import ijfx.service.IjfxService;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import org.scijava.plugin.Plugin;
@@ -31,7 +32,7 @@ import org.scijava.util.ColorRGB;
  * @author Pierre BONNEAU
  */
 @Plugin(type = SciJavaService.class)
-public class OverlayOptionsService extends AbstractService implements SciJavaService{
+public class OverlayOptionsService extends AbstractService implements IjfxService{
     
     private Property<ColorRGB> colorProperty;
     private Property<Double> widthProperty;

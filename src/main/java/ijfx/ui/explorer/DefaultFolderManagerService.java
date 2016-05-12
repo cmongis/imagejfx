@@ -108,7 +108,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     }
 
     protected Folder addFolder(Folder f) {
-        folderList.add(f);
+        getFolderList().add(f);
 
         if (folderList.size() == 1) {
             setCurrentFolder(f);

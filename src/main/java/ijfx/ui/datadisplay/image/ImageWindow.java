@@ -43,6 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.embed.swing.SwingFXUtils;
@@ -633,8 +634,11 @@ public class ImageWindow extends Window {
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
         System.out.println(positionOnImage);
         logger.info(String.format("This image contains %s overlays", overlayService.getOverlays(imageDisplay).size()));
-
+        
+        
+        
         boolean wasOverlaySelected = false;
+        /*
         for (Overlay o : overlayService.getOverlays(imageDisplay)) //.parallelStream().forEach(o -> 
         {
             if (isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o)) {
@@ -645,12 +649,29 @@ public class ImageWindow extends Window {
             } else {
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, false);
             }
-        };
+        };*/
+        
+        List<Overlay> touchedOverlay = overlayService.getOverlays(imageDisplay).stream()
+                .filter(o->isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o))
+                .collect(Collectors.toList());
+        
+        wasOverlaySelected = touchedOverlay.size() > 0;
+        
+        if(touchedOverlay.size() == 0) {
+            overlaySelectionService.unselectedAll(imageDisplay);
+        }
+        else if (touchedOverlay.size() == 1) {
+            overlaySelectionService.selectOnlyOneOverlay(imageDisplay, touchedOverlay.get(0));
+        }
+        else {
+            // TODO: 
+        }
+        
 
         if (!wasOverlaySelected) {
             setEdited(null);
         }
-        contextCalculationService.determineContext(imageDisplay, true);
+        //contextCalculationService.determineContext(imageDisplay, true);
         refreshSourceImage();
         updateInfoLabel();
 
