@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.NumberUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -63,8 +65,8 @@ public class GroupExplorable<T> {
 
         size = 0;
         list3D.clear();
-        SortExplorableUtils.sort(metaDataList.get(2), filterExplorable(listItems, metaDataList));
-        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, filterExplorable(listItems, metaDataList));
+        SortExplorableUtils.sort(metaDataList.get(2), filterExplorableWithList(listItems, metaDataList));
+        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, filterExplorableWithList(listItems, metaDataList));
         list2D.stream().forEach((l2D) -> {
             sortListExplorable.setItems(l2D);
             sortListExplorable.process();
@@ -76,11 +78,29 @@ public class GroupExplorable<T> {
         });
     }
 
-    public List<Explorable> filterExplorable(List<Explorable> arrayList, List<String> metaData) {
+    public boolean checkNumber(String metaData){
+        if (!NumberUtils.isNumber(SortExplorableUtils.getValueMetaData(listItems.get(0), metaData))){
+            return true;
+        }
+        else
+        {
+            List<Explorable> filtered = filterExplorable(listItems, metaData);
+            SortExplorableUtils.sort(metaData, filtered);
+            return SortExplorableUtils.findLimits(metaData, filtered).size() <= 10;
+        }
+    }
+    
+     public List<Explorable> filterExplorableWithList(List<Explorable> arrayList, List<String> metaData) {
         return arrayList.stream().filter(p -> {
             return metaData.stream().allMatch(m ->  p
                     .getMetaDataSet()
                     .containsKey(m));
+        }).collect(Collectors.toList());
+    }
+       
+    public List<Explorable> filterExplorable(List<Explorable> arrayList, String metaData) {
+        return arrayList.stream().filter(p -> {
+            return p.getMetaDataSet().containsKey(metaData);
         }).collect(Collectors.toList());
     }
 

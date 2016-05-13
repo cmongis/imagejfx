@@ -41,7 +41,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -50,13 +53,14 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = ExplorerView.class)
 public class GridIconView extends BorderPane implements ExplorerView {
 
+    @Parameter
+    UIService uIService;
     private VBox vBox = new VBox();
     private ScrollPane scrollPane;
     private ScrollBinderChildren scrollBinderChildren;
     private HBox hBox;
     private GroupExplorable groupExplorable;
     private List<ComboBox<String>> comboBoxList;
-
 
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(vBox);
 
@@ -92,7 +96,7 @@ public class GridIconView extends BorderPane implements ExplorerView {
     public void setItem(List<? extends Explorable> items) {
         List<String> metadataList = this.getMetaDataKey(items);
         comboBoxList.stream().forEach(c -> c.getItems().addAll(metadataList));
-                initComboBox();
+        initComboBox();
 
         groupExplorable.setListItems(new CopyOnWriteArrayList(items));
         sortItems();
@@ -105,9 +109,17 @@ public class GridIconView extends BorderPane implements ExplorerView {
                             .getSelectionModel()
                             .selectedItemProperty()
                             .addListener((obs, old, newValue) -> {
-                                groupExplorable.getMetaDataList()
-                                        .set(i, newValue);
-                                sortItems();
+                                if (groupExplorable.checkNumber(newValue)) {
+                                    groupExplorable.getMetaDataList()
+                                            .set(i, newValue);
+                                    sortItems();
+                                }
+                                else
+                                {
+                                    groupExplorable.getMetaDataList().set(i, old);
+                                    uIService.showDialog(newValue+" contains to much different values", DialogPrompt.MessageType.ERROR_MESSAGE);
+                                    return;
+                                }
                             });
                 });
     }
