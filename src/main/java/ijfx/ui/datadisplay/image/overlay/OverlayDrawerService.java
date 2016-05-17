@@ -20,11 +20,8 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.service.IjfxService;
-import java.util.HashMap;
-import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.overlay.Overlay;
 import org.scijava.Context;
-import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;

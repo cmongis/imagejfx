@@ -19,24 +19,13 @@
  */
 package ijfx.ui.datadisplay.image.overlay;
 
-import ijfx.plugins.ImageJ1PluginAdapter;
 import ijfx.ui.canvas.utils.ViewPort;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.RectangleOverlay;
-import net.imagej.plugins.commands.imglib.GaussianBlur;
-import org.scijava.Context;
-import org.scijava.command.CommandService;
-import org.scijava.module.Module;
-import org.scijava.module.ModuleService;
-import org.scijava.module.process.AbstractPostprocessorPlugin;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.util.ColorRGB;
 
 /**
  *
@@ -44,7 +33,7 @@ import org.scijava.util.ColorRGB;
  */
 @Plugin(type = OverlayDrawer.class)
 public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
-
+    
    private Rectangle rectangle;
     
     @Override

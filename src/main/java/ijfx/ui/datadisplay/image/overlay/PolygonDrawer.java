@@ -34,7 +34,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = OverlayDrawer.class)
 public class PolygonDrawer implements OverlayDrawer<PolygonOverlay> {
-
+    
     Polygon shape;
 
     @Override
@@ -60,6 +60,7 @@ public class PolygonDrawer implements OverlayDrawer<PolygonOverlay> {
         }
 
         shape.getPoints().addAll(points);
+        
         OverlayDrawer.color(overlay, shape);
         return shape;
 

@@ -294,11 +294,12 @@
 }
 .text-field.editable-label {
     -fx-background-color:transparent;
-    -fx-border:0;
     -fx-effect:none;
+    
 }
 .text-field.editable-label {
     -fx-text-fill:white;
+    -fx-stroke-fill:white;
 }
 .text-field.editable-label {
     -fx-padding: 0;
@@ -306,6 +307,7 @@
 .text-field.editable-label:hover {
     -fx-background-color:-bg-light;
 }
+
 
 
 
@@ -376,6 +378,10 @@
  * ComboBox                                                                    *
  *                                                                             *
  ******************************************************************************/
+.combo-box {
+    /*-fx-skin: "com.sun.javafx.scene.control.skin.ComboBoxBaseSkin";*/
+}
+
 .combo-box-base {
     /*-fx-skin: "com.guigarage.flatterfx.skin.FlatterComboBoxSkin";*/
     -fx-effect:-flatter-shadow;
@@ -904,7 +910,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .combo-box-base  {
     -fx-background-color:-flatter-primary;
-    /*-fx-skin: "com.sun.javafx.scene.control.skin.ComboBoxBaseSkin";*/
+    /**/
 }
 
 .combo-box,.menu-button {
@@ -1339,10 +1345,46 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-padding: 10px;
 
     -fx-background-color:-bg-dark;
+
 }
 .module-config-pane .editable-label {
-    -fx-margin:10px;
+    -fx-padding:4px;
+    -fx-stroke-color:white;
+    -fx-stroke:1px;
 }
+
+
+.module-config-pane .grid-pane {
+    -fx-vgap:10px;
+    -fx-margin:10px
+}
+.module-config-pane .grid-pane > .label {
+    
+    -fx-font-size:16px;
+}
+.module-config-pane .combo-box-base  {
+    -fx-padding:0 0 0 0;
+    /*-fx-background-color:red;*/
+    -fx-background-insets:0 0 0 0;
+    -fx-font-size:0.9em;
+    
+}
+.module-config-pane .grid-pane .text-field {
+    -fx-font-size:0.8em;
+}
+.module-config-pane .input-label {
+    
+    
+}
+
+.module-config-pane .editable-label:hover {
+    -fx-background-color:derive(-bg-light,20%);;
+}
+
+.module-config-pane .content-vbox {
+    -fx-spacing:10;
+}
+
 
 /*
 .module-config-pane .grid-pane {

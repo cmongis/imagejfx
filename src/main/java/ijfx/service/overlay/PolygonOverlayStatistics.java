@@ -21,10 +21,12 @@ package ijfx.service.overlay;
 
 
 import ij.blob.RotatingCalipers;
+import ijfx.ui.main.ImageJFX;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import javafx.scene.shape.Polygon;
 import javafx.geometry.Point2D;
@@ -72,6 +74,7 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         super(overlay, context);
         
         this.shape = getShape(getOverlay());
+       
         this.convexHull = getConvexHull();
         
         super.area = setArea();
@@ -293,7 +296,7 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
 
         ArrayList<Point2D> hullVertices = new ArrayList<>();
         //Initialize the hull
-        
+      
         //Check if there are at least 3 points and make sure that all points are not colinear
         if(this.shape.npoints < 3 )
             return null;
@@ -363,6 +366,7 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         Polygon polygon = new Polygon();
         polygon.getPoints().addAll(p);
         return polygon;
+        
     }
     
     

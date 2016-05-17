@@ -151,6 +151,7 @@ public class ModuleConfigPane extends BorderPane {
         fieldCount++;
         inputControlMap.put(id, input);
         Label label = new Label();
+        label.getStyleClass().add("input-label");
         label.textProperty().bind(input.labelProperty());
         gridPane.add(label, labelColumn, fieldCount);
         gridPane.add(input, fieldColumn, fieldCount);
@@ -193,6 +194,7 @@ public class ModuleConfigPane extends BorderPane {
         step.getParameters().forEach((key, value) -> {
             InputControl input = getField(key);
             if (input != null) {
+                System.out.println(value);
                 input.setValue(value);
             }
         });
@@ -292,6 +294,11 @@ public class ModuleConfigPane extends BorderPane {
     // Fires a InputEvent (used by other components to act when a parameter is changed)
     private void handleInputValueChanged(InputEvent event) {
         fireEvent(event);
+        
+        if(step!=null) {
+            step.getParameters().put(event.getInput().getName(),event.getInput().getValue());
+        }
+        
     }
 
     // Returns the editable label

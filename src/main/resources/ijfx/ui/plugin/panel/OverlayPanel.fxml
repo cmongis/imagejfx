@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.chart.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -9,7 +10,7 @@
 
 <fx:root fx:id="overlayPanel" styleClass="overlay-panel" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <TitledPane animated="false" text="Overlay" BorderPane.alignment="CENTER">
+      <TitledPane fx:id="chartTitledPane" animated="false" text="Overlay" BorderPane.alignment="CENTER">
          <content>
             <BorderPane styleClass="panel-sub-container">
                <center>

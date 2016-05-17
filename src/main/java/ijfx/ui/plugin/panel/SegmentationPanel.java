@@ -19,20 +19,26 @@
  */
 package ijfx.ui.plugin.panel;
 
+import ijfx.bridge.ImageJContainer;
 import ijfx.plugins.commands.BinaryToOverlay;
-import ijfx.service.batch.BatchInputWrapper;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.ImageDisplayBatchInput;
+import ijfx.service.batch.SegmentationService;
+import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
+import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.main.Localization;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,18 +46,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import mongis.utils.TaskButtonBinding;
-import net.imagej.Dataset;
 import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -60,7 +69,6 @@ import net.imagej.overlay.Overlay;
 import net.imagej.plugins.commands.binary.Binarize;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
 import net.imagej.table.DefaultGenericTable;
-import net.imagej.table.Table;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -74,36 +82,68 @@ import org.scijava.ui.UIService;
 @UiConfiguration(id = "segmentation-panel", context = "segmentation", localization = Localization.RIGHT)
 public class SegmentationPanel extends BorderPane implements UiPlugin {
 
-    @Parameter
-    private Context context;
-
+    /*
+        FXML components
+     */
     @FXML
     private VBox workflowVBox;
 
     @FXML
     private Button testButton;
 
-    @Parameter
-    ImageDisplayService imageDisplayService;
+    @FXML
+    private Button startButton;
+
+    @FXML
+    private ToggleButton singlePlaneToggleButton;
+
+    @FXML
+    private ToggleButton allPlanesToggleButton;
 
     @Parameter
-    BatchService batchService;
+    private Context context;
+
+    /*
+            Context related components
+     */
+    @Parameter
+    private ExplorerService explorerService;
 
     @Parameter
-    UIService uiService;
+    private ImageDisplayService imageDisplayService;
 
     @Parameter
-    OverlayService overlayService;
+    private BatchService batchService;
 
     @Parameter
-    OverlayStatService overlayStatsService;
+    private UIService uiService;
 
     @Parameter
-    LoadingScreenService loadingScreenService;
+    private OverlayService overlayService;
+
+    @Parameter
+    private OverlayStatService overlayStatsService;
+
+    @Parameter
+    private LoadingScreenService loadingScreenService;
+
+    @Parameter
+    ActivityService activityService;
+
+    @Parameter
+    SegmentationService segmentationService;
+    
+    ToggleGroupValue<Boolean> toggleGroup;
 
     TaskButtonBinding taskButtonBinding;
 
     WorkflowPanel workflowPanel;
+
+    BooleanProperty replaceFile;
+
+    ObjectProperty<File> ouputFolderProperty;
+
+    private static final Boolean USE_ALL_PLANE = Boolean.TRUE;
 
     public SegmentationPanel() {
         try {
@@ -111,6 +151,13 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
             taskButtonBinding = new TaskButtonBinding(testButton);
             taskButtonBinding.runTaskOnClick(this::createTaskButtonBinding);
+
+            toggleGroup = new ToggleGroupValue<Boolean>();
+            
+            toggleGroup.add(allPlanesToggleButton, USE_ALL_PLANE);
+            toggleGroup.add(singlePlaneToggleButton, !USE_ALL_PLANE);
+
+            new TaskButtonBinding(startButton).runTaskOnClick(this::generateTask);
 
         } catch (IOException ex) {
             Logger.getLogger(SegmentationPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -161,8 +208,39 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         if (handler == null) {
             handler = new SilentProgressHandler();
         }
+        
+
         // generating the batch service input from an image display
-        BatchSingleInput input = new ImageDisplayBatchInput(imageDisplayService.getActiveImageDisplay(), true);
+        BatchSingleInput input;
+        ImageDisplay inputDisplay;
+        
+        boolean isExplorer = activityService.getCurrentActivityAsClass() == ExplorerActivity.class;
+        
+        if(isExplorer) {
+            Explorable explorable;
+            if(explorerService.getSelectedItems().size() > 0) {
+                explorable = explorerService.getSelectedItems().get(0);
+            }
+            else {
+                explorable = explorerService.getItems().get(0);
+            }
+                       
+                input = new BatchInputBuilder(context)
+                        .from(explorable)
+                        .getInput();
+                        
+                
+            inputDisplay = new DefaultImageDisplay();
+            context.inject(inputDisplay);
+            inputDisplay.display(explorable.getDataset());
+            uiService.show(inputDisplay);
+            
+        }
+        else {
+            input = new ImageDisplayBatchInput(imageDisplayService.getActiveImageDisplay(), true);
+            inputDisplay = imageDisplayService.getActiveImageDisplay();
+        }
+        
         System.out.println("Executing");
 
         // applying the workflow
@@ -175,13 +253,19 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         // detecting objects
         handler.setStatus("Detecting objects...");
         Overlay[] overlay = BinaryToOverlay.transform(context, input.getDataset(), false);
-
-        // adding the objects to the display
+        // giving a random color to each overlay
+        overlayStatsService.setRandomColor(Arrays.asList(overlay));
+        
+        // deleting the overlay owned previously by the input
+        overlayService.getOverlays(inputDisplay).forEach(o->overlayService.removeOverlay(o));
+        // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();
         context.inject(outputDisplay);
         outputDisplay.display(input.getDataset());
-        overlayService.addOverlays(outputDisplay, Arrays.asList(overlay));
-
+        
+        // adding the overlay to the input dipslay
+        overlayService.addOverlays(inputDisplay, Arrays.asList(overlay));
+        
         handler.setStatus("Gathering statistics...");
 
         handler.setProgress(-1);
@@ -190,7 +274,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         List<HashMap<String, Double>> map = Arrays.stream(overlay)
                 .map(o -> {
                     try {
-                        return overlayStatsService.getStat(imageDisplay, o);
+                        
+                        return overlayStatsService.getStat(inputDisplay, o);
                     } catch (Exception e) {
                         return null;
                     }
@@ -217,9 +302,41 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
         }
 
+        if(isExplorer) {
+            activityService.openByType(ImageJContainer.class);
+        }
         uiService.show(resultTable);
         uiService.show(outputDisplay);
         return true;
+
+    }
+
+    protected Task<Boolean> generateTask(TaskButtonBinding binding) {
+
+        if (activityService.getCurrentActivity() instanceof ExplorerActivity) {
+
+            final DefaultWorkflow workflow = new DefaultWorkflow(workflowPanel.stepListProperty());
+
+            
+            List<BatchSingleInput> inputList = explorerService.getSelectedItems()
+                    .stream()
+                    .map(explorable->new BatchInputBuilder(context)
+                            .from(explorable)
+                            //.saveNextToSourceWithPrefix("_mask","png")
+                            .onFinished(segmentationService::saveOverlaysNextToSourceFile)
+                            .getInput()
+                    )
+                    .collect(Collectors.toList());
+                    
+            
+
+            return new AsyncCallback<List<BatchSingleInput>, Boolean>(inputList)
+                    .run((progress, input) -> {
+                        return batchService.applyWorkflow(progress, input, workflow);
+                    });
+        }
+
+        return null;
 
     }
 

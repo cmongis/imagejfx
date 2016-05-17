@@ -488,8 +488,9 @@ public class ImageWindow extends Window {
             Node node = getDrawer(overlay).update(overlay, canvas.getCamera());
             node.setMouseTransparent(true);
             node.setUserData(overlay);
+            
+            
             if (anchorPane.getChildren().contains(node) == false) {
-
                 anchorPane.getChildren().add(node);
             }
 

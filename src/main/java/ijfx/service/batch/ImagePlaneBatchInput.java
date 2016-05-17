@@ -59,6 +59,8 @@ public class ImagePlaneBatchInput implements BatchSingleInput {
     DatasetView datasetView;
     Logger logger = ImageJFX.getLogger();
     
+    String source;
+    
     public ImagePlaneBatchInput() {
         
     }
@@ -67,6 +69,7 @@ public class ImagePlaneBatchInput implements BatchSingleInput {
         this.fileSource = fileSource;
         this.planeIndex = planeIndex;
         this.savePath = savePath;
+        source = fileSource.getAbsolutePath();
        
     }
     Dataset dataset;
@@ -160,6 +163,11 @@ public class ImagePlaneBatchInput implements BatchSingleInput {
     @Override
     public void setDatasetView(DatasetView datasetView) {
         this.datasetView = datasetView;
+    }
+
+    @Override
+    public String getSourceFile() {
+        return source;
     }
     
 }

@@ -59,11 +59,7 @@
            </BorderPane>
        </top>
        <center>
-           <StackPane fx:id="centerStackPane" BorderPane.alignment="CENTER">
-               <children>
-                   <WebView fx:id="centralWebView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-               </children>
-           </StackPane>
+           <StackPane fx:id="centerStackPane" BorderPane.alignment="CENTER" />
        </center>
        <left>
            <VBox fx:id="leftVBox" BorderPane.alignment="CENTER" />

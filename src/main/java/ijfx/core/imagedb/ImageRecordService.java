@@ -44,6 +44,9 @@ public interface ImageRecordService extends IjfxService{
     // adds a record manually
     public void addRecord(File file, MetaDataSet metaDataSet);
    
+    // get the record, if doesn't exist, calculates it
+    public ImageRecord getRecord(File file);
+    
     // get all the record
     public Collection<? extends ImageRecord> getRecords();
     

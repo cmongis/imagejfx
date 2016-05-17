@@ -22,17 +22,9 @@ package ijfx.service.preview;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.DisplayBatchInput;
-import ijfx.service.batch.FileBatchInput;
-import ijfx.service.batch.ImagePlaneBatchInput;
 import java.awt.image.BufferedImage;
-import static java.lang.Math.toIntExact;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -40,24 +32,22 @@ import javafx.scene.image.WritableImage;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.ImageJService;
-import net.imagej.ImageMetadata;
 import net.imagej.Position;
-import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
-import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable;
-import net.imglib2.display.ColorTable16;
 import net.imglib2.display.ColorTable8;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
+import org.scijava.module.DefaultMutableModuleInfo;
 import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -82,6 +72,9 @@ public class PreviewService extends AbstractService implements ImageJService {
     @Parameter
     CommandService commandService;
 
+    @Parameter
+    ModuleService moduleService;
+    
     @Parameter
     BatchService batchService;
     private int width;
@@ -266,8 +259,10 @@ public class PreviewService extends AbstractService implements ImageJService {
             BatchSingleInput batchSingleInput = new DisplayBatchInput();
             this.context().inject(batchSingleInput);
             batchSingleInput.setDataset(dataset);
-            CommandInfo commandInfo = new CommandInfo(command);
-            Module module = new CommandModule(commandInfo);
+            
+            Module module = moduleService.createModule(commandService.getCommand(command));
+            //CommandInfo commandInfo = new CommandInfo(command);
+           // Module module = new CommandModule(commandInfo);
             this.context().inject(module.getDelegateObject());
             batchService.executeModule(batchSingleInput, module, false, inputMap);
             Dataset result = batchSingleInput.getDataset();

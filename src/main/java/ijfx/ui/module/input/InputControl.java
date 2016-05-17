@@ -103,6 +103,7 @@ public class InputControl<T extends Object> extends Control {
     
     protected void onValueChanged(Observable object, T oldValue, T newValue) {
         
+        System.out.println("The value has changed to "+newValue);
         //System.out.println("new input event : "+newValue.toString());
         if(input.getValue() != newValue) input.setValue(newValue);
         this.fireEvent(new InputEvent(input, newValue));

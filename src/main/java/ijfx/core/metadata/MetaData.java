@@ -126,6 +126,8 @@ public interface MetaData {
     
     public final static String STATS_PIXEL_STD_DEV = "Standard deviation";
  
+    public final static MetaData NULL = new GenericMetaData("", null);
+    
     public static boolean notNull(MetaData data) {
         return data.isNull() == false;
     }

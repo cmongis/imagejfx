@@ -20,12 +20,14 @@
 package ijfx.service.overlay.io;
 
 import ijfx.service.IjfxService;
+import ijfx.ui.utils.NamingUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.overlay.Overlay;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  *
@@ -44,6 +46,12 @@ public interface OverlayIOService extends IjfxService{
      */
     public void saveOverlays(List<Overlay> overlay, File ovlFile) throws IOException;
     
+    default void saveOverlaysNextToFile(List<Overlay> overlay, File imageFile) throws IOException{
+        String filename = FilenameUtils.getBaseName(imageFile.getName()) + OVERLAY_FILE_EXTENSION;
+        
+        saveOverlays(overlay, new File(imageFile.getParentFile(),filename));
+        
+    }
     
     /**
      * Save the a list of overlay next to the file associated to the dataset.
@@ -67,6 +75,19 @@ public interface OverlayIOService extends IjfxService{
         return new File(imageFile.getParent(), nameWithoutExtension + OVERLAY_FILE_EXTENSION);
     }
     
-    public List<Overlay> loadOverlays(File file);
+    public default File getImageFileFromOverlayFile(File overlayFile) {
+        String jsonFileName = overlayFile.getName();
+        String basename = FilenameUtils.getBaseName(jsonFileName);
+        
+        File[] listFiles = overlayFile.getParentFile().listFiles(f->f.getName().startsWith(basename) && f.getName().equals(jsonFileName) == false);
+        if(listFiles.length < 1) {
+            return null;
+        }
+        else {
+            return listFiles[0];
+        }
+    }
+    
+    public List<Overlay> loadOverlays(File overlayJsonFile);
     
 }

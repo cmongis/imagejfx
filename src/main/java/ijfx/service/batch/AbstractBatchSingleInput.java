@@ -39,12 +39,16 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput {
 
     private ImageDisplay display;
 
+    private String sourceFile;
+    
     @Parameter
     protected ImageDisplayService imageDisplayService;
 
     @Parameter
     protected DisplayService displayService;
 
+    
+    
     @Override
     public void setDatasetView(DatasetView datasetView) {
         this.datasetView = datasetView;
@@ -96,5 +100,16 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput {
         display = null;
         System.gc();
     }
+
+    public String getSourceFile() {
+        return sourceFile;
+    }
+
+    public void setSourceFile(String sourceFile) {
+        this.sourceFile = sourceFile;
+    }
+    
+    
+    
 
 }

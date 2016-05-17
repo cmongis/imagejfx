@@ -24,15 +24,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
-import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
 import org.scijava.Context;
+import static ucar.unidata.util.Format.l;
 
 /**
  *
@@ -42,6 +44,8 @@ class OverlayDeserializer extends JsonDeserializer<Overlay> {
     
     private final Context context;
 
+    Logger logger = ImageJFX.getLogger();
+    
     public OverlayDeserializer(Context context) {
         this.context = context;
     }
@@ -79,18 +83,36 @@ class OverlayDeserializer extends JsonDeserializer<Overlay> {
     private Overlay loadPolygon(JsonNode node) {
         PolygonOverlay overlay = new PolygonOverlay(context);
         Integer dimension = 0;
-        int pointCount = node.get("points").size();
         
+         double[] xpoints = getArray(node,"xpoints");
+        double[] ypoints = getArray(node,"ypoints");
+        
+        int pointCount = xpoints.length;
+        
+        // it means there is no array
+        if(pointCount <= 0) {
+            logger.severe("Invalid polygon array !");
+            return null;
+        }
+        
+        else {
         for (int p = 0; p != pointCount; p++) {
-            JsonNode jsonPoint = node.get("points").get(p);
-            double[] vertex = IntStream.range(0, jsonPoint.size())
-                    .mapToDouble(i->jsonPoint.get(i).asDouble())
-                    .toArray();
-            
-            overlay.getRegionOfInterest().addVertex(p, new RealPoint(vertex));
-            
+            overlay.getRegionOfInterest().addVertex(p, new RealPoint(xpoints[p],ypoints[p]));
         }
         return overlay;
+        }
+    }
+    
+    private double[] getArray(JsonNode node, String fieldName) {
+        JsonNode arrayNode = node.get(fieldName);
+        if(arrayNode == null) return new double[0];
+        int arraySize = arrayNode.size();
+        if(arraySize < 0) return new double[0];
+        else {
+            return IntStream.range(0, arraySize)
+                    .mapToDouble(i->arrayNode.get(i).asDouble())
+                    .toArray();
+        }
     }
 
     private Overlay loadLine(JsonNode node) {
@@ -103,7 +125,7 @@ class OverlayDeserializer extends JsonDeserializer<Overlay> {
         }
         return lineOverlay;
     }
-
+    /*
     private double[] getArray(JsonNode node, String key) {
         JsonNode arrayNode = node.get(key);
         double[] values = new double[arrayNode.size()];
@@ -111,6 +133,6 @@ class OverlayDeserializer extends JsonDeserializer<Overlay> {
             values[i] = arrayNode.get(i).asDouble();
         }
         return values;
-    }
+    }*/
     
 }

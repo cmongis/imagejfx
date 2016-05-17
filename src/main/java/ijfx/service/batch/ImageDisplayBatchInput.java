@@ -44,6 +44,8 @@ public class ImageDisplayBatchInput implements BatchSingleInput{
     
     private DatasetView view;
     
+    private String source;
+    
     @Parameter
     ImagePlaneService imagePlaneService;
     
@@ -73,6 +75,8 @@ public class ImageDisplayBatchInput implements BatchSingleInput{
         // creating a new dataset from this position
         dataset = imagePlaneService.isolatePlane(imageDisplayService.getActiveDataset(inputDisplay), position);
 
+        this.source = dataset.getSource();
+        
         this.imageDisplay.display(dataset);
         
         //view = imageDisplayService.getActiveDatasetView(imageDisplay);
@@ -127,6 +131,11 @@ public class ImageDisplayBatchInput implements BatchSingleInput{
     @Override
     public String getName() {
         return dataset.getName();
+    }
+
+    @Override
+    public String getSourceFile() {
+        return source;
     }
     
 }

@@ -204,19 +204,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
 
             // creating the instance
             
-            /*
-            uiPlugin = (UiPlugin) new AsyncCallback<PluginInfo<UiPlugin>, UiPlugin>()
-                    .setInput(uiPluginInfos)
-                    .run(info -> {
-                        try {
-                            return info.createInstance();
-                        } catch (InstantiableException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                            return null;
-                        }
-                    })
-                    .ui()
-                    .getValue();*/
+         
             uiPlugin = uiPluginInfos.createInstance();
             timer.elapsed(String.format("[%s]Instance creation", widgetClassName));
 
@@ -248,8 +236,8 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
 
             } catch (NullPointerException ne) {
 
-                ne.printStackTrace();
-
+                logger.log(Level.SEVERE, null, ne);
+                
                 // in case of error, the user is also notified
                 logger.warning(String.format(MSG_NO_INFO_SPECIFIED, widgetClassName));
                 logErrorService.notifyError(
@@ -269,15 +257,9 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
 
             // the widget has been launch successfully
             logger.info(String.format(MSG_INITALIZE, widgetClassName));
+//            uiPlugin.init();
         } catch (Exception ex) {
-            //logger.warning(String.format(MSG_ERROR_WHEN_LAUNCHING, widgetClassName));
-
-            /*
-            logErrorService.notifyError(
-                    new LogEntry(LogEntryType.ERROR)
-                    .setTitle(String.format(MSG_ERROR_WHEN_LAUNCHING, widgetClassName))
-                    .setException(ex)
-            );*/
+          
             logger.log(Level.SEVERE, MSG_ERROR_WHEN_LAUNCHING, ex);
         }
 

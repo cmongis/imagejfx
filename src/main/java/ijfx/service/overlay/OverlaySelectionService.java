@@ -53,7 +53,7 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
     
     public void selectOnlyOneOverlay(ImageDisplay imageDisplay, Overlay overlay) {
         
-        System.out.println(overlay);
+        //System.out.println(overlay);
         
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView) {
