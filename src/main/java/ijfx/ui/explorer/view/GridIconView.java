@@ -33,10 +33,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import mongis.utils.panecell.PaneCell;
@@ -58,24 +60,30 @@ public class GridIconView extends BorderPane implements ExplorerView {
     private VBox vBox = new VBox();
     private ScrollPane scrollPane;
     private ScrollBinderChildren scrollBinderChildren;
-    private HBox hBox;
+    private GridPane topBar;
     private GroupExplorable groupExplorable;
     private List<ComboBox<String>> comboBoxList;
-
+    private List<Label> listLabel;
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(vBox);
 
     public GridIconView() {
+        super();
         groupExplorable = new GroupExplorable();
         comboBoxList = new ArrayList<>();
-        IntStream.rangeClosed(0, 2)
-                .forEach(i -> comboBoxList.add(new ComboBox<String>()));
+        topBar = new GridPane();
 
-        hBox = new HBox();
-
-        hBox.getChildren().addAll(comboBoxList);
+        listLabel = new ArrayList<>();
+        listLabel.add(new Label("Columns"));
+        listLabel.add(new Label("Rows"));
+        listLabel.add(new Label("Group by"));
+        IntStream.range(0, listLabel.size()).forEach(i -> {
+            topBar.add(listLabel.get(i), i, 0);
+            comboBoxList.add(new ComboBox<String>());
+            topBar.add(comboBoxList.get(i), i, 1);
+        });
         scrollPane = new ScrollPane();
         scrollPane.setContent(vBox);
-        this.setTop(hBox);
+        this.setTop(topBar);
 
         this.setCenter(scrollPane);
         setPrefWidth(400);
@@ -113,11 +121,9 @@ public class GridIconView extends BorderPane implements ExplorerView {
                                     groupExplorable.getMetaDataList()
                                             .set(i, newValue);
                                     sortItems();
-                                }
-                                else
-                                {
+                                } else {
                                     groupExplorable.getMetaDataList().set(i, old);
-                                    uIService.showDialog(newValue+" contains to much different values", DialogPrompt.MessageType.ERROR_MESSAGE);
+                                    uIService.showDialog(newValue + " contains to much different values", DialogPrompt.MessageType.ERROR_MESSAGE);
                                     return;
                                 }
                             });
@@ -126,7 +132,7 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     private void sortItems() {
         groupExplorable.process();
-        cellPaneCtrl.update3DList(new CopyOnWriteArrayList<>(groupExplorable.getList3D()), groupExplorable.getSizeList3D());
+        cellPaneCtrl.update3DList(new CopyOnWriteArrayList<>(groupExplorable.getList3D()), groupExplorable.getSizeList3D(), groupExplorable.getMetaDataList());
     }
 
     private PaneCell<Iconazable> createIcon() {
