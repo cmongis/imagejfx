@@ -78,8 +78,8 @@ public class ExplorerTableVie implements ExplorerView{
                 .filter(item->item.selectedProperty().getValue())
                 .collect(Collectors.toList());
                 
-                
-        tableView.getSelectionModel().getSelectedItems().addAll(selected);
+        
+        //tableView.getSelectionModel().getSelectedItems().addAll(selected);
         
     }
 

@@ -148,9 +148,20 @@ public class UiContextCalculatorService extends AbstractService implements Image
 
     }
 
-    public boolean hasAxisType(ImageDisplay display, AxisType axisType) {
+    public static boolean hasAxisType(ImageDisplay display, AxisType axisType) {
         CalibratedAxis[] calibratedAxises = new CalibratedAxis[display.numDimensions()];
         display.axes(calibratedAxises);
+        for (CalibratedAxis calibratedAxis : calibratedAxises) {
+            if (calibratedAxis.type() == axisType) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean hasAxisType(Dataset dataset, AxisType axisType) {
+        CalibratedAxis[] calibratedAxises = new CalibratedAxis[dataset.numDimensions()];
+        dataset.axes(calibratedAxises);
         for (CalibratedAxis calibratedAxis : calibratedAxises) {
             if (calibratedAxis.type() == axisType) {
                 return true;

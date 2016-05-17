@@ -22,12 +22,14 @@ package ijfx.ui.arcmenu;
 import ijfx.ui.arcmenu.skin.ArcItemCircleSkin;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.PopupWindow;
+import javafx.stage.Screen;
 
 /**
  *
@@ -48,7 +50,8 @@ public class PopArcMenu extends PopupControl {
         setSkin(createDefaultSkin());
         
        
-        
+        setPrefWidth(400);
+        setPrefHeight(400);
         
         
     }
@@ -176,12 +179,20 @@ public class PopArcMenu extends PopupControl {
         
         if(event.getButton() != MouseButton.SECONDARY) return;
         
+        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+        setPrefWidth(visualBounds.getWidth());
+        setPrefHeight(visualBounds.getHeight());
         double x = event.getScreenX();
         double y = event.getScreenY();
         System.out.println(getHeight());
         System.out.println(y);
         x-= getWidth()/2;
         y-= getHeight()/2;
+        x = 0;
+        y = 0;
+        
+        setCenterX(event.getScreenX());
+        setCenterY(event.getScreenY());
         
         super.show(((Node)event.getTarget()).getScene().getWindow(),x,y);
     }

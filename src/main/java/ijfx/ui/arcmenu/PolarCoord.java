@@ -29,6 +29,9 @@ public class PolarCoord {
     double angle;
     double radius;
 
+    
+    
+    
     public PolarCoord(PolarSystem ps, double radius, double angle) {
         this.angle = angle;
         this.radius = radius;

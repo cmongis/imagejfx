@@ -23,6 +23,7 @@ import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
+import ijfx.ui.UiContexts;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.explorer.cell.FolderListCellCtrl;
 import ijfx.ui.explorer.event.DisplayedListChanged;
@@ -479,7 +480,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     public void onSegmentButtonPressed() {
         
-        uiContextService.enter("segment");
+        uiContextService.toggleContext("segment",!uiContextService.isCurrent("segment"));
+        uiContextService.toggleContext("segmentation",!uiContextService.isCurrent("segmentation"));
         uiContextService.update();
         
         

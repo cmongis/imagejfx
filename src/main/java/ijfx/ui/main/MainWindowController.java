@@ -773,6 +773,7 @@ public class MainWindowController implements Initializable {
         addSideMenuButton("Segment",FontAwesomeIcon.EYE,null).setOnAction(event->{
             uiContextService.enter("segment","segmentation");
             uiContextService.update();
+            hideSideMenu();
         
         });
         

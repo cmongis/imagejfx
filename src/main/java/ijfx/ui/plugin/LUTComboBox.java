@@ -22,28 +22,20 @@ package ijfx.ui.plugin;
 
 import com.sun.javafx.scene.control.behavior.ComboBoxBaseBehavior;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.ComboBoxBaseSkin;
-import ijfx.plugins.commands.ApplyLUT;
-import ijfx.ui.plugin.LUTView;
 import ijfx.service.ui.FxImageService;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.image.ImageView;
 import javafx.util.Callback;
-import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.lut.LUTService;
@@ -85,7 +77,7 @@ public class LUTComboBox extends ComboBox<LUTView> {
         setItems(colorTableList);
         setCellFactory(callback);
         //setSkin(new LUTComboBoxSkin(this, new LUTComboBoxBehaviour(this, null)));
-        setStyle(getStyle() + "-fx-skin: \"ijfx.ui.plugin.LUTComboBox.LUTComboBoxSkin\";");
+        //setStyle(getStyle() + "-fx-skin: \"ijfx.ui.plugin.LUTComboBoxSkin\";");
 
         setPrefWidth(150);
         setMaxWidth(150);
@@ -119,10 +111,20 @@ public class LUTComboBox extends ComboBox<LUTView> {
         public ColorTableCell() {
             super();
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            itemProperty().addListener(this::onItemChanged);
         }
         
-       
         
+       
+        protected void onItemChanged(Observable obs, LUTView odValue, LUTView newValue) {
+            if(newValue == null) setGraphic(null);
+            else {
+                setGraphic(newValue.getImageView());
+            }         
+        }
+        
+        
+        /*
         @Override
         protected void updateItem(LUTView item, boolean empty) {
             super.updateItem(item, empty);
@@ -137,7 +139,7 @@ public class LUTComboBox extends ComboBox<LUTView> {
                 }
             }
 
-        }
+        }*/
 
     }
 
@@ -145,34 +147,6 @@ public class LUTComboBox extends ComboBox<LUTView> {
 
     }
 
-    public class LUTComboBoxSkin extends ComboBoxBaseSkin<LUTView> {
-
-        LUTView view;
-
-        public LUTComboBoxSkin(ComboBoxBase<LUTView> comboBox, ComboBoxBaseBehavior<LUTView> behavior) {
-            super(comboBox, behavior);
-            view = comboBox.getValue();
-        }
-
-        @Override
-        public Node getDisplayNode() {
-            if (view == null) {
-                return new Label("Nothing for now");
-            }
-            return view.getImageView();
-        }
-
-        @Override
-        public void show() {
-            view.getImageView().setVisible(true);
-        }
-
-        @Override
-        public void hide() {
-            view.getImageView().setVisible(false);
-        }
-
-    }
 
     public class LUTComboBoxBehaviour extends ComboBoxBaseBehavior<LUTView> {
 

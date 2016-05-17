@@ -21,7 +21,7 @@
 package ijfx.ui.arcmenu.skin;
 
 import ijfx.ui.arcmenu.ArcItem;
-import ijfx.ui.arcmenu.ArcMenu;
+import ijfx.ui.arcmenu.PopArcMenu;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
 
@@ -63,7 +63,7 @@ public abstract class ArcItemSkin implements Skin<ArcItem> {
         return skinnable;
     }
 
-    public ArcMenu getArcMenu() {
+    public PopArcMenu getArcMenu() {
         return getSkinnable().getArcMenu();
     }
 

@@ -29,6 +29,7 @@ import ijfx.service.uicontext.UiContextCalculatorService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
+import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.utils.ViewPort;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawerService;
@@ -58,6 +59,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jfxtras.scene.control.window.CloseIcon;
@@ -167,14 +169,14 @@ public class ImageWindow extends Window {
     BorderPane borderPane = new BorderPane();
     FxImageCanvas canvas = new FxImageCanvas();
     AnchorPane anchorPane = new AnchorPane();
-
+    StackPane stackPane = new StackPane();
     HBox hbox = new HBox();
 
     HBox bottomHBox = new HBox();
 
     Label infoLabel = new Label("Some text as example I guess");
 
-    ArcMenu arcMenu;
+    PopArcMenu arcMenu;
 
     static String TITLE_CLASS_NAME = "image-window-titlebar";
 
@@ -208,9 +210,15 @@ public class ImageWindow extends Window {
         hiddenSidePane.setContent(anchorPane);
         borderPane.setCenter(hiddenSidePane);
 
+       
+       anchorPane.getChildren().add(stackPane);
         anchorPane.getChildren().add(canvas);
+         
         //hbox.getChildren().add(canvas);
 
+        stackPane.prefWidthProperty().bind(anchorPane.widthProperty());
+        stackPane.prefHeightProperty().bind(anchorPane.heightProperty());
+        
         // Bind canvas size to stack pane size.
         canvas.widthProperty().bind(anchorPane.widthProperty());
         canvas.heightProperty().bind(anchorPane.heightProperty());
@@ -310,13 +318,16 @@ public class ImageWindow extends Window {
         //   System.out.println(getDatasetview().getPlanePosition().numDimensions());
 
         logService.setLevel(LogService.INFO);
-
+        
+        
+        
         if (arcMenu != null) {
-            arcMenu.detachFrom(anchorPane);
+           anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, arcMenu::show);
             arcMenu = null;
+            
         }
-        arcMenu = new ArcMenu();
-
+        arcMenu = new PopArcMenu();
+        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, arcMenu::show);
         if (checkServices()) {
 
             double min = getDatasetview().getChannelMin(0);
@@ -337,7 +348,7 @@ public class ImageWindow extends Window {
         }
 
         arcMenu.build();
-        arcMenu.attachedTo(anchorPane);
+       
 
         refreshSourceImage();
     }

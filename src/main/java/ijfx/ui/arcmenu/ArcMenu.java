@@ -64,7 +64,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
     Logger logger = ImageJFX.getLogger();
 
 
-    PopArcMenu popArcMenu;
+    PopArcMenu skinnable;
     
     
      Text text = new Text();
@@ -83,7 +83,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
     /**
      * Creates a ArcMenu. T
      */
-    public ArcMenu(PopArcMenu menu) {
+    public ArcMenu(PopArcMenu skinnable) {
         super();
 
         getStyleClass().addAll("arc-group");
@@ -91,13 +91,14 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
         //attachedPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         text.setFill(Color.WHITE);
 
-        popArcMenu = menu;
-        setStyle("-fx-background-color:null");
-        setPrefWidth(300);
-        setPrefHeight(300);
-        menu.showingProperty().addListener(this::toggle);
+        this.skinnable = skinnable;
+        setStyle("-fx-background-color:blue");
+      
+        this.skinnable.showingProperty().addListener(this::toggle);
         //setSkin(new ArcMenuSk());
         
+        prefWidthProperty().bind(skinnable.prefWidthProperty());
+        prefHeightProperty().bind(skinnable.prefHeightProperty());
         
         addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
         
@@ -137,8 +138,8 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
     public void toggle(Observable obs, Boolean oldvalue, Boolean show) {
 
         logger.info("Toggling");
-        prefWidth(400);
-        prefHeight(400);
+        prefWidth(500);
+        prefHeight(500);
         // if not pane is attached, we return
         if (isAnimating) {
             return;
@@ -179,8 +180,8 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
 
         double margin = 7;
 
-        double minRadius = popArcMenu.getMinRadius();
-        double maxRadius = popArcMenu.getMaxRadius();
+        double minRadius = skinnable.getMinRadius();
+        double maxRadius = skinnable.getMaxRadius();
         
         
         for (int i = 0; i != items.size(); i++) {
@@ -198,7 +199,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
             shape.getStyleClass().add("arc-item");
 
             //setting the polar system and coordinates (easier to get x and y);
-            PolarSystem ps = new PolarSystem(popArcMenu.getCenterX(), popArcMenu.getCenterY());
+            PolarSystem ps = new PolarSystem(skinnable.getCenterX(), skinnable.getCenterY());
             PolarCoord pc = new PolarCoord(ps, minRadius + ((maxRadius - minRadius) / 2), itemCenter);
             shape.setPolarCoordinates(pc);
 
@@ -221,7 +222,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
      */
     protected void addSlider() {
         getChildren().add(text);
-        text.setTranslateY(popArcMenu.getMaxRadius() + 40);
+        text.setTranslateY(skinnable.getMaxRadius() + 40);
     }
 
     /**
@@ -306,7 +307,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
             // a bit further from the center.
             Point2D closerToCenterPoint = item
                     .getPolarCoordinates()
-                    .getLocationCloserToCenter(popArcMenu.getMinRadius());
+                    .getLocationCloserToCenter(skinnable.getMinRadius());
 
             // configuring the translate transition
             fromCenter.setFromX(closerToCenterPoint.getX());
@@ -329,21 +330,11 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
 
     
 
-    /**
-     *
-     * @param stackPane
-     */
-    public void detachFrom(Pane stackPane) {
-
-        if (stackPane.getChildren().contains(this)) {
-            stackPane.getChildren().remove(this);
-        }
-        
-    }
+  
 
     @Override
     public PopArcMenu getSkinnable() {
-        return popArcMenu;
+        return skinnable;
     }
 
     @Override
@@ -357,7 +348,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
 
     public void onMouseClick(MouseEvent event) {
         if(event.getTarget() == this)
-        popArcMenu.hide();
+        skinnable.hide();
         
     }
     
