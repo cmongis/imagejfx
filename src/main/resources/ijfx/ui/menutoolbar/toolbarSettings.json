@@ -1,37 +1,13 @@
 [
-
     {
         "name": "Math"
         ,
         "context": "image-open"
         ,
-        "icon": "BITCOIN"
+        "icon": "CALCULATOR"
         ,
         "items": [
-            {
-                "type": "Command"
-                ,
-                "label": "Divide"
-                ,
-                "action": "net.imagej.plugins.commands.assign.DivideDataValuesBy"
-                ,
-                "icon": "ANDROID"
-                ,
-                "context": "image-open"
-
-            },
-            {
-                "type": "Command"
-                ,
-                "label": "Multiply"
-                ,
-                "action": "net.imagej.plugins.commands.assign.MultiplyDataValuesBy"
-                ,
-                "icon": "/logo.png"
-                ,
-                "context": "image-open"
-
-            },
+            
             {
                 "type": "Command"
                 ,
@@ -39,31 +15,61 @@
                 ,
                 "action": "net.imagej.plugins.commands.assign.AddToDataValues"
                 ,
-                "icon": "/logo.png"
+                "icon": "char:+"
                 ,
                 "context": "image-open"
 
             },
-            {
+            
+             {
                 "type": "Command"
                 ,
                 "label": "Subtract"
                 ,
                 "action": "net.imagej.plugins.commands.assign.SubtractFromDataValues"
                 ,
-                "icon": "/logo.png"
+                "icon": "char:-"
+                ,
+                "context": "image-open"
+
+            },
+            
+            {
+                "type": "Command"
+                ,
+                "label": "Multiply"
+                ,
+                "action": "net.imagej.plugins.commands.assign.MultiplyDataValuesBy"
+                ,
+                "icon": "char:x"
+                ,
+                "context": "image-open"
+
+            },
+            
+            {
+                "type": "Command"
+                ,
+                "label": "Divide"
+                ,
+                "action": "net.imagej.plugins.commands.assign.DivideDataValuesBy"
+                ,
+                "icon": "char:/"
                 ,
                 "context": "image-open"
 
             }
+            
+            
+           
         ]
     },
     {
         "name": "Colors"
         ,
-        "context": "multichannel+image-open"
+        "context": "image-open"
         ,
-        "icon": "BITCOIN"
+        "icon": "PAINT_BRUSH"
         ,
         "items": [
             {
@@ -75,7 +81,7 @@
                 ,
                 "icon": "ANDROID"
                 ,
-                "context": "multichannel"
+                "context": "multi-channel-img"
 
             }
             ,
@@ -86,9 +92,9 @@
                 ,
                 "action": "net.imagej.plugins.commands.SeparateChannel"
                 ,
-                "icon": "ANDROID"
+                "icon": "USERS"
                 ,
-                "context": "multichannel rgb-image"
+                "context": "multi-channel-img rgb-image"
             }
             ,
             {
@@ -108,21 +114,30 @@
     , {
         "name": "Stacks"
         ,
-        "context": "multi-z-img"
+        "context": "multi-z-img multi-time-img"
         ,
-        "icon": "BITCOIN"
+        "icon": "STACK_OVERFLOW"
         ,
         "items": [
             {
                 "type": "Command"
                 ,
-                "label": "Add Data..."
+                "label": "Extract slices"
                 ,
-                "action": "net.imagej.plugins.commands.restructure.AddData"
+                "action": "net.imagej.plugins.commands.restructure.DeleteData"
                 ,
-                "icon": "preview"
+                "icon": "ANDROID"
                 ,
-                "context": "multi-z-img"
+                "context": "image-open"
+                
+            }
+            
+            ,{
+                "type":"Command"
+                ,"label":"Delete Slices"
+                ,"action":"ijfx.plugins.RemoveSlice"
+                ,"icon":"ANDROID"
+                ,"context":"image-open"
             }
             , {
                 "type": "Command"
@@ -133,7 +148,7 @@
                 ,
                 "icon": "ANDROID"
                 ,
-                "context": "multi-z-img"
+                "context": "image-open"
             }
             , {
                 "type": "Command"
@@ -144,7 +159,7 @@
                 ,
                 "icon": "ANDROID"
                 ,
-                "context": "multi-z-img"
+                "context": "image-open"
             }
         ]
     },
@@ -153,7 +168,7 @@
         ,
         "context": "image-open"
         ,
-        "icon": "BITCOIN"
+        "icon": "BULLSEYE"
         ,
         "items": [
             {
@@ -171,6 +186,78 @@
                     "sigma": 3
                     ,
                     "useUnits": false
+
+                }
+            },
+            
+            {
+                "type": "Command"
+                ,
+                "label": "Adaptive Median"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAdaptiveMedian"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Alpha Trimmed Mean"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAlphaTrimmedMean"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "neighTypeString": "RECTANGULAR_STRING"
+
+                }
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Geometric Mean"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionGeometricMean"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "neighTypeString": "RECTANGULAR_STRING"
+
+                }
+
+
+            }
+
+            ,
+            {
+                "type": "Command"
+                ,
+                "label": "Harmonic Mean"
+                ,
+                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionHarmonicMean"
+                ,
+                "icon": "preview"
+                ,
+                "context": "image-open"
+                ,
+                "parameters": {
+                    "neighTypeString": "RECTANGULAR_STRING"
 
                 }
             }
@@ -217,80 +304,6 @@
 
             }
 
-            ,
-            {
-                "type": "Command"
-                ,
-                "label": "Noise Reduction Adaptive Median"
-                ,
-                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAdaptiveMedian"
-                ,
-                "icon": "preview"
-                ,
-                "context": "image-open"
-
-
-            }
-
-            ,
-            {
-                "type": "Command"
-                ,
-                "label": "Noise Reduction Alpha Trimmed Mean"
-                ,
-                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAlphaTrimmedMean"
-                ,
-                "icon": "preview"
-                ,
-                "context": "image-open"
-                ,
-                "parameters": {
-                    "neighTypeString": "RECTANGULAR_STRING"
-
-                }
-
-
-            }
-
-            ,
-            {
-                "type": "Command"
-                ,
-                "label": "Noise Reduction Geometric Mean"
-                ,
-                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionGeometricMean"
-                ,
-                "icon": "preview"
-                ,
-                "context": "image-open"
-                ,
-                "parameters": {
-                    "neighTypeString": "RECTANGULAR_STRING"
-
-                }
-
-
-            }
-
-            ,
-            {
-                "type": "Command"
-                ,
-                "label": "Noise Reduction Harmonic Mean"
-                ,
-                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionHarmonicMean"
-                ,
-                "icon": "preview"
-                ,
-                "context": "image-open"
-                ,
-                "parameters": {
-                    "neighTypeString": "RECTANGULAR_STRING"
-
-                }
-
-
-            }
 
 
         ]
@@ -328,7 +341,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.ResizeImage"
                 ,
-                "icon": "ANDROID"
+                "icon": "EXPAND"
                 ,
                 "context": "image-open"
 
@@ -344,7 +357,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.RotateImageXY"
                 ,
-                "icon": "preview"
+                "icon": "REPEAT"
                 ,
                 "context": "image-open"
                 ,
@@ -363,7 +376,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.rotate.Rotate90DegreesRight"
                 ,
-                "icon": "preview"
+                "icon": "REPEAT"
                 ,
                 "context": "image-open"
 
@@ -378,7 +391,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.rotate.Rotate90DegreesLeft"
                 ,
-                "icon": "preview"
+                "icon": "UNDO"
                 ,
                 "context": "image-open"
 
@@ -393,7 +406,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.TranslateImage"
                 ,
-                "icon": "ANDROID"
+                "icon": "OUTDENT"
                 ,
                 "context": "image-open"
                 ,
@@ -413,7 +426,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.CropImage"
                 ,
-                "icon": "ANDROID"
+                "icon": "CROP"
                 ,
                 "context": "image-open"
 
@@ -428,7 +441,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.DuplicateImage"
                 ,
-                "icon": "ANDROID"
+                "icon": "FILES_O"
                 ,
                 "context": "image-open"
 
@@ -444,7 +457,7 @@
         ,
         "context": "image-open"
         ,
-        "icon": "BITCOIN"
+        "icon": "BARCODE"
         ,
         "items": [
             {
@@ -460,7 +473,7 @@
                 ,
                 "parameters": {
                     "method": "ToObject:net.imagej.threshold.DefaultThresholdMethod",
-                    "maskColor" : "Black"
+                    "maskColor": "Black"
                 }
 
             }
@@ -468,7 +481,7 @@
             {
                 "type": "Command"
                 ,
-                "label": "ErodeBinaryImage"
+                "label": "Erode"
                 ,
                 "action": "net.imagej.plugins.commands.binary.ErodeBinaryImage"
                 ,
@@ -482,14 +495,14 @@
             {
                 "type": "Command"
                 ,
-                "label": "DilateBinaryImage"
+                "label": "Dilate"
                 ,
                 "action": "net.imagej.plugins.commands.binary.DilateBinaryImage"
                 ,
                 "icon": "preview"
                 ,
                 "context": "binary"
-  
+
 
             }
             ,
