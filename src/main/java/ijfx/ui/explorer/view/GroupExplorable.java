@@ -23,10 +23,8 @@ import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.NumberUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -61,12 +59,13 @@ public class GroupExplorable<T> {
     }
 
     public void process() {
+        List<Explorable> list1D = new CopyOnWriteArrayList<>(filterExplorableWithList(listItems, metaDataList));
         sortListExplorable.setMetaData(metaDataList.get(0), metaDataList.get(1));
 
         size = 0;
         list3D.clear();
-        SortExplorableUtils.sort(metaDataList.get(2), filterExplorableWithList(listItems, metaDataList));
-        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, filterExplorableWithList(listItems, metaDataList));
+        SortExplorableUtils.sort(metaDataList.get(2), list1D);
+        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, list1D);
         list2D.stream().forEach((l2D) -> {
             sortListExplorable.setItems(l2D);
             sortListExplorable.process();

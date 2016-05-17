@@ -61,12 +61,12 @@ public class SortExplorableUtils {
     public static List<Integer> findLimits(String metaDataName, List<? extends Explorable> listItems) {
         List<Integer> limits = new ArrayList<>();
         limits.add(0);
-        
+        //TODO Cluestering
         for (int i = 0; i < listItems.size(); i++) {
             if (i == listItems.size() - 1) {
                 limits.add(i + 1);
             } else if (!SortExplorableUtils.getValueMetaData(listItems.get(i), metaDataName).equals(SortExplorableUtils.getValueMetaData(listItems.get(i + 1), metaDataName))) {
-                limits.add(i);
+                limits.add(i+1);
             }
         }
         return limits;
