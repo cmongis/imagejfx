@@ -21,7 +21,6 @@ package ijfx.ui.module.skin;
 
 import ijfx.plugins.DefaultInterval;
 import ijfx.plugins.LongInterval;
-import ijfx.plugins.RemoveSlice;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import javafx.beans.property.ObjectProperty;
@@ -30,11 +29,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import net.imagej.axis.AxisType;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
 import org.controlsfx.control.RangeSlider;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -117,20 +112,7 @@ public abstract class AbstractIntervalInputSkin<T extends LongInterval> extends 
             high = initialInterval.getHighValue();
             low = initialInterval.getLowValue();
 
-        /* // otherwise, the active image display is taken as
-        else {
-
-            try {
-                
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                min = 0;
-                max = 0;
-                high = 0;
-                low = 0;
-            }
-        }*/
+       
         
         rangeSlider.setMin(min);
         rangeSlider.setMax(max);
