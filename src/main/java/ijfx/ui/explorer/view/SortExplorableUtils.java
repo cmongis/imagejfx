@@ -31,11 +31,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Tuan anh TRINH
  */
 public class SortExplorableUtils {
-
+    
     public static String getValueMetaData(Explorable ex, String metaDataName) {
         return MetaData.metaDataSetToMap(ex.getMetaDataSet()).get(metaDataName);
     }
-
+    
     public static Comparator MetadataComparator(String metaDataName) {
         Comparator<? extends Explorable> comparator = (o1, o2) -> {
             String s1 = SortExplorableUtils.getValueMetaData(o1, metaDataName);
@@ -44,34 +44,36 @@ public class SortExplorableUtils {
         };
         return comparator;
     }
-
+    
     public static void create2DList(String metaDataName, List<List<? extends Explorable>> list2D, List<? extends Explorable> listItems) {
         list2D.clear();
-        List<Integer> limits = new ArrayList<>();
-        limits.add(0);
-
-        for (int i = 0; i < listItems.size(); i++) {
-            if (i == listItems.size() - 1) {
-                limits.add(i + 1);
-            } else if (!SortExplorableUtils.getValueMetaData(listItems.get(i), metaDataName).equals(SortExplorableUtils.getValueMetaData(listItems.get(i + 1), metaDataName))) {
-                limits.add(i);
-            }
-        }
-
+        List<Integer> limits = findLimits(metaDataName, listItems);
+        
         for (int j = 0; j < limits.size() - 1; j++) {
             List<? extends Explorable> l = new CopyOnWriteArrayList<>(listItems.subList(limits.get(j), limits.get(j + 1)));
-            if (!l.isEmpty())
-            {
-            list2D.add(l);
+            if (!l.isEmpty()) {
+                list2D.add(l);
                 
             }
         }
     }
     
-    
-    
-        public static void sort(String metaDataName, List<? extends Explorable> listItems) {
-            //Cannot use method reference, has to give the metaDataName
+    public static List<Integer> findLimits(String metaDataName, List<? extends Explorable> listItems) {
+        List<Integer> limits = new ArrayList<>();
+        limits.add(0);
+        //TODO Cluestering
+        for (int i = 0; i < listItems.size(); i++) {
+            if (i == listItems.size() - 1) {
+                limits.add(i + 1);
+            } else if (!SortExplorableUtils.getValueMetaData(listItems.get(i), metaDataName).equals(SortExplorableUtils.getValueMetaData(listItems.get(i + 1), metaDataName))) {
+                limits.add(i+1);
+            }
+        }
+        return limits;
+    }
+
+    public static void sort(String metaDataName, List<? extends Explorable> listItems) {
+        //Cannot use method reference, has to give the metaDataName
         listItems.sort(SortExplorableUtils.MetadataComparator(metaDataName));
     }
     

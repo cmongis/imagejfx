@@ -23,8 +23,8 @@ import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.NumberUtils;
 
 /**
  *
@@ -59,12 +59,13 @@ public class GroupExplorable<T> {
     }
 
     public void process() {
+        List<Explorable> list1D = new CopyOnWriteArrayList<>(filterExplorableWithList(listItems, metaDataList));
         sortListExplorable.setMetaData(metaDataList.get(0), metaDataList.get(1));
 
         size = 0;
         list3D.clear();
-        SortExplorableUtils.sort(metaDataList.get(2), filterExplorable(listItems, metaDataList));
-        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, filterExplorable(listItems, metaDataList));
+        SortExplorableUtils.sort(metaDataList.get(2), list1D);
+        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, list1D);
         list2D.stream().forEach((l2D) -> {
             sortListExplorable.setItems(l2D);
             sortListExplorable.process();
@@ -76,11 +77,29 @@ public class GroupExplorable<T> {
         });
     }
 
-    public List<Explorable> filterExplorable(List<Explorable> arrayList, List<String> metaData) {
+    public boolean checkNumber(String metaData){
+        if (!NumberUtils.isNumber(SortExplorableUtils.getValueMetaData(listItems.get(0), metaData))){
+            return true;
+        }
+        else
+        {
+            List<Explorable> filtered = filterExplorable(listItems, metaData);
+            SortExplorableUtils.sort(metaData, filtered);
+            return SortExplorableUtils.findLimits(metaData, filtered).size() <= 10;
+        }
+    }
+    
+     public List<Explorable> filterExplorableWithList(List<Explorable> arrayList, List<String> metaData) {
         return arrayList.stream().filter(p -> {
             return metaData.stream().allMatch(m ->  p
                     .getMetaDataSet()
                     .containsKey(m));
+        }).collect(Collectors.toList());
+    }
+       
+    public List<Explorable> filterExplorable(List<Explorable> arrayList, String metaData) {
+        return arrayList.stream().filter(p -> {
+            return p.getMetaDataSet().containsKey(metaData);
         }).collect(Collectors.toList());
     }
 

@@ -19,14 +19,12 @@
  */
 package mongis.utils.panecell;
 
+import ijfx.ui.explorer.Explorable;
 import ijfx.ui.main.ImageJFX;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -38,6 +36,7 @@ import javafx.collections.ObservableSet;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -113,7 +112,7 @@ public class PaneCellController<T extends Object> {
 
     }
 
-    public synchronized void update3DList(List<List<List<T>>> items, int size) {
+    public synchronized void update3DList(List<List<List<T>>> items, int size, List<String> metaDatas) {
         new AsyncCallback<Integer, List<PaneCell<T>>>()
                 .setInput(size)
                 .run(this::retrieve)
@@ -128,10 +127,18 @@ public class PaneCellController<T extends Object> {
                             for (int j = 0; j < items.get(x).get(i).size(); j++) {
                                 gridPane.add(controllers.get(cpt).getContent(), j, i);
                                 controllers.get(cpt).setItem(items.get(x).get(i).get(j));
+                                String informations = "";
+                                for (String metaData : metaDatas) {
+                                    informations = informations + metaData + " = " + ((Explorable) items.get(x).get(i).get(j)).getMetaDataSet().get(metaData).getStringValue() + "\n";
+                                }
+                                Tooltip tooltip = new Tooltip(informations);
+                                Tooltip.install(controllers.get(cpt).getContent(), tooltip);
                                 cpt++;
 
                             }
                         }
+                        gridPane.getStyleClass().add("grid-pane-view");
+
                         pane.getChildren().add(gridPane);
 
                     }
