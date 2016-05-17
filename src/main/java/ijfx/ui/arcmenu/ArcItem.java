@@ -126,12 +126,12 @@ public class ArcItem<T> extends Control {
      */
     ArrayList<T> choices;
 
-    ArcMenu arcMenu;
+    PopArcMenu arcMenu;
 
     /**
      *
      */
-    public static final double DEFAULT_SLIDER_WIDTH = 300;
+    public static final double DEFAULT_SLIDER_WIDTH = 200;
 
     public DoubleProperty sliderWidth = new SimpleDoubleProperty(DEFAULT_SLIDER_WIDTH);
 
@@ -379,7 +379,7 @@ public class ArcItem<T> extends Control {
      *
      * @return
      */
-    public ArcMenu getArcMenu() {
+    public PopArcMenu getArcMenu() {
         return arcMenu;
     }
 
@@ -387,7 +387,7 @@ public class ArcItem<T> extends Control {
      *
      * @param arcRenderer
      */
-    public void setArcRenderer(ArcMenu arcRenderer) {
+    public void setArcRenderer(PopArcMenu arcRenderer) {
         this.arcMenu = arcRenderer;
     }
 
@@ -395,8 +395,8 @@ public class ArcItem<T> extends Control {
      *
      */
     public void subscribeEvents() {
-        addEventHandler(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
-        addEventHandler(MouseEvent.MOUSE_RELEASED, onMouseReleased);
+        addEventHandler(MouseEvent.MOUSE_DRAGGED, this::onMouseDragged);
+        addEventHandler(MouseEvent.MOUSE_RELEASED, this::onMouseReleased);
 
         slideProperty().addListener((obj, oldValue, newValue) -> {
 
@@ -414,9 +414,9 @@ public class ArcItem<T> extends Control {
         });
 
         // makes sure that the tick hash map is always up to date
-        sliderMinValue.addListener(tickUpdater);
-        sliderMaxValue.addListener(tickUpdater);
-        sliderTick.addListener(tickUpdater);
+        sliderMinValue.addListener(this::onTickChanged);
+        sliderMaxValue.addListener(this::onTickChanged);
+        sliderTick.addListener(this::onTickChanged);
 
         translateXProperty().addListener((event, oldValue, newValue) -> placeLabel(newValue.doubleValue()));
         translateYProperty().addListener((event, oldValue, newValue) -> placeLabel(newValue.doubleValue()));
@@ -430,12 +430,14 @@ public class ArcItem<T> extends Control {
      */
     public void placeLabel(double value) {
         if (isSliding.get()) {
-
+            
             selectionLabel.setTranslateX(getTranslateX());
             selectionLabel.setTranslateY(getTranslateY() + getHeight() + ImageJFX.MARGIN);
         } else {
-            selectionLabel.setTranslateX(getPolarCoordinates().getLocationCloserToCenter(-10).getX());
+            //selectionLabel.setTranslateX(getPolarCoordinates().getLocationCloserToCenter(-10).getX());
             selectionLabel.setTranslateY(getPolarCoordinates().getLocationCloserToCenter(-10).getY());
+            
+            selectionLabel.setTranslateY(getTranslateY() + getHeight() + ImageJFX.MARGIN);
         }
     }
 
@@ -459,15 +461,17 @@ public class ArcItem<T> extends Control {
      *
      */
     public void unsubscribeEvents() {
-        removeEventHandler(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
-        removeEventHandler(MouseEvent.MOUSE_RELEASED, onMouseReleased);
+        removeEventHandler(MouseEvent.MOUSE_DRAGGED, this::onMouseDragged);
+        removeEventHandler(MouseEvent.MOUSE_RELEASED, this::onMouseReleased);
     }
 
     MouseEvent lastEvent = null;
     MouseEvent firstEvent = null;
 
     // event used for sliding
-    EventHandler<MouseEvent> onMouseDragged = (javafx.scene.input.MouseEvent event) -> {
+    
+    public void onMouseDragged(MouseEvent event) {
+  
 
         if (getType() == ArcItemType.CLICK) {
             return;
@@ -486,13 +490,15 @@ public class ArcItem<T> extends Control {
             double diff = event.getScreenX() - lastEvent.getScreenX();
 
             double newSliderValue = sliderRatio.get() + diff / sliderWidth.getValue();
-
+            System.out.println(diff);
             if (newSliderValue < 0.0 || newSliderValue > 1.0) {
                 event.consume();
                 return;
             }
+            
+            
             setTranslateX(getTranslateX() + diff);
-
+            //setTranslateX(getPolarCoordinates().getX() + diff);
             sliderRatio.set(newSliderValue);
 
         }
@@ -500,14 +506,26 @@ public class ArcItem<T> extends Control {
         displayBar();
         event.consume();
 //
-    };
+    }
     //event used for button click
-    EventHandler<MouseEvent> onMouseReleased = event -> {
+    
+    private void getLabelTranslateX() {
+        
+    }
+    
+    private void onMouseReleased(MouseEvent event) {
+    
 
         TranslateTransition backToOrigin = new TranslateTransition(Duration.millis(200), this);
         backToOrigin.setFromX(getTranslateX());
         backToOrigin.setToX(getPolarCoordinates().getX());
         backToOrigin.play();
+        
+        backToOrigin = new TranslateTransition(Duration.millis(200), selectionLabel);
+        backToOrigin.setFromX(getTranslateX());
+        backToOrigin.setToX(getPolarCoordinates().getX());
+        backToOrigin.play();
+        
         lastEvent = null;
         firstEvent = null;
         hideBar();
@@ -516,12 +534,10 @@ public class ArcItem<T> extends Control {
         event.consume();
     };
 
-    ChangeListener<Number> tickUpdater = new ChangeListener<Number>() {
-
-        @Override
-        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+    private void onTickChanged(ObservableValue<? extends Number> obs, Number oldValue, Number newValue) {
+  
             rebuildTickHashMap();
-        }
+        
     };
 
     Group bar;
@@ -532,7 +548,7 @@ public class ArcItem<T> extends Control {
     protected double originalValue;
 
     /**
-     *
+     * Displays the bar so the current value is centered on the slide departure
      */
     public void displayBar() {
 
@@ -558,7 +574,7 @@ public class ArcItem<T> extends Control {
             });
         }
 
-        bar.setTranslateX(getPolarCoordinates().getX() + getTranslateValue());
+        bar.setTranslateX(getTranslateValue());
         bar.setTranslateY(getPolarCoordinates().getY());
 
         //adding the bar
@@ -640,7 +656,7 @@ public class ArcItem<T> extends Control {
      * @param xdiff
      * @param ydiff
      */
-    public void centerDependingOn(Node origin, Node toPlace, double xdiff, double ydiff) {
+    private void centerDependingOn(Node origin, Node toPlace, double xdiff, double ydiff) {
         
         double x = origin.getTranslateX();
         
@@ -675,8 +691,7 @@ public class ArcItem<T> extends Control {
     private double getTranslateValue() {
       
         final double sliderW = sliderWidth.getValue();
-
-        return (sliderW / 2) - sliderRatio.get() * sliderW;
+        return sliderW/2 - (sliderRatio.get() * sliderW) + (getWidth() * Math.signum(polarCoordinates.getX()));
     }
 
     // the closer choice is the sliderTick sliderValue from the brut sliderValue

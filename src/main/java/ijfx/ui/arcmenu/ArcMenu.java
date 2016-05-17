@@ -20,10 +20,8 @@
  */
 package ijfx.ui.arcmenu;
 
-import ijfx.ui.arcmenu.skin.ArcItemCircleSkin;
 import ijfx.ui.main.ImageJFX;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import javafx.animation.ParallelTransition;
@@ -31,14 +29,16 @@ import javafx.animation.Transition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import ijfx.ui.context.animated.Animations;
+import java.util.List;
+import javafx.beans.Observable;
+import javafx.scene.Node;
+import javafx.scene.control.Skin;
 import javafx.scene.layout.Pane;
 
 /**
@@ -55,26 +55,25 @@ import javafx.scene.layout.Pane;
  *
  * @author Cyril MONGIS
  */
-public class ArcMenu extends StackPane {
+public class ArcMenu extends StackPane implements ArcMenuSkin{
 
-    double minRadius = 45.0f;
-    double maxRadius = 70.0f;
-    double centerX = 0.0f;
-    double centerY = 0.0f;
-
-    ArrayList<ArcItem> items = new ArrayList<>();
+   
+   
+    
 
     Logger logger = ImageJFX.getLogger();
 
-    Text text = new Text();
 
+    PopArcMenu popArcMenu;
+    
+    
+     Text text = new Text();
     /**
      *
      */
     protected boolean isAnimating = false;
 
     // attached stack pane
-    Pane attachedPane = null;
 
     /**
      *
@@ -84,116 +83,87 @@ public class ArcMenu extends StackPane {
     /**
      * Creates a ArcMenu. T
      */
-    public ArcMenu() {
+    public ArcMenu(PopArcMenu menu) {
         super();
 
         getStyleClass().addAll("arc-group");
         setVisible(true);
-        setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        //attachedPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         text.setFill(Color.WHITE);
 
+        popArcMenu = menu;
+        setStyle("-fx-background-color:null");
+        setPrefWidth(300);
+        setPrefHeight(300);
+        menu.showingProperty().addListener(this::toggle);
+        //setSkin(new ArcMenuSk());
+        
+        
+        addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
+        
+    }
+    
+    
+    
+    public List<ArcItem> getItems() {
+        return getSkinnable().getItems();
     }
 
-    /**
-     * Add an ArcMenuItem
-     *
-     * @param item
-     * @return the menu iteself
-     */
-    public ArcMenu addItem(ArcItem item) {
-        items.add(item);
+   
 
-        item.setArcRenderer(this);
-        item.setSkin(new ArcItemCircleSkin(item));
+    
+    public Node getRoot() {
         return this;
     }
-
-    /**
-     *
-     * @param items
-     */
-    public void addAll(ArcItem... items) {
-        for (ArcItem item : items) {
-            addItem(item);
-        }
-
-    }
+    
+   
 
     /**
      *
      * @param pane
      */
     public void attachedTo(Pane pane) {
-        attachedPane = pane;
-        attachedPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            toggle(event);
-
-        });
+        //attachedPane = pane;
+        //attachedPane.addEventHandler(MouseEvent.MOUSE_CLICKED,this::toggle);
     }
 
+  
+    boolean isShowing = false;
+    
     /**
      *
      * @param event
      */
-    public void toggle(MouseEvent event) {
+    public void toggle(Observable obs, Boolean oldvalue, Boolean show) {
 
         logger.info("Toggling");
-
+        prefWidth(400);
+        prefHeight(400);
         // if not pane is attached, we return
-        if (attachedPane == null || isAnimating) {
+        if (isAnimating) {
             return;
         }
 
         // cheking if the attached pane is already showing the element
-        if (attachedPane.getChildren().contains(this) && event.getEventType() == MouseEvent.MOUSE_CLICKED) {
+        if (!show) {
 
             logger.info("Hiding");
 
             // creating the fading transition that removes the object
             Transition transition = Animations.FADEOUT.configure(this, ANIMATION_SPEED);
 
-            // when the transition is over, the pane is removed
-            transition.setOnFinished(evt -> {
-                attachedPane.getChildren().remove(this);
-                text.setText("");
-            });
+           
 
             transition.play();
+ 
         } else {
 
             logger.info("Showing");
-
-            //if it wasn't a right button, we abort the function
-            if (event.getButton() != MouseButton.SECONDARY) {
-                logger.info("It wasn't the right button");
-                return;
-            }
-            // adding the element to the pane
-            attachedPane.getChildren().add(this);
-
             // setting the opacity
             this.setOpacity(1.0);
 
-            // getting the width and height of the pane to calculate the translation
-            // of the center (the group we be placed at the center by the stackpane)
-            double paneWidth = attachedPane.widthProperty().getValue();
-            double paneHeight = attachedPane.heightProperty().getValue();
-
-            // calculating the distance to the center of the pane and the mouse event
-            double xToCenter =  event.getX();//-paneWidth / 2 + event.getX();
-           // xToCenter *= attachedPane.getScaleX();
-            double yToCenter = event.getY(); //paneHeight / 2 + event.getY();
-           // yToCenter *= 1 / attachedPane.getScaleY();
-
-            
-            //this.setLayoutX(centerX);
-            //this.setLayoutY(centerY);
-            
-            // setting the translation 
-            this.setTranslateX(xToCenter-(getWidth())/2);
-            this.setTranslateY(yToCenter-(getHeight()/2));
-
             animate();
+            
         }
     }
 
@@ -201,11 +171,18 @@ public class ArcMenu extends StackPane {
      *
      */
     public void build() {
+        
+        List<ArcItem> items = getItems();
+        
         double itemLength = 360f / items.size();
         getChildren().clear();
 
         double margin = 7;
 
+        double minRadius = popArcMenu.getMinRadius();
+        double maxRadius = popArcMenu.getMaxRadius();
+        
+        
         for (int i = 0; i != items.size(); i++) {
 
             // calculating the start angle
@@ -221,7 +198,7 @@ public class ArcMenu extends StackPane {
             shape.getStyleClass().add("arc-item");
 
             //setting the polar system and coordinates (easier to get x and y);
-            PolarSystem ps = new PolarSystem(centerX, centerY);
+            PolarSystem ps = new PolarSystem(popArcMenu.getCenterX(), popArcMenu.getCenterY());
             PolarCoord pc = new PolarCoord(ps, minRadius + ((maxRadius - minRadius) / 2), itemCenter);
             shape.setPolarCoordinates(pc);
 
@@ -244,7 +221,7 @@ public class ArcMenu extends StackPane {
      */
     protected void addSlider() {
         getChildren().add(text);
-        text.setTranslateY(maxRadius + 40);
+        text.setTranslateY(popArcMenu.getMaxRadius() + 40);
     }
 
     /**
@@ -268,7 +245,7 @@ public class ArcMenu extends StackPane {
      */
     protected void animateOtherThan(ArcItem excludedItemCtrl, Animations animation) {
 
-        items.forEach(itemCtrl -> {
+        getItems().forEach(itemCtrl -> {
             if (itemCtrl == excludedItemCtrl) {
                 return;
             }
@@ -309,9 +286,9 @@ public class ArcMenu extends StackPane {
         animation.setOnFinished(event -> isAnimating = false);
 
         // for 0 to n-items
-        IntStream.range(0, items.size()).forEach(index -> {
+        IntStream.range(0, getItems().size()).forEach(index -> {
 
-            ArcItem item = items.get(index);
+            ArcItem item = getItems().get(index);
             // we make the item invisible
             item.setOpacity(0);
 
@@ -329,7 +306,7 @@ public class ArcMenu extends StackPane {
             // a bit further from the center.
             Point2D closerToCenterPoint = item
                     .getPolarCoordinates()
-                    .getLocationCloserToCenter(minRadius);
+                    .getLocationCloserToCenter(popArcMenu.getMinRadius());
 
             // configuring the translate transition
             fromCenter.setFromX(closerToCenterPoint.getX());
@@ -348,77 +325,9 @@ public class ArcMenu extends StackPane {
         animation.play();
     }
 
-    /**
-     *
-     * @return
-     */
-    public double getMinRadius() {
-        return minRadius;
-    }
+   
 
-    /**
-     *
-     * @param minRadius
-     */
-    public void setMinRadius(double minRadius) {
-        this.minRadius = minRadius;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public double getMaxRadius() {
-        return maxRadius;
-    }
-
-    /**
-     *
-     * @param maxRadius
-     */
-    public void setMaxRadius(double maxRadius) {
-        this.maxRadius = maxRadius;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public double getCenterX() {
-        return centerX;
-    }
-
-    /**
-     *
-     * @param centerX
-     */
-    public void setCenterX(double centerX) {
-        this.centerX = centerX;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public double getCenterY() {
-        return centerY;
-    }
-
-    /**
-     *
-     * @param centerY
-     */
-    public void setCenterY(double centerY) {
-        this.centerY = centerY;
-    }
-
-    int getItemPosition(ArcItem item) {
-        return items.indexOf(item);
-    }
-
-    int getItemCount() {
-        return items.size();
-    }
+    
 
     /**
      *
@@ -429,7 +338,27 @@ public class ArcMenu extends StackPane {
         if (stackPane.getChildren().contains(this)) {
             stackPane.getChildren().remove(this);
         }
-        this.attachedPane = null;
+        
     }
 
+    @Override
+    public PopArcMenu getSkinnable() {
+        return popArcMenu;
+    }
+
+    @Override
+    public Node getNode() {
+        return this;
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    public void onMouseClick(MouseEvent event) {
+        if(event.getTarget() == this)
+        popArcMenu.hide();
+        
+    }
+    
 }
