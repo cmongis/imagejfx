@@ -85,7 +85,7 @@ public class GroupExplorable<T> {
         {
             List<Explorable> filtered = filterExplorable(listItems, metaData);
             SortExplorableUtils.sort(metaData, filtered);
-            return SortExplorableUtils.findLimits(metaData, filtered).size() <= 10;
+            return SortExplorableUtils.findLimits(metaData, filtered).size() <= 25;
         }
     }
     
