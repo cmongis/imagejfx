@@ -27,6 +27,7 @@ import ijfx.ui.plugin.LUTComboBox;
 import ijfx.ui.plugin.LUTView;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.ui.FxImageService;
+import ijfx.service.ui.LoadingScreenService;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -63,6 +64,8 @@ import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.project_manager.search.PopoverToggleButton;
 import javafx.beans.Observable;
+import javafx.concurrent.Task;
+import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
 
@@ -113,6 +116,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @Parameter
     DatasetService datasetService;
 
+    @Parameter
+    LoadingScreenService loadingService;
+    
     Node lutPanelCtrl;
 
     @FXML
@@ -339,9 +345,18 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @FXML
     private void autoRange(ActionEvent event) {
 
-        displayRangeServ.autoRange();
-        updateViewRangeFromModel();
+        Task task = 
+        new AsyncCallback()
+                .setName("Auto-contrast...")
+                .run(displayRangeServ::autoRange)
+                .then(o->{
+                  updateViewRangeFromModel();
         updateLabel();
+                }).start();
+        
+        loadingService.frontEndTask(task);
+       // displayRangeServ.autoRange();
+      
     }
 
 }
