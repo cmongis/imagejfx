@@ -27,7 +27,9 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.context.PaneContextualView;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
+import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -67,6 +69,9 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     
     @Parameter
     TimerService stopWatchService;
+    
+    
+    Logger logger = ImageJFX.getLogger();
     
     private PopOver popOver;
     private JsonReader jsonReader;
@@ -141,6 +146,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.maxWidthProperty().bind(this.getScene().widthProperty());
         pane.setMinWidth(popOver.minWidthProperty().getValue());
         pane.setMaxWidth(popOver.minWidthProperty().getValue());
+       
         popOver.setDetached(false);
         popOver.setDetachable(false);
         popOver.setHideOnEscape(true);
@@ -180,14 +186,16 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      */
     public void onEnter(LabelCategory labelCategory) {
         
-        System.out.println("activating !");
+        logger.info("Activating category : "+labelCategory.getText());
         
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCellPreview paneIconCellPreview = (PaneIconCellPreview) e;
-
+            
+            //paneIconCellPreview
+            
             //Has to use forceUpdateImage
-            paneIconCellPreview.updateImageAsync(paneIconCellPreview.getItem());
-
+            //paneIconCellPreview.updateImageAsync(paneIconCellPreview.getItem());
+            paneIconCellPreview.forceImageUpdate();
             paneIconCellPreview.setSubtitleVisible(false);
         });
         if (!labelCategory.getPane().getChildren().isEmpty()) {
