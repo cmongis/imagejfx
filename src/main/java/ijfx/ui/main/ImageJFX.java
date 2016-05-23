@@ -113,13 +113,14 @@ public class ImageJFX extends Application {
             getLogger().info(new File("./plugins").getAbsolutePath());
             // System.setProperty("imagej.dir","/Applications/Fiji.app/");
             // System.setProperty("plugins.dir","plugins/");
+            
+            //loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
+            //root = loader.load();
 
-            loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
-            root = loader.load();
+            controller = new MainWindowController();//loader.<MainWindowController>getController();
 
-            controller = loader.<MainWindowController>getController();
-
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(controller);
+           
             scene.getStylesheets().add(getStylesheet());
             
             // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Open+Sans");
@@ -135,6 +136,8 @@ public class ImageJFX extends Application {
                 }
             });
             primaryStage.show();
+            controller.setScene(scene);
+            Platform.runLater(controller::init);
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         }
