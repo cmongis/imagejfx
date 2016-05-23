@@ -90,7 +90,7 @@ public class LoadingPopupSkinBase extends StackPane implements Skin<LoadingPopup
         
         finishButton.translateXProperty().bind(Bindings.createDoubleBinding(this::getFinishButtonX, widthProperty(),skinnable.showingProperty()));
         
-        progressBar.progressProperty().add(skinnable.progressProperty());
+        progressBar.progressProperty().bind(skinnable.progressProperty());
         
         getStyleClass().add("dark-background");
         

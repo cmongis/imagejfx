@@ -62,13 +62,15 @@ public class LoadingPopup extends PopupControl {
 
     private final BooleanProperty taskRunningProperty = new SimpleBooleanProperty();
 
+    Scene lastScene;
+
     public LoadingPopup() {
         super();
 
         setSkin(new LoadingPopupSkinBase(this));
         taskProperty.addListener(this::onTaskChanged);
-        taskRunningProperty.addListener(this::onTaskFinished);
-        
+        taskRunningProperty.addListener(this::onRunningPropertyChanged);
+
     }
 
     public LoadingPopup setOnCancel(EventHandler<? extends ActionEvent> eventHandler) {
@@ -93,20 +95,25 @@ public class LoadingPopup extends PopupControl {
 
     public void onTaskChanged(Observable obs, Task oldValue, Task task) {
 
-        if (task == null) {
-            messageProperty.unbind();
-            progressProperty.unbind();
-            canCancelProperty.unbind();
-            
+       
 
-        } else {
+        messageProperty.unbind();
+        progressProperty.unbind();
+        canCancelProperty.unbind();
+        taskRunningProperty.unbind();
+        if (task != null) {
+            if (task.isRunning() && showingProperty().getValue() == false) {
+                showOnScene(lastScene);
+            }
+
             bindMessageProperty(task.messageProperty());
+
             bindProgressProperty(task.progressProperty());
             setOnCancel(this::cancelCurrentTask);
-            
+
             taskRunningProperty.bind(task.runningProperty());
             showCloseButton.bind(taskRunningProperty.not());
-            
+
         }
 
     }
@@ -129,15 +136,19 @@ public class LoadingPopup extends PopupControl {
     }
 
     public LoadingPopup showOnScene(Scene scene) {
-
-       // Scene scene = node.getScene();
+        lastScene = scene;
         
+        if(taskProperty.getValue() != null && taskProperty.getValue().isDone()) {
+            return this;
+        }
+        
+        // Scene scene = node.getScene();
         //super.show(node.getScene().getWindow());
         super.show(scene.getWindow());
         double px, py, pw, ph, ww, wh;
-        
-        setPrefWidth(scene.getWidth());
-        setPrefHeight(scene.getHeight());
+
+        setPrefWidth(500);
+        setPrefHeight(500);
 
         // width and height of the window
         ww = scene.getWindow().getWidth();
@@ -152,7 +163,7 @@ public class LoadingPopup extends PopupControl {
         py = scene.getWindow().getY();
 
         px += (ww / 2) - (pw / 2);
-        py += (wh / 2) - (ph / 2)+15;
+        py += (wh / 2) - (ph / 2) + 15;
         setAnchorX(px);
         setAnchorY(py);
         getScene().getWindow().setX(px);
@@ -160,8 +171,6 @@ public class LoadingPopup extends PopupControl {
         //super.show(scene.getWindow(), px, py);
         return this;
     }
-    
-    
 
     /*
      *  Properties
@@ -181,39 +190,40 @@ public class LoadingPopup extends PopupControl {
     public BooleanProperty showCloseButtonProperty() {
         return showCloseButton;
     }
-    
+
     public ReadOnlyBooleanProperty taskRunningProperty() {
         return taskRunningProperty;
     }
 
-    public PopupWindow closeOnFinished() {
+    public LoadingPopup closeOnFinished() {
         return closeOnFinished(Boolean.TRUE);
     }
 
-    public PopupWindow closeOnFinished(Boolean closeOnFinished) {
+    public LoadingPopup closeOnFinished(Boolean closeOnFinished) {
         this.closeOnFinished.setValue(closeOnFinished);
         return this;
     }
 
-    public void onTaskFinished(Observable obs, Boolean oldValue, Boolean newValue) {
-        System.out.println("Task finished !");
-        if(oldValue == true && newValue == false) {
+    public void onRunningPropertyChanged(Observable obs, Boolean oldValue, Boolean newValue) {
+
+        System.out.println("Task property changed : " + newValue);
+
+        if (oldValue == true && newValue == false) { // task is finished
             taskRunningProperty.unbind();
-            System.out.println("close on finished ? "+closeOnFinished.getValue());
-            if(closeOnFinished.getValue()) {
+            System.out.println("close on finished ? " + closeOnFinished.getValue());
+            if (closeOnFinished.getValue()) {
                 hide();
             }
-        }
-        else if(newValue == true && isShowing() == false){
+        } else if (newValue == true && isShowing() == false) { // the task started running
             showOnScene(coveredNode.getValue().getScene());
         }
-        
+
     }
 
     public LoadingPopup showOnStart(Node node) {
         coveredNode.setValue(node);
         return this;
-        
+
     }
 
 }

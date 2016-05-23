@@ -60,7 +60,7 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         this.callback = callback;
     }
 
-    public AsyncCallback setName(String name) {
+    public AsyncCallback<INPUT,OUTPUT> setName(String name) {
         updateTitle(name);
         updateMessage(name);
         return this;

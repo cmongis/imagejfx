@@ -97,6 +97,7 @@ public class PaneCellController<T extends Object> {
 
         Task task = new AsyncCallback<Integer, List<PaneCell<T>>>()
                 .setInput(items.size())
+                .setName("Loading...")
                 .run(this::retrieve)
                 .then(controllers -> {
                     MercuryTimer timer = new MercuryTimer("Browser view");
