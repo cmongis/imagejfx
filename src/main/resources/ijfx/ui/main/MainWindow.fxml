@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.*?>
 
-<AnchorPane fx:id="mainAnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ijfx.ui.main.MainWindowController">
+<fx:root fx:id="mainAnchorPane" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
    
    <BorderPane fx:id="mainBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -109,4 +109,4 @@
          </bottom>
       </BorderPane>
    </children>
-</AnchorPane>
+</fx:root>

@@ -43,10 +43,10 @@ public class FakeTask<T> extends Task<T> {
         super();
     }
     
-    public FakeTask(int totalTime) {
+    public FakeTask(int totalTimeinMilliseconds) {
         this();
         
-        this.totalTime = totalTime;
+        this.totalTime = totalTimeinMilliseconds;
     }
     
     public FakeTask(T fakeResult) {

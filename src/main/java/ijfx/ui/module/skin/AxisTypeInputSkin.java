@@ -73,7 +73,7 @@ public class AxisTypeInputSkin extends AbstractInputSkinPlugin<AxisType> {
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        System.out.println("can i handle ?" + clazz);
+        
         return clazz == AxisType.class;
     }
 

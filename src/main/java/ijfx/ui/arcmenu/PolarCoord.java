@@ -20,38 +20,64 @@
  */
 package ijfx.ui.arcmenu;
 
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 
 // class used to switch between polar and cartesian coordinates.
 public class PolarCoord {
 
-    PolarSystem ps;
-    double angle;
-    double radius;
+    private final PolarSystem ps;
+    private final DoubleProperty angle = new SimpleDoubleProperty();
+    private final DoubleProperty radius = new SimpleDoubleProperty();
 
+    
+    
+    private final DoubleBinding xProperty;
+    private final DoubleBinding yProperty;
+    
     
     
     
     public PolarCoord(PolarSystem ps, double radius, double angle) {
-        this.angle = angle;
-        this.radius = radius;
+        this.angle.setValue(angle);
+        this.radius.setValue(radius);
         this.ps = ps;
+        
+        xProperty = Bindings.createDoubleBinding(this::getX, ps.centerXProperty(),ps.centerYProperty(),this.angle,this.radius);
+        yProperty = Bindings.createDoubleBinding(this::getY, ps.centerXProperty(),ps.centerYProperty(),this.angle,this.radius);
     }
 
     public Point2D getPointLocation() {
-        return ps.degreeToPolar(radius, angle);
+        return ps.degreeToPolar(radius.getValue(), angle.getValue());
     }
 
-    public double getX() {
+    private double getX() {
+        System.out.println("Getting the x ?");
+        System.out.println(ps.centerXProperty().getValue());
         return getPointLocation().getX();
     }
 
-    public double getY() {
+    private double getY() {
         return getPointLocation().getY();
     }
 
+    public DoubleBinding xProperty() {
+        
+        return xProperty;
+        
+    }
+    public DoubleBinding yProperty() {
+        return yProperty;
+    }
+    
+    
     public Point2D getLocationCloserToCenter(double xFromShape) {
-        return ps.degreeToPolar(radius - xFromShape, angle);
+        return ps.degreeToPolar(radius.getValue() - xFromShape, angle.getValue());
     }
 
 }

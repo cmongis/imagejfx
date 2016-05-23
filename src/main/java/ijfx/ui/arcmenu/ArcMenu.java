@@ -38,7 +38,6 @@ import ijfx.ui.context.animated.Animations;
 import java.util.List;
 import javafx.beans.Observable;
 import javafx.scene.Node;
-import javafx.scene.control.Skin;
 import javafx.scene.layout.Pane;
 
 /**
@@ -86,13 +85,13 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
     public ArcMenu(PopArcMenu skinnable) {
         super();
 
-        getStyleClass().addAll("arc-group");
+        
         setVisible(true);
         //attachedPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         text.setFill(Color.WHITE);
-
+        
         this.skinnable = skinnable;
-        setStyle("-fx-background-color:blue");
+        
       
         this.skinnable.showingProperty().addListener(this::toggle);
         //setSkin(new ArcMenuSk());
@@ -136,7 +135,10 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
      * @param event
      */
     public void toggle(Observable obs, Boolean oldvalue, Boolean show) {
-
+        
+        
+        
+        
         logger.info("Toggling");
         prefWidth(500);
         prefHeight(500);
@@ -171,15 +173,20 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
     /**
      *
      */
+    
+    boolean build = false;
+    
     public void build() {
+        
+        
+        if(build) return;
         
         List<ArcItem> items = getItems();
         
         double itemLength = 360f / items.size();
         getChildren().clear();
 
-        double margin = 7;
-
+    
         double minRadius = skinnable.getMinRadius();
         double maxRadius = skinnable.getMaxRadius();
         
@@ -199,13 +206,12 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
             shape.getStyleClass().add("arc-item");
 
             //setting the polar system and coordinates (easier to get x and y);
-            PolarSystem ps = new PolarSystem(skinnable.getCenterX(), skinnable.getCenterY());
-            PolarCoord pc = new PolarCoord(ps, minRadius + ((maxRadius - minRadius) / 2), itemCenter);
-            shape.setPolarCoordinates(pc);
+            PolarSystem polarSystem = new PolarSystem(skinnable.getCenterX(),skinnable.getCenterY());
+            PolarCoord polarCoord = new PolarCoord(polarSystem, minRadius + ((maxRadius - minRadius) / 2), itemCenter);
+            shape.setPolarCoordinates(polarCoord);
 
-            shape.setTranslateX(pc.getX());
-            shape.setTranslateY(pc.getY());
-
+        
+            
             Label selectionLabel = shape.getSelectionLabel();
             getChildren().add(selectionLabel);
 
@@ -213,16 +219,19 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
             getChildren().add(shape);
             addEvents(shape);
         }
-        animate();
+        //animate();
         addSlider();
+        
+        build = true;
     }
 
     /**
      *
      */
     protected void addSlider() {
+        logger.info("Adding slider");
         getChildren().add(text);
-        text.setTranslateY(skinnable.getMaxRadius() + 40);
+        //text.setTranslateY(skinnable.getMaxRadius() + 40);
     }
 
     /**
@@ -312,13 +321,13 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
             // configuring the translate transition
             fromCenter.setFromX(closerToCenterPoint.getX());
             fromCenter.setFromY(closerToCenterPoint.getY());
-            fromCenter.setToX(item.getPolarCoordinates().getX());
-            fromCenter.setToY(item.getPolarCoordinates().getY());
+            fromCenter.setToX(item.getPolarCoordinates().xProperty().doubleValue());
+            fromCenter.setToY(item.getPolarCoordinates().yProperty().doubleValue());
             fromCenter.setDelay(delayDuration); // same delay as the fade in
 
             // both animation will play with the others
-            animation.getChildren().addAll(fadeIn, fromCenter);
-            // fromCenter.play();
+            animation.getChildren().addAll(fadeIn,fromCenter);
+           // fromCenter.play();
             //fadeIn.play();
         });
 

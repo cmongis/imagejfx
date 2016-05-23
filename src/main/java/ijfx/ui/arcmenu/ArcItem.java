@@ -27,16 +27,17 @@ import static ijfx.ui.arcmenu.skin.ArcItemSkin.CSS_ARC_MENU;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import javafx.animation.TranslateTransition;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
@@ -138,6 +139,8 @@ public class ArcItem<T> extends Control {
     T choice;
 
     Label selectionLabel = new Label();
+
+    Logger logger = ImageJFX.getLogger();
 
     /**
      *
@@ -394,7 +397,11 @@ public class ArcItem<T> extends Control {
     /**
      *
      */
+    
+    boolean isSubscribed = false;
+    
     public void subscribeEvents() {
+        if(isSubscribed) return;
         addEventHandler(MouseEvent.MOUSE_DRAGGED, this::onMouseDragged);
         addEventHandler(MouseEvent.MOUSE_RELEASED, this::onMouseReleased);
 
@@ -404,6 +411,7 @@ public class ArcItem<T> extends Control {
 
         });
 
+        /*
         sliderValue.addListener((event, oldValue, newValue) -> {
             updateTicks(newValue.doubleValue());
             if (getType() == ArcItemType.SLIDE) {
@@ -411,23 +419,48 @@ public class ArcItem<T> extends Control {
             } else if (getType() == ArcItemType.CHOICE) {
                 selectionLabel.setText(choices.get(newValue.intValue()).toString());
             }
-        });
+        });*/
+        sliderValue.addListener(this::onSliderValueChanged);
 
         // makes sure that the tick hash map is always up to date
         sliderMinValue.addListener(this::onTickChanged);
         sliderMaxValue.addListener(this::onTickChanged);
         sliderTick.addListener(this::onTickChanged);
 
-        translateXProperty().addListener((event, oldValue, newValue) -> placeLabel(newValue.doubleValue()));
-        translateYProperty().addListener((event, oldValue, newValue) -> placeLabel(newValue.doubleValue()));
-        // rebuildTickHashMap();
+        //translateXProperty().addListener((event, oldValue, newValue) -> placeLabel(newValue.doubleValue()));
+        //translateYProperty().addListener((event, oldValue, newValue) -> placeLabel(newValue.doubleValue()));
+        selectionLabel.translateXProperty().bind(translateXProperty());
+        selectionLabel.translateYProperty().bind(Bindings.createDoubleBinding(this::getLabelY, translateXProperty(), translateYProperty()));
+        isSubscribed = true;
+// rebuildTickHashMap();
+    }
 
+    private void onSliderValueChanged(Observable value, Number oldValue, Number newValue) {
+        updateTicks(newValue.doubleValue());
+        if (getType() == ArcItemType.SLIDE) {
+            selectionLabel.setText(newValue.toString());
+        } else if (getType() == ArcItemType.CHOICE) {
+            selectionLabel.setText(choices.get(newValue.intValue()).toString());
+        }
     }
 
     /**
      *
      * @param value
      */
+    private double getLabelY() {
+        // if(isSliding.get()) {
+        if (getPolarCoordinates() == null) {
+            return 0.0;
+        }
+        return getPolarCoordinates().getLocationCloserToCenter(-getHeight()).getY() + ImageJFX.MARGIN;
+        //}
+        //else {
+
+        //}
+    }
+
+    /*
     public void placeLabel(double value) {
         if (isSliding.get()) {
             
@@ -439,8 +472,7 @@ public class ArcItem<T> extends Control {
             
             selectionLabel.setTranslateY(getTranslateY() + getHeight() + ImageJFX.MARGIN);
         }
-    }
-
+    }*/
     /**
      *
      * @return
@@ -461,84 +493,87 @@ public class ArcItem<T> extends Control {
      *
      */
     public void unsubscribeEvents() {
+        
         removeEventHandler(MouseEvent.MOUSE_DRAGGED, this::onMouseDragged);
         removeEventHandler(MouseEvent.MOUSE_RELEASED, this::onMouseReleased);
+        isSubscribed = false;
     }
 
     MouseEvent lastEvent = null;
     MouseEvent firstEvent = null;
 
     // event used for sliding
-    
-    public void onMouseDragged(MouseEvent event) {
-  
-
+    private void onMouseDragged(MouseEvent event) {
+        
+        
+       
+        logger.info("event : "+event);
+        logger.info("firstEvent : "+firstEvent);
+        logger.info("lastEvent : "+lastEvent);
+        
         if (getType() == ArcItemType.CLICK) {
             return;
         }
         if (firstEvent == null) {
             firstEvent = event;
-
+            lastEvent = event;
             originalValue = sliderValue.get();
 
             isSliding.set(true);
 
         }
-        double shift = event.getSceneX() - firstEvent.getSceneX();
+        
+        double shift = event.getScreenX() - firstEvent.getScreenX();
 
         if (lastEvent != null) {
             double diff = event.getScreenX() - lastEvent.getScreenX();
 
             double newSliderValue = sliderRatio.get() + diff / sliderWidth.getValue();
-            System.out.println(diff);
+            
+            /*
             if (newSliderValue < 0.0 || newSliderValue > 1.0) {
                 event.consume();
                 return;
-            }
-            
-            
-            setTranslateX(getTranslateX() + diff);
-            //setTranslateX(getPolarCoordinates().getX() + diff);
+            }*/
+
+            // setTranslateX(getTranslateX() + diff);
+            setTranslateX(getPolarCoordinates().xProperty().getValue() + shift);
             sliderRatio.set(newSliderValue);
 
         }
         lastEvent = event;
         displayBar();
-        event.consume();
+        //event.consume();
 //
     }
     //event used for button click
-    
-    private void getLabelTranslateX() {
-        
-    }
-    
+
     private void onMouseReleased(MouseEvent event) {
-    
 
         TranslateTransition backToOrigin = new TranslateTransition(Duration.millis(200), this);
         backToOrigin.setFromX(getTranslateX());
-        backToOrigin.setToX(getPolarCoordinates().getX());
+        backToOrigin.setToX(getPolarCoordinates().xProperty().doubleValue());
         backToOrigin.play();
-        
+
+        /*
         backToOrigin = new TranslateTransition(Duration.millis(200), selectionLabel);
         backToOrigin.setFromX(getTranslateX());
-        backToOrigin.setToX(getPolarCoordinates().getX());
-        backToOrigin.play();
-        
+        backToOrigin.setToX(getPolarCoordinates().xProperty().doubleValue());
+        backToOrigin.play();*/
         lastEvent = null;
         firstEvent = null;
         hideBar();
         sliderRatio.set(valueToSliderValue(sliderValue.get()));
         isSliding.set(false);
-        event.consume();
-    };
+        //event.consume();
+    }
+
+    ;
 
     private void onTickChanged(ObservableValue<? extends Number> obs, Number oldValue, Number newValue) {
-  
-            rebuildTickHashMap();
-        
-    };
+        rebuildTickHashMap();
+    }
+    ;
 
     Group bar;
 
@@ -574,10 +609,11 @@ public class ArcItem<T> extends Control {
             });
         }
 
-        bar.setTranslateX(getTranslateValue());
-        bar.setTranslateY(getPolarCoordinates().getY());
-
-        //adding the bar
+       bar.setTranslateX(getTranslateValue());
+       bar.setTranslateY(getPolarCoordinates().yProperty().doubleValue());
+       //bar.translateXProperty().bind(Bindings.createDoubleBinding(this::getTranslateValue, translateYProperty()));
+       //bar.translateYProperty().bind(Bindings.createDoubleBinding(getPolarCoordinates().yProperty()::doubleValue,translateYProperty()));
+       //adding the bar
         getArcMenu().getChildren().add(0, bar);
 
     }
@@ -620,9 +656,9 @@ public class ArcItem<T> extends Control {
         if (tickHashMap == null) {
             rebuildTickHashMap();
         }
-       
+
         tickHashMap.forEach((key, node) -> {
-            
+
             if (key.equals(newValue)) {
                 node.getStyleClass().add(ArcItemSkin.CSS_ARC_ITEM_CHOICE_BOX_HOVER);
             } else {
@@ -657,9 +693,9 @@ public class ArcItem<T> extends Control {
      * @param ydiff
      */
     private void centerDependingOn(Node origin, Node toPlace, double xdiff, double ydiff) {
-        
+
         double x = origin.getTranslateX();
-        
+
         toPlace.setTranslateX(x);
         toPlace.setTranslateY(origin.getTranslateY());
     }
@@ -689,9 +725,12 @@ public class ArcItem<T> extends Control {
     }
 
     private double getTranslateValue() {
-      
+
         final double sliderW = sliderWidth.getValue();
-        return sliderW/2 - (sliderRatio.get() * sliderW) + (getWidth() * Math.signum(polarCoordinates.getX()));
+
+        double x = polarCoordinates.xProperty().getValue() + (sliderW / 2) - (sliderRatio.get() * sliderW);
+
+        return x;
     }
 
     // the closer choice is the sliderTick sliderValue from the brut sliderValue

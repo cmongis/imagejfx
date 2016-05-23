@@ -103,7 +103,7 @@ public class BatchService extends AbstractService implements ImageJService {
             input.load();
             count++;
             final Module createdModule = moduleService.createModule(module.getInfo());
-            if (!executeModule(input, createdModule, process, parameters)) {
+            if (!executeModule(input, createdModule, parameters)) {
                 return false;
             }
             input.save();
@@ -183,7 +183,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 final Module module = moduleService.createModule(step.getModule().getInfo());
                 getContext().inject(module.getDelegateObject());
                 logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
-                if (!executeModule(input, module, true, step.getParameters())) {
+                if (!executeModule(input, module, step.getParameters())) {
 
                     progress.setStatus("Error :-(");
                     progress.setProgress(0, 1);
@@ -221,7 +221,7 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     // execute a module (with all the side parameters injected)
-    public boolean executeModule(BatchSingleInput input, Module module, boolean process, Map<String, Object> parameters) {
+    public boolean executeModule(BatchSingleInput input, Module module, Map<String, Object> parameters) {
        
         
         logger.info("Executing module " + module.getDelegateObject().getClass().getSimpleName());
@@ -246,7 +246,8 @@ public class BatchService extends AbstractService implements ImageJService {
         module.getInputs().forEach((key, value) -> {
             module.setResolved(key, true);
         });
-
+        
+        // calling the batch preprocessor plugins
         pluginService
                 .createInstancesOfType(BatchPrepreprocessorPlugin.class)
                 .forEach(processor->processor.process(input, module,parameters));
@@ -381,11 +382,9 @@ public class BatchService extends AbstractService implements ImageJService {
                 .filter(p -> !processorBlackList.contains(p.getClass()))
                 .sequential()
                 .map(p->{
-                    System.out.println(p.getClass());
                     return p;
                 })
                 //.map(this::injectPlugin)
-                
                 .collect(Collectors.toList());
     }
 

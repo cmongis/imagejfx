@@ -264,7 +264,7 @@ public class PreviewService extends AbstractService implements ImageJService {
             //CommandInfo commandInfo = new CommandInfo(command);
            // Module module = new CommandModule(commandInfo);
             this.context().inject(module.getDelegateObject());
-            batchService.executeModule(batchSingleInput, module, false, inputMap);
+            batchService.executeModule(batchSingleInput, module, inputMap);
             Dataset result = batchSingleInput.getDataset();
             return result;
         } catch (Exception e) {

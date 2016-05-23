@@ -22,13 +22,16 @@ package ijfx.ui.arcmenu;
 import ijfx.ui.arcmenu.skin.ArcItemCircleSkin;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.PopupWindow;
 import javafx.stage.Screen;
 
 /**
@@ -39,9 +42,11 @@ public class PopArcMenu extends PopupControl {
 
     private double minRadius = 45.0f;
     private double maxRadius = 70.0f;
-    private double centerX = 0.0f;
-    private double centerY = 0.0f;
+    private final DoubleProperty centerX  = new SimpleDoubleProperty(0.0f);
+    private final DoubleProperty centerY = new SimpleDoubleProperty(0.0f);
 
+   
+    
     private final ArrayList<ArcItem> items = new ArrayList<>();
 
     
@@ -50,8 +55,7 @@ public class PopArcMenu extends PopupControl {
         setSkin(createDefaultSkin());
         
        
-        setPrefWidth(400);
-        setPrefHeight(400);
+     
         
         
     }
@@ -130,23 +134,23 @@ public class PopArcMenu extends PopupControl {
      *
      * @return
      */
-    public double getCenterX() {
-        return centerX;
+    public ReadOnlyDoubleProperty getCenterX() {
+        return  centerX;
     }
 
     /**
      *
      * @param centerX
      */
-    public void setCenterX(double centerX) {
-        this.centerX = centerX;
+    protected void setCenterX(double centerX) {
+        this.centerX.setValue(centerX);
     }
 
     /**
      *
      * @return
      */
-    public double getCenterY() {
+    public ReadOnlyDoubleProperty getCenterY() {
         return centerY;
     }
 
@@ -154,8 +158,8 @@ public class PopArcMenu extends PopupControl {
      *
      * @param centerY
      */
-    public void setCenterY(double centerY) {
-        this.centerY = centerY;
+    protected void setCenterY(double centerY) {
+        this.centerY.setValue(centerY);
     }
     
     public List<Node> getChildren() {
@@ -178,24 +182,52 @@ public class PopArcMenu extends PopupControl {
     public void show(MouseEvent event) {
         
         if(event.getButton() != MouseButton.SECONDARY) return;
+        Rectangle2D visualBounds = Screen.getScreensForRectangle(event.getScreenX(), event.getScreenY(), 20, 20).get(0).getVisualBounds();
         
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
-        setPrefWidth(visualBounds.getWidth());
-        setPrefHeight(visualBounds.getHeight());
-        double x = event.getScreenX();
-        double y = event.getScreenY();
+        Node node = (Node) event.getTarget();
+        Scene scene = node.getScene();
+        
+        setStyle("-fx-background-color:transparent");
+      
+        
+     
+        
+        double margin = 400;
+        
+       
+       
+        
+       double wx,wy,ww,wh;
+        
+        wx = scene.getWindow().getX();
+        wy = scene.getWindow().getY();
+        ww = scene.getWidth();
+        wh = scene.getHeight();
+        
+        
+        setPrefWidth(ww);
+        setPrefHeight(wh);
+        
+        double x = event.getSceneX();
+        double y = event.getSceneY();
         System.out.println(getHeight());
         System.out.println(y);
-        x-= getWidth()/2;
-        y-= getHeight()/2;
-        x = 0;
-        y = 0;
+        x-= ww/2;
+        y-= wh/2;
+       
+      
+        setCenterX(x);
+        setCenterY(y);
         
-        setCenterX(event.getScreenX());
-        setCenterY(event.getScreenY());
+        super.show(scene.getWindow(),wx,wy);
         
-        super.show(((Node)event.getTarget()).getScene().getWindow(),x,y);
+        List<String> styleClasses = getScene().getRoot().getStyleClass();
+        
+        if(styleClasses.contains(TRANSPARENT_CLASS) == false) styleClasses.add(TRANSPARENT_CLASS);
+      
+        //super.show(((Node)event.getTarget()).getScene().getWindow(),visualBounds.getMinX()+(margin/2),visualBounds.getMinY()+(margin / 2));
     }
     
+    public static final String TRANSPARENT_CLASS = "transparent";
     
 }

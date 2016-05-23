@@ -21,6 +21,7 @@ package mongis.utils.panecell;
 
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.main.LoadingPopup;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,7 @@ import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -93,7 +95,7 @@ public class PaneCellController<T extends Object> {
      */
     public synchronized void update(List<T> items) {
 
-        new AsyncCallback<Integer, List<PaneCell<T>>>()
+        Task task = new AsyncCallback<Integer, List<PaneCell<T>>>()
                 .setInput(items.size())
                 .run(this::retrieve)
                 .then(controllers -> {
@@ -109,7 +111,15 @@ public class PaneCellController<T extends Object> {
 
                 })
                 .start();
-
+        if(pane != null) {
+        new LoadingPopup()
+                .bindTask(task)
+                .showOnScene(pane.getScene())
+                .setCanCancel(false)
+                .closeOnFinished()
+                
+                ;
+        }
     }
 
     public synchronized void update3DList(List<List<List<T>>> items, int size, List<String> metaDatas) {

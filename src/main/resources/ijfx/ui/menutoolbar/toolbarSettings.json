@@ -142,17 +142,6 @@
             , {
                 "type": "Command"
                 ,
-                "label": "Delete Data"
-                ,
-                "action": "net.imagej.plugins.commands.restructure.DeleteData"
-                ,
-                "icon": "ANDROID"
-                ,
-                "context": "image-open"
-            }
-            , {
-                "type": "Command"
-                ,
                 "label": "Reorder Data"
                 ,
                 "action": "net.imagej.plugins.commands.restructure.ReorderData"
@@ -200,7 +189,11 @@
                 "icon": "preview"
                 ,
                 "context": "image-open"
+                
+                ,"parameters": {
+                    "neighTypeString": "RADIAL_STRING"
 
+                }
 
             }
 
@@ -212,12 +205,12 @@
                 ,
                 "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAlphaTrimmedMean"
                 ,
-                "icon": "preview"
+                "icon": "REMOVE"
                 ,
                 "context": "image-open"
                 ,
                 "parameters": {
-                    "neighTypeString": "RECTANGULAR_STRING"
+                    "neighTypeString": "RADIAL_STRING"
 
                 }
 
@@ -232,12 +225,12 @@
                 ,
                 "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionGeometricMean"
                 ,
-                "icon": "preview"
+                "icon": "REMOVE"
                 ,
                 "context": "image-open"
                 ,
                 "parameters": {
-                    "neighTypeString": "RECTANGULAR_STRING"
+                    "neighTypeString": "RADIAL_STRING"
 
                 }
 
@@ -257,7 +250,7 @@
                 "context": "image-open"
                 ,
                 "parameters": {
-                    "neighTypeString": "RECTANGULAR_STRING"
+                    "neighTypeString": "RADIAL_STRING"
 
                 }
             }

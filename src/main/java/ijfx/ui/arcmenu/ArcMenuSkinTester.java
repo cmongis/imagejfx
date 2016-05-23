@@ -20,7 +20,7 @@
 package ijfx.ui.arcmenu;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import ijfx.ui.utils.AbstractApp;
+import ijfx.ui.utils.BaseTester;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -28,7 +28,7 @@ import javafx.scene.shape.Rectangle;
  *
  * @author cyril
  */
-public class ArcMenuSkinTester extends AbstractApp {
+public class ArcMenuSkinTester extends BaseTester {
 
     PopArcMenu arcMenu = new PopArcMenu();
 

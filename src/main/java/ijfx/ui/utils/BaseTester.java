@@ -32,13 +32,13 @@ import javafx.stage.Stage;
  *
  * @author cyril
  */
-public abstract class AbstractApp extends Application {
+public abstract class BaseTester extends Application {
 
     BorderPane borderPane = new BorderPane();
 
     ToolBar toolbar = new ToolBar();
 
-    public AbstractApp() {
+    public BaseTester() {
 
        
        
@@ -59,6 +59,8 @@ public abstract class AbstractApp extends Application {
         borderPane.getStyleClass().add("explorer-filter");
 
         Scene scene = new Scene(borderPane);
+        primaryStage.setWidth(600);
+        primaryStage.setHeight(400);
         primaryStage.setScene(scene);
         primaryStage.show();
         
