@@ -30,6 +30,7 @@ import ijfx.service.ui.AppService;
 import ijfx.service.uiplugin.DefaultUiPluginService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.log.LogService;
+import ijfx.service.ui.FontEndTaskSubmitted;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.hint.DefaultHint;
 import ijfx.service.ui.hint.Hint;
@@ -42,7 +43,6 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -95,14 +95,20 @@ import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.explorer.ExplorerActivity;
+import java.io.IOException;
+import java.util.Collection;
+import javafx.scene.Scene;
 import mongis.utils.AnimationChain;
+import mongis.utils.AsyncCallback;
+import mongis.utils.FXUtilities;
+import mongis.utils.ProgressHandler;
 
 /**
  * FXML Controller class
  *
  * @author Cyril MONGIS, 2015
  */
-public class MainWindowController implements Initializable {
+public class MainWindowController extends AnchorPane{
 
     public static int ANIMATION_DURATION = 300;
 
@@ -164,7 +170,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private Label memoryLabel;
 
-    protected final LoadingScreen loadingScreen = LoadingScreen.getInstance();
+    //protected final LoadingScreen loadingScreen = LoadingScreen.getInstance();
 
     protected ImageJ imageJ;
 
@@ -194,6 +200,8 @@ public class MainWindowController implements Initializable {
     @Parameter
     ActivityService activityService;
 
+    LoadingPopup loadingPopup = new LoadingPopup();
+
     Queue<Hint> hintQueue = new LinkedList<>();
 
     boolean isHintDisplaying = false;
@@ -211,41 +219,15 @@ public class MainWindowController implements Initializable {
 
     });
 
-    Task<Void> imageJStarter = new Task<Void>() {
+    public MainWindowController() throws IOException {
 
-        @Override
-        protected Void call() throws Exception {
+        FXUtilities.injectFXML(this, "/ijfx/ui/main/MainWindow.fxml");
 
-            Font.loadFont(FontAwesomeIcon.class.getResource("fontawesome-webfont.ttf").toExternalForm(), 16);
+        Font.loadFont(FontAwesomeIcon.class.getResource("fontawesome-webfont.ttf").toExternalForm(), 16);
 
-            logger.info("Starting ImageJ Loading");
-            updateMessage("Initializing ImageJ");
-            try {
-                imageJ = new ImageJ();
-                // System.out.println("Done.");
-            } catch (Exception e) {
-                updateMessage("Error initializing ImageJ");
-                e.printStackTrace();
-                loadingScreen.canCancel.setValue(true);
-                Thread.sleep(4000);
-                return null;
-            }
-
-            logger.info("ImageJ initialized.");
-            updateMessage("ImageJ initilialized.");
-
-            return null;
-
-        }
-
-    };
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-
-        thisController = this;
-
-        // binding the sides to the pseudo class empty
+        
+        
+         // binding the sides to the pseudo class empty
         final PseudoClass empty = PseudoClass.getPseudoClass("empty");
         final PseudoClass hidden = PseudoClass.getPseudoClass("hidden");
 
@@ -253,24 +235,193 @@ public class MainWindowController implements Initializable {
         BindingsUtils.bindNodeToPseudoClass(empty, rightVBox, new SimpleListProperty<Node>(rightVBox.getChildren()).emptyProperty());
         BindingsUtils.bindNodeToPseudoClass(hidden, sideMenu, Bindings.createBooleanBinding(() -> sideMenu.getTranslateX() <= -1.0 * sideMenu.getWidth() + 2, sideMenu.translateXProperty()));
 
-        /*
-        BooleanBinding binding = Bindings.isEmpty(leftVBox.getChildren()).addListener((obs,oldValue,newValue)->{
-
-            leftVBox.pseudoClassStateChanged(empty, newValue);
-        });*/
         leftVBox.pseudoClassStateChanged(empty, true);
 
         Bindings.isEmpty(rightVBox.getChildren()).addListener((obs, oldValue, newValue) -> {
             rightVBox.pseudoClassStateChanged(empty, newValue);
         });
 
-        loadingScreen.setDefaultPane(mainAnchorPane);
+        //loadingScreen.setDefaultPane(mainAnchorPane);
+        
+        
+        
+        sideMenu.setTranslateZ(0);
 
+        mainAnchorPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+
+            if (event.getButton() == MouseButton.PRIMARY && event.getSceneX() >= sideMenu.getWidth() && sideMenu.getTranslateX() > -1 * sideMenu.getWidth()) {
+                hideSideMenu();
+            }
+
+        });
+        
+        
+        memoryThread.start();
+        
         initMenuAction();
+        
+        
+        /*
+            The boot sequence is the following
+            1. start imagej
+            2. inject the context
+            3. register contextuals viewx
+            4. load plugins
+            5. register plugins to the context wideget
+            6. finish the start
+        */
+        
+        mainBorderPane.setOpacity(1.0);
+        mainBorderPane.setCenter(new Label("Loading..."));
+        
+    }
+    
+    
+    private Scene myScene;
+    public void setScene(Scene scene) {
+        myScene = scene;
+    }
+    
+    public void init() {
+        
+        
+        AsyncCallback<Void,ImageJ> imageJStart = new AsyncCallback<Void,ImageJ>()
+                .run(this::initializeImageJ)
+                .error(System.out::println);
+        
+        //new LoadingPopup().bindTask(imageJStart).showOnScene(myScene);
+        
+        AsyncCallback<ImageJ,Boolean> injectAndRegister = new AsyncCallback<ImageJ,Boolean>()
+                .run(this::injectImageJContext);
+        
+        AsyncCallback<Boolean,Collection<UiPlugin>> loadPlugins = new AsyncCallback<Boolean,Collection<UiPlugin>>()
+                .runLongCallable(this::loadPlugins);
+        
+        AsyncCallback<Collection<UiPlugin>,Boolean> bindWidgets = new AsyncCallback<Collection<UiPlugin>,Boolean>()
+                .run(this::bindWidgetToController)
+                .then(this::finishInitialization);
+        
+        
+         new LoadingPopup()
+                .bindTask(imageJStart)
+                .showOnStart(this)
+                .setCanCancel(false)
+                .closeOnFinished();
+        
+        new LoadingPopup()
+                .bindTask(loadPlugins)
+                .showOnStart(this)
+                .setCanCancel(false)
+                .closeOnFinished();
+        
+        imageJStart.then(injectAndRegister).start();
+        injectAndRegister.then(loadPlugins);
+        loadPlugins.then(bindWidgets);
+        
+       
+        
+        
+       hideSideMenu();
+        
+        
+     
+        
+    }
+
+  
+    
+    
+    
+    /**
+     *  ImageJ is initialized
+     * @param handler
+     * @param v
+     * @return 
+     */
+
+    protected ImageJ initializeImageJ(ProgressHandler handler, Void v) {
+        handler.setStatus("Initializing ImageJ");
+        logger.info("Starting ImageJ Loading");
+       
+     
+        imageJ = new ImageJ();
+          
+        logger.info("ImageJ initialized = " + imageJ );
+        handler.setStatus("ImageJ initilialized.");
+        
+        return imageJ;
+    }
+    
+    protected Collection<UiPlugin> loadPlugins(ProgressHandler handler) {
+        return uiPluginService.loadAll(handler);
+    }
+    
+    protected Boolean injectImageJContext(ImageJ imagej) {
+        
+        
+        
+        logger.info("Injecting ImageJ = "+imagej);
+        imagej.getContext().inject(this);
+        
+        logger.info("ImageJ injected");
+        
+        logger.info("Registering widhet controllers");
+        registerWidgetControllers();
+        
+        return true;
+        
+    }
+    protected Boolean bindWidgetToController(Collection<UiPlugin> uiPluginList) {
+        logger.info("Getting widget list");
+        // uiPluginService.getUiPluginList().forEach(widgetPlugin -> {
+        for (UiPlugin uiPlugin : uiPluginList) {
+            UiConfiguration infos = uiPluginService.getInfos(uiPlugin);
+
+            if (infos == null) {
+                logger.warning("No informations for " + uiPlugin.getClass().getName());
+                return false;
+            }
+
+            uiContextService.link(infos.id(), infos.context());
+            loadWidget(uiPlugin);
+        }
+
+        logger.info("Widget laoading done.");
+        return true;
+    }
+    
+    protected void finishInitialization(Object o) {
+        
+        logger.info("finishing initialization...");
+        // entering the right context
+            uiContextService.enter(UiContexts.list(UiContexts.DEBUG));
+
+            // showing the intro app
+            //appService.showApp(WebApps.PROJECT_WIZARD);
+            // updating the context
+            uiContextService.update();
+            activityService.openByType(ImageJContainer.class);
+            // sequence over
+            
+            
+            logger.info("Start over");
+            
+            
+    }
+  
+
+    /*
+    public void initialized(URL url, ResourceBundle rb) {
+
+        thisController = this;
+
+       
+
+        
         Platform.runLater(() -> hideSideMenu());
 
         // the first stack loads ImageJ
-        final Task task1 = imageJStarter;
+        //final Task task1 = imageJStarter;
 
         // the third one takes of setting up the interface and the context
         final Task<Boolean> task3 = new Task<Boolean>() {
@@ -292,8 +443,6 @@ public class MainWindowController implements Initializable {
         };
 
         // submitting the task to the loading screen
-        loadingScreen.submitTask(task1, false);
-
         // when the first task is over
         task1.setOnSucceeded(result -> {
             logger.info("ImageJ Loading done");
@@ -302,7 +451,8 @@ public class MainWindowController implements Initializable {
             imageJ.getContext().inject(thisController);
 
             // the second one loads the FXWidgets
-            final Task task2 = uiPluginService.loadAll(false);
+            final Task task2 = new AsyncCallback<Void,Collection<UiPlugin>>()
+                    .runLongCallable(uiPluginService::loadAll);
 
             // registering the controllers
             registerWidgetControllers();
@@ -313,19 +463,18 @@ public class MainWindowController implements Initializable {
             // when the second task is over, starting the third task
             task2.setOnSucceeded(resul -> ImageJFX.getThreadPool().submit(task3));
 
-            loadingScreen.submitTask(task2, false);
-            loadingScreen.submitTask(task3, false);
-
+            //loadingScreen.submitTask(task2, false);
+            //loadingScreen.submitTask(task3, false);
+            loadingPopup.bindTask(task2);
         });
 
         task3.setOnSucceeded(result -> {
 
             // entering the right context
-           uiContextService.enter(UiContexts.list(UiContexts.DEBUG));
+            uiContextService.enter(UiContexts.list(UiContexts.DEBUG));
 
             // showing the intro app
             //appService.showApp(WebApps.PROJECT_WIZARD);
-
             // updating the context
             //uiContextService.update();
             activityService.openByType(ImageJContainer.class);
@@ -337,21 +486,12 @@ public class MainWindowController implements Initializable {
         // starting the first task
         ImageJFX.getThreadPool().submit(task1);
 
-        sideMenu.setTranslateZ(0);
 
-        mainAnchorPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-
-            if (event.getButton() == MouseButton.PRIMARY && event.getSceneX() >= sideMenu.getWidth() && sideMenu.getTranslateX() > -1 * sideMenu.getWidth()) {
-                hideSideMenu();
-            }
-
-        });
-
-        memoryThread.start();
+        
 
     }
 
-    public void startContextManager() {
+    protected void startContextManager() {
 
         logger.info("Getting widget list");
         // uiPluginService.getUiPluginList().forEach(widgetPlugin -> {
@@ -368,8 +508,9 @@ public class MainWindowController implements Initializable {
 
         logger.info("Widget laoading done.");
 
-    }
-
+    }*/
+    
+    
     public void registerWidgetControllers() {
         registerPaneCtrl(topLeftHBox)
                 .setAnimationOnHide(Animations.DISAPPEARS_LEFT)
@@ -420,18 +561,18 @@ public class MainWindowController implements Initializable {
         //widgetLoaderService.reload();
     }
 
-    public void showLoading() {
+    protected void showLoading() {
         logger.info("Showing loading screen");
 
-        Platform.runLater(() -> loadingScreen.showOn(mainAnchorPane));
+        //Platform.runLater(() -> loadingScreen.showOn(mainAnchorPane));
     }
 
-    public void hideLoading() {
+    protected void hideLoading() {
         logger.info("Hiding logging screen");
-        Platform.runLater(() -> loadingScreen.hideFrom(mainAnchorPane));
+        //Platform.runLater(() -> loadingScreen.hideFrom(mainAnchorPane));
     }
 
-    public AnimatedPaneContextualView registerPaneCtrl(Pane node) {
+    private AnimatedPaneContextualView registerPaneCtrl(Pane node) {
 
         // The UI plugin service implements the interface used to sort nodes inside the contextual containers
         UiPluginSorter sorter = uiPluginService;
@@ -445,7 +586,7 @@ public class MainWindowController implements Initializable {
 
     }
 
-    public void updateMemoryUsage() {
+    protected void updateMemoryUsage() {
 
         if (memoryLabel == null) {
             return;
@@ -462,8 +603,9 @@ public class MainWindowController implements Initializable {
         memoryLabel.setText(String.format("%d / %d MB", used, max));
 
     }
-
-    public void bindWidgetsToControllers() {
+    
+    /*
+    protected void bindWidgetsToControllers() {
 
         imageJ
                 .getContext()
@@ -474,8 +616,8 @@ public class MainWindowController implements Initializable {
                     loadWidget(uiPlugin);
                 });
     }
-
-    public void loadWidget(UiPlugin uiPlugin) {
+    */
+    protected void loadWidget(UiPlugin uiPlugin) {
 
         // getting the localization from the Localization Plugin (which gets
         // it from the annotation
@@ -497,7 +639,7 @@ public class MainWindowController implements Initializable {
 
     @EventHandler
     public void handleEvent(UiPluginReloadedEvent event) {
-        Platform.runLater(() -> loadWidget(event.getWidget()));
+       // Platform.runLater(() -> loadWidget(event.getWidget()));
     }
 
     @EventHandler
@@ -560,6 +702,7 @@ public class MainWindowController implements Initializable {
             };
 
         }
+        Platform.runLater(() -> mainBorderPane.setCenter(event.getActivity().getContent()));
         new AnimationChain()
                 .animate(mainBorderPane.getCenter(), Animations.FADEOUT)
                 .then(runnable)
@@ -567,7 +710,15 @@ public class MainWindowController implements Initializable {
                 .animate(event.getActivity().getContent(), Animations.FADEIN)
                 .execute();
 
-        Platform.runLater(() -> mainBorderPane.setCenter(event.getActivity().getContent()));
+        
+    }
+    
+    @EventHandler
+    public void onFrontEndTaskSubmitted(FontEndTaskSubmitted event) {
+        loadingPopup.bindTask(event.getObject())
+                .closeOnFinished();
+                
+        Platform.runLater(()->loadingPopup.showOnScene(this.getScene()));
     }
 
     private void showNotification(Notification notification) {
@@ -766,32 +917,29 @@ public class MainWindowController implements Initializable {
      */
     public void initMenuAction() {
 
-        addSideMenuButton("Explore",FontAwesomeIcon.COMPASS,ExplorerActivity.class);
-        
-        
-        addSideMenuButton("Visualize",FontAwesomeIcon.PICTURE_ALT,ImageJContainer.class);
-        addSideMenuButton("Segment",FontAwesomeIcon.EYE,null).setOnAction(event->{
-            uiContextService.enter("segment","segmentation");
+        addSideMenuButton("Explore", FontAwesomeIcon.COMPASS, ExplorerActivity.class);
+
+        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class);
+        addSideMenuButton("Segment", FontAwesomeIcon.EYE, null).setOnAction(event -> {
+            uiContextService.enter("segment", "segmentation");
             uiContextService.update();
             hideSideMenu();
-        
+
         });
-        
+
         /*
         
         sideMenuMainTopVBox.getChildren().addAll(
                 new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", ImageJContainer.class).setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", FileBatchProcessorPanel.class).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", ProjectManager.class).setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR), new SideMenuButton("Explore", ExplorerActivity.class).setIcon(FontAwesomeIcon.COMPASS)
         );*/
-
     }
-     
+
     private SideMenuButton addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass) {
-        
-        SideMenuButton sideMenuButton = new SideMenuButton(title,actClass).setIcon(icon);
-        
-        
+
+        SideMenuButton sideMenuButton = new SideMenuButton(title, actClass).setIcon(icon);
+
         sideMenuTopVBox.getChildren().add(sideMenuButton);
-        
+
         return sideMenuButton;
     }
 
