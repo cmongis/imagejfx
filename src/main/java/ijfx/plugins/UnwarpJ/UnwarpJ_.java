@@ -82,6 +82,7 @@ import ij.process.FloatProcessor;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
+import ijfx.plugins.AbstractImageJ1PluginAdapter;
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Canvas;
@@ -128,6 +129,12 @@ import java.util.Arrays;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import net.imagej.Dataset;
+import org.scijava.ItemIO;
+import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /*====================================================================
 |   UnwarpJ_
@@ -136,20 +143,28 @@ import java.util.Vector;
    This is the one called by ImageJ */
 
 /*------------------------------------------------------------------*/
-public class UnwarpJ_
-   implements
-      PlugIn
 
-{ /* begin class UnwarpJ_ */
+@Plugin(type = Command.class, menuPath = "Plugins>UnwarpJ")
+public class UnwarpJ_ extends AbstractImageJ1PluginAdapter {
+   @Parameter
+    protected Dataset dataset;
+    @Parameter(label = "Source")
+    Dataset source;
+    
+    @Parameter(label = "Target")
+    Dataset target;
+ /* begin class UnwarpJ_ */
 
 /*....................................................................
    Public methods
 ....................................................................*/
 
 /*------------------------------------------------------------------*/
-public void run (
-   final String commandLine
-) {
+   @Override
+    public void run() 
+ {
+     setWholeWrap(true);
+   final String commandLine ="";
    String options = Macro.getOptions();
    if (!commandLine.equals("")) options = commandLine;
    if (options == null) {
@@ -175,10 +190,12 @@ public void run (
       }
       return;
    }
-} /* end run */
+//} /* end run */
+//
+///*------------------------------------------------------------------*/
+//public static void main(String args[]) {
+String []args= new String("unwarpj -align target.jpg NULL source.jpg NULL 0 2 1 1 0 output.tif 1 landmarks.txt").split(" ");
 
-/*------------------------------------------------------------------*/
-public static void main(String args[]) {
    if (args.length<1) {
       dumpSyntax();
       System.exit(1);
@@ -195,7 +212,7 @@ public static void main(String args[]) {
 ....................................................................*/
 
 /*------------------------------------------------------------------*/
-private static void alignImagesMacro(String args[]) {
+private void alignImagesMacro(String args[]) {
 
    if(args.length < 11)
    {
@@ -210,9 +227,9 @@ private static void alignImagesMacro(String args[]) {
    if (jpeg_output) args_len--;
 
    // Read input parameters
-   String fn_target=args[1];
+//   String fn_target=args[1];
    String fn_target_mask=args[2];
-   String fn_source=args[3];
+//   String fn_source=args[3];
    String fn_source_mask=args[4];
    int min_scale_deformation=((Integer) new Integer(args[5])).intValue();
    int max_scale_deformation=((Integer) new Integer(args[6])).intValue();
@@ -231,19 +248,19 @@ private static void alignImagesMacro(String args[]) {
       stopThreshold=((Double) new Double(args[13])).doubleValue();
 
    // Show parameters
-   IJ.write("Target image           : "+fn_target);
-   IJ.write("Target mask            : "+fn_target_mask);
-   IJ.write("Source image           : "+fn_source);
-   IJ.write("Source mask            : "+fn_source_mask);
-   IJ.write("Min. Scale Deformation : "+min_scale_deformation);
-   IJ.write("Max. Scale Deformation : "+max_scale_deformation);
-   IJ.write("Div. Weight            : "+divWeight);
-   IJ.write("Curl Weight            : "+curlWeight);
-   IJ.write("Image Weight           : "+imageWeight);
-   IJ.write("Output:                : "+fn_out);
-   IJ.write("Landmark Weight        : "+landmarkWeight);
-   IJ.write("Landmark file          : "+fn_landmark);
-   IJ.write("JPEG Output            : "+jpeg_output);
+//   IJ.write("Target image           : "+fn_target);
+//   IJ.write("Target mask            : "+fn_target_mask);
+//   IJ.write("Source image           : "+fn_source);
+//   IJ.write("Source mask            : "+fn_source_mask);
+//   IJ.write("Min. Scale Deformation : "+min_scale_deformation);
+//   IJ.write("Max. Scale Deformation : "+max_scale_deformation);
+//   IJ.write("Div. Weight            : "+divWeight);
+//   IJ.write("Curl Weight            : "+curlWeight);
+//   IJ.write("Image Weight           : "+imageWeight);
+//   IJ.write("Output:                : "+fn_out);
+//   IJ.write("Landmark Weight        : "+landmarkWeight);
+//   IJ.write("Landmark file          : "+fn_landmark);
+//   IJ.write("JPEG Output            : "+jpeg_output);
 
    // Produce side information
    int     imagePyramidDepth=max_scale_deformation-min_scale_deformation+1;
@@ -260,8 +277,8 @@ private static void alignImagesMacro(String args[]) {
 
    // Open target
    Opener opener=new Opener();
-   ImagePlus targetImp;
-   targetImp=opener.openImage(fn_target);
+   ImagePlus targetImp = this.getInput(this.dataset);
+//   targetImp=opener.openImage(fn_target);
    unwarpJImageModel target =
       new unwarpJImageModel(targetImp.getProcessor(), true);
    target.setPyramidDepth(imagePyramidDepth+min_scale_image);
@@ -273,8 +290,8 @@ private static void alignImagesMacro(String args[]) {
    unwarpJPointHandler targetPh=null;
 
    // Open source
-   ImagePlus sourceImp;
-   sourceImp=opener.openImage(fn_source);
+   ImagePlus sourceImp = getInput(dataset);
+//   sourceImp=opener.openImage(fn_source);
    unwarpJImageModel source =
       new unwarpJImageModel(sourceImp.getProcessor(), false);
    source.setPyramidDepth(imagePyramidDepth+min_scale_image);
@@ -476,6 +493,13 @@ private static void transformImageMacro(String args[]) {
    } else
       fs.saveAsTiff(fn_out);
 }
+
+    @Override
+    public ImagePlus processImagePlus(ImagePlus input) {
+        return input;
+    }
+
+ 
 
 } /* end class UnwarpJ_ */
 
