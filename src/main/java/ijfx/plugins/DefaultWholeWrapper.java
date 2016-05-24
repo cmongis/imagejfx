@@ -38,7 +38,8 @@ public class DefaultWholeWrapper extends AbstractImageJ1PluginAdapter {
 
     @Override
     public void run() {
-        dataset = processDatasetWholeWrap(dataset);
+        setWholeWrap(true);
+        dataset = setOutput(getInput(dataset), dataset);
     }
 
 }

@@ -62,14 +62,29 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
     @Parameter
     boolean createCopy = false;
 
+    boolean wholeWrap = false;
+
     public abstract ImagePlus processImagePlus(ImagePlus input);
 
     public ImagePlus getInput(Dataset dataset) {
         return unwrapDataset(dataset);
     }
 
-    public void setOutput(ImagePlus imp, Dataset dataset) {
-        dataset = wrapDataset(imp);
+    public Dataset setOutput(ImagePlus imp, Dataset dataset) {
+        if (!wholeWrap) {
+            dataset = wrapDataset(imp);
+        } else {
+            ImagePlus resultCopy = imp.duplicate();
+            if (createCopy) {
+                dataset = emptyDataset(dataset, dataset.numDimensions());
+            }
+            Dataset dataset2 = wrapDataset(resultCopy);
+            for (int i = 0; i < getNumberOfSlices(dataset); i++) {
+                dataset.setPlane(i, dataset2.getPlane(i));
+            }
+
+        }
+        return dataset;
     }
 
     public static ImagePlus unwrapDataset(Dataset dataset) {
@@ -79,7 +94,7 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
     }
 
     public Dataset wrapDataset(ImagePlus imp) {
-        Img img = ImageJFunctions.wrap(imp);
+        Img img = ImageJFunctions.wrap(imp.duplicate());
         return service.create(img);
     }
 
@@ -120,35 +135,41 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
     public Dataset processDataset(Dataset dataset) {
         Dataset datasetToModify = chooseDataset();
 
-        IntStream
-                .range(0, getNumberOfSlices(datasetToModify))
-                .forEach(i -> {
-                    Dataset datasetOnePlane = emptyDataset(this.dataset, 2);
-                    ImagePlus result = processImagePlus(getInput(datasetOnePlane));
-                    setOutput(result, datasetOnePlane);
-                    datasetToModify.setPlane(i, datasetOnePlane.getPlane(0));
-                });
+        for (int i = 0; i < getNumberOfSlices(dataset); i++) {
+            Dataset datasetOnePlane = emptyDataset(dataset, 2);
+            datasetOnePlane.setPlane(0, dataset.getPlane(i));
+            ImagePlus result = processImagePlus(getInput(datasetOnePlane));
+            setOutput(result.duplicate(), datasetOnePlane);
+            datasetToModify.setPlane(i, datasetOnePlane.getPlane(0));
+        }
         dataset = datasetToModify;
         return dataset;
     }
+//
+//    /**
+//     * Wrap the whole Dataset. Use more memory
+//     *
+//     * @param dataset
+//     * @return
+//     */
+//    public Dataset processDatasetWholeWrap(Dataset dataset) {
+//        ImagePlus result = processImagePlus(getInput(dataset));
+//        ImagePlus resultCopy = result.duplicate();
+//        if (createCopy) {
+//            dataset = emptyDataset(dataset, dataset.numDimensions());
+//        }
+//        Dataset dataset2 = wrapDataset(resultCopy);
+//        for (int i = 0; i < getNumberOfSlices(dataset); i++) {
+//            dataset.setPlane(i, dataset2.getPlane(i));
+//        }
+//        return dataset;
+//    }
 
-    /**
-     * Wrap the whole Dataset.
-     * Use more memory
-     * @param dataset
-     * @return 
-     */
-    public Dataset processDatasetWholeWrap(Dataset dataset) {
-        ImagePlus result = processImagePlus(getInput(dataset));
-        ImagePlus resultCopy = result.duplicate();
-        if (createCopy) {
-            dataset = emptyDataset(dataset, dataset.numDimensions());
-        }
-        Dataset dataset2 = wrapDataset(resultCopy);
-        for (int i = 0; i < getNumberOfSlices(dataset); i++) {
-            dataset.setPlane(i, dataset2.getPlane(i));
-        }
-        return dataset;
+    public boolean isWholeWrap() {
+        return wholeWrap;
     }
 
+    public void setWholeWrap(boolean wholeWrap) {
+        this.wholeWrap = wholeWrap;
+    }
 }
