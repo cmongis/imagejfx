@@ -22,9 +22,6 @@ package ijfx.plugins;
 
 import ij.ImagePlus;
 import static java.lang.Math.toIntExact;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
@@ -33,8 +30,6 @@ import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.event.DatasetCreatedEvent;
-import net.imagej.event.DatasetUpdatedEvent;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -49,7 +44,7 @@ import org.scijava.plugin.Parameter;
  *
  * @author Cyril MONGIS, 2015
  */
-public abstract class ImageJ1PluginAdapter implements Command {
+public abstract class AbstractImageJ1PluginAdapter implements Command {
 
     @Parameter(type = ItemIO.BOTH)
     protected Dataset dataset;
@@ -63,7 +58,10 @@ public abstract class ImageJ1PluginAdapter implements Command {
     @Parameter
     EventService eventService;
 
+    @Parameter
     boolean createCopy = false;
+
+    public abstract ImagePlus processImagePlus(ImagePlus input);
 
     public ImagePlus getInput(Dataset dataset) {
         return unwrapDataset(dataset);
@@ -92,13 +90,13 @@ public abstract class ImageJ1PluginAdapter implements Command {
 
     }
 
-    private Dataset emptyDataset(Dataset input) {
+    private Dataset emptyDataset(Dataset input, int sizeDims) {
         AxisType[] axisType = new AxisType[input.numDimensions()];
         CalibratedAxis[] axeArray = new CalibratedAxis[input.numDimensions()];
         input.axes(axeArray);
 
-        long[] dims = new long[2];
-        for (int i = 0; i < 2; i++) {
+        long[] dims = new long[sizeDims];
+        for (int i = 0; i < sizeDims; i++) {
             axisType[i] = axeArray[i].type();
             dims[i] = toIntExact(input.max(i) + 1);
         }
@@ -112,38 +110,39 @@ public abstract class ImageJ1PluginAdapter implements Command {
         return dataset;
     }
 
-    public boolean isCreateCopy() {
-        return createCopy;
-    }
-
-    public void setCreateCopy(boolean createCopy) {
-        this.createCopy = createCopy;
-    }
-
-    public abstract ImagePlus run(ImagePlus input);
-
     public int getNumberOfSlices(Dataset dataset) {
 
-        return (int) (dataset.getImgPlus().size()/(dataset.dimension(0)*dataset.dimension(1)));
- 
+        return (int) (dataset.getImgPlus().size() / (dataset.dimension(0) * dataset.dimension(1)));
+
     }
 
-    @Override
-    public void run() {
-        setCreateCopy(true);
+    public Dataset processDataset(Dataset dataset) {
         Dataset datasetToModify = chooseDataset();
 
         IntStream
                 .range(0, getNumberOfSlices(datasetToModify))
                 .forEach(i -> {
-                    byte[] plane = (byte[]) this.dataset.getPlane(i);
-                    Dataset datasetOnePlane = emptyDataset(this.dataset);
-                    datasetOnePlane.setPlane(0, plane);
-                    ImagePlus result = run(getInput(datasetOnePlane));
+
+                    Dataset datasetOnePlane = emptyDataset(this.dataset, 2);
+                    ImagePlus result = processImagePlus(getInput(datasetOnePlane));
                     setOutput(result, datasetOnePlane);
                     datasetToModify.setPlane(i, datasetOnePlane.getPlane(0));
                 });
         dataset = datasetToModify;
+        return dataset;
+    }
+
+    public Dataset processDatasetWholeWrap(Dataset dataset) {
+        ImagePlus result = processImagePlus(getInput(dataset));
+        ImagePlus resultCopy = result.duplicate();
+        if (createCopy) {
+            dataset = emptyDataset(dataset, dataset.numDimensions());
+        }
+        Dataset dataset2 = wrapDataset(resultCopy);
+        for (int i = 0; i < getNumberOfSlices(dataset); i++) {
+            dataset.setPlane(i, dataset2.getPlane(i));
+        }
+        return dataset;
     }
 
 }

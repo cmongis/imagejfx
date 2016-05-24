@@ -20,6 +20,7 @@
 package ijfx.plugins;
 
 import ij.ImagePlus;
+import net.imagej.ImageJ;
 import org.scijava.command.Command;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Plugin;
@@ -27,9 +28,9 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>DefaultAdapter", attrs = {
+@Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter", attrs = {
     @Attr(name = "no-legacy")})
-public class DefaultImageJ1PluginAdapter extends AbstractImageJ1PluginAdapter {
+public class DefaultWholeWrapper extends AbstractImageJ1PluginAdapter {
 
     @Override
     public ImagePlus processImagePlus(ImagePlus input) {
@@ -38,9 +39,7 @@ public class DefaultImageJ1PluginAdapter extends AbstractImageJ1PluginAdapter {
 
     @Override
     public void run() {
-        dataset = processDataset(dataset);
+        dataset = processDatasetWholeWrap(dataset);
     }
-
-  
 
 }
