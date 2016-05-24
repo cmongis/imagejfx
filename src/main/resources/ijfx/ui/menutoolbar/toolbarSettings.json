@@ -122,7 +122,11 @@
                 ,
                 "icon": "preview"
                 ,
-                "context": "multi-z-img"
+                "context": "multi-z-img",
+                "parameters": {
+                    "axisName" :"X"
+
+                }
             }
             , {
                 "type": "Command"

@@ -23,6 +23,7 @@ import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.DisplayBatchInput;
 import java.awt.image.BufferedImage;
+import static java.lang.Math.abs;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -74,7 +75,7 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     @Parameter
     ModuleService moduleService;
-    
+
     @Parameter
     BatchService batchService;
     private int width;
@@ -119,11 +120,17 @@ public class PreviewService extends AbstractService implements ImageJService {
         this.y = y;
         this.width = w;
         this.height = h;
+        int widthDataset = (int) imageDisplayService.getActiveDataset().max(0);
+        int heightDataset = (int) imageDisplayService.getActiveDataset().max(1);
         if (x < 0 || y < 0) {
-            int widthDataset = (int) imageDisplayService.getActiveDataset().max(0);
-            int heightDataset = (int) imageDisplayService.getActiveDataset().max(1);
             this.x = (int) (widthDataset / 2.0 - width / 2.0);
             this.y = (int) (heightDataset / 2.0 - height / 2.0);
+        }
+        if (widthDataset < width || heightDataset < height) {
+            this.x = 0;
+            this.y = 0;
+            width = widthDataset;
+            height = heightDataset;
 
         }
     }
@@ -149,15 +156,13 @@ public class PreviewService extends AbstractService implements ImageJService {
      * @return output
      */
     public Dataset getEmptyDataset(Dataset input) {
-        AxisType[] axisType = new AxisType[input.numDimensions()];
-        CalibratedAxis[] axeArray = new CalibratedAxis[input.numDimensions()];
+        AxisType[] axisType = new AxisType[2];
+        CalibratedAxis[] axeArray = new CalibratedAxis[2];
         input.axes(axeArray);
 
-        long[] dims = new long[axeArray.length];
+        long[] dims = new long[2];
         for (int i = 0; i < dims.length; i++) {
             axisType[i] = axeArray[i].type();
-            dims[i] = 1;// toIntExact(input.max(i) + 1);
-
         }
         dims[0] = width;
         dims[1] = height;
@@ -259,11 +264,16 @@ public class PreviewService extends AbstractService implements ImageJService {
             BatchSingleInput batchSingleInput = new DisplayBatchInput();
             this.context().inject(batchSingleInput);
             batchSingleInput.setDataset(dataset);
-            
+
             Module module = moduleService.createModule(commandService.getCommand(command));
             //CommandInfo commandInfo = new CommandInfo(command);
-           // Module module = new CommandModule(commandInfo);
-            this.context().inject(module.getDelegateObject());
+            // Module module = new CommandModule(commandInfo);
+            try {
+                this.context().inject(module.getDelegateObject());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             batchService.executeModule(batchSingleInput, module, false, inputMap);
             Dataset result = batchSingleInput.getDataset();
             return result;
