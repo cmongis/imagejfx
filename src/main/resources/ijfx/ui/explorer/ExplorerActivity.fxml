@@ -27,10 +27,26 @@
          <bottom>
             <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
                <children>
+                  <Button mnemonicParsing="false" onAction="#explainMe" styleClass="success" text="Explain me">
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="QUESTION_CIRCLE" styleClass="success" />
+                     </graphic>
+                  </Button>
                   <Button mnemonicParsing="false" onAction="#openSelection" text="Open">
                      <graphic>
                         <FontAwesomeIconView glyphName="IMAGE" />
                      </graphic>
+                  </Button>
+                  <Button fx:id="statisticsButton" mnemonicParsing="false" onAction="#computeStatistics" text="Compute more statistics">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="BAR_CHART" />
+                     </graphic>
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
                   </Button>
                   <Button fx:id="selectAllButton" mnemonicParsing="false" onAction="#selectAll" styleClass="success" text="Select all">
                      <graphic>
@@ -70,7 +86,7 @@
                         <FontAwesomeIconView glyphName="PLUS" styleClass="h4" text="" />
                      </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" styleClass="danger" text="Delete">
+                  <Button mnemonicParsing="false" onAction="#removeFolder" styleClass="danger" text="Delete">
                      <graphic>
                         <FontAwesomeIconView glyphName="REMOVE" />
                      </graphic>

@@ -907,6 +907,28 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-text-fill:#fff;
 }
 
+
+.list-view-fx .list-cell {
+    -fx-background-color:white;
+    -fx-padding:0.3em;
+    -fx-text-fill:-dark;
+ 
+}
+.list-view-fx .list-cell:filled:hover {
+    -fx-background-color:derive(-dark,120%);
+}
+.list-view-fx .list-cell:selected, .list-view-fx .list-cell:selected:hover {
+    -fx-background-color:derive(-flatter-primary,10%);
+}
+
+.toggle-selection-list .toggle-button{
+    -fx-background-radius:0;
+}
+.toggle-selection-list .toggle-button:hover{
+    -fx-translate-x:0;
+    -fx-translate-y:0;
+}
+
 .combo-box .list-cell {
     -fx-padding:8 12 8 12px;
     -fx-font-size:16px;
