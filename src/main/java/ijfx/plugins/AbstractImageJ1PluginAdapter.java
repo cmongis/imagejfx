@@ -43,6 +43,7 @@ import org.scijava.plugin.Parameter;
 /**
  *
  * @author Cyril MONGIS, 2015
+ * @author Tuan anh TRINH
  */
 public abstract class AbstractImageJ1PluginAdapter implements Command {
 
@@ -122,7 +123,6 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
         IntStream
                 .range(0, getNumberOfSlices(datasetToModify))
                 .forEach(i -> {
-
                     Dataset datasetOnePlane = emptyDataset(this.dataset, 2);
                     ImagePlus result = processImagePlus(getInput(datasetOnePlane));
                     setOutput(result, datasetOnePlane);
@@ -132,6 +132,12 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
         return dataset;
     }
 
+    /**
+     * Wrap the whole Dataset.
+     * Use more memory
+     * @param dataset
+     * @return 
+     */
     public Dataset processDatasetWholeWrap(Dataset dataset) {
         ImagePlus result = processImagePlus(getInput(dataset));
         ImagePlus resultCopy = result.duplicate();

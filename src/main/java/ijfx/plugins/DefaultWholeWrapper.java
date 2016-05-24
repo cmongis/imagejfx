@@ -20,7 +20,6 @@
 package ijfx.plugins;
 
 import ij.ImagePlus;
-import net.imagej.ImageJ;
 import org.scijava.command.Command;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Plugin;
