@@ -125,7 +125,7 @@ public class ProjectServiceBinder implements AngularService {
         List<File> files = FXUtilities.openFiles("Import images into project", null, null);
         try {
             Task task = imageLoader.loadImageFromFile(files, getCurrentProject());
-            LoadingScreen.getInstance().submitTask(task);
+            loadingScreenService.submitTask(task);
             return task;
         }
         catch(IOException ioe) {
@@ -178,7 +178,7 @@ public class ProjectServiceBinder implements AngularService {
 
             Task task = imageLoader.loadImageFromDirectory(files, projectService.currentProjectProperty().getValue());
             
-            LoadingScreen.getInstance().submitTask(task,true);
+           loadingScreenService.frontEndTask(task, true);
             
             return task;
 

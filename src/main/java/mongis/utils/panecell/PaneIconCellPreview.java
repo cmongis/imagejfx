@@ -29,6 +29,7 @@ public class PaneIconCellPreview<T> extends PaneIconCell<T>{
     super();
             titleLabel.setPrefSize(200, 200);
             showIconProperty().setValue(false);
+            setLoadImageOnChange(false);
     }
     
     

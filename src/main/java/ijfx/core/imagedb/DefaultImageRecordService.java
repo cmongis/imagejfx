@@ -238,5 +238,8 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
         return records;
     }
 
+    public void forceSave() {
+        ImageJFX.getThreadPool().execute(this::save);
+    }
     
 }

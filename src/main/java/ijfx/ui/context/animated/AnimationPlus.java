@@ -20,9 +20,11 @@
 package ijfx.ui.context.animated;
 
 import ijfx.ui.main.ImageJFX;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.property.Property;
 import javafx.scene.Node;
 import javafx.util.Duration;
 
@@ -78,5 +80,13 @@ public interface AnimationPlus {
         Timeline timeLine = new Timeline(begin,end);
         return timeLine;
     };
+    
+    
+    public static <T> Animation configurePropertyTransition(Property<T> property, T value, Duration duration) {
+        KeyFrame keyFrame = new KeyFrame(duration, new KeyValue(property,value));
+        return new Timeline(keyFrame);
+    }
+    
+   
     
 }

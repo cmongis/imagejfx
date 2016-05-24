@@ -273,12 +273,12 @@ public class ProjectMainPane extends BorderPane implements Initializable, Listen
 
     @EventHandler
     private void handleEvent(DefaultQueryService.QueryStart event) {
-        Platform.runLater(() -> LoadingScreen.getInstance().showOn(queryStackPane));
+        //Platform.runLater(() -> LoadingScreen.getInstance().showOn(queryStackPane));
     }
 
     @EventHandler
     private void handleEvent(DefaultQueryService.QueryStop event) {
-        Platform.runLater(() -> LoadingScreen.getInstance().hideFrom(queryStackPane));
+        //Platform.runLater(() -> LoadingScreen.getInstance().hideFrom(queryStackPane));
     }
 
     private void updateTitle(TreeItem item) {

@@ -147,12 +147,18 @@ public class DefaultFolder implements Folder,FileChangeListener{
         if (files == null) {
 
             files = new ArrayList<>();
-            /*
-            new AsyncCallback<Void, List<Explorable>>()
+            
+            
+            new AsyncCallback<Void,List<Explorable>>()
+                    .setInput(null)
                     .run(this::fetchItems)
-                    .then(this::addItems)
-                    .start();*/
-            files = fetchItems(null);
+                    .then(result->{
+                        files = result;
+                        eventService.publish(new FolderUpdatedEvent().setObject(this));
+                    })
+                    .start();
+                    
+            //files = fetchItems(null);
             
             
            
@@ -165,6 +171,8 @@ public class DefaultFolder implements Folder,FileChangeListener{
 
     private List<Explorable> fetchItems(Void v) {
 
+        
+        
         Timer timer = timerService.getTimer(this.getClass());
         timer.start();
         Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(file);
@@ -183,6 +191,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
                         .toList());
 
         System.out.println(String.format("%d records fetched", records.size()));
+        imageRecordService.forceSave();
         return explorables;
     }
 
@@ -293,7 +302,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
         
         try {
             System.out.println("Listening to "+getPath());
-            dirWatchService.register(this, getPath(),"");
+            dirWatchService.register(this, getPath());
             registered = true;
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
@@ -302,26 +311,41 @@ public class DefaultFolder implements Folder,FileChangeListener{
         
     }
     
+    @Override
     public void onFileCreate(String filePath) {
         logger.info("File added "+filePath);
         
-        File file = new File(filePath);
+        File file = new File(getDirectory(),filePath);
         
-        if(file.getName().endsWith(".ovl.json")) {
+        if(file.getName().endsWith(OverlayIOService.OVERLAY_FILE_EXTENSION)) {
             File imageFile = overlayIOService.getImageFileFromOverlayFile(file);
+            System.out.println(imageFile.getAbsolutePath());
             getObjectList().addAll(loadOverlay(imageFile, file));
         }
+        
+       
+        
+    }
+    
+    @Override
+    public void onFileModify(String filePath) {
+        logger.info("File was modified : "+filePath);
     }
     
    
     private List<Explorable> loadOverlay(File imageFile, File overlayJsonFile) {
-        return overlayIOService.loadOverlays(overlayJsonFile)
+        List<Explorable> collect = overlayIOService.loadOverlays(overlayJsonFile)
                 .stream()
                 .filter(o->o!=null)
                 .map(overlay->new OverlayExplorableWrapper(context, imageFile, overlay))
                 .filter(expl->expl.isValid())
                 
                 .collect(Collectors.toList());
+        
+        System.out.println("Overlay collecté : "+collect.size());
+        return collect;
+                
+        
     }
     
     

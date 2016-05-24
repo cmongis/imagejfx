@@ -41,9 +41,9 @@ import static mongis.utils.panecell.ScrollWindowEvent.SCROLL_WINDOW_EXITED;
 public class ScrollBinder {
 
     //public static EventType SCROLL_WINDOW_EXITED = new EventType(EventType.ROOT,"SCROLL_WINDOW_EXITED");
-    ObservableList<Node> visiblesNode = FXCollections.observableArrayList();
+    protected ObservableList<Node> visiblesNode = FXCollections.observableArrayList();
 
-    private final ScrollPane scrollPane;
+    protected final ScrollPane scrollPane;
 
     public ScrollBinder(ScrollPane pane) {
         scrollPane = pane;

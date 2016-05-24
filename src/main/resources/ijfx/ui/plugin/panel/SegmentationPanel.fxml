@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -21,10 +22,25 @@
                   <String fx:value="toggle-group" />
                   <String fx:value="vertical" />
                </styleClass>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding>
             </VBox>
-            <FontAwesomeIconView glyphName="ARROW_DOWN" size="30" styleClass="down-arrow" />
+            <FontAwesomeIconView glyphName="ARROW_DOWN" size="30">
+               <styleClass>
+                  <String fx:value="down-arrow" />
+                  <String fx:value="with-padding" />
+                  <String fx:value="with-margin" />
+               </styleClass></FontAwesomeIconView>
             <VBox fx:id="workflowVBox" />
-            <FontAwesomeIconView glyphName="ARROW_DOWN" layoutX="46.0" layoutY="104.0" size="30" styleClass="down-arrow" />
+            <FontAwesomeIconView glyphName="ARROW_DOWN" layoutX="46.0" layoutY="104.0" size="30">
+               <styleClass>
+                  <String fx:value="down-arrow" />
+                  <String fx:value="with-padding" />
+               </styleClass></FontAwesomeIconView>
             <VBox fx:id="resultbox">
                <children>
                   <Button fx:id="testButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="warning" text="Test on one image">
@@ -42,6 +58,9 @@
                   <String fx:value="with-padding" />
                   <String fx:value="vbox" />
                </styleClass>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
             </VBox>
          </children>
       </VBox>

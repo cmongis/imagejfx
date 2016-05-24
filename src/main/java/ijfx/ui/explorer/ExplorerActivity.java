@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.explorer.cell.FolderListCellCtrl;
 import ijfx.ui.explorer.event.DisplayedListChanged;
@@ -39,6 +40,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -63,6 +65,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import org.reactfx.EventStreams;
@@ -76,7 +79,7 @@ import org.scijava.plugin.PluginService;
  *
  * @author cyril
  */
-@Plugin(type = Activity.class,name="explorerActivity")
+@Plugin(type = Activity.class, name = "explorerActivity")
 public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
@@ -104,12 +107,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     ToggleButton objectModeToggleButton;
 
     @FXML
-     HBox viewHBox;
-    
+    HBox viewHBox;
+
     ToggleGroup explorationModeToggleGroup;
 
-    ToggleGroup viewToggleGroup;
-    
+ 
+    ToggleGroupValue<ExplorerView> currentView = new ToggleGroupValue<>();
     @Parameter
     FolderManagerService folderManagerService;
 
@@ -124,9 +127,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @Parameter
     PluginService pluginService;
-    
-    
-    
+
+    @Parameter
+    UiContextService uiContextService;
+
     ExplorerView view;
 
     List<Runnable> folderUpdateHandler = new ArrayList<>();
@@ -137,7 +141,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         try {
             FXUtilities.injectFXML(this);
 
-           // contentBorderPane.setCenter(view.getNode());
+            // contentBorderPane.setCenter(view.getNode());
             folderListView.setCellFactory(this::createFolderListCell);
             folderListView.getSelectionModel().selectedItemProperty().addListener(this::onFolderSelectionChanged);
 
@@ -148,16 +152,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
             explorationModeToggleGroup = new ToggleGroup();
             explorationModeToggleGroup.getToggles().addAll(fileModeToggleButton, planeModeToggleButton, objectModeToggleButton);
-            
-            
+
             fileModeToggleButton.setUserData(ExplorationMode.FILE);
             planeModeToggleButton.setUserData(ExplorationMode.PLANE);
             objectModeToggleButton.setUserData(ExplorationMode.OBJECT);
-            
+
             explorationModeToggleGroup.selectedToggleProperty().addListener(this::onToggleSelectionChanged);
             
-            
-           
+            currentView.valueProperty().addListener(this::onViewModeChanged);
             
             EventStreams.valuesOf(filterTextField.textProperty()).successionEnds(Duration.ofSeconds(1))
                     .subscribe(this::updateTextFilter);
@@ -168,33 +170,38 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     }
 
-    
     private void init() {
-        
-        if(view == null) {
-            
+
+        if (view == null) {
+
             List<ExplorerView> views = pluginService.createInstancesOfType(ExplorerView.class);
-            
-            
+
             List<ToggleButton> buttons = views.stream().map(this::createViewToggle).collect(Collectors.toList());
+            //Map<ExplorerView, ToggleButton> viewButtons = views.stream().collect(Collectors.toMap(v -> v, this::createViewToggle));
+
             
-            viewToggleGroup = new ToggleGroup();
             
-            viewToggleGroup.getToggles().addAll(buttons);
             
-            viewToggleGroup.selectedToggleProperty().addListener(this::onViewModeChanged);
             
-            viewToggleGroup.selectToggle(buttons.get(0));
-            
+           // viewToggleGroup = new ToggleGroup();
+
+            //viewToggleGroup.getToggles().addAll(buttons);
+
+            //viewToggleGroup.selectedToggleProperty().addListener(this::onViewModeChanged);
+
+            //viewToggleGroup.selectToggle(buttons.get(0));
+
             viewHBox.getChildren().addAll(buttons);
-            
+
             buttons.get(0).getStyleClass().add("first");
-            buttons.get(buttons.size()-1).getStyleClass().add("last");
+            buttons.get(buttons.size() - 1).getStyleClass().add("last");
             
+            
+            currentView.setValue(views.get(0));
         }
-        
+
     }
-    
+
     @Override
     public Node getContent() {
         return this;
@@ -202,9 +209,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @Override
     public Task updateOnShow() {
-        
+
         init();
-        
+
         explorationModeToggleGroup.selectToggle(getToggleButton(folderManagerService.getCurrentExplorationMode()));
         return new AsyncCallback<Void, List<Explorable>>()
                 .run(this::update)
@@ -236,13 +243,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
                         .collect(Collectors.toList()));
     }
 
-    
     public void updateExplorerView(ExplorerView view) {
         this.view = view;
         contentBorderPane.setCenter(view.getNode());
         view.setItem(explorerService.getFilteredItems());
     }
-    
+
     public void updateUi(List<? extends Explorable> explorable) {
 
         updateFolderList();
@@ -419,21 +425,20 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     /*
         View related functions
-    */
-    
+     */
     private ToggleButton createViewToggle(ExplorerView view) {
-         ToggleButton toggle =  new ToggleButton(null,view.getIcon());
-         toggle.setUserData(view);
-         
-         return toggle;
+        ToggleButton toggle = new ToggleButton(null, view.getIcon());
         
+        currentView.add(toggle, view);
+
+        return toggle;
+
     }
-    
-    private void onViewModeChanged(Observable obs, Toggle oldValue, Toggle newValue) {
-        updateExplorerView((ExplorerView)newValue.getUserData());
+
+    private void onViewModeChanged(Observable obs, ExplorerView oldValue, ExplorerView newValue) {
+        updateExplorerView(newValue);
     }
-    
-    
+
     private class MetaDataFilterWrapper implements MetaDataOwnerFilter {
 
         private final MetaDataOwnerFilter filter;
@@ -475,7 +480,11 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     @FXML
-    public void segment() {
+    public void onSegmentButtonPressed() {
+
+        uiContextService.toggleContext("segment", !uiContextService.isCurrent("segment"));
+        uiContextService.toggleContext("segmentation", !uiContextService.isCurrent("segmentation"));
+        uiContextService.update();
 
     }
 
@@ -483,6 +492,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void process() {
 
     }
+
     @FXML
     public void openSelection() {
         explorerService.getSelectedItems().forEach(System.out::println);
@@ -499,36 +509,42 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     protected void updateTextFilter(final String query) {
         if (filterTextField.getText() != null && !filterTextField.getText().equals("")) {
             explorerService.setOptionalFilter(m -> m.getMetaDataSet().get(MetaData.FILE_NAME).getStringValue().toLowerCase().contains(query.toLowerCase()));
-        }
-        else {
+        } else {
             explorerService.setOptionalFilter(null);
         }
     }
-    
+
     /*
         Exploration Mode Toggle related methods
     
-    */
-    
-    
+     */
     protected ExplorationMode getExplorationMode(Toggle toggle) {
         return (ExplorationMode) toggle.getUserData();
     }
-    
+
     protected Toggle getToggleButton(ExplorationMode mode) {
-        return explorationModeToggleGroup.getToggles().stream().filter(toggle->toggle.getUserData() == mode).findFirst().orElse(fileModeToggleButton);
+        return explorationModeToggleGroup.getToggles().stream().filter(toggle -> toggle.getUserData() == mode).findFirst().orElse(fileModeToggleButton);
     }
-    
-    
+
     protected void onToggleSelectionChanged(Observable obs, Toggle oldValue, Toggle newValue) {
-        if(newValue == null) return;
+        if (newValue == null) {
+            return;
+        }
         folderManagerService.setExplorationMode(getExplorationMode(newValue));
     }
-    
+
     @EventHandler
     protected void onExplorationModeChanged(ExplorationModeChangeEvent event) {
         explorationModeToggleGroup.selectToggle(getToggleButton(event.getObject()));
     }
-    
+
+    @EventHandler
+    protected void onExplorerServiceSelectionChanged(ExplorerSelectionChangedEvent event) {
+        if (event.getObject().size() == 0) {
+            System.out.println("nothing to select ?");
+        } else {
+            System.out.println("there is " + event.getObject().size());
+        }
+    }
 
 }

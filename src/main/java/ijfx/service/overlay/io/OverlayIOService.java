@@ -76,9 +76,9 @@ public interface OverlayIOService extends IjfxService{
     }
     
     public default File getImageFileFromOverlayFile(File overlayFile) {
-        String jsonFileName = overlayFile.getName();
-        String basename = FilenameUtils.getBaseName(jsonFileName);
         
+        final String basename = overlayFile.getName().replace(OVERLAY_FILE_EXTENSION, "");
+        final String jsonFileName = basename + OVERLAY_FILE_EXTENSION;
         File[] listFiles = overlayFile.getParentFile().listFiles(f->f.getName().startsWith(basename) && f.getName().equals(jsonFileName) == false);
         if(listFiles.length < 1) {
             return null;

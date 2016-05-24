@@ -19,10 +19,13 @@
  */
 package ijfx.ui.filter;
 
+import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import javafx.application.Application;
-import javafx.scene.Parent;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -32,26 +35,48 @@ import org.apache.commons.math3.random.RandomDataGenerator;
  */
 public class FilterTest extends Application {
 
+    NumberFilter filter;
+    
+    BorderPane borderPane;
+    
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        NumberFilter filter = new DefaultNumberFilter();
-        Scene scene = new Scene((Parent)filter.getContent());
+        borderPane = new BorderPane();
+        
+        borderPane.getStylesheets().add(ImageJFX.getStylesheet());
+        borderPane.getStyleClass().add("explorer-filter");
+        Button updateButton = new Button("Update values");
+        
+        
+        filter = new DefaultNumberFilter();
+        Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
 
-        ArrayList<Double> numbers = new ArrayList<>();
-        RandomDataGenerator generator = new RandomDataGenerator();
-
-        for (int i = 0; i != 300; i++) {
-            numbers.add(new Double(generator.nextInt(0, 2200)));
-        }
-
-        filter.setAllPossibleValue(numbers);
+       borderPane.setCenter(filter.getContent());
+       borderPane.setBottom(updateButton);
         
+        updateButton.setOnAction(this::update);
         
         primaryStage.show();
         
     }
+    
+    public void update(ActionEvent event) {
+         ArrayList<Double> numbers = new ArrayList<>();
+        RandomDataGenerator generator = new RandomDataGenerator();
+
+        for (int i = 0; i != 300; i++) {
+            numbers.add(new Double(generator.nextUniform(0, 0.5)));
+        }
+
+        filter.setAllPossibleValue(numbers);
+        
+        borderPane.getStylesheets().remove(ImageJFX.getStylesheet());
+        borderPane.getStylesheets().add(ImageJFX.getStylesheet());
+        
+    }
+    
     public static void main(String... args) {
         launch(args);
     }

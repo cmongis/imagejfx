@@ -20,6 +20,9 @@
  */
 package ijfx.ui.arcmenu;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 
 /**
@@ -27,23 +30,36 @@ import javafx.geometry.Point2D;
  * @author Cyril MONGIS, 2015
  */
 public class PolarSystem {
-    protected double centerX;
-    protected double centerY;
+    private final DoubleProperty centerX = new SimpleDoubleProperty(0.0f);
+    private final  DoubleProperty centerY = new SimpleDoubleProperty(0.0f);
 
-    public PolarSystem(double centerX, double centerY) {
-        this.centerX = centerX;
-        this.centerY = centerY;
+    
+    
+    public PolarSystem(ReadOnlyDoubleProperty centerX, ReadOnlyDoubleProperty centerY) {
+        this.centerX.bind(centerX);
+        this.centerY.bind(centerY);
     }
+
 
     public Point2D degreeToPolar(double r, double a) {
         a = toRadian(a);
-        double x = r * Math.cos(a);
-        double y = r * Math.sin(a);
+        double x = centerX.getValue() + (r * Math.cos(a));
+        double y = centerY.getValue() + (r * Math.sin(a));
         return new Point2D(x, y);
     }
 
     public double toRadian(double a) {
         return a * Math.PI / 180;
+    }
+    
+    
+    public DoubleProperty centerXProperty() {
+        return centerX;
+        
+    }
+    public DoubleProperty centerYProperty() {
+        return centerY;
+        
     }
 
 }

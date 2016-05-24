@@ -71,6 +71,16 @@ public class ExplorerTableVie implements ExplorerView{
         helper.setColumnsFromItems(items);
         helper.setItem(items);
         currentItems = items;
+        
+        
+        List<? extends Explorable> selected = items
+                .stream()
+                .filter(item->item.selectedProperty().getValue())
+                .collect(Collectors.toList());
+                
+        
+        //tableView.getSelectionModel().getSelectedItems().addAll(selected);
+        
     }
 
     @Override

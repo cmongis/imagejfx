@@ -102,6 +102,12 @@ public interface MetaData {
     public final static String CHANNEL_NAME = "Channel name";
     public final static String SEQUENCE_NUMBER = "Seq";
 
+    public final static String METADATA_SET_TYPE_KEY = "*Metadataset type";
+    
+    public final static String METADATA_SET_TYPE_FILE = "file";
+    public final static String METADATA_SET_TYPE_PLANE = "plane";
+    public final static String METADATA_SET_TYPE_OBJECT = "object";
+    
     public static String FILE_SIZE = "File size";
 
     public final static String PLANE_INDEX = "Plane Index";
@@ -116,8 +122,8 @@ public interface MetaData {
     public final static String BITS_PER_PIXEL = "Bits per pixels";
     public final static String TIME_COUNT = "Time frame number";
 
-    public final static String DIMENSION_ORDER = "Dimension order";
-    public final static String DIMENSION_LENGHS = "Dimension lengths";
+    public final static String DIMENSION_ORDER = "*Dimension order";
+    public final static String DIMENSION_LENGHS = "*Dimension lengths";
     public final static String PLANE_NON_PLANAR_POSITION = "*Non planar position";
     
     public final static String STATS_PIXEL_MIN = "Min";
@@ -137,7 +143,7 @@ public interface MetaData {
     }
     
     public static boolean canDisplay(String metadataKey) {
-        return metadataKey.startsWith("*");
+        return metadataKey.startsWith("*") == false;
     }
     public static boolean canDisplay(MetaData m) {
         return canDisplay(m.getName());

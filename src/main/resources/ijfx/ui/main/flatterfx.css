@@ -44,6 +44,9 @@
 
 }
 
+.root.transparent {
+    -fx-background-color:transparent;
+}
 
 
 .mnemonic-underline {
@@ -1495,6 +1498,9 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-vgap:20px;
     -fx-padding: 0;
 }
+.grid-pane-view {
+-fx-border-color: -bg-darker;;
+}
 .add-icon {
     -glyph-name: "PLUS";
     -glyph-color: blue;
@@ -1831,6 +1837,9 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .explorer-filter > .content{
     -fx-padding: 0.6em;
+}
+.explorer-filter .range-slider {
+    -fx-padding:0 10 0 45px;
 }
 
 

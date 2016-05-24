@@ -19,21 +19,13 @@
  */
 package ijfx.service.overlay.io;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
-import net.imagej.overlay.PolygonOverlay;
-import net.imagej.overlay.RectangleOverlay;
-import net.imglib2.RealPoint;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 
@@ -52,9 +44,13 @@ public class OverlayLoader {
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Overlay.class, new OverlayDeserializer(context));
         mapper.registerModule(module);
-
+        try {
         return mapper.readValue(f, mapper.getTypeFactory().constructCollectionType(List.class, Overlay.class));
-
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+                return new ArrayList<>();
+                }
     }
 
     public static void main(String... args) throws IOException {

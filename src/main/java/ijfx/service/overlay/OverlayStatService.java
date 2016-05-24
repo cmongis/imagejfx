@@ -286,7 +286,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public HashMap<String, Double> getStatistics(OverlayStatistics overlayStats) {
         
         HashMap<String, Double> statistics = new HashMap<>();
-        
+        if(overlayStats.getPixelStatistics() != null) {
         statistics.put(LBL_MEAN, overlayStats.getPixelStatistics().getMean());
         statistics.put(LBL_MIN, overlayStats.getPixelStatistics().getMin());
         statistics.put(LBL_MAX, overlayStats.getPixelStatistics().getMax());
@@ -294,6 +294,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         statistics.put(LBL_VARIANCE, overlayStats.getPixelStatistics().getVariance());
         statistics.put(LBL_MEDIAN, overlayStats.getPixelStatistics().getMedian());
         statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelStatistics().getPixelCount());
+        }
         statistics.put(LBL_AREA, overlayStats.getArea());        
         
         statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());

@@ -31,13 +31,20 @@ import javafx.util.Callback;
  *
  * @author cyril
  */
-public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler{
+public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler, Consumer<INPUT> {
 
     INPUT input;
 
     Callback<INPUT, OUTPUT> callback;
-    LongCallback<ProgressHandler,INPUT,OUTPUT> longCallback;
+    LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
+    Callback<ProgressHandler, OUTPUT> longCallable;
+
+    Consumer<Throwable> errorHandler;
+    Throwable error;
+
     Runnable runnable;
+
+    ExecutorService executor = ImageJFX.getThreadPool();
 
     public AsyncCallback() {
         super();
@@ -53,12 +60,12 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         this.callback = callback;
     }
 
-    public AsyncCallback setName(String name) {
+    public AsyncCallback<INPUT,OUTPUT> setName(String name) {
         updateTitle(name);
         updateMessage(name);
         return this;
     }
-    
+
     public AsyncCallback<INPUT, OUTPUT> run(Callback<INPUT, OUTPUT> callback) {
         this.callback = callback;
         return this;
@@ -72,54 +79,70 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         this.runnable = runnable;
         return this;
     }
-    public AsyncCallback<INPUT,OUTPUT> run(LongCallback<ProgressHandler,INPUT,OUTPUT> longCallback) {
-       this.longCallback = longCallback;
+
+    public AsyncCallback<INPUT, OUTPUT> run(LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback) {
+        this.longCallback = longCallback;
+        return this;
+    }
+
+    public AsyncCallback<INPUT, OUTPUT> runLongCallable(Callback<ProgressHandler, OUTPUT> longCallable) {
+        this.longCallable = longCallable;
         return this;
     }
 
     public OUTPUT call() {
-        try {
-            // first we check if the task was cancelled BEFORE RUNNING IT
+
+        // first we check if the task was cancelled BEFORE RUNNING IT
+        if (isCancelled()) {
+            return null;
+        }
+
+        if (longCallback != null) {
+            OUTPUT output = longCallback.handle(this, input);
+
             if (isCancelled()) {
                 return null;
+            } else {
+                return output;
             }
-            try {
-               
-                if(longCallback != null) {
-                    OUTPUT output = longCallback.handle(this,input);
-                    
-                    if(isCancelled()) return null;
-                    else return output;
-                    
-                    
-                }    
-                // now if we should execute a callback
-                else if (callback != null) {
-                    // executing and betting the output
-                    OUTPUT output = callback.call(input);
-                    // if the task has been cancelled during execution,
-                    // we cancel the output and return null
-                    if (isCancelled()) {
-                        return null;
-                    } else {
-                        return output;
-                    }
-                } // now if we have a runnable as part of the task
-                else if (runnable != null) {
-                    runnable.run();
-                    // same if it was cancelled during the problem
 
-                } else {
-                    return null;
-                }
-            } catch (Exception e) {
-                ImageJFX.getLogger().log(Level.SEVERE, "Error when executing callback", e);
+        } // now if we should execute a callback
+        else if (callback != null) {
+            // executing and betting the output
+            OUTPUT output = callback.call(input);
+            // if the task has been cancelled during execution,
+            // we cancel the output and return null
+            if (isCancelled()) {
                 return null;
+            } else {
+                return output;
             }
-        } catch (Exception e) {
-            ImageJFX.getLogger().log(Level.SEVERE, "Error when executing AsyncCallback " + callback.toString(), e);
+        } else if (longCallable != null) {
+            if (isCancelled()) {
+                return null;
+            } else {
+                OUTPUT output = longCallable.call(this);
+                if (isCancelled()) {
+                    return null;
+                } else {
+                    return output;
+                }
+            }
+        } // now if we have a runnable as part of the task
+        else if (runnable != null) {
+            runnable.run();
+            // same if it was cancelled during the problem
+
+        } else {
+            return null;
         }
         return null;
+    }
+    
+    @Override
+    protected void failed() {
+        super.failed();
+        if(errorHandler != null) errorHandler.accept(getException());
     }
 
     public AsyncCallback<INPUT, OUTPUT> setInput(INPUT input) {
@@ -131,25 +154,30 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         return input;
     }
 
-    public AsyncCallback<INPUT,OUTPUT> startIn(ExecutorService executorService) {
+    public AsyncCallback<INPUT, OUTPUT> startIn(ExecutorService executorService) {
         executorService.execute(this);
         return this;
     }
-    
+
     public AsyncCallback<INPUT, OUTPUT> start() {
-        ImageJFX.getThreadPool().execute(this);
+        executor.execute(this);
         return this;
     }
 
     public AsyncCallback<INPUT, OUTPUT> queue() {
-        ImageJFX.getThreadQueue().execute(this);
+        executor = ImageJFX.getThreadQueue();
+        executor.execute(this);
         return this;
     }
+
+  
 
     public AsyncCallback<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
         setOnSucceeded(event -> {
             // if it wasn't cancelled and it was a callback executed
-            if(consumer == null) return;
+            if (consumer == null) {
+                return;
+            }
             if (!isCancelled() && getValue() != null && runnable == null) {
                 consumer.accept(getValue());
             } else if (!isCancelled() && runnable != null) {
@@ -192,6 +220,26 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         updateMessage(message);
     }
 
-  
+    @Override
+    public void accept(INPUT t) {
+
+        setInput(t);
+        System.out.println("Starting !");
+        start();
+    }
+
+    public AsyncCallback<INPUT, OUTPUT> error(Consumer<Throwable> handler) {
+        errorHandler = handler;
+        return this;
+    }
+
+    public AsyncCallback<INPUT, OUTPUT> setExecutor(ExecutorService executor) {
+        this.executor = executor;
+        return this;
+    }
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
 
 }

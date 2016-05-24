@@ -104,7 +104,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private Task currentImageSearch;
 
-    private boolean loadImageOnlyWhenVisible = true;
+    
 
     private boolean isInsideScrollWindow = false;
 
@@ -115,7 +115,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
   
 
    
-    BooleanProperty loadImageOnlyWhenVisibleProperty;
+    private BooleanProperty loadImageOnChange = new SimpleBooleanProperty(true);
 
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
 
@@ -137,12 +137,14 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             }
 
             titleLabel.setPrefSize(100, 100);
+             imageView.setSmooth(false);
             imageView.fitWidthProperty().bind(widthProperty());
             imageView.fitHeightProperty().bind(widthProperty());
 
             imageView.fitWidthProperty().bind(imageViewContainer.widthProperty());
             imageView.fitHeightProperty().bind(imageViewContainer.widthProperty());
-
+           
+           
             item.addListener(this::onItemChanged);
 
             addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
@@ -233,6 +235,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             return;
         };
         
+        imageView.setSmooth(false);
+       
         
         setCenter(imageView);
         imageView.setImage(image);
@@ -289,7 +293,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .then(this::setAdditionalData)
                 .start();
 
-        if (loadImageOnlyWhenVisible == false || isInsideScrollWindow) {
+        if (loadImageOnChange.getValue() == true || isInsideScrollWindow) {
             updateImageAsync(newItem);
         }
 
@@ -299,7 +303,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         updateImageAsync(itemProperty().getValue());
     }
 
-    public void updateImageAsync(T newItem) {
+    protected void updateImageAsync(T newItem) {
 
         if (newItem == null) {
             return;
@@ -361,13 +365,18 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
 
     /**
-     * When false, the image is loaded whenever the item is updated. When true,
-     * the image is loaded only if the Ui element appears on the scroll window.
+     * When true, the image is loaded whenever the item is updated. When false,
+     * the image is loaded only if the UI element receive an SCROLL_WINDOW_ENTERED EVENT or if the forceUpdate
+     * method is called
      *
      * @param loadImageOnlyWhenVisible
      */
-    public void setLoadImageOnlyWhenVisible(boolean loadImageOnlyWhenVisible) {
-        this.loadImageOnlyWhenVisible = loadImageOnlyWhenVisible;
+    public void setLoadImageOnChange(boolean loadImageOnlyWhenVisible) {
+        this.loadImageOnChange.setValue(loadImageOnlyWhenVisible);
+    }
+    
+    public Boolean isLoadImageOnChange() {
+        return loadImageOnChange.getValue();
     }
 
     public BooleanProperty subtibleVisibleProperty() {

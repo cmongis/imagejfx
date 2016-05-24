@@ -133,7 +133,6 @@ public class LoadingIcon extends StackPane {
     }
     
     private double calculateCircleRadius() {
-        System.out.println(getSize());
         return sizeProperty().doubleValue() * (1. - circleGrowth) - circle.getStrokeWidth();
     }
         

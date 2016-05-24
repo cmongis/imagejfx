@@ -151,7 +151,7 @@ public class WorkflowEditor extends TitledPane implements UiPlugin {
                     return null;
                 }
             };
-            LoadingScreen.getInstance().submitTask(task, false, stackPane);
+            //LoadingScreen.getInstance().submitTask(task, false, stackPane);
             ImageJFX.getThreadQueue().submit(task);
 
         }

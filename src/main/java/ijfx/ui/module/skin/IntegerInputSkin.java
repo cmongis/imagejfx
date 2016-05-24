@@ -22,14 +22,6 @@ package ijfx.ui.module.skin;
 
 
 import ijfx.ui.module.InputSkinPlugin;
-import ijfx.ui.module.input.Input;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -37,75 +29,18 @@ import org.scijava.plugin.Plugin;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = InputSkinPlugin.class)
-public class IntegerInputSkin extends AbstractInputSkinPlugin<Integer> {
-
-    TextField field;
-
-    EventHandler<KeyEvent> changeListener = (event) -> {
-        onChange(field.getText());
-    };
-
-    public static String CLASS_INVALID = "danger";
-
-    public IntegerInputSkin() {
-        super();
-        
-       
-        
-    }
-    
-    
-    @Override
-    public Node getNode() {
-
-        field.addEventHandler(KeyEvent.KEY_RELEASED, changeListener);
-
-        return field;
-
-    }
+public class IntegerInputSkin extends AbstractNumberInput<Integer> {
 
     @Override
-    public void dispose() {
+    Integer convert(String newValue) {
+        return Integer.parseInt(newValue);
     }
-
-    Property<Integer> value = new SimpleObjectProperty<Integer>();
-
-    public void onChange(String newValue) {
-        try {
-            Integer value = Integer.parseInt(newValue);
-            valueProperty().setValue(value);
-
-            validProperty().setValue(true);
-
-            field.getStyleClass().remove(CLASS_INVALID);
-
-        } catch (Exception e) {
-            if (field.getStyleClass().contains(CLASS_INVALID) == false) {
-
-                validProperty().setValue(false);
-                field.getStyleClass().add(CLASS_INVALID);
-
-            }
-        }
-    }
-
-    @Override
-    public Property<Integer> valueProperty() {
-        return (ObjectProperty<Integer>) value;
-    }
-
-   
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        return  clazz == Integer.class;
+        return clazz == int.class || clazz == Integer.class;
     }
 
-    @Override
-    public void init(Input input) {
-        
-        field = new TextField();
-        field.setText(input.getValue().toString());
-    }
+  
 
 }

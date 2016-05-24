@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer.view;
 
+import mongis.utils.panecell.ScrollBinderChildren;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.explorer.Explorable;
@@ -27,24 +28,25 @@ import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.Iconazable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
-import mongis.utils.panecell.ScrollBinder;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -54,46 +56,83 @@ import org.scijava.plugin.Plugin;
 public class GridIconView extends BorderPane implements ExplorerView {
 
     @Parameter
-        private final GridPane gridPane = new GridPane();
+    UIService uIService;
+    private VBox vBox = new VBox();
+    private ScrollPane scrollPane;
+    private ScrollBinderChildren scrollBinderChildren;
+    private GridPane topBar;
+    private GroupExplorable groupExplorable;
+    private List<ComboBox<String>> comboBoxList;
+    private List<Label> listLabel;
+    private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(vBox);
 
-    private ScrollBinder binder;
-    private HBox hBox;
-    private SortExplorable sortExplorable;
+    public GridIconView() {
+        super();
+        groupExplorable = new GroupExplorable();
+        comboBoxList = new ArrayList<>();
+        topBar = new GridPane();
 
-    private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(gridPane);
-        public GridIconView() {
-            sortExplorable = new SortExplorable();
-            hBox = new HBox();
-            hBox.getChildren().add(new Button("r"));
-            this.setTop(hBox);
-            this.setCenter(gridPane);
-//setContent(gridPane);
+        listLabel = new ArrayList<>();
+        listLabel.add(new Label("Columns"));
+        listLabel.add(new Label("Rows"));
+        listLabel.add(new Label("Group by"));
+        IntStream.range(0, listLabel.size()).forEach(i -> {
+            topBar.add(listLabel.get(i), i, 0);
+            comboBoxList.add(new ComboBox<String>());
+            topBar.add(comboBoxList.get(i), i, 1);
+        });
+        scrollPane = new ScrollPane();
+        scrollPane.setContent(vBox);
+        this.setTop(topBar);
+
+        this.setCenter(scrollPane);
         setPrefWidth(400);
-        //setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        gridPane.prefWidthProperty().bind(widthProperty());
-        gridPane.prefHeightProperty().bind(heightProperty());
-ColumnConstraints column1 = new ColumnConstraints(100);
-    ColumnConstraints column2 = new ColumnConstraints(50, 150, 300);
-        //tilePane.setPrefTileHeight(Control.USE_PREF_SIZE);
-        gridPane.setVgap(5);
-        gridPane.setHgap(5);
-        //binder = new ScrollBinder(this);
+
         cellPaneCtrl.setCellFactory(this::createIcon);
-        
+        scrollBinderChildren = new ScrollBinderChildren(scrollPane);
+
         addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
-        
+
     }
-        
+
     @Override
     public Node getNode() {
         return this;
     }
 
-@Override
+    @Override
     public void setItem(List<? extends Explorable> items) {
-        sortExplorable.setItems(items);
-        //TODO
-        cellPaneCtrl.update(new ArrayList<Iconazable>(items));
+        List<String> metadataList = this.getMetaDataKey(items);
+        comboBoxList.stream().forEach(c -> c.getItems().addAll(metadataList));
+        initComboBox();
+
+        groupExplorable.setListItems(new CopyOnWriteArrayList(items));
+        sortItems();
+    }
+
+    public void initComboBox() {
+        IntStream.range(0, comboBoxList.size())
+                .forEach(i -> {
+                    comboBoxList.get(i)
+                            .getSelectionModel()
+                            .selectedItemProperty()
+                            .addListener((obs, old, newValue) -> {
+                                if (groupExplorable.checkNumber(newValue)) {
+                                    groupExplorable.getMetaDataList()
+                                            .set(i, newValue);
+                                    sortItems();
+                                } else {
+                                    groupExplorable.getMetaDataList().set(i, old);
+                                    uIService.showDialog(newValue + " contains to much different values", DialogPrompt.MessageType.ERROR_MESSAGE);
+                                    return;
+                                }
+                            });
+                });
+    }
+
+    private void sortItems() {
+        groupExplorable.process();
+        cellPaneCtrl.update3DList(new CopyOnWriteArrayList<>(groupExplorable.getList3D()), groupExplorable.getSizeList3D(), groupExplorable.getMetaDataList());
     }
 
     private PaneCell<Iconazable> createIcon() {
@@ -105,22 +144,21 @@ ColumnConstraints column1 = new ColumnConstraints(100);
         return cellPaneCtrl
                 .getItems()
                 .stream()
-                .map(item->(Explorable)item)
-                .filter(item->item.selectedProperty().getValue())
+                .map(item -> (Explorable) item)
+                .filter(item -> item.selectedProperty().getValue())
                 .collect(Collectors.toList());
     }
 
-    
-    public void onMouseClick(MouseEvent event){
+    public void onMouseClick(MouseEvent event) {
         System.out.println(event);
-        if(event.getTarget() == gridPane) {
-            cellPaneCtrl.getItems().forEach(item->item.selectedProperty().setValue(false));
+        if (event.getTarget() == vBox) {
+            cellPaneCtrl.getItems().forEach(item -> item.selectedProperty().setValue(false));
         }
     }
-    
+
     public void onMouseDrag(DragEvent event) {
         System.out.println(event);
-        
+
     }
 
     @Override
@@ -130,7 +168,23 @@ ColumnConstraints column1 = new ColumnConstraints(100);
 
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
-      
+
     }
-    
+
+    public ArrayList<String> getMetaDataKey(List<? extends Explorable> items) {
+
+        ArrayList<String> keyList = new ArrayList<String>();
+
+        items.forEach(plane -> {
+            plane.getMetaDataSet().keySet().forEach(key -> {
+
+                if (!keyList.contains(key)) {
+                    keyList.add(key);
+                }
+            });
+        });
+
+        return keyList;
+    }
+
 }

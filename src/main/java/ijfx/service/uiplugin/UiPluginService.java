@@ -26,10 +26,8 @@ import ijfx.ui.UiPluginSorter;
 import java.util.Collection;
 import javafx.concurrent.Task;
 import net.imagej.ImageJService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import javafx.scene.Node;
+import mongis.utils.ProgressHandler;
 
 /**
  *
@@ -41,7 +39,7 @@ public interface UiPluginService extends ImageJService,UiPluginSorter<Node>{
 
     Collection<UiPlugin> getUiPluginList();
     
-    Task<Collection<UiPlugin>> loadAll(boolean startNow);
+    Collection<UiPlugin> loadAll(ProgressHandler handler);
     
     void reload(Class<? extends UiPlugin> widget);
  

@@ -20,15 +20,17 @@
  */
 package ijfx.service.uiplugin;
 
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.ui.UiPlugin;
 import ijfx.service.log.LogService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.LoadingScreen;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.concurrent.Task;
 import javafx.scene.Node;
 import mercury.core.LogEntry;
 import mercury.core.LogEntryType;
@@ -51,7 +53,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import mongis.utils.AsyncCallback;
 import mongis.utils.CountProperty;
-import org.scijava.InstantiableException;
+import mongis.utils.ProgressHandler;
+import mongis.utils.SilentProgressHandler;
 
 /**
  *
@@ -79,6 +82,12 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
     @Parameter
     EventService eventService;
 
+    @Parameter
+    TimerService timerService;
+
+    @Parameter
+    UiContextService contextService;
+    
     Logger logger = ImageJFX.getLogger();
 
     public static final String MSG_INITALIZE = "[%s] Initializing...";
@@ -89,60 +98,15 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
     public static final String MSG_NODE_NULL = "[%s] getWidget() returns null !";
     public static final String MSG_LOADING_COUNT = "Loading widget %d / %d";
 
-    public Task<Collection<UiPlugin>> loadAll(boolean start) {
+    public Collection<UiPlugin> loadAll(ProgressHandler handler) {
 
-        final DefaultUiPluginService thisService = this;
-
-        Task<Collection<UiPlugin>> task = new Task<Collection<UiPlugin>>() {
-
-            @Override
-            protected Collection<UiPlugin> call() {
-
-                if (uiPluginMap == null) {
-                    uiPluginMap = new HashMap<>();
-
-                    // counting
-                    int count = 0;
-                    int total = pluginService.getPluginsOfType(UiPlugin.class).size();
-
-                    // starting a timer
-                    MercuryTimer timer = new MercuryTimer("Starting");
-                    timer.setLogger(logger);
-                    timer.start();
-
-                    // for each plugin   
-                    for (PluginInfo<UiPlugin> pi : pluginService.getPluginsOfType(UiPlugin.class)) {
-
-                        count++;
-                        loadWidget(pi);
-                        // Updating task progress
-                        updateProgress((long) count, total);
-                        updateMessage(String.format(MSG_LOADING_COUNT, count, total));
-
-                    }
-                }
-                return uiPluginMap.values();
-
-            }
-
-        };
-
-        if (start) {
-            ImageJFX.getThreadPool().submit(task);
+        if (handler == null) {
+            handler = new SilentProgressHandler();
         }
-
-        return task;
-    }
-
-    public void loadWidgetList() {
-        loadAll(false).run();
-
-    }
-
-    @Override
-    public Collection<UiPlugin> getUiPluginList() {
+        
+        Timer timer = timerService.getTimer(this.getClass());
+        
         if (uiPluginMap == null) {
-
             uiPluginMap = new HashMap<>();
 
             // counting
@@ -150,36 +114,36 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
             int total = pluginService.getPluginsOfType(UiPlugin.class).size();
 
             // starting a timer
-            MercuryTimer timer = new MercuryTimer("Starting");
-            timer.setLogger(logger);
+           
+            
             timer.start();
-            
-            
-            CountProperty counter = new CountProperty();
-            
-            
-            ExecutorService executor = Executors.newFixedThreadPool(4);
-            
+
             // for each plugin   
-            for (PluginInfo<UiPlugin> uiPlugin : pluginService.getPluginsOfType(UiPlugin.class)) {
-                
-                executor.submit(
-                new AsyncCallback<>(this::loadWidget)
-                        .setInput(uiPlugin)
-                        .then(plugin->{
-                         LoadingScreen.getInstance().setText(String.format(MSG_LOADING_COUNT, counter.increment(), total));
-                        }));
-                
-                
-               
+            for (PluginInfo<UiPlugin> pi : pluginService.getPluginsOfType(UiPlugin.class)) {
+
+                count++;
+                loadWidget(pi);
+                timer.elapsed("Widget loading");
+                // Updating task progress
+                handler.setProgress((long) count, total);
+                handler.setStatus(String.format(MSG_LOADING_COUNT, count, total));
+
             }
-            try {
-                executor.awaitTermination(1, TimeUnit.MINUTES);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(DefaultUiPluginService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            
+            logger.info(String.format("%d UiPlugins created",count));
+        }
+        
+        timer.logAll();
+        return uiPluginMap.values();
+    }
+
+    public void loadWidgetList() {
+        loadAll(null);
+    }
+
+    @Override
+    public Collection<UiPlugin> getUiPluginList() {
+        if (uiPluginMap == null) {
+            loadAll(null);
         }
         return uiPluginMap.values();
     }
@@ -203,8 +167,6 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
             logger.info(String.format(MSG_INITALIZE, widgetClassName));
 
             // creating the instance
-            
-         
             uiPlugin = uiPluginInfos.createInstance();
             timer.elapsed(String.format("[%s]Instance creation", widgetClassName));
 
@@ -237,7 +199,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
             } catch (NullPointerException ne) {
 
                 logger.log(Level.SEVERE, null, ne);
-                
+
                 // in case of error, the user is also notified
                 logger.warning(String.format(MSG_NO_INFO_SPECIFIED, widgetClassName));
                 logErrorService.notifyError(
@@ -259,7 +221,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
             logger.info(String.format(MSG_INITALIZE, widgetClassName));
 //            uiPlugin.init();
         } catch (Exception ex) {
-          
+
             logger.log(Level.SEVERE, MSG_ERROR_WHEN_LAUNCHING, ex);
         }
 

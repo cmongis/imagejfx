@@ -10,17 +10,16 @@
 
 <fx:root fx:id="gridPane" hgap="15.0" maxWidth="1.7976931348623157E308" type="GridPane" vgap="15.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ListView fx:id="stepListView" maxWidth="1.7976931348623157E308" prefHeight="200.0" GridPane.columnSpan="5" GridPane.rowIndex="1" />
+      <ListView fx:id="stepListView" maxWidth="1.7976931348623157E308" prefHeight="200.0" GridPane.columnSpan="5" GridPane.rowIndex="2" />
       <TextField fx:id="moduleSearchTextField" promptText="Type a step name, e.g. Gaussian Blur..." GridPane.columnIndex="1" />
       <Button fx:id="addButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Add" GridPane.columnIndex="2" />
-      <MenuButton fx:id="menuButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text="Find from the menu" GridPane.columnIndex="3" />
+      <MenuButton fx:id="menuButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text=".... or find from the menu" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
       <FontAwesomeIconView glyphName="SEARCH" size="16.0" />
    </children>
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
       <ColumnConstraints />
       <ColumnConstraints />
    </columnConstraints>
@@ -29,6 +28,7 @@
    </padding>
    <rowConstraints>
       <RowConstraints maxHeight="29.0" minHeight="10.0" prefHeight="23.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
    </rowConstraints>
 </fx:root>

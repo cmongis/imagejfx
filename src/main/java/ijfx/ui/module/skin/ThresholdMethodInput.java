@@ -37,24 +37,20 @@ import org.scijava.plugin.PluginService;
  * @author cyril
  */
 @Plugin(type = InputSkinPlugin.class)
-public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMethod>{
+public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMethod> {
 
     ObjectProperty<ThresholdMethod> methodProperty = new SimpleObjectProperty();
-    
-    
-    
+
     ComboBox<ThresholdMethod> thresholdMethodComboBox = new ComboBox<>();
-    
+
     List<ThresholdMethod> methodList;
-    
+
     @Parameter
     PluginService pluginService;
-    
-    
-    
+
     @Override
     public Property<ThresholdMethod>
-         valueProperty() {
+            valueProperty() {
         return methodProperty;
     }
 
@@ -65,32 +61,32 @@ public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMetho
 
     @Override
     public void dispose() {
-        
+
     }
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-       
+
         return clazz == ThresholdMethod.class;
     }
 
     @Override
     public void init(Input<ThresholdMethod> input) {
-        System.out.println("init ?");
+
         thresholdMethodComboBox.getItems().addAll(getMethodsList());
         thresholdMethodComboBox.getSelectionModel().select(input.getDefaultValue());
-        thresholdMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->{
+        thresholdMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             methodProperty.setValue(newValue);
-           
-                });
-        
+
+        });
+
     }
-    
+
     public List<ThresholdMethod> getMethodsList() {
-        if(methodList == null) {
+        if (methodList == null) {
             methodList = pluginService.createInstancesOfType(ThresholdMethod.class);
         }
         return methodList;
     }
-    
+
 }

@@ -20,6 +20,7 @@
 package ijfx.ui.batch;
 
 import ijfx.core.listenableSystem.MetaDataSetUtils;
+import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
 import java.util.Arrays;
@@ -75,7 +76,7 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
                 .stream()
                 .map(i->i.getMetaDataSet())
                 .collect(Collectors.toList());
-        updateColumns(MetaDataSetUtils.getAllPossibleKeys(mList).stream().collect(Collectors.toList()));
+        updateColumns(MetaDataSetUtils.getAllPossibleKeys(mList).stream().filter(MetaData::canDisplay).collect(Collectors.toList()));
     }
 
     private void updateColums(String... columnList) {
