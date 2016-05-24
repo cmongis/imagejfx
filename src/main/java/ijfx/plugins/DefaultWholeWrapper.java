@@ -20,17 +20,23 @@
 package ijfx.plugins;
 
 import ij.ImagePlus;
+import java.io.File;
+import net.imagej.Dataset;
+import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.plugin.Attr;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 /**
  * 
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter", attrs = {
-    @Attr(name = "no-legacy")})
+@Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter")
 public class DefaultWholeWrapper extends AbstractImageJ1PluginAdapter {
-
+   @Parameter(type = ItemIO.BOTH)
+    protected Dataset dataset;
+   @Parameter
+   File f;
     @Override
     public ImagePlus processImagePlus(ImagePlus input) {
         return input;

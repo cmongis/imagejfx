@@ -47,9 +47,6 @@ import org.scijava.plugin.Parameter;
  */
 public abstract class AbstractImageJ1PluginAdapter implements Command {
 
-    @Parameter(type = ItemIO.BOTH)
-    protected Dataset dataset;
-
     @Parameter
     DatasetService service;
 
@@ -60,7 +57,7 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
     EventService eventService;
 
     @Parameter
-    boolean createCopy = false;
+    boolean createCopy;
 
     boolean wholeWrap = false;
 
@@ -119,7 +116,7 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
         return service.create(dims, input.getName(), axisType, input.getValidBits(), input.isSigned(), false);
     }
 
-    private Dataset chooseDataset() {
+    private Dataset chooseDataset(Dataset dataset) {
         if (createCopy) {
             return dataset.duplicateBlank();
         }
@@ -133,7 +130,7 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
     }
 
     public Dataset processDataset(Dataset dataset) {
-        Dataset datasetToModify = chooseDataset();
+        Dataset datasetToModify = chooseDataset(dataset);
 
         for (int i = 0; i < getNumberOfSlices(dataset); i++) {
             Dataset datasetOnePlane = emptyDataset(dataset, 2);

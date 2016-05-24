@@ -20,17 +20,20 @@
 package ijfx.plugins;
 
 import ij.ImagePlus;
+import net.imagej.Dataset;
+import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.plugin.Attr;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 /**
  * 
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>DefaultAdapter", attrs = {
-    @Attr(name = "no-legacy")})
+@Plugin(type = Command.class, menuPath = "Plugins>DefaultAdapter")
 public class DefaultImageJ1PluginAdapter extends AbstractImageJ1PluginAdapter {
-
+   @Parameter(type = ItemIO.BOTH)
+    protected Dataset dataset;
     @Override
     public ImagePlus processImagePlus(ImagePlus input) {
         return input;
