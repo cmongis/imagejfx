@@ -221,6 +221,8 @@ public class DefaultFolder implements Folder,FileChangeListener{
         eventService.publish(new FolderUpdatedEvent().setObject(this));
     }
 
+    
+    /*
     private Integer fetchMoreStatistics(List<Explorable> explorableList) {
         Integer elementAnalyzedCount = 0;
         int elements = explorableList.size();
@@ -241,7 +243,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
             i++;
         }
         return elementAnalyzedCount;
-    }
+    }*/
 
     public Project getFolderProject() {
         return null;
@@ -279,10 +281,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
     
     
     public void onFileAdded(List<Explorable> files) {
-        new AsyncCallback<>(files)
-                .run(this::fetchMoreStatistics)
-                .setIn(currentTaskProperty())
-                .startIn(ImageJFX.getThreadQueue());
+       
                 
     }
     

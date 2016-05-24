@@ -26,6 +26,7 @@ import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.explorer.event.FolderAddedEvent;
+import ijfx.ui.explorer.event.FolderDeletedEvent;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.notification.DefaultNotification;
@@ -138,7 +139,15 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Override
     public void setCurrentFolder(Folder folder) {
         currentFolder = folder;
-
+        
+        
+        if(currentFolder == null) {
+            
+            setItems(new ArrayList<>());
+            updateExploredElements();
+        }
+        else {
+        
         logger.info("Setting current folder " + folder.getName());
 
         explorerService.setItems(currentFolder.getFileList());
@@ -146,6 +155,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         uiContextService.enter("explore-files");
         uiContextService.update();
         updateExploredElements();
+        }
     }
 
     @EventHandler
@@ -199,15 +209,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     private void setItems(List<Explorable> items) {
         explorerService.setItems(items);
         
-        new AsyncCallback<List<Explorable>,Integer>(items)
-                .run(this::fetchMoreStatistics)
-                .then(n->{
-                 if(n > 0 && explorerService.getItems() == items) { 
-                     explorerService.setItems(items);
-                     notificationService.publish(new DefaultNotification(getCurrentFolder().getName(), String.format("The statistics of %d images has been completed.",n)));
-                 }
-                })
-                .start();
+       
         
     }
     private Integer fetchMoreStatistics(ProgressHandler progress,List<Explorable> explorableList) {
@@ -268,6 +270,11 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     
     private void onStatisticComputingEnded(Integer computedImages) {
         notificationService.publish(new DefaultNotification("Statistic Computation", String.format("%d images where computed.",computedImages)));
+    }
+    
+    public void removeFolder(Folder folder) {
+        folderList.remove(folder);
+        eventService.publish(new FolderDeletedEvent().setObject(folder));
     }
     
 }

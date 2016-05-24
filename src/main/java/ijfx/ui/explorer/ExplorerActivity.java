@@ -53,6 +53,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -106,11 +107,13 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     ToggleButton objectModeToggleButton;
 
     @FXML
+    Button statisticsButton;
+
+    @FXML
     HBox viewHBox;
 
     ToggleGroup explorationModeToggleGroup;
 
- 
     ToggleGroupValue<ExplorerView> currentView = new ToggleGroupValue<>();
     @Parameter
     FolderManagerService folderManagerService;
@@ -157,9 +160,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             objectModeToggleButton.setUserData(ExplorationMode.OBJECT);
 
             explorationModeToggleGroup.selectedToggleProperty().addListener(this::onToggleSelectionChanged);
-            
+
             currentView.valueProperty().addListener(this::onViewModeChanged);
-            
+
             EventStreams.valuesOf(filterTextField.textProperty()).successionEnds(Duration.ofSeconds(1))
                     .subscribe(this::updateTextFilter);
 
@@ -178,18 +181,11 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             List<ToggleButton> buttons = views.stream().map(this::createViewToggle).collect(Collectors.toList());
             //Map<ExplorerView, ToggleButton> viewButtons = views.stream().collect(Collectors.toMap(v -> v, this::createViewToggle));
 
-            
-            
-            
-            
-        
-
             viewHBox.getChildren().addAll(buttons);
 
             buttons.get(0).getStyleClass().add("first");
             buttons.get(buttons.size() - 1).getStyleClass().add("last");
-            
-            
+
             currentView.setValue(views.get(0));
         }
 
@@ -273,6 +269,11 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         }
     }
 
+    @FXML
+    public void removeFolder() {
+        folderManagerService.removeFolder(folderListView.getSelectionModel().getSelectedItem());
+    }
+
     @EventHandler
     public void onFolderAdded(FolderAddedEvent event) {
         Platform.runLater(this::updateFolderList);
@@ -280,7 +281,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @EventHandler
     public void onFolderDeleted(FolderDeletedEvent event) {
-        folderListView.getItems().remove(event.getObject());
+
+        Platform.runLater(() -> {
+            folderListView.getItems().remove(event.getObject());
+        });
     }
 
     @EventHandler
@@ -317,9 +321,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
                 setGraphic(ctrl);
 
-                if (newValue != null) {
-                    ctrl.setItem(newValue);
-                }
+                ctrl.setItem(newValue);
             }
         }
 
@@ -339,14 +341,13 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     public void updateFilters() {
 
-       Task task =  new AsyncCallback<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
+        Task task = new AsyncCallback<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
                 .setInput(explorerService.getItems())
                 .run(this::generateFilter)
                 .then(this::replaceFilters)
-                
                 .start();
-       
-       loadingScreenService.frontEndTask(task, true);
+
+        loadingScreenService.frontEndTask(task, true);
 
     }
 
@@ -424,7 +425,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
      */
     private ToggleButton createViewToggle(ExplorerView view) {
         ToggleButton toggle = new ToggleButton(null, view.getIcon());
-        
+
         currentView.add(toggle, view);
 
         return toggle;
@@ -492,6 +493,16 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     public void openSelection() {
         explorerService.getSelectedItems().forEach(System.out::println);
+    }
+
+    @FXML
+    public void computeStatistics() {
+        folderManagerService.completeStatistics();
+    }
+
+    @FXML
+    public void explainMe() {
+        System.out.println("TODO");
     }
 
     public boolean isEverythingSelected() {
