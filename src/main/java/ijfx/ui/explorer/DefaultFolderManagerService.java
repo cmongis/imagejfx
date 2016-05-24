@@ -254,4 +254,20 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         });
     }
 
+    @Override
+    public void completeStatistics() {
+        loadingScreenService.frontEndTask(
+          new AsyncCallback<List<Explorable>,Integer>()
+                .run(this::fetchMoreStatistics)
+                .setInput(getCurrentFolder().getFileList())
+                .then(this::onStatisticComputingEnded)
+                .start()
+        );
+        
+    }
+    
+    private void onStatisticComputingEnded(Integer computedImages) {
+        notificationService.publish(new DefaultNotification("Statistic Computation", String.format("%d images where computed.",computedImages)));
+    }
+    
 }

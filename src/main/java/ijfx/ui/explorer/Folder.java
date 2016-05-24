@@ -19,9 +19,10 @@
  */
 package ijfx.ui.explorer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.File;
 import java.util.List;
+import javafx.beans.property.Property;
+import javafx.concurrent.Task;
 
 /**
  *
@@ -41,5 +42,7 @@ public interface Folder {
     public List<Explorable> getPlaneList();
     
     public List<Explorable> getObjectList();
+    
+    public Property<Task> currentTaskProperty();
     
 }

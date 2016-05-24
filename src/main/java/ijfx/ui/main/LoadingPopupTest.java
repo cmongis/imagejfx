@@ -20,8 +20,11 @@
 package ijfx.ui.main;
 
 import ijfx.ui.utils.BaseTester;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import javafx.scene.control.Label;
 import mongis.utils.FakeTask;
+import mongis.utils.TaskList2;
 
 /**
  *
@@ -33,6 +36,9 @@ public class LoadingPopupTest extends BaseTester {
 
     LoadingPopup loadingPopup;
 
+    TaskList2 taskList = new TaskList2();
+    
+    
     @Override
     public void initApp() {
         setContent(helloWorld);
@@ -43,13 +49,7 @@ public class LoadingPopupTest extends BaseTester {
 
     public void showPopup() {
         if (loadingPopup.isShowing() == false) {
-            loadingPopup
-                    .showOnStart(helloWorld)
-                    .bindTask(new FakeTask(2000).start())
-                    
-                    .setCanCancel(false)
-                    .closeOnFinished(true)
-                    ;//.closeOnFinished(false);
+            submitTask();
         } else {
             loadingPopup.hide();
         }
@@ -59,11 +59,24 @@ public class LoadingPopupTest extends BaseTester {
     public void reset() {
         loadingPopup = new LoadingPopup();
         loadingPopup.showCloseButtonProperty().setValue(true);
-
+        loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
+        loadingPopup.attachTo(helloWorld.getScene());
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+    
+     
+
+    public void submitTask() {
+        
+        System.out.println("Starting ...");
+        taskList.submitTask(new FakeTask(2000).start());
+        taskList.submitTask(new FakeTask(1000).start());
+        taskList.submitTask(new FakeTask(4000).start());
+
+        
     }
 
 }

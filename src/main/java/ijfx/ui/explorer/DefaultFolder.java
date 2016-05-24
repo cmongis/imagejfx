@@ -33,6 +33,7 @@ import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.service.thumb.ThumbService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.watch_dir.DirectoryWatchService;
 import ijfx.service.watch_dir.FileChangeListener;
 import ijfx.ui.activity.ActivityService;
@@ -47,9 +48,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
 import mongis.utils.AsyncCallback;
-import net.imagej.overlay.Overlay;
+import mongis.utils.ProgressHandler;
+import mongis.utils.SilentProgressHandler;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.util.Incrementor;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
 import org.scijava.event.EventService;
@@ -113,6 +119,11 @@ public class DefaultFolder implements Folder,FileChangeListener{
     @Parameter
     OverlayIOService overlayIOService;
     
+    @Parameter
+    LoadingScreenService loadingScreenService;
+    
+    Property<Task> currentTaskProperty = new SimpleObjectProperty<>();
+    
     public DefaultFolder() {
 
     }
@@ -149,34 +160,33 @@ public class DefaultFolder implements Folder,FileChangeListener{
             files = new ArrayList<>();
             
             
-            new AsyncCallback<Void,List<Explorable>>()
+            Task task = new AsyncCallback<Void,List<Explorable>>()
                     .setInput(null)
                     .run(this::fetchItems)
                     .then(result->{
                         files = result;
                         eventService.publish(new FolderUpdatedEvent().setObject(this));
                     })
+                    .setIn(currentTaskProperty())
                     .start();
-                    
-            //files = fetchItems(null);
             
+            loadingScreenService.frontEndTask(task);
             
-           
-            
-
         }
          listenToDirectoryChange();
         return files;
     }
 
-    private List<Explorable> fetchItems(Void v) {
+    private List<Explorable> fetchItems(ProgressHandler progress, Void v) {
 
+        if(progress == null) progress = new SilentProgressHandler();
         
         
         Timer timer = timerService.getTimer(this.getClass());
         timer.start();
         Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(file);
         timer.elapsed("record fetching");
+        progress.setStatus("Analysing folder...");
         List<Explorable> explorables = records
                 .stream()
                 .map(record->{
@@ -199,12 +209,6 @@ public class DefaultFolder implements Folder,FileChangeListener{
     public void setPath(String path) {
         file = new File(path);
         files = null;
-        
-        
-        
-        
-        
-        
     }
 
     @JsonGetter("path")
@@ -214,19 +218,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
 
     private void addItems(List<Explorable> explorables) {
         files.addAll(explorables);
-        System.out.println("Added " + explorables.size());
         eventService.publish(new FolderUpdatedEvent().setObject(this));
-
-        // now we can start a second thread that will slowly get statistics from images
-        new AsyncCallback<List<Explorable>, Integer>()
-                .setInput(files)
-                .run(this::fetchMoreStatistics)
-                .then(count -> {
-                    if (count > 0) {
-                        eventService.publish(new FolderUpdatedEvent().setObject(this));
-                    }
-                })
-                .start();
     }
 
     private Integer fetchMoreStatistics(List<Explorable> explorableList) {
@@ -289,6 +281,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
     public void onFileAdded(List<Explorable> files) {
         new AsyncCallback<>(files)
                 .run(this::fetchMoreStatistics)
+                .setIn(currentTaskProperty())
                 .startIn(ImageJFX.getThreadQueue());
                 
     }
@@ -346,6 +339,11 @@ public class DefaultFolder implements Folder,FileChangeListener{
         return collect;
                 
         
+    }
+
+    @Override
+    public Property<Task> currentTaskProperty() {
+        return currentTaskProperty;
     }
     
     

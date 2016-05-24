@@ -22,8 +22,8 @@ package mongis.utils;
 import ijfx.ui.main.ImageJFX;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 import javafx.application.Platform;
+import javafx.beans.property.Property;
 import javafx.concurrent.Task;
 import javafx.util.Callback;
 
@@ -238,6 +238,11 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         return this;
     }
 
+    public AsyncCallback<INPUT,OUTPUT> setIn(Property<Task> taskProperty) {
+        Platform.runLater(()->taskProperty.setValue(this));
+        return this;
+    }
+    
     public ExecutorService getExecutor() {
         return executor;
     }

@@ -40,7 +40,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -183,13 +182,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             
             
             
-           // viewToggleGroup = new ToggleGroup();
-
-            //viewToggleGroup.getToggles().addAll(buttons);
-
-            //viewToggleGroup.selectedToggleProperty().addListener(this::onViewModeChanged);
-
-            //viewToggleGroup.selectToggle(buttons.get(0));
+        
 
             viewHBox.getChildren().addAll(buttons);
 
@@ -346,11 +339,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     public void updateFilters() {
 
-        new AsyncCallback<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
+       Task task =  new AsyncCallback<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
                 .setInput(explorerService.getItems())
                 .run(this::generateFilter)
                 .then(this::replaceFilters)
+                
                 .start();
+       
+       loadingScreenService.frontEndTask(task, true);
 
     }
 

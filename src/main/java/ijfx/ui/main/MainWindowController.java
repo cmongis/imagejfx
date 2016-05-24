@@ -27,7 +27,6 @@ import ijfx.bridge.ImageJContainer;
 import ijfx.ui.notification.Notification;
 import ijfx.ui.notification.NotificationEvent;
 import ijfx.service.ui.AppService;
-import ijfx.service.uiplugin.DefaultUiPluginService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.log.LogService;
 import ijfx.service.ui.FontEndTaskSubmitted;
@@ -36,9 +35,7 @@ import ijfx.service.ui.hint.DefaultHint;
 import ijfx.service.ui.hint.Hint;
 import ijfx.service.ui.hint.HintRequestEvent;
 import ijfx.service.uiplugin.UiPluginReloadedEvent;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -96,12 +93,12 @@ import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
-import java.util.Collection;
 import javafx.scene.Scene;
 import mongis.utils.AnimationChain;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
+import mongis.utils.TaskList2;
 
 /**
  * FXML Controller class
@@ -203,6 +200,8 @@ public class MainWindowController extends AnchorPane {
 
     Queue<Hint> hintQueue = new LinkedList<>();
 
+    TaskList2 taskList = new TaskList2();
+    
     boolean isHintDisplaying = false;
 
     private Thread memoryThread = new Thread(() -> {
@@ -265,6 +264,8 @@ public class MainWindowController extends AnchorPane {
         mainBorderPane.setOpacity(1.0);
         mainBorderPane.setCenter(new Label("Loading..."));
 
+        loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
+        
     }
 
     private Scene myScene;
@@ -282,10 +283,11 @@ public class MainWindowController extends AnchorPane {
 
         loadingPopup
                 .setCanCancel(false)
-                .bindTask(task)
                 .closeOnFinished()
-                .showOnScene(this.getScene());
+                .attachTo(this.getScene());
 
+        
+        taskList.submitTask(task);
         hideSideMenu();
 
     }
@@ -662,9 +664,7 @@ public class MainWindowController extends AnchorPane {
             Platform.runLater(() -> {
                 System.out.println("front end task submitted");
                 if(event.getObject() == null) return;
-                loadingPopup.bindTask(event.getObject())
-                        .closeOnFinished();
-                loadingPopup.showOnScene(this.getScene());
+                taskList.submitTask(event.getObject());
             });
         }
     }

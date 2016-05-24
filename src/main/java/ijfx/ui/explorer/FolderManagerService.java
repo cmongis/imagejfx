@@ -42,4 +42,6 @@ public interface FolderManagerService extends IjfxService{
     
     public ExplorationMode getCurrentExplorationMode();
     
+    public void completeStatistics();
+    
 }

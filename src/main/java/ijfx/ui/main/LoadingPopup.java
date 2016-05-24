@@ -23,6 +23,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -37,7 +38,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.PopupControl;
-import javafx.stage.PopupWindow;
 
 /**
  *
@@ -73,6 +73,11 @@ public class LoadingPopup extends PopupControl {
 
     }
 
+    public LoadingPopup attachTo(Scene scene) {
+        lastScene = scene;
+        return this;
+    }
+    
     public LoadingPopup setOnCancel(EventHandler<? extends ActionEvent> eventHandler) {
         onCancel.setValue(eventHandler);
         return this;
@@ -195,6 +200,8 @@ public class LoadingPopup extends PopupControl {
         return taskRunningProperty;
     }
 
+    
+    
     public LoadingPopup closeOnFinished() {
         return closeOnFinished(Boolean.TRUE);
     }
@@ -224,6 +231,10 @@ public class LoadingPopup extends PopupControl {
         coveredNode.setValue(node);
         return this;
 
+    }
+    
+    public Property<Task> taskProperty() {
+        return taskProperty;
     }
 
 }
