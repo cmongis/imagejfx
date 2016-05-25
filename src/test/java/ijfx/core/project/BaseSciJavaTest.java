@@ -36,11 +36,7 @@ public class BaseSciJavaTest {
     public static SciJava scijava;
     
     
-    @Parameter
-    ProjectManagerService projectService;
-    
-    @Parameter
-    ProjectIoService projectIOService;
+   
     
     @Parameter
     ImageRecordService imageRecordService;
@@ -66,7 +62,7 @@ public class BaseSciJavaTest {
         
        init();
         
-        System.out.println(projectService);
+        System.out.println(imageRecordService);
         
         
     }

@@ -20,7 +20,6 @@
  */
 package ijfx.ui.datadisplay.image;
 
-import ijfx.ui.arcmenu.ArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.ToolChangeEvent;
@@ -48,6 +47,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -244,16 +244,10 @@ public class ImageWindow extends Window {
 
         getRightIcons().add(closeIcon);
 
-        this.setOnCloseAction((event) -> {
-            eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
-        });
+       
+        setOnCloseAction(this::onWindowClosed);
 
-        closeIcon.onActionProperty().addListener(event -> {
-            toolService.getCurrentTool().unsubscribe(canvas);
-            imageDisplay.close();
-
-        });
-
+       
         setPrefSize(300, 300);
 
         //putting an unused hbox...
@@ -736,6 +730,15 @@ public class ImageWindow extends Window {
         refreshSourceImage();
     }
     
+    protected void onWindowClosed(ActionEvent event) {
+          System.out.println("Closing dataset");
+            if(toolService.getCurrentTool() != null)
+            toolService.getCurrentTool().unsubscribe(canvas);
+            datasetService.getDatasets().remove(datasetService.getDatasets(imageDisplay));
+            //mageDisplayService.getActiveDataset(imageDisplay).
+            imageDisplay.close();
+             eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
+    }
    
 
     @EventHandler

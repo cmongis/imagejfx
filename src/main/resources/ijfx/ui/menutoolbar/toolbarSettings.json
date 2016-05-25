@@ -179,25 +179,7 @@
                 }
             },
             
-            {
-                "type": "Command"
-                ,
-                "label": "Adaptive Median"
-                ,
-                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAdaptiveMedian"
-                ,
-                "icon": "preview"
-                ,
-                "context": "image-open"
-                
-                ,"parameters": {
-                    "neighTypeString": "RADIAL_STRING"
-
-                }
-
-            }
-
-            ,
+            
             {
                 "type": "Command"
                 ,

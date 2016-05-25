@@ -23,11 +23,18 @@ import ijfx.ui.explorer.Folder;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import mongis.utils.FXUtilities;
 import mongis.utils.ListCellController;
+import static org.reactfx.util.Tuples.t;
 
 /**
  *
@@ -43,6 +50,10 @@ public class FolderListCellCtrl extends VBox implements ListCellController<Folde
 
     Folder currentFolder;
 
+    Property<Task> currentTaskProperty = new SimpleObjectProperty<>();
+    
+    BooleanProperty taskRunningProperty = new SimpleBooleanProperty();
+    
     public FolderListCellCtrl() {
         try {
             FXUtilities.injectFXML(this);
@@ -58,10 +69,15 @@ public class FolderListCellCtrl extends VBox implements ListCellController<Folde
 
         if (t != null) {
             titleLabel.setText(t.getName());
-            subtitleLabel.setText(String.format("%d images", t.getFileList().size()));
+            updateLabel();
         }
     }
 
+    public void updateLabel() {
+        subtitleLabel.textProperty().unbind();
+        subtitleLabel.setText(String.format("%d images", currentFolder.getFileList().size()));
+    }
+    
     @Override
     public Folder getItem() {
         return currentFolder;
@@ -72,6 +88,24 @@ public class FolderListCellCtrl extends VBox implements ListCellController<Folde
         if(currentFolder != null) {
             setItem(currentFolder);
         }
+    }
+    
+    
+    
+    private void onCurrentTaskChanged(Observable obs, Task oldValue, Task newValue) {
+        
+        subtitleLabel.textProperty().bind(newValue.messageProperty());
+        taskRunningProperty.bind(newValue.runningProperty());
+        
+        
+    }
+    
+    private void onTaskStatusChanged(Observable obs, Boolean oldValue, Boolean isRunning) {
+        if(!isRunning) {
+            updateLabel();
+        }
+        
+        
     }
     
 }

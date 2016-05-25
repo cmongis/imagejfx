@@ -62,13 +62,12 @@ import org.scijava.plugin.Plugin;
 import org.scijava.thread.ThreadService;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
-import ijfx.ui.project_manager.search.PopoverToggleButton;
 import javafx.beans.Observable;
 import javafx.concurrent.Task;
 import mongis.utils.AsyncCallback;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
-
+import ijfx.ui.widgets.PopoverToggleButton;
 /**
  *
  * @author Cyril MONGIS

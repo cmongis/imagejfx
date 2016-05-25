@@ -98,6 +98,12 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     private void setColumnNumber(Integer number) {
         int actualSize = tableView.getColumns().size();
         System.out.println(String.format("Changing the number of column from %d to %d", actualSize, number));
+        
+        if(number == 0) {
+            tableView.getColumns().clear();
+            return;
+        }
+        
         if (actualSize == number) {
             return;
         }

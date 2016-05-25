@@ -69,6 +69,8 @@ public abstract class ImageJ1PluginAdapter implements Command{
         return wrapImage;
     }
     
+    
+    
     public Dataset wrapDataset(ImagePlus imp) {
          Img img = ImageJFunctions.wrap(imp);
         return service.create(img);

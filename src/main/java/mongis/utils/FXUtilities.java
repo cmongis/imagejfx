@@ -22,7 +22,6 @@ package mongis.utils;
 
 import ijfx.core.listenableSystem.Listening;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.project_manager.project.IconItem;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;

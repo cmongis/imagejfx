@@ -20,7 +20,6 @@
  */
 package ijfx.ui.datadisplay.table;
 
-import ijfx.core.project.query.QueryService;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,11 +39,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
-import jfxtras.scene.control.window.CloseIcon;
 import net.imagej.table.Table;
 import net.imagej.table.TableDisplay;
 import mongis.utils.FXUtilities;
-import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -61,9 +58,7 @@ public class TableDisplayView extends BorderPane {
 
     final Logger logger = ImageJFX.getLogger();
 
-    @Parameter
-    QueryService queryService;
-
+   
     public TableDisplayView() {
 
         logger.info("Injecting FXML");

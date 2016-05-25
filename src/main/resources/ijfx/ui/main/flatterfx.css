@@ -923,10 +923,18 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 .toggle-selection-list .toggle-button{
     -fx-background-radius:0;
+    -fx-effect:null;
+    -fx-background-color:transparent;
+    -fx-text-alignment:left!important;
+    -fx-alignment:left;
 }
 .toggle-selection-list .toggle-button:hover{
     -fx-translate-x:0;
     -fx-translate-y:0;
+    -fx-background-color:-flatter-primary;
+}
+.toggle-selection-list .toggle-button:selected {
+    -fx-background-color:derive(-flatter-warning,-15%);
 }
 
 .combo-box .list-cell {
@@ -1902,4 +1910,22 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
  .down-arrow {
      -fx-padding:10px;
      -fx-font-size:20px;
+ }
+
+ /*
+    Drag Panel
+ 
+ */
+ .drag-panel *{
+     -fx-fill:derive(-bg-light,50%);
+    
+ }
+ .drag-panel .label {
+     -fx-text-align:center;
+ }
+ .drag-panel .glyph {
+     
+    -glyph-size:150;
+    -fx-translate-x:10;
+    -glyph-color:red;
  }

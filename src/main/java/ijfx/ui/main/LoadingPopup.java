@@ -222,7 +222,7 @@ public class LoadingPopup extends PopupControl {
                 hide();
             }
         } else if (newValue == true && isShowing() == false) { // the task started running
-            showOnScene(coveredNode.getValue().getScene());
+            showOnScene(lastScene);
         }
 
     }

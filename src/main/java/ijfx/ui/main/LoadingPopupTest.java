@@ -19,10 +19,9 @@
  */
 package ijfx.ui.main;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.ui.utils.BaseTester;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import javafx.scene.control.Label;
+import ijfx.ui.utils.DragPanel;
 import mongis.utils.FakeTask;
 import mongis.utils.TaskList2;
 
@@ -32,7 +31,7 @@ import mongis.utils.TaskList2;
  */
 public class LoadingPopupTest extends BaseTester {
 
-    Label helloWorld = new Label("hello");
+    DragPanel helloWorld;
 
     LoadingPopup loadingPopup;
 
@@ -41,7 +40,7 @@ public class LoadingPopupTest extends BaseTester {
     
     @Override
     public void initApp() {
-        setContent(helloWorld);
+       
         addAction("Show popup", this::showPopup);
         addAction("Reset", this::reset);
         reset();
@@ -57,10 +56,15 @@ public class LoadingPopupTest extends BaseTester {
     }
 
     public void reset() {
+        
+        
+        helloWorld= new DragPanel("Drag something here. Because\n I need a longer text",FontAwesomeIcon.BANK);
+        setContent(helloWorld);
         loadingPopup = new LoadingPopup();
         loadingPopup.showCloseButtonProperty().setValue(true);
         loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
         loadingPopup.attachTo(helloWorld.getScene());
+        System.out.println("Reseted");
     }
 
     public static void main(String[] args) {

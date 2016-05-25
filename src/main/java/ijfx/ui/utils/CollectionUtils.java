@@ -17,23 +17,20 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
+package ijfx.ui.utils;
 
-import java.io.File;
-import java.io.IOException;
-import net.imagej.Dataset;
-import net.imglib2.type.numeric.RealType;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author cyril
  */
-public interface ImagePlaneService extends IjfxService {
-
-    <T extends RealType<T>> Dataset extractPlane(File file, long[] dims, long[] dimsLength) throws IOException;
-
-    Dataset extractPlane(File file, int planeIndex) throws IOException;
-
-    <T extends RealType<T>> Dataset isolatePlane(Dataset dataset, long[] position);
-
+public class CollectionUtils {
+    public static <T> void syncronizeContent(List<T> source, List<T> dest) {
+        
+        dest.addAll(source.stream().filter(e->!dest.contains(e)).collect(Collectors.toList()));
+        dest.removeAll(dest.stream().filter(e->source.contains(e) == false).collect(Collectors.toList()));
+        
+    }
 }

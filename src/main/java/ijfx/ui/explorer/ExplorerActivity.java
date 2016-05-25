@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.ui.LoadingScreenService;
@@ -34,6 +35,8 @@ import ijfx.ui.filter.DefaultMetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataOwnerFilter;
 import ijfx.ui.main.SideMenuBinding;
+import ijfx.ui.utils.CollectionUtils;
+import ijfx.ui.utils.DragPanel;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -47,8 +50,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -74,6 +80,7 @@ import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
+import org.scijava.util.ListUtils;
 
 /**
  *
@@ -139,6 +146,17 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     Property<ExplorationMode> explorationModeProperty = new SimpleObjectProperty<>();
 
+    BooleanProperty folderListEmpty = new SimpleBooleanProperty(true);
+
+    BooleanProperty explorerListEmpty = new SimpleBooleanProperty(true);
+
+    DragPanel dragPanel;
+
+    private  final String NO_FOLDER_TEXT = "Click on \"Add folder\" or drop a\nfolder here to explorer it";
+    private  final FontAwesomeIcon NO_FOLDER_ICON = FontAwesomeIcon.DOWNLOAD;
+    private  final String EMPTY_FOLDER_TEXT = "Empty";
+    private  final FontAwesomeIcon EMPTY_FOLDER_ICON = FontAwesomeIcon.FROWN_ALT;
+    
     public ExplorerActivity() {
         try {
             FXUtilities.injectFXML(this);
@@ -162,6 +180,11 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             explorationModeToggleGroup.selectedToggleProperty().addListener(this::onToggleSelectionChanged);
 
             currentView.valueProperty().addListener(this::onViewModeChanged);
+
+            dragPanel = new DragPanel("No folder open", FontAwesomeIcon.DASHCUBE);
+            
+            folderListEmpty.addListener(this::onFolderListEmptyPropertyChange);
+            explorerListEmpty.addListener(this::onExplorerListEmptyPropertyChange);
 
             EventStreams.valuesOf(filterTextField.textProperty()).successionEnds(Duration.ofSeconds(1))
                     .subscribe(this::updateTextFilter);
@@ -222,6 +245,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     public void updateFolderList() {
+        
+        
+        /*
         folderListView
                 .getItems()
                 .addAll(
@@ -230,6 +256,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
                         .stream()
                         .filter(this::isNotDisplayed)
                         .collect(Collectors.toList()));
+       */
+        
+        CollectionUtils.syncronizeContent(folderManagerService.getFolderList(), folderListView.getItems());
+        
     }
 
     public void updateExplorerView(ExplorerView view) {
@@ -241,18 +271,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void updateUi(List<? extends Explorable> explorable) {
 
         updateFolderList();
-        System.out.println(explorable.size());
-        if (explorable == null) {
-            contentBorderPane.setCenter(new Label("Drag and drop a folder containing your image to explore it"));
 
-        } else if (explorable.size() == 0) {
-            contentBorderPane.setCenter(new Label("This folder doesn't contain any images... for now"));
-        } else {
-            contentBorderPane.setCenter(view.getNode());
+        folderListEmpty.setValue(folderListView.getItems().isEmpty());
+        explorerListEmpty.setValue(explorable == null || explorable.isEmpty());
+        if (explorable != null) {
             view.setItem(explorable);
-
         }
-
     }
 
     // returns true if the folder is not displayed yet
@@ -280,11 +304,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     @EventHandler
-    public void onFolderDeleted(FolderDeletedEvent event) {
-
-        Platform.runLater(() -> {
-            folderListView.getItems().remove(event.getObject());
-        });
+    public void onFolderDeleted(FolderDeletedEvent event) {     
+        Platform.runLater(this::updateFolderList);
     }
 
     @EventHandler
@@ -503,6 +524,28 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     public void explainMe() {
         System.out.println("TODO");
+    }
+
+    private void onFolderListEmptyPropertyChange(Observable obs, Boolean oldV, Boolean isEmpty) {
+        if (isEmpty) {
+            dragPanel.setLabel(NO_FOLDER_TEXT)
+                    .setIcon(NO_FOLDER_ICON);
+
+        }
+
+    }
+
+    public void onExplorerListEmptyPropertyChange(Observable obs, Boolean oldV, Boolean isEmpty) {
+        if (!isEmpty) {
+            contentBorderPane.setCenter(currentView.getValue().getNode());
+           // getChildren().remove(dragPanel);
+        } else {
+            contentBorderPane.setCenter(dragPanel);
+            
+            dragPanel.setLabel(EMPTY_FOLDER_TEXT)
+                    .setIcon(EMPTY_FOLDER_ICON);
+            
+        }
     }
 
     public boolean isEverythingSelected() {

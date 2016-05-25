@@ -26,7 +26,7 @@ import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
-import ijfx.core.project.Project;
+
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
@@ -245,14 +245,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
         return elementAnalyzedCount;
     }*/
 
-    public Project getFolderProject() {
-        return null;
-    }
 
-    private Project createPlaneProject() {
-
-        return null;
-    }
 
     @Override
     public List<Explorable> getPlaneList() {

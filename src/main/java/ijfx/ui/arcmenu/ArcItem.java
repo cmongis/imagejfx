@@ -658,7 +658,7 @@ public class ArcItem<T> extends Control {
         }
 
         tickHashMap.forEach((key, node) -> {
-
+            
             if (key.equals(newValue)) {
                 node.getStyleClass().add(ArcItemSkin.CSS_ARC_ITEM_CHOICE_BOX_HOVER);
             } else {
