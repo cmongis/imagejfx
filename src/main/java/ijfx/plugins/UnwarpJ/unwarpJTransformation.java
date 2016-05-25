@@ -2146,8 +2146,8 @@ class unwarpJTransformation {
                 }
             }
         }
-        double min_val = output_ip.getProcessor().getMin();
-        double max_val = output_ip.getProcessor().getMax();
+        double min_val = sourceImp.getProcessor().getMin();
+        double max_val = sourceImp.getProcessor().getMax();
         fp.setMinAndMax(min_val, max_val);
         output_ip.setProcessor("Output", fp);
         output_ip.updateImage();

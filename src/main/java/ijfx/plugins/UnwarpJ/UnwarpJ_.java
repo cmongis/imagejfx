@@ -20,7 +20,7 @@
  */
 /*====================================================================
 | Version: July 8, 2006 by Steve Bryson and Carlos Oscar
-| modified to replace Tiff image output with high-quality Jpeg output
+| modified to replace Tiff image outputDataset with high-quality Jpeg outputDataset
 \===================================================================*/
 
 /*====================================================================
@@ -64,75 +64,23 @@ package ijfx.plugins.UnwarpJ;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.Macro;
 import ij.WindowManager;
 import ij.gui.GUI;
-import ij.gui.ImageCanvas;
-import ij.gui.ImageWindow;
-import ij.gui.Roi;
-import ij.gui.Toolbar;
 import ij.io.FileSaver;
 import ij.plugin.JpegWriter;
 import ij.io.Opener;
-import ij.measure.Calibration;
-import ij.plugin.PlugIn;
-import ij.process.ByteProcessor;
-import ij.process.FloatProcessor;
 import ij.process.ImageConverter;
-import ij.process.ImageProcessor;
-import ij.process.ShortProcessor;
 import ijfx.plugins.AbstractImageJ1PluginAdapter;
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Canvas;
-import java.awt.Checkbox;
-import java.awt.CheckboxGroup;
-import java.awt.Choice;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Event;
-import java.awt.FileDialog;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.Label;
-import java.awt.Panel;
 import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.TextArea;
-import java.awt.TextField;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.TextEvent;
-import java.awt.event.TextListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Stack;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import net.imagej.Dataset;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.Img;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -144,15 +92,15 @@ import org.scijava.plugin.Plugin;
 
 /*------------------------------------------------------------------*/
 
-@Plugin(type = Command.class, menuPath = "Plugins>UnwarpJ")
+@Plugin(type = Command.class, menuPath = "Plugins>UnwarpJ_")
 public class UnwarpJ_ extends AbstractImageJ1PluginAdapter {
-   @Parameter
-    protected Dataset dataset;
+   @Parameter(type = ItemIO.OUTPUT)
+   Dataset outputDataset;
     @Parameter(label = "Source")
-    Dataset source;
+    Dataset sourceDataset;
     
     @Parameter(label = "Target")
-    Dataset target;
+    Dataset targetDataset;
  /* begin class UnwarpJ_ */
 
 /*....................................................................
@@ -164,7 +112,7 @@ public class UnwarpJ_ extends AbstractImageJ1PluginAdapter {
     public void run() 
  {
      setWholeWrap(true);
-   final String commandLine ="";
+   final String commandLine ="-align target.tif NULL source.tif NULL 0 4 0 0 1 output.tif";
    String options = Macro.getOptions();
    if (!commandLine.equals("")) options = commandLine;
    if (options == null) {
@@ -194,7 +142,7 @@ public class UnwarpJ_ extends AbstractImageJ1PluginAdapter {
 //
 ///*------------------------------------------------------------------*/
 //public static void main(String args[]) {
-String []args= new String("unwarpj -align target.jpg NULL source.jpg NULL 0 2 1 1 0 output.tif 1 landmarks.txt").split(" ");
+String []args= commandLine.split(" ");
 
    if (args.length<1) {
       dumpSyntax();
@@ -227,9 +175,9 @@ private void alignImagesMacro(String args[]) {
    if (jpeg_output) args_len--;
 
    // Read input parameters
-//   String fn_target=args[1];
+   String fn_target=args[1];
    String fn_target_mask=args[2];
-//   String fn_source=args[3];
+   String fn_source=args[3];
    String fn_source_mask=args[4];
    int min_scale_deformation=((Integer) new Integer(args[5])).intValue();
    int max_scale_deformation=((Integer) new Integer(args[6])).intValue();
@@ -248,24 +196,24 @@ private void alignImagesMacro(String args[]) {
       stopThreshold=((Double) new Double(args[13])).doubleValue();
 
    // Show parameters
-//   IJ.write("Target image           : "+fn_target);
-//   IJ.write("Target mask            : "+fn_target_mask);
-//   IJ.write("Source image           : "+fn_source);
-//   IJ.write("Source mask            : "+fn_source_mask);
-//   IJ.write("Min. Scale Deformation : "+min_scale_deformation);
-//   IJ.write("Max. Scale Deformation : "+max_scale_deformation);
-//   IJ.write("Div. Weight            : "+divWeight);
-//   IJ.write("Curl Weight            : "+curlWeight);
-//   IJ.write("Image Weight           : "+imageWeight);
-//   IJ.write("Output:                : "+fn_out);
-//   IJ.write("Landmark Weight        : "+landmarkWeight);
-//   IJ.write("Landmark file          : "+fn_landmark);
-//   IJ.write("JPEG Output            : "+jpeg_output);
+   IJ.write("Target image           : "+fn_target);
+   IJ.write("Target mask            : "+fn_target_mask);
+   IJ.write("Source image           : "+fn_source);
+   IJ.write("Source mask            : "+fn_source_mask);
+   IJ.write("Min. Scale Deformation : "+min_scale_deformation);
+   IJ.write("Max. Scale Deformation : "+max_scale_deformation);
+   IJ.write("Div. Weight            : "+divWeight);
+   IJ.write("Curl Weight            : "+curlWeight);
+   IJ.write("Image Weight           : "+imageWeight);
+   IJ.write("Output:                : "+fn_out);
+   IJ.write("Landmark Weight        : "+landmarkWeight);
+   IJ.write("Landmark file          : "+fn_landmark);
+   IJ.write("JPEG Output            : "+jpeg_output);
 
    // Produce side information
    int     imagePyramidDepth=max_scale_deformation-min_scale_deformation+1;
    int     min_scale_image=0;
-   int     outputLevel=-1;
+   int     outputLevel=2;
    boolean showMarquardtOptim=false;
    int     accurate_mode=1;
    boolean saveTransf=true;
@@ -275,9 +223,9 @@ private void alignImagesMacro(String args[]) {
    if (dot == -1) fn_tnf=fn_out + "_transf.txt";
    else           fn_tnf=fn_out.substring(0, dot)+"_transf.txt";
 
-   // Open target
+   // Open targetDataset
    Opener opener=new Opener();
-   ImagePlus targetImp = this.getInput(this.dataset);
+   ImagePlus targetImp = this.getInput(this.targetDataset);
 //   targetImp=opener.openImage(fn_target);
    unwarpJImageModel target =
       new unwarpJImageModel(targetImp.getProcessor(), true);
@@ -289,8 +237,9 @@ private void alignImagesMacro(String args[]) {
        targetMsk.readFile(fn_target_mask);
    unwarpJPointHandler targetPh=null;
 
-   // Open source
-   ImagePlus sourceImp = getInput(dataset);
+   // Open sourceDataset
+   ImagePlus sourceImp = getInput(sourceDataset);
+   sourceImp.show();
 //   sourceImp=opener.openImage(fn_source);
    unwarpJImageModel source =
       new unwarpJImageModel(sourceImp.getProcessor(), false);
@@ -347,7 +296,12 @@ private void alignImagesMacro(String args[]) {
       WindowManager.setTempCurrentImage(output_ip);	
       js.run(fn_out);
    } else
-      fs.saveAsTiff(fn_out);
+      //fs.saveAsTiff(fn_out);
+       output_ip.show();
+    Img img = ImageJFunctions.wrap(output_ip);
+    ImageJFunctions.show((RandomAccessibleInterval) img);
+   outputDataset= service.create(img);//setOutput(output_ip, outputDataset);;
+   outputDataset.setName(fn_out);
 }
 
 /*------------------------------------------------------------------*/
@@ -441,7 +395,7 @@ private static void transformImageMacro(String args[]) {
    String fn_tnf   =args[3];
    String fn_out   =args[4];
 
-   // Jpeg output
+   // Jpeg outputDataset
    String last_argument=args[args.length-1];
    boolean jpeg_output=last_argument.equals("-jpg_output");
 
@@ -452,12 +406,12 @@ private static void transformImageMacro(String args[]) {
    IJ.write("Output                 : "+fn_out);
    IJ.write("JPEG output            : "+jpeg_output);
 
-   // Open target
+   // Open targetDataset
    Opener opener=new Opener();
    ImagePlus targetImp;
    targetImp=opener.openImage(fn_target);
 
-   // Open source
+   // Open sourceDataset
    ImagePlus sourceImp;
    sourceImp=opener.openImage(fn_source);
    unwarpJImageModel source =
@@ -479,7 +433,7 @@ private static void transformImageMacro(String args[]) {
       IJ.error("Unexpected interruption exception " + e);
    }
 
-   // Apply transformation to source
+   // Apply transformation to sourceDataset
    unwarpJMiscTools.applyTransformationToSource(
       sourceImp,targetImp,source,intervals,cx,cy);
 

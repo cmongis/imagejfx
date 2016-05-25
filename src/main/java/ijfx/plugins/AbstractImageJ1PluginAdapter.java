@@ -48,7 +48,7 @@ import org.scijava.plugin.Parameter;
 public abstract class AbstractImageJ1PluginAdapter implements Command {
 
     @Parameter
-    DatasetService service;
+    public DatasetService service;
 
     @Parameter
     ImageDisplayService imageDisplayService;
