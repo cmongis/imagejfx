@@ -222,28 +222,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
     }
 
     
-    /*
-    private Integer fetchMoreStatistics(List<Explorable> explorableList) {
-        Integer elementAnalyzedCount = 0;
-        int elements = explorableList.size();
-        int i = 0;
-        for (Explorable e : explorableList) {
-            statusService.showStatus(i, elements, "Fetchting min/max for more exploration.");
-
-            if (!e.getMetaDataSet().containsKey(MetaData.STATS_PIXEL_MIN)) {
-                if (e instanceof ImageRecordIconizer) {
-                    ImageRecordIconizer iconizer = (ImageRecordIconizer) e;
-                    SummaryStatistics stats = statsService.getStatistics(iconizer.getImageRecord().getFile());
-                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
-                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
-                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
-                    elementAnalyzedCount++;
-                }
-            }
-            i++;
-        }
-        return elementAnalyzedCount;
-    }*/
+   
 
 
 

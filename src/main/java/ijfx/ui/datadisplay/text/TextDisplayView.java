@@ -20,10 +20,50 @@
  */
 package ijfx.ui.datadisplay.text;
 
+import ijfx.ui.main.ImageJFX;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.fxml.FXML;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Text;
+import mongis.utils.FXUtilities;
+import org.scijava.display.TextDisplay;
+
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public class TextDisplayView {
+public class TextDisplayView extends BorderPane {
+
+    @FXML
+    Text text;
+
+    TextDisplay textDisplay;
+
+
+    final Logger logger = ImageJFX.getLogger();
+
+
+    public TextDisplayView() {
     
+       
+        logger.info("Injecting FXML");
+        try {
+            // inject TextDisplayView.fxml from the class name
+            FXUtilities.injectFXML(this, "/ijfx/ui/text/TextDisplayView.fxml");
+            logger.info("FXML injected");
+        } catch (IOException ex) {
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+        }
+        logger.info("Creating text model");
+        logger.info("Text created");
+
+    }
+
+    TextDisplayView(TextDisplay textDisplay) {
+        this();
+        this.textDisplay = textDisplay;
+        text.setText(this.textDisplay.get(0));
+    }
 }

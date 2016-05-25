@@ -24,7 +24,9 @@ import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import net.imagej.Dataset;
@@ -37,11 +39,12 @@ import org.scijava.plugin.Plugin;
 /**
  *
  * @author Cyril MONGIS, 2015
+ * @author Tuan anh TRINH
  */
 @Plugin(type = InputSkinPlugin.class)
 public class DatasetComboBoxInputSkin extends AbstractInputSkinPlugin<Dataset> {
 
-    //ObjectProperty<Dataset> valueProperty = new SimpleObjectProperty<>();
+    ObjectProperty<Dataset> valueProperty = new SimpleObjectProperty<>();
     @Parameter
     ImageDisplayService imageDisplayService;
 
@@ -56,7 +59,7 @@ public class DatasetComboBoxInputSkin extends AbstractInputSkinPlugin<Dataset> {
     @Override
     public Property valueProperty() {
 
-        return datasetComboBox.itemsProperty();
+        return valueProperty;
     }
 
     @Override
@@ -71,25 +74,24 @@ public class DatasetComboBoxInputSkin extends AbstractInputSkinPlugin<Dataset> {
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        //return false;
-        return clazz.isAssignableFrom(Dataset.class);
+        System.out.println("can i handle ?" + clazz);
+        return clazz == Dataset.class;
     }
 
     @Override
     public void init(Input<Dataset> input) {
 
         //datasetComboBox.getItems().addAll(datasetService.getDatasets());
-
-        
-        List<Dataset> toAdd =  datasetService.getDatasets()
+        List<Dataset> toAdd = datasetService.getDatasets()
                 .parallelStream()
                 .filter(dataset -> dataset.toString().endsWith("lut") == false)
                 .collect(Collectors.toList());
 
-      datasetComboBox.getItems().addAll(toAdd);
+        datasetComboBox.getItems().addAll(toAdd);
+        datasetComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+            valueProperty.setValue(newValue);
+        });
 
-
-       
         //input.getValue();
     }
 
