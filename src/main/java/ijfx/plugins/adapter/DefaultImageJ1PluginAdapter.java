@@ -17,38 +17,33 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.adapter;
 
-import java.util.List;
-import net.imglib2.Sampler;
-import net.imglib2.type.numeric.RealType;
+import ij.ImagePlus;
+import net.imagej.Dataset;
+import org.scijava.ItemIO;
+import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-
-@Plugin(type = ProjectionMethod.class, name = "Min", label = "Minimum")
-public class MinProjection implements ProjectionMethod {
-
-    private final String name = "Min";
-
+/**
+ * 
+ * @author Tuan anh TRINH
+ */
+@Plugin(type = Command.class, menuPath = "Plugins>DefaultAdapter")
+public class DefaultImageJ1PluginAdapter extends AbstractImageJ1PluginAdapter {
+   @Parameter(type = ItemIO.BOTH)
+    protected Dataset dataset;
     @Override
-    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
-
-        T min = null;
-
-        for (T t : list) {
-            if (min == null) {
-
-                min = t.copy();
-            } else if (t.compareTo(min) < 0) {
-                min = t.copy();
-            }
-        }
-        sampler.get().set(min);
-
+    public ImagePlus processImagePlus(ImagePlus input) {
+        return input;
     }
 
     @Override
-    public String toString() {
-        return this.name;
+    public void run() {
+        dataset = processDataset(dataset);
     }
+
+  
 
 }

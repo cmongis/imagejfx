@@ -60,7 +60,7 @@
 | publish results that are based on it.
 \===================================================================*/
 
-package ijfx.plugins.UnwarpJ;
+package ijfx.plugins.unwarpJ;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -71,7 +71,7 @@ import ij.io.FileSaver;
 import ij.plugin.JpegWriter;
 import ij.io.Opener;
 import ij.process.ImageConverter;
-import ijfx.plugins.AbstractImageJ1PluginAdapter;
+import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
 import java.awt.Point;
 import java.util.Stack;
 import java.util.StringTokenizer;

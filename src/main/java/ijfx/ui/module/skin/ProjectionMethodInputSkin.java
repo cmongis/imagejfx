@@ -19,7 +19,7 @@
  */
 package ijfx.ui.module.skin;
 
-import ijfx.plugins.ProjectionMethod;
+import ijfx.plugins.projection.ProjectionMethod;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import java.util.List;

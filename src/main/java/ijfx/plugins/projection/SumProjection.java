@@ -17,12 +17,11 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.projection;
 
 import java.util.List;
 import net.imglib2.Sampler;
 import net.imglib2.type.numeric.RealType;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -30,23 +29,22 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = ProjectionMethod.class)
-public class MedianProjection implements ProjectionMethod {
+public class SumProjection implements ProjectionMethod {
 
-    private final String name = "Median";
+    private final String name = "Sum";
 
     @Override
-    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
-        DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
-        list.stream()
-                .forEach((t) -> descriptiveStatistics.addValue(t.getRealDouble()));
 
-        //Set result
-        sampler.get().setReal(descriptiveStatistics.getPercentile(50));
+    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
+        T result = list.get(0).createVariable();
+        list.stream()
+                .forEach((t) -> result.add(t));
+
+        sampler.get().add(result);
     }
 
     @Override
     public String toString() {
         return this.name;
     }
-
 }

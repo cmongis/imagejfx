@@ -17,35 +17,36 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.projection;
 
-import ij.ImagePlus;
-import java.io.File;
-import net.imagej.Dataset;
-import org.scijava.ItemIO;
-import org.scijava.command.Command;
-import org.scijava.plugin.Attr;
-import org.scijava.plugin.Parameter;
+import java.util.List;
+import net.imglib2.Sampler;
+import net.imglib2.type.numeric.RealType;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.plugin.Plugin;
+
 /**
- * 
+ *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter")
-public class DefaultWholeWrapper extends AbstractImageJ1PluginAdapter {
-   @Parameter(type = ItemIO.BOTH)
-    protected Dataset dataset;
-   @Parameter
-   File f;
+@Plugin(type = ProjectionMethod.class)
+public class MeanProjection implements ProjectionMethod {
+    private final String name = "Mean";
     @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        return input;
-    }
+    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
+        SummaryStatistics summaryStatistics = new SummaryStatistics();
+        list.stream()
+                .forEach((t) -> summaryStatistics.addValue(t.getRealDouble()));
+        
+        //Set result
+        sampler.get().setReal(summaryStatistics.getMean());
 
+    }
+    
     @Override
-    public void run() {
-        setWholeWrap(true);
-        dataset = setOutput(getInput(dataset), dataset);
+    public String toString()
+    {
+        return this.name;
     }
 
 }

@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.UnwarpJ;
+package ijfx.plugins.unwarpJ;
 
 import ij.ImagePlus;
 import java.awt.Button;

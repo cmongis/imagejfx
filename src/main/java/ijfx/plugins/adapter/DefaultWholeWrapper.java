@@ -17,34 +17,35 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.adapter;
 
-import java.util.List;
-import net.imglib2.Sampler;
-import net.imglib2.type.numeric.RealType;
+import ij.ImagePlus;
+import java.io.File;
+import net.imagej.Dataset;
+import org.scijava.ItemIO;
+import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-
 /**
- *
+ * 
  * @author Tuan anh TRINH
  */
-@Plugin(type = ProjectionMethod.class)
-public class SumProjection implements ProjectionMethod {
-
-    private final String name = "Sum";
-
+@Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter")
+public class DefaultWholeWrapper extends AbstractImageJ1PluginAdapter {
+   @Parameter(type = ItemIO.BOTH)
+    protected Dataset dataset;
+   @Parameter
+   File f;
     @Override
-
-    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
-        T result = list.get(0).createVariable();
-        list.stream()
-                .forEach((t) -> result.add(t));
-
-        sampler.get().add(result);
+    public ImagePlus processImagePlus(ImagePlus input) {
+        return input;
     }
 
     @Override
-    public String toString() {
-        return this.name;
+    public void run() {
+        setWholeWrap(true);
+        dataset = setOutput(getInput(dataset), dataset);
     }
+
 }

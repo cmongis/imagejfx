@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.projection;
 
 import static java.lang.Math.toIntExact;
 import net.imagej.Dataset;

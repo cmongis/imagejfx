@@ -18,7 +18,7 @@
  * 	Copyright 2015,2016 Cyril MONGIS, Michael Knop
  *
  */
-package ijfx.plugins;
+package ijfx.plugins.adapter;
 
 import ij.ImagePlus;
 import static java.lang.Math.toIntExact;
