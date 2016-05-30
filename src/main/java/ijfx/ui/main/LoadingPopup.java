@@ -149,6 +149,7 @@ public class LoadingPopup extends PopupControl {
         
         // Scene scene = node.getScene();
         //super.show(node.getScene().getWindow());
+        if(scene == null) return this;
         super.show(scene.getWindow());
         double px, py, pw, ph, ww, wh;
 
