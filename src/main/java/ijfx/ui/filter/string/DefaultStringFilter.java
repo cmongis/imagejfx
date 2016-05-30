@@ -99,7 +99,7 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
             //textField.disableProperty().bind(lotOfItems.not());
             listView.prefHeightProperty().bind(prefHeight);
             
-            showAll.bind(moreButton.armedProperty());
+            showAll.bind(moreButton.selectedProperty());
             showAll.addListener(this::onShowAllPropertyChange);
         } catch (IOException e) {
             e.printStackTrace();
@@ -153,18 +153,25 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
 
         allItems.clear();
         allItems.addAll(items);
+        
         updateDisplayedItems();
+        
         predicateProperty().setValue(null);
 
     }
 
     private void onShowAllPropertyChange(Observable obs, Boolean oldValue, Boolean newValue) {
-        updateDisplayedItems();
+       
+        updateDisplayedItems(textField.getText(),newValue,lotOfItems.getValue());
     }
     
     @FXML
-    private void updateDisplayedItems() {
-        String s = textField.getText();
+    private void updateDisplayedItems() {   
+        updateDisplayedItems(textField.getText(), showAll.getValue(), lotOfItems.getValue());
+    }
+    
+    private void updateDisplayedItems(String s, boolean showAll, boolean lotOfItems) {
+      
         List<Item> itemToShow;
 
         // if there is a query
@@ -172,7 +179,7 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
         if (s != null && s.trim().equals("") == false) {
             itemToShow = allItems.filtered(item -> item.getName().contains(s));
         } // if everything should be shown or if there is not a lot of item, we show everything
-        else if (showAll.getValue() || lotOfItems.getValue() == false) {
+        else if (showAll || !lotOfItems) {
             itemToShow = allItems;
         } // otherwise is means only a small set of items should be shown
         else {

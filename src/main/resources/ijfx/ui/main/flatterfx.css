@@ -1862,17 +1862,26 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 
 
-.explorer-filter,#filterVBox {
+.explorer-filter,#filterScrollPane {
     -fx-background-color:-bg-darker;
+}
+.explorer-filter .content{
+     -fx-max-height:250px;
 }
 .explorer-filter > .content{
     -fx-padding: 0.6em;
 }
 .explorer-filter .range-slider {
     -fx-padding:0 10 0 45px;
+   
 }
-
-
+#filterScrollPane {
+    -fx-pref-width:300px;
+}
+#filterVBox {
+    
+    -fx-pref-width:280px;
+}
 
 /*
     Number filter related classes

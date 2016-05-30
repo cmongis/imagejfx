@@ -66,6 +66,8 @@ public abstract class BaseTester extends Application {
         
         initApp();
 
+        addAction("Reset",this::initApp);
+        
     }
 
     public void addAction(String label, Runnable action) {
