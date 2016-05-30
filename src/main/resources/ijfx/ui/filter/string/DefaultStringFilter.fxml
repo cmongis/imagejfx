@@ -18,7 +18,7 @@
       <TextField fx:id="textField" onKeyReleased="#updateDisplayedItems" promptText="Filter propositions here..." BorderPane.alignment="CENTER" />
    </top>
    <bottom>
-      <Button fx:id="moreButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#setBigger" text="Show all possibilities..." BorderPane.alignment="CENTER" />
+      <ToggleButton fx:id="moreButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Show all possibilities..." BorderPane.alignment="CENTER" />
    </bottom>
    <center>
       <ListView fx:id="listView" BorderPane.alignment="CENTER" />

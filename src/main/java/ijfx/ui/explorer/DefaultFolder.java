@@ -154,7 +154,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
 
     @Override
     public List<Explorable> getFileList() {
-
+       
         if (files == null) {
 
             files = new ArrayList<>();
@@ -162,7 +162,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
             
             Task task = new AsyncCallback<Void,List<Explorable>>()
                     .setInput(null)
-                    .run(this::fetchItems)
+                    .run(this::fetchFiles)
                     .then(result->{
                         files = result;
                         eventService.publish(new FolderUpdatedEvent().setObject(this));
@@ -177,7 +177,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
         return files;
     }
 
-    private List<Explorable> fetchItems(ProgressHandler progress, Void v) {
+    private List<Explorable> fetchFiles(ProgressHandler progress, Void v) {
 
         if(progress == null) progress = new SilentProgressHandler();
         

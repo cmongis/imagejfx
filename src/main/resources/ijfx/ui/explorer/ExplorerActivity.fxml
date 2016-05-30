@@ -12,7 +12,7 @@
 
 <fx:root id="AnchorPane" fx:id="explorerActivity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="800.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane maxHeight="1.7976931348623157E308" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane maxHeight="1.7976931348623157E308" prefWidth="290.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <HBox prefHeight="40.0" BorderPane.alignment="CENTER">
                <styleClass>
@@ -23,7 +23,7 @@
             </HBox>
          </top>
       </BorderPane>
-      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="54.0">
+      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="54.0">
          <bottom>
             <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
                <children>
@@ -76,7 +76,10 @@
                   <Insets left="10.0" />
                </opaqueInsets>
             </HBox>
-         </bottom></BorderPane>
+         </bottom>
+         <left>
+            <ListView fx:id="folderListView" prefWidth="290.0" BorderPane.alignment="CENTER" />
+         </left></BorderPane>
       <BorderPane fx:id="toolbarBorderPane" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
             <HBox fx:id="folderTitleHBox" prefWidth="250.0" spacing="10.0" BorderPane.alignment="CENTER">
@@ -126,7 +129,10 @@
             </HBox>
          </right>
       </BorderPane>
-      <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="54.0" />
-      <Accordion fx:id="filterVBox" prefWidth="250.0" translateX="-300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="50.0" />
+      <ScrollPane fx:id="filterScrollPane" hbarPolicy="NEVER" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="55.0">
+         <content>
+            <Accordion fx:id="filterVBox" />
+         </content>
+      </ScrollPane>
    </children>
 </fx:root>
