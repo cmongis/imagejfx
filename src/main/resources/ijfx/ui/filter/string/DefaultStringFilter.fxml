@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import java.net.*?>
 <?import java.util.*?>
@@ -21,6 +22,9 @@
       <ToggleButton fx:id="moreButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Show all possibilities..." BorderPane.alignment="CENTER" />
    </bottom>
    <center>
-      <ListView fx:id="listView" BorderPane.alignment="CENTER" />
+      <ListView fx:id="listView" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="10.0" />
+         </BorderPane.margin></ListView>
    </center>
 </fx:root>
