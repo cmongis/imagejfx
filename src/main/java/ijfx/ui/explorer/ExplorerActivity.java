@@ -71,7 +71,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import jfxtras.scene.control.ToggleGroupValue;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import org.reactfx.EventStreams;
 import org.scijava.app.StatusService;
@@ -223,7 +223,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         init();
 
         explorationModeToggleGroup.selectToggle(getToggleButton(folderManagerService.getCurrentExplorationMode()));
-        return new AsyncCallback<Void, List<Explorable>>()
+        return new CallbackTask<Void, List<Explorable>>()
                 .run(this::update)
                 .then(this::updateUi)
                 .start();
@@ -360,7 +360,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     public void updateFilters() {
 
-        Task task = new AsyncCallback<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
+        Task task = new CallbackTask<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
                 .setInput(explorerService.getItems())
                 .setName("Updating filters...")
                 .run(this::generateFilter)

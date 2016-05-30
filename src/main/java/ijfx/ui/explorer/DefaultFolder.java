@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -160,7 +160,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
             files = new ArrayList<>();
             
             
-            Task task = new AsyncCallback<Void,List<Explorable>>()
+            Task task = new CallbackTask<Void,List<Explorable>>()
                     
                     .run(this::fetchFiles)
                     .then(result->{

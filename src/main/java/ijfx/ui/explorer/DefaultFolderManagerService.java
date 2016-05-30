@@ -40,7 +40,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import mongis.utils.AsyncCallable;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -258,8 +258,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
     @Override
     public void completeStatistics() {
-        loadingScreenService.frontEndTask(
-          new AsyncCallback<List<Explorable>,Integer>()
+        loadingScreenService.frontEndTask(new CallbackTask<List<Explorable>,Integer>()
                 .run(this::fetchMoreStatistics)
                 .setInput(getCurrentFolder().getFileList())
                 .then(this::onStatisticComputingEnded)

@@ -56,7 +56,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import jfxtras.scene.control.ToggleGroupValue;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
@@ -189,7 +189,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     protected Task<Boolean> generateTestTask() {
 
-        Task<Boolean> task = new AsyncCallback<ImageDisplay, Boolean>(imageDisplayService.getActiveImageDisplay())
+        Task<Boolean> task = new CallbackTask<ImageDisplay, Boolean>(imageDisplayService.getActiveImageDisplay())
                 .run(this::runTestProcessing)
                 .then(this::whenTestFinished);
 
@@ -330,7 +330,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
                     
             
 
-            return new AsyncCallback<List<BatchSingleInput>, Boolean>(inputList)
+            return new CallbackTask<List<BatchSingleInput>, Boolean>(inputList)
                     .run((progress, input) -> {
                         return batchService.applyWorkflow(progress, input, workflow);
                     });

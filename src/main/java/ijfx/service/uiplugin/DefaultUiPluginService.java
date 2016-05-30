@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.CountProperty;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;

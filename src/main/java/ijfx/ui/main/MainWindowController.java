@@ -95,7 +95,7 @@ import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
 import javafx.scene.Scene;
 import mongis.utils.AnimationChain;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
@@ -276,7 +276,7 @@ public class MainWindowController extends AnchorPane {
 
     public void init() {
 
-        Task task = new AsyncCallback<Void, Boolean>()
+        Task task = new CallbackTask<Void, Boolean>()
                 .runLongCallable(this::init)
                 .then(this::finishInitialization)
                 .start();
@@ -396,7 +396,7 @@ public class MainWindowController extends AnchorPane {
             imageJ.getContext().inject(thisController);
 
             // the second one loads the FXWidgets
-            final Task task2 = new AsyncCallback<Void,Collection<UiPlugin>>()
+            final Task task2 = new CallbackTask<Void,Collection<UiPlugin>>()
                     .runLongCallable(uiPluginService::loadAll);
 
             // registering the controllers

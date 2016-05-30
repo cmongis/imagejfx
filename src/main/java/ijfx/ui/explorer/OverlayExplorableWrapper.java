@@ -40,7 +40,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Path;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 
 import net.imagej.Dataset;
 import net.imagej.overlay.Overlay;
@@ -155,7 +155,7 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
             final SnapshotParameters params = new SnapshotParameters();
            
             params.setFill(Color.TRANSPARENT);
-            AsyncCallback run = new AsyncCallback()
+            CallbackTask run = new CallbackTask()
                     .run(()->canvas.snapshot(params, image));
             
             Platform.runLater(run);

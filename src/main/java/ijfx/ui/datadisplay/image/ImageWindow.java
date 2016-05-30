@@ -64,7 +64,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.CalibratedAxis;
@@ -446,7 +446,7 @@ public class ImageWindow extends Window {
         
         if (checkServices()) {
            
-            refreshQueue.execute(new AsyncCallback<Void, Void>()
+            refreshQueue.execute(new CallbackTask<Void, Void>()
                     .run(this::transformImage)
                     .then(this::updateImageAndOverlays)
             );
