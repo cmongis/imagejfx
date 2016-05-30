@@ -161,7 +161,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
             
             
             Task task = new AsyncCallback<Void,List<Explorable>>()
-                    .setInput(null)
+                    
                     .run(this::fetchFiles)
                     .then(result->{
                         files = result;
@@ -186,7 +186,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
         timer.start();
         Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(file);
         timer.elapsed("record fetching");
-        progress.setStatus("Analysing folder...");
+        progress.setStatus("Reading folder...");
         List<Explorable> explorables = records
                 .stream()
                 .map(record->{
