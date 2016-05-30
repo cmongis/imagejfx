@@ -734,6 +734,7 @@ public class ImageWindow extends Window {
           System.out.println("Closing dataset");
             if(toolService.getCurrentTool() != null)
             toolService.getCurrentTool().unsubscribe(canvas);
+            
             datasetService.getDatasets().remove(datasetService.getDatasets(imageDisplay));
             //mageDisplayService.getActiveDataset(imageDisplay).
             imageDisplay.close();

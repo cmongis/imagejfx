@@ -702,7 +702,7 @@ public class MainWindowController extends AnchorPane {
 
         final Timeline timeline = new Timeline();
 
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), 0, Interpolator.LINEAR);
+        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), 0, Interpolator.EASE_OUT);
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
@@ -714,7 +714,7 @@ public class MainWindowController extends AnchorPane {
     public void hideSideMenu() {
         final Timeline timeline = new Timeline();
 
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * sideMenu.getWidth(), Interpolator.LINEAR);
+        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * (sideMenu.getWidth()+20), Interpolator.EASE_IN);
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();

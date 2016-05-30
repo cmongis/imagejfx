@@ -35,9 +35,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
-import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -49,6 +47,7 @@ import javafx.util.Callback;
 import mongis.utils.AsyncCallback;
 
 import mongis.utils.BindingsUtils;
+import mongis.utils.FXUtilities;
 
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons
@@ -110,7 +109,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     Image currentImage = null;
 
-    private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
+   // private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
 
   
 
@@ -127,14 +126,14 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     public PaneIconCell() {
         try {
-            //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
-            
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
+            /*
             synchronized (LOADER) {
 
                 LOADER.setController(this);
                 LOADER.setRoot(this);
                 LOADER.load();
-            }
+            }*/
 
             titleLabel.setPrefSize(100, 100);
              imageView.setSmooth(false);
