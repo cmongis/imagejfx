@@ -20,8 +20,12 @@
 package mongis.utils;
 
 import ijfx.ui.main.ImageJFX;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.concurrent.Task;
@@ -35,6 +39,8 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
 
     INPUT input;
 
+    Callable<INPUT> inputGetter;
+    
     Callback<INPUT, OUTPUT> callback;
     LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
     Callback<ProgressHandler, OUTPUT> longCallable;
@@ -46,6 +52,10 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
 
     ExecutorService executor = ImageJFX.getThreadPool();
 
+    Consumer<OUTPUT> successHandler;
+    
+    private final static Logger logger = Logger.getLogger(AsyncCallback.class.getName());
+    
     public AsyncCallback() {
         super();
     }
@@ -60,6 +70,11 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         this.callback = callback;
     }
 
+    public AsyncCallback<INPUT,OUTPUT> setInput(Callable<INPUT> inputGetter) {
+        this.inputGetter = inputGetter;
+        return this;
+    }
+    
     public AsyncCallback<INPUT,OUTPUT> setName(String name) {
         updateTitle(name);
         updateMessage(name);
@@ -97,6 +112,12 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
             return null;
         }
 
+        if(inputGetter != null) try {
+            input = inputGetter.call();
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        
         if (longCallback != null) {
             OUTPUT output = longCallback.handle(this, input);
 
@@ -171,23 +192,32 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
     }
 
   
+    @Override
+    public void succeeded() {
+        logger.info("succeeded");
+         successHandler.accept(getValue());
+        super.succeeded();
+       
+    }
+    
+    @Override
+    public void cancelled() {
+        logger.info("cancelled...");
+        super.cancelled();
+    }
+    
 
     public AsyncCallback<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
-        setOnSucceeded(event -> {
-            // if it wasn't cancelled and it was a callback executed
-            if (consumer == null) {
-                return;
-            }
-            if (!isCancelled() && getValue() != null && runnable == null) {
-                consumer.accept(getValue());
-            } else if (!isCancelled() && runnable != null) {
-                consumer.accept(null);
-            }
-            if (getValue() == null && runnable == null) {
-                ImageJFX.getLogger().warning("Return value was null :-(");
-            }
-        });
+        successHandler = consumer;
         return this;
+    }
+    
+    public <NEXTOUTPUT> AsyncCallback<OUTPUT,NEXTOUTPUT> then(Callback<OUTPUT,NEXTOUTPUT> callback) {
+        AsyncCallback<OUTPUT,NEXTOUTPUT> task = new AsyncCallback<OUTPUT,NEXTOUTPUT>()
+                .setInput(this::getValue)
+                .run(callback);
+        then(task);
+        return task;       
     }
 
     public AsyncCallback<INPUT, OUTPUT> ui() {
@@ -223,8 +253,8 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
     @Override
     public void accept(INPUT t) {
 
+        logger.info("Consumed a new input "+t);
         setInput(t);
-        System.out.println("Starting !");
         start();
     }
 
