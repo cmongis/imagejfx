@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mongis.utils.TextFileUtils;
 
 /**
  *
@@ -47,8 +48,8 @@ public class JsonReader {
         try {
             //JSON from file to Object
             TypeFactory typeFactory = TypeFactory.defaultInstance();
-            
-            widgetGroupList = mapper.readValue(getClass().getResourceAsStream(path), typeFactory.constructCollectionType(ArrayList.class, DefaultWidgetGroup.class));
+            String json = TextFileUtils.readFileFromJar(path);
+            widgetGroupList = mapper.readValue(json, typeFactory.constructCollectionType(ArrayList.class, DefaultWidgetGroup.class));
         } catch (IOException ex) {
             Logger.getLogger(JsonReader.class.getName()).log(Level.SEVERE, null, ex);
         }
