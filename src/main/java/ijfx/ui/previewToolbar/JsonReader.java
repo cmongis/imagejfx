@@ -47,8 +47,8 @@ public class JsonReader {
         try {
             //JSON from file to Object
             TypeFactory typeFactory = TypeFactory.defaultInstance();
-
-            widgetGroupList = mapper.readValue(new File(path), typeFactory.constructCollectionType(ArrayList.class, DefaultWidgetGroup.class));
+            
+            widgetGroupList = mapper.readValue(getClass().getResourceAsStream(path), typeFactory.constructCollectionType(ArrayList.class, DefaultWidgetGroup.class));
         } catch (IOException ex) {
             Logger.getLogger(JsonReader.class.getName()).log(Level.SEVERE, null, ex);
         }

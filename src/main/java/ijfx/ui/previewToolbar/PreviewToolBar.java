@@ -108,7 +108,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         //fakeToolBar.setPadding(new Insets(10, 10,10,10));
         this.setTop(fakeToolBar);
         jsonReader = new JsonReader();
-        jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
+        jsonReader.read("/ijfx/ui/menutoolbar/toolbarSettings.json");
         jsonReader.separate();
         popOver = new PopOver();
         popOver.setMinHeight(200);
