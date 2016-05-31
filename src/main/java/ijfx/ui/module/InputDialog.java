@@ -28,9 +28,6 @@ import javafx.util.Callback;
 import org.scijava.Context;
 import org.scijava.module.Module;
 
-
-
-
 /**
  *
  * @author Cyril MONGIS, 2015
@@ -41,7 +38,7 @@ public class InputDialog extends Dialog<Module> {
     Module module;
 
     Logger logger = ImageJFX.getLogger();
-    
+
     public InputDialog() {
         super();
 
@@ -57,7 +54,7 @@ public class InputDialog extends Dialog<Module> {
             getDialogPane().lookupButton(ButtonType.OK).setDisable(!newValue);
 
         });
-        
+
         moduleConfigPane.getCloseButton().setVisible(false);
 
         // setting the content
@@ -65,49 +62,44 @@ public class InputDialog extends Dialog<Module> {
 
     }
 
-    public InputDialog(Module module,Context context) {
+    public InputDialog(Module module, Context context) {
         this();
         this.module = module;
-       context.inject(moduleConfigPane);
+        context.inject(moduleConfigPane);
         moduleConfigPane.configure(module);
-        
-        moduleConfigPane.addEventHandler(InputEvent.CALLBACK,this::onCallbackRequested);
-        
-        setResultConverter(new Callback<ButtonType, Module>() {
-            @Override
-            public Module call(ButtonType param) {
-                
-               String moduleName = module.getDelegateObject().getClass().getSimpleName();
-                
-                if (param == ButtonType.OK) {
-                    logger.info("Validating parameters for : "+moduleName);
-                    moduleConfigPane.getHashMap().forEach((key, value) -> {
-                        
-                        module.setInput(key, value);
-                        module.setResolved(key, true);
-                    });
-                    return module;
-                    
-                }
-                else {
-                    logger.info("Cancelling "+moduleName);
-                    module.cancel();
-                }
-                return null;
-            }
-        });
 
+        moduleConfigPane.addEventHandler(InputEvent.CALLBACK, this::onCallbackRequested);
+
+        setResultConverter(this::convertResult);
+
+    }
+
+    public Module convertResult(ButtonType param) {
+        String moduleName = module.getDelegateObject().getClass().getSimpleName();
+
+        if (param == ButtonType.OK) {
+            logger.info("Validating parameters for : " + moduleName);
+            moduleConfigPane.getHashMap().forEach((key, value) -> {
+
+                module.setInput(key, value);
+                module.setResolved(key, true);
+            });
+            return module;
+
+        } else {
+            logger.info("Cancelling " + moduleName);
+            module.cancel();
+            
+        }
+        return module;
     }
 
     public boolean canShow() {
         return moduleConfigPane.inputCount() > 0;
     }
-    
+
     public void onCallbackRequested(InputEvent event) {
-        
-        
-        
+
     }
-    
 
 }
