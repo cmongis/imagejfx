@@ -73,6 +73,7 @@ import ij.io.Opener;
 import ij.process.ImageConverter;
 import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
 import java.awt.Point;
+import java.io.File;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import net.imagej.Dataset;
@@ -101,6 +102,10 @@ public class UnwarpJ_ extends AbstractImageJ1PluginAdapter {
     
     @Parameter(label = "Target")
     Dataset targetDataset;
+    
+    @Parameter(label = "Landmarks")
+    File file;
+    
  /* begin class UnwarpJ_ */
 
 /*....................................................................
@@ -187,10 +192,11 @@ private void alignImagesMacro(String args[]) {
    String fn_out=args[10];
    double  landmarkWeight=0;
    String fn_landmark="";
-   if (args_len>=13) {
-      landmarkWeight=((Double) new Double(args[11])).doubleValue();
-      fn_landmark=args[12];
-   }
+//   if (args_len>=13) {
+       landmarkWeight = 1;
+//      landmarkWeight=((Double) new Double(args[11])).doubleValue();
+      fn_landmark=file.getAbsolutePath();
+//   }
    double  stopThreshold=1e-2;
    if (args_len>=14)
       stopThreshold=((Double) new Double(args[13])).doubleValue();

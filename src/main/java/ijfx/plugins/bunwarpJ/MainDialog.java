@@ -57,8 +57,6 @@ import java.util.Stack;
 public class MainDialog {
 
     /* begin class MainDialog */
-
-
  /*....................................................................
     	Public variables
  	....................................................................*/
@@ -301,6 +299,7 @@ public class MainDialog {
     private TextField consistencyWeightTextField = null;
 
     private String pathFile;
+
     /*....................................................................
        Public methods
     ....................................................................*/
@@ -432,18 +431,20 @@ public class MainDialog {
 
         // Start source and target images (concurrent threads 
         // need to be started later)
-        Stack<Point> sourceStack = new Stack<Point>();
-        Stack<Point> targetStack = new Stack<Point>();
-        MiscTools.loadPoints(this.pathFile, sourceStack, targetStack);
+            createSourceImage(bIsReverse);
+            createTargetImage();
+        if (!this.pathFile.equals("")) {
 
+            Stack<Point> sourceStack = new Stack<Point>();
+            Stack<Point> targetStack = new Stack<Point>();
+            MiscTools.loadPoints(this.pathFile, sourceStack, targetStack);
 
-        createSourceImage(bIsReverse);
-        createTargetImage();
-        while ((!sourceStack.empty()) && (!targetStack.empty())) {
-            Point sourcePoint = (Point) sourceStack.pop();
-            Point targetPoint = (Point) targetStack.pop();
-            sourcePh.addPoint(sourcePoint.x, sourcePoint.y);
-            targetPh.addPoint(targetPoint.x, targetPoint.y);
+            while ((!sourceStack.empty()) && (!targetStack.empty())) {
+                Point sourcePoint = (Point) sourceStack.pop();
+                Point targetPoint = (Point) targetStack.pop();
+                sourcePh.addPoint(sourcePoint.x, sourcePoint.y);
+                targetPh.addPoint(targetPoint.x, targetPoint.y);
+            }
         }
 
         loadPointRoiAsLandmarks();
@@ -452,8 +453,6 @@ public class MainDialog {
     }
 
     /* end MainDialog (constructor) */
-
-
  /*------------------------------------------------------------------*/
     /**
      * Set source Mask.
@@ -1118,8 +1117,6 @@ public class MainDialog {
     }
 
     /* end createTargetImage */
-
-
  /*------------------------------------------------------------------*/
     /**
      * Load point rois in the source and target images as landmarks.
@@ -1438,7 +1435,6 @@ public class MainDialog {
     }
 
     /* end getSource */
-
     /**
      * Get the macro flag
      *
@@ -1457,4 +1453,5 @@ public class MainDialog {
         return macroArgs;
     }
 
-} /* end class MainDialog */
+}
+/* end class MainDialog */

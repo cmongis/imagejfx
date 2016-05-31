@@ -291,7 +291,7 @@ public class IODialog extends Dialog implements ActionListener
 			return;
 
 		String fn_tnf = path+filename;
-
+ 
 		int intervals = MiscTools.numberOfIntervalsOfTransformation(fn_tnf);
 
 		double [][]cx = new double[intervals+3][intervals+3];

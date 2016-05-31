@@ -42,13 +42,17 @@ import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Stack;
+import javafx.scene.control.Label;
+import javafx.stage.FileChooser;
 import net.imagej.Dataset;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.ItemIO;
+import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.widget.Button;
 
 /*====================================================================
 |   bUnwarpJ_
@@ -84,10 +88,10 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
     @Parameter(type = ItemIO.OUTPUT)
     Dataset outputDataset;
 
-    @Parameter
+    @Parameter(type = ItemIO.INPUT)
     Dataset sourceDataset;
 
-    @Parameter
+    @Parameter(type = ItemIO.INPUT)
     Dataset targetDataset;
     /**
      * Image representation for source image
@@ -175,8 +179,11 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
     @Parameter(choices = {"Fast", "Accurate", "Mono"})
     String modeChoice;
 
-    @Parameter
-    File pathFile;
+    @Parameter(callback = "chooseFile")
+    Button buttonFile;
+
+ 
+    String pathFile = "";
 
     /*....................................................................
        Public methods
@@ -199,14 +206,14 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
 //            return;
 //        }
 
-        final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).indexOf(modeChoice),
+final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).indexOf(modeChoice),
                 bUnwarpJ_.maxImageSubsamplingFactor, Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation),
                 Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation), bUnwarpJ_.divWeight, bUnwarpJ_.curlWeight,
                 bUnwarpJ_.landmarkWeight, bUnwarpJ_.imageWeight, bUnwarpJ_.consistencyWeight,
                 bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation,
                 sourceImp,
                 targetImp,
-                pathFile.getAbsolutePath());
+                pathFile);
 //        dialog.showDialog();
 
 //        // If canceled
@@ -284,6 +291,12 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
 
     }
 
+    public void chooseFile(){
+                FileChooser chooser = new FileChooser();
+        File f = chooser.showOpenDialog(null);
+        pathFile = f.getAbsolutePath();
+
+    }
     /* end run */
     //------------------------------------------------------------------
     /**
