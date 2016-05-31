@@ -212,7 +212,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
     
-    public <NEXTOUTPUT> CallbackTask<OUTPUT,NEXTOUTPUT> then(Callback<OUTPUT,NEXTOUTPUT> callback) {
+    public <NEXTOUTPUT> CallbackTask<OUTPUT,NEXTOUTPUT> thenRun(Callback<OUTPUT,NEXTOUTPUT> callback) {
         CallbackTask<OUTPUT,NEXTOUTPUT> task = new CallbackTask<OUTPUT,NEXTOUTPUT>()
                 .setInput(this::getValue)
                 .run(callback);

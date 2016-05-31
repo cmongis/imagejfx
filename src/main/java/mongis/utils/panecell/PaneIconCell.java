@@ -123,7 +123,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private static final ExecutorService refreshThreadPool = Executors.newFixedThreadPool(2);
     
-   LoadingIcon loadingIcon = new LoadingIcon(16);
+   LoadingIcon loadingIcon = new LoadingIcon(20);
 
     public PaneIconCell() {
         try {
@@ -136,8 +136,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 LOADER.load();
             }*/
 
-            titleLabel.setPrefSize(100, 100);
+            titleLabel.setPrefHeight(100);
              imageView.setSmooth(false);
+             
             imageView.fitWidthProperty().bind(widthProperty());
             imageView.fitHeightProperty().bind(widthProperty());
 

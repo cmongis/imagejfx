@@ -361,7 +361,6 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
                 .run(this::getLineChartSerie)
                 .then(this::updateLineChart)
                 .start();
-
     }
 
     private void updateLineChart(XYChart.Series<Double, Double> serie) {

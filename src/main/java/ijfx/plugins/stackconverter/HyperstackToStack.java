@@ -38,7 +38,7 @@ import org.scijava.ui.UIService;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Hyperstack to Stack", attrs = {@Attr(name = "no-legacy")})
+@Plugin(type = Command.class, menuPath = "Image > Hyperstacks > Hyperstack to Stack...", attrs = {@Attr(name = "no-legacy")})
 public class HyperstackToStack implements Command{
     @Parameter
     UIService uIService;
