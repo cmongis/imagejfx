@@ -266,6 +266,9 @@ public class MainWindowController extends AnchorPane {
 
         loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
         
+        
+        memoryProgressBar.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMemoryProgressBarClicked);
+        
     }
 
     private Scene myScene;
@@ -725,6 +728,10 @@ public class MainWindowController extends AnchorPane {
 
         hintService.displayHints(uiPlugin.getObject().getClass(), false);
 
+    }
+    
+    private void onMemoryProgressBarClicked(MouseEvent event) {
+        System.gc();
     }
 
     public synchronized void nextHint() {
