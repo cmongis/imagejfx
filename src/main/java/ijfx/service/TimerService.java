@@ -29,4 +29,5 @@ public interface TimerService extends IjfxService{
     Timer getTimer(Class<?> clazz);
     Timer getTimer(String id);
     Collection<? extends Timer> getTimers();
+    public void resetTimers();
 }
