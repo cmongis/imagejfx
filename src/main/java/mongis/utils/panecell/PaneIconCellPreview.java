@@ -19,17 +19,26 @@
  */
 package mongis.utils.panecell;
 
+import ijfx.ui.previewToolbar.ItemWidget;
+import org.scijava.command.CommandInfo;
+
 /**
  *
  * @author Tuan anh TRINH
  */
-public class PaneIconCellPreview<T> extends PaneIconCell<T> {
+public class PaneIconCellPreview<T extends ItemWidget> extends PaneIconCell<T> {
 
     public PaneIconCellPreview() {
         super();
         setPrefWidth(120);
         showIconProperty().setValue(false);
         setLoadImageOnChange(false);
+        
+    }
+    
+    @Override
+    public void onSimpleClick() {
+        
     }
 
 }
