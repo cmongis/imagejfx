@@ -281,7 +281,7 @@ public class BatchService extends AbstractService implements ImageJService {
             logger.info(String.format("[%s] module finished", moduleName));
             extractOutput(input, module);
         } catch (Exception ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, "Error when running module " + moduleName, ex);;
+            logger.log(Level.SEVERE, "Error when extracting ouput from module module " + moduleName, ex);;
             return false;
 
         }

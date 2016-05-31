@@ -65,6 +65,8 @@ public class LogService extends AbstractService implements ImageJService {
 
     String reportAddress = "http://www.imagejfx.net/report/send/";
 
+    Logger logger = ImageJFX.getLogger();
+    
     Handler handler = new Handler() {
 
         @Override
@@ -89,8 +91,8 @@ public class LogService extends AbstractService implements ImageJService {
     public LogService() {
         super();
 
-        Logger.getGlobal().addHandler(handler);
-        //ImageJFX.getLogger().addHandler(handler);
+        //Logger.getGlobal().addHandler(handler);
+        ImageJFX.getLogger().addHandler(handler);
 
     }
 
@@ -107,6 +109,14 @@ public class LogService extends AbstractService implements ImageJService {
 
     }
 
+    public void info(String format, Object... obj) {
+        logger.info(String.format(format,obj));
+    }
+    
+    public void severe(Throwable throwable) {
+        logger.log(Level.SEVERE,null,throwable);
+    }
+    
     public void resetErrorCount() {
         errorCount = 0;
         eventService.publishLater(new CountResetChange());
