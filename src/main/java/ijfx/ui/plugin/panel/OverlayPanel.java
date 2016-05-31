@@ -70,7 +70,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import net.imagej.display.ImageDisplay;
 import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
@@ -294,7 +294,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
         Timer timer = timerService.getTimer(this.getClass());
 
-        new AsyncCallback<Overlay, XYChart.Series<Double, Double>>()
+        new CallbackTask<Overlay, XYChart.Series<Double, Double>>()
                 .setInput(overlay)
                 .run(this::getOverlayHistogram)
                 .then(serie -> {
@@ -356,12 +356,11 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     */
     
      private void updateLineChart(LineOverlay overlay) {
-        new AsyncCallback<Overlay, XYChart.Series<Double, Double>>()
+        new CallbackTask<Overlay, XYChart.Series<Double, Double>>()
                 .setInput(overlay)
                 .run(this::getLineChartSerie)
                 .then(this::updateLineChart)
                 .start();
-
     }
 
     private void updateLineChart(XYChart.Series<Double, Double> serie) {

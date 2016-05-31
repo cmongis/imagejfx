@@ -40,7 +40,7 @@ public class DefaultFactoryPaneCell implements FactoryPaneCell {
 
     public PaneIconCellPreview generate(ItemWidget itemWidget, PreviewService previewService) {
        PaneIconCellPreview<ItemWidget> paneIconCellPreview = new PaneIconCellPreview();
-        paneIconCellPreview.setImageFactory(i -> i.getImage(previewService,120));
+        paneIconCellPreview.setImageFactory(i -> i.getImage(previewService,80));
         paneIconCellPreview.setSubtitleVisible(false);
         paneIconCellPreview.setTitleFactory(f -> f.getLabel());
         paneIconCellPreview.setLoadImageOnChange(false);

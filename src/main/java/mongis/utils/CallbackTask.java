@@ -20,8 +20,12 @@
 package mongis.utils;
 
 import ijfx.ui.main.ImageJFX;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.concurrent.Task;
@@ -31,10 +35,12 @@ import javafx.util.Callback;
  *
  * @author cyril
  */
-public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler, Consumer<INPUT> {
+public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler, Consumer<INPUT> {
 
     INPUT input;
 
+    Callable<INPUT> inputGetter;
+    
     Callback<INPUT, OUTPUT> callback;
     LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
     Callback<ProgressHandler, OUTPUT> longCallable;
@@ -46,32 +52,41 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
 
     ExecutorService executor = ImageJFX.getThreadPool();
 
-    public AsyncCallback() {
+    Consumer<OUTPUT> successHandler;
+    
+    private final static Logger logger = Logger.getLogger(CallbackTask.class.getName());
+    
+    public CallbackTask() {
         super();
     }
 
-    public AsyncCallback(INPUT input) {
+    public CallbackTask(INPUT input) {
         this();
         setInput(input);
     }
 
-    public AsyncCallback(Callback<INPUT, OUTPUT> callback) {
+    public CallbackTask(Callback<INPUT, OUTPUT> callback) {
         this();
         this.callback = callback;
     }
 
-    public AsyncCallback<INPUT,OUTPUT> setName(String name) {
+    public CallbackTask<INPUT,OUTPUT> setInput(Callable<INPUT> inputGetter) {
+        this.inputGetter = inputGetter;
+        return this;
+    }
+    
+    public CallbackTask<INPUT,OUTPUT> setName(String name) {
         updateTitle(name);
         updateMessage(name);
         return this;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> run(Callback<INPUT, OUTPUT> callback) {
+    public CallbackTask<INPUT, OUTPUT> run(Callback<INPUT, OUTPUT> callback) {
         this.callback = callback;
         return this;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> run(Runnable runnable) {
+    public CallbackTask<INPUT, OUTPUT> run(Runnable runnable) {
         if (runnable == null) {
             System.out.println("Cannot run null :-S");
             return this;
@@ -80,12 +95,12 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         return this;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> run(LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback) {
+    public CallbackTask<INPUT, OUTPUT> run(LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback) {
         this.longCallback = longCallback;
         return this;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> runLongCallable(Callback<ProgressHandler, OUTPUT> longCallable) {
+    public CallbackTask<INPUT, OUTPUT> runLongCallable(Callback<ProgressHandler, OUTPUT> longCallable) {
         this.longCallable = longCallable;
         return this;
     }
@@ -97,6 +112,12 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
             return null;
         }
 
+        if(inputGetter != null) try {
+            input = inputGetter.call();
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        
         if (longCallback != null) {
             OUTPUT output = longCallback.handle(this, input);
 
@@ -145,7 +166,7 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         if(errorHandler != null) errorHandler.accept(getException());
     }
 
-    public AsyncCallback<INPUT, OUTPUT> setInput(INPUT input) {
+    public CallbackTask<INPUT, OUTPUT> setInput(INPUT input) {
         this.input = input;
         return this;
     }
@@ -154,43 +175,52 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
         return input;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> startIn(ExecutorService executorService) {
+    public CallbackTask<INPUT, OUTPUT> startIn(ExecutorService executorService) {
         executorService.execute(this);
         return this;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> start() {
+    public CallbackTask<INPUT, OUTPUT> start() {
         executor.execute(this);
         return this;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> queue() {
+    public CallbackTask<INPUT, OUTPUT> queue() {
         executor = ImageJFX.getThreadQueue();
         executor.execute(this);
         return this;
     }
 
   
+    @Override
+    public void succeeded() {
+        logger.info("succeeded");
+         successHandler.accept(getValue());
+        super.succeeded();
+       
+    }
+    
+    @Override
+    public void cancelled() {
+        logger.info("cancelled...");
+        super.cancelled();
+    }
+    
 
-    public AsyncCallback<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
-        setOnSucceeded(event -> {
-            // if it wasn't cancelled and it was a callback executed
-            if (consumer == null) {
-                return;
-            }
-            if (!isCancelled() && getValue() != null && runnable == null) {
-                consumer.accept(getValue());
-            } else if (!isCancelled() && runnable != null) {
-                consumer.accept(null);
-            }
-            if (getValue() == null && runnable == null) {
-                ImageJFX.getLogger().warning("Return value was null :-(");
-            }
-        });
+    public CallbackTask<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
+        successHandler = consumer;
         return this;
     }
+    
+    public <NEXTOUTPUT> CallbackTask<OUTPUT,NEXTOUTPUT> thenRun(Callback<OUTPUT,NEXTOUTPUT> callback) {
+        CallbackTask<OUTPUT,NEXTOUTPUT> task = new CallbackTask<OUTPUT,NEXTOUTPUT>()
+                .setInput(this::getValue)
+                .run(callback);
+        then(task);
+        return task;       
+    }
 
-    public AsyncCallback<INPUT, OUTPUT> ui() {
+    public CallbackTask<INPUT, OUTPUT> ui() {
         if (Platform.isFxApplicationThread()) {
             call();
         } else {
@@ -223,22 +253,22 @@ public class AsyncCallback<INPUT, OUTPUT> extends Task<OUTPUT> implements Progre
     @Override
     public void accept(INPUT t) {
 
+        logger.info("Consumed a new input "+t);
         setInput(t);
-        System.out.println("Starting !");
         start();
     }
 
-    public AsyncCallback<INPUT, OUTPUT> error(Consumer<Throwable> handler) {
+    public CallbackTask<INPUT, OUTPUT> error(Consumer<Throwable> handler) {
         errorHandler = handler;
         return this;
     }
 
-    public AsyncCallback<INPUT, OUTPUT> setExecutor(ExecutorService executor) {
+    public CallbackTask<INPUT, OUTPUT> setExecutor(ExecutorService executor) {
         this.executor = executor;
         return this;
     }
 
-    public AsyncCallback<INPUT,OUTPUT> setIn(Property<Task> taskProperty) {
+    public CallbackTask<INPUT,OUTPUT> setIn(Property<Task> taskProperty) {
         Platform.runLater(()->taskProperty.setValue(this));
         return this;
     }

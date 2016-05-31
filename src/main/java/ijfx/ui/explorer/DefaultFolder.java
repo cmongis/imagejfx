@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -154,15 +154,15 @@ public class DefaultFolder implements Folder,FileChangeListener{
 
     @Override
     public List<Explorable> getFileList() {
-
+       
         if (files == null) {
 
             files = new ArrayList<>();
             
             
-            Task task = new AsyncCallback<Void,List<Explorable>>()
-                    .setInput(null)
-                    .run(this::fetchItems)
+            Task task = new CallbackTask<Void,List<Explorable>>()
+                    
+                    .run(this::fetchFiles)
                     .then(result->{
                         files = result;
                         eventService.publish(new FolderUpdatedEvent().setObject(this));
@@ -177,7 +177,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
         return files;
     }
 
-    private List<Explorable> fetchItems(ProgressHandler progress, Void v) {
+    private List<Explorable> fetchFiles(ProgressHandler progress, Void v) {
 
         if(progress == null) progress = new SilentProgressHandler();
         
@@ -186,7 +186,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
         timer.start();
         Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(file);
         timer.elapsed("record fetching");
-        progress.setStatus("Analysing folder...");
+        progress.setStatus("Reading folder...");
         List<Explorable> explorables = records
                 .stream()
                 .map(record->{

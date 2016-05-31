@@ -23,15 +23,13 @@ package mongis.utils.panecell;
  *
  * @author Tuan anh TRINH
  */
-public class PaneIconCellPreview<T> extends PaneIconCell<T>{
+public class PaneIconCellPreview<T> extends PaneIconCell<T> {
 
     public PaneIconCellPreview() {
-    super();
-            setPrefSize(200, 200);
-            showIconProperty().setValue(false);
-            setLoadImageOnChange(false);
+        super();
+        setPrefWidth(120);
+        showIconProperty().setValue(false);
+        setLoadImageOnChange(false);
     }
-    
-    
-    
+
 }

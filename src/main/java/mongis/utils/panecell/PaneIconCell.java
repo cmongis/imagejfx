@@ -21,6 +21,7 @@ package mongis.utils.panecell;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.LoadingIcon;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -35,9 +36,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
-import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -46,9 +45,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 
 import mongis.utils.BindingsUtils;
+import mongis.utils.FXUtilities;
 
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons
@@ -104,13 +104,13 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private Task currentImageSearch;
 
-    
+    Logger logger = ImageJFX.getLogger();
 
     private boolean isInsideScrollWindow = false;
 
     Image currentImage = null;
 
-    private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
+   // private final static FXMLLoader LOADER = new FXMLLoader(PaneIconCell.class.getResource("/ijfx/ui/explorer/ImageIconItem.fxml"));
 
   
 
@@ -123,21 +123,22 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private static final ExecutorService refreshThreadPool = Executors.newFixedThreadPool(2);
     
-   LoadingIcon loadingIcon = new LoadingIcon(16);
+   LoadingIcon loadingIcon = new LoadingIcon(20);
 
     public PaneIconCell() {
         try {
-            //FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
-            
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/ImageIconItem.fxml");
+            /*
             synchronized (LOADER) {
 
                 LOADER.setController(this);
                 LOADER.setRoot(this);
                 LOADER.load();
-            }
+            }*/
 
-            titleLabel.setPrefSize(100, 100);
+            titleLabel.setPrefHeight(100);
              imageView.setSmooth(false);
+             
             imageView.fitWidthProperty().bind(widthProperty());
             imageView.fitHeightProperty().bind(widthProperty());
 
@@ -228,6 +229,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     }
 
     public void setImage(Image image) {
+        logger.info("Setting image : "+image);
         loadingIcon.stop();
         
         if(image == null) {
@@ -265,20 +267,20 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     public void forceUpdate(T newItem) {
         //otherwise starting to charge everything
-        new AsyncCallback<T, String>()
+        new CallbackTask<T, String>()
                 .setInput(newItem)
                 .run(titleFactory)
                 .then(this::setTitle)
                 .start();
 
-        new AsyncCallback<T, String>()
+        new CallbackTask<T, String>()
                 .setInput(newItem)
                 .run(subtitleFactory)
                 .then(this::setSubtitle)
                 .start();
 
         
-        new AsyncCallback<T, FontAwesomeIconView>()
+        new CallbackTask<T, FontAwesomeIconView>()
                 .setInput(newItem)
                 .run(iconFactory)
                 .then(this::setIcon)
@@ -287,7 +289,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         /*
         
          */
-        new AsyncCallback<T, String>()
+        new CallbackTask<T, String>()
                 .setInput(newItem)
                 .run(additionalInfoFactory)
                 .then(this::setAdditionalData)
@@ -312,7 +314,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         setCenter(loadingIcon);
         loadingIcon.play();
 
-        currentImageSearch = new AsyncCallback<T, Image>()
+        currentImageSearch = new CallbackTask<T, Image>()
                 .setInput(newItem)
                 .run(imageFactory)
                 .then(this::setImage)

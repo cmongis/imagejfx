@@ -55,7 +55,7 @@ public class DefaultImageLoaderService extends AbstractService implements ImageL
     @Parameter
     private HashService hashService;
 
-    private final static String FORMAT_FILE_NAME = "supportedFormats.txt";
+    private final String FORMAT_FILE_NAME = "/supportedFormats.txt";
     public List<String> formats = new ArrayList<>();
 
     @Override

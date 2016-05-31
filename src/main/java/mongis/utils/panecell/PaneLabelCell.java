@@ -42,7 +42,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -199,13 +199,13 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
 
     public void forceUpdate(T newItem) {
         //otherwise starting to charge everything
-        new AsyncCallback<T, String>()
+        new CallbackTask<T, String>()
                 .setInput(newItem)
                 .run(titleFactory)
                 .then(this::setTitle)
                 .queue();
 
-        new AsyncCallback<T, String>()
+        new CallbackTask<T, String>()
                 .setInput(newItem)
                 .run(subtitleFactory)
                 .then(this::setSubtitle)
@@ -214,7 +214,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
         /*
         
          */
-        new AsyncCallback<T, String>()
+        new CallbackTask<T, String>()
                 .setInput(newItem)
                 .run(additionalInfoFactory)
                 .then(this::setAdditionalData)
@@ -232,7 +232,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
             return;
         }
 
-        currentImageSearch = new AsyncCallback<T, Image>()
+        currentImageSearch = new CallbackTask<T, Image>()
                 .setInput(newItem)
                 .run(imageFactory)
                 .start();

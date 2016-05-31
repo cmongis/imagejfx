@@ -114,7 +114,7 @@ public class AnimationChain {
 
     private class LaunchableRunnable implements Launchable {
 
-        protected AsyncCallback callback = new AsyncCallback();
+        protected CallbackTask callback = new CallbackTask();
 
         public LaunchableRunnable(Runnable runnable) {
             callback.run(runnable);

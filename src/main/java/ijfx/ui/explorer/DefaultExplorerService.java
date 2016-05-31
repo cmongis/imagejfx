@@ -31,7 +31,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
 import org.scijava.event.EventService;
@@ -87,7 +87,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     @Override
     public void applyFilter(Predicate<MetaDataOwner> predicate) {
 
-        new AsyncCallback<Predicate<MetaDataOwner>, List<Explorable>>(predicate)
+        new CallbackTask<Predicate<MetaDataOwner>, List<Explorable>>(predicate)
                 .run(this::filter)
                 .then(this::setFilteredItems)
                 .start();
