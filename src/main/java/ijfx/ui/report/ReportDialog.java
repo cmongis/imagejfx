@@ -40,7 +40,7 @@ public class ReportDialog extends Dialog<Boolean>{
     public ReportDialog(Context context) {
         super();
         
-        initStyle(StageStyle.UNDECORATED);
+        initStyle(StageStyle.DECORATED);
         
         pane = new DialogPane();
        
@@ -48,6 +48,7 @@ public class ReportDialog extends Dialog<Boolean>{
         setDialogPane(pane);
         pane.getStylesheets().add(ImageJFX.STYLESHEET_ADDR);
         pane.setContent(new ReportPanel(context).setOnReportDone(this::onSendingDone));
+       
        setResultConverter(this::onResultFired);
         
     }
@@ -56,6 +57,9 @@ public class ReportDialog extends Dialog<Boolean>{
     
     public Void onSendingDone(Boolean result) {
           
+            if(result == null) {
+                setResult(false);
+            }
             
         
             if(result) {
@@ -76,7 +80,9 @@ public class ReportDialog extends Dialog<Boolean>{
         if(buttonType == ButtonType.OK) {
             return true;
         }
-        return true;
+        else {
+            return false;
+        }
     } 
     
 }

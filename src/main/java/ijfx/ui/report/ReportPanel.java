@@ -48,6 +48,9 @@ public class ReportPanel extends GridPane {
     Button sendButton;
 
     @FXML
+    Button cancelButton;
+    
+    @FXML
     TextArea descriptionTextArea;
 
     @FXML
@@ -119,7 +122,10 @@ public class ReportPanel extends GridPane {
         return this;
     }
 
-  
+   @FXML
+   public void cancel() {
+       this.onReportDone.call(null);
+   }
     
     
     
