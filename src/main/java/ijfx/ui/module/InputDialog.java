@@ -24,8 +24,9 @@ import ijfx.ui.main.ImageJFX;
 import java.util.logging.Logger;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.util.Callback;
+import org.apache.http.concurrent.Cancellable;
 import org.scijava.Context;
+import org.scijava.command.CommandModule;
 import org.scijava.module.Module;
 
 /**
@@ -88,7 +89,11 @@ public class InputDialog extends Dialog<Module> {
 
         } else {
             logger.info("Cancelling " + moduleName);
+            if(CommandModule.class.isAssignableFrom(module.getClass())) {
+                ((CommandModule)module).cancel("User cancelled.");
+            }
             module.cancel();
+            
             
         }
         return module;
