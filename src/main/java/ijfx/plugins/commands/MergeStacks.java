@@ -28,6 +28,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
@@ -38,7 +39,7 @@ import org.scijava.ui.UIService;
  * @author cyril
  */
 @Plugin(type = Command.class,menuPath = "Image > Stacks > Merge into channels...")
-public class MergeStacks implements Command {
+public class MergeStacks extends ContextCommand {
 
     @Parameter(type = ItemIO.INPUT, required = true, label = "Select dataset to merge")
     Dataset[] inputs = null;
@@ -131,5 +132,7 @@ public class MergeStacks implements Command {
         }
 
     }
+
+   
 
 }
