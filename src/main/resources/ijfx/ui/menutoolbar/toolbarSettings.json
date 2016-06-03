@@ -71,7 +71,19 @@
         ,
         "icon": "PAINT_BRUSH"
         ,
-        "items": [
+        "items": [     
+            {
+                "type": "Command"
+                ,
+                "label": "Auto contrast"
+                ,
+                "action": "net.imagej.plugins.commands.display.AutoContrast"
+                ,
+                "icon": "ADJUST"
+                ,
+                "context": "image-open"
+
+            },
             {
                 "type": "Command"
                 ,
@@ -94,21 +106,10 @@
                 ,
                 "icon": "USERS"
                 ,
-                "context": "multi-channel-img rgb-image"
+                "context": "multi-channel-img"
             }
-            ,
-            {
-                "type": "Command"
-                ,
-                "label": "Auto contrast"
-                ,
-                "action": "net.imagej.plugins.commands.display.AutoContrast"
-                ,
-                "icon": "ADJUST"
-                ,
-                "context": "Image-Colors"
-
-            }
+            
+            
         ]
     }
     , {

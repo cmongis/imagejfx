@@ -23,6 +23,7 @@ import ijfx.plugins.AxisInterval;
 import ijfx.plugins.DefaultAxisInterval;
 import ijfx.plugins.LongInterval;
 import ijfx.plugins.RemoveSlice;
+import ijfx.plugins.commands.AxisUtils;
 import ijfx.ui.module.InputSkinPlugin;
 import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
@@ -48,7 +49,7 @@ public class AxisIntervalInputSkin extends AbstractIntervalInputSkin<AxisInterva
 
         ImageDisplay imageDisplay = imageDisplayService.getActiveImageDisplay();
 
-        AxisType axisType = RemoveSlice.getSliceAxis(imageDisplay);
+        AxisType axisType = AxisUtils.getSliceAxis(imageDisplay);
         if (axisType == null) {
             min = 0;
             max = 0;
