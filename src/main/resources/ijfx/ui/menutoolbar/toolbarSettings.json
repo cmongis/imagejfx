@@ -126,7 +126,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.restructure.DeleteData"
                 ,
-                "icon": "ANDROID"
+                "icon": "UPLOAD"
                 ,
                 "context": "image-open"
                 
@@ -136,7 +136,7 @@
                 "type":"Command"
                 ,"label":"Delete Slices"
                 ,"action":"ijfx.plugins.RemoveSlice"
-                ,"icon":"ANDROID"
+                ,"icon":"ERASER"
                 ,"context":"image-open"
             }
             , {
@@ -146,9 +146,23 @@
                 ,
                 "action": "net.imagej.plugins.commands.restructure.ReorderData"
                 ,
-                "icon": "ANDROID"
+                "icon": "SORT"
                 ,
                 "context": "image-open"
+            }
+            ,{
+                "type":"Command"
+                ,"label":"Convert to Hyperstack..."
+                ,"action":"ijfx.plugins.stackconverter.StackToHS"
+                ,"icon":"STACK_OVERFLOW"
+                ,"context":"image-open"
+            }
+            ,{
+                "type":"Command"
+                ,"label":"Hyperstack to Stack..."
+                ,"action":"ijfx.plugins.stackconverter.HyperstackToStack"
+                ,"icon":"STACK_OVERFLOW"
+                ,"context":"image-open"
             }
         ]
     },
@@ -179,25 +193,7 @@
                 }
             },
             
-            {
-                "type": "Command"
-                ,
-                "label": "Adaptive Median"
-                ,
-                "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionAdaptiveMedian"
-                ,
-                "icon": "preview"
-                ,
-                "context": "image-open"
-                
-                ,"parameters": {
-                    "neighTypeString": "RADIAL_STRING"
-
-                }
-
-            }
-
-            ,
+            
             {
                 "type": "Command"
                 ,
@@ -245,7 +241,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.assign.noisereduce.NoiseReductionHarmonicMean"
                 ,
-                "icon": "preview"
+                "icon": "REMOVE"
                 ,
                 "context": "image-open"
                 ,
@@ -316,7 +312,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.display.interactive.Threshold"
                 ,
-                "icon": "preview"
+                "icon": "GAVEL"
                 ,
                 "context": "image-open"
                 ,
@@ -434,7 +430,7 @@
                 ,
                 "action": "net.imagej.plugins.commands.imglib.DuplicateImage"
                 ,
-                "icon": "FILES_O"
+                "icon": "CLONE"
                 ,
                 "context": "image-open"
 

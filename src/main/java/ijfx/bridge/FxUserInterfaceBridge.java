@@ -25,6 +25,7 @@ import ijfx.ui.datadisplay.image.ImageWindowContainer;
 import ijfx.ui.datadisplay.image.ImageWindow;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.datadisplay.table.TableWindow;
+import ijfx.ui.datadisplay.text.TextWindow;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -47,6 +48,7 @@ import org.scijava.ui.UIService;
 import org.scijava.ui.UserInterface;
 import org.scijava.ui.viewer.DisplayWindow;
 import mongis.utils.FXUtilities;
+import org.scijava.display.TextDisplay;
 
 /**
  * UI bridge between ImageJFX and ImageJ
@@ -204,7 +206,15 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
                 ImageWindowContainer.getInstance().getChildren().add(new TableWindow((TableDisplay) dspl));
             });
 
-        } else {
+        } 
+        else if (dspl instanceof TextDisplay) {
+            Platform.runLater(() -> {
+
+                ImageWindowContainer.getInstance().getChildren().add(new TextWindow((TextDisplay) dspl));
+            });
+
+        }
+        else {
             logger.warning("Cannot show display type :" + dspl.getClass().getSimpleName());
         }
     }

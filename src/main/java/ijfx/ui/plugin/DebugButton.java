@@ -89,6 +89,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Reload App Browser", event -> appService.reloadCurrentView());
         addItem("Test hints", this::testHints);
         addItem("Switch context",event->setContext());
+        addItem("Open performance monitor",this::openPerformanceMonitor);
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED,this::updateReloadMenu);
         System.out.println("Added");
@@ -141,6 +142,10 @@ public class DebugButton extends MenuButton implements UiPlugin {
         MenuItem mi = (MenuItem) event.getTarget();
         UiPlugin ui = (UiPlugin) mi.getUserData();
         uiPluginService.reload(ui.getClass());
+    }
+    
+    private void openPerformanceMonitor(ActionEvent event) {
+        activityService.openByType(PerformanceActivity.class);
     }
 
     private void updateReloadMenu(MouseEvent event) {

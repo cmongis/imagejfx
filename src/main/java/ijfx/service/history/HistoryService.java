@@ -149,7 +149,7 @@ public class HistoryService extends AbstractService implements ImageJService{
         try {
             return loadWorkflow(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,"Error when loading workflow.",ex);;
+            ImageJFX.getLogger().log(Level.WARNING,"Error when loading workflow.",ex);;
         }
         return null;
     }

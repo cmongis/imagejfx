@@ -108,9 +108,10 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         //fakeToolBar.setPadding(new Insets(10, 10,10,10));
         this.setTop(fakeToolBar);
         jsonReader = new JsonReader();
-        jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
+        jsonReader.read("/ijfx/ui/menutoolbar/toolbarSettings.json");
         jsonReader.separate();
         popOver = new PopOver();
+        popOver.setMinHeight(200);
         generateItems(jsonReader, paneContextualView);
         created = true;
     }
@@ -154,6 +155,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.setAutoHide(true);
         popOver.setOpacity(1.0);
         popOver.setArrowSize(0);
+        popOver.setMinHeight(200);
         int anchorX = (int) (this.localToScreen(this.getBoundsInParent()).getMinX() + 1);
         int anchorY = (int) (this.localToScreen(this.getTop().getBoundsInParent()).getMaxY() - 1);
         popOver.show(owner);

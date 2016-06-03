@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.ui.LoadingScreenService;
@@ -34,13 +35,14 @@ import ijfx.ui.filter.DefaultMetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataOwnerFilter;
 import ijfx.ui.main.SideMenuBinding;
+import ijfx.ui.utils.CollectionUtils;
+import ijfx.ui.utils.DragPanel;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -48,15 +50,18 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Toggle;
@@ -66,7 +71,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import jfxtras.scene.control.ToggleGroupValue;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import org.reactfx.EventStreams;
 import org.scijava.app.StatusService;
@@ -83,60 +88,76 @@ import org.scijava.plugin.PluginService;
 public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
-    ListView<Folder> folderListView;
+    private ListView<Folder> folderListView;
 
     @FXML
-    BorderPane contentBorderPane;
+    private BorderPane contentBorderPane;
 
     @FXML
-    ToggleButton filterToggleButton;
+    private ToggleButton filterToggleButton;
 
     @FXML
-    TextField filterTextField;
+    private TextField filterTextField;
 
     @FXML
-    Accordion filterVBox;
+    private Accordion filterVBox;
 
     @FXML
-    ToggleButton fileModeToggleButton;
+    private ScrollPane filterScrollPane;
+    
+    @FXML
+    private ToggleButton fileModeToggleButton;
 
     @FXML
-    ToggleButton planeModeToggleButton;
+    private ToggleButton planeModeToggleButton;
 
     @FXML
-    ToggleButton objectModeToggleButton;
+    private ToggleButton objectModeToggleButton;
 
     @FXML
-    HBox viewHBox;
+    private Button statisticsButton;
 
-    ToggleGroup explorationModeToggleGroup;
+    @FXML
+    private HBox viewHBox;
 
- 
-    ToggleGroupValue<ExplorerView> currentView = new ToggleGroupValue<>();
+    private ToggleGroup explorationModeToggleGroup;
+
+    private final ToggleGroupValue<ExplorerView> currentView = new ToggleGroupValue<>();
     @Parameter
-    FolderManagerService folderManagerService;
-
-    @Parameter
-    ExplorerService explorerService;
-
-    @Parameter
-    LoadingScreenService loadingScreenService;
-
-    @Parameter
-    StatusService statusService;
+    private FolderManagerService folderManagerService;
 
     @Parameter
-    PluginService pluginService;
+    private ExplorerService explorerService;
 
     @Parameter
-    UiContextService uiContextService;
+    private LoadingScreenService loadingScreenService;
 
-    ExplorerView view;
+    @Parameter
+    private StatusService statusService;
 
-    List<Runnable> folderUpdateHandler = new ArrayList<>();
+    @Parameter
+    private PluginService pluginService;
 
-    Property<ExplorationMode> explorationModeProperty = new SimpleObjectProperty<>();
+    @Parameter
+   private  UiContextService uiContextService;
 
+    private ExplorerView view;
+
+    private List<Runnable> folderUpdateHandler = new ArrayList<>();
+
+    private Property<ExplorationMode> explorationModeProperty = new SimpleObjectProperty<>();
+
+    private BooleanProperty folderListEmpty = new SimpleBooleanProperty(true);
+
+    private BooleanProperty explorerListEmpty = new SimpleBooleanProperty(true);
+
+    private DragPanel dragPanel;
+
+    private  final String NO_FOLDER_TEXT = "Click on \"Add folder\" or drop a\nfolder here to explorer it";
+    private  final FontAwesomeIcon NO_FOLDER_ICON = FontAwesomeIcon.DOWNLOAD;
+    private  final String EMPTY_FOLDER_TEXT = "Empty";
+    private  final FontAwesomeIcon EMPTY_FOLDER_ICON = FontAwesomeIcon.FROWN_ALT;
+    
     public ExplorerActivity() {
         try {
             FXUtilities.injectFXML(this);
@@ -145,10 +166,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             folderListView.setCellFactory(this::createFolderListCell);
             folderListView.getSelectionModel().selectedItemProperty().addListener(this::onFolderSelectionChanged);
 
-            SideMenuBinding binding = new SideMenuBinding(filterVBox);
+            SideMenuBinding binding = new SideMenuBinding(filterScrollPane);
 
             binding.showProperty().bind(filterToggleButton.selectedProperty());
-            filterVBox.setTranslateX(-250);
+            filterScrollPane.setTranslateX(-300);
 
             explorationModeToggleGroup = new ToggleGroup();
             explorationModeToggleGroup.getToggles().addAll(fileModeToggleButton, planeModeToggleButton, objectModeToggleButton);
@@ -158,9 +179,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             objectModeToggleButton.setUserData(ExplorationMode.OBJECT);
 
             explorationModeToggleGroup.selectedToggleProperty().addListener(this::onToggleSelectionChanged);
-            
+
             currentView.valueProperty().addListener(this::onViewModeChanged);
+
+            dragPanel = new DragPanel("No folder open", FontAwesomeIcon.DASHCUBE);
             
+            folderListEmpty.addListener(this::onFolderListEmptyPropertyChange);
+            explorerListEmpty.addListener(this::onExplorerListEmptyPropertyChange);
+
             EventStreams.valuesOf(filterTextField.textProperty()).successionEnds(Duration.ofSeconds(1))
                     .subscribe(this::updateTextFilter);
 
@@ -171,35 +197,19 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     private void init() {
-
         if (view == null) {
-
             List<ExplorerView> views = pluginService.createInstancesOfType(ExplorerView.class);
 
             List<ToggleButton> buttons = views.stream().map(this::createViewToggle).collect(Collectors.toList());
             //Map<ExplorerView, ToggleButton> viewButtons = views.stream().collect(Collectors.toMap(v -> v, this::createViewToggle));
 
-            
-            
-            
-            
-           // viewToggleGroup = new ToggleGroup();
-
-            //viewToggleGroup.getToggles().addAll(buttons);
-
-            //viewToggleGroup.selectedToggleProperty().addListener(this::onViewModeChanged);
-
-            //viewToggleGroup.selectToggle(buttons.get(0));
-
             viewHBox.getChildren().addAll(buttons);
 
             buttons.get(0).getStyleClass().add("first");
             buttons.get(buttons.size() - 1).getStyleClass().add("last");
-            
-            
+
             currentView.setValue(views.get(0));
         }
-
     }
 
     @Override
@@ -213,7 +223,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         init();
 
         explorationModeToggleGroup.selectToggle(getToggleButton(folderManagerService.getCurrentExplorationMode()));
-        return new AsyncCallback<Void, List<Explorable>>()
+        return new CallbackTask<Void, List<Explorable>>()
                 .run(this::update)
                 .then(this::updateUi)
                 .start();
@@ -233,6 +243,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     public void updateFolderList() {
+        
+        
+        /*
         folderListView
                 .getItems()
                 .addAll(
@@ -241,6 +254,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
                         .stream()
                         .filter(this::isNotDisplayed)
                         .collect(Collectors.toList()));
+       */
+        
+        CollectionUtils.syncronizeContent(folderManagerService.getFolderList(), folderListView.getItems());
+        
     }
 
     public void updateExplorerView(ExplorerView view) {
@@ -252,18 +269,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void updateUi(List<? extends Explorable> explorable) {
 
         updateFolderList();
-        System.out.println(explorable.size());
-        if (explorable == null) {
-            contentBorderPane.setCenter(new Label("Drag and drop a folder containing your image to explore it"));
 
-        } else if (explorable.size() == 0) {
-            contentBorderPane.setCenter(new Label("This folder doesn't contain any images... for now"));
-        } else {
-            contentBorderPane.setCenter(view.getNode());
+        folderListEmpty.setValue(folderListView.getItems().isEmpty());
+        explorerListEmpty.setValue(explorable == null || explorable.isEmpty());
+        if (explorable != null) {
             view.setItem(explorable);
-
         }
-
     }
 
     // returns true if the folder is not displayed yet
@@ -280,14 +291,19 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         }
     }
 
+    @FXML
+    public void removeFolder() {
+        folderManagerService.removeFolder(folderListView.getSelectionModel().getSelectedItem());
+    }
+
     @EventHandler
     public void onFolderAdded(FolderAddedEvent event) {
         Platform.runLater(this::updateFolderList);
     }
 
     @EventHandler
-    public void onFolderDeleted(FolderDeletedEvent event) {
-        folderListView.getItems().remove(event.getObject());
+    public void onFolderDeleted(FolderDeletedEvent event) {     
+        Platform.runLater(this::updateFolderList);
     }
 
     @EventHandler
@@ -324,9 +340,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
                 setGraphic(ctrl);
 
-                if (newValue != null) {
-                    ctrl.setItem(newValue);
-                }
+                ctrl.setItem(newValue);
             }
         }
 
@@ -346,11 +360,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     public void updateFilters() {
 
-        new AsyncCallback<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
+        Task task = new CallbackTask<List<? extends Explorable>, List<MetaDataFilterWrapper>>()
                 .setInput(explorerService.getItems())
+                .setName("Updating filters...")
                 .run(this::generateFilter)
                 .then(this::replaceFilters)
                 .start();
+
+        loadingScreenService.frontEndTask(task, true);
 
     }
 
@@ -383,10 +400,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         items
                 .stream()
                 .map(owner -> owner.getMetaDataSet().keySet())
+                
                 .forEach(keys -> keySet.addAll(keys));
 
         return keySet
                 .stream()
+                .filter(MetaData::canDisplay)
                 .map(key -> new MetaDataFilterWrapper(key, filterFactory.generateFilter(explorerService.getItems(), key)))
                 .filter(filter -> filter.getContent() != null)
                 .collect(Collectors.toList());
@@ -428,7 +447,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
      */
     private ToggleButton createViewToggle(ExplorerView view) {
         ToggleButton toggle = new ToggleButton(null, view.getIcon());
-        
+
         currentView.add(toggle, view);
 
         return toggle;
@@ -452,6 +471,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
                 pane = new TitledPane(title, filter.getContent());
                 pane.setExpanded(false);
                 pane.getStyleClass().add("explorer-filter");
+                pane.getContent().getStyleClass().add("content");
             } else {
                 pane = null;
             }
@@ -496,6 +516,38 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     public void openSelection() {
         explorerService.getSelectedItems().forEach(System.out::println);
+    }
+
+    @FXML
+    public void computeStatistics() {
+        folderManagerService.completeStatistics();
+    }
+
+    @FXML
+    public void explainMe() {
+        System.out.println("TODO");
+    }
+
+    private void onFolderListEmptyPropertyChange(Observable obs, Boolean oldV, Boolean isEmpty) {
+        if (isEmpty) {
+            dragPanel.setLabel(NO_FOLDER_TEXT)
+                    .setIcon(NO_FOLDER_ICON);
+
+        }
+
+    }
+
+    public void onExplorerListEmptyPropertyChange(Observable obs, Boolean oldV, Boolean isEmpty) {
+        if (!isEmpty) {
+            contentBorderPane.setCenter(currentView.getValue().getNode());
+           // getChildren().remove(dragPanel);
+        } else {
+            contentBorderPane.setCenter(dragPanel);
+            
+            dragPanel.setLabel(EMPTY_FOLDER_TEXT)
+                    .setIcon(EMPTY_FOLDER_ICON);
+            
+        }
     }
 
     public boolean isEverythingSelected() {

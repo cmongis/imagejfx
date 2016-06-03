@@ -22,15 +22,12 @@ package ijfx.ui.explorer;
 import ijfx.bridge.ImageJContainer;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
-import ijfx.core.project.ProjectToImageJService;
-import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -65,9 +62,7 @@ public class PlaneMetaDataSetWrapper implements Explorable{
         @Parameter
         ImagePlaneService imagePlaneService;
         
-        @Parameter
-        ProjectToImageJService projectToImageJService;
-        
+      
         public PlaneMetaDataSetWrapper(Context context, MetaDataSet m) {
             context.inject(this);
             this.m = m;
@@ -168,7 +163,7 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                 if (m.containsKey(MetaData.PLANE_INDEX) == false) {
                     return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
                 } else {
-                    return projectToImageJService.getDataset(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue());
+                    return imagePlaneService.extractPlane(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue());
                 }
             } catch (Exception io) {
                 ImageJFX.getLogger().log(Level.SEVERE, null, io);

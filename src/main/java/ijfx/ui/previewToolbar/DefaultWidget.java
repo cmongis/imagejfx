@@ -24,7 +24,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 
 /**
  *
@@ -145,7 +145,7 @@ public class DefaultWidget implements ItemWidget {
             params.setFill(Color.TRANSPARENT);
 //            final WritableImage snapshot = canvas.snapshot(params, null);
             
-            Task<WritableImage> getIcon = new AsyncCallback<Canvas, WritableImage>(canvas)
+            Task<WritableImage> getIcon = new CallbackTask<Canvas, WritableImage>(canvas)
                     .run(input->input.snapshot(params, null));
             
             Platform.runLater(getIcon);

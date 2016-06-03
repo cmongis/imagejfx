@@ -27,7 +27,6 @@ import ijfx.bridge.ImageJContainer;
 import ijfx.ui.notification.Notification;
 import ijfx.ui.notification.NotificationEvent;
 import ijfx.service.ui.AppService;
-import ijfx.service.uiplugin.DefaultUiPluginService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.log.LogService;
 import ijfx.service.ui.FontEndTaskSubmitted;
@@ -36,9 +35,7 @@ import ijfx.service.ui.hint.DefaultHint;
 import ijfx.service.ui.hint.Hint;
 import ijfx.service.ui.hint.HintRequestEvent;
 import ijfx.service.uiplugin.UiPluginReloadedEvent;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -96,12 +93,12 @@ import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
-import java.util.Collection;
 import javafx.scene.Scene;
 import mongis.utils.AnimationChain;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
+import mongis.utils.TaskList2;
 
 /**
  * FXML Controller class
@@ -203,6 +200,8 @@ public class MainWindowController extends AnchorPane {
 
     Queue<Hint> hintQueue = new LinkedList<>();
 
+    TaskList2 taskList = new TaskList2();
+    
     boolean isHintDisplaying = false;
 
     private Thread memoryThread = new Thread(() -> {
@@ -265,6 +264,11 @@ public class MainWindowController extends AnchorPane {
         mainBorderPane.setOpacity(1.0);
         mainBorderPane.setCenter(new Label("Loading..."));
 
+        loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
+        
+        
+        memoryProgressBar.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMemoryProgressBarClicked);
+        
     }
 
     private Scene myScene;
@@ -275,17 +279,18 @@ public class MainWindowController extends AnchorPane {
 
     public void init() {
 
-        Task task = new AsyncCallback<Void, Boolean>()
+        Task task = new CallbackTask<Void, Boolean>()
                 .runLongCallable(this::init)
                 .then(this::finishInitialization)
                 .start();
 
         loadingPopup
                 .setCanCancel(false)
-                .bindTask(task)
                 .closeOnFinished()
-                .showOnScene(this.getScene());
+                .attachTo(this.getScene());
 
+        
+        taskList.submitTask(task);
         hideSideMenu();
 
     }
@@ -394,7 +399,7 @@ public class MainWindowController extends AnchorPane {
             imageJ.getContext().inject(thisController);
 
             // the second one loads the FXWidgets
-            final Task task2 = new AsyncCallback<Void,Collection<UiPlugin>>()
+            final Task task2 = new CallbackTask<Void,Collection<UiPlugin>>()
                     .runLongCallable(uiPluginService::loadAll);
 
             // registering the controllers
@@ -662,9 +667,7 @@ public class MainWindowController extends AnchorPane {
             Platform.runLater(() -> {
                 System.out.println("front end task submitted");
                 if(event.getObject() == null) return;
-                loadingPopup.bindTask(event.getObject())
-                        .closeOnFinished();
-                loadingPopup.showOnScene(this.getScene());
+                taskList.submitTask(event.getObject());
             });
         }
     }
@@ -702,7 +705,7 @@ public class MainWindowController extends AnchorPane {
 
         final Timeline timeline = new Timeline();
 
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), 0, Interpolator.LINEAR);
+        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), 0, Interpolator.EASE_OUT);
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
@@ -714,7 +717,7 @@ public class MainWindowController extends AnchorPane {
     public void hideSideMenu() {
         final Timeline timeline = new Timeline();
 
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * sideMenu.getWidth(), Interpolator.LINEAR);
+        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * (sideMenu.getWidth()+20), Interpolator.EASE_IN);
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
@@ -725,6 +728,10 @@ public class MainWindowController extends AnchorPane {
 
         hintService.displayHints(uiPlugin.getObject().getClass(), false);
 
+    }
+    
+    private void onMemoryProgressBarClicked(MouseEvent event) {
+        System.gc();
     }
 
     public synchronized void nextHint() {

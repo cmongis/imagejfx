@@ -20,7 +20,8 @@
  */
 package ijfx.ui.datadisplay.image;
 
-import ijfx.ui.arcmenu.ArcMenu;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.ToolChangeEvent;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -64,7 +66,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.CalibratedAxis;
@@ -160,6 +162,9 @@ public class ImageWindow extends Window {
     @Parameter
     private OverlayDrawerService overlayDrawerService;
 
+    @Parameter
+    private TimerService timerService;
+    
     FxTool currentTool;
 
     /*
@@ -244,16 +249,10 @@ public class ImageWindow extends Window {
 
         getRightIcons().add(closeIcon);
 
-        this.setOnCloseAction((event) -> {
-            eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
-        });
+       
+        setOnCloseAction(this::onWindowClosed);
 
-        closeIcon.onActionProperty().addListener(event -> {
-            toolService.getCurrentTool().unsubscribe(canvas);
-            imageDisplay.close();
-
-        });
-
+       
         setPrefSize(300, 300);
 
         //putting an unused hbox...
@@ -429,7 +428,6 @@ public class ImageWindow extends Window {
         if (wi == null) {
             wi = new WritableImage(getDatasetview().getPreferredWidth(), getDatasetview().getPreferredHeight());
             canvas.setImage(wi);
-
         }
         return wi;
     }
@@ -452,7 +450,7 @@ public class ImageWindow extends Window {
         
         if (checkServices()) {
            
-            refreshQueue.execute(new AsyncCallback<Void, Void>()
+            refreshQueue.execute(new CallbackTask<Void, Void>()
                     .run(this::transformImage)
                     .then(this::updateImageAndOverlays)
             );
@@ -460,33 +458,49 @@ public class ImageWindow extends Window {
     }
 
     private void transformImage() {
+        
+        Timer t = timerService.getTimer(this.getClass());
+        t.start();
+        
         logger.info("Refreshing source image "+imageDisplay.getName());
 
         //Retrieving buffered image from the dataset view
         BufferedImage bf = getDatasetview().getScreenImage().image();
-
+        
+        t.elapsed("getScreenImage");
+        
         // getting a writableImage (previously created or not)
         WritableImage writableImage = getWrittableImage();
-
+        
+       
+        
         // if the size of the images are different, the buffer is recreated;
-        if (writableImage.getWidth() != canvas.getCamera().getImageSpace().getWidth() || writableImage.getHeight() != canvas.getCamera().getImageSpace().getHeight()) {
-
+        if (bf.getWidth() != canvas.getCamera().getImageSpace().getWidth() || bf.getHeight() != canvas.getCamera().getImageSpace().getHeight()) {
+            
+            
             logger.info(String.format("Image size has changed :  %.0f x %.0f", writableImage.getWidth(), writableImage.getHeight()));
 
             // force buffer recreation
             wi = null;
             writableImage = getWrittableImage();
+            
         }
-
+        t.elapsed("getWrittableImage");
         SwingFXUtils.toFXImage(bf, writableImage);
+        t.elapsed("write to buffer");
     }
 
     private void updateImageAndOverlays(Void v) {
+        
+        Timer t = timerService.getTimer(this.getClass());
+        
         canvas.repaint();
-
+        t.elapsed("canvas.repaint");
         updateInfoLabel();
-
+        t.elapsed("updateInfoLabel");
         updateOverlays();
+        t.elapsed("updateOverlays");
+       
     }
 
     private void updateOverlays() {
@@ -496,7 +510,8 @@ public class ImageWindow extends Window {
     public void updateOverlay(Overlay overlay) {
         try {
             
-        
+            Timer t = timerService.getTimer(this.getClass());
+            t.start();
             Node node = getDrawer(overlay).update(overlay, canvas.getCamera());
             node.setMouseTransparent(true);
             node.setUserData(overlay);
@@ -510,6 +525,7 @@ public class ImageWindow extends Window {
                 Shape shape = (Shape) node;
                 shape.setFill(shape.getStroke());
             }
+            t.elapsed("updateOverlay");
 
         } catch (NullPointerException e) {
             logger.log(Level.WARNING, "Couldn't draw overlay. Probably because of a lack of Drawer", e);
@@ -697,12 +713,12 @@ public class ImageWindow extends Window {
         }
         logger.info("Changing a axis");
         imageDisplay.update();
-        refreshSourceImage();
+        //refreshSourceImage();
         //refreshSourceImage();
     }
 
     @EventHandler
-    protected void onEvent(LUTsChangedEvent event) {
+    protected void onLUTChanged(LUTsChangedEvent event) {
 
         if (event.getView() != getDatasetview()) {
             return;
@@ -712,16 +728,19 @@ public class ImageWindow extends Window {
         // System.out.println(getDatasetview());
         //imageDisplay.update();
         imageDisplayService.getActiveDataset(imageDisplay).update();
-        refreshSourceImage();
+        //refreshSourceImage();
 
     }
 
     @EventHandler
-    protected void onEvent(DatasetUpdatedEvent event) {
+    protected void onDatasetUpdated(DatasetUpdatedEvent event) {
         //imageDisplay.update();
         if(event.getObject() != imageDisplayService.getActiveDataset(imageDisplay)) return;
         logger.info("DatasetChangedEvent : " + event.getObject());
-        refreshSourceImage();
+        imageDisplay.update();
+        
+        
+        //refreshSourceImage();
     }
 
     @EventHandler
@@ -732,10 +751,20 @@ public class ImageWindow extends Window {
             return;
         }
         logger.info("DisplayUpdatedEvent");
-
         refreshSourceImage();
+        
     }
     
+    protected void onWindowClosed(ActionEvent event) {
+          System.out.println("Closing dataset");
+            if(toolService.getCurrentTool() != null)
+            toolService.getCurrentTool().unsubscribe(canvas);
+            
+            datasetService.getDatasets().remove(datasetService.getDatasets(imageDisplay));
+            //mageDisplayService.getActiveDataset(imageDisplay).
+            imageDisplay.close();
+             eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
+    }
    
 
     @EventHandler

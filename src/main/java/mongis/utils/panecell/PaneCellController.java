@@ -43,7 +43,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import mercury.core.MercuryTimer;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.properties.ServiceProperty;
 
 /**
@@ -95,7 +95,7 @@ public class PaneCellController<T extends Object> {
      */
     public synchronized void update(List<T> items) {
 
-        Task task = new AsyncCallback<Integer, List<PaneCell<T>>>()
+        Task task = new CallbackTask<Integer, List<PaneCell<T>>>()
                 .setInput(items.size())
                 .setName("Loading...")
                 .run(this::retrieve)
@@ -124,7 +124,7 @@ public class PaneCellController<T extends Object> {
     }
 
     public synchronized void update3DList(List<List<List<T>>> items, int size, List<String> metaDatas) {
-        new AsyncCallback<Integer, List<PaneCell<T>>>()
+        new CallbackTask<Integer, List<PaneCell<T>>>()
                 .setInput(size)
                 .run(this::retrieve)
                 .then(controllers -> {

@@ -77,8 +77,7 @@ public class AppService extends AbstractService implements ImageJService {
     @Parameter
     LogService logErrorService;
 
-    @Parameter
-    ProjectManagerWebWrapper projectManager;
+  
 
     @Parameter
     ActivityService activityService;

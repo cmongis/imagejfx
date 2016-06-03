@@ -62,13 +62,12 @@ import org.scijava.plugin.Plugin;
 import org.scijava.thread.ThreadService;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
-import ijfx.ui.project_manager.search.PopoverToggleButton;
 import javafx.beans.Observable;
 import javafx.concurrent.Task;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
-
+import ijfx.ui.widgets.PopoverToggleButton;
 /**
  *
  * @author Cyril MONGIS
@@ -346,7 +345,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     private void autoRange(ActionEvent event) {
 
         Task task = 
-        new AsyncCallback()
+        new CallbackTask()
                 .setName("Auto-contrast...")
                 .run(displayRangeServ::autoRange)
                 .then(o->{

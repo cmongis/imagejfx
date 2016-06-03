@@ -78,25 +78,20 @@ public class OpenImageBar extends HBox implements UiPlugin {
         previousButton = GlyphsDude
                 .createIconButton(FontAwesomeIcon.ARROW_CIRCLE_LEFT);
         previousButton.setTooltip(new Tooltip(PREVIOUS_BUTTON_TXT));
+        previousButton.getStyleClass().add("icon");
+        previousButton.setOnAction(event -> activityService.back());
         
-        nextButton = GlyphsDude
-                .createIconButton(FontAwesomeIcon.ARROW_CIRCLE_LEFT);
-        nextButton.setTooltip(new Tooltip(NEXT_BUTTON_TXT));
         
         openButton = GlyphsDude.createIconButton(FontAwesomeIcon.FOLDER_OPEN);
         openButton.setTooltip(new Tooltip(OPEN_BUTTON_TXT));
         //openButton.setText(" ");
         openButton.getStyleClass().add("icon");
         openButton.setId("open-button");
-
-        previousButton.getStyleClass().add("icon");
-        nextButton.getStyleClass().add("icon");
+        openButton.setOnAction(event -> openImage());
 
         nextButton = GlyphsDude.createIconButton(FontAwesomeIcon.ARROW_CIRCLE_RIGHT);
         nextButton.setTooltip(new Tooltip(NEXT_BUTTON_TXT));
-
-        previousButton.setOnAction(event -> activityService.back());
-        openButton.setOnAction(event -> openImage());
+        nextButton.getStyleClass().add("icon");
         nextButton.setOnAction(event -> nextImage());
 
         getChildren().addAll(previousButton, nextButton, openButton);
@@ -122,6 +117,6 @@ public class OpenImageBar extends HBox implements UiPlugin {
     }
 
     private void previousImage() {
-
+        activityService.forward();
     }
 }

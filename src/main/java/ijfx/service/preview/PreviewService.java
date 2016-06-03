@@ -22,6 +22,7 @@ package ijfx.service.preview;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.DisplayBatchInput;
+import ijfx.service.log.LogService;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +42,8 @@ import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable;
 import net.imglib2.display.ColorTable8;
 import net.imglib2.type.numeric.RealType;
-import org.scijava.command.CommandInfo;
-import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
-import org.scijava.module.DefaultMutableModuleInfo;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
@@ -61,22 +59,26 @@ import org.scijava.service.Service;
 public class PreviewService extends AbstractService implements ImageJService {
 
     @Parameter
-    DisplayService displayService;
+    private DisplayService displayService;
 
     @Parameter
-    ImageDisplayService imageDisplayService;
+    private ImageDisplayService imageDisplayService;
 
     @Parameter
-    DatasetService datasetService;
+    private DatasetService datasetService;
 
     @Parameter
-    CommandService commandService;
+    private CommandService commandService;
 
     @Parameter
-    ModuleService moduleService;
+    private ModuleService moduleService;
+
+    @Parameter
+    private BatchService batchService;
     
     @Parameter
-    BatchService batchService;
+    private LogService logService;
+    
     private int width;
     private int height;
     private int x;
@@ -119,11 +121,17 @@ public class PreviewService extends AbstractService implements ImageJService {
         this.y = y;
         this.width = w;
         this.height = h;
+        int widthDataset = (int) imageDisplayService.getActiveDataset().max(0);
+        int heightDataset = (int) imageDisplayService.getActiveDataset().max(1);
         if (x < 0 || y < 0) {
-            int widthDataset = (int) imageDisplayService.getActiveDataset().max(0);
-            int heightDataset = (int) imageDisplayService.getActiveDataset().max(1);
             this.x = (int) (widthDataset / 2.0 - width / 2.0);
             this.y = (int) (heightDataset / 2.0 - height / 2.0);
+        }
+        if (widthDataset < width || heightDataset < height) {
+            this.x = 0;
+            this.y = 0;
+            width = widthDataset;
+            height = heightDataset;
 
         }
     }
@@ -149,15 +157,13 @@ public class PreviewService extends AbstractService implements ImageJService {
      * @return output
      */
     public Dataset getEmptyDataset(Dataset input) {
-        AxisType[] axisType = new AxisType[input.numDimensions()];
-        CalibratedAxis[] axeArray = new CalibratedAxis[input.numDimensions()];
+        AxisType[] axisType = new AxisType[2];
+        CalibratedAxis[] axeArray = new CalibratedAxis[2];
         input.axes(axeArray);
 
-        long[] dims = new long[axeArray.length];
+        long[] dims = new long[2];
         for (int i = 0; i < dims.length; i++) {
             axisType[i] = axeArray[i].type();
-            dims[i] = 1;// toIntExact(input.max(i) + 1);
-
         }
         dims[0] = width;
         dims[1] = height;
@@ -259,16 +265,21 @@ public class PreviewService extends AbstractService implements ImageJService {
             BatchSingleInput batchSingleInput = new DisplayBatchInput();
             this.context().inject(batchSingleInput);
             batchSingleInput.setDataset(dataset);
-            
+
             Module module = moduleService.createModule(commandService.getCommand(command));
             //CommandInfo commandInfo = new CommandInfo(command);
-           // Module module = new CommandModule(commandInfo);
-            this.context().inject(module.getDelegateObject());
+            // Module module = new CommandModule(commandInfo);
+            try {
+                this.context().inject(module.getDelegateObject());
+
+            } catch (Exception e) {
+                logService.severe(e);
+            }
             batchService.executeModule(batchSingleInput, module, inputMap);
             Dataset result = batchSingleInput.getDataset();
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            logService.severe(e);
         }
         return null;
     }

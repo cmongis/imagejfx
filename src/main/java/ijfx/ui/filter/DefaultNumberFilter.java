@@ -46,7 +46,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -307,7 +307,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
     // when the low and high of the range change, we count the number of elements
     // inside the range
     private void onLowHighValueChanged(Observable obs, Number oldValue, Number newValue) {
-        new AsyncCallback<Collection<? extends Number>,Long>()
+        new CallbackTask<Collection<? extends Number>,Long>()
                 .setInput(possibleValues)
                 .run(this::countElementsInRange)
                 .then(this::updateCountLabel)

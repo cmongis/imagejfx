@@ -73,8 +73,8 @@ public class GridIconView extends BorderPane implements ExplorerView {
         topBar = new GridPane();
 
         listLabel = new ArrayList<>();
-        listLabel.add(new Label("Columns"));
         listLabel.add(new Label("Rows"));
+        listLabel.add(new Label("Columns"));
         listLabel.add(new Label("Group by"));
         IntStream.range(0, listLabel.size()).forEach(i -> {
             topBar.add(listLabel.get(i), i, 0);

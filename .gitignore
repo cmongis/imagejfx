@@ -4,3 +4,4 @@ log-*.txt.lck
 *.gz
 package.sh
 target/*
+/nbproject/

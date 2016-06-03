@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
@@ -91,6 +92,8 @@ public class LoadingPopupSkinBase extends StackPane implements Skin<LoadingPopup
         finishButton.translateXProperty().bind(Bindings.createDoubleBinding(this::getFinishButtonX, widthProperty(),skinnable.showingProperty()));
         
         progressBar.progressProperty().bind(skinnable.progressProperty());
+        
+        progressBar.visibleProperty().bind(Bindings.createBooleanBinding(this::shouldDisplayProgressBar , skinnable.progressProperty()));
         
         getStyleClass().add("dark-background");
         
@@ -162,4 +165,9 @@ public class LoadingPopupSkinBase extends StackPane implements Skin<LoadingPopup
             Animations.FADEOUT.configure(this,ImageJFX.getAnimationDurationAsDouble()).play();
         }
     }
+    
+    private Boolean shouldDisplayProgressBar() {
+        return skinnable.progressProperty().getValue() > 0;
+    }
+    
 }

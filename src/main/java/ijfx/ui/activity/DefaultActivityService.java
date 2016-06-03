@@ -108,7 +108,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
             logger.severe("Passing NULL as activity parameter !");
             return null;
         }
-        if (activityMap.containsKey(activityClass.getName()) == false || debug) {
+        if (activityMap.containsKey(activityClass.getName()) == false) {
             try {
                 logger.info("Loading activity : " + activityClass.getName());
                 PluginInfo<SciJavaPlugin> plugin;
@@ -135,7 +135,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     public Activity getActivityByName(String activityId) {
         logger.info(activityId);
         // checking if an activity with this has already been around
-        if (activityMapById.containsKey(activityId) == false || debug) {
+        if (activityMapById.containsKey(activityId) == false) {
             List<PluginInfo<Activity>> pluginsOfType = pluginService.getPluginsOfType(Activity.class);
 
             for (PluginInfo<Activity> info : pluginsOfType) {

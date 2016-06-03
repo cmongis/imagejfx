@@ -180,7 +180,7 @@ public class BinaryToOverlay implements Command {
                 roi.addVertex(i, localizable);
 
             }
-
+            po.setLineWidth(2.0);
             listOverlays.add(po);
 
         }

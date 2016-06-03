@@ -22,6 +22,7 @@ package ijfx.ui.main;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.ui.activity.Activity;
+import ijfx.ui.activity.ActivityService;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -76,6 +77,9 @@ public class PerformanceActivity extends BorderPane implements Activity {
     @FXML
     TableColumn<TimerEntry, Long> countColumn;
     
+    @Parameter
+    ActivityService activityService;
+    
     public PerformanceActivity() throws IOException {
         FXUtilities.injectFXML(this);
 
@@ -111,6 +115,12 @@ public class PerformanceActivity extends BorderPane implements Activity {
         
         return null;
 
+    }
+    
+    @FXML
+    public void reset() {
+        timerService.resetTimers();
+        activityService.back();
     }
 
     private ListCell<Timer> createListCell(ListView<Timer> listView) {
@@ -217,4 +227,6 @@ public class PerformanceActivity extends BorderPane implements Activity {
        public void setCount(Long l) {};
        
     }
+    
+    
 }

@@ -6,7 +6,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <SplitPane dividerPositions="0.2842809364548495" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -28,4 +27,11 @@
          </items>
       </SplitPane>
    </center>
+   <bottom>
+      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+          <Button mnemonicParsing="false" onAction="#reset" text="Reset statistics" />
+        </items>
+      </ToolBar>
+   </bottom>
 </fx:root>

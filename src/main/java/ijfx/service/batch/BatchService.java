@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import net.imagej.Dataset;
@@ -115,7 +115,7 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     public Task<Boolean> applyWorkflow(List<BatchSingleInput> inputs, Workflow workflow) {
-        return new AsyncCallback<List<BatchSingleInput>, Boolean>()
+        return new CallbackTask<List<BatchSingleInput>, Boolean>()
                 .setInput(inputs)
                 .run((progress, input) -> applyWorkflow(progress, inputs, workflow));
     }
@@ -281,7 +281,7 @@ public class BatchService extends AbstractService implements ImageJService {
             logger.info(String.format("[%s] module finished", moduleName));
             extractOutput(input, module);
         } catch (Exception ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, "Error when running module " + moduleName, ex);;
+            logger.log(Level.SEVERE, "Error when extracting ouput from module module " + moduleName, ex);;
             return false;
 
         }
