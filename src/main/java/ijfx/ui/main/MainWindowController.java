@@ -585,7 +585,7 @@ public class MainWindowController extends AnchorPane {
 
     @EventHandler
     public void handleEvent(UiPluginReloadedEvent event) {
-        // Platform.runLater(() -> loadWidget(event.getWidget()));
+        Platform.runLater(() -> loadWidget(event.getWidget()));
     }
 
     @EventHandler
