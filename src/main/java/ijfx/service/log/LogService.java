@@ -117,6 +117,10 @@ public class LogService extends AbstractService implements ImageJService {
         logger.log(Level.SEVERE,null,throwable);
     }
     
+    public void warn(Throwable throwable, String format, Object... params) {
+        logger.log(Level.WARNING,String.format(format,params),throwable);
+    }
+    
     public void resetErrorCount() {
         errorCount = 0;
         eventService.publishLater(new CountResetChange());
