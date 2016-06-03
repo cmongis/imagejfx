@@ -33,6 +33,7 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
+import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
@@ -45,9 +46,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -94,11 +95,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @FXML
     private Button startButton;
 
-    @FXML
-    private ToggleButton singlePlaneToggleButton;
-
-    @FXML
-    private ToggleButton allPlanesToggleButton;
+  
 
     @Parameter
     private Context context;
@@ -133,7 +130,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @Parameter
     SegmentationService segmentationService;
     
-    ToggleGroupValue<Boolean> toggleGroup;
+   
 
     TaskButtonBinding taskButtonBinding;
 
@@ -143,6 +140,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     ObjectProperty<File> ouputFolderProperty;
 
+    ReadOnlyBooleanProperty isExplorer;
+    
     private static final Boolean USE_ALL_PLANE = Boolean.TRUE;
 
     public SegmentationPanel() {
@@ -152,10 +151,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             taskButtonBinding = new TaskButtonBinding(testButton);
             taskButtonBinding.runTaskOnClick(this::createTaskButtonBinding);
 
-            toggleGroup = new ToggleGroupValue<Boolean>();
-            
-            toggleGroup.add(allPlanesToggleButton, USE_ALL_PLANE);
-            toggleGroup.add(singlePlaneToggleButton, !USE_ALL_PLANE);
+           
 
             new TaskButtonBinding(startButton).runTaskOnClick(this::generateTask);
 
@@ -174,6 +170,10 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         workflowPanel.addStep(GaussianBlur.class);
         workflowPanel.addStep(Binarize.class);
 
+        isExplorer = new UiContextProperty(context, "segmentation");
+        
+        startButton.visibleProperty().bind(isExplorer);
+        
         return this;
     }
 
