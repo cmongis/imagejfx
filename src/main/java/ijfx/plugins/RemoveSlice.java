@@ -19,6 +19,7 @@
  */
 package ijfx.plugins;
 
+import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.uicontext.UiContextCalculatorService;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
@@ -69,7 +70,7 @@ public class RemoveSlice  implements Command{
         
          DeleteData deleteData = commandService.create(DeleteData.class);
         
-         AxisType axisType = getSliceAxis(dataset);
+         AxisType axisType = AxisUtils.getSliceAxis(dataset);
          
 
          if(axisType == null) {
@@ -84,29 +85,5 @@ public class RemoveSlice  implements Command{
         
     }
     
-    public static AxisType getSliceAxis(Dataset dataset) {
-       
-        AxisType axisType = null;
-        
-        if(UiContextCalculatorService.hasAxisType(dataset, Axes.Z)) {
-             axisType = Axes.Z;
-         }
-         if( axisType == null && UiContextCalculatorService.hasAxisType(dataset, Axes.TIME)) {
-             axisType = Axes.TIME;
-         }
-         return axisType;
-    }
-    
-    public static AxisType getSliceAxis(ImageDisplay display) {
-         AxisType axisType = null;
-        
-        if(UiContextCalculatorService.hasAxisType(display, Axes.Z)) {
-             axisType = Axes.Z;
-         }
-         if( axisType == null && UiContextCalculatorService.hasAxisType(display, Axes.TIME)) {
-             axisType = Axes.TIME;
-         }
-         return axisType;
-    }
     
 }
