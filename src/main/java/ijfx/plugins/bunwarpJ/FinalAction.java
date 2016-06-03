@@ -159,14 +159,18 @@ public class FinalAction implements Runnable
         //IJ.log("FinalAction: maxImageSubsamplingFactor = " + maxImageSubsamplingFactor);
         
         // Prepare registration parameters
+        if (warp == null)
+        {
+            
         warp = new Transformation(
           sourceImp, targetImp, source, target, sourcePh, targetPh,
           sourceMsk, targetMsk, sourceAffineMatrix, targetAffineMatrix,
           min_scale_deformation, max_scale_deformation,
           min_scale_image, divWeight, curlWeight, landmarkWeight, imageWeight,
           consistencyWeight, stopThreshold, outputLevel, showMarquardtOptim, accurate_mode, "", "", 
-          output_ip[0], output_ip[1], dialog, service, outputDataset);        
+          output_ip[0], output_ip[1], dialog);        
 				
+        }
         
         // Perform the registration
         IJ.showStatus("Registering...");
@@ -270,9 +274,7 @@ public class FinalAction implements Runnable
        final double stopThreshold,
        final int outputLevel,
        final boolean showMarquardtOptim,
-       final int accurate_mode,
-            DatasetService service,
-            Dataset outpuDataset)
+       final int accurate_mode)
     {
        this.sourceImp             = sourceImp;
        this.targetImp             = targetImp;
@@ -296,8 +298,6 @@ public class FinalAction implements Runnable
        this.outputLevel           = outputLevel;
        this.showMarquardtOptim    = showMarquardtOptim;
        this.accurate_mode         = accurate_mode;
-       this.service = service;
-       this.outputDataset = outpuDataset;
     } /* end setup */
 
     /* ------------------------------------------------------------------------ */
@@ -411,6 +411,10 @@ public class FinalAction implements Runnable
         	outputIP[1] = null;
         
         return outputIP;
+    }
+
+    public void setWarp(Transformation transformation) {
+        warp = transformation;
     }
 
 } /* end FinalAction*/

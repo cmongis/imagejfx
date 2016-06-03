@@ -210,10 +210,8 @@ final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).in
                 bUnwarpJ_.maxImageSubsamplingFactor, Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation),
                 Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation), bUnwarpJ_.divWeight, bUnwarpJ_.curlWeight,
                 bUnwarpJ_.landmarkWeight, bUnwarpJ_.imageWeight, bUnwarpJ_.consistencyWeight,
-                bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation,
-                sourceImp,
-                targetImp,
-                pathFile);
+                bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation
+                );
 //        dialog.showDialog();
 
 //        // If canceled
@@ -271,7 +269,7 @@ final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).in
                 dialog.getSourceAffineMatrix(), dialog.getTargetAffineMatrix(),
                 Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation), Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation),
                 min_scale_image, divWeight, curlWeight, landmarkWeight, imageWeight,
-                consistencyWeight, stopThreshold, outputLevel, showMarquardtOptim, mode, service, outputDataset);
+                consistencyWeight, stopThreshold, outputLevel, showMarquardtOptim, mode);
 
         dialog.setFinalActionLaunched(true);
         dialog.setToolbarAllUp();
@@ -288,6 +286,7 @@ final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).in
         }
         Img img = ImageJFunctions.wrap(finalAction.getWarp().getDirectResults());
         outputDataset = service.create(img);
+        
 
     }
 

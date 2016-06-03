@@ -324,24 +324,20 @@ public class MainDialog {
      * @param richOutput default verbose flag
      * @param saveTransformation default save transformations flag
      */
-    public MainDialog(
-            //			final Frame parentWindow,
-            final ImagePlus[] imageList,
-            final int mode,
-            final int maxImageSubsamplingFactor,
-            final int min_scale_deformation,
-            final int max_scale_deformation,
-            final double divWeight,
-            final double curlWeight,
-            final double landmarkWeight,
-            final double imageWeight,
-            final double consistencyWeight,
-            final double stopThreshold,
-            final boolean richOutput,
-            final boolean saveTransformation,
-            final ImagePlus sourceImp,
-            final ImagePlus targetImp,
-            String pathFile) {
+    public MainDialog (
+			final ImagePlus[] imageList,
+			final int mode,
+			final int maxImageSubsamplingFactor,
+			final int min_scale_deformation,
+			final int max_scale_deformation,
+			final double divWeight,
+			final double curlWeight,
+			final double landmarkWeight,
+			final double imageWeight,
+			final double consistencyWeight,
+			final double stopThreshold,
+			final boolean richOutput,
+			final boolean saveTransformation) {
 //		super("bUnwarpJ", null);
 //		setModal(false);
 
@@ -360,7 +356,7 @@ public class MainDialog {
         this.saveTransformation = saveTransformation;
         this.sourceImp = sourceImp;
         this.targetImp = targetImp;
-        this.pathFile = pathFile;
+        this.pathFile = "";
 
         // We create a list of image titles to be used as source or target images
         String[] titles = new String[imageList.length];
@@ -415,7 +411,7 @@ public class MainDialog {
         // If the mode is "mono" (=unidirectional), then disable consistency weight text field
         if (this.mode == MainDialog.MONO_MODE) {
             this.bIsReverse = false;
-            this.consistencyWeightTextField.setEnabled(false);
+//            this.consistencyWeightTextField.setEnabled(false);
         }
 //		
 //		addNumericField("Stop_Threshold :", this.stopThreshold, 2);
@@ -693,8 +689,8 @@ public class MainDialog {
         MiscTools.applyTransformationToSourceMT(
                 this.sourceImp, this.targetImp, this.source, intervals, cx, cy);
 
-        // Restart the computation of the model
-        cancelSource();
+//        // Restart the computation of the model
+       cancelSource();
         this.targetPh.removePoints();
 
         createSourceImage(false);
@@ -732,7 +728,7 @@ public class MainDialog {
         imageList = null;
         sourceIc = null;
         targetIc = null;
-        sourceImp = null;
+        //sourceImp = null;
         targetImp = null;
         source = null;
         target = null;
@@ -976,7 +972,7 @@ public class MainDialog {
         // Restore previous roi
         sourceImp.setRoi(this.previousSourceRoi);
 
-        sourceImp = null;
+        //sourceImp = null;
         source = null;
         sourceMsk = null;
         Runtime.getRuntime().gc();
@@ -1030,7 +1026,7 @@ public class MainDialog {
             item = Macro.getValue(macroOptions, "Source_Image", item);
             for (int i = 0; i < this.imageList.length; i++) {
                 if ((this.imageList[i].getTitle()).equals(item)) {
-                    this.sourceChoiceIndex = i;
+                    this.sourceChoiceIndex = 0;
                     break;
                 }
             }
@@ -1087,7 +1083,7 @@ public class MainDialog {
 //				}			
         }
 
-//		targetImp = imageList[targetChoiceIndex];
+		targetImp = imageList[1];
         // Save original image processor
         if (this.targetImp.getImageStackSize() > 1) {
             this.originalTargetIP = this.targetImp.getImageStack().getProcessor(1);

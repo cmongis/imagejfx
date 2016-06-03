@@ -40,10 +40,6 @@ import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Vector;
-import net.imagej.Dataset;
-import net.imagej.DatasetService;
-import net.imglib2.img.Img;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 
 
 /**
@@ -252,8 +248,6 @@ public class Transformation
 	/** regularization P12 (target to source) matrix */
 	private double  [][]P12_TargetToSource;
 
-        private DatasetService service;
-        private Dataset outputDataset;
 	/*....................................................................
        Public methods
     ....................................................................*/
@@ -317,9 +311,7 @@ public class Transformation
 			final String fn_tnf_2,
 			final ImagePlus output_ip_1,
 			final ImagePlus output_ip_2,
-			final MainDialog dialog,
-                        DatasetService service,
-                        Dataset outputDataset)
+			final MainDialog dialog)
 	{
 		this.sourceImp	      = sourceImp;
 		this.targetImp	      = targetImp;
@@ -356,8 +348,6 @@ public class Transformation
 		this.sourceHeight          = source.getHeight();
 		this.targetWidth           = target.getWidth();
 		this.targetHeight          = target.getHeight();
-                this.service = service;
-                this.outputDataset = outputDataset;
 	} /* end Transformation */
 
 	
@@ -5200,9 +5190,9 @@ public class Transformation
 		// Calculate tranformation results 
 		IJ.showStatus("Calculating result window...");
 		ImagePlus result_imp = applyTransformationMultiThread(intervals, cx, cy, bIsReverse);
-		output_ip = result_imp;
+		
 		output_ip.close();
-              
+		output_ip = result_imp;
 			
 		output_ip.show();				
 		output_ip.updateAndRepaintWindow();
