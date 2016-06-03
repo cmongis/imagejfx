@@ -21,13 +21,12 @@ package ijfx.plugins.commands;
 
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.process.ColorBlitter;
 import ij.process.ColorProcessor;
-import ijfx.plugins.RemoveSlice;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,16 +34,32 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
+import net.imagej.display.DatasetView;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
+import net.imagej.ops.OpService;
+import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.converter.Converter;
+import net.imglib2.converter.RealLUTConverter;
+import net.imglib2.display.projector.composite.CompositeXYProjector;
 import net.imglib2.img.Img;
+import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.type.NativeType;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.NumericType;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -59,27 +74,153 @@ public class MergeChannels implements Command {
     @Parameter(type = ItemIO.OUTPUT)
     Dataset output;
 
+ 
     @Parameter
-    ImagePlaneService imagePlaneService;
+    private DatasetService datasetService;
+
 
     @Parameter
-    DatasetService datasetService;
+    private UIService uiService;
 
-    @Parameter
-    int mode = 1;
-
-    @Parameter
-    TimerService timerService;
-
-    Timer timer;
 
     @Override
     public void run() {
 
+        
+        
+        //Dataset dataset = imageDisplayService.getActiveDataset(input);
+
+        output = convert2(input);
+    }
+
+    public <T extends RealType<T>> Dataset convert2(Dataset inputDataset) {
+        ImgPlus<T> imgPlus = (ImgPlus<T>) inputDataset.getImgPlus();
+
+        long[] dims = new long[imgPlus.numDimensions()];
+        AxisType[] axes = new AxisType[imgPlus.numDimensions()];
+
+        for (int i = 0; i != dims.length; i++) {
+            dims[i] = imgPlus.dimension(i);
+            axes[i] = imgPlus.axis(i).type();
+        }
+
+        ArrayList<Converter<T, ARGBType>> converters
+                = new ArrayList<>();
+        long channelNumber = imgPlus.max(imgPlus.dimensionIndex(Axes.CHANNEL)) + 1;
+        int channelAxisIdex = imgPlus.dimensionIndex(Axes.CHANNEL);
+
+        dims[channelAxisIdex] = 3;
+        //DatasetView view = imageDisplayService.getActiveDatasetView(input);
+        for (int i = 0; i != channelNumber; i++) {
+            converters.add(new RealLUTConverter<>(inputDataset.getChannelMinimum(i), inputDataset.getChannelMaximum(i), imgPlus.getColorTable(i)));
+        }
+
+        output = datasetService.create(new UnsignedByteType(), dims, "", axes);
+
+        //RandomAccess<T> inputRandomAccess = (RandomAccess<T>) inputDataset.randomAccess();
+        Cursor<T> inputCursor = (Cursor<T>) imgPlus.cursor();
+        RandomAccess<? extends RealType> outputCursor = output.randomAccess();
+        long[] position = new long[imgPlus.numDimensions()];
+
+        
+        final ARGBType color = new ARGBType();
+        
+        T t;
+        inputCursor.reset();
+        while (inputCursor.hasNext()) {
+            inputCursor.fwd();
+
+           
+            // copy the localization of the input cursor so we can localized the output
+            inputCursor.localize(position);
+          
+            // i don't know if it's necessary
+            //inputRandomAccess.setPosition(position);
+            
+            t = inputCursor.get();
+
+            int channel = inputCursor.getIntPosition(channelAxisIdex);
+            
+            double d = t.getRealDouble();
+
+            
+          
+            // get the color associated to the the pixel depending on which channel it comes from
+            converters.get(channel).convert(t, color);
+
+            // set the output cur
+            position[channelAxisIdex] = 0;
+            outputCursor.setPosition(position);
+
+            // we separate the rgb from the argb integer
+            int value = color.get();
+
+            final int red = (value >> 16 ) & 0xff;
+            final int green = ( value >> 8 ) & 0xff;
+            final int blue = value & 0xff;
+
+            // put it in a array
+            int[] rgb = new int[]{red, green, blue};
+            for (int c = 0; c != rgb.length; c++) {
+
+                // now we go from 0 to 2 (rgb) of the output and additionate
+                // the r, g and blue of the channel
+                outputCursor.setPosition(c, channelAxisIdex);
+
+                // calculate the new value of the pixel
+                double p = outputCursor.get().getRealDouble() + rgb[c];
+
+                // make sure it's not too much
+                p = p > 255 ? 255 : p;
+
+                // set the new output
+                outputCursor.get().setReal(p);
+            }
+        }
+        
+        System.out.println("over");
+
+        //output.setCompositeChannelCount(3);
+        return output;
+    }
+
+    public <T extends RealType<T> & NativeType<T>> Dataset convert(Dataset input) {
+
+        ImgPlus<T> dataset = (ImgPlus<T>) input.getImgPlus();
+
+        long[] dims = new long[input.numDimensions()];
+        AxisType[] axes = new AxisType[input.numDimensions()];
+
+        for (int i = 0; i != dims.length; i++) {
+            dims[i] = input.dimension(i);
+            axes[i] = input.axis(i).type();
+        }
+
+        ArrayList<Converter<T, ARGBType>> converters
+                = new ArrayList<>();
+        long channelNumber = input.max(dataset.dimensionIndex(Axes.CHANNEL)) + 1;
+        for (int i = 0; i != channelNumber; i++) {
+            converters.add(new RealLUTConverter<T>(input.getChannelMinimum(i), input.getChannelMaximum(i), input.getColorTable(i)));
+        }
+
+        Img<ARGBType> out = new ArrayImgFactory<ARGBType>().create(new long[]{dims[0], dims[1]}, new ARGBType());
+        CompositeXYProjector<T> compositeXYProjector = new CompositeXYProjector<>(dataset, out, converters, 2);
+        compositeXYProjector.setComposite(true);
+
+        compositeXYProjector.map();
+
+        uiService.show(out);
+        return datasetService.create(new ImgPlus(out));
+    }
+
+    //@Override
+    /*
+    public void runold() {
+
         timer = timerService.getTimer(this.getClass());
 
         if (input.numDimensions() == 4) {
-            final AxisType sliceAxis = RemoveSlice.getSliceAxis(input);
+            final AxisType sliceAxis = AxisUtils.getSliceAxis(input);
             final int sliceAxisIndex = input.dimensionIndex(sliceAxis);
             final long sliceAxisMax = input.max(sliceAxisIndex) + 1;
             List<ImagePlus> collect = LongStream
@@ -100,11 +241,10 @@ public class MergeChannels implements Command {
 
             output = ImagePlusListToDataset(collect);
 
-        }
-        else if(input.numDimensions() == 3) {
+        } else if (input.numDimensions() == 3) {
             long[] pos = new long[3];
-            
-            ImagePlus mergeChannels = mergeChannels(datasetToImagePlus(extractChannels(input, pos)),mode);
+
+            ImagePlus mergeChannels = mergeChannels(datasetToImagePlus(extractChannels(input, pos)), mode);
             mergeChannels.show();
             output = imagePlusToDataset(mergeChannels);
         }
@@ -170,8 +310,8 @@ public class MergeChannels implements Command {
 
         long width = input.max(0);
         long height = input.max(1);
-        final AxisType sliceAxis = RemoveSlice.getSliceAxis(input);
-        final int sliceAxisIndex = input.dimensionIndex(RemoveSlice.getSliceAxis(input));
+        final AxisType sliceAxis = AxisUtils.getSliceAxis(input);
+        final int sliceAxisIndex = input.dimensionIndex(AxisUtils.getSliceAxis(input));
         final long sliceAxisMax = input.max(sliceAxisIndex) + 1;
 
         long[] dims = new long[]{width, height, sliceAxisMax};
@@ -189,13 +329,12 @@ public class MergeChannels implements Command {
 
         ImagePlus result = new ImagePlus("", stack);
         result.show();
-       
+
         return imagePlusToDataset(result);
     }
-    
-    private Dataset imagePlusToDataset(ImagePlus imp) {
-         Img img = ImageJFunctions.wrap(imp);
-        return datasetService.create(img);
-    }
 
+    private Dataset imagePlusToDataset(ImagePlus imp) {
+        Img img = ImageJFunctions.wrap(imp);
+        return datasetService.create(img);
+    }*/
 }
