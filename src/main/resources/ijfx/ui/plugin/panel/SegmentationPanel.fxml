@@ -29,6 +29,14 @@
                         <FontAwesomeIconView glyphName="LIST" />
                      </graphic>
                   </Button>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#close" styleClass="danger" text="Close">
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="SIGN_OUT" />
+                     </graphic>
+                  </Button>
                </children>
                <VBox.margin>
                   <Insets top="10.0" />
@@ -40,7 +48,7 @@
    <top>
       <HBox BorderPane.alignment="CENTER">
          <children>
-            <Label styleClass="h4" text="1. Edit your segmentation workflow">
+            <Label fx:id="titleLabel" styleClass="h4" text="1. Edit your segmentation workflow">
                <padding>
                   <Insets bottom="10.0" />
                </padding>

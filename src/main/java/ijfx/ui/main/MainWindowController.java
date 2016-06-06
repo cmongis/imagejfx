@@ -358,105 +358,6 @@ public class MainWindowController extends AnchorPane {
     }
 
 
-    /*
-    public void initialized(URL url, ResourceBundle rb) {
-
-        thisController = this;
-
-       
-
-        
-        Platform.runLater(() -> hideSideMenu());
-
-        // the first stack loads ImageJ
-        //final Task task1 = imageJStarter;
-
-        // the third one takes of setting up the interface and the context
-        final Task<Boolean> task3 = new Task<Boolean>() {
-
-            @Override
-            protected Boolean call() throws Exception {
-
-                //FXUtilities.runAndWait(() -> uiPluginService.getUiPluginList());
-                logger.info("Loading widgets done.");
-
-                // bind widget to controller
-                startContextManager();
-
-                bindWidgetsToControllers();
-
-                return true;
-            }
-
-        };
-
-        // submitting the task to the loading screen
-        // when the first task is over
-        task1.setOnSucceeded(result -> {
-            logger.info("ImageJ Loading done");
-
-            //injecting this controller with image services
-            imageJ.getContext().inject(thisController);
-
-            // the second one loads the FXWidgets
-            final Task task2 = new CallbackTask<Void,Collection<UiPlugin>>()
-                    .runLongCallable(uiPluginService::loadAll);
-
-            // registering the controllers
-            registerWidgetControllers();
-
-            // starting the second task
-            ImageJFX.getThreadPool().submit(task2);
-
-            // when the second task is over, starting the third task
-            task2.setOnSucceeded(resul -> ImageJFX.getThreadPool().submit(task3));
-
-            //loadingScreen.submitTask(task2, false);
-            //loadingScreen.submitTask(task3, false);
-            loadingPopup.bindTask(task2);
-        });
-
-        task3.setOnSucceeded(result -> {
-
-            // entering the right context
-            uiContextService.enter(UiContexts.list(UiContexts.DEBUG));
-
-            // showing the intro app
-            //appService.showApp(WebApps.PROJECT_WIZARD);
-            // updating the context
-            //uiContextService.update();
-            activityService.openByType(ImageJContainer.class);
-            // sequence over
-            logger.info("Start over");
-
-        });
-
-        // starting the first task
-        ImageJFX.getThreadPool().submit(task1);
-
-
-        
-
-    }
-
-    protected void startContextManager() {
-
-        logger.info("Getting widget list");
-        // uiPluginService.getUiPluginList().forEach(widgetPlugin -> {
-        for (UiPlugin uiPlugin : uiPluginService.getUiPluginList()) {
-            UiConfiguration infos = uiPluginService.getInfos(uiPlugin);
-
-            if (infos == null) {
-                logger.warning("No informations for " + uiPlugin.getClass().getName());
-                return;
-            }
-
-            uiContextService.link(infos.id(), infos.context());
-        }
-
-        logger.info("Widget laoading done.");
-
-    }*/
     public void registerWidgetControllers() {
         registerPaneCtrl(topLeftHBox)
                 .setAnimationOnHide(Animations.DISAPPEARS_LEFT)
@@ -550,19 +451,7 @@ public class MainWindowController extends AnchorPane {
 
     }
 
-    /*
-    protected void bindWidgetsToControllers() {
-
-        imageJ
-                .getContext()
-                .getService(DefaultUiPluginService.class
-                )
-                .getUiPluginList()
-                .forEach(uiPlugin -> {
-                    loadWidget(uiPlugin);
-                });
-    }
-     */
+    
     protected void loadWidget(UiPlugin uiPlugin) {
 
         // getting the localization from the Localization Plugin (which gets
@@ -880,6 +769,13 @@ public class MainWindowController extends AnchorPane {
             uiContextService.update();
             hideSideMenu();
 
+        });
+        addSideMenuButton("Batch process",FontAwesomeIcon.LIST,null).setOnAction(event->{
+            uiContextService.enter("batch");
+            uiContextService.update();
+            if(activityService.getCurrentActivityAsClass() != ExplorerActivity.class) {
+                activityService.openByType(ExplorerActivity.class);
+            }
         });
 
         /*

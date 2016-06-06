@@ -28,6 +28,7 @@ import ijfx.service.batch.SegmentationService;
 import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
@@ -53,10 +54,9 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
@@ -95,6 +95,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @FXML
     private Button startButton;
 
+    @FXML
+    private Label titleLabel;
   
 
     @Parameter
@@ -115,6 +117,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @Parameter
     private UIService uiService;
 
+    @Parameter
+    private UiContextService uiContextService;
+    
     @Parameter
     private OverlayService overlayService;
 
@@ -149,11 +154,11 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             FXUtilities.injectFXML(this);
 
             taskButtonBinding = new TaskButtonBinding(testButton);
-            taskButtonBinding.runTaskOnClick(this::createTaskButtonBinding);
+            taskButtonBinding.setTaskFactory(this::createTaskButtonBinding);
 
            
 
-            new TaskButtonBinding(startButton).runTaskOnClick(this::generateTask);
+            new TaskButtonBinding(startButton).setTaskFactory(this::generateTask);
 
         } catch (IOException ex) {
             Logger.getLogger(SegmentationPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -339,5 +344,10 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         return null;
 
     }
-
+    
+    @FXML
+    public void close() {
+        uiContextService.leave("segment segmentation");
+        uiContextService.update();
+    }
 }

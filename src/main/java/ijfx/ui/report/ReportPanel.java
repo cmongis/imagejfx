@@ -77,7 +77,7 @@ public class ReportPanel extends GridPane {
                     .setWhenSucceed(() -> {
                         onReportDone.call(true);
                     })
-                    .runTaskOnClick(this::generateTask);
+                    .setTaskFactory(this::generateTask);
 
         } catch (IOException ex) {
             ImageJFX.getLogger();

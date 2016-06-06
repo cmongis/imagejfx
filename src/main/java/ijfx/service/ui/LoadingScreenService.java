@@ -21,7 +21,7 @@
 package ijfx.service.ui;
 
 import ijfx.bridge.FxStatusBar;
-import ijfx.ui.main.LoadingScreen;
+import java.util.function.Consumer;
 import javafx.concurrent.Task;
 import net.imagej.ImageJService;
 import org.scijava.event.EventService;
@@ -35,7 +35,7 @@ import org.scijava.service.Service;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = Service.class)
-public class LoadingScreenService extends AbstractService implements ImageJService{
+public class LoadingScreenService extends AbstractService implements ImageJService,Consumer<Task>{
     
     @Parameter
     EventService eventService;
@@ -60,6 +60,11 @@ public class LoadingScreenService extends AbstractService implements ImageJServi
 
     public void submitTask(Task task) {
            backgroundTask(task,true);
+    }
+
+    @Override
+    public void accept(Task t) {
+        frontEndTask(t);
     }
 
     
