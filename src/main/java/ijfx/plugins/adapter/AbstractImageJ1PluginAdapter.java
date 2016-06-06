@@ -48,7 +48,7 @@ import org.scijava.plugin.Parameter;
 public abstract class AbstractImageJ1PluginAdapter implements Command {
 
     @Parameter
-    public DatasetService service;
+    public DatasetService datasetService;
 
     @Parameter
     ImageDisplayService imageDisplayService;
@@ -92,7 +92,7 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
 
     public Dataset wrapDataset(ImagePlus imp) {
         Img img = ImageJFunctions.wrap(imp.duplicate());
-        return service.create(img);
+        return datasetService.create(img);
     }
 
     public static void configureImagePlus(ImagePlus imp, ImageDisplay imageDisplay) {
@@ -113,7 +113,7 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
             axisType[i] = axeArray[i].type();
             dims[i] = toIntExact(input.max(i) + 1);
         }
-        return service.create(dims, input.getName(), axisType, input.getValidBits(), input.isSigned(), false);
+        return datasetService.create(dims, input.getName(), axisType, input.getValidBits(), input.isSigned(), false);
     }
 
     private Dataset chooseDataset(Dataset dataset) {

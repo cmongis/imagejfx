@@ -182,7 +182,6 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
     @Parameter(callback = "chooseFile")
     Button buttonFile;
 
- 
     String pathFile = "";
 
     /*....................................................................
@@ -206,12 +205,12 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
 //            return;
 //        }
 
-final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).indexOf(modeChoice),
+        final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).indexOf(modeChoice),
                 bUnwarpJ_.maxImageSubsamplingFactor, Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation),
                 Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation), bUnwarpJ_.divWeight, bUnwarpJ_.curlWeight,
                 bUnwarpJ_.landmarkWeight, bUnwarpJ_.imageWeight, bUnwarpJ_.consistencyWeight,
-                bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation
-                );
+                bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation, ""
+        );
 //        dialog.showDialog();
 
 //        // If canceled
@@ -285,17 +284,17 @@ final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).in
             e.printStackTrace();
         }
         Img img = ImageJFunctions.wrap(finalAction.getWarp().getDirectResults());
-        outputDataset = service.create(img);
-        
+        outputDataset = datasetService.create(img);
 
     }
 
-    public void chooseFile(){
-                FileChooser chooser = new FileChooser();
+    public void chooseFile() {
+        FileChooser chooser = new FileChooser();
         File f = chooser.showOpenDialog(null);
         pathFile = f.getAbsolutePath();
 
     }
+
     /* end run */
     //------------------------------------------------------------------
     /**
@@ -579,6 +578,135 @@ final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).in
         return warp;
 
     } // end computeTransformationBatch    
+
+    public static Transformation computeTransformationBatch(ImagePlus targetImp,
+            ImagePlus sourceImp,
+            ImageProcessor targetMskIP,
+            ImageProcessor sourceMskIP,
+            Stack<Point> sourcePoints,
+            Stack<Point> targetPoints,
+            Param parameter) {
+        if (targetImp == null || sourceImp == null || parameter == null) {
+            IJ.error("Missing parameters to compute transformation!");
+            return null;
+        }
+
+        if (debug) {
+            IJ.log("\n--- bUnwarpJ parameters ---\n"
+                    + "\nSource image: " + sourceImp.getTitle()
+                    + "\nTarget image: " + targetImp.getTitle() + "\n"
+                    + parameter.toString() + "\n");
+        }
+
+        // Produce side information
+        final int imagePyramidDepth = parameter.max_scale_deformation - parameter.min_scale_deformation + 1;
+        final int min_scale_image = 0;
+
+        // output level to -1 so nothing is displayed 
+        final int outputLevel = -1;
+
+        final boolean showMarquardtOptim = false;
+
+        // Create target image model
+        final BSplineModel target = new BSplineModel(targetImp.getProcessor(), true,
+                (int) Math.pow(2, parameter.img_subsamp_fact));
+
+        target.setPyramidDepth(imagePyramidDepth + min_scale_image);
+        target.startPyramids();
+
+        // Create target mask
+        final Mask targetMsk = (targetMskIP != null) ? new Mask(targetMskIP, true)
+                : new Mask(targetImp.getProcessor(), false);
+
+        PointHandler targetPh = null;
+
+        // Create source image model
+        boolean bIsReverse = true;
+
+        final BSplineModel source = new BSplineModel(sourceImp.getProcessor(), bIsReverse,
+                (int) Math.pow(2, parameter.img_subsamp_fact));
+
+        source.setPyramidDepth(imagePyramidDepth + min_scale_image);
+        source.startPyramids();
+
+        // Create source mask
+        final Mask sourceMsk = (sourceMskIP != null) ? new Mask(sourceMskIP, true)
+                : new Mask(sourceImp.getProcessor(), false);
+
+        PointHandler sourcePh = null;
+
+        // Load landmarks
+        //if (parameter.landmarkWeight != 0)
+        //{
+//        Stack<Point> sourcePoints = new Stack<Point>();
+//        Stack<Point> targetPoints = new Stack<Point>();
+//        MiscTools.loadPointRoiAsLandmarks(sourceImp, targetImp, sourcePoints, targetPoints);
+
+        sourcePh = new PointHandler(sourceImp);
+        targetPh = new PointHandler(targetImp);
+
+        while ((!sourcePoints.empty()) && (!targetPoints.empty())) {
+            Point sourcePoint = (Point) sourcePoints.pop();
+            Point targetPoint = (Point) targetPoints.pop();
+            sourcePh.addPoint(sourcePoint.x, sourcePoint.y);
+            targetPh.addPoint(targetPoint.x, targetPoint.y);
+        }
+        //}
+
+        // Set no initial affine matrices
+        final double[][] sourceAffineMatrix = null;
+        final double[][] targetAffineMatrix = null;
+
+        // Join threads
+        try {
+            source.getThread().join();
+            target.getThread().join();
+        } catch (InterruptedException e) {
+            IJ.error("Unexpected interruption exception " + e);
+        }
+
+        // Perform registration
+        ImagePlus[] output_ip = new ImagePlus[2];
+        output_ip[0] = null;
+        output_ip[1] = null;
+
+        // The dialog is set to null to work in batch mode
+        final MainDialog dialog = null;
+
+        final ImageProcessor originalSourceIP = sourceImp.getProcessor();
+        final ImageProcessor originalTargetIP = targetImp.getProcessor();
+
+        final Transformation warp = new Transformation(
+                sourceImp, targetImp, source, target, sourcePh, targetPh,
+                sourceMsk, targetMsk, sourceAffineMatrix, targetAffineMatrix,
+                parameter.min_scale_deformation, parameter.max_scale_deformation,
+                min_scale_image, parameter.divWeight,
+                parameter.curlWeight, parameter.landmarkWeight, parameter.imageWeight,
+                parameter.consistencyWeight, parameter.stopThreshold,
+                outputLevel, showMarquardtOptim, parameter.mode, null, null, output_ip[0], output_ip[1], dialog,
+                originalSourceIP, originalTargetIP);
+
+        // Initial affine transform correction values
+        warp.setAnisotropyCorrection(parameter.getAnisotropyCorrection());
+        warp.setScaleCorrection(parameter.getScaleCorrection());
+        warp.setShearCorrection(parameter.getShearCorrection());
+
+        IJ.log("\nRegistering...\n");
+
+        long start = System.currentTimeMillis(); // start timing
+
+        if (parameter.mode == MainDialog.MONO_MODE) {
+            warp.doUnidirectionalRegistration();
+        } else {
+            warp.doBidirectionalRegistration();
+        }
+
+        long stop = System.currentTimeMillis(); // stop timing
+        IJ.log("bUnwarpJ is done! Registration time: " + (stop - start) + "ms"); // print execution time
+
+        return warp;
+
+    }
 
     //------------------------------------------------------------------
     /**

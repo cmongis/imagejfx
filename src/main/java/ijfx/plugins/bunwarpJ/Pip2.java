@@ -21,17 +21,27 @@ package ijfx.plugins.bunwarpJ;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.io.OpenDialog;
+import ij.ImageStack;
 import ij.io.Opener;
 import ij.process.ImageProcessor;
 import ijfx.core.project.ImageLoaderService;
 import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
+import static ijfx.plugins.bunwarpJ.Pipeline.modesArray;
+import static ijfx.plugins.bunwarpJ.Pipeline.sMaxScaleDeformationChoices;
+import static ijfx.plugins.bunwarpJ.Pipeline.sMinScaleDeformationChoices;
+import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import javafx.stage.FileChooser;
+import java.util.Stack;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.display.ImageDisplayService;
+import net.imglib2.img.Img;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.command.Command;
+import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -43,10 +53,22 @@ import org.scijava.plugin.Plugin;
 
 public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
 
-    /* begin class this */
-  @Parameter
+    public static String[] modesArray = {"Fast", "Accurate", "Mono"};
+    public static String[] sMinScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine"};
+    public static String[] sMaxScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
+
+    @Parameter
     ImageLoaderService imageLoaderService;
- /*....................................................................
+
+    @Parameter
+    DisplayService displayService;
+
+    @Parameter
+    Dataset datasetSource;
+
+    @Parameter
+    Dataset datasetTarget;
+    /*....................................................................
     	Private variables
  	....................................................................*/
     /**
@@ -61,99 +83,90 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     /**
      * minimum scale deformation
      */
-    private static int min_scale_deformation = 3;
+    @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine"})
+    private String min_scale_deformation_choice;
+
     /**
      * maximum scale deformation
      */
-    private static int max_scale_deformation = 4;
+    @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"})
+    private String max_scale_deformation_choice;
+
     /**
      * algorithm mode (fast, accurate or mono)
      */
-    private static int mode = MainDialog.MONO_MODE;
+    @Parameter(choices = {"Fast", "Accurate", "Mono"})
+    private String modeChoice = "Mono";
     /**
      * image subsampling factor at the highest pyramid level
      */
-    private static int maxImageSubsamplingFactor = 0;
+    @Parameter
+    private int maxImageSubsamplingFactor = 0;
 
     // Transformation parameters
     /**
      * divergence weight
      */
-    private static double divWeight = 0;
+    @Parameter
+    private double divWeight = 0;
     /**
      * curl weight
      */
-    private static double curlWeight = 0;
+    @Parameter
+    private double curlWeight = 0;
     /**
      * landmarks weight
      */
-    private static double landmarkWeight = 0;
+    @Parameter
+    private double landmarkWeight = 0;
     /**
      * image similarity weight
      */
-    private static double imageWeight = 1;
+    @Parameter
+    private double imageWeight = 1;
     /**
      * consistency weight
      */
-    private static double consistencyWeight = 10;
+    @Parameter
+    private double consistencyWeight = 10;
     /**
      * flag for rich output (verbose option)
      */
-    private static boolean richOutput = false;
+    @Parameter
+    private boolean richOutput = false;
     /**
      * flag for save transformation option
      */
-    private static boolean saveTransformation = false;
+    @Parameter
+    private boolean saveTransformation = false;
 
     /**
      * minimum image scale
      */
+    @Parameter
     private int min_scale_image = 0;
     /**
      * stopping threshold
      */
+    @Parameter
     private static double stopThreshold = 1e-2;
-    /**
-     * debug flag
-     */
-    private static boolean debug = false;
+
     @Parameter(choices = {"0", "1", "2", "3", "4", "5", "6", "7"})
     String img_subsamp_fact;
-    @Parameter
-    Dataset dataset1;
 
     @Parameter
-    Dataset dataset2;
+    File file;
 
     @Parameter
-            File file;
-        ImageProcessor targetMskIP = null;
+    File landmarksFile;
+    ImageProcessor targetMskIP = null;
     ImageProcessor sourceMskIP = null;
+    int max_scale_deformation;
+    int min_scale_deformation;
+
     /*....................................................................
        Public methods
     ....................................................................*/
-    private void loadTransformation(MainDialog dialog) {
-        final OpenDialog od = new OpenDialog("Load Elastic Transformation", "");
-        final String path = od.getDirectory();
-        final String filename = od.getFileName();
-
-        if ((path == null) || (filename == null)) {
-            return;
-        }
-
-        String fn_tnf = path + filename;
-
-        int intervals = MiscTools.numberOfIntervalsOfTransformation(fn_tnf);
-
-        double[][] cx = new double[intervals + 3][intervals + 3];
-        double[][] cy = new double[intervals + 3][intervals + 3];
-
-        MiscTools.loadTransformation(fn_tnf, cx, cy);
-
-        // Apply transformation
-        dialog.applyTransformationToSource(intervals, cx, cy);
-    }
-
     //------------------------------------------------------------------
     /**
      * Method to lunch the plugin.
@@ -163,149 +176,83 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     @Override
     public void run() {
         Runtime.getRuntime().gc();
-        final ImagePlus[] imageList = createImageList();
-        if (imageList.length < 2) {
-            IJ.error("At least two (8, 16, 32-bit or RGB Color) images are required");
-            return;
-        }
-        this.sourceImp = imageList[0];
-        this.targetImp = imageList[1];
-        this.sourceImp.show();
-        this.targetImp.show();
-        Transformation transformation = bUnwarpJ_.computeTransformationBatch(targetImp, sourceImp, targetMskIP, sourceMskIP, mode, Integer.parseInt(img_subsamp_fact), min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold);
+ 
+        //Set parameters
+        int mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
+        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
+        min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
+        this.sourceImp = getInput(datasetSource);
+        this.targetImp = getInput(datasetTarget);
+        
+        //Load landmarks
+        Stack<Point> sourcePoints = new Stack<>();
+        Stack<Point> targetPoints = new Stack<>();
+        MiscTools.loadPoints(landmarksFile.getAbsolutePath(), sourcePoints, targetPoints);
+        Param param = new Param(mode, maxImageSubsamplingFactor, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold);
 
-        loadImagePlus().stream().forEach((imagePlus) ->{
+        //Calcul transformation which have to be applied after
+        Transformation transformation = bUnwarpJ_.computeTransformationBatch(targetImp, sourceImp, targetMskIP, sourceMskIP, sourcePoints, targetPoints, param);
+        
+        //Apply transformation
+        loadImagePlus().parallelStream().forEach((imagePlus) -> {
             ImagePlus[] imArray = new ImagePlus[2];
             imArray[0] = imagePlus;
             imArray[1] = imagePlus;
-        final MainDialog dialog = new MainDialog(imArray, this.mode,
-                this.maxImageSubsamplingFactor, this.min_scale_deformation,
-                this.max_scale_deformation, this.divWeight, this.curlWeight,
-                this.landmarkWeight, this.imageWeight, this.consistencyWeight,
-                this.stopThreshold, this.richOutput, this.saveTransformation);
+            final MainDialog dialog = new MainDialog(imArray, mode,
+                    this.maxImageSubsamplingFactor, this.min_scale_deformation,
+                    this.max_scale_deformation, this.divWeight, this.curlWeight,
+                    this.landmarkWeight, this.imageWeight, this.consistencyWeight,
+                    this.stopThreshold, false, this.saveTransformation, "");
 
-        dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
-            imagePlus.show();
+            dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
+            
+            //Display result
+            Img img = ImageJFunctions.wrap(imagePlus);
+            displayService.createDisplay(transformedTitle(imagePlus), datasetService.create(img));
         });
-//		  
-//		// Fast or accurate mode
-//		this.mode = dialog.getNextChoiceIndex();
-//		// Image subsampling factor at highest resolution level		
-//		this.maxImageSubsamplingFactor = (int) dialog.getNextNumber();
-//		  
-//		// Min and max scale deformation level
-//		this.min_scale_deformation = dialog.getNextChoiceIndex();
-//		this.max_scale_deformation = dialog.getNextChoiceIndex();
-//				  
-//		// Weights
-//		this.divWeight  			= dialog.getNextNumber();
-//		this.curlWeight 			= dialog.getNextNumber();
-//		this.landmarkWeight 		= dialog.getNextNumber();
-//		this.imageWeight			= dialog.getNextNumber();
-//		this.consistencyWeight		= dialog.getNextNumber();
-//		this.stopThreshold			= dialog.getNextNumber();
-//		  
-//		// Verbose and save transformation options
-//		this.richOutput 		   	= dialog.getNextBoolean();
-//		this.saveTransformation 	= dialog.getNextBoolean();
-//        dialog.setSaveTransformation(this.saveTransformation);
-//
-//        int outputLevel = 1;
-//
-//        boolean showMarquardtOptim = false;
-//
-//        if (richOutput)
-//        {
-//           outputLevel++;
-//           showMarquardtOptim = true;
-//        }                                 
-//        
-//        FinalAction finalAction =
-//           new FinalAction(dialog);
-//
-//        finalAction.setup(sourceImp, targetImp,
-//           dialog.getSource(), dialog.getTarget(), dialog.getSourcePh(), dialog.getTargetPh(),
-//           dialog.getSourceMsk(), dialog.getTargetMsk(), 
-//           dialog.getSourceAffineMatrix(), dialog.getTargetAffineMatrix(),
-//           min_scale_deformation, max_scale_deformation,
-//           min_scale_image, divWeight, curlWeight, landmarkWeight, imageWeight,
-//           consistencyWeight, stopThreshold, outputLevel, showMarquardtOptim, mode);
-//
-//        dialog.setFinalActionLaunched(true);
-//        dialog.setToolbarAllUp();
-//        dialog.repaintToolbar();                
-//        
-//        // Throw final action thread
-//        Thread fa = finalAction.getThread();
-//        fa.start();
-//        try {
-//        	// We join the thread to the main plugin thread
-//			fa.join();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		
 
+        if (richOutput) {
+            Img img = ImageJFunctions.wrap(getFeedback(transformation));
+            displayService.createDisplay("Feedback", img);
+        }
+	
     }
 
     /* end run */
-
-    // end alignImagesCommandLine
-
-    //------------------------------------------------------------------
-    /**
-     * Create a list with the open images in ImageJ that bUnwarpJ can process.
-     *
-     * @return array of references to the open images in bUnwarpJ
-     */
-    private ImagePlus[] createImageList() {
-//       final int[] windowList = WindowManager.getIDList();
-//       final Stack <ImagePlus> stack = new Stack <ImagePlus>();
-//       for (int k = 0; ((windowList != null) && (k < windowList.length)); k++) 
-//       {
-//          final ImagePlus imp = WindowManager.getImage(windowList[k]);
-//          final int inputType = imp.getType();
-//
-//          // Since October 6th, 2008, bUnwarpJ can deal with 8, 16, 32-bit grayscale 
-//          // and RGB Color images.
-//          if ((imp.getStackSize() == 1) || (inputType == ImagePlus.GRAY8) || (inputType == ImagePlus.GRAY16)
-//             || (inputType == ImagePlus.GRAY32) || (inputType == ImagePlus.COLOR_RGB)) 
-//          {
-//             stack.push(imp);
-//          }
-//       }
-//       final ImagePlus[] imageList = new ImagePlus[stack.size()];
-//       int k = 0;
-//       while (!stack.isEmpty()) {
-//          imageList[k++] = (ImagePlus)stack.pop();
-//       }
-        ImagePlus[] imageList = new ImagePlus[2];
-        imageList[0] = getInput(dataset1);
-        imageList[1] = getInput(dataset2);
-        return (imageList);
-    }
-
-    /* end createImageList */
+ 
 
     @Override
     public ImagePlus processImagePlus(ImagePlus input) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
     public List<ImagePlus> loadImagePlus() {
         Opener opener = new Opener();
-
 
         List<File> listFiles;
         listFiles = (List<File>) imageLoaderService.getAllImagesFromDirectory(file.getParentFile());
         List<ImagePlus> listImagePlus = new ArrayList();
         listFiles.stream()
-                .forEach((file) -> {
-                    ImagePlus imagePlus = opener.openImage(file.getAbsolutePath());
+                .forEach((f) -> {
+                    ImagePlus imagePlus = opener.openImage(f.getAbsolutePath());
                     listImagePlus.add(imagePlus);
-                    imagePlus.show();
                 });
-//        return new ImagePlus[]{sourceImp, targetImp};
         return listImagePlus;
+    }
+
+    private ImagePlus getFeedback(Transformation transformation) {
+        ImagePlus deformation = new ImagePlus();
+        ImageStack imageStack = new ImageStack(sourceImp.getWidth(), sourceImp.getHeight());
+        transformation.computeDeformationVectors(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
+        transformation.computeDeformationGrid(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
+        deformation.setStack(imageStack);
+        return deformation;
+    }
+
+    private String transformedTitle(ImagePlus imagePlus) {
+        String title = imagePlus.getTitle();
+        int index = title.indexOf(".");
+        title = title.substring(0, index) + "-aligned" + title.substring(index);
+        return title;
     }
 }

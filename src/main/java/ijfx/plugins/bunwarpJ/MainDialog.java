@@ -324,20 +324,21 @@ public class MainDialog {
      * @param richOutput default verbose flag
      * @param saveTransformation default save transformations flag
      */
-    public MainDialog (
-			final ImagePlus[] imageList,
-			final int mode,
-			final int maxImageSubsamplingFactor,
-			final int min_scale_deformation,
-			final int max_scale_deformation,
-			final double divWeight,
-			final double curlWeight,
-			final double landmarkWeight,
-			final double imageWeight,
-			final double consistencyWeight,
-			final double stopThreshold,
-			final boolean richOutput,
-			final boolean saveTransformation) {
+    public MainDialog(
+            final ImagePlus[] imageList,
+            final int mode,
+            final int maxImageSubsamplingFactor,
+            final int min_scale_deformation,
+            final int max_scale_deformation,
+            final double divWeight,
+            final double curlWeight,
+            final double landmarkWeight,
+            final double imageWeight,
+            final double consistencyWeight,
+            final double stopThreshold,
+            final boolean richOutput,
+            final boolean saveTransformation,
+            String pathFile) {
 //		super("bUnwarpJ", null);
 //		setModal(false);
 
@@ -354,9 +355,7 @@ public class MainDialog {
         this.stopThreshold = stopThreshold;
         this.richOutput = richOutput;
         this.saveTransformation = saveTransformation;
-        this.sourceImp = sourceImp;
-        this.targetImp = targetImp;
-        this.pathFile = "";
+        this.pathFile = pathFile;
 
         // We create a list of image titles to be used as source or target images
         String[] titles = new String[imageList.length];
@@ -427,8 +426,8 @@ public class MainDialog {
 
         // Start source and target images (concurrent threads 
         // need to be started later)
-            createSourceImage(bIsReverse);
-            createTargetImage();
+        createSourceImage(bIsReverse);
+        createTargetImage();
         if (!this.pathFile.equals("")) {
 
             Stack<Point> sourceStack = new Stack<Point>();
@@ -443,6 +442,8 @@ public class MainDialog {
             }
         }
 
+        sourceImp.setRoi(sourcePh);
+        targetImp.setRoi(targetPh);
         loadPointRoiAsLandmarks();
         setSecondaryPointHandlers();
 
@@ -690,7 +691,7 @@ public class MainDialog {
                 this.sourceImp, this.targetImp, this.source, intervals, cx, cy);
 
 //        // Restart the computation of the model
-       cancelSource();
+        cancelSource();
         this.targetPh.removePoints();
 
         createSourceImage(false);
@@ -1083,7 +1084,7 @@ public class MainDialog {
 //				}			
         }
 
-		targetImp = imageList[1];
+        targetImp = imageList[1];
         // Save original image processor
         if (this.targetImp.getImageStackSize() > 1) {
             this.originalTargetIP = this.targetImp.getImageStack().getProcessor(1);

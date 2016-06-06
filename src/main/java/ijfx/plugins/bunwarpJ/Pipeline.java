@@ -221,7 +221,7 @@ public class Pipeline extends AbstractImageJ1PluginAdapter implements Command {
     		return;
     	}
 	
-            MainDialog dialog = new MainDialog(imageList, mode, max_scale_deformation, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold, false, false);
+            MainDialog dialog = new MainDialog(imageList, mode, max_scale_deformation, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold, false, false,"");
 
 //	 	dialog.showDialog();
 	 	

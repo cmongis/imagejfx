@@ -5003,7 +5003,7 @@ public class Transformation
 	 * @param is image stack where we want to show the deformation grid
 	 * @param bIsReverse flag to determine the transformation direction (target-source=FALSE or source-target=TRUE)
 	 */
-	private void computeDeformationGrid(
+	public void computeDeformationGrid(
 			int intervals,
 			double [][]cx,
 			double [][]cy,
@@ -5086,7 +5086,7 @@ public class Transformation
 	 * @param is image stack where we want to show the deformation vectors
 	 * @param bIsReverse flag to determine the transformation direction (target-source=FALSE or source-target=TRUE)
 	 */
-	private void computeDeformationVectors(
+	public void computeDeformationVectors(
 			int intervals,
 			double [][]cx,
 			double [][]cy,
