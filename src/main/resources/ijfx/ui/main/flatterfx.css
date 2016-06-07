@@ -37,6 +37,7 @@
     -flatter-primary-bg:derive(-flatter-green,40%);
     -flatter-danger-bg:derive(-flatter-red,40%);
     -flatter-warning-bg:derive(-flatter-blue,40%);
+    -flatter-success-bg:derive(-flatter-success,40%);
     -flatter-success:-flatter-green;
 
     -flatter-shadow: dropshadow(gaussian,rgba(0,0,0,0.5),3,0.3,1px,1px);
@@ -118,7 +119,11 @@
 
     -fx-pref-height:2em;
 }
-
+.label.h4.toolbar {
+    -fx-padding:14px;
+    -fx-max-width:infinity;
+    
+}
 .text {
     -fx-font-family:'Open Sans';
     /*-fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); */
@@ -704,6 +709,11 @@
 
 .tool-bar {
     -fx-background-color:-bg-dark;
+}
+.tool-bar .label {
+    
+    -fx-padding:0.3em;
+    -fx-background-color:red;
 }
 
 /*
@@ -1668,6 +1678,10 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-underline:false;
 }
 
+#batch-processing-panel {
+    -fx-pref-width:250px;
+    -fx-min-width:200px;
+}
 
 /**
        Notification
@@ -1899,9 +1913,13 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
      Explorer Activity
  */
  
- #toolbarBorderPane {
+ .toolbar {
      -fx-padding:10px;
      -fx-background-color:-bg-darker;
+ }
+ .toolbar .label {
+     
+     -fx-padding:7px;
  }
  #viewHBox .toggle-button {
      -fx-padding:0.5em;
@@ -1937,4 +1955,26 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -glyph-size:150;
     -fx-translate-x:10;
     -glyph-color:red;
+ }
+
+ /*
+        Message Box
+ 
+ */
+ .message-box {
+     -fx-padding:0.3em;
+ }
+ .message-box.danger {
+     -fx-background-color:-flatter-danger-bg;
+     
+ }
+  .message-box.success {
+     -fx-background-color:-flatter-success-bg;   
+ }
+  .message-box.warning {
+     -fx-background-color:-flatter-warning-bg;   
+ }
+ .message-box.label {
+     -fx-wrap-text:true;
+     
  }
