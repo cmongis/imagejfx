@@ -50,7 +50,7 @@
                         <FontAwesomeIconView glyphName="THUMB_TACK" />
                      </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" styleClass="normal" text="Process">
+                  <Button mnemonicParsing="false" onAction="#onProcessButtonPressed" styleClass="normal" text="Process">
                      <graphic>
                         <FontAwesomeIconView glyphName="GEARS" />
                      </graphic>
@@ -68,7 +68,7 @@
          <left>
             <ListView fx:id="folderListView" prefWidth="290.0" BorderPane.alignment="CENTER" />
          </left></BorderPane>
-      <BorderPane fx:id="toolbarBorderPane" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="toolbarBorderPane" styleClass="toolbar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
             <HBox fx:id="folderTitleHBox" prefWidth="250.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
