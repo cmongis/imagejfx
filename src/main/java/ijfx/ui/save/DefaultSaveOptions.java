@@ -24,6 +24,8 @@ import ijfx.ui.messageBox.MessageBox;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -42,6 +44,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
+import mongis.utils.FXUtilities;
 
 import mongis.utils.FileButtonBinding;
 
@@ -55,7 +58,7 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     private Property<String>  suffix;
     private Property<File> folder;
     
-    private String CSS_FILE = getClass().getResource("/ijfx/ui/main/flatterfx.css").toExternalForm();
+   // private String CSS_FILE = getClass().getResource("/ijfx/ui/main/flatterfx.css").toExternalForm();
     
     @FXML
     private Label title;
@@ -75,54 +78,54 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
     @FXML
     private Button destinationFolderBtn;
     
-    @FXML
-    private Button startBtn;
+
     
     private MessageBox messageBox;
         
-    public DefaultSaveOptions() throws IOException{
+    public DefaultSaveOptions() {
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("DefaultSaveOptions.fxml"));
-        loader.setRoot(this);
-        loader.setController(this);
-        loader.load();
-        
-        saveType = new SimpleObjectProperty<>();
-        suffix = new SimpleStringProperty();
-        folder = new SimpleObjectProperty<>();
-        
-        ToggleGroup toggleGroup = new ToggleGroup();
-        
-        replaceFilesBtn.setToggleGroup(toggleGroup);
-        newFilesBtn.setToggleGroup(toggleGroup);
-        
-        replaceFilesBtn.selectedProperty().setValue(Boolean.TRUE);
-        
-        
-        ObjectBinding<SaveType> obinding = Bindings.createObjectBinding(this::updateSaveType,
-                toggleGroup.selectedToggleProperty()
-        );
-        
-        saveType().bind(obinding);
-        
-        StringBinding sbinding = Bindings.createStringBinding(()->{
-            return newSuffix.textProperty().getValue();
-        },
-                newSuffix.textProperty());
-        
-        suffix().bind(sbinding);
-        
-        newSuffix.disableProperty().bind(replaceFilesBtn.selectedProperty());
-        destinationFolderBtn.disableProperty().bind(replaceFilesBtn.selectedProperty());
-        
-        FileButtonBinding fbinding = new FileButtonBinding(destinationFolderBtn);
-        
-        folder().bind(fbinding.fileProperty());
-        
-               
-        messageBox = new DefaultMessageBox();
-               
-        this.getStylesheets().add(CSS_FILE);
+        try {
+            FXUtilities.injectFXML(this);
+            
+            saveType = new SimpleObjectProperty<>();
+            suffix = new SimpleStringProperty();
+            folder = new SimpleObjectProperty<>();
+            
+            ToggleGroup toggleGroup = new ToggleGroup();
+            
+            replaceFilesBtn.setToggleGroup(toggleGroup);
+            newFilesBtn.setToggleGroup(toggleGroup);
+            
+            replaceFilesBtn.selectedProperty().setValue(Boolean.TRUE);
+            
+            
+            ObjectBinding<SaveType> obinding = Bindings.createObjectBinding(this::updateSaveType,
+                    toggleGroup.selectedToggleProperty()
+            );
+            
+            saveType().bind(obinding);
+            
+            StringBinding sbinding = Bindings.createStringBinding(()->{
+                return newSuffix.textProperty().getValue();
+            },
+                    newSuffix.textProperty());
+            
+            suffix().bind(sbinding);
+            
+            newSuffix.disableProperty().bind(replaceFilesBtn.selectedProperty());
+            destinationFolderBtn.disableProperty().bind(replaceFilesBtn.selectedProperty());
+            
+            FileButtonBinding fbinding = new FileButtonBinding(destinationFolderBtn);
+            
+            folder().bind(fbinding.fileProperty());
+            
+            
+            messageBox = new DefaultMessageBox();
+            
+           
+        } catch (IOException ex) {
+            Logger.getLogger(DefaultSaveOptions.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @Override

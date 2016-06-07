@@ -19,6 +19,7 @@
  */
 package ijfx.ui.save;
 
+import ijfx.ui.utils.BaseTester;
 import java.io.IOException;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -30,21 +31,23 @@ import javafx.stage.Stage;
  *
  * @author Pierre BONNEAU
  */
-public class SaveOptionsTest extends Application{
+public class SaveOptionsTest extends BaseTester{
+    
+    
+    SaveOptions saveOptions;
     
     public static void main(String[] args) {
         launch(args);
     }
-    
-    
+
     @Override
-    public void start(Stage primaryStage) throws IOException{
+    public void initApp() {
         
-        SaveOptions saveOptions = new DefaultSaveOptions();
         
-        Scene scene = new Scene((Parent) saveOptions);
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        saveOptions = new DefaultSaveOptions();
+        setContent(saveOptions.getContent());
     }
+    
+    
+   
 }
