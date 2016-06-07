@@ -6,27 +6,30 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root alignment="BASELINE_CENTER" minHeight="250.0" minWidth="250.0" prefHeight="400.0" prefWidth="280.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="BASELINE_CENTER" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="title" text="Save Options">
-         <font>
-            <Font name="System Bold" size="13.0" />
-         </font></Label>
-      <RadioButton fx:id="replaceFilesBtn" mnemonicParsing="false" text="Replace File" />
-      <RadioButton fx:id="newFilesBtn" mnemonicParsing="false" text="Add suffix" />
-      <HBox alignment="CENTER" prefHeight="39.0" prefWidth="327.0" spacing="5.0">
+      <RadioButton fx:id="replaceFilesBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Replace File" />
+      <RadioButton fx:id="newFilesBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Add suffix" />
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <TextField fx:id="newSuffix" promptText="new suffix" />
-            <Label fx:id="extension" text=".tiff" />
+            <TextField fx:id="newSuffix" maxWidth="1.7976931348623157E308" promptText="new suffix" />
+            <Label fx:id="extension" text=".tiff" GridPane.columnIndex="1" />
          </children>
-      </HBox> 
-      <Button fx:id="destinationFolderBtn" mnemonicParsing="false" text="Destination folder">
+      </GridPane>
+      <Button fx:id="destinationFolderBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button">
          <VBox.margin>
-            <Insets top="10.0" />
-         </VBox.margin></Button>
-      <Button fx:id="startBtn" mnemonicParsing="false" text="Start" />
+            <Insets />
+         </VBox.margin>
+      </Button>
    </children>
-   <padding>
-      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-   </padding>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
 </fx:root>
