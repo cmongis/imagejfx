@@ -22,9 +22,10 @@ package ijfx.ui.explorer.view;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaData;
-import ijfx.core.metadata.MetaDataOwner;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +35,8 @@ import javafx.scene.Node;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -46,7 +49,12 @@ public class ExplorerTableVie implements ExplorerView{
     TableView<Explorable> tableView = new TableView<>();
     
     MetaDataSetOwnerHelper<Explorable> helper = new MetaDataSetOwnerHelper(tableView);
-     
+    
+    @Parameter
+    EventService eventService;
+    
+    @Parameter
+    ExplorerService explorerService;
     
     List<? extends Explorable> currentItems;
     public ExplorerTableVie() {
@@ -123,6 +131,11 @@ public class ExplorerTableVie implements ExplorerView{
         currentItems.forEach(item->{
             item.selectedProperty().setValue(tableView.getSelectionModel().getSelectedItems().contains(item));
         });
+        
+        if(eventService != null) {
+            eventService.publish(new ExplorerSelectionChangedEvent().setObject(explorerService.getSelectedItems()));
+        }
+        
     }
     
     private TableRow<Explorable> createRow(TableView<Explorable> explorable) {
