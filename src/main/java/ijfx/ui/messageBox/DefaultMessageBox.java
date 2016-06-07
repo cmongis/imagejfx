@@ -60,9 +60,9 @@ public class DefaultMessageBox extends HBox implements MessageBox {
 
     private final FadeTransition fadeIn;
 
-    private final String GREEN = "#00ff00";
-    private final String ORANGE = "#ff6600";
-    private final String RED = "#ff0000";
+    private final String GREEN = "success";
+    private final String ORANGE = "warning";
+    private final String RED = "danger";
 
     private final double MAX_HEIGHT = 300.0;
     private final double MIN_HEIGHT = 0.0;
@@ -71,7 +71,7 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     private final double TIMELINE_DURATION = 300.0;
     private final double FADE_DURATION = 300.0;
     
-    private final double LINE_HEIGHT = 24.0;
+    private final double LINE_HEIGHT = 30.0;
 
     public DefaultMessageBox() {
         
@@ -81,17 +81,17 @@ public class DefaultMessageBox extends HBox implements MessageBox {
 
         message = new SimpleObjectProperty<>(new DefaultMessage());
 
-
-        getMessage().textProperty().addListener(this::playAnimation);
-        getMessage().typeProperty().addListener(this::setBgColor);
-
+        
+        message.addListener(this::onMessageChanged);
+      
+        
 
         label = new Label();
         label.setWrapText(true);
-        label.setOpacity(0.0);
+        //label.setOpacity(0.0);
         label.setMinHeight(0.0);
 
-        label.textProperty().bind(getMessage().textProperty());
+        
         
         
         openTimeline = new Timeline();
@@ -103,6 +103,18 @@ public class DefaultMessageBox extends HBox implements MessageBox {
         configureCloseTimeline();
         
         this.getChildren().add(label);
+    }
+    
+    private void onMessageChanged(Observable obs, Message oldValue, Message newValue) {
+        if(newValue != null) {
+            bindMessage(newValue);
+        }
+        playAnimation(obs);
+        setBgColor(obs);
+    }
+    
+    private void bindMessage(Message message) {
+         label.textProperty().bind(getMessage().textProperty());
     }
 
     @Override
@@ -123,12 +135,13 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     
     
     public void playAnimation(Observable obs) {
-        if (messageProperty().getValue().getText() == null){
+        if (messageProperty().getValue() == null || messageProperty().getValue().getText() == null){
             label.setOpacity(0.0);
             closeTimeline.playFromStart();
         }
         else {
             configureOpenTimeline();
+            label.setOpacity(1.0);
             openSeqTransition = new SequentialTransition(openTimeline, fadeIn);
             openSeqTransition.playFromStart();
         }
@@ -137,7 +150,11 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     public void setBgColor(Observable obs) {
 
             String bgColor = null;
-
+            if(messageProperty().getValue() == null) {
+                //setBackground(null);
+                return;
+            }
+            
             switch (messageProperty().getValue().getType()){
                 case SUCCESS:
                     bgColor = GREEN; break;
@@ -148,12 +165,12 @@ public class DefaultMessageBox extends HBox implements MessageBox {
                 default:
                     break;
             }
+            
+            
+            getStyleClass().clear();
+            getStyleClass().addAll("message-box",bgColor);
 
-            this.setBackground(new Background(
-                    new BackgroundFill(
-                            Color.web(bgColor), 
-                            new CornerRadii(4.0), 
-                            Insets.EMPTY)));
+            
 
     }
 
@@ -176,7 +193,9 @@ public class DefaultMessageBox extends HBox implements MessageBox {
     }
     
     
-    public double computeTextHeight(){
+    private double computeTextHeight(){
+        
+        if(message.getValue() == null) return 0;
         
         double computedHeight;
         
@@ -188,6 +207,8 @@ public class DefaultMessageBox extends HBox implements MessageBox {
         for(String s : subString){
             if(s != null && !s.equals("")){
                 Text text = new Text(s);
+                text.setFont(label.getFont());
+                //subStringLenght = text.g
                 subStringLenght = text.getLayoutBounds().getWidth();
                 lineToAdd = (int)Math.ceil(subStringLenght/this.getBoundsInParent().getWidth());
                 lineCount = lineCount + lineToAdd;
@@ -196,7 +217,7 @@ public class DefaultMessageBox extends HBox implements MessageBox {
                 lineCount++;
         }
         
-        computedHeight = lineCount * LINE_HEIGHT;
-        return computedHeight;
+        computedHeight = (lineCount * label.getFont().getSize()) + (getPadding().getTop()*2);
+        return computedHeight*1.3;
     }
 }
