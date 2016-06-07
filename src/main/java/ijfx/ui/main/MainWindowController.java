@@ -598,7 +598,9 @@ public class MainWindowController extends AnchorPane {
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
-
+        
+        System.out.println(rightVBox.getChildren());
+        
     }
 
     // animating the disapearance of the menu
@@ -775,6 +777,7 @@ public class MainWindowController extends AnchorPane {
             uiContextService.update();
             if(activityService.getCurrentActivityAsClass() != ExplorerActivity.class) {
                 activityService.openByType(ExplorerActivity.class);
+                hideSideMenu();
             }
         });
 
