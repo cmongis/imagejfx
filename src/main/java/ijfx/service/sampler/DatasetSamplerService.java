@@ -48,7 +48,7 @@ public class DatasetSamplerService extends AbstractService implements IjfxServic
     DatasetService datasetService;
 
     /**
-     * Isolate a point of a dimension of a dataset. It meands for instance that
+     * Isolate a point of a dimension of a dataset. It means for instance that
      * if you have a dataset with CHANNEL and Z, you can isolate a the Z stack
      * corresponding to a single channel just by doing :
      * sampleService.isolateDimension(myDataset,Axes.CHANNEL,2)
@@ -61,8 +61,9 @@ public class DatasetSamplerService extends AbstractService implements IjfxServic
     public Dataset isolateDimension(Dataset dataset, AxisType axes, long position) {
 
         SamplingDefinition def = new SamplingDefinition(dataset);
-
-        def.constrain(axes, new AxisSubrange(position));
+        AxisSubrange subrange = new AxisSubrange(position);
+        
+        def.constrain(axes, subrange);
 
         Dataset output = createOutputImage(dataset, def);
 

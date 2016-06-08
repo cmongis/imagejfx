@@ -113,7 +113,10 @@ public class SamplingDefinition {
 		final List<List<Long>> axesDefs = new ArrayList<List<Long>>();
 		for (int i = 0; i < display.numDimensions(); i++) {
 			final AxisType axisType = display.axis(i).type();
-			final AxisSubrange subrange = axisSubranges.get(axisType);
+			AxisSubrange subrange = axisSubranges.get(axisType);
+                        if(subrange == null) {
+                            subrange = new AxisSubrange(display.min(i),display.max(i));
+                        }
 			final List<Long> axisValues = subrange.getIndices();
 			axesDefs.add(axisValues);
 		}
