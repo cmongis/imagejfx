@@ -763,7 +763,7 @@ public class ImageWindow extends Window {
             datasetService.getDatasets().remove(datasetService.getDatasets(imageDisplay));
             //mageDisplayService.getActiveDataset(imageDisplay).
             imageDisplay.close();
-             eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
+            eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
     }
    
 
