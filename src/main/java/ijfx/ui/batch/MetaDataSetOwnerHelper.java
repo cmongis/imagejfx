@@ -135,6 +135,10 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         setPriority(Arrays.asList(keyName));
     }
     
+    public String[] getPriority() {
+        return priority.toArray(new String[priority.size()]);
+    }
+    
     public Set<String> applyPriority(Set<String> strings) {
         return strings
                 .stream()
