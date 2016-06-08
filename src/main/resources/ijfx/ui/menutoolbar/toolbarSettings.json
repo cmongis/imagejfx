@@ -141,7 +141,7 @@
             ,{
                 "type":"Command"
                 ,"label":"Delete Slices"
-                ,"action":"ijfx.plugins.RemoveSlice"
+                ,"action":"ijfx.plugins.commands.RemoveSlice"
                 ,"icon":"ERASER"
                 ,"context":"image-open"
             }
