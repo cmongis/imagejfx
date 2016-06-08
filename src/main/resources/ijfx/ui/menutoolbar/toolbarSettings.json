@@ -87,14 +87,13 @@
             {
                 "type": "Command"
                 ,
-                "label": "Merge channels"
+                "label": "Merge to RGB"
                 ,
-                "action": "net.imagej.plugins.commands.MergeChannels"
+                "action": "ijfx.plugins.commands.MergeChannels"
                 ,
-                "icon": "ANDROID"
+                "icon": "TINT"
                 ,
-                "context": "multi-channel-img"
-
+                "context": "image-open"
             }
             ,
             {
@@ -107,6 +106,12 @@
                 "icon": "USERS"
                 ,
                 "context": "multi-channel-img"
+            },{
+                "type":"Command"
+                ,"label":"Stacks to multi-channel"
+                ,"action":"ijfx.plugins.commands.MergeStacks"
+                ,"icon":"USERS"
+                ,"context":"image-open"
             }
             
             
@@ -165,6 +170,14 @@
                 ,"icon":"STACK_OVERFLOW"
                 ,"context":"image-open"
             }
+            ,{
+                "type":"Command"
+                ,"label":"Merge stacks into a multi-channel"
+                ,"action":"ijfx.plugins.command.MergeStacks"
+                ,"icon":"USERS"
+                ,"context":"image-open"
+            }
+            
         ]
     },
     {
