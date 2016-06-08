@@ -19,6 +19,7 @@
  */
 package ijfx.plugins.commands;
 
+import ijfx.service.ui.LoadingScreenService;
 import java.util.stream.Stream;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
@@ -32,6 +33,7 @@ import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.StatusBar;
 import org.scijava.ui.UIService;
 
 /**
@@ -41,7 +43,7 @@ import org.scijava.ui.UIService;
 @Plugin(type = Command.class,menuPath = "Image > Stacks > Merge into channels...")
 public class MergeStacks extends ContextCommand {
 
-    @Parameter(type = ItemIO.INPUT, required = true, label = "Select dataset to merge")
+    @Parameter(type = ItemIO.INPUT, required = true, label = "Select datasets to merge")
     Dataset[] inputs = null;
 
     @Parameter(type = ItemIO.OUTPUT)
@@ -53,6 +55,8 @@ public class MergeStacks extends ContextCommand {
     @Parameter
     DatasetService datasetService;
 
+    
+    
     @Override
     public void run() {
 
@@ -77,20 +81,33 @@ public class MergeStacks extends ContextCommand {
         long height = firstDataset.max(1);
         long depth = firstDataset.max(2);
         long channelNumber = inputs.length;
-
+        int total = 1 + inputs.length;
+        
+        StatusBar statusBar = uiService.getDefaultUI().getStatusBar();
+        
+        statusBar.setProgress(1, total);
+        statusBar.setStatus("Creating dataset...");
+        
+        
+        
+        
+        
         long[] dims = new long[]{width, height, channelNumber, depth};
         AxisType[] axes = new AxisType[]{Axes.X, Axes.Y, Axes.CHANNEL, Axes.Z};
-
+        
         output = datasetService.create(dims, firstDataset.getName(), axes, firstDataset.getValidBits(), firstDataset.isSigned(), false);
-
+          statusBar.setStatus("Copying data...");
         for (int c = 0; c != channelNumber; c++) {
+            statusBar.setProgress(c+1, total);
+          
             copyDataset(c, inputs[c]);
         }
     }
 
     private boolean checkAxis(Dataset[] datasets) {
         // check if all the datasets have 3 dimensions, not more, not less
-        return datasets.length == Stream.of(datasets).filter(d -> d.numDimensions() == 3).count();
+        System.out.println("hello");
+        return datasets.length == Stream.of(datasets).filter(d -> d.numDimensions() <= 3).count();
     }
 
     private boolean checkDatasetSize(Dataset[] datasets) {

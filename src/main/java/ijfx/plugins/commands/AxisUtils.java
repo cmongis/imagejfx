@@ -57,23 +57,24 @@ public class AxisUtils {
     public static CalibratedAxis getAxis(Dataset dataset, AxisType type) {
         CalibratedAxis[] calibratedAxes = new CalibratedAxis[dataset.numDimensions()];
         dataset.axes(calibratedAxes);
-        
-        for(CalibratedAxis a : calibratedAxes) {
-            if(a.type().equals(type)) {
+
+        for (CalibratedAxis a : calibratedAxes) {
+            if (a.type().equals(type)) {
                 return a;
             }
         }
         return null;
-        
+
     }
 
     public static long getAxisMax(Dataset dataset, AxisType axisType) {
         int d = dataset.dimensionIndex(axisType);
-        
+
         return dataset.max(d);
     }
+
     public static long getChannelNumber(Dataset dataset) {
-       return getAxisMax(dataset, Axes.CHANNEL) +1;
+        return getAxisMax(dataset, Axes.CHANNEL) + 1;
     }
 
     public static boolean hasAxisType(ImageDisplay display, AxisType axisType) {
@@ -96,6 +97,32 @@ public class AxisUtils {
             }
         }
         return false;
+    }
+
+    public static long calcNumPlanes(long[] dims, AxisType[] axes) {
+        long num = 1;
+        for (int i = 0; i < dims.length; i++) {
+            AxisType type = axes[i];
+            if (type == Axes.X || type == Axes.Y) {
+                continue;
+            }
+            num *= dims[i];
+        }
+        return num;
+    }
+
+    /**
+     * Calculates a plane number from a position within a dimensional space.
+     */
+    public static int planeNum(final long[] dims, final long[] pos) {
+        int plane = 0;
+        int inc = 1;
+        // TODO - assumes X & Y are 1st two dims
+        for (int i = 2; i < dims.length; i++) {
+            plane += pos[i] * inc;
+            inc *= dims[i];
+        }
+        return plane;
     }
 
 }

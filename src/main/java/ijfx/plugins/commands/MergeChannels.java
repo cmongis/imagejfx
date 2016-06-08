@@ -19,19 +19,9 @@
  */
 package ijfx.plugins.commands;
 
-import ij.ImagePlus;
-import ij.ImageStack;
-import ij.process.ColorProcessor;
-import ijfx.service.ImagePlaneService;
-import ijfx.service.Timer;
-import ijfx.service.TimerService;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.ImgPlus;
@@ -40,25 +30,24 @@ import net.imagej.axis.AxisType;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.ops.OpService;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.converter.Converter;
 import net.imglib2.converter.RealLUTConverter;
+import net.imglib2.display.ColorTable;
 import net.imglib2.display.projector.composite.CompositeXYProjector;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.ARGBType;
-import net.imglib2.type.numeric.NumericType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
 
 /**
@@ -66,97 +55,221 @@ import org.scijava.ui.UIService;
  * @author cyril
  */
 @Plugin(type = Command.class, menuPath = "Image > Stacks > Merge channels")
-public class MergeChannels implements Command {
+public class MergeChannels<T extends RealType<T>> extends ContextCommand {
 
-    @Parameter(type = ItemIO.INPUT)
+     @Parameter(type=ItemIO.INPUT)
     Dataset input;
 
     @Parameter(type = ItemIO.OUTPUT)
     Dataset output;
 
- 
+    @Parameter
+    private ImageDisplayService imageDisplayService;
+
     @Parameter
     private DatasetService datasetService;
 
+    long[] dims;
+
+    AxisType[] axes;
+
+    boolean inputMonoChannel;
+
+    
+
+    List<RealLUTConverter<T>> converters;
 
     @Parameter
     private UIService uiService;
 
-
     @Override
     public void run() {
-
         
-        
-        //Dataset dataset = imageDisplayService.getActiveDataset(input);
 
-        output = convert2(input);
+        inputMonoChannel = input.dimensionIndex(Axes.CHANNEL) == -1;
+
+        initializeOutputDataset();
+        initializeConverter();
+        if (inputMonoChannel) {
+            processMonoChannelInput();
+        }
+        else processMultiChannelInput();
     }
 
-    public <T extends RealType<T>> Dataset convert2(Dataset inputDataset) {
-        ImgPlus<T> imgPlus = (ImgPlus<T>) inputDataset.getImgPlus();
+    public void initializeOutputDataset() {
 
-        long[] dims = new long[imgPlus.numDimensions()];
-        AxisType[] axes = new AxisType[imgPlus.numDimensions()];
+        int numDimensions = input.numDimensions();
 
-        for (int i = 0; i != dims.length; i++) {
-            dims[i] = imgPlus.dimension(i);
-            axes[i] = imgPlus.axis(i).type();
-        }
+        if (inputMonoChannel) {
 
-        ArrayList<Converter<T, ARGBType>> converters
-                = new ArrayList<>();
-        long channelNumber = imgPlus.max(imgPlus.dimensionIndex(Axes.CHANNEL)) + 1;
-        int channelAxisIdex = imgPlus.dimensionIndex(Axes.CHANNEL);
+            axes = new AxisType[numDimensions + 1];
+            dims = new long[numDimensions + 1];
+            int d = 0;
+            axes[0] = Axes.X;
+            axes[1] = Axes.Y;
+            axes[2] = Axes.CHANNEL;
+            dims[0] = input.dimension(0);
+            dims[1] = input.dimension(1);
+            dims[2] = 3;
+            for (int i = 3; i <= numDimensions; i++) {
+                axes[i] = input.axis(i - 1).type();
+                dims[i] = input.dimension(i - 1);
+            }
+        } else {
+            axes = new AxisType[numDimensions];
+            dims = new long[numDimensions];
 
-        dims[channelAxisIdex] = 3;
-        //DatasetView view = imageDisplayService.getActiveDatasetView(input);
-        for (int i = 0; i != channelNumber; i++) {
-            converters.add(new RealLUTConverter<>(inputDataset.getChannelMinimum(i), inputDataset.getChannelMaximum(i), imgPlus.getColorTable(i)));
+            for (int i = 0; i != numDimensions; i++) {
+                axes[i] = input.axis(i).type();
+                dims[i] = input.dimension(i);
+            }
+
+            // makes sure the output dataset is 3-channel dataset;
+            dims[getChannelAxisIndex()] = 3;
         }
 
         output = datasetService.create(new UnsignedByteType(), dims, "", axes);
 
-        //RandomAccess<T> inputRandomAccess = (RandomAccess<T>) inputDataset.randomAccess();
+    }
+
+    public <T> void initializeConverter() {
+        converters = new ArrayList<>();
+        if (inputMonoChannel) {
+
+            converters.add(getConverter(0));
+        } else {
+            for (int i = 0; i <= input.max(getChannelAxisIndex()); i++) {
+                converters.add(getConverter(i));
+            }
+        }
+    }
+
+    public RealLUTConverter<T> getConverter(int channel) {
+        double min = input.getChannelMinimum(channel);
+        double max = input.getChannelMaximum(channel);
+        ColorTable table = input.getColorTable(channel);
+        return new RealLUTConverter<>(min, max, table);
+    }
+
+    public int getChannelAxisIndex() {
+        return input.dimensionIndex(Axes.CHANNEL);
+    }
+
+    public  void processMonoChannelInput() {
+        ImgPlus<T> imgPlus = (ImgPlus<T>) input.getImgPlus();
+
+        Cursor<T> inputCursor = (Cursor<T>) imgPlus.cursor();
+        RandomAccess<? extends RealType> outputCursor = output.randomAccess();
+        
+        long[] inputPosition = new long[input.numDimensions()];
+        long[] outputPosition = new long[output.numDimensions()];
+        
+        
+        final ARGBType color = new ARGBType();
+       
+        T t;
+        inputCursor.reset();
+        while (inputCursor.hasNext()) {
+
+            inputCursor.fwd();
+
+            // copy the localization of the input cursor so we can localized the output
+            inputCursor.localize(inputPosition);
+
+            // i don't know if it's necessary
+            //inputRandomAccess.setPosition(position);
+            t = inputCursor.get();
+
+           
+
+            double d = t.getRealDouble();
+
+            // get the color associated to the the pixel depending on which channel it comes from
+            converters.get(0).convert(t, color);
+
+            for(int i = 0;i!=inputPosition.length;i++) {
+                
+                // if the position is after 2, it must be incremented because
+                // the output has more dimensions than the input.
+                // The channel axis was inserted at the position 2
+                outputPosition[i >= 2 ? i+1 : i] = inputPosition[i];
+                //outputCursor.setPosition(inputPosition[i], i >= 2 ? i+1 : i);
+            }
+            outputCursor.setPosition(outputPosition);
+
+            // we separate the rgb from the argb integer
+            int value = color.get();
+
+            final int red = (value >> 16) & 0xff;
+            final int green = (value >> 8) & 0xff;
+            final int blue = value & 0xff;
+
+            // put it in a array
+            int[] rgb = new int[]{red, green, blue};
+            if(outputPosition[1] > 400 && outputPosition[0] > 400)
+            System.out.println(Arrays.toString(outputPosition));
+            for (int c = 0; c != rgb.length; c++) {
+
+                // now we go from 0 to 2 (rgb) of the output and additionate
+                // the r, g and blue of the channel
+                outputCursor.setPosition(c, 2);
+                //if(outputCursor.getLongPosition(1) > 1000) {
+               
+                    
+                //}
+                // calculate the new value of the pixel
+                double p = outputCursor.get().getRealDouble() + rgb[c];
+
+                // make sure it's not too much
+                p = p > 255 ? 255 : p;
+
+                // set the new output
+                outputCursor.get().setReal(p);
+            }
+        }
+    }
+
+    public void processMultiChannelInput() {
+
+        ImgPlus<T> imgPlus = (ImgPlus<T>) input.getImgPlus();
+
         Cursor<T> inputCursor = (Cursor<T>) imgPlus.cursor();
         RandomAccess<? extends RealType> outputCursor = output.randomAccess();
         long[] position = new long[imgPlus.numDimensions()];
 
-        
         final ARGBType color = new ARGBType();
-        
+        int channelAxisIndex = getChannelAxisIndex();
         T t;
         inputCursor.reset();
         while (inputCursor.hasNext()) {
+
             inputCursor.fwd();
 
-           
             // copy the localization of the input cursor so we can localized the output
             inputCursor.localize(position);
-          
+
             // i don't know if it's necessary
             //inputRandomAccess.setPosition(position);
-            
             t = inputCursor.get();
 
-            int channel = inputCursor.getIntPosition(channelAxisIdex);
-            
+            int channel = inputCursor.getIntPosition(channelAxisIndex);
+
             double d = t.getRealDouble();
 
-            
-          
             // get the color associated to the the pixel depending on which channel it comes from
             converters.get(channel).convert(t, color);
 
             // set the output cur
-            position[channelAxisIdex] = 0;
+            if (channelAxisIndex != -1) {
+                position[channelAxisIndex] = 0;
+            }
             outputCursor.setPosition(position);
 
             // we separate the rgb from the argb integer
             int value = color.get();
 
-            final int red = (value >> 16 ) & 0xff;
-            final int green = ( value >> 8 ) & 0xff;
+            final int red = (value >> 16) & 0xff;
+            final int green = (value >> 8) & 0xff;
             final int blue = value & 0xff;
 
             // put it in a array
@@ -165,7 +278,7 @@ public class MergeChannels implements Command {
 
                 // now we go from 0 to 2 (rgb) of the output and additionate
                 // the r, g and blue of the channel
-                outputCursor.setPosition(c, channelAxisIdex);
+                outputCursor.setPosition(c, channelAxisIndex);
 
                 // calculate the new value of the pixel
                 double p = outputCursor.get().getRealDouble() + rgb[c];
@@ -177,7 +290,113 @@ public class MergeChannels implements Command {
                 outputCursor.get().setReal(p);
             }
         }
-        
+    }
+
+    /*
+    public <T extends RealType<T>> Dataset convert2(Dataset inputDataset) {
+        ImgPlus<T> imgPlus = (ImgPlus<T>) inputDataset.getImgPlus();
+
+        long[] dims = new long[imgPlus.numDimensions()];
+
+        AxisType[] axes = new AxisType[imgPlus.numDimensions()];
+
+        for (int i = 0; i != dims.length; i++) {
+            dims[i] = imgPlus.dimension(i);
+            axes[i] = imgPlus.axis(i).type();
+        }
+
+        if (dims.length == 2) {
+            dims = new long[]{dims[0], dims[1], 3};
+            axes = new AxisType[]{Axes.X, Axes.Y, Axes.CHANNEL};
+        }
+
+        // creating the converters
+        ArrayList<Converter<T, ARGBType>> converters
+                = new ArrayList<>();
+        int channelAxisIndex = imgPlus.dimensionIndex(Axes.CHANNEL);
+
+        long channelNumber;
+
+        // if it's a 2D image
+        if (channelAxisIndex == -1) {
+            channelNumber = 1;
+        } else {
+            channelNumber = imgPlus.max(imgPlus.dimensionIndex(Axes.CHANNEL)) + 1;
+        }
+
+        if (channelAxisIndex != -1) {
+            dims[channelAxisIndex] = 3;
+        }
+        //DatasetView view = imageDisplayService.getActiveDatasetView(input);
+        double min, max;
+        for (int i = 0; i != channelNumber; i++) {
+            DatasetView view = imageDisplayService.getActiveDatasetView(imageDisplay);
+            min = view.getChannelMin(i);
+            max = view.getChannelMax(i);
+            ColorTable table = view.getColorTables().get(i);
+            converters.add(new RealLUTConverter<>(min, max, table));
+        }
+
+        output = datasetService.create(new UnsignedByteType(), dims, "", axes);
+
+        //RandomAccess<T> inputRandomAccess = (RandomAccess<T>) input.randomAccess();
+        Cursor<T> inputCursor = (Cursor<T>) imgPlus.cursor();
+        RandomAccess<? extends RealType> outputCursor = output.randomAccess();
+        long[] position = new long[imgPlus.numDimensions()];
+
+        final ARGBType color = new ARGBType();
+
+        T t;
+        inputCursor.reset();
+        while (inputCursor.hasNext()) {
+            inputCursor.fwd();
+
+            // copy the localization of the input cursor so we can localized the output
+            inputCursor.localize(position);
+
+            // i don't know if it's necessary
+            //inputRandomAccess.setPosition(position);
+            t = inputCursor.get();
+
+            int channel = inputCursor.getIntPosition(channelAxisIndex);
+
+            double d = t.getRealDouble();
+
+            // get the color associated to the the pixel depending on which channel it comes from
+            converters.get(channel).convert(t, color);
+
+            // set the output cur
+            if (channelAxisIndex != -1) {
+                position[channelAxisIndex] = 0;
+            }
+            outputCursor.setPosition(position);
+
+            // we separate the rgb from the argb integer
+            int value = color.get();
+
+            final int red = (value >> 16) & 0xff;
+            final int green = (value >> 8) & 0xff;
+            final int blue = value & 0xff;
+
+            // put it in a array
+            int[] rgb = new int[]{red, green, blue};
+            for (int c = 0; c != rgb.length; c++) {
+
+                // now we go from 0 to 2 (rgb) of the output and additionate
+                // the r, g and blue of the channel
+                outputCursor.setPosition(c, channelAxisIndex);
+
+                // calculate the new value of the pixel
+                double p = outputCursor.get().getRealDouble() + rgb[c];
+
+                // make sure it's not too much
+                p = p > 255 ? 255 : p;
+
+                // set the new output
+                outputCursor.get().setReal(p);
+            }
+        }
+
         System.out.println("over");
 
         //output.setCompositeChannelCount(3);
