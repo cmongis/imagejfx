@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
@@ -19,14 +21,26 @@
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
       <Label styleClass="h4" text="Report bug" GridPane.rowIndex="1" />
       <Label text="Explanin what you were trying to do and what happend (or didn't)" GridPane.columnSpan="2" GridPane.rowIndex="4" />
       <TextArea fx:id="descriptionTextArea" maxWidth="1.7976931348623157E308" minWidth="300.0" prefHeight="150.0" prefWidth="300.0" GridPane.columnSpan="2" GridPane.rowIndex="5" />
       <Label fx:id="statusLabel" GridPane.rowIndex="6" />
-      <Button fx:id="sendButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Send report" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+      <Button fx:id="sendButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Send report" GridPane.columnSpan="2" GridPane.rowIndex="6">
+         <graphic>
+            <FontAwesomeIconView glyphName="SEND" />
+         </graphic></Button>
       <Label text="Email (optional):" GridPane.rowIndex="2" />
       <TextField fx:id="senderTextField" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cancel" text="Cancel" GridPane.columnSpan="2" GridPane.rowIndex="7">
+         <graphic>
+            <FontAwesomeIconView glyphName="REMOVE" />
+         </graphic>
+      </Button>
    </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
 </fx:root>

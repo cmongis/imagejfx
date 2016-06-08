@@ -36,7 +36,7 @@ import org.scijava.ui.UIService;
  * @author tuananh
  */
 //@Plugin(type = Command.class, menuPath = "Plugins>StacktoHS", label = "Test plugin")
-@Plugin(type = Command.class, menuPath = "Plugins>Stack to HS", attrs = {
+@Plugin(type = Command.class, menuPath = "Image > Hyperstacks > Stack to Hyperstack...", attrs = {
     @Attr(name = "no-legacy")})
 public class StackToHS implements Command {
 

@@ -25,8 +25,10 @@ import ijfx.service.history.HistoryService;
 import ijfx.ui.main.ImageJFX;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import org.apache.http.concurrent.Cancellable;
 import org.scijava.Context;
 import org.scijava.Priority;
+import org.scijava.command.CommandModule;
 import org.scijava.module.Module;
 import org.scijava.module.process.AbstractPreprocessorPlugin;
 import org.scijava.module.process.PreprocessorPlugin;
@@ -63,6 +65,11 @@ public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin{
         
         if(workflowService.isRunning() || batchService.isRunning()) return;
         
+        if(CommandModule.class.isAssignableFrom(module.getClass())) {
+            if(((CommandModule)module).isCanceled()) {
+                return;
+            }
+        }
         
         DefaultWorkflowStep step = new DefaultWorkflowStep(module);
         step.setParameters(module.getInputs());

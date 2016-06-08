@@ -52,7 +52,7 @@ public class FlatItemRenderer extends ArcItemSkin {
     public Shape drawArc(double centerX, double centerY, double minRadius, double maxRadius, double startAngle, double length) {
         final Path path = new Path();
 
-        final PolarSystem ps = new PolarSystem(centerX, centerY);
+        final PolarSystem ps = new PolarSystem(null,null);
 
         final Point2D A = ps.degreeToPolar(minRadius, startAngle);
         final Point2D B = ps.degreeToPolar(maxRadius, startAngle);
@@ -89,8 +89,11 @@ public class FlatItemRenderer extends ArcItemSkin {
         final int maxItem = getArcMenu().getItemCount();
         final double minRadius = getArcMenu().getMinRadius();
         final double maxRadius = getArcMenu().getMaxRadius();
-        final double centerX = getArcMenu().getCenterX();
-        final double centerY = getArcMenu().getCenterY();
+        
+        arc.centerXProperty().bind(getArcMenu().getCenterX());
+        arc.centerYProperty().bind(getArcMenu().getCenterY());
+        //final double centerX = getArcMenu().getCenterX();
+        //final double centerY = getArcMenu().getCenterY();
         final double startAngle = 360 * position / maxItem;
         final double length = 360 / maxItem;
         arc.setStrokeWidth(10.0f);
@@ -98,8 +101,8 @@ public class FlatItemRenderer extends ArcItemSkin {
         arc.setFill(null);
         arc.setType(ArcType.OPEN);
         arc.setStrokeType(StrokeType.INSIDE);
-        arc.setCenterX(centerX);
-        arc.setCenterY(centerY);
+       // arc.setCenterX(centerX);
+       // arc.setCenterY(centerY);
         arc.setRadiusX(minRadius);
         arc.setRadiusY(minRadius);
         arc.setStartAngle(startAngle);

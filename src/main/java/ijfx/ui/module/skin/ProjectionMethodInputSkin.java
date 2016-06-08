@@ -68,7 +68,7 @@ public class ProjectionMethodInputSkin   extends AbstractInputSkinPlugin<Project
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        System.out.println("can i handle ?"+clazz);
+      
         return clazz == ProjectionMethod.class;
     }
     

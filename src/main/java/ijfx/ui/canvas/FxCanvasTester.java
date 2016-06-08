@@ -68,6 +68,7 @@ import org.scijava.module.ModuleItem;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugins.commands.io.OpenFile;
+import static javafx.application.Application.launch;
 
 /**
  *

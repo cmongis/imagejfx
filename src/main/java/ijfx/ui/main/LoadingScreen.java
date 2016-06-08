@@ -54,9 +54,10 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 /**
- *
+ * The loading screen is now deprecated
  * @author Cyril MONGIS, 2015
  */
+@Deprecated
 public class LoadingScreen extends StackPane {
 
     Text iconNode;
@@ -77,9 +78,9 @@ public class LoadingScreen extends StackPane {
     
     BooleanProperty canCancel = new SimpleBooleanProperty(false);
     
-    public static LoadingScreen getInstance() {
-        return singleton;
-    }
+    //public static LoadingScreen getInstance() {
+      //  return singleton;
+   // }
     
     private class TaskRequest {
         Task task;
@@ -184,13 +185,14 @@ public class LoadingScreen extends StackPane {
             return;
         }
         
+        rectangle.setWidth(400);
+        rectangle.setHeight(400);
         Bounds boundsInParent = node.getBoundsInParent();
         double width = boundsInParent.getWidth();
         double height = boundsInParent.getHeight();
-        rectangle.setWidth(300);
-        rectangle.setHeight(300);
-        setTranslateX(width/2-150);
-        setTranslateY(height/2-150);
+        
+        setTranslateX(-width/2);
+        setTranslateY(-height/2);
         //MainWindowController.logger.info("" + node.getWidth());
         
         if(node.getChildren().contains(this) == false)   {
@@ -259,11 +261,11 @@ public class LoadingScreen extends StackPane {
     
     
     public static void submit(Task task, boolean canCancel) {
-        submit(task, getInstance().getDefaultPane());
+        //submit(task, getInstance().getDefaultPane());
     }
     
     public static void submit(Task task, Pane pane) {
-        getInstance().submitTask(task, pane);
+       // getInstance().submitTask(task, pane);
     }
     
     public void submitTask(Task task) {
@@ -308,6 +310,7 @@ public class LoadingScreen extends StackPane {
             showOn(pane);
              
              this.canCancel.setValue(canCancel);
+             statusText.textProperty().bind(task.messageProperty());
         } else {
 
             task.addEventHandler(WorkerStateEvent.WORKER_STATE_RUNNING, ch -> {

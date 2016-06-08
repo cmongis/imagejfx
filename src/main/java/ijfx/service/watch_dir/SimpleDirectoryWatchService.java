@@ -48,6 +48,8 @@ public class SimpleDirectoryWatchService extends AbstractService implements Dire
         mWatchKeyToDirPathMap = newConcurrentMap();
         mDirPathToListenersMap = newConcurrentMap();
         mListenerToFilePatternsMap = newConcurrentMap();
+        
+        start();
     }
 
     @SuppressWarnings("unchecked")
@@ -116,16 +118,21 @@ public class SimpleDirectoryWatchService extends AbstractService implements Dire
 
             if (eventKind.equals(ENTRY_CREATE)) {
                 matchedListeners(getDirPath(key), file)
+                        .parallelStream()
                         .forEach((ijfx.service.watch_dir.FileChangeListener listener) -> listener.onFileCreate(file.toString()));
             } else if (eventKind.equals(ENTRY_MODIFY)) {
                 matchedListeners(getDirPath(key), file)
+                        .parallelStream()
                         .forEach((ijfx.service.watch_dir.FileChangeListener listener) -> listener.onFileModify(file.toString()));
             } else if (eventKind.equals(ENTRY_DELETE)) {
                 matchedListeners(getDirPath(key), file)
+                        .parallelStream()
                         .forEach((ijfx.service.watch_dir.FileChangeListener listener) -> listener.onFileDelete(file.toString()));
             }
         }
     }
+    
+    
 
     /**
      * {@inheritDoc}

@@ -20,22 +20,15 @@
  */
 package ijfx.ui.datadisplay.text;
 
-import ijfx.core.project.query.QueryService;
-import ijfx.ui.datadisplay.table.TableDisplayView;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import mongis.utils.FXUtilities;
-import net.imagej.table.TableDisplay;
 import org.scijava.display.TextDisplay;
-import org.scijava.plugin.Parameter;
 
 /**
  *

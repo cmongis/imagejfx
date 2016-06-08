@@ -22,8 +22,8 @@ package ijfx.service.preview;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.DisplayBatchInput;
+import ijfx.service.log.LogService;
 import java.awt.image.BufferedImage;
-import static java.lang.Math.abs;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -42,11 +42,8 @@ import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable;
 import net.imglib2.display.ColorTable8;
 import net.imglib2.type.numeric.RealType;
-import org.scijava.command.CommandInfo;
-import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
-import org.scijava.module.DefaultMutableModuleInfo;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
@@ -62,22 +59,26 @@ import org.scijava.service.Service;
 public class PreviewService extends AbstractService implements ImageJService {
 
     @Parameter
-    DisplayService displayService;
+    private DisplayService displayService;
 
     @Parameter
-    ImageDisplayService imageDisplayService;
+    private ImageDisplayService imageDisplayService;
 
     @Parameter
-    DatasetService datasetService;
+    private DatasetService datasetService;
 
     @Parameter
-    CommandService commandService;
+    private CommandService commandService;
 
     @Parameter
-    ModuleService moduleService;
+    private ModuleService moduleService;
 
     @Parameter
-    BatchService batchService;
+    private BatchService batchService;
+    
+    @Parameter
+    private LogService logService;
+    
     private int width;
     private int height;
     private int x;
@@ -272,13 +273,13 @@ public class PreviewService extends AbstractService implements ImageJService {
                 this.context().inject(module.getDelegateObject());
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logService.severe(e);
             }
-            batchService.executeModule(batchSingleInput, module, false, inputMap);
+            batchService.executeModule(batchSingleInput, module, inputMap);
             Dataset result = batchSingleInput.getDataset();
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            logService.severe(e);
         }
         return null;
     }

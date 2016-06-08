@@ -424,7 +424,13 @@ public class UiContextService extends AbstractService implements UiContextManage
         return uiContextMap;
     }
     
+    public void clean() {
+       currentContextList.clear();
+    }
     
+   public Set<String> getContextList() {
+       return currentContextList;
+   }
     
     
 }

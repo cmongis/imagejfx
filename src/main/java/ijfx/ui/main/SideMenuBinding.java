@@ -38,6 +38,8 @@ public class SideMenuBinding {
 
     final Node node;
 
+    double xWhenHidden = 20;
+    
     public SideMenuBinding(Node node) {
         this.node = node;
         
@@ -60,7 +62,7 @@ public class SideMenuBinding {
             timeline.getKeyFrames().add(kf);
             timeline.play();
         } else {
-            KeyValue kv = new KeyValue(node.translateXProperty(), -1 * (node.getBoundsInParent().getWidth() + 10), Interpolator.LINEAR);
+            KeyValue kv = new KeyValue(node.translateXProperty(), -1 * (node.getBoundsInParent().getWidth() + xWhenHidden), Interpolator.LINEAR);
             KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
             timeline.getKeyFrames().add(kf);
             timeline.play();

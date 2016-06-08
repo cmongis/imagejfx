@@ -44,7 +44,7 @@ public class TaskButtonBinding {
 
    
     
-    private Callback<TaskButtonBinding,Task> onClick;
+    private Callback<TaskButtonBinding,Task> taskFactory;
     
     private Runnable whenSucceed;
     
@@ -91,12 +91,12 @@ public class TaskButtonBinding {
      }
     
     
-    public Callback<TaskButtonBinding, Task> getOnClick() {
-        return onClick;
+    public Callback<TaskButtonBinding, Task> getTaskFactory() {
+        return taskFactory;
     }
 
-    public TaskButtonBinding runTaskOnClick(Callback<TaskButtonBinding, Task> onClick) {
-        this.onClick = onClick;
+    public TaskButtonBinding setTaskFactory(Callback<TaskButtonBinding, Task> onClick) {
+        this.taskFactory = onClick;
         return this;
     }
 
@@ -126,7 +126,7 @@ public class TaskButtonBinding {
         
         
         if(currentTask == null || currentTask.isDone()) {
-            currentTask = onClick.call(this); 
+            currentTask = taskFactory.call(this); 
         }
         
         currentTask.addEventHandler(WorkerStateEvent.ANY, this::onTaskStatusChange);

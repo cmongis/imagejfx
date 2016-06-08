@@ -24,7 +24,6 @@ import ijfx.ui.context.animated.AnimatedPaneContextualView;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
 import ijfx.service.uicontext.UiContextService;
 import java.io.File;
-import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.ToolBar;
@@ -42,7 +41,16 @@ import org.scijava.plugin.PluginService;
 import mongis.utils.FXUtilities;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.activity.Activity;
+import ijfx.ui.activity.ActivityService;
+import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.explorer.Folder;
+import ijfx.ui.explorer.FolderManagerService;
+import ijfx.ui.plugin.panel.RecentFilePanel;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.scene.control.Label;
+import mongis.utils.CallbackTask;
+import org.scijava.display.DisplayService;
 import org.scijava.plugins.commands.io.OpenFile;
 
 /**
@@ -59,6 +67,9 @@ public class ImageJContainer extends BorderPane implements Activity {
     //MenuBar menuBar = new MenuBar();
     ToolBar toolbar = new ToolBar();
 
+    private Label infoLabel = new Label("Drag-n-drop a folder to explore it :-)");
+    
+    
     @Parameter
     Context context;
 
@@ -77,16 +88,29 @@ public class ImageJContainer extends BorderPane implements Activity {
     @Parameter
     CommandService commandService;
 
+    @Parameter
+    ActivityService activityService;
+    
+    @Parameter
+    FolderManagerService folderManagerService;
+    
     private static final String DRAG_OVER_CSS_STYLE = "dragover";
 
     @Override
     public Node getContent() {
         return this;
     }
+    
+   
+    
+    @Parameter
+    DisplayService displayService;
+    
     public static final String TOP = "imagej-container-top";
 
     AnimatedPaneContextualView hboxViewCtrl;
-
+    
+    RecentFilePanel recentFilePanel;
     
     public ImageJContainer() {
 
@@ -103,6 +127,23 @@ public class ImageJContainer extends BorderPane implements Activity {
         
     }
 
+    private void updateCenter() {
+        if(ImageWindowContainer.getInstance().getChildren().size()  == 0) {
+            setCenter(getRecentFilePanel());
+            getRecentFilePanel().update();
+        }
+        else {
+            setCenter(ImageWindowContainer.getInstance());
+        }
+    }
+    
+    private RecentFilePanel getRecentFilePanel() {
+        if(recentFilePanel == null) {
+            recentFilePanel = new RecentFilePanel(context);
+        }
+        return recentFilePanel;
+    }
+    
     /* method called when the number of windows is changed. The container 
     takes care of entering or leaving the "image-open" context.
     
@@ -110,20 +151,8 @@ public class ImageJContainer extends BorderPane implements Activity {
     TODO: delegate the context calculation to an other class
      */
     public void onListChange(ListChangeListener.Change<? extends Node> change) {
-
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(() -> onListChange(change));
-            return;
-        }
-
-        change.next();
-        if (change.getList().size() > 0) {
-            contextService.enter("display-open");
-            contextService.update();
-        } else {
-            contextService.leave("display-open");
-            contextService.update();
-        }
+        System.out.println("Hello");
+        Platform.runLater(this::updateCenter);
 
     }
 
@@ -167,11 +196,23 @@ public class ImageJContainer extends BorderPane implements Activity {
     @Override
     public Task updateOnShow() {
 
+        
+        Platform.runLater(this::updateCenter);
+        
       
         return null;
     }
 
+    
+    
     private void openFile(File file) {
+        
+        if(file.isDirectory()) {
+           Folder folder =  folderManagerService.addFolder(file);
+          // folderManagerService.setCurrentFolder(folder);
+           activityService.openByType(ExplorerActivity.class);
+        }
+        
         commandService.run(OpenFile.class, true, "inputFile", file);
     }
 

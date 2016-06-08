@@ -217,7 +217,7 @@ public class FileBatchProcessorPanel extends SplitPane implements Activity {
          
             new TaskButtonBinding(startProcessingButton)
                     .setBaseIcon(FontAwesomeIcon.TASKS)
-                    .runTaskOnClick(this::getBatchProcessingTask)
+                    .setTaskFactory(this::getBatchProcessingTask)
                     .setTextWhenSucceed("Batch processing finished !")
                     .setTextWhenError("Error while batch processing !");
 

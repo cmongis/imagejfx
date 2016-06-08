@@ -43,7 +43,7 @@ public class DefaultTimerService extends AbstractService implements TimerService
     @Override
     public Timer getTimer(String id) {
         timerMap.putIfAbsent(id, new DefaultTimer(id));
-        return timerMap.get(id);
+        return new ThreadSafeTimerWrapper((DefaultTimer)timerMap.get(id));
     }
     
    
@@ -52,4 +52,9 @@ public class DefaultTimerService extends AbstractService implements TimerService
         return timerMap.values();
     }
 
+    
+    @Override
+    public void resetTimers() {
+        timerMap.clear();
+    }
 }

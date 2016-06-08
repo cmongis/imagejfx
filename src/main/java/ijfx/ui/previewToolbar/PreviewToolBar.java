@@ -27,7 +27,9 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.context.PaneContextualView;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
+import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -68,6 +70,9 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     @Parameter
     TimerService stopWatchService;
     
+    
+    Logger logger = ImageJFX.getLogger();
+    
     private PopOver popOver;
     private JsonReader jsonReader;
 
@@ -103,9 +108,10 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         //fakeToolBar.setPadding(new Insets(10, 10,10,10));
         this.setTop(fakeToolBar);
         jsonReader = new JsonReader();
-        jsonReader.read("./src/main/resources/ijfx/ui/menutoolbar/toolbarSettings.json");
+        jsonReader.read("/ijfx/ui/menutoolbar/toolbarSettings.json");
         jsonReader.separate();
         popOver = new PopOver();
+        popOver.setMinHeight(200);
         generateItems(jsonReader, paneContextualView);
         created = true;
     }
@@ -141,6 +147,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.maxWidthProperty().bind(this.getScene().widthProperty());
         pane.setMinWidth(popOver.minWidthProperty().getValue());
         pane.setMaxWidth(popOver.minWidthProperty().getValue());
+       
         popOver.setDetached(false);
         popOver.setDetachable(false);
         popOver.setHideOnEscape(true);
@@ -148,6 +155,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.setAutoHide(true);
         popOver.setOpacity(1.0);
         popOver.setArrowSize(0);
+        popOver.setMinHeight(200);
         int anchorX = (int) (this.localToScreen(this.getBoundsInParent()).getMinX() + 1);
         int anchorY = (int) (this.localToScreen(this.getTop().getBoundsInParent()).getMaxY() - 1);
         popOver.show(owner);
@@ -180,14 +188,16 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      */
     public void onEnter(LabelCategory labelCategory) {
         
-        System.out.println("activating !");
+        logger.info("Activating category : "+labelCategory.getText());
         
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCellPreview paneIconCellPreview = (PaneIconCellPreview) e;
-
+            
+            //paneIconCellPreview
+            
             //Has to use forceUpdateImage
-            paneIconCellPreview.updateImageAsync(paneIconCellPreview.getItem());
-
+            //paneIconCellPreview.updateImageAsync(paneIconCellPreview.getItem());
+            paneIconCellPreview.forceImageUpdate();
             paneIconCellPreview.setSubtitleVisible(false);
         });
         if (!labelCategory.getPane().getChildren().isEmpty()) {

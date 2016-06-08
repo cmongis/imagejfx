@@ -86,7 +86,7 @@ public class WorkflowPanel extends GridPane {
             FXUtilities.injectFXML(this);
 
             context.inject(this);
-            init();
+           init();
 
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Couldn't initiate the WorkflowPanel", ex);

@@ -22,10 +22,13 @@ package ijfx.ui.explorer.view;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaData;
-import ijfx.core.metadata.MetaDataOwner;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorationMode;
+import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
+import ijfx.ui.explorer.FolderManagerService;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
@@ -34,6 +37,8 @@ import javafx.scene.Node;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -46,19 +51,31 @@ public class ExplorerTableVie implements ExplorerView{
     TableView<Explorable> tableView = new TableView<>();
     
     MetaDataSetOwnerHelper<Explorable> helper = new MetaDataSetOwnerHelper(tableView);
-     
+    
+    @Parameter
+    EventService eventService;
+    
+    @Parameter
+    ExplorerService explorerService;
+    
+    @Parameter
+            FolderManagerService folderService;
     
     List<? extends Explorable> currentItems;
+    
+    private static final String[] FILE_PRIORITY = { MetaData.FILE_NAME, MetaData.WIDTH, MetaData.HEIGHT,MetaData.BITS_PER_PIXEL,MetaData.SLICE_NUMBER , MetaData.SERIE_COUNT, MetaData.SLICE_NUMBER, MetaData.ZSTACK_NUMBER, MetaData.CHANNEL_COUNT, MetaData.TIME_COUNT};
+    
+    private static final String[] PLANE_PRIORITY = {MetaData.FILE_NAME, MetaData.PLANE_INDEX, MetaData.CHANNEL, MetaData.TIME, MetaData.Z_POSITION};
+    
     public ExplorerTableVie() {
-        
         System.out.println("Listening now");
        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
        tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
        tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
        tableView.setRowFactory(this::createRow);
-       helper.setPriority(MetaData.FILE_NAME,MetaData.FILE_SIZE);
-        
     }
+
+    
     
     @Override
     public Node getNode() {
@@ -68,9 +85,25 @@ public class ExplorerTableVie implements ExplorerView{
     @Override
     public void setItem(List<? extends Explorable> items) {
         
+        
+        
+        if(getPriority().length != helper.getPriority().length) {
+            helper.setPriority(getPriority());
+        }
+        
         helper.setColumnsFromItems(items);
         helper.setItem(items);
         currentItems = items;
+        
+        
+        List<? extends Explorable> selected = items
+                .stream()
+                .filter(item->item.selectedProperty().getValue())
+                .collect(Collectors.toList());
+                
+        
+        //tableView.getSelectionModel().getSelectedItems().addAll(selected);
+        
     }
 
     @Override
@@ -113,6 +146,11 @@ public class ExplorerTableVie implements ExplorerView{
         currentItems.forEach(item->{
             item.selectedProperty().setValue(tableView.getSelectionModel().getSelectedItems().contains(item));
         });
+        
+        if(eventService != null) {
+            eventService.publish(new ExplorerSelectionChangedEvent().setObject(explorerService.getSelectedItems()));
+        }
+        
     }
     
     private TableRow<Explorable> createRow(TableView<Explorable> explorable) {
@@ -138,4 +176,13 @@ public class ExplorerTableVie implements ExplorerView{
         if(owner == null) return;
         ((Explorable)owner).selectedProperty().setValue(false);
     }
+    
+    
+    private String[] getPriority() {
+        if(explorerService == null || folderService.getCurrentExplorationMode() == ExplorationMode.FILE) {
+            return FILE_PRIORITY;
+        }
+        else return PLANE_PRIORITY;
+    }
+    
 }

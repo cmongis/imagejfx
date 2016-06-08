@@ -23,7 +23,9 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.main.ImageJFX;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,9 +47,9 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class DefaultActivityService extends AbstractService implements ActivityService {
 
-    Stack<Activity> backStack = new Stack<>();
+    Stack<State> backStack = new Stack<>();
 
-    Stack<Activity> forwardStack = new Stack<>();
+    Stack<State> forwardStack = new Stack<>();
 
     HashMap<String, Activity> activityMap = new HashMap<>();
     HashMap<String, Activity> activityMapById = new HashMap<>();
@@ -64,6 +66,8 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     @Parameter
     Context context;
 
+    
+    
     Activity currentActivity;
 
     Logger logger = ImageJFX.getLogger();
@@ -104,7 +108,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
             logger.severe("Passing NULL as activity parameter !");
             return null;
         }
-        if (activityMap.containsKey(activityClass.getName()) == false || debug) {
+        if (activityMap.containsKey(activityClass.getName()) == false) {
             try {
                 logger.info("Loading activity : " + activityClass.getName());
                 PluginInfo<SciJavaPlugin> plugin;
@@ -131,7 +135,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     public Activity getActivityByName(String activityId) {
         logger.info(activityId);
         // checking if an activity with this has already been around
-        if (activityMapById.containsKey(activityId) == false || debug) {
+        if (activityMapById.containsKey(activityId) == false) {
             List<PluginInfo<Activity>> pluginsOfType = pluginService.getPluginsOfType(Activity.class);
 
             for (PluginInfo<Activity> info : pluginsOfType) {
@@ -166,22 +170,27 @@ public class DefaultActivityService extends AbstractService implements ActivityS
 
         // adding the activity to the back stack
         if (activity != null) {
-            backStack.add(activity);
+            backStack.add(new State());
         }
         setCurrentActivity(activity);
     }
 
     @Override
     public void back() {
-        Activity activity = backStack.pop();
-        forwardStack.add(activity);
-        setCurrentActivity(activity);
+        State state = backStack.pop();
+        forwardStack.add(state);
+        
+        setCurrentActivity(state.getActivity());
+        state.restoreContext();
     }
 
     @Override
     public void forward() {
-        Activity activity = forwardStack.pop();
-        open(activity);
+        State activity = forwardStack.pop();
+        activity.restoreContext();
+        open(activity.getActivity());
+        
+        
     }
 
     @Override
@@ -227,4 +236,35 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     public Class<?> getCurrentActivityAsClass() {
         return currentActivity.getClass();
     }
+    
+    
+    private class State {
+        final Activity activity;
+        final Set<String> context;
+
+        
+        
+        public State() {
+            this.activity = getCurrentActivity();
+            this.context = new HashSet<>(uiContextService.getContextList());
+        }
+
+        public Activity getActivity() {
+            return activity;
+        }
+
+        public Set<String> getContext() {
+            return context;
+        }
+        
+        public void restoreContext() {
+            uiContextService.clean();
+            uiContextService.enter(context.toArray(new String[context.size()]));
+            uiContextService.update();
+        }
+        
+        
+        
+    }
+    
 }

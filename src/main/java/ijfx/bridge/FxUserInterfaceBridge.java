@@ -214,6 +214,7 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
             });
 
         }
+        
         else {
             logger.warning("Cannot show display type :" + dspl.getClass().getSimpleName());
         }

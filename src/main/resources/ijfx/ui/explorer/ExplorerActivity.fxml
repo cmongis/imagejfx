@@ -12,7 +12,7 @@
 
 <fx:root id="AnchorPane" fx:id="explorerActivity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="800.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane maxHeight="1.7976931348623157E308" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane maxHeight="1.7976931348623157E308" prefWidth="290.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <HBox prefHeight="40.0" BorderPane.alignment="CENTER">
                <styleClass>
@@ -23,7 +23,7 @@
             </HBox>
          </top>
       </BorderPane>
-      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="54.0">
+      <BorderPane fx:id="contentBorderPane" layoutX="400.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="54.0">
          <bottom>
             <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
                <children>
@@ -32,29 +32,29 @@
                         <FontAwesomeIconView glyphName="IMAGE" />
                      </graphic>
                   </Button>
+                  <Button fx:id="statisticsButton" mnemonicParsing="false" onAction="#computeStatistics" text="Compute more statistics">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="BAR_CHART" />
+                     </graphic>
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                  </Button>
                   <Button fx:id="selectAllButton" mnemonicParsing="false" onAction="#selectAll" styleClass="success" text="Select all">
                      <graphic>
                         <FontAwesomeIconView glyphName="CHECK" />
                      </graphic>
                   </Button>
-                  <MenuButton mnemonicParsing="false" styleClass="normal" text="Segment">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                      <MenuItem mnemonicParsing="false" text="Action 2" />
-                    </items>
+                  <Button mnemonicParsing="false" onAction="#onSegmentButtonPressed" text="Segment">
                      <graphic>
                         <FontAwesomeIconView glyphName="THUMB_TACK" />
                      </graphic>
-                  </MenuButton>
-                  <MenuButton mnemonicParsing="false" styleClass="normal" text="Process">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                      <MenuItem mnemonicParsing="false" text="Action 2" />
-                    </items>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#onProcessButtonPressed" styleClass="normal" text="Process">
                      <graphic>
                         <FontAwesomeIconView glyphName="GEARS" />
                      </graphic>
-                  </MenuButton>
+                  </Button>
                </children>
                <styleClass>
                   <String fx:value="hbox" />
@@ -64,8 +64,11 @@
                   <Insets left="10.0" />
                </opaqueInsets>
             </HBox>
-         </bottom></BorderPane>
-      <BorderPane fx:id="toolbarBorderPane" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         </bottom>
+         <left>
+            <ListView fx:id="folderListView" prefWidth="290.0" BorderPane.alignment="CENTER" />
+         </left></BorderPane>
+      <BorderPane fx:id="toolbarBorderPane" styleClass="toolbar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
             <HBox fx:id="folderTitleHBox" prefWidth="250.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
@@ -74,7 +77,7 @@
                         <FontAwesomeIconView glyphName="PLUS" styleClass="h4" text="" />
                      </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" styleClass="danger" text="Delete">
+                  <Button mnemonicParsing="false" onAction="#removeFolder" styleClass="danger" text="Delete">
                      <graphic>
                         <FontAwesomeIconView glyphName="REMOVE" />
                      </graphic>
@@ -114,7 +117,10 @@
             </HBox>
          </right>
       </BorderPane>
-      <ListView fx:id="folderListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="54.0" />
-      <Accordion fx:id="filterVBox" prefWidth="250.0" translateX="-300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="50.0" />
+      <ScrollPane fx:id="filterScrollPane" hbarPolicy="NEVER" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="55.0">
+         <content>
+            <Accordion fx:id="filterVBox" />
+         </content>
+      </ScrollPane>
    </children>
 </fx:root>

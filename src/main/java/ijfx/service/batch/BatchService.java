@@ -21,6 +21,7 @@
 package ijfx.service.batch;
 
 import ijfx.bridge.FxUIPreprocessor;
+import ijfx.plugins.process.DatasetArrayPostprocessor;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowRecorderPreprocessor;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import net.imagej.Dataset;
@@ -90,6 +91,7 @@ public class BatchService extends AbstractService implements ImageJService {
         processorBlackList.add(DisplayPostprocessor.class);
         processorBlackList.add(InitPreprocessor.class);
         processorBlackList.add(WorkflowRecorderPreprocessor.class);
+        processorBlackList.add(DatasetArrayPostprocessor.class);
 
     }
 
@@ -103,7 +105,7 @@ public class BatchService extends AbstractService implements ImageJService {
             input.load();
             count++;
             final Module createdModule = moduleService.createModule(module.getInfo());
-            if (!executeModule(input, createdModule, process, parameters)) {
+            if (!executeModule(input, createdModule, parameters)) {
                 return false;
             }
             input.save();
@@ -115,7 +117,7 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     public Task<Boolean> applyWorkflow(List<BatchSingleInput> inputs, Workflow workflow) {
-        return new AsyncCallback<List<BatchSingleInput>, Boolean>()
+        return new CallbackTask<List<BatchSingleInput>, Boolean>()
                 .setInput(inputs)
                 .run((progress, input) -> applyWorkflow(progress, inputs, workflow));
     }
@@ -183,7 +185,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 final Module module = moduleService.createModule(step.getModule().getInfo());
                 getContext().inject(module.getDelegateObject());
                 logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
-                if (!executeModule(input, module, true, step.getParameters())) {
+                if (!executeModule(input, module, step.getParameters())) {
 
                     progress.setStatus("Error :-(");
                     progress.setProgress(0, 1);
@@ -221,7 +223,7 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     // execute a module (with all the side parameters injected)
-    public boolean executeModule(BatchSingleInput input, Module module, boolean process, Map<String, Object> parameters) {
+    public boolean executeModule(BatchSingleInput input, Module module, Map<String, Object> parameters) {
        
         
         logger.info("Executing module " + module.getDelegateObject().getClass().getSimpleName());
@@ -246,7 +248,8 @@ public class BatchService extends AbstractService implements ImageJService {
         module.getInputs().forEach((key, value) -> {
             module.setResolved(key, true);
         });
-
+        
+        // calling the batch preprocessor plugins
         pluginService
                 .createInstancesOfType(BatchPrepreprocessorPlugin.class)
                 .forEach(processor->processor.process(input, module,parameters));
@@ -280,7 +283,7 @@ public class BatchService extends AbstractService implements ImageJService {
             logger.info(String.format("[%s] module finished", moduleName));
             extractOutput(input, module);
         } catch (Exception ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, "Error when running module " + moduleName, ex);;
+            logger.log(Level.SEVERE, "Error when extracting ouput from module module " + moduleName, ex);;
             return false;
 
         }
@@ -381,11 +384,9 @@ public class BatchService extends AbstractService implements ImageJService {
                 .filter(p -> !processorBlackList.contains(p.getClass()))
                 .sequential()
                 .map(p->{
-                    System.out.println(p.getClass());
                     return p;
                 })
                 //.map(this::injectPlugin)
-                
                 .collect(Collectors.toList());
     }
 

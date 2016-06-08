@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
@@ -31,10 +32,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
@@ -53,7 +54,7 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
     @FXML
     private TextField textField;
     @FXML
-    private Button moreButton;
+    private ToggleButton moreButton;
     @FXML
     private ListView<Item> listView;
     private final ObservableList<Item> allItems = FXCollections.observableArrayList();
@@ -83,19 +84,23 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
             
             // setting the visible property of the button so it appears only
             // only when there is a lot of items and the button option showall is not true
-            moreButton.disableProperty().bind(lotOfItems.not().and(showAll.not()));
+            moreButton.visibleProperty().bind(lotOfItems);
 
             // adding the CSS stylesheet
             getStylesheets().add(CSS_FILE);
 
+            textField.visibleProperty().bind(lotOfItems);
+            
             // change the factory to the class method
             listView.setCellFactory(this::createListCell);
             listView.setItems(displayedItems);
             
             // showing the textfield only when there is a lot of items
-            textField.disableProperty().bind(lotOfItems.not());
+            //textField.disableProperty().bind(lotOfItems.not());
             listView.prefHeightProperty().bind(prefHeight);
-
+            
+            showAll.bind(moreButton.selectedProperty());
+            showAll.addListener(this::onShowAllPropertyChange);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -148,13 +153,25 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
 
         allItems.clear();
         allItems.addAll(items);
+        
         updateDisplayedItems();
+        
         predicateProperty().setValue(null);
 
     }
 
-    public void updateDisplayedItems() {
-        String s = textField.getText();
+    private void onShowAllPropertyChange(Observable obs, Boolean oldValue, Boolean newValue) {
+       
+        updateDisplayedItems(textField.getText(),newValue,lotOfItems.getValue());
+    }
+    
+    @FXML
+    private void updateDisplayedItems() {   
+        updateDisplayedItems(textField.getText(), showAll.getValue(), lotOfItems.getValue());
+    }
+    
+    private void updateDisplayedItems(String s, boolean showAll, boolean lotOfItems) {
+      
         List<Item> itemToShow;
 
         // if there is a query
@@ -162,7 +179,7 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
         if (s != null && s.trim().equals("") == false) {
             itemToShow = allItems.filtered(item -> item.getName().contains(s));
         } // if everything should be shown or if there is not a lot of item, we show everything
-        else if (showAll.getValue() || lotOfItems.getValue() == false) {
+        else if (showAll || !lotOfItems) {
             itemToShow = allItems;
         } // otherwise is means only a small set of items should be shown
         else {
@@ -177,9 +194,7 @@ public class DefaultStringFilter extends BorderPane implements Initializable, St
 
     }
 
-    public void setBigger() {
-        showAll.setValue(true);
-    }
+    
 
     public void setPredicate() {
         List<String> listBuffer = new ArrayList<>();

@@ -116,14 +116,14 @@ public class DefaultTimer implements Timer {
     }
 
     
-    private static String COLUMNS = String.format("+\n%22s|%22s|%22s\n+--------------\n","Action","Mean","Std. Deviation");
+    private static String COLUMNS = String.format("\n+--------------\n%30s | %8s | %8s | %8s\n+--------------\n","Action","Mean","Std. Dev","N");
     protected String getColumns() {
         return COLUMNS;
     }
     
     protected String getRow(String id,SummaryStatistics statics) {
         
-        return String.format("%22s|%20.0fms|%20.0fms\n",id.length() > 22 ? id.substring(0, 21) : id,statics.getMean(),statics.getStandardDeviation());
+        return String.format("%30s | %6.0fms | %6.0fms | %8d\n",id.length() > 22 ? id.substring(0, 21) : id,statics.getMean(),statics.getStandardDeviation(),statics.getN());
         
     }
 

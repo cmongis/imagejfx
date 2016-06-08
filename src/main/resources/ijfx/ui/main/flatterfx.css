@@ -37,6 +37,7 @@
     -flatter-primary-bg:derive(-flatter-green,40%);
     -flatter-danger-bg:derive(-flatter-red,40%);
     -flatter-warning-bg:derive(-flatter-blue,40%);
+    -flatter-success-bg:derive(-flatter-success,40%);
     -flatter-success:-flatter-green;
 
     -flatter-shadow: dropshadow(gaussian,rgba(0,0,0,0.5),3,0.3,1px,1px);
@@ -44,6 +45,9 @@
 
 }
 
+.root.transparent {
+    -fx-background-color:transparent;
+}
 
 
 .mnemonic-underline {
@@ -115,7 +119,11 @@
 
     -fx-pref-height:2em;
 }
-
+.label.h4.toolbar {
+    -fx-padding:14px;
+    -fx-max-width:infinity;
+    
+}
 .text {
     -fx-font-family:'Open Sans';
     /*-fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); */
@@ -702,6 +710,11 @@
 .tool-bar {
     -fx-background-color:-bg-dark;
 }
+.tool-bar .label {
+    
+    -fx-padding:0.3em;
+    -fx-background-color:red;
+}
 
 /*
     Helper classes
@@ -902,6 +915,36 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .list-cell:selected {
     -fx-text-fill:#fff;
+}
+
+
+.list-view-fx .list-cell {
+    -fx-background-color:white;
+    -fx-padding:0.3em;
+    -fx-text-fill:-dark;
+ 
+}
+.list-view-fx .list-cell:filled:hover {
+    -fx-background-color:derive(-dark,120%);
+}
+.list-view-fx .list-cell:selected, .list-view-fx .list-cell:selected:hover {
+    -fx-background-color:derive(-flatter-primary,10%);
+}
+
+.toggle-selection-list .toggle-button{
+    -fx-background-radius:0;
+    -fx-effect:null;
+    -fx-background-color:transparent;
+    -fx-text-alignment:left!important;
+    -fx-alignment:left;
+}
+.toggle-selection-list .toggle-button:hover{
+    -fx-translate-x:0;
+    -fx-translate-y:0;
+    -fx-background-color:-flatter-primary;
+}
+.toggle-selection-list .toggle-button:selected {
+    -fx-background-color:derive(-flatter-warning,-15%);
 }
 
 .combo-box .list-cell {
@@ -1339,6 +1382,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 .module-config-pane {
     -fx-padding:15px 15px 15px 15px;
+    -fx-pref-width:500px;
 }
 
 .module-config-pane .title {
@@ -1385,6 +1429,17 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-spacing:10;
 }
 
+.interval-input-skin {
+   
+}
+.interval-input-skin .label{
+    -fx-pref-width:30px;
+    -fx-font-size:0.8em;
+    
+}
+.interval-input-skin .range-slider {
+    
+}
 
 /*
 .module-config-pane .grid-pane {
@@ -1635,12 +1690,17 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-underline:false;
 }
 
+#batch-processing-panel {
+    -fx-pref-width:250px;
+    -fx-min-width:200px;
+}
 
 /**
        Notification
 
 
 */
+
 
 
 
@@ -1829,14 +1889,26 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 
 
-.explorer-filter,#filterVBox {
+.explorer-filter,#filterScrollPane {
     -fx-background-color:-bg-darker;
+}
+.explorer-filter .content{
+     -fx-max-height:250px;
 }
 .explorer-filter > .content{
     -fx-padding: 0.6em;
 }
-
-
+.explorer-filter .range-slider {
+    -fx-padding:0 10 0 45px;
+   
+}
+#filterScrollPane {
+    -fx-pref-width:300px;
+}
+#filterVBox {
+    
+    -fx-pref-width:280px;
+}
 
 /*
     Number filter related classes
@@ -1854,9 +1926,13 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
      Explorer Activity
  */
  
- #toolbarBorderPane {
+ .toolbar {
      -fx-padding:10px;
      -fx-background-color:-bg-darker;
+ }
+ .toolbar .label {
+     
+     -fx-padding:7px;
  }
  #viewHBox .toggle-button {
      -fx-padding:0.5em;
@@ -1874,4 +1950,44 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
  .down-arrow {
      -fx-padding:10px;
      -fx-font-size:20px;
+ }
+
+ /*
+    Drag Panel
+ 
+ */
+ .drag-panel *{
+     -fx-fill:derive(-bg-light,50%);
+    
+ }
+ .drag-panel .label {
+     -fx-text-align:center;
+ }
+ .drag-panel .glyph {
+     
+    -glyph-size:150;
+    -fx-translate-x:10;
+    -glyph-color:red;
+ }
+
+ /*
+        Message Box
+ 
+ */
+ .message-box {
+     -fx-padding:0.3em;
+ }
+ .message-box.danger {
+     -fx-background-color:-flatter-danger-bg;
+     
+ }
+  .message-box.success {
+     -fx-background-color:-flatter-success-bg;   
+ }
+  .message-box.warning {
+     -fx-background-color:-flatter-warning-bg;   
+ }
+ .message-box.label {
+     -fx-wrap-text:true;
+     
  }

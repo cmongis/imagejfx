@@ -26,8 +26,11 @@ import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.explorer.event.FolderAddedEvent;
+import ijfx.ui.explorer.event.FolderDeletedEvent;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.notification.DefaultNotification;
+import ijfx.ui.notification.NotificationService;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +40,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import mongis.utils.AsyncCallable;
-import mongis.utils.AsyncCallback;
+import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -84,6 +87,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Parameter
     IjfxStatisticService statsService;
     
+    @Parameter
+    NotificationService notificationService;
+    
     private static String FOLDER_PREFERENCE_FILE = "folder_db.json";
 
     Logger logger = ImageJFX.getLogger();
@@ -103,7 +109,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     }
 
     protected Folder addFolder(Folder f) {
-        folderList.add(f);
+        getFolderList().add(f);
 
         if (folderList.size() == 1) {
             setCurrentFolder(f);
@@ -133,7 +139,15 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Override
     public void setCurrentFolder(Folder folder) {
         currentFolder = folder;
-
+        
+        
+        if(currentFolder == null) {
+            
+            setItems(new ArrayList<>());
+            updateExploredElements();
+        }
+        else {
+        
         logger.info("Setting current folder " + folder.getName());
 
         explorerService.setItems(currentFolder.getFileList());
@@ -141,6 +155,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         uiContextService.enter("explore-files");
         uiContextService.update();
         updateExploredElements();
+        }
     }
 
     @EventHandler
@@ -194,13 +209,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     private void setItems(List<Explorable> items) {
         explorerService.setItems(items);
         
-        new AsyncCallback<List<Explorable>,Integer>(items)
-                .run(this::fetchMoreStatistics)
-                .then(n->{
-                 if(n > 0 && explorerService.getItems() == items) 
-                     explorerService.setItems(items);
-                })
-                .start();
+       
         
     }
     private Integer fetchMoreStatistics(ProgressHandler progress,List<Explorable> explorableList) {
@@ -220,6 +229,13 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
                     iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
                     iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
                     elementAnalyzedCount++;
+                }
+                if(e instanceof PlaneMetaDataSetWrapper) {
+                    SummaryStatistics stats = statsService.getDatasetStatistics(e.getDataset());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
                 }
             }
             i++;
@@ -247,4 +263,24 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         });
     }
 
+    @Override
+    public void completeStatistics() {
+        loadingScreenService.frontEndTask(new CallbackTask<List<Explorable>,Integer>()
+                .run(this::fetchMoreStatistics)
+                .setInput(getCurrentFolder().getFileList())
+                .then(this::onStatisticComputingEnded)
+                .start()
+        );
+        
+    }
+    
+    private void onStatisticComputingEnded(Integer computedImages) {
+        notificationService.publish(new DefaultNotification("Statistic Computation", String.format("%d images where computed.",computedImages)));
+    }
+    
+    public void removeFolder(Folder folder) {
+        folderList.remove(folder);
+        eventService.publish(new FolderDeletedEvent().setObject(folder));
+    }
+    
 }

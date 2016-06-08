@@ -36,13 +36,14 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugins.commands.io.OpenFile;
 import ijfx.ui.UiConfiguration;
+import ijfx.ui.activity.ActivityService;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "open-image-button", localization = "topLeftHBox", context = "imagej")
+@UiConfiguration(id = "open-image-button", localization = "topLeftHBox", context = "imagej segment segmentation explorer-activity explorer")
 public class OpenImageBar extends HBox implements UiPlugin {
 
     Button openButton;
@@ -66,6 +67,9 @@ public class OpenImageBar extends HBox implements UiPlugin {
     @Parameter
     CommandService commandService;
 
+    @Parameter
+    ActivityService activityService;
+
     public OpenImageBar() {
         super();
 
@@ -74,19 +78,23 @@ public class OpenImageBar extends HBox implements UiPlugin {
         previousButton = GlyphsDude
                 .createIconButton(FontAwesomeIcon.ARROW_CIRCLE_LEFT);
         previousButton.setTooltip(new Tooltip(PREVIOUS_BUTTON_TXT));
+        previousButton.getStyleClass().add("icon");
+        previousButton.setOnAction(event -> activityService.back());
+        
+        
         openButton = GlyphsDude.createIconButton(FontAwesomeIcon.FOLDER_OPEN);
         openButton.setTooltip(new Tooltip(OPEN_BUTTON_TXT));
         //openButton.setText(" ");
         openButton.getStyleClass().add("icon");
         openButton.setId("open-button");
+        openButton.setOnAction(event -> openImage());
+
         nextButton = GlyphsDude.createIconButton(FontAwesomeIcon.ARROW_CIRCLE_RIGHT);
         nextButton.setTooltip(new Tooltip(NEXT_BUTTON_TXT));
-
-        previousButton.setOnAction(event -> previousImage());
-        openButton.setOnAction(event -> openImage());
+        nextButton.getStyleClass().add("icon");
         nextButton.setOnAction(event -> nextImage());
 
-        getChildren().addAll(openButton);
+        getChildren().addAll(previousButton, nextButton, openButton);
     }
 
     @Override
@@ -109,6 +117,6 @@ public class OpenImageBar extends HBox implements UiPlugin {
     }
 
     private void previousImage() {
-
+        activityService.forward();
     }
 }

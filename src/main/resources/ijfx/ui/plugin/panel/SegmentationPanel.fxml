@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -11,39 +12,48 @@
    <center>
       <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
          <children>
-            <VBox fx:id="inputHBox" alignment="CENTER">
-               <children>
-                  <Label maxWidth="1.7976931348623157E308" styleClass="h4" text="Input" />
-                  <ToggleButton fx:id="singlePlaneToggleButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Single plane" />
-                  <ToggleButton fx:id="allPlanesToggleButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="The whole image" />
-               </children>
-               <styleClass>
-                  <String fx:value="toggle-group" />
-                  <String fx:value="vertical" />
-               </styleClass>
-            </VBox>
-            <FontAwesomeIconView glyphName="ARROW_DOWN" size="30" styleClass="down-arrow" />
             <VBox fx:id="workflowVBox" />
-            <FontAwesomeIconView glyphName="ARROW_DOWN" layoutX="46.0" layoutY="104.0" size="30" styleClass="down-arrow" />
-            <VBox fx:id="resultbox">
+            <FontAwesomeIconView glyphName="ARROW_DOWN" layoutX="46.0" layoutY="104.0" size="30">
+               <styleClass>
+                  <String fx:value="down-arrow" />
+                  <String fx:value="with-padding" />
+               </styleClass></FontAwesomeIconView>
+            <VBox fx:id="resultbox" styleClass="vbox">
                <children>
                   <Button fx:id="testButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="warning" text="Test on one image">
                      <graphic>
-                        <FontAwesomeIconView glyphName="CHECK_SQUARE_O" />
+                        <FontAwesomeIconView glyphName="CHECK_SQUARE" />
                      </graphic></Button>
                   <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Process all">
                      <graphic>
-                        <FontAwesomeIconView glyphName="LIST_ALL" />
+                        <FontAwesomeIconView glyphName="LIST" />
+                     </graphic>
+                  </Button>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#close" styleClass="danger" text="Close">
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="SIGN_OUT" />
                      </graphic>
                   </Button>
                </children>
-               <styleClass>
-                  <String fx:value="darker-background" />
-                  <String fx:value="with-padding" />
-                  <String fx:value="vbox" />
-               </styleClass>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
             </VBox>
          </children>
       </VBox>
    </center>
+   <top>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="titleLabel" styleClass="h4" text="1. Edit your segmentation workflow">
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding>
+            </Label>
+         </children>
+      </HBox>
+   </top>
 </fx:root>

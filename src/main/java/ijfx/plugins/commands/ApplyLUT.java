@@ -39,18 +39,16 @@ public class ApplyLUT implements Command {
     LUTService lutService;
     
     
-    @Parameter(label = "Choose an LUT",type = ItemIO.INPUT)
+    @Parameter(label = "Choose an LUT",type = ItemIO.BOTH)
     ColorTable colorTable;
     
     @Parameter(type = ItemIO.BOTH)
     ImageDisplay imageDisplay;
     
-   
-
+  
     @Override
     public void run() {
        
-        
         lutService.applyLUT(colorTable, imageDisplay);
     }
     

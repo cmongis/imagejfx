@@ -19,9 +19,7 @@
  */
 package ijfx.core.imagedb;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ijfx.core.metadata.MetaDataSet;
-import ijfx.core.project.ImageLoaderService;
 import ijfx.service.ui.JsonPreferenceService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.notification.DefaultNotification;
@@ -238,5 +236,8 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
         return records;
     }
 
+    public void forceSave() {
+        ImageJFX.getThreadPool().execute(this::save);
+    }
     
 }

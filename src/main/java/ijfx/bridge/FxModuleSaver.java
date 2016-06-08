@@ -21,12 +21,16 @@
 package ijfx.bridge;
 
 import ijfx.ui.main.ImageJFX;
+import java.io.File;
 import java.util.logging.Logger;
 import org.scijava.Priority;
+import org.scijava.io.RecentFileService;
 import org.scijava.module.Module;
 import org.scijava.module.process.AbstractPreprocessorPlugin;
 import org.scijava.module.process.PreprocessorPlugin;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  * This is a dummy Preprocessor plugin showing which module has been executed
@@ -37,6 +41,9 @@ import org.scijava.plugin.Plugin;
 public class FxModuleSaver extends AbstractPreprocessorPlugin {
 
     private final static Logger logger = ImageJFX.getLogger();
+    
+    @Parameter
+    RecentFileService recentFileService;
     
     @Override
     public void process(Module module) {
@@ -57,6 +64,14 @@ public class FxModuleSaver extends AbstractPreprocessorPlugin {
             
 
         });
+        
+        
+        if(module.getDelegateObject().getClass() == OpenFile.class) {
+            File f = (File)module.getInfo().getInput("inputFile").getValue(module);
+            if(f != null) {
+                recentFileService.add(f.getAbsolutePath());
+            }
+        }
         
          logger.finest(String.format("###### %s #####\n%s"
                  , module.getDelegateObject().getClass().getSimpleName()

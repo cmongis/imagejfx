@@ -20,11 +20,7 @@
  */
 package ijfx.ui.batch;
 
-import ijfx.core.project.ProjectManagerService;
-import ijfx.core.project.imageDBService.PlaneDB;
 import ijfx.service.batch.BatchService;
-import ijfx.service.batch.BatchSingleInput;
-import ijfx.service.batch.PlaneDBBatchInput;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.MyWorkflowService;
@@ -33,9 +29,7 @@ import ijfx.service.workflow.DefaultWorkflowStep;
 import ijfx.service.workflow.WorkflowStep;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
@@ -52,9 +46,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -80,15 +72,10 @@ import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
 import ijfx.ui.UiContexts;
 import ijfx.ui.activity.Activity;
-import ijfx.ui.project_manager.projectdisplay.PlaneSet;
-import ijfx.ui.project_manager.projectdisplay.ProjectDisplay;
-import ijfx.ui.project_manager.projectdisplay.ProjectDisplayActived;
-import ijfx.ui.project_manager.projectdisplay.ProjectDisplayService;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.ComboBox;
 import ijfx.ui.context.animated.Animations;
-import mongis.utils.AsyncCallback;
 
 /**
  *
@@ -122,11 +109,7 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
     @Parameter
    private MyWorkflowService myWorkflowService;
     
-    @Parameter
-    private ProjectManagerService projectService;
 
-    @Parameter
-    private ProjectDisplayService projectDisplayService;
     
     @Parameter
     private UiContextService uiContextService;
@@ -168,7 +151,7 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
     private Button startButton;
 
     @FXML
-    private ComboBox<PlaneSet> planeSetComboBox;
+    private ComboBox planeSetComboBox;
     
     
     /*
@@ -368,19 +351,13 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
 
     }
     
-    @org.scijava.event.EventHandler
-    public void onProjectDisplayChanged(ProjectDisplayActived event) {
-        
-        updatePlaneSet();
-        System.out.println("plane set changed");
-        
-    }
+ 
             
     
     
     
     private void updatePlaneSet() {
-        
+        /*
         if(projectDisplayService.getActiveProjectDisplay() == ProjectDisplay.NO_DISPLAY) return;
         
         planeSetComboBox.setItems(projectDisplayService.getActiveProjectDisplay().getPlaneSetList());
@@ -396,7 +373,7 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
                 projectDisplayService.getActiveProjectDisplay().currentPlaneSetProperty())
                 
         );
-        
+        */
     }
     
     
@@ -416,7 +393,7 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
 
     @FXML
     public void startBatchProcessing() {
-
+        /*
         List<BatchSingleInput> inputs = new ArrayList<>();
         PlaneSet<PlaneDB> planeSet = planeSetComboBox.getSelectionModel().getSelectedItem();
         for (PlaneDB plane : planeSet.getPlaneList()) {
@@ -446,7 +423,7 @@ public class BatchProcessorConfigurator extends BorderPane implements Activity, 
         fakeTask.addEventHandler(WorkerStateEvent.WORKER_STATE_CANCELLED, onFinished);
         //currentTaskProperty.setValue(batchService.applyWorkflow(inputs, new DefaultWorkflow(steps))) ;
         ImageJFX.getThreadPool().submit(currentTaskProperty.getValue());
-        
+           */
     }
 
     public void onCurrentTaskChanged(Observable obs, Task oldValue, Task newValue) {

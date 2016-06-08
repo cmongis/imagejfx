@@ -21,6 +21,7 @@
 package ijfx.service.overlay;
 
 import ijfx.ui.main.ImageJFX;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,15 +36,15 @@ import net.imagej.measure.StatisticsService;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
+import net.imglib2.roi.PolygonRegionOfInterest;
 import net.imglib2.type.numeric.RealType;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -264,6 +265,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
    
     public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
         
+        
         OverlayStatistics overlayStatistics;
         
         if(overlay instanceof LineOverlay)
@@ -272,8 +274,10 @@ public class OverlayStatService extends AbstractService implements ImageJService
         else if(overlay instanceof RectangleOverlay)
             overlayStatistics = new RectangleOverlayStatistics(display, overlay, this.context());
         
-        else
-            overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());
+        else{
+            overlay = cleanOverlay(overlay);
+            overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());        
+        }
         
         return overlayStatistics;
     }
@@ -282,7 +286,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public HashMap<String, Double> getStatistics(OverlayStatistics overlayStats) {
         
         HashMap<String, Double> statistics = new HashMap<>();
-        
+        if(overlayStats.getPixelStatistics() != null) {
         statistics.put(LBL_MEAN, overlayStats.getPixelStatistics().getMean());
         statistics.put(LBL_MIN, overlayStats.getPixelStatistics().getMin());
         statistics.put(LBL_MAX, overlayStats.getPixelStatistics().getMax());
@@ -290,6 +294,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         statistics.put(LBL_VARIANCE, overlayStats.getPixelStatistics().getVariance());
         statistics.put(LBL_MEDIAN, overlayStats.getPixelStatistics().getMedian());
         statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelStatistics().getPixelCount());
+        }
         statistics.put(LBL_AREA, overlayStats.getArea());        
         
         statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
@@ -353,5 +358,52 @@ public class OverlayStatService extends AbstractService implements ImageJService
         b = (int)(b1*256);
 
         return new ColorRGB(r, g, b);          
+    }
+    
+    
+    public Overlay cleanOverlay(Overlay overlay){
+
+        PolygonRegionOfInterest roi = (PolygonRegionOfInterest) overlay.getRegionOfInterest();
+        int npoints = roi.getVertexCount();
+
+        if(npoints >= 3){
+            
+            int i;
+            for(i = 0; i <= npoints-1; i++){
+                int j = i+1;
+                int k = i+2;
+                if(i == npoints-1){
+                    j = 0;
+                    k = 1;
+                }
+                if(i == npoints-2){
+                    k = 0;
+                }
+                Point pt1 = new Point((int)roi.getVertex(i).getDoublePosition(0), (int)roi.getVertex(i).getDoublePosition(1));
+                Point pt2 = new Point((int)roi.getVertex(j).getDoublePosition(0), (int)roi.getVertex(j).getDoublePosition(1));                
+                Point pt3 = new Point((int)roi.getVertex(k).getDoublePosition(0), (int)roi.getVertex(k).getDoublePosition(1));
+                
+                if(areColinear(pt1, pt2, pt3)){
+                    roi.removeVertex(j);
+                    i--;
+                    npoints--;
+                }
+            }
+            
+        }
+        
+        return overlay;
+    }
+    
+    
+    public boolean areColinear(Point pt1, Point pt2, Point pt3){
+        
+        boolean colinear = false;
+        
+        double signedArea = ( (pt2.getX() - pt1.getX()) * (pt3.getY() - pt1.getY()) ) - ( (pt3.getX() - pt1.getX()) * (pt2.getY() - pt1.getY()) );
+        
+        colinear = (signedArea == 0.0 );
+        
+        return colinear;
     }
 }
