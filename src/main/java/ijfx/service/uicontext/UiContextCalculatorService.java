@@ -20,6 +20,7 @@
  */
 package ijfx.service.uicontext;
 
+import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import net.imagej.Dataset;
@@ -82,25 +83,32 @@ public class UiContextCalculatorService extends AbstractService implements Image
 
         ImageDisplay imageDisplay = (ImageDisplay) display;
 
-        contextService.toggleContext(CTX_OVERLAY_SELECTED, overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
+        contextService.toggleContext(CTX_OVERLAY_SELECTED, display != null && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
 
-        contextService.toggleContext(CTX_MULTI_Z_IMAGE, hasAxisType(imageDisplay, Axes.Z));
+        contextService.toggleContext(CTX_MULTI_Z_IMAGE, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.Z));
 
-        contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, hasAxisType(imageDisplay, Axes.CHANNEL));
+        contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.CHANNEL));
 
-        contextService.toggleContext(CTX_MULTI_TIME_IMG, hasAxisType(imageDisplay, Axes.TIME));
+        contextService.toggleContext(CTX_MULTI_TIME_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.TIME));
 
-        contextService.toggleContext(CTX_RGB_IMAGE, imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
+        contextService.toggleContext(CTX_RGB_IMAGE, display != null && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
 
-        contextService.toggleContext(CTX_IMAGE_BINARY, imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
+        contextService.toggleContext(CTX_IMAGE_BINARY, display != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
 
-        contextService.toggleContext(CTX_IMAGE_DISPLAY, ImageDisplay.class.isAssignableFrom(display.getClass()));
+        contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
 
-        contextService.toggleContext(CTX_TABLE_DISPLAY, TableDisplay.class.isAssignableFrom(display.getClass()));
-        Dataset dataset = (Dataset) imageDisplay.getActiveView().getData();
+        contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()));
 
-        for (int i = 1; i <= 32; i *= 2) {
-            contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", dataset.getValidBits() == i);
+        Dataset dataset = null;
+        if (display != null) {
+            dataset = (Dataset) imageDisplay.getActiveView().getData();
+            for (int i = 1; i <= 32; i *= 2) {
+                contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", dataset.getValidBits() == i);
+            }
+        } else {
+            for (int i = 1; i <= 32; i *= 2) {
+                contextService.toggleContext(String.valueOf(i) + "-bits", false);
+            }
         }
 
     }
@@ -138,36 +146,19 @@ public class UiContextCalculatorService extends AbstractService implements Image
 
     @EventHandler
     public void handleEvent(DisplayDeletedEvent event) {
-        determineContext(event.getObject());
+        
+        
+        determineContext(null);
+        
+        /*
+        
         displayService.getDisplays().stream().forEach((display) -> {
             if (display != event.getObject()) {
                 determineContext(display);
             }
-        });
+        });*/
         contextService.update();
 
-    }
-
-    public static boolean hasAxisType(ImageDisplay display, AxisType axisType) {
-        CalibratedAxis[] calibratedAxises = new CalibratedAxis[display.numDimensions()];
-        display.axes(calibratedAxises);
-        for (CalibratedAxis calibratedAxis : calibratedAxises) {
-            if (calibratedAxis.type() == axisType) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public static boolean hasAxisType(Dataset dataset, AxisType axisType) {
-        CalibratedAxis[] calibratedAxises = new CalibratedAxis[dataset.numDimensions()];
-        dataset.axes(calibratedAxises);
-        for (CalibratedAxis calibratedAxis : calibratedAxises) {
-            if (calibratedAxis.type() == axisType) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

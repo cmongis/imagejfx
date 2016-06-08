@@ -45,9 +45,11 @@ import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
+import ijfx.ui.plugin.panel.RecentFilePanel;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
+import mongis.utils.CallbackTask;
 import org.scijava.display.DisplayService;
 import org.scijava.plugins.commands.io.OpenFile;
 
@@ -99,13 +101,16 @@ public class ImageJContainer extends BorderPane implements Activity {
         return this;
     }
     
+   
+    
     @Parameter
     DisplayService displayService;
     
     public static final String TOP = "imagej-container-top";
 
     AnimatedPaneContextualView hboxViewCtrl;
-
+    
+    RecentFilePanel recentFilePanel;
     
     public ImageJContainer() {
 
@@ -124,11 +129,19 @@ public class ImageJContainer extends BorderPane implements Activity {
 
     private void updateCenter() {
         if(ImageWindowContainer.getInstance().getChildren().size()  == 0) {
-            setCenter(infoLabel);
+            setCenter(getRecentFilePanel());
+            getRecentFilePanel().update();
         }
         else {
             setCenter(ImageWindowContainer.getInstance());
         }
+    }
+    
+    private RecentFilePanel getRecentFilePanel() {
+        if(recentFilePanel == null) {
+            recentFilePanel = new RecentFilePanel(context);
+        }
+        return recentFilePanel;
     }
     
     /* method called when the number of windows is changed. The container 
@@ -138,7 +151,7 @@ public class ImageJContainer extends BorderPane implements Activity {
     TODO: delegate the context calculation to an other class
      */
     public void onListChange(ListChangeListener.Change<? extends Node> change) {
-
+        System.out.println("Hello");
         Platform.runLater(this::updateCenter);
 
     }
@@ -183,10 +196,15 @@ public class ImageJContainer extends BorderPane implements Activity {
     @Override
     public Task updateOnShow() {
 
+        
+        Platform.runLater(this::updateCenter);
+        
       
         return null;
     }
 
+    
+    
     private void openFile(File file) {
         
         if(file.isDirectory()) {

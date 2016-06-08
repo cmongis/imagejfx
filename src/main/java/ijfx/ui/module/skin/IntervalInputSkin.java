@@ -17,37 +17,28 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.save;
+package ijfx.ui.module.skin;
 
-import ijfx.ui.utils.BaseTester;
-import java.io.IOException;
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import ijfx.plugins.DefaultInterval;
+import ijfx.plugins.LongInterval;
+import ijfx.ui.module.InputSkinPlugin;
+import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author Pierre BONNEAU
+ * @author cyril
  */
-public class SaveOptionsTest extends BaseTester{
-    
-    
-    SaveOptions saveOptions;
-    
-    public static void main(String[] args) {
-        launch(args);
+@Plugin(type = InputSkinPlugin.class)
+public class IntervalInputSkin extends AbstractIntervalInputSkin<LongInterval>{
+
+    @Override
+    protected LongInterval createInitialInterval() {
+        return new DefaultInterval(0,100,0,100);
     }
 
     @Override
-    public void initApp() {
-        
-        
-        saveOptions = new DefaultSaveOptions();
-        setContent(saveOptions.getContent());
+    public boolean canHandle(Class<?> clazz) {
+        return LongInterval.class.isAssignableFrom(clazz);
     }
     
-    
-   
 }

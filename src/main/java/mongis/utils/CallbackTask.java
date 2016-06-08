@@ -195,6 +195,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     @Override
     public void succeeded() {
         logger.info("succeeded");
+        if(successHandler != null)
          successHandler.accept(getValue());
         super.succeeded();
        
@@ -212,7 +213,11 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
     
-    public <NEXTOUTPUT> CallbackTask<OUTPUT,NEXTOUTPUT> thenRun(Callback<OUTPUT,NEXTOUTPUT> callback) {
+    public CallbackTask<INPUT,OUTPUT> thenRunnable(Runnable runnable) {
+        return then(item->runnable.run());
+    }
+    
+    public <NEXTOUTPUT> CallbackTask<OUTPUT,NEXTOUTPUT> thenTask(Callback<OUTPUT,NEXTOUTPUT> callback) {
         CallbackTask<OUTPUT,NEXTOUTPUT> task = new CallbackTask<OUTPUT,NEXTOUTPUT>()
                 .setInput(this::getValue)
                 .run(callback);
@@ -277,4 +282,9 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return executor;
     }
 
+    public CallbackTask<INPUT,OUTPUT> submit(Consumer<Task> consumer) {
+        consumer.accept(this);
+        return this;
+    }
+    
 }

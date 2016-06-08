@@ -36,8 +36,8 @@ import org.scijava.module.ModuleItem;
  */
 public class ModuleInputWrapper<T extends Object> implements Input{
 
-    public Module module;
-    public ModuleItem<T> moduleItem;
+    private final  Module module;
+    private final ModuleItem<T> moduleItem;
     
     public ModuleInputWrapper(Module module, ModuleItem moduleItem) {
         this.module = module;

@@ -90,13 +90,24 @@ public class BatchInputBuilder {
     
    
     
-    public BatchInputBuilder eraseOriginal() {
+    public BatchInputBuilder overwriteOriginal() {
         input = new ReplaceOriginalFileSaver(context,input);
         return this;
     }
     
     public BatchInputBuilder onFinished(Consumer<BatchSingleInput> action) {
         input = new ConsumerBatchInputWrapper(input, action);
+        return this;
+    }
+    
+    
+    public BatchInputBuilder saveIn(File directory) {
+        input =  new SaveToFileWrapper(context,input, new File(directory,input.getName()));
+        return this;
+    }
+    
+    public BatchInputBuilder saveIn(File directory, String suffix) {
+        input = new SaveToFileWrapper(context,input,new File(directory,input.getName()),suffix);
         return this;
     }
     

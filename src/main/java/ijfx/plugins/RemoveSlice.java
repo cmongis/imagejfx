@@ -19,11 +19,11 @@
  */
 package ijfx.plugins;
 
-import ijfx.service.uicontext.UiContextCalculatorService;
+import ijfx.plugins.commands.AxisUtils;
 import net.imagej.Dataset;
-import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import net.imagej.plugins.commands.restructure.DeleteData;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -38,75 +38,74 @@ import org.scijava.ui.UIService;
  *
  * @author cyril
  */
-@Plugin(type = Command.class,initializer = "init")
-public class RemoveSlice  implements Command{
+@Plugin(type = Command.class, initializer = "init")
+public class RemoveSlice implements Command {
 
-    @Parameter(label="Interval to remove")
-    AxisInterval interval;
-    
-    @Parameter(type=ItemIO.BOTH)
+    @Parameter(label = "Interval to remove")
+    LongInterval interval;
+
+    @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
-    
+
     AxisType axistype;
-    
+
     @Parameter
     ModuleService moduleService;
-    
+
     @Parameter
     CommandService commandService;
-    
+
     @Parameter
     UIService uiService;
-    
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
+
     public void init() {
-        
+
+        if (interval == null) {
+            interval = new DefaultAxisInterval(0, 100);
+            long min, max, low, high;
+
+            ImageDisplay imageDisplay = imageDisplayService.getActiveImageDisplay();
+
+            AxisType axisType = AxisUtils.getSliceAxis(imageDisplay);
+            if (axisType == null) {
+                min = 0;
+                max = 0;
+                low = min;
+                high = max;
+            } else {
+                int axisIndex = imageDisplay.dimensionIndex(axisType);
+
+                min = imageDisplay.min(axisIndex);
+                max = imageDisplay.max(axisIndex);
+                low = min;
+                high = max;
+
+            }
+        }
+
     }
-    
+
     @Override
     public void run() {
-        
-        
-        
-         DeleteData deleteData = commandService.create(DeleteData.class);
-        
-         AxisType axisType = getSliceAxis(dataset);
-         
 
-         if(axisType == null) {
-             uiService.showDialog("The dataset doesn't contain any Z or Time axis", DialogPrompt.MessageType.ERROR_MESSAGE);
-         }
-         
+        DeleteData deleteData = commandService.create(DeleteData.class
+        );
+
+        AxisType axisType = AxisUtils.getSliceAxis(dataset);
+
+        if (axisType == null) {
+            uiService.showDialog("The dataset doesn't contain any Z or Time axis", DialogPrompt.MessageType.ERROR_MESSAGE);
+        }
+
         deleteData.setInput("axisName", axisType.toString());
-        deleteData.setInput("dataset",dataset);
-        deleteData.setInput("position",interval.getLowValue());
-        deleteData.setInput("quantity",interval.getHighValue());
+        deleteData.setInput("dataset", dataset);
+        deleteData.setInput("position", interval.getLowValue());
+        deleteData.setInput("quantity", interval.getHighValue());
         deleteData.run();
-        
+
     }
-    
-    public static AxisType getSliceAxis(Dataset dataset) {
-       
-        AxisType axisType = null;
-        
-        if(UiContextCalculatorService.hasAxisType(dataset, Axes.Z)) {
-             axisType = Axes.Z;
-         }
-         if( axisType == null && UiContextCalculatorService.hasAxisType(dataset, Axes.TIME)) {
-             axisType = Axes.TIME;
-         }
-         return axisType;
-    }
-    
-    public static AxisType getSliceAxis(ImageDisplay display) {
-         AxisType axisType = null;
-        
-        if(UiContextCalculatorService.hasAxisType(display, Axes.Z)) {
-             axisType = Axes.Z;
-         }
-         if( axisType == null && UiContextCalculatorService.hasAxisType(display, Axes.TIME)) {
-             axisType = Axes.TIME;
-         }
-         return axisType;
-    }
-    
+
 }

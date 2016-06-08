@@ -289,8 +289,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         double max = displayRangeServ.getCurrentViewMaximum();
 
     
-        rangeSlider.setMin(displayRangeServ.getCurrentDatasetMinimum());
-        rangeSlider.setMax(displayRangeServ.getCurrentDatasetMaximum());
+        rangeSlider.setMin(displayRangeServ.getCurrentDatasetMinimum()*.8);
+        rangeSlider.setMax(displayRangeServ.getCurrentDatasetMaximum()*1.2);
 
         rangeSlider.setMajorTickUnit(displayRangeServ.getCurrentDatasetMaximum() - displayRangeServ.getCurrentDatasetMinimum());
         minValue.set(min);

@@ -28,5 +28,8 @@
         "name":"segmentation"
         ,"incompatibleWith":["imagej","webapp"]
     }
-
+    ,{
+        "name":"batch"
+        ,"incompatibleWith":["imagej","segmentation","webapp"]
+    }
 ]

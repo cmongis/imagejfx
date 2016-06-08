@@ -28,11 +28,13 @@ import ijfx.service.batch.SegmentationService;
 import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
+import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
@@ -45,17 +47,16 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
@@ -95,10 +96,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     private Button startButton;
 
     @FXML
-    private ToggleButton singlePlaneToggleButton;
-
-    @FXML
-    private ToggleButton allPlanesToggleButton;
+    private Label titleLabel;
+  
 
     @Parameter
     private Context context;
@@ -119,6 +118,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     private UIService uiService;
 
     @Parameter
+    private UiContextService uiContextService;
+    
+    @Parameter
     private OverlayService overlayService;
 
     @Parameter
@@ -133,7 +135,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @Parameter
     SegmentationService segmentationService;
     
-    ToggleGroupValue<Boolean> toggleGroup;
+   
 
     TaskButtonBinding taskButtonBinding;
 
@@ -143,6 +145,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     ObjectProperty<File> ouputFolderProperty;
 
+    ReadOnlyBooleanProperty isExplorer;
+    
     private static final Boolean USE_ALL_PLANE = Boolean.TRUE;
 
     public SegmentationPanel() {
@@ -150,14 +154,11 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             FXUtilities.injectFXML(this);
 
             taskButtonBinding = new TaskButtonBinding(testButton);
-            taskButtonBinding.runTaskOnClick(this::createTaskButtonBinding);
+            taskButtonBinding.setTaskFactory(this::createTaskButtonBinding);
 
-            toggleGroup = new ToggleGroupValue<Boolean>();
-            
-            toggleGroup.add(allPlanesToggleButton, USE_ALL_PLANE);
-            toggleGroup.add(singlePlaneToggleButton, !USE_ALL_PLANE);
+           
 
-            new TaskButtonBinding(startButton).runTaskOnClick(this::generateTask);
+            new TaskButtonBinding(startButton).setTaskFactory(this::generateTask);
 
         } catch (IOException ex) {
             Logger.getLogger(SegmentationPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -169,11 +170,15 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
         workflowPanel = new WorkflowPanel(context);
 
-        workflowVBox.getChildren().add(workflowPanel);
+        setCenter(workflowPanel);
 
         workflowPanel.addStep(GaussianBlur.class);
         workflowPanel.addStep(Binarize.class);
 
+        isExplorer = new UiContextProperty(context, "segmentation");
+        
+        startButton.visibleProperty().bind(isExplorer);
+        
         return this;
     }
 
@@ -339,5 +344,10 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         return null;
 
     }
-
+    
+    @FXML
+    public void close() {
+        uiContextService.leave("segment segmentation");
+        uiContextService.update();
+    }
 }

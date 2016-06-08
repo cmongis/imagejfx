@@ -230,6 +230,13 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
                     iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
                     elementAnalyzedCount++;
                 }
+                if(e instanceof PlaneMetaDataSetWrapper) {
+                    SummaryStatistics stats = statsService.getDatasetStatistics(e.getDataset());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
+                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
+                }
             }
             i++;
         }

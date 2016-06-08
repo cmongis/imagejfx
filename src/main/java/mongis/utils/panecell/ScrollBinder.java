@@ -55,11 +55,13 @@ public class ScrollBinder {
         //
         visiblesNode.addListener(this::onListChange);
 
-        onScroll(null, null, scrollPane.hminProperty().doubleValue());
-
+        
+        update();
     }
 
-    
+    public void update() {
+        onScroll(null, null, scrollPane.hminProperty().doubleValue());
+    }
     
     private void onListChange(ListChangeListener.Change<? extends Node> change) {
         while (change.next()) {

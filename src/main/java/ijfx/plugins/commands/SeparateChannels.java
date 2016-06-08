@@ -17,37 +17,23 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.save;
+package ijfx.plugins.commands;
 
-import ijfx.ui.utils.BaseTester;
-import java.io.IOException;
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import org.scijava.command.Command;
+import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author Pierre BONNEAU
+ * @author cyril
  */
-public class SaveOptionsTest extends BaseTester{
-    
-    
-    SaveOptions saveOptions;
-    
-    public static void main(String[] args) {
-        launch(args);
-    }
+@Plugin(type = Command.class, menuPath = "Image > Color > Separate channels")
+public class SeparateChannels extends SeparateCommandBase{
 
     @Override
-    public void initApp() {
-        
-        
-        saveOptions = new DefaultSaveOptions();
-        setContent(saveOptions.getContent());
+    protected AxisType getAxis() {
+        return Axes.CHANNEL;
     }
     
-    
-   
 }

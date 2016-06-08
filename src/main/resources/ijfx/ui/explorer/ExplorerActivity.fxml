@@ -27,14 +27,6 @@
          <bottom>
             <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
                <children>
-                  <Button mnemonicParsing="false" onAction="#explainMe" styleClass="success" text="Explain me">
-                     <HBox.margin>
-                        <Insets right="20.0" />
-                     </HBox.margin>
-                     <graphic>
-                        <FontAwesomeIconView glyphName="QUESTION_CIRCLE" styleClass="success" />
-                     </graphic>
-                  </Button>
                   <Button mnemonicParsing="false" onAction="#openSelection" text="Open">
                      <graphic>
                         <FontAwesomeIconView glyphName="IMAGE" />
@@ -58,15 +50,11 @@
                         <FontAwesomeIconView glyphName="THUMB_TACK" />
                      </graphic>
                   </Button>
-                  <MenuButton mnemonicParsing="false" styleClass="normal" text="Process">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                      <MenuItem mnemonicParsing="false" text="Action 2" />
-                    </items>
+                  <Button mnemonicParsing="false" onAction="#onProcessButtonPressed" styleClass="normal" text="Process">
                      <graphic>
                         <FontAwesomeIconView glyphName="GEARS" />
                      </graphic>
-                  </MenuButton>
+                  </Button>
                </children>
                <styleClass>
                   <String fx:value="hbox" />
@@ -80,7 +68,7 @@
          <left>
             <ListView fx:id="folderListView" prefWidth="290.0" BorderPane.alignment="CENTER" />
          </left></BorderPane>
-      <BorderPane fx:id="toolbarBorderPane" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="toolbarBorderPane" styleClass="toolbar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
             <HBox fx:id="folderTitleHBox" prefWidth="250.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>

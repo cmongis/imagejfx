@@ -17,37 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.save;
+package ijfx.service;
 
-import ijfx.ui.utils.BaseTester;
-import java.io.IOException;
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import ijfx.ui.IjfxEvent;
 
 /**
  *
- * @author Pierre BONNEAU
+ * @author cyril
  */
-public class SaveOptionsTest extends BaseTester{
+public class RecentFileListClearedEvent extends IjfxEvent{
     
-    
-    SaveOptions saveOptions;
-    
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    @Override
-    public void initApp() {
-        
-        
-        saveOptions = new DefaultSaveOptions();
-        setContent(saveOptions.getContent());
-    }
-    
-    
-   
 }

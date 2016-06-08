@@ -39,6 +39,7 @@ public class DefaultMessage implements Message{
     }
     
     public DefaultMessage(String text, MessageType type){
+        this();
         textProperty().setValue(text);
         typeProperty().setValue(type);
     }

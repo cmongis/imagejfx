@@ -62,7 +62,7 @@ public abstract class AbstractNumberInput<T extends Number> extends AbstractInpu
     public void dispose() {
     }
 
-    Property<Integer> value = new SimpleObjectProperty<Integer>();
+    Property<T> value = new SimpleObjectProperty<T>();
 
     abstract T convert(String newValue);
 
@@ -94,6 +94,8 @@ public abstract class AbstractNumberInput<T extends Number> extends AbstractInpu
     public void init(Input input) {
         field = new TextField();
         field.setText(input.getValue().toString());
+        value.setValue((T)input.getValue());
+        Object t = input.getValue();
         field.addEventHandler(KeyEvent.KEY_RELEASED, this::onKeyTyped);
     }
 

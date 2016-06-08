@@ -132,6 +132,9 @@ public interface MetaData {
     
     public final static String STATS_PIXEL_STD_DEV = "Standard deviation";
  
+    
+    public final static String[] STATS_RELATED_METADATA = new String[] { STATS_PIXEL_MIN, STATS_PIXEL_MAX, STATS_PIXEL_MEAN, STATS_PIXEL_STD_DEV };
+    
     public final static MetaData NULL = new GenericMetaData("", null);
     
     public static boolean notNull(MetaData data) {

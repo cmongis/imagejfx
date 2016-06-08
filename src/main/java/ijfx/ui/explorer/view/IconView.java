@@ -27,6 +27,7 @@ import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.Iconazable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -68,6 +69,10 @@ public class IconView extends ScrollPane implements ExplorerView {
         
     }
 
+    public void setCellFactory(Callable<PaneCell<Iconazable>> callable) {
+        cellPaneCtrl.setCellFactory(callable);
+    }
+    
     @Override
     public Node getNode() {
 
@@ -77,6 +82,7 @@ public class IconView extends ScrollPane implements ExplorerView {
     @Override
     public void setItem(List<? extends Explorable> items) {
         cellPaneCtrl.update(new ArrayList<Iconazable>(items));
+        binder.update();
     }
 
     private PaneCell<Iconazable> createIcon() {

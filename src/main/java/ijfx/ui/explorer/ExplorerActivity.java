@@ -509,8 +509,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     @FXML
-    public void process() {
-
+    public void onProcessButtonPressed() {
+        uiContextService.toggleContext("batch", true);
+        uiContextService.update();
     }
 
     @FXML
