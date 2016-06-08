@@ -683,7 +683,7 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
                 min_scale_image, parameter.divWeight,
                 parameter.curlWeight, parameter.landmarkWeight, parameter.imageWeight,
                 parameter.consistencyWeight, parameter.stopThreshold,
-                outputLevel, showMarquardtOptim, parameter.mode, null, null, output_ip[0], output_ip[1], dialog,
+                outputLevel, showMarquardtOptim, parameter.mode, "", "", output_ip[0], output_ip[1], dialog,
                 originalSourceIP, originalTargetIP);
 
         // Initial affine transform correction values

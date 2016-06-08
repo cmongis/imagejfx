@@ -19,16 +19,13 @@
  */
 package ijfx.plugins.bunwarpJ;
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.Opener;
+import ij.plugin.SubstackMaker;
 import ij.process.ImageProcessor;
 import ijfx.core.project.ImageLoaderService;
 import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
-import static ijfx.plugins.bunwarpJ.Pipeline.modesArray;
-import static ijfx.plugins.bunwarpJ.Pipeline.sMaxScaleDeformationChoices;
-import static ijfx.plugins.bunwarpJ.Pipeline.sMinScaleDeformationChoices;
 import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
@@ -36,8 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import net.imagej.Dataset;
-import net.imagej.DatasetService;
-import net.imagej.display.ImageDisplayService;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.command.Command;
@@ -50,7 +45,6 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class, menuPath = "Plugins>Pipeline2")
-
 public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
 
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
@@ -71,6 +65,8 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     /*....................................................................
     	Private variables
  	....................................................................*/
+    @Parameter
+    private int position;
     /**
      * Image representation for source image
      */
@@ -181,8 +177,8 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         int mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
         max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
         min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
-        this.sourceImp = getInput(datasetSource);
-        this.targetImp = getInput(datasetTarget);
+        this.sourceImp = getInput(datasetSource);//getImpParameter(datasetSource, position);
+        this.targetImp = getInput(datasetTarget);//getImpParameter(datasetTarget, position);
         
         //Load landmarks
         Stack<Point> sourcePoints = new Stack<>();
@@ -192,7 +188,7 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
 
         //Calcul transformation which have to be applied after
         Transformation transformation = bUnwarpJ_.computeTransformationBatch(targetImp, sourceImp, targetMskIP, sourceMskIP, sourcePoints, targetPoints, param);
-        
+        transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
         //Apply transformation
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
             ImagePlus[] imArray = new ImagePlus[2];
@@ -254,5 +250,24 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         int index = title.indexOf(".");
         title = title.substring(0, index) + "-aligned" + title.substring(index);
         return title;
+    }
+    
+    /**
+     * Convert Dataset to ImagePlus and extract slice.
+     * @param dataset
+     * @param i
+     * @return 
+     */
+    private ImagePlus getImpParameter(Dataset dataset, int i)
+    {
+        ImagePlus imagePlus = getInput(dataset);
+        ImageStack imageStack = imagePlus.getStack();
+        ImageStack imageStack2 = new ImageStack(imagePlus.getWidth(), imagePlus.getHeight());
+        ImageProcessor imageProcessor2 = imageStack.getProcessor(i);
+        imageStack2.addSlice(imageStack.getShortSliceLabel(i), imageProcessor2);
+        ImagePlus result = imagePlus.createImagePlus();
+        result.setStack(imageStack);
+        result.setCalibration(imagePlus.getCalibration());
+        return result;
     }
 }
