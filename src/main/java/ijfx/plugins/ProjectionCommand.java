@@ -22,17 +22,12 @@ package ijfx.plugins;
 import static java.lang.Math.toIntExact;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
-import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
-import net.imagej.axis.TypedAxis;
 import net.imagej.ops.OpService;
-import net.imagej.ops.commands.project.ProjectMethod;
-import net.imagej.ops.image.project.DefaultProjectParallel;
 import net.imagej.ops.special.computer.UnaryComputerOp;
-import net.imagej.ops.threshold.otsu.ComputeOtsuThreshold;
-import net.imglib2.img.Img;
+import net.imagej.ops.transform.project.DefaultProjectParallel;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -45,7 +40,7 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  * @param <T>
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Projection Command", attrs = {
+@Plugin(type = Command.class, menuPath = "Image > Stacks > Project...", attrs = {
     @Attr(name = "no-legacy")})
 public class ProjectionCommand<T extends RealType<T>> implements Command {
 
@@ -90,6 +85,7 @@ public class ProjectionCommand<T extends RealType<T>> implements Command {
             out = datasetService.create(dims, in.getName(), axisType, in.getValidBits(), in.isSigned(), false);
         }
         int axisIndex = in.dimensionIndex(Axes.Z);
-        ops.image().project(out.getImgPlus(), in.getImgPlus(), method, axisIndex);
+        
+        //ops.image().project(out.getImgPlus(), in.getImgPlus(), method, axisIndex);
     }
 }
