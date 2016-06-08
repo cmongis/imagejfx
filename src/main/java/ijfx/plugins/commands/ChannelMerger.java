@@ -59,10 +59,10 @@ import org.scijava.ui.UIService;
 public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
 
      @Parameter(type=ItemIO.INPUT)
-    Dataset input;
+    private Dataset input;
 
     @Parameter(type = ItemIO.OUTPUT)
-    Dataset output;
+    private Dataset output;
 
     @Parameter
     private ImageDisplayService imageDisplayService;
@@ -70,11 +70,11 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
     @Parameter
     private DatasetService datasetService;
 
-    long[] dims;
+    private long[] dims;
 
-    AxisType[] axes;
+    private AxisType[] axes;
 
-    boolean inputMonoChannel;
+    private boolean inputMonoChannel;
 
     
 
