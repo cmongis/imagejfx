@@ -24,9 +24,11 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaData;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorationMode;
 import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
+import ijfx.ui.explorer.FolderManagerService;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
@@ -56,17 +58,24 @@ public class ExplorerTableVie implements ExplorerView{
     @Parameter
     ExplorerService explorerService;
     
+    @Parameter
+            FolderManagerService folderService;
+    
     List<? extends Explorable> currentItems;
+    
+    private static final String[] FILE_PRIORITY = { MetaData.FILE_NAME, MetaData.WIDTH, MetaData.HEIGHT,MetaData.BITS_PER_PIXEL,MetaData.SLICE_NUMBER , MetaData.SERIE_COUNT, MetaData.SLICE_NUMBER, MetaData.ZSTACK_NUMBER, MetaData.CHANNEL_COUNT, MetaData.TIME_COUNT};
+    
+    private static final String[] PLANE_PRIORITY = {MetaData.FILE_NAME, MetaData.PLANE_INDEX, MetaData.CHANNEL, MetaData.TIME, MetaData.Z_POSITION};
+    
     public ExplorerTableVie() {
-        
         System.out.println("Listening now");
        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
        tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
        tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
        tableView.setRowFactory(this::createRow);
-       helper.setPriority(MetaData.FILE_NAME,MetaData.FILE_SIZE);
-        
     }
+
+    
     
     @Override
     public Node getNode() {
@@ -75,6 +84,12 @@ public class ExplorerTableVie implements ExplorerView{
 
     @Override
     public void setItem(List<? extends Explorable> items) {
+        
+        
+        
+        if(getPriority().length != helper.getPriority().length) {
+            helper.setPriority(getPriority());
+        }
         
         helper.setColumnsFromItems(items);
         helper.setItem(items);
@@ -161,4 +176,13 @@ public class ExplorerTableVie implements ExplorerView{
         if(owner == null) return;
         ((Explorable)owner).selectedProperty().setValue(false);
     }
+    
+    
+    private String[] getPriority() {
+        if(explorerService == null || folderService.getCurrentExplorationMode() == ExplorationMode.FILE) {
+            return FILE_PRIORITY;
+        }
+        else return PLANE_PRIORITY;
+    }
+    
 }
