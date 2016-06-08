@@ -20,11 +20,11 @@
  */
 package ijfx.ui.plugin.panel;
 
-import ijfx.bridge.FxStatusBar;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.main.LoadingScreen;
 import ijfx.ui.main.Localization;
 import ijfx.service.history.HistoryService;
+import ijfx.service.workflow.DefaultWorkflow;
+import ijfx.service.workflow.WorkflowIOService;
 import ijfx.service.workflow.WorkflowStep;
 import ijfx.ui.history.HistoryStepCellFactory;
 import java.io.File;
@@ -32,11 +32,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
@@ -68,6 +66,9 @@ public class WorkflowEditor extends TitledPane implements UiPlugin {
     @Parameter
     HistoryService editService;
 
+    @Parameter
+    WorkflowIOService workflowIOService;
+    
     @Parameter
     UIService uiService;
 
@@ -125,7 +126,7 @@ public class WorkflowEditor extends TitledPane implements UiPlugin {
 
         if (file != null) {
 
-            editService.saveWorkflow(file.getAbsolutePath());
+            workflowIOService.saveWorkflow(new DefaultWorkflow(editService.getStepList()),file);
         }
 
     }
@@ -142,7 +143,8 @@ public class WorkflowEditor extends TitledPane implements UiPlugin {
                         updateMessage("Loading workflow...");
                         updateProgress(0,3);
                         Thread.sleep(500);
-                        editService.loadWorkflow(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+                        //editService.loadWorkflow(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+                        editService.setCurrentWorkflow(workflowIOService.loadWorkflow(file));
                         updateProgress(3,3);
                     } catch (Exception ex) {
                         ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
