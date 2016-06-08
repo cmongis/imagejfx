@@ -89,7 +89,7 @@
                 ,
                 "label": "Merge to RGB"
                 ,
-                "action": "ijfx.plugins.commands.MergeChannels"
+                "action": "ijfx.plugins.commands.ChannelMerger"
                 ,
                 "icon": "TINT"
                 ,
@@ -130,7 +130,7 @@
                 ,
                 "label": "Extract slices"
                 ,
-                "action": "net.imagej.plugins.commands.restructure.DeleteData"
+                "action": "ijfx.plugins.commands.ExtractSlices"
                 ,
                 "icon": "UPLOAD"
                 ,
@@ -141,7 +141,7 @@
             ,{
                 "type":"Command"
                 ,"label":"Delete Slices"
-                ,"action":"ijfx.plugins.RemoveSlice"
+                ,"action":"ijfx.plugins.commands.RemoveSlice"
                 ,"icon":"ERASER"
                 ,"context":"image-open"
             }

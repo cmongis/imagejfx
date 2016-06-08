@@ -59,10 +59,10 @@ import org.scijava.ui.UIService;
 public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
 
      @Parameter(type=ItemIO.INPUT)
-    Dataset input;
+    private Dataset input;
 
     @Parameter(type = ItemIO.OUTPUT)
-    Dataset output;
+    private Dataset output;
 
     @Parameter
     private ImageDisplayService imageDisplayService;
@@ -70,11 +70,11 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
     @Parameter
     private DatasetService datasetService;
 
-    long[] dims;
+    private long[] dims;
 
-    AxisType[] axes;
+    private AxisType[] axes;
 
-    boolean inputMonoChannel;
+    private boolean inputMonoChannel;
 
     
 
@@ -113,6 +113,7 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
         initializeOutputDataset();
         initializeConverter();
         if (inputMonoChannel) {
+
             processMonoChannelInput();
         }
         else processMultiChannelInput();
@@ -228,8 +229,8 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
 
             // put it in a array
             int[] rgb = new int[]{red, green, blue};
-            if(outputPosition[1] > 400 && outputPosition[0] > 400)
-            System.out.println(Arrays.toString(outputPosition));
+            
+          
             for (int c = 0; c != rgb.length; c++) {
 
                 // now we go from 0 to 2 (rgb) of the output and additionate

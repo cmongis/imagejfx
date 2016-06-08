@@ -55,6 +55,8 @@ public abstract class AbstractIntervalInputSkin<T extends LongInterval> extends 
         hbox.setSpacing(10);
         lowValueLabel.textProperty().bind(rangeSlider.lowValueProperty().asString("%.0f"));
         highValueLabel.textProperty().bind(rangeSlider.highValueProperty().asString("%.0f"));
+        rangeSlider.setPrefWidth(150);
+        hbox.getStyleClass().add("interval-input-skin");
         
     }
     

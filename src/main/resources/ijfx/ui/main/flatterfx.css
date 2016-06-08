@@ -1382,6 +1382,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 .module-config-pane {
     -fx-padding:15px 15px 15px 15px;
+    -fx-pref-width:500px;
 }
 
 .module-config-pane .title {
@@ -1428,6 +1429,17 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-spacing:10;
 }
 
+.interval-input-skin {
+   
+}
+.interval-input-skin .label{
+    -fx-pref-width:30px;
+    -fx-font-size:0.8em;
+    
+}
+.interval-input-skin .range-slider {
+    
+}
 
 /*
 .module-config-pane .grid-pane {
@@ -1688,6 +1700,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 
 */
+
 
 
 

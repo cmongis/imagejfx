@@ -1,5 +1,8 @@
 
 package ijfx.plugins;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /*
     This file is part of ImageJ FX.
 
@@ -23,6 +26,7 @@ package ijfx.plugins;
  *
  * @author cyril
  */
+@JsonDeserialize(as = DefaultInterval.class)
 public interface LongInterval {
     
     long getMinValue();

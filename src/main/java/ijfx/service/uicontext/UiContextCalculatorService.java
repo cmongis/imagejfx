@@ -146,10 +146,15 @@ public class UiContextCalculatorService extends AbstractService implements Image
 
     @EventHandler
     public void handleEvent(DisplayDeletedEvent event) {
-        
-        
-        determineContext(null);
-        
+
+        if (imageDisplayService.getImageDisplays().size() > 0) {
+            displayService.setActiveDisplay(imageDisplayService.getImageDisplays().get(0));
+            determineContext(imageDisplayService.getImageDisplays().get(0));
+        } else {
+            determineContext(null);
+
+        }
+
         /*
         
         displayService.getDisplays().stream().forEach((display) -> {

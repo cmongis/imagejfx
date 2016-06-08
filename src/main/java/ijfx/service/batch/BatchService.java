@@ -21,6 +21,7 @@
 package ijfx.service.batch;
 
 import ijfx.bridge.FxUIPreprocessor;
+import ijfx.plugins.process.DatasetArrayPostprocessor;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowRecorderPreprocessor;
@@ -90,6 +91,7 @@ public class BatchService extends AbstractService implements ImageJService {
         processorBlackList.add(DisplayPostprocessor.class);
         processorBlackList.add(InitPreprocessor.class);
         processorBlackList.add(WorkflowRecorderPreprocessor.class);
+        processorBlackList.add(DatasetArrayPostprocessor.class);
 
     }
 

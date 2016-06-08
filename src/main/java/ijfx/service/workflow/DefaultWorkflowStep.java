@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import ijfx.plugins.LongInterval;
 import ijfx.service.workflow.json.FileDeserializer;
 import ijfx.service.workflow.json.FileSerializer;
 import ijfx.service.workflow.json.JsonFieldName;
@@ -80,7 +81,8 @@ public class DefaultWorkflowStep implements WorkflowStep {
         Integer.class,
         String.class,
         File.class,
-        ColorTable8.class
+        ColorTable8.class,
+        LongInterval.class
             
     };
 

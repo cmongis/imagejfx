@@ -20,12 +20,14 @@
  */
 package ijfx.service.workflow;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
+@JsonDeserialize(as=DefaultWorkflow.class)
 public interface Workflow {
 
     public void setName(String name);
