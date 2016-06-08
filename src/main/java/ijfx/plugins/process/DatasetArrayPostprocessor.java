@@ -34,7 +34,7 @@ import org.scijava.ui.UIService;
  * @author cyril
  */
 @Plugin(type = PostprocessorPlugin.class)
-public class DatasetArrayPostprocessorPlugin extends AbstractPostprocessorPlugin{
+public class DatasetArrayPostprocessor extends AbstractPostprocessorPlugin{
 
     @Parameter
     ModuleService moduleService;
