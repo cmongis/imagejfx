@@ -23,6 +23,7 @@ import ijfx.service.sampler.DatasetSamplerService;
 import net.imagej.Dataset;
 import net.imagej.axis.AxisType;
 import org.scijava.ItemIO;
+import org.scijava.ItemVisibility;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.DialogPrompt;
@@ -46,8 +47,8 @@ public abstract class SeparateCommandBase extends ContextCommand {
     @Parameter
     UIService uiService;
 
-    @Parameter
-    boolean forceSeparation;
+    @Parameter(visibility = ItemVisibility.INVISIBLE)
+    Boolean forceSeparation = false;
 
     @Override
     public void run() {
