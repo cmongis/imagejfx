@@ -79,7 +79,8 @@ public class DefaultWorkflow implements Workflow {
 
     @Override
     public void setStepList(List<WorkflowStep> stepList) {
-        steps = stepList;
+        steps.clear();
+        steps.addAll(stepList);
     }
 
     @JsonSetter("stepList")

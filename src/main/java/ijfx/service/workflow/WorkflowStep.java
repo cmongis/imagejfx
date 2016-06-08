@@ -20,6 +20,7 @@
  */
 package ijfx.service.workflow;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Map;
 import org.scijava.module.Module;
 
@@ -27,6 +28,7 @@ import org.scijava.module.Module;
  *
  * @author Cyril MONGIS, 2015
  */
+@JsonDeserialize(as=DefaultWorkflowStep.class)
 public interface WorkflowStep {
 
     public static StepParameterType DEFAULT_PARAMETER_TYPE = StepParameterType.PRESET;
