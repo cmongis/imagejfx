@@ -38,11 +38,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.transform.stream.StreamSource;
 import mongis.ndarray.NDimensionalArray;
 import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
-import org.apache.commons.math3.geometry.spherical.oned.S1Point;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -183,7 +181,9 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             for(long[] coordinate : coordinateList) {
                 
                 MetaDataSet planeMetaDataSet = new MetaDataSet().merge(metadataset);
-                
+                for (String statsMetaData : MetaData.STATS_RELATED_METADATA) {
+                    planeMetaDataSet.remove(statsMetaData);
+                }
                 for(int d = 0; d!= coordinate.length;d++) {
                     String label = dimensionLabelArray[d];
                     long value = coordinate[d];
@@ -192,6 +192,9 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
                 } 
                 // putting the plane index
                 planeMetaDataSet.putGeneric(MetaData.PLANE_INDEX, planeIndex);
+                
+                // indicate metadata type
+                planeMetaDataSet.putGeneric(MetaData.METADATA_SET_TYPE_KEY, MetaData.METADATA_SET_TYPE_PLANE);
                 
                 // puting the non planar position
                 planeMetaDataSet.putGeneric(MetaData.PLANE_NON_PLANAR_POSITION,Arrays.toString(coordinate));
