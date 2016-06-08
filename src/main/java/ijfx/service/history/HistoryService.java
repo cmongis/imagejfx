@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
+import ijfx.service.workflow.WorkflowIOService;
 import ijfx.service.workflow.WorkflowService;
 import ijfx.service.workflow.WorkflowStep;
 import ijfx.service.workflow.json.WorkflowMapperModule;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,8 +46,8 @@ import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 
-/**
- *
+/**  
+ * TODO : move load and save operation to the WorkflowIOService
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = Service.class, priority = Priority.VERY_LOW_PRIORITY,description = "Service storing history of modules ran the user. Allow to play, replay, load or save. Uses JavaFX components.")
@@ -71,6 +71,9 @@ public class HistoryService extends AbstractService implements ImageJService{
     @Parameter
     Context context;
 
+    @Parameter
+    WorkflowIOService workflowIOService;
+    
     boolean enabled;
     
     public HistoryService() {
@@ -149,7 +152,7 @@ public class HistoryService extends AbstractService implements ImageJService{
         try {
             return loadWorkflow(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.WARNING,"Error when loading workflow.",ex);;
+            ImageJFX.getLogger().log(Level.SEVERE,"File not found.",ex);;
         }
         return null;
     }
