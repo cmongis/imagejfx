@@ -41,37 +41,37 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej</artifactId>
-            <version>2.0.0-rc-45-SNAPSHOT</version>
+            <version>2.0.0-rc-50-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-api</artifactId>
-            <version>5.1.8</version>
+            <version>5.2.0-m3</version>
         </dependency>
         <dependency>
             <groupId>io.scif</groupId>
             <artifactId>scifio-bf-compat</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.scif</groupId>
             <artifactId>jai_imageio</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej-plugins-commands</artifactId>
-            <version>0.5.2</version>
+            <version>0.5.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.imglib2</groupId>
             <artifactId>imglib2-ij</artifactId>
-            <version>2.0.0-beta-31</version>
+            <version>2.0.0-beta-33-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.scijava</groupId>
             <artifactId>scijava-plugins-commands</artifactId>
-            <version>0.2.2</version>
+            <version>0.2.3-SNAPSHOT</version>
         </dependency>
         <!--
          <dependency>
@@ -84,17 +84,17 @@
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-bsd</artifactId>
-            <version>5.1.8</version>
+            <version>5.1.10</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-gpl</artifactId>
-            <version>5.1.8</version>
+            <version>5.1.10</version>
         </dependency>
         <dependency>
             <groupId>de.jensd</groupId>
             <artifactId>fontawesomefx</artifactId>
-            <version>8.5</version>
+            <version>8.9</version>
         </dependency>
         
         <dependency>
@@ -116,12 +116,12 @@
         <dependency>
             <groupId>org.jfxtras</groupId>
             <artifactId>jfxtras-window</artifactId>
-            <version>8.0-r4</version>
+            <version>8.0-r5</version>
         </dependency>
         <dependency>
             <groupId>org.jfxtras</groupId>
             <artifactId>jfxtras-controls</artifactId>
-            <version>8.0-r4</version>
+            <version>8.0-r5</version>
         </dependency>
         
         <dependency>
