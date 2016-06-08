@@ -35,7 +35,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = InputSkinPlugin.class)
+
 public class AxisIntervalInputSkin extends AbstractIntervalInputSkin<AxisInterval> {
 
     @Parameter
