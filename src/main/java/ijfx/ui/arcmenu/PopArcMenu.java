@@ -182,20 +182,21 @@ public class PopArcMenu extends PopupControl {
     public void show(MouseEvent event) {
         
         if(event.getButton() != MouseButton.SECONDARY) return;
+        System.out.println("showing for sure");
         Rectangle2D visualBounds = Screen.getScreensForRectangle(event.getScreenX(), event.getScreenY(), 20, 20).get(0).getVisualBounds();
         
         Node node = (Node) event.getTarget();
         Scene scene = node.getScene();
         
-        setStyle("-fx-background-color:transparent");
+        setStyle("-fx-background-color:blue");
       
         
-     
+        
         
         double margin = 400;
         
-       
-       
+        
+        //xProperty().bind(scene.getWindow().xProperty());
         
        double wx,wy,ww,wh;
         
@@ -220,7 +221,8 @@ public class PopArcMenu extends PopupControl {
         setCenterY(y);
         
         super.show(scene.getWindow(),wx,wy);
-        
+        setX(wx);
+        setY(wy);
         List<String> styleClasses = getScene().getRoot().getStyleClass();
         
         if(styleClasses.contains(TRANSPARENT_CLASS) == false) styleClasses.add(TRANSPARENT_CLASS);
