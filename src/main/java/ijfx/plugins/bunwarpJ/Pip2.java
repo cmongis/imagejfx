@@ -24,7 +24,7 @@ import ij.ImageStack;
 import ij.io.Opener;
 import ij.plugin.SubstackMaker;
 import ij.process.ImageProcessor;
-import ijfx.core.project.ImageLoaderService;
+import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
 import java.awt.Point;
 import java.io.File;
