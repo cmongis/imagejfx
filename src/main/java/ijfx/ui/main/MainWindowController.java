@@ -94,6 +94,8 @@ import ijfx.ui.context.animated.Animations;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import mongis.utils.AnimationChain;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
@@ -282,6 +284,7 @@ public class MainWindowController extends AnchorPane {
         Task task = new CallbackTask<Void, Boolean>()
                 .runLongCallable(this::init)
                 .then(this::finishInitialization)
+                .error(this::onError)
                 .start();
 
         loadingPopup
@@ -295,6 +298,11 @@ public class MainWindowController extends AnchorPane {
 
     }
 
+    public void onError(Throwable t) {
+        ImageJFX.getLogger().log(Level.SEVERE, "Error when starting ImageJ", t);
+        new Alert(Alert.AlertType.ERROR, t.getMessage(), ButtonType.CLOSE).show();
+    }
+    
     public Boolean init(ProgressHandler handler) {
         handler.setStatus("Initializing ImageJ....");
         handler.setProgress(1, 3);
