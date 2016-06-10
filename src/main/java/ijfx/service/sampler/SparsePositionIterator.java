@@ -40,7 +40,7 @@ import java.util.List;
  * 
  * @author Barry DeZonia
  */
-class SparsePositionIterator implements PositionIterator {
+public class SparsePositionIterator implements PositionIterator {
 
 	// -- instance variables --
 
@@ -55,7 +55,7 @@ class SparsePositionIterator implements PositionIterator {
 	 * Creates a SparsePositionIterator from a SamplingDefinition. The space to be
 	 * iterated is the input space of a sampling. It may not be contiguous.
 	 */
-	SparsePositionIterator(final SamplingDefinition def) {
+	public SparsePositionIterator(final SamplingDefinition def) {
 		actualValues = def.getInputRanges();
 		maxIndexes = calcMaxes(def);
 		currPos = new long[maxIndexes.length];

@@ -32,6 +32,7 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
+import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
 import ijfx.ui.explorer.ExplorerService;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -98,6 +100,8 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
     @FXML
     private VBox resultVBox;
 
+   
+    
     private ToggleButton toggleButton;
 
     @Parameter
@@ -136,6 +140,7 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
 
     VBox vBox = new VBox();
 
+ 
     public BatchProcessingPanel() {
 
         try {
@@ -185,6 +190,8 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
         vBox.setSpacing(5);
         vBox.getChildren().addAll(stepCount, selectedItemCount, toggleButton);
 
+      
+        
         // the pretty counts
         selectedItemCount.valueProperty().bind(selectedItems);
         stepCount.valueProperty().bind(Bindings.createIntegerBinding(() -> workflowPanel.stepListProperty().size(), workflowPanel.stepListProperty()));
@@ -340,5 +347,6 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
     public void onExplorerSelectionChanged(ExplorerSelectionChangedEvent event) {
         Platform.runLater(() -> selectedItems.setValue(event.getObject().size()));
     }
-
+    
+    
 }

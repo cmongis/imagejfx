@@ -20,12 +20,26 @@
  */
 package ijfx.service.display;
 
+import ijfx.core.stats.IjfxStatisticService;
+import ijfx.service.sampler.PositionIterator;
+import ijfx.service.sampler.SamplingDefinition;
+import ijfx.service.sampler.SparsePositionIterator;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import javafx.util.Pair;
+import net.imagej.Dataset;
 import net.imagej.ImageJService;
+import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.measure.StatisticsService;
+import net.imagej.sampler.AxisSubrange;
+import net.imglib2.RandomAccess;
+import net.imglib2.type.numeric.RealType;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventService;
@@ -36,10 +50,11 @@ import org.scijava.service.Service;
 
 /**
  * Gives information on display range of an image display
+ *
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = Service.class)
-public class DisplayRangeService extends AbstractService implements ImageJService{
+public class DisplayRangeService extends AbstractService implements ImageJService {
 
     @Parameter
     DisplayService displayService;
@@ -52,8 +67,12 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
 
     @Parameter
     StatisticsService statService;
-    
-    
+
+    @Parameter
+    IjfxStatisticService ijfxStatsService;
+
+    Map<String, SummaryStatistics> datasetMinMax = new HashMap<>();
+
     private CalibratedAxis getChannelAxis() {
 
         for (CalibratedAxis a : getAxisList()) {
@@ -83,14 +102,17 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
 
     public double getCurrentDatasetMinimum() {
 
+        /*
         return imageDisplayService
                 .getActiveDataset(displayService
                         .getActiveDisplay(ImageDisplay.class))
-                .getChannelMinimum(getCurrentChannelId());
+                .getChannelMinimum(getCurrentChannelId());*/
+        return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMin();
     }
 
     public double getCurrentDatasetMaximum() {
-        return imageDisplayService.getActiveDataset(displayService.getActiveDisplay(ImageDisplay.class)).getChannelMaximum(getCurrentChannelId());
+        //return imageDisplayService.getActiveDataset(displayService.getActiveDisplay(ImageDisplay.class)).getChannelMaximum(getCurrentChannelId());
+        return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMax();
     }
 
     public double getCurrentViewMinimum() {
@@ -100,38 +122,52 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
     public double getCurrentViewMaximum() {
         return imageDisplayService.getActiveDatasetView().getChannelMax(getCurrentChannelId());
     }
-    
+
     public double getCurrentPixelMinimumValue() {
         return statService.minimum(imageDisplayService.getActiveDataset(displayService.getActiveDisplay(ImageDisplay.class)));
+        // return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMin();
     }
-    
+
     public double getCurrentPixelMaximumValue() {
+
+        // getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMax();
         return statService.maximum(imageDisplayService.getActiveDataset(displayService.getActiveDisplay(ImageDisplay.class)));
     }
 
     public int getCurrentChannelId() {
-        if (getChannelAxis() == null) {
-            return 0;
-        }
-        return imageDisplayService.getActiveDatasetView().getIntPosition(getChannelAxis().type());
+        return imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
 
     }
 
-    
-   
-    
     public void updateCurrentDisplayRange(double min, double max) {
         imageDisplayService.getActiveDatasetView().setChannelRange(getCurrentChannelId(), min, max);
         //imageDisplayService.getActiveDatasetView().setChannelRanges(minValue.doubleValue(), maxValue.doubleValue());
         imageDisplayService.getActiveDatasetView().getProjector().map();
-       // imageDisplayService.getActiveDatasetView().update();
+        // imageDisplayService.getActiveDatasetView().update();
 
         eventService.publishLater(new DisplayUpdatedEvent(displayService.getActiveDisplay(), DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
     }
 
     public void autoRange() {
         updateCurrentDisplayRange(getCurrentPixelMinimumValue(), getCurrentPixelMaximumValue());
-        
+
     }
-    
+
+    private SummaryStatistics getDisplayStatistics(ImageDisplay display, int channel) {
+
+        String uuid = getDisplayChannelId(display, channel);
+        Dataset dataset = imageDisplayService.getActiveDataset(display);
+        if (datasetMinMax.containsKey(uuid) == false) {
+
+            SummaryStatistics stats = ijfxStatsService.getChannelStatistics(dataset, channel);
+            datasetMinMax.put(uuid, stats);
+        }
+        return datasetMinMax.get(uuid);
+
+    }
+
+    private String getDisplayChannelId(ImageDisplay display, int channel) {
+        return UUID.nameUUIDFromBytes(new String(display.hashCode() + "" + channel).getBytes()).toString();
+    }
+
 }

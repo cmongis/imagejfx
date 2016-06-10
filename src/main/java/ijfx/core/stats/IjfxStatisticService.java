@@ -35,5 +35,6 @@ public interface IjfxStatisticService extends IjfxService{
     public SummaryStatistics getDatasetSummaryStatistics(Dataset dataset);
     public DescriptiveStatistics getDatasetDescriptiveStatistics(Dataset dataset);
     public SummaryStatistics getStatistics(File file);
+    public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition);
     
 }

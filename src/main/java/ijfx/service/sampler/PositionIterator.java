@@ -37,7 +37,7 @@ package ijfx.service.sampler;
  * 
  * @author Barry DeZonia
  */
-interface PositionIterator {
+public interface PositionIterator {
 
 	boolean hasNext();
 

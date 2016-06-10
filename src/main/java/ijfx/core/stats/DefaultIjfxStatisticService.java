@@ -21,15 +21,20 @@ package ijfx.core.stats;
 
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.sampler.PositionIterator;
+import ijfx.service.sampler.SamplingDefinition;
+import ijfx.service.sampler.SparsePositionIterator;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
+import net.imagej.axis.Axes;
+import net.imagej.sampler.AxisSubrange;
 import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -52,24 +57,25 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     @Parameter
     ImageDisplayService imageDisplayService;
     
+
     @Override
     public SummaryStatistics getDatasetSummaryStatistics(Dataset dataset) {
         SummaryStatistics summary = new SummaryStatistics();
         Cursor<RealType<?>> cursor = dataset.cursor();
         cursor.reset();
-        
+
         while (cursor.hasNext()) {
             cursor.fwd();
             double value = cursor.get().getRealDouble();
             summary.addValue(value);
-           
+
         }
         return summary;
     }
 
     public SummaryStatistics getStatistics(File file) {
         try {
-            Timer t  = timerService.getTimer("getStatistics(File)");   
+            Timer t = timerService.getTimer("getStatistics(File)");
             t.start();
             Dataset dataset = datasetIoService.open(file.getAbsolutePath());
             t.elapsed("open dataset");
@@ -97,5 +103,34 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     }
 
    
+
+
+    public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition) {
+        SummaryStatistics stats = new SummaryStatistics();
+        if (dataset.dimensionIndex(Axes.CHANNEL) == -1) {
+            Cursor<RealType<?>> cursor = dataset.cursor();
+            cursor.reset();
+            while (cursor.hasNext()) {
+                cursor.fwd();
+                stats.addValue(cursor.get().getRealDouble());
+            }
+        } else {
+            SamplingDefinition def = new SamplingDefinition(dataset);
+
+            def.constrain(Axes.CHANNEL, new AxisSubrange(channelPosition));
+            
+            
+            
+            
+            PositionIterator itr = new SparsePositionIterator(def);
+
+            RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
+            while (itr.hasNext()) {
+                randomAccess.setPosition(itr.next());
+                stats.addValue(randomAccess.get().getRealDouble());
+            }
+        }
+        return stats;
+    }
 
 }
