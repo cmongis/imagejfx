@@ -24,7 +24,7 @@ import ij.ImagePlus;
 import ij.io.OpenDialog;
 import ij.io.Opener;
 import ij.process.ImageProcessor;
-import ijfx.core.project.ImageLoaderService;
+import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
 import static ijfx.plugins.bunwarpJ.bUnwarpJ_.sMaxScaleDeformationChoices;
 import static ijfx.plugins.bunwarpJ.bUnwarpJ_.sMinScaleDeformationChoices;

@@ -77,6 +77,7 @@ import java.io.File;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -103,6 +104,9 @@ public class UnwarpJ_ extends AbstractImageJ1PluginAdapter {
     @Parameter(label = "Target")
     Dataset targetDataset;
     
+        @Parameter
+    public DatasetService datasetService;
+        
     @Parameter(label = "Landmarks")
     File file;
     
@@ -306,7 +310,7 @@ private void alignImagesMacro(String args[]) {
        output_ip.show();
     Img img = ImageJFunctions.wrap(output_ip);
     ImageJFunctions.show((RandomAccessibleInterval) img);
-   outputDataset= service.create(img);//setOutput(output_ip, outputDataset);;
+   outputDataset= datasetService.create(img);//setOutput(output_ip, outputDataset);;
    outputDataset.setName(fn_out);
 }
 
