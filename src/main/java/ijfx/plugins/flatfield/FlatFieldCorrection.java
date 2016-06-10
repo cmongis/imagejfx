@@ -19,34 +19,29 @@
 package ijfx.plugins.flatfield;
 
 import ijfx.core.stats.IjfxStatisticService;
-import ijfx.plugins.convertype.ConvertTo8bits;
 import ijfx.plugins.convertype.TypeChangerIJFX;
-import ijfx.service.batch.BatchSingleInput;
-import ijfx.service.batch.DisplayBatchInput;
 import ijfx.service.sampler.DatasetSamplerService;
-import ijfx.ui.main.ImageJFX;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.concurrent.Task;
+import java.util.stream.Collectors;
 import net.imagej.Dataset;
-import net.imagej.ImageJ;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.operator.OpDivide;
 import net.imagej.plugins.commands.assign.DivideDataValuesBy;
 import net.imagej.plugins.commands.calculator.ImageCalculator;
-import net.imagej.plugins.commands.typechange.TypeChanger;
-import net.imagej.sampler.SamplingDefinition;
 import net.imagej.types.DataTypeService;
+import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
@@ -58,17 +53,8 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>FlatField")
+@Plugin(type = Command.class, menuPath = "Plugins>FlatField Corrrection")
 public class FlatFieldCorrection implements Command {
-
-    @Parameter(type = ItemIO.INPUT)
-    ImageDisplay flatFieldImageDisplay;
-
-    @Parameter(type = ItemIO.INPUT)
-    Dataset inputDataset;
-
-    @Parameter(type = ItemIO.OUTPUT)
-    Dataset outputDataset;
 
     @Parameter
     CommandService commandService;
@@ -87,15 +73,26 @@ public class FlatFieldCorrection implements Command {
 
     @Parameter
     DatasetSamplerService datasetSamplerService;
+
+    @Parameter
+    Dataset flatFieldDataset;
+
+    @Parameter
+    Dataset inputDataset;
+
+    @Parameter(type = ItemIO.OUTPUT)
+    Dataset outputDataset;
+
     @Parameter
     boolean createNewImage = true;
 
-    private double median;
+    private double median = 0.0;
 
     @Override
     public void run() {
-        Dataset flatFieldDataset = extractFlatfield(flatFieldImageDisplay);//convertTo32(inputDataset);
+        flatFieldDataset = extractFlatfield(getImageDisplay(flatFieldDataset));//convertTo32(inputDataset);
         inputDataset = convertTo32(inputDataset);
+        flatFieldDataset = convertTo32(flatFieldDataset);
         median = ijfxStatisticService.getDatasetDescriptiveStatistics(inputDataset).getPercentile(50);
         inputDataset = divideDatasetByValue(inputDataset, median);
         outputDataset = divideDatasetByDataset(inputDataset, flatFieldDataset);
@@ -117,12 +114,14 @@ public class FlatFieldCorrection implements Command {
         } catch (MethodCallException ex) {
             Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
         }
+        module.setInput("data", dataset);
+        module.setResolved("data", true);
         module.setInput("typeName", type);
         module.setResolved("typeName", true);
         module.setInput("combineChannels", false);
         module.setResolved("combineChannels", true);
 
-        Future run = moduleService.run(module, true);
+        Future run = moduleService.run(module, false);
 
         try {
             run.get();
@@ -131,7 +130,8 @@ public class FlatFieldCorrection implements Command {
         } catch (ExecutionException ex) {
             Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return (Dataset) module.getOutput("data");
+        Dataset data = (Dataset) module.getOutput("data");
+        return data;
     }
 
     private Dataset extractFlatfield(ImageDisplay imageDisplay) {
@@ -147,32 +147,33 @@ public class FlatFieldCorrection implements Command {
     }
 
     private Dataset divideDatasetByValue(Dataset dataset, double value) {
-        Map<String,Object> parameters = new HashMap<>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("value", value);
         parameters.put("preview", false);
-        parameters.put("allPlanes",true);
+        parameters.put("allPlanes", true);
+        parameters.put("display", getImageDisplay(dataset));
         Module module = executeCommand(DivideDataValuesBy.class, parameters);
-        ImageDisplay imageDisplay = (ImageDisplay)module.getOutput("display");
-        return (Dataset)imageDisplay.getActiveView().getData();
-        
+        ImageDisplay imageDisplay = (ImageDisplay) module.getOutput("display");
+        return (Dataset) imageDisplay.getActiveView().getData();
+
     }
 
-    private Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator)
-    {
-        Map<String,Object> parameters = new HashMap<>();
-        parameters.put("input1", numerator);
-        parameters.put("input2", denominator);
-        parameters.put("wantDoubles",true);
-        try {
-            parameters.put("op", OpDivide.class.newInstance());
-        } catch (InstantiationException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        Module module = executeCommand(ImageCalculator.class, parameters);
-        return (Dataset)module.getOutput("output");
-    }
+//    private Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator) {
+//        Map<String, Object> parameters = new HashMap<>();
+//        parameters.put("input1", numerator);
+//        parameters.put("input2", denominator);
+//        parameters.put("wantDoubles", true);
+//        try {
+//            parameters.put("op", OpDivide.class.newInstance());
+//        } catch (InstantiationException ex) {
+//            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        Module module = executeCommand(ImageCalculator.class, parameters);
+//        Dataset result = (Dataset) module.getOutput("output");
+//        return result;
+//    }
     private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
         Module module = moduleService.createModule(commandService.getCommand(type));
         try {
@@ -185,7 +186,7 @@ public class FlatFieldCorrection implements Command {
             module.setResolved(k, true);
         });
 
-        Future run = moduleService.run(module, true);
+        Future run = moduleService.run(module, false, parameters);
 
         try {
             run.get();
@@ -196,4 +197,53 @@ public class FlatFieldCorrection implements Command {
         }
         return module;
     }
+
+    public ImageDisplay getImageDisplay(Dataset dataset) {
+        Optional<ImageDisplay> optional = imageDisplayService.getImageDisplays()
+                .parallelStream()
+                .filter((d) -> imageDisplayService.getActiveDataset(d) == dataset)
+                .findFirst();
+        return optional.get();
+    }
+
+    /**
+     * Divide 2 different Dataset with different dimensions
+     * @param <T>
+     * @param numerator
+     * @param denominator
+     * @return 
+     */
+    public < T extends RealType< T>> Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator) {
+        
+        Dataset resultDataset = numerator.duplicateBlank();
+        
+        RandomAccess<T> resultRandomAccess = (RandomAccess<T>) resultDataset.randomAccess();
+        Cursor<T> numeratorCursor = (Cursor<T>) numerator.cursor();
+        RandomAccess<T> denominatorRandomAccess = (RandomAccess<T>) denominator.randomAccess();
+        
+        int[] positionDenominator = new int[denominator.numDimensions()];
+        denominatorRandomAccess.localize(positionDenominator);
+        while (numeratorCursor.hasNext()) {
+            numeratorCursor.next();
+            //Set position
+            positionDenominator[0] = numeratorCursor.getIntPosition(0);
+            positionDenominator[1] = numeratorCursor.getIntPosition(1);
+            denominatorRandomAccess.setPosition(positionDenominator);
+            resultRandomAccess.setPosition(numeratorCursor);
+            
+            //Calculate value
+            try {
+                
+            resultRandomAccess.get().set(numeratorCursor.get());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+           // System.out.println(resultRandomAccess.get().toString());
+            Float f = numeratorCursor.get().getRealFloat()+denominatorRandomAccess.get().getRealFloat();
+            resultRandomAccess.get().setReal(f);
+
+        }
+        return resultDataset;
+    }
+
 }
