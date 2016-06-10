@@ -38,7 +38,9 @@ import net.imagej.ImageJ;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import net.imagej.operator.OpDivide;
 import net.imagej.plugins.commands.assign.DivideDataValuesBy;
+import net.imagej.plugins.commands.calculator.ImageCalculator;
 import net.imagej.plugins.commands.typechange.TypeChanger;
 import net.imagej.sampler.SamplingDefinition;
 import net.imagej.types.DataTypeService;
@@ -93,8 +95,10 @@ public class FlatFieldCorrection implements Command {
     @Override
     public void run() {
         Dataset flatFieldDataset = extractFlatfield(flatFieldImageDisplay);//convertTo32(inputDataset);
-        median = ijfxStatisticService.getDatasetDescriptiveStatistics(outputDataset).getPercentile(50);
         inputDataset = convertTo32(inputDataset);
+        median = ijfxStatisticService.getDatasetDescriptiveStatistics(inputDataset).getPercentile(50);
+        inputDataset = divideDatasetByValue(inputDataset, median);
+        outputDataset = divideDatasetByDataset(inputDataset, flatFieldDataset);
     }
 
     public boolean isCreateNewImage() {
@@ -142,7 +146,7 @@ public class FlatFieldCorrection implements Command {
         return dataset;
     }
 
-    private Dataset divideDatasetBy(Dataset dataset, double value) {
+    private Dataset divideDatasetByValue(Dataset dataset, double value) {
         Map<String,Object> parameters = new HashMap<>();
         parameters.put("value", value);
         parameters.put("preview", false);
@@ -153,6 +157,22 @@ public class FlatFieldCorrection implements Command {
         
     }
 
+    private Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator)
+    {
+        Map<String,Object> parameters = new HashMap<>();
+        parameters.put("input1", numerator);
+        parameters.put("input2", denominator);
+        parameters.put("wantDoubles",true);
+        try {
+            parameters.put("op", OpDivide.class.newInstance());
+        } catch (InstantiationException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Module module = executeCommand(ImageCalculator.class, parameters);
+        return (Dataset)module.getOutput("output");
+    }
     private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
         Module module = moduleService.createModule(commandService.getCommand(type));
         try {
