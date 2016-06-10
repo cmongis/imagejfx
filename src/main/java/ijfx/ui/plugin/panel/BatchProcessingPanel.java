@@ -339,7 +339,7 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
         } else if (saveOption.folder().getValue() == null) {
             return new DefaultMessage("If you don't select a\ndirectory, the created images\nwill be saved in their original\ndirectory.", MessageType.WARNING);
         } else {
-            return null;
+            return null; 
         }
     }
 
