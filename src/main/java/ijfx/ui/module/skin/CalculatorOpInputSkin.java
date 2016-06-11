@@ -19,7 +19,6 @@
  */
 package ijfx.ui.module.skin;
 
-import ijfx.plugins.projection.ProjectionMethod;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import java.util.List;
@@ -28,6 +27,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import net.imagej.operator.CalculatorOp;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
@@ -36,16 +36,17 @@ import org.scijava.plugin.PluginService;
  *
  * @author Tuan anh TRINH
  */
+
 @Plugin(type = InputSkinPlugin.class)
-public class ProjectionMethodInputSkin   extends AbstractInputSkinPlugin<ProjectionMethod>{
+public class CalculatorOpInputSkin   extends AbstractInputSkinPlugin<CalculatorOp>{
     
-    ObjectProperty<ProjectionMethod> projectionMethodProperty = new SimpleObjectProperty();
+    ObjectProperty<CalculatorOp> calculatorOpProperty = new SimpleObjectProperty();
     
     
     
-    ComboBox<ProjectionMethod> projectionMethodComboBox = new ComboBox<>();
+    ComboBox<CalculatorOp> calculatorOpComboBox = new ComboBox<>();
     
-    List<ProjectionMethod> projectionMethodList;
+    List<CalculatorOp> calculatorOpList;
 
     @Parameter
     PluginService pluginService;
@@ -53,12 +54,12 @@ public class ProjectionMethodInputSkin   extends AbstractInputSkinPlugin<Project
     
     @Override
     public Property valueProperty() {
-        return projectionMethodProperty;
+        return calculatorOpProperty;
     }
 
     @Override
     public Node getNode() {
-        return projectionMethodComboBox;
+        return calculatorOpComboBox;
     }
 
     @Override
@@ -69,23 +70,23 @@ public class ProjectionMethodInputSkin   extends AbstractInputSkinPlugin<Project
     @Override
     public boolean canHandle(Class<?> clazz) {
       
-        return clazz == ProjectionMethod.class;
+        return clazz == CalculatorOp.class;
     }
     
-    public List<ProjectionMethod> getProjectionMethodList() {
-        if(projectionMethodList == null) {
-            projectionMethodList = pluginService.createInstancesOfType(ProjectionMethod.class);
+    public List<CalculatorOp> getCalculatorOpList() {
+        if(calculatorOpList == null) {
+            calculatorOpList = pluginService.createInstancesOfType(CalculatorOp.class);
 
         }
         
-        return projectionMethodList;
+        return calculatorOpList;
     }
 
     @Override
-    public void init(Input<ProjectionMethod> input) {
+    public void init(Input<CalculatorOp> input) {
         System.out.println("Initiliazing");
-        projectionMethodComboBox.getItems().addAll(getProjectionMethodList());
-        projectionMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->projectionMethodProperty.setValue(newValue));
+        calculatorOpComboBox.getItems().addAll(getCalculatorOpList());
+        calculatorOpComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->calculatorOpProperty.setValue(newValue));
     }
     
 }

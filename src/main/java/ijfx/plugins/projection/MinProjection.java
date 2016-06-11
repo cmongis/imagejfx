@@ -17,34 +17,38 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.projection;
 
-import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
-import ij.ImagePlus;
-import net.imagej.Dataset;
-import org.scijava.command.Command;
-import org.scijava.plugin.Attr;
-import org.scijava.plugin.Parameter;
+import java.util.List;
+import net.imglib2.Sampler;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.plugin.Plugin;
 
-@Plugin(type = Command.class, menuPath = "Plugins>UnwarpJ", attrs = {
-    @Attr(name = "no-legacy")})
-public class UnwarpJPlugin extends AbstractImageJ1PluginAdapter {
+@Plugin(type = ProjectionMethod.class, name = "Min", label = "Minimum")
+public class MinProjection implements ProjectionMethod {
 
-    @Parameter(label = "Source")
-    Dataset source;
-    
-    @Parameter(label = "Target")
-    Dataset target;
-            
+    private final String name = "Min";
+
     @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        return input;
+    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
+
+        T min = null;
+
+        for (T t : list) {
+            if (min == null) {
+
+                min = t.copy();
+            } else if (t.compareTo(min) < 0) {
+                min = t.copy();
+            }
+        }
+        sampler.get().set(min);
+
     }
 
     @Override
-    public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String toString() {
+        return this.name;
     }
-    
+
 }

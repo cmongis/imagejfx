@@ -26,7 +26,7 @@ import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.Recorder;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
-import ijfx.plugins.AbstractImageJ1PluginAdapter;
+import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
 import ijfx.service.object_detection.ObjectDetectionService;
 import java.util.List;
 import net.imagej.Dataset;

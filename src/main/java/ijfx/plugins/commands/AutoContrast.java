@@ -25,7 +25,6 @@ import net.imagej.axis.Axes;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.event.DatasetUpdatedEvent;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -74,7 +73,7 @@ public class AutoContrast extends ContextCommand {
                 }
             }
             else {
-                SummaryStatistics stats = statsService.getDatasetStatistics(dataset);
+                SummaryStatistics stats = statsService.getDatasetSummaryStatistics(dataset);
                 setMinMax(stats, 0);
 
             }

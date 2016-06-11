@@ -17,24 +17,36 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.stats;
+package ijfx.plugins.projection;
 
-import ijfx.service.IjfxService;
-import java.io.File;
-import net.imagej.Dataset;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import java.util.List;
+import net.imglib2.Sampler;
+import net.imglib2.type.numeric.RealType;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Tuan anh TRINH
  */
-public interface IjfxStatisticService extends IjfxService{
+@Plugin(type = ProjectionMethod.class)
+public class MeanProjection implements ProjectionMethod {
+    private final String name = "Mean";
+    @Override
+    public <T extends RealType<T>> void process(List<T> list, Sampler<T> sampler) {
+        SummaryStatistics summaryStatistics = new SummaryStatistics();
+        list.stream()
+                .forEach((t) -> summaryStatistics.addValue(t.getRealDouble()));
+        
+        //Set result
+        sampler.get().setReal(summaryStatistics.getMean());
+
+    }
     
-    
-    public SummaryStatistics getDatasetSummaryStatistics(Dataset dataset);
-    public DescriptiveStatistics getDatasetDescriptiveStatistics(Dataset dataset);
-    public SummaryStatistics getStatistics(File file);
-    public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition);
-    
+    @Override
+    public String toString()
+    {
+        return this.name;
+    }
+
 }

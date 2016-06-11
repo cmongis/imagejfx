@@ -28,12 +28,13 @@ import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
 import net.imagej.Dataset;
+import net.imagej.display.ImageDisplayService;
 import net.imagej.axis.Axes;
-import net.imagej.display.ImageDisplay;
 import net.imagej.sampler.AxisSubrange;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -53,8 +54,12 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     @Parameter
     DatasetIOService datasetIoService;
 
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
+
     @Override
-    public SummaryStatistics getDatasetStatistics(Dataset dataset) {
+    public SummaryStatistics getDatasetSummaryStatistics(Dataset dataset) {
         SummaryStatistics summary = new SummaryStatistics();
         Cursor<RealType<?>> cursor = dataset.cursor();
         cursor.reset();
@@ -74,7 +79,7 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
             t.start();
             Dataset dataset = datasetIoService.open(file.getAbsolutePath());
             t.elapsed("open dataset");
-            SummaryStatistics stats = getDatasetStatistics(dataset);
+            SummaryStatistics stats = getDatasetSummaryStatistics(dataset);
             t.elapsed("read dataset");
             return stats;
         } catch (IOException e) {
@@ -83,6 +88,23 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     }
 
     @Override
+    public DescriptiveStatistics getDatasetDescriptiveStatistics(Dataset dataset) {
+        DescriptiveStatistics summary = new DescriptiveStatistics();
+        Cursor<RealType<?>> cursor = dataset.cursor();
+        cursor.reset();
+        
+        while (cursor.hasNext()) {
+            cursor.fwd();
+            double value = cursor.get().getRealDouble();
+            summary.addValue(value);
+           
+        }
+        return summary;
+    }
+
+   
+
+
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition) {
         SummaryStatistics stats = new SummaryStatistics();
         if (dataset.dimensionIndex(Axes.CHANNEL) == -1) {

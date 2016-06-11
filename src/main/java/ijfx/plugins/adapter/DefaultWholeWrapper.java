@@ -17,24 +17,35 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.stats;
+package ijfx.plugins.adapter;
 
-import ijfx.service.IjfxService;
+import ij.ImagePlus;
 import java.io.File;
 import net.imagej.Dataset;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-
+import org.scijava.ItemIO;
+import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 /**
- *
- * @author cyril
+ * 
+ * @author Tuan anh TRINH
  */
-public interface IjfxStatisticService extends IjfxService{
-    
-    
-    public SummaryStatistics getDatasetSummaryStatistics(Dataset dataset);
-    public DescriptiveStatistics getDatasetDescriptiveStatistics(Dataset dataset);
-    public SummaryStatistics getStatistics(File file);
-    public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition);
-    
+@Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter")
+public class DefaultWholeWrapper extends AbstractImageJ1PluginAdapter {
+   @Parameter(type = ItemIO.BOTH)
+    protected Dataset dataset;
+   @Parameter
+   File f;
+    @Override
+    public ImagePlus processImagePlus(ImagePlus input) {
+        return input;
+    }
+
+    @Override
+    public void run() {
+        setWholeWrap(true);
+        dataset = setOutput(getInput(dataset), dataset);
+    }
+
 }
