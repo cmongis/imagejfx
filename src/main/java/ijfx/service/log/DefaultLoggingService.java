@@ -20,6 +20,7 @@
  */
 package ijfx.service.log;
 
+import ijfx.service.IjfxService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.LogRecorderService;
 import java.io.IOException;
@@ -35,7 +36,6 @@ import mercury.core.LogEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import mercury.core.LogEntryType;
-import net.imagej.ImageJService;
 import netscape.javascript.JSException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -57,8 +57,8 @@ import org.scijava.service.Service;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = Service.class,priority = -99)
-public class DefaultLoggingService extends AbstractService implements ImageJService,LogService {
+@Plugin(type = Service.class)
+public class DefaultLoggingService extends AbstractService implements IjfxService {
 
     protected final ObservableList<LogEntry> errorList = FXCollections.observableArrayList();
 
@@ -142,54 +142,54 @@ public class DefaultLoggingService extends AbstractService implements ImageJServ
         return errorList;
     }
 
-    @Override
+   
     public void debug(Object o) {
         logger.info(o.toString());
         setLevel(LogService.DEBUG);
     }
 
-    @Override
+ 
     public void debug(Throwable thrwbl) {
         logger.log(Level.FINE,null,thrwbl);
         setLevel(LogService.DEBUG);
     }
 
-    @Override
+  
     public void debug(Object o, Throwable thrwbl) {
         logger.log(Level.FINE,o.toString(),thrwbl);
         setLevel(LogService.DEBUG);
     }
 
-    @Override
+   
     public void error(Object o) {
         logger.severe(o.toString());
         setLevel(LogService.ERROR);
     }
 
-    @Override
+  
     public void error(Throwable thrwbl) {
         logger.log(Level.SEVERE,null,thrwbl);
         setLevel(LogService.ERROR);
     }
 
-    @Override
+   
     public void error(Object o, Throwable thrwbl) {
         logger.log(Level.SEVERE,o.toString(),thrwbl);
         setLevel(LogService.ERROR);
     }
 
-    @Override
+  
     public void info(Object o) {
         logger.info(o.toString());
     }
 
-    @Override
+   
     public void info(Throwable thrwbl) {
         logger.log(Level.INFO,null,thrwbl);
         setLevel(LogService.INFO);
     }
 
-    @Override
+   
     public void info(Object o, Throwable thrwbl) {
         logger.log(Level.INFO,o.toString(),thrwbl);
         setLevel(LogService.INFO);
@@ -197,25 +197,25 @@ public class DefaultLoggingService extends AbstractService implements ImageJServ
     
    
 
-    @Override
+  
     public void trace(Object o) {
         logger.finer(o.toString());
         setLevel(LogService.TRACE);
     }
 
-    @Override
+ 
     public void trace(Throwable thrwbl) {
         logger.log(Level.INFO,null,thrwbl);
         setLevel(LogService.TRACE);
     }
 
-    @Override
+   
     public void trace(Object o, Throwable thrwbl) {
         logger.log(Level.FINER,o.toString(),thrwbl);
         setLevel(LogService.TRACE);
     }
 
-    @Override
+  
     public void warn(Object o) {
         logger.warning(o.toString());
     }
@@ -224,49 +224,48 @@ public class DefaultLoggingService extends AbstractService implements ImageJServ
         logger.warning(String.format(format,params));
     }
     
-    @Override
+  
     public void warn(Throwable thrwbl) {
         logger.log(Level.WARNING,null,thrwbl);
         setLevel(LogService.WARN);
     }
 
-    @Override
     public void warn(Object o, Throwable thrwbl) {
         logger.log(Level.WARNING,o.toString(),thrwbl);
         setLevel(LogService.WARN);
     }
 
-    @Override
+   
     public boolean isDebug() {
         return lastLevel == LogService.DEBUG;
     }
 
-    @Override
+  
     public boolean isError() {
         return lastLevel == LogService.ERROR;
     }
 
-    @Override
+ 
     public boolean isInfo() {
         return lastLevel == LogService.INFO;
     }
 
-    @Override
+  
     public boolean isTrace() {
         return lastLevel == LogService.TRACE;
     }
 
-    @Override
+  
     public boolean isWarn() {
          return lastLevel == LogService.WARN;
     }
 
-    @Override
+  
     public int getLevel() {
         return lastLevel;
     }
 
-    @Override
+ 
     public void setLevel(int i) {
         lastLevel = i;
     }
