@@ -231,7 +231,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
                     elementAnalyzedCount++;
                 }
                 if(e instanceof PlaneMetaDataSetWrapper) {
-                    SummaryStatistics stats = statsService.getDatasetStatistics(e.getDataset());
+                    SummaryStatistics stats = statsService.getDatasetSummaryStatistics(e.getDataset());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
