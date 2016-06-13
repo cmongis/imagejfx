@@ -36,12 +36,13 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- *
+ * Deprecated., trying to solve the problem
  * @author Tuan anh TRINH
  * @param <T>
  */
-@Plugin(type = Command.class, menuPath = "Image > Stacks > Project...", attrs = {
-    @Attr(name = "no-legacy")})
+@Deprecated
+//@Plugin(type = Command.class, menuPath = "Image > Stacks > Project...", attrs = {
+  //  @Attr(name = "no-legacy")})
 public class ProjectionCommand<T extends RealType<T>> implements Command {
 
     @Parameter(type = ItemIO.OUTPUT)
@@ -86,6 +87,7 @@ public class ProjectionCommand<T extends RealType<T>> implements Command {
         }
         int axisIndex = in.dimensionIndex(Axes.Z);
         
+        ops.op("project",out.getImgPlus(),in.getImgPlus(),method,(int)axisIndex);
         //ops.image().project(out.getImgPlus(), in.getImgPlus(), method, axisIndex);
     }
 }

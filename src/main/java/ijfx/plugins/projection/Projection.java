@@ -42,7 +42,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Projection", attrs = {
+@Plugin(type = Command.class, menuPath = "Image > Stacks > Project...", attrs = {
     @Attr(name = "no-legacy")})
 public class Projection implements Command {
 
