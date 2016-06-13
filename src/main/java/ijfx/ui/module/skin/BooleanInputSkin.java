@@ -49,7 +49,9 @@ public class BooleanInputSkin extends AbstractInputSkinPlugin<Boolean> {
         
         choice = new CheckBox();
          Bindings.bindBidirectional(choice.selectedProperty(), value);
-
+         
+         choice.textProperty().bind(Bindings.createStringBinding(this::getLabel, choice.selectedProperty()));
+         
     }
       
     @Override
@@ -66,6 +68,10 @@ public class BooleanInputSkin extends AbstractInputSkinPlugin<Boolean> {
     public void dispose() {
     }
 
+    private String getLabel() {
+        return choice.isSelected() ? YES : NO;
+    }
+    
     @Override
     public boolean canHandle(Class<?> clazz) {
         return clazz == boolean.class || clazz == Boolean.class;
