@@ -196,7 +196,7 @@ public class PreviewService extends AbstractService implements ImageJService {
             for (int j = y; j < height + y; j++) {
                 randomAccessOrigin.setPosition(j, 1);
                 randomAccessOutput.setPosition(j - y, 1);
-                randomAccessOutput.get().set(randomAccessOrigin.get());
+                randomAccessOutput.get().setReal(randomAccessOrigin.get().getRealFloat());
             }
         }
 
