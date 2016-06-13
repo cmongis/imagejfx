@@ -21,6 +21,7 @@
 package ijfx.ui.module.input;
 
 
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.module.InputEvent;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -107,6 +108,7 @@ public class InputControl<T extends Object> extends Control {
         //System.out.println("new input event : "+newValue.toString());
         if(input.getValue() != newValue) input.setValue(newValue);
         this.fireEvent(new InputEvent(input, newValue));
+        ImageJFX.getThreadPool().execute(input::callback);
     }
     
     

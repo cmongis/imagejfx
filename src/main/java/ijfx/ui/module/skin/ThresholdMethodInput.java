@@ -73,11 +73,15 @@ public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMetho
     @Override
     public void init(Input<ThresholdMethod> input) {
 
+        ThresholdMethod def = input.getDefaultValue();
+        
+        
+        
         thresholdMethodComboBox.getItems().addAll(getMethodsList());
-        thresholdMethodComboBox.getSelectionModel().select(input.getDefaultValue());
+        if(def == null) def = methodList.get(0);
+        thresholdMethodComboBox.getSelectionModel().select(def);
         thresholdMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             methodProperty.setValue(newValue);
-
         });
 
     }

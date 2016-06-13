@@ -21,20 +21,24 @@ package ijfx.ui.plugin.panel;
 
 import ijfx.service.log.LogService;
 import ijfx.service.thumb.ThumbService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.AbstractExplorable;
 import ijfx.ui.explorer.Iconazable;
 import ijfx.ui.explorer.view.IconView;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import mongis.utils.CallbackTask;
 import mongis.utils.FileUtils;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneIconCell;
 import net.imagej.Dataset;
 import org.scijava.Context;
+import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.io.RecentFileService;
 import org.scijava.plugin.Parameter;
@@ -62,6 +66,10 @@ public class RecentFilePanel extends BorderPane{
     
     @Parameter
     CommandService commandService;
+    
+    @Parameter
+    LoadingScreenService loadingScreenService;
+    
     
     public RecentFilePanel(Context context) {
         this.context = context;
@@ -135,8 +143,9 @@ public class RecentFilePanel extends BorderPane{
         }
 
         @Override
-        public void open() {
-            commandService.run(OpenFile.class, true, "inputFile",file);
+        public void open() throws Exception {
+            Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile",file);
+            run.get();
         }
 
         @Override
@@ -160,8 +169,26 @@ public class RecentFilePanel extends BorderPane{
         @Override
         public void onSimpleClick() {
             System.out.println("it was a simple click !");
-                   
-            getItem().open();
+            
+            new CallbackTask<Void,Boolean>()
+                    .setName("Opening file...")
+                    .run(vd ->  {
+                        try{ 
+                        getItem().open();
+                        return true;
+                            }
+                    catch(Exception e) {
+                        return false;
+                    }})
+                    .then(success->{
+                        if(success) {
+                            
+                        }
+                    })
+                    .submit(loadingScreenService)
+                    .start();
+            
+            
         }
     }
     

@@ -512,7 +512,10 @@ public class ImageWindow extends Window {
             
             Timer t = timerService.getTimer(this.getClass());
             t.start();
-            Node node = getDrawer(overlay).update(overlay, canvas.getCamera());
+            if(overlay == null) return;
+            OverlayDrawer drawer = getDrawer(overlay);
+            if(drawer == null) return;
+            Node node = drawer.update(overlay, canvas.getCamera());
             node.setMouseTransparent(true);
             node.setUserData(overlay);
             

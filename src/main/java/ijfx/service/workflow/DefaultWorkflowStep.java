@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import net.imagej.ImageJ;
+import net.imagej.threshold.ThresholdMethod;
 import net.imglib2.display.ColorTable8;
 import org.apache.commons.lang3.ArrayUtils;
 import org.scijava.command.CommandInfo;
@@ -83,7 +84,7 @@ public class DefaultWorkflowStep implements WorkflowStep {
         File.class,
         ColorTable8.class,
         LongInterval.class
-            
+        ,ThresholdMethod.class
     };
 
     public DefaultWorkflowStep() {

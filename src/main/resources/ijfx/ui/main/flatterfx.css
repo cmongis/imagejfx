@@ -1887,6 +1887,9 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .pane-icon-cell:selected {
     -fx-background-color:-flatter-primary;
 }
+.pane-icon-cell:hover {
+    -fx-cursor:HAND;
+}
 
 
 .explorer-filter,#filterScrollPane {

@@ -21,6 +21,7 @@
 package ijfx.ui.plugin.panel;
 
 import ijfx.plugins.commands.ApplyLUT;
+import ijfx.plugins.commands.ApplyLUT;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
@@ -75,6 +76,7 @@ import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.input.MouseEvent;
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
@@ -244,7 +246,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     public void applyLUT(ColorTable table) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("colorTable", table);
-        commandService.run(ApplyLUT.class, true, params);
+        int channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
+        channel = channel == -1 ? 0 : channel;
+        commandService.run(ApplyLUT.class, true, "input",imageDisplayService.getActiveDataset(),"colorTable",table,"channelId",channel);
 
         //lutService.applyLUT(table, displayService.getActiveDisplay(ImageDisplay.class));
     }
@@ -384,14 +388,14 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         if (getCurrentImageDisplay() != null) {
             if (getCurrentDatasetView().getColorMode() != booleanToColorMode(mergedViewToggleButton.isSelected())) {
-                getCurrentDatasetView().setColorMode(mergedViewToggleButton.isSelected() ? ColorMode.COMPOSITE : ColorMode.GRAYSCALE);
+                getCurrentDatasetView().setColorMode(mergedViewToggleButton.isSelected() ? ColorMode.COMPOSITE : ColorMode.COLOR);
             }
         }
 
     }
 
     private ColorMode booleanToColorMode(boolean isComposite) {
-        return isComposite ? ColorMode.COMPOSITE : ColorMode.GRAYSCALE;
+        return isComposite ? ColorMode.COMPOSITE : ColorMode.COLOR;
     }
 
     public ImageDisplay getCurrentImageDisplay() {
