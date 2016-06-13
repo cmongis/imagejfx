@@ -47,6 +47,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.scijava.event.EventService;
 import org.scijava.event.SciJavaEvent;
+import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -56,8 +57,8 @@ import org.scijava.service.Service;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = Service.class)
-public class LogService extends AbstractService implements ImageJService {
+@Plugin(type = Service.class,priority = -99)
+public class DefaultLoggingService extends AbstractService implements ImageJService,LogService {
 
     protected final ObservableList<LogEntry> errorList = FXCollections.observableArrayList();
 
@@ -66,6 +67,8 @@ public class LogService extends AbstractService implements ImageJService {
     String reportAddress = "http://www.imagejfx.net/report/send/";
 
     Logger logger = ImageJFX.getLogger();
+    
+    int lastLevel = LogService.NONE;
     
     Handler handler = new Handler() {
 
@@ -88,7 +91,7 @@ public class LogService extends AbstractService implements ImageJService {
         }
     };
 
-    public LogService() {
+    public DefaultLoggingService() {
         super();
 
         //Logger.getGlobal().addHandler(handler);
@@ -137,6 +140,135 @@ public class LogService extends AbstractService implements ImageJService {
 
     public ObservableList<LogEntry> getErrorList() {
         return errorList;
+    }
+
+    @Override
+    public void debug(Object o) {
+        logger.info(o.toString());
+        setLevel(LogService.DEBUG);
+    }
+
+    @Override
+    public void debug(Throwable thrwbl) {
+        logger.log(Level.FINE,null,thrwbl);
+        setLevel(LogService.DEBUG);
+    }
+
+    @Override
+    public void debug(Object o, Throwable thrwbl) {
+        logger.log(Level.FINE,o.toString(),thrwbl);
+        setLevel(LogService.DEBUG);
+    }
+
+    @Override
+    public void error(Object o) {
+        logger.severe(o.toString());
+        setLevel(LogService.ERROR);
+    }
+
+    @Override
+    public void error(Throwable thrwbl) {
+        logger.log(Level.SEVERE,null,thrwbl);
+        setLevel(LogService.ERROR);
+    }
+
+    @Override
+    public void error(Object o, Throwable thrwbl) {
+        logger.log(Level.SEVERE,o.toString(),thrwbl);
+        setLevel(LogService.ERROR);
+    }
+
+    @Override
+    public void info(Object o) {
+        logger.info(o.toString());
+    }
+
+    @Override
+    public void info(Throwable thrwbl) {
+        logger.log(Level.INFO,null,thrwbl);
+        setLevel(LogService.INFO);
+    }
+
+    @Override
+    public void info(Object o, Throwable thrwbl) {
+        logger.log(Level.INFO,o.toString(),thrwbl);
+        setLevel(LogService.INFO);
+    }
+    
+   
+
+    @Override
+    public void trace(Object o) {
+        logger.finer(o.toString());
+        setLevel(LogService.TRACE);
+    }
+
+    @Override
+    public void trace(Throwable thrwbl) {
+        logger.log(Level.INFO,null,thrwbl);
+        setLevel(LogService.TRACE);
+    }
+
+    @Override
+    public void trace(Object o, Throwable thrwbl) {
+        logger.log(Level.FINER,o.toString(),thrwbl);
+        setLevel(LogService.TRACE);
+    }
+
+    @Override
+    public void warn(Object o) {
+        logger.warning(o.toString());
+    }
+
+    public void warn(String format, Object... params) {
+        logger.warning(String.format(format,params));
+    }
+    
+    @Override
+    public void warn(Throwable thrwbl) {
+        logger.log(Level.WARNING,null,thrwbl);
+        setLevel(LogService.WARN);
+    }
+
+    @Override
+    public void warn(Object o, Throwable thrwbl) {
+        logger.log(Level.WARNING,o.toString(),thrwbl);
+        setLevel(LogService.WARN);
+    }
+
+    @Override
+    public boolean isDebug() {
+        return lastLevel == LogService.DEBUG;
+    }
+
+    @Override
+    public boolean isError() {
+        return lastLevel == LogService.ERROR;
+    }
+
+    @Override
+    public boolean isInfo() {
+        return lastLevel == LogService.INFO;
+    }
+
+    @Override
+    public boolean isTrace() {
+        return lastLevel == LogService.TRACE;
+    }
+
+    @Override
+    public boolean isWarn() {
+         return lastLevel == LogService.WARN;
+    }
+
+    @Override
+    public int getLevel() {
+        return lastLevel;
+    }
+
+    @Override
+    public void setLevel(int i) {
+        lastLevel = i;
     }
 
     public class LogErrorEvent extends SciJavaEvent {

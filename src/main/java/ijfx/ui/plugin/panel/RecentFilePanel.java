@@ -19,7 +19,7 @@
  */
 package ijfx.ui.plugin.panel;
 
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.AbstractExplorable;
@@ -62,7 +62,7 @@ public class RecentFilePanel extends BorderPane{
     ThumbService thumbService;
     
     @Parameter
-    LogService logService;
+    DefaultLoggingService logService;
     
     @Parameter
     CommandService commandService;

@@ -21,7 +21,7 @@
 package ijfx.service.ui;
 
 import ijfx.service.uicontext.UiContextService;
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.main.ImageJFX;
@@ -75,7 +75,7 @@ public class AppService extends AbstractService implements ImageJService {
     EventService eventService;
 
     @Parameter
-    LogService logErrorService;
+    DefaultLoggingService logErrorService;
 
   
 

@@ -22,6 +22,7 @@ package ijfx.ui.datadisplay.image;
 
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.ToolChangeEvent;
@@ -133,7 +134,7 @@ public class ImageWindow extends Window {
     private EventService eventService;
 
     @Parameter
-    private LogService logService;
+    private DefaultLoggingService logService;
 
     @Parameter
     private ThreadService threadService;
@@ -514,7 +515,9 @@ public class ImageWindow extends Window {
             t.start();
             if(overlay == null) return;
             OverlayDrawer drawer = getDrawer(overlay);
-            if(drawer == null) return;
+            if(drawer == null) {
+                logService.warn("No drawer found for %s",overlay.getClass().getSimpleName());
+            };
             Node node = drawer.update(overlay, canvas.getCamera());
             node.setMouseTransparent(true);
             node.setUserData(overlay);
