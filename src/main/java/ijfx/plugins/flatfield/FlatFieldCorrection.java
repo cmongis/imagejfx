@@ -238,8 +238,7 @@ public class FlatFieldCorrection implements Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-           // System.out.println(resultRandomAccess.get().toString());
-            Float f = numeratorCursor.get().getRealFloat()+denominatorRandomAccess.get().getRealFloat();
+            Float f = numeratorCursor.get().getRealFloat()/denominatorRandomAccess.get().getRealFloat();
             resultRandomAccess.get().setReal(f);
 
         }
