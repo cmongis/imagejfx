@@ -30,6 +30,8 @@ import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.FolderManagerService;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
@@ -159,7 +161,11 @@ public class ExplorerTableVie implements ExplorerView{
         row.setOnMouseClicked(event->{
             if(event.getClickCount() == 2 && row.isEmpty() == false) {
                 Explorable e = row.getItem();
-                e.open();
+                try {
+                    e.open();
+                } catch (Exception ex) {
+                    Logger.getLogger(ExplorerTableVie.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         
