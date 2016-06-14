@@ -22,7 +22,7 @@ package ijfx.service.preview;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.DisplayBatchInput;
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +77,7 @@ public class PreviewService extends AbstractService implements ImageJService {
     private BatchService batchService;
     
     @Parameter
-    private LogService logService;
+    private DefaultLoggingService logService;
     
     private int width;
     private int height;

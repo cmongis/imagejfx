@@ -23,12 +23,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import mongis.utils.panecell.PaneIconCell;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
 public class ExplorerIconCell extends PaneIconCell<Iconazable>{
+    
+    @Parameter
+    ExplorerService explorerService;
     
     public ExplorerIconCell() {
         super();
@@ -74,11 +78,7 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
     
     @Override
     public void onDoubleClick() {
-        try {
-            getItem().open();
-        } catch (Exception ex) {
-            Logger.getLogger(ExplorerIconCell.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        explorerService.open(getItem());
     }
     
 }

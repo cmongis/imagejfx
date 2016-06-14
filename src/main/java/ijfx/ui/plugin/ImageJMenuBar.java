@@ -24,7 +24,7 @@ import ijfx.ui.UiPlugin;
 import ijfx.bridge.FxMenuCreator;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.ui.ImageJ1PluginService;
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import java.util.logging.Logger;
 
 import javafx.scene.Node;
@@ -76,7 +76,7 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
     final Logger logger = ImageJFX.getLogger();
 
     @Parameter
-    LogService logErrorService;
+    DefaultLoggingService logErrorService;
 
     public static final String CSS_IJ1_CMD = "ij1-command";
     

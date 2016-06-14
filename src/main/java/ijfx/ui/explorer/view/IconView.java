@@ -23,6 +23,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.Iconazable;
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ import javafx.scene.layout.TilePane;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
 import mongis.utils.panecell.ScrollBinder;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -52,6 +55,12 @@ public class IconView extends ScrollPane implements ExplorerView {
 
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(tilePane);
 
+    @Parameter
+    ExplorerService explorerService;
+    
+    @Parameter
+    Context context;
+    
     public IconView() {
         setContent(tilePane);
         setPrefWidth(400);
@@ -86,7 +95,9 @@ public class IconView extends ScrollPane implements ExplorerView {
     }
 
     private PaneCell<Iconazable> createIcon() {
-        return new ExplorerIconCell();
+        ExplorerIconCell cell = new ExplorerIconCell();
+        context.inject(cell);
+        return cell;
     }
 
     @Override

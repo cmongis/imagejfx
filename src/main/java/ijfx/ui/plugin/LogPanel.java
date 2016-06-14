@@ -25,8 +25,8 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
-import ijfx.service.log.LogService;
-import ijfx.service.log.LogService.LogErrorEvent;
+import ijfx.service.log.DefaultLoggingService;
+import ijfx.service.log.DefaultLoggingService.LogErrorEvent;
 import ijfx.ui.report.ReportDialog;
 import java.io.IOException;
 import javafx.application.Platform;
@@ -84,7 +84,7 @@ public class LogPanel extends BorderPane implements UiPlugin {
     Context context;
     
      @Parameter
-    private LogService logService;
+    private DefaultLoggingService logService;
 
    
 
@@ -207,7 +207,7 @@ public class LogPanel extends BorderPane implements UiPlugin {
 
     // update the button when... what is this ?
     @EventHandler
-    public void handleEvent(LogService.CountResetChange event) {
+    public void handleEvent(DefaultLoggingService.CountResetChange event) {
         Platform.runLater(() -> updateButton());
     }
 

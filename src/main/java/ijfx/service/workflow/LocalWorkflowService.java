@@ -55,14 +55,15 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
     
     private ObjectMapper objectMapper = new ObjectMapper();
     
-    private String paramFile = ImageJFX.getConfigFile("workflowList.js");
+    private String paramFile = ImageJFX.getConfigFile("my_workflows.js");
     
     Logger logger = ImageJFX.getLogger();
     
     @Parameter
     LoadingScreenService loadingScreenService;
     
-   
+    @Parameter
+    WorkflowIOService workflowIOService;
     
     @Override
     public void initialize() {
@@ -113,6 +114,22 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
             objectMapper.writeValue(f, new WorkflowList(workflowList));
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE,"Error when saving workflow.",ex);;
+        }
+    }
+
+    @Override
+    public boolean importWorkflow(Workflow workflow, File inputFile) {
+        return addWorkflow(workflowIOService.loadWorkflow(inputFile));
+    }
+
+    @Override
+    public boolean exportWorkflow(Workflow workflow, File outputFile) {
+        try {
+            workflowIOService.saveWorkflow(workflow, outputFile);
+            return true;
+        }
+        catch(Exception e) {
+            return false;
         }
     }
     

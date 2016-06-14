@@ -710,10 +710,10 @@
 .tool-bar {
     -fx-background-color:-bg-dark;
 }
-.tool-bar .label {
+.toolbar-label {
     
-    -fx-padding:0.3em;
-    -fx-background-color:red;
+   
+    
 }
 
 /*

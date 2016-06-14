@@ -67,6 +67,8 @@ public class DefaultFxToolService extends AbstractService implements FxToolServi
                 toolMap.put(tool.getClass(), tool);
                 toolList.add(tool);
             }
+            setCurrentTool(Hand.class);
+            
         }
     }
     

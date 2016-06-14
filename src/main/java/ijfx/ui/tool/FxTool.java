@@ -21,6 +21,7 @@
 package ijfx.ui.tool;
 
 import ijfx.ui.canvas.FxImageCanvas;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import org.scijava.plugin.SciJavaPlugin;
 
@@ -40,9 +41,16 @@ import org.scijava.plugin.SciJavaPlugin;
  */
 public interface FxTool extends SciJavaPlugin {
 
+    public void update(FxTool currentTool);
+    
     public void subscribe(FxImageCanvas canvas);
 
     public void unsubscribe(FxImageCanvas canvas);
 
     public Node getNode();
+    
+    default public Cursor getDefaultCursor() {
+        return Cursor.DEFAULT;
+    }
+    
 }

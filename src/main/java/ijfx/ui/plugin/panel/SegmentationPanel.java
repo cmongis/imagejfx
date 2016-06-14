@@ -98,7 +98,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @FXML
     private Label titleLabel;
   
-
+    @FXML
+    private VBox resultVBox;
+   
     @Parameter
     private Context context;
 

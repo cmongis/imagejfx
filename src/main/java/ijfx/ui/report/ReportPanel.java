@@ -20,7 +20,7 @@
  */
 package ijfx.ui.report;
 
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -57,7 +57,7 @@ public class ReportPanel extends GridPane {
     TextField senderTextField;
 
     @Parameter
-    LogService logService;
+    DefaultLoggingService logService;
 
 
     static final Logger logger = ImageJFX.getLogger();

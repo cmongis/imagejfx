@@ -24,7 +24,7 @@ import ijfx.ui.UiPlugin;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +49,7 @@ public class ErrorButton extends AbstractContextButton {
     PopOver popover;
 
     @Parameter
-    LogService logEntryService;
+    DefaultLoggingService logEntryService;
 
     LogPanel errorPanel;
     
@@ -122,12 +122,12 @@ public class ErrorButton extends AbstractContextButton {
     }
     
     @EventHandler
-    public void handleEvent(LogService.LogErrorEvent event) {
+    public void handleEvent(DefaultLoggingService.LogErrorEvent event) {
         Platform.runLater(()->updateButton());
     }
     
     @EventHandler
-    public void handleEvent(LogService.CountResetChange event) {
+    public void handleEvent(DefaultLoggingService.CountResetChange event) {
         Platform.runLater(()->updateButton());
     }
     

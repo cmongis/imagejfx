@@ -161,11 +161,7 @@ public class ExplorerTableVie implements ExplorerView{
         row.setOnMouseClicked(event->{
             if(event.getClickCount() == 2 && row.isEmpty() == false) {
                 Explorable e = row.getItem();
-                try {
-                    e.open();
-                } catch (Exception ex) {
-                    Logger.getLogger(ExplorerTableVie.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                explorerService.open(e);
             }
         });
         

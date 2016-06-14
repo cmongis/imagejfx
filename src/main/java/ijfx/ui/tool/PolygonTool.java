@@ -22,6 +22,7 @@ package ijfx.ui.tool;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
@@ -119,6 +120,9 @@ public class PolygonTool extends AbstractPathTool {
         return (StackPane)getCanvas().getParent();
     }
     
-    
+    @Override
+    public Cursor getDefaultCursor() {
+        return Cursor.CROSSHAIR;
+    }
     
 }

@@ -28,7 +28,7 @@ import ijfx.ui.notification.Notification;
 import ijfx.ui.notification.NotificationEvent;
 import ijfx.service.ui.AppService;
 import ijfx.service.uicontext.UiContextService;
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.ui.FontEndTaskSubmitted;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.hint.DefaultHint;
@@ -190,7 +190,7 @@ public class MainWindowController extends AnchorPane {
     AppService appService;
 
     @Parameter
-    LogService logErrorService;
+    DefaultLoggingService logErrorService;
 
     @Parameter
     HintService hintService;

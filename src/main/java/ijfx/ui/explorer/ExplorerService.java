@@ -45,4 +45,9 @@ public interface ExplorerService extends IjfxService{
     
     void selectItem(Explorable explorable);
     
+    /**
+     *  Open the iconazable displaying a loading screen
+     * @param iconazable to open
+     */
+    void open(Iconazable iconazable);
 }

@@ -20,6 +20,7 @@
 package ijfx.ui.explorer;
 
 import ijfx.core.metadata.MetaDataOwner;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.event.DisplayedListChanged;
 import ijfx.ui.explorer.event.ExploredListChanged;
 import java.time.Duration;
@@ -54,6 +55,9 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     @Parameter
     EventService eventService;
 
+    @Parameter
+            LoadingScreenService loadingScreenService;
+    
     Predicate<MetaDataOwner> lastFilter;
     Predicate<MetaDataOwner> optionalFilter;
 
@@ -157,7 +161,29 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         else selected.add(-1);
     }
     
-    
+    public void open(Iconazable explorable){
+        
+        
+        new CallbackTask<Void,Boolean>()
+                    .setName("Opening file...")
+                    .run(vd ->  {
+                        try{ 
+                        explorable.open();
+                        return true;
+                            }
+                    catch(Exception e) {
+                        return false;
+                    }})
+                    .then(success->{
+                        if(success) {
+                            
+                        }
+                    })
+                    .submit(loadingScreenService)
+                    .start();
+        
+        
+    }
 
     
 }

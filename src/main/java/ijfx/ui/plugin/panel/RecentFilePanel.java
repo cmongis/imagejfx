@@ -19,10 +19,11 @@
  */
 package ijfx.ui.plugin.panel;
 
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.AbstractExplorable;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.Iconazable;
 import ijfx.ui.explorer.view.IconView;
 import java.io.File;
@@ -32,7 +33,6 @@ import java.util.stream.Collectors;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
-import mongis.utils.CallbackTask;
 import mongis.utils.FileUtils;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneIconCell;
@@ -62,7 +62,7 @@ public class RecentFilePanel extends BorderPane{
     ThumbService thumbService;
     
     @Parameter
-    LogService logService;
+    DefaultLoggingService logService;
     
     @Parameter
     CommandService commandService;
@@ -70,6 +70,8 @@ public class RecentFilePanel extends BorderPane{
     @Parameter
     LoadingScreenService loadingScreenService;
     
+    @Parameter
+    ExplorerService explorerService;
     
     public RecentFilePanel(Context context) {
         this.context = context;
@@ -168,26 +170,8 @@ public class RecentFilePanel extends BorderPane{
         
         @Override
         public void onSimpleClick() {
-            System.out.println("it was a simple click !");
-            
-            new CallbackTask<Void,Boolean>()
-                    .setName("Opening file...")
-                    .run(vd ->  {
-                        try{ 
-                        getItem().open();
-                        return true;
-                            }
-                    catch(Exception e) {
-                        return false;
-                    }})
-                    .then(success->{
-                        if(success) {
-                            
-                        }
-                    })
-                    .submit(loadingScreenService)
-                    .start();
-            
+          
+            explorerService.open(getItem());
             
         }
     }

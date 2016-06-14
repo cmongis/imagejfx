@@ -41,20 +41,25 @@ public interface OverlayDrawer<T extends Overlay> extends ClassHandler<Overlay> 
     // with size and position depending on the viewport
     public Node update(T overlay, ViewPort viewport);
 
-    public static Color toFxColor(ColorRGB colorRGB) {
+    public static Color toFxColor(ColorRGB color) {
+        return toFxColor(color,1.0);
+    }
+    
+    public static Color toFxColor(ColorRGB colorRGB,double f) {
         double red = 1.0 * colorRGB.getRed() / 255;
         double green = 1.0 * colorRGB.getGreen() / 255;
         double blue = 1.0 * colorRGB.getBlue() / 255;
-        double alpha = 1.0 * colorRGB.getAlpha() / 255;
+        double alpha = colorRGB.getAlpha() / 255 * f;
         //return new fillColor
         return new Color(red, green, blue, alpha);
     }
 
     public static void color(Overlay overlay, Shape shape) {
         ColorRGB fillColor = overlay.getFillColor();
-        Color fxFillColor = toFxColor(fillColor).deriveColor(0.0, 0, 0, 0.1);
+        Color fxFillColor = toFxColor(fillColor,0).deriveColor(1.0, 0, 0, 0.0);
         shape.setFill(fxFillColor);
-        shape.setStroke(toFxColor(overlay.getLineColor()));
+        shape.setStroke(toFxColor(overlay.getLineColor(),1));
+       
         shape.setStrokeWidth(overlay.getLineWidth());
         shape.setOpacity(1.0);
     }

@@ -128,8 +128,7 @@ public class WorkflowPanel extends GridPane {
                 return;
             }
             if (event.getCode() == KeyCode.ENTER) {
-                modules.get(moduleSearchTextField.getText()).run();
-                moduleSearchTextField.setText("");
+               onAddButtonClicked();
             }
         });
 
@@ -141,6 +140,15 @@ public class WorkflowPanel extends GridPane {
 
     }
 
+    
+    
+    
+    @FXML
+    private void onAddButtonClicked() {
+         modules.get(moduleSearchTextField.getText()).run();
+                moduleSearchTextField.setText("");
+    }
+    
     // handler used when clicked on a action in the menu list
     private void onAddStepButtonClicked(ShadowMenu shadowMenu) {
         addStep(shadowMenu.getModuleInfo());
