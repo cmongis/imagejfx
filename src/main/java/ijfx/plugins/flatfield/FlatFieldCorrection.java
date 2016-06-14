@@ -50,7 +50,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>FlatField Corrrection")
+@Plugin(type = Command.class, menuPath = "Plugins>FlatField Correction")
 public class FlatFieldCorrection implements Command {
 
     @Parameter
@@ -151,7 +151,8 @@ public class FlatFieldCorrection implements Command {
         parameters.put("display", getImageDisplay(dataset));
         Module module = executeCommand(DivideDataValuesBy.class, parameters);
         ImageDisplay imageDisplay = (ImageDisplay) module.getOutput("display");
-        return (Dataset) imageDisplay.getActiveView().getData();
+        Dataset datasetResult = (Dataset) imageDisplay.getActiveView().getData();
+        return datasetResult;
 
     }
 

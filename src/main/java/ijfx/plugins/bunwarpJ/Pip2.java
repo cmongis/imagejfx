@@ -114,12 +114,12 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
      * landmarks weight
      */
     @Parameter
-    private double landmarkWeight = 0;
+    private double landmarkWeight = 1.0;
     /**
      * image similarity weight
      */
     @Parameter
-    private double imageWeight = 1;
+    private double imageWeight = 0.0;
     /**
      * consistency weight
      */
@@ -128,8 +128,8 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     /**
      * flag for rich output (verbose option)
      */
-    @Parameter
-    private boolean richOutput = false;
+    //@Parameter
+    private boolean richOutput = true;
     /**
      * flag for save transformation option
      */
@@ -159,6 +159,7 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     ImageProcessor sourceMskIP = null;
     int max_scale_deformation;
     int min_scale_deformation;
+    int mode;
 
     /*....................................................................
        Public methods
@@ -172,23 +173,24 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     @Override
     public void run() {
         Runtime.getRuntime().gc();
- 
-        //Set parameters
-        int mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
-        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
-        min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
-        this.sourceImp = getInput(datasetSource);//getImpParameter(datasetSource, position);
-        this.targetImp = getInput(datasetTarget);//getImpParameter(datasetTarget, position);
-        
+init();
+//        //Set parameters
+//        int mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
+//        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
+//        min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
+//        this.sourceImp = getInput(datasetSource);//getImpParameter(datasetSource, position);
+//        this.targetImp = getInput(datasetTarget);//getImpParameter(datasetTarget, position);
+
         //Load landmarks
         Stack<Point> sourcePoints = new Stack<>();
         Stack<Point> targetPoints = new Stack<>();
         MiscTools.loadPoints(landmarksFile.getAbsolutePath(), sourcePoints, targetPoints);
+        Param p = new Param();
         Param param = new Param(mode, maxImageSubsamplingFactor, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold);
 
         //Calcul transformation which have to be applied after
         Transformation transformation = bUnwarpJ_.computeTransformationBatch(targetImp, sourceImp, targetMskIP, sourceMskIP, sourcePoints, targetPoints, param);
-        transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
+        //transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
         //Apply transformation
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
             ImagePlus[] imArray = new ImagePlus[2];
@@ -201,21 +203,29 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
                     this.stopThreshold, false, this.saveTransformation, "");
 
             dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
-            
+
             //Display result
             Img img = ImageJFunctions.wrap(imagePlus);
-            displayService.createDisplay(transformedTitle(imagePlus), datasetService.create(img));
+            Dataset datasetPostTransformation = datasetService.create(img);
+            displayService.createDisplay(transformedTitle(imagePlus), datasetPostTransformation);
         });
 
         if (richOutput) {
             Img img = ImageJFunctions.wrap(getFeedback(transformation));
             displayService.createDisplay("Feedback", img);
         }
-	
+
     }
 
     /* end run */
- 
+    public void init() {
+        //Set parameters
+        mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
+        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
+        min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
+        this.sourceImp = getInput(datasetSource);//getImpParameter(datasetSource, position);
+        this.targetImp = getInput(datasetTarget);//getImpParameter(datasetTarget, position);
+    }
 
     @Override
     public ImagePlus processImagePlus(ImagePlus input) {
@@ -251,15 +261,15 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         title = title.substring(0, index) + "-aligned" + title.substring(index);
         return title;
     }
-    
+
     /**
      * Convert Dataset to ImagePlus and extract slice.
+     *
      * @param dataset
      * @param i
-     * @return 
+     * @return
      */
-    private ImagePlus getImpParameter(Dataset dataset, int i)
-    {
+    private ImagePlus getImpParameter(Dataset dataset, int i) {
         ImagePlus imagePlus = getInput(dataset);
         ImageStack imageStack = imagePlus.getStack();
         ImageStack imageStack2 = new ImageStack(imagePlus.getWidth(), imagePlus.getHeight());
