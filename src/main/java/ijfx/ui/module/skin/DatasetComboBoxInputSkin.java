@@ -82,8 +82,9 @@ public class DatasetComboBoxInputSkin extends AbstractInputSkinPlugin<Dataset> {
     public void init(Input<Dataset> input) {
 
         //datasetComboBox.getItems().addAll(datasetService.getDatasets());
-        List<Dataset> toAdd = datasetService.getDatasets()
+        List<Dataset> toAdd = imageDisplayService.getImageDisplays()
                 .parallelStream()
+                .map(d -> imageDisplayService.getActiveDataset(d))
                 .filter(dataset -> dataset.toString().endsWith("lut") == false)
                 .collect(Collectors.toList());
 

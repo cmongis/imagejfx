@@ -19,13 +19,16 @@
  */
 package ijfx.ui.plugin.panel;
 
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.thumb.ThumbService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.AbstractExplorable;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.Iconazable;
 import ijfx.ui.explorer.view.IconView;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -35,6 +38,7 @@ import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneIconCell;
 import net.imagej.Dataset;
 import org.scijava.Context;
+import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.io.RecentFileService;
 import org.scijava.plugin.Parameter;
@@ -58,10 +62,16 @@ public class RecentFilePanel extends BorderPane{
     ThumbService thumbService;
     
     @Parameter
-    LogService logService;
+    DefaultLoggingService logService;
     
     @Parameter
     CommandService commandService;
+    
+    @Parameter
+    LoadingScreenService loadingScreenService;
+    
+    @Parameter
+    ExplorerService explorerService;
     
     public RecentFilePanel(Context context) {
         this.context = context;
@@ -135,8 +145,9 @@ public class RecentFilePanel extends BorderPane{
         }
 
         @Override
-        public void open() {
-            commandService.run(OpenFile.class, true, "inputFile",file);
+        public void open() throws Exception {
+            Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile",file);
+            run.get();
         }
 
         @Override
@@ -159,9 +170,9 @@ public class RecentFilePanel extends BorderPane{
         
         @Override
         public void onSimpleClick() {
-            System.out.println("it was a simple click !");
-                   
-            getItem().open();
+          
+            explorerService.open(getItem());
+            
         }
     }
     

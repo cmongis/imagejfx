@@ -23,7 +23,7 @@ package ijfx.service.uiplugin;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.ui.UiPlugin;
-import ijfx.service.log.LogService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.LoadingScreen;
@@ -77,7 +77,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
     Context context;
 
     @Parameter
-    LogService logErrorService;
+    DefaultLoggingService logErrorService;
 
     @Parameter
     EventService eventService;

@@ -39,10 +39,10 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
+import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
@@ -57,6 +57,10 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     @Parameter
     UIService uIService;
+    
+    @Parameter
+    Context context;
+    
     private VBox vBox = new VBox();
     private ScrollPane scrollPane;
     private ScrollBinderChildren scrollBinderChildren;
@@ -136,7 +140,9 @@ public class GridIconView extends BorderPane implements ExplorerView {
     }
 
     private PaneCell<Iconazable> createIcon() {
-        return new ExplorerIconCell();
+       PaneCell<Iconazable> cell = new ExplorerIconCell();
+        context.inject(cell);
+        return cell;
     }
 
     @Override

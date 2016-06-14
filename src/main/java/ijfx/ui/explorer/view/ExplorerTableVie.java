@@ -159,7 +159,7 @@ public class ExplorerTableVie implements ExplorerView{
         row.setOnMouseClicked(event->{
             if(event.getClickCount() == 2 && row.isEmpty() == false) {
                 Explorable e = row.getItem();
-                e.open();
+                explorerService.open(e);
             }
         });
         

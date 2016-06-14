@@ -48,6 +48,7 @@ public class IjfxRecentFileService extends AbstractService implements RecentFile
     
     List<String> listPath;
     
+    private final int RECENT_FILE_DISPLAYED_LIMIT = 10;
     
     @Override
     public void initialize() {
@@ -85,7 +86,11 @@ public class IjfxRecentFileService extends AbstractService implements RecentFile
 
     @Override
     public List<String> getRecentFiles() {
-        return Lists.reverse(listPath);
+        List<String> recentFile = Lists.reverse(listPath);
+        if(recentFile.size() > RECENT_FILE_DISPLAYED_LIMIT) {
+            recentFile = recentFile.subList(0, 10);
+        }
+        return recentFile;
     }
     
     public void save() {

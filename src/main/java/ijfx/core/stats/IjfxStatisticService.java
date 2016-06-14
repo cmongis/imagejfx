@@ -22,6 +22,7 @@ package ijfx.core.stats;
 import ijfx.service.IjfxService;
 import java.io.File;
 import net.imagej.Dataset;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
@@ -31,7 +32,9 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 public interface IjfxStatisticService extends IjfxService{
     
     
-    public SummaryStatistics getDatasetStatistics(Dataset dataset);
+    public SummaryStatistics getDatasetSummaryStatistics(Dataset dataset);
+    public DescriptiveStatistics getDatasetDescriptiveStatistics(Dataset dataset);
     public SummaryStatistics getStatistics(File file);
+    public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition);
     
 }

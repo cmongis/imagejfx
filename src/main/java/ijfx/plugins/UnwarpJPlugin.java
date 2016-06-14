@@ -19,6 +19,7 @@
  */
 package ijfx.plugins;
 
+import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
 import ij.ImagePlus;
 import net.imagej.Dataset;
 import org.scijava.command.Command;

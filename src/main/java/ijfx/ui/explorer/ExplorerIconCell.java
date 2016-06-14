@@ -21,12 +21,16 @@ package ijfx.ui.explorer;
 
 import javafx.scene.image.Image;
 import mongis.utils.panecell.PaneIconCell;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
 public class ExplorerIconCell extends PaneIconCell<Iconazable>{
+    
+    @Parameter
+    ExplorerService explorerService;
     
     public ExplorerIconCell() {
         super();
@@ -72,7 +76,7 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
     
     @Override
     public void onDoubleClick() {
-        getItem().open();
+        explorerService.open(getItem());
     }
     
 }

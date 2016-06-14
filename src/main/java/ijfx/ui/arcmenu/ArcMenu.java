@@ -272,7 +272,9 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
      *
      */
     protected void animate() {
-
+        
+        
+        
         // used in the loop
         int count = 0;
 

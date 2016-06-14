@@ -27,6 +27,7 @@ import ijfx.ui.activity.ActivityService;
 import io.scif.services.DatasetIOService;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
@@ -35,6 +36,7 @@ import javafx.scene.image.Image;
 import mongis.utils.FileUtils;
 import net.imagej.Dataset;
 import org.scijava.Context;
+import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugins.commands.io.OpenFile;
@@ -94,13 +96,13 @@ public class ImageRecordIconizer implements Explorable {
     }
 
     @Override
-    public void open() {
+    public void open() throws Exception {
         
         HashMap<String,Object> inputs = new HashMap<>();
         inputs.put("inputFile",imageRecord.getFile());
         
-        commandService.run(OpenFile.class,true,inputs);
-        
+        Future<CommandModule> run = commandService.run(OpenFile.class,true,inputs);
+        run.get();
         activityService.openByType(ImageJContainer.class);
     }
 

@@ -23,6 +23,11 @@
                   <FontAwesomeIconView glyphName="ARROWS_H" />
                </graphic>
             </Button>
+            <ToggleButton fx:id="mergedViewToggleButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Merged view">
+               <graphic>
+                  <FontAwesomeIconView glyphName="EYE" />
+               </graphic>
+            </ToggleButton>
          </children>
         </VBox>
     </content>

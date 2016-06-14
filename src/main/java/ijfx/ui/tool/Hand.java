@@ -22,11 +22,10 @@ package ijfx.ui.tool;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.canvas.utils.CanvasCamera;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import org.scijava.plugin.Plugin;
 
@@ -84,6 +83,11 @@ public class Hand extends AbstractPathTool {
 
         return GlyphsDude.createIcon(FontAwesomeIcon.HAND_ALT_UP);
 
+    }
+    
+    @Override
+    public Cursor getDefaultCursor() {
+        return Cursor.HAND;
     }
 
 }

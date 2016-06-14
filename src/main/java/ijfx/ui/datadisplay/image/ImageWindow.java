@@ -22,6 +22,7 @@ package ijfx.ui.datadisplay.image;
 
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.ToolChangeEvent;
@@ -48,11 +49,15 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -133,7 +138,7 @@ public class ImageWindow extends Window {
     private EventService eventService;
 
     @Parameter
-    private LogService logService;
+    private DefaultLoggingService logService;
 
     @Parameter
     private ThreadService threadService;
@@ -164,24 +169,24 @@ public class ImageWindow extends Window {
 
     @Parameter
     private TimerService timerService;
-    
+
     FxTool currentTool;
 
     /*
             JavaFX Nodes
      */
-    HiddenSidesPane hiddenSidePane = new HiddenSidesPane();
-    BorderPane borderPane = new BorderPane();
-    FxImageCanvas canvas = new FxImageCanvas();
-    AnchorPane anchorPane = new AnchorPane();
-    StackPane stackPane = new StackPane();
-    HBox hbox = new HBox();
+    private HiddenSidesPane hiddenSidePane = new HiddenSidesPane();
+    private BorderPane borderPane = new BorderPane();
+    private FxImageCanvas canvas = new FxImageCanvas();
+    private AnchorPane anchorPane = new AnchorPane();
+    private StackPane stackPane = new StackPane();
+    private HBox hbox = new HBox();
 
-    HBox bottomHBox = new HBox();
+    private HBox bottomHBox = new HBox();
 
-    Label infoLabel = new Label("Some text as example I guess");
+    private Label infoLabel = new Label("Some text as example I guess");
 
-    PopArcMenu arcMenu;
+    private PopArcMenu arcMenu;
 
     static String TITLE_CLASS_NAME = "image-window-titlebar";
 
@@ -190,40 +195,35 @@ public class ImageWindow extends Window {
     static String INFO_LABEL_CLASS_NAME = "info-label";
 
     private Color selectedOverlayColor = Color.BLUE;
-    private Color overlayColor = Color.YELLOW;
+    private Color overlayColor = Color.RED;
 
     private final ExecutorService refreshQueue = Executors.newFixedThreadPool(1);
 
-    HashMap<Overlay,Node> shapeMap = new HashMap<>();
+    private final HashMap<Overlay, Node> shapeMap = new HashMap<>();
+
+    private final HashMap<Overlay, OverlayDrawer> drawerMap = new HashMap();
+    private final HashMap<Overlay, OverlayModifier> modifierMap = new HashMap();
+
+    private final Property<FxTool> currentToolProperty = new SimpleObjectProperty();
     
-   HashMap<Overlay,OverlayDrawer> drawerMap = new HashMap();
-   HashMap<Overlay,OverlayModifier> modifierMap = new HashMap();
-    
-   
-   
-   
-   public ImageWindow() {
+    public ImageWindow() {
         super();
         logger.info("Creating window.");
         setContentPane(borderPane);
-        
-        
-        
+
         getStyleClass().add(WINDOW_CLASS_NAME);
         setTitleBarStyleClass(TITLE_CLASS_NAME);
 
         hiddenSidePane.setContent(anchorPane);
         borderPane.setCenter(hiddenSidePane);
 
-       
-       anchorPane.getChildren().add(stackPane);
+        anchorPane.getChildren().add(stackPane);
         anchorPane.getChildren().add(canvas);
-         
-        //hbox.getChildren().add(canvas);
 
+        //hbox.getChildren().add(canvas);
         stackPane.prefWidthProperty().bind(anchorPane.widthProperty());
         stackPane.prefHeightProperty().bind(anchorPane.heightProperty());
-        
+
         // Bind canvas size to stack pane size.
         canvas.widthProperty().bind(anchorPane.widthProperty());
         canvas.heightProperty().bind(anchorPane.heightProperty());
@@ -231,6 +231,8 @@ public class ImageWindow extends Window {
         // Adding clicking listening
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onCanvasClick);
 
+        canvas.cursorProperty().bind(Bindings.createObjectBinding(this::getToolDefaultCursor,currentToolProperty));
+        
         // setting the window movable
         setMovable(true);
 
@@ -249,10 +251,8 @@ public class ImageWindow extends Window {
 
         getRightIcons().add(closeIcon);
 
-       
         setOnCloseAction(this::onWindowClosed);
 
-       
         setPrefSize(300, 300);
 
         //putting an unused hbox...
@@ -287,6 +287,8 @@ public class ImageWindow extends Window {
         focusedProperty().addListener(this::onFocus);
 
         translateXProperty().addListener(event -> putInFront());
+        
+        
 
     }
 
@@ -317,13 +319,11 @@ public class ImageWindow extends Window {
         //   System.out.println(getDatasetview().getPlanePosition().numDimensions());
 
         logService.setLevel(LogService.INFO);
-        
-        
-        
+
         if (arcMenu != null) {
-           anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, arcMenu::show);
+            anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, arcMenu::show);
             arcMenu = null;
-            
+
         }
         arcMenu = new PopArcMenu();
         anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, arcMenu::show);
@@ -347,7 +347,6 @@ public class ImageWindow extends Window {
         }
 
         arcMenu.build();
-       
 
         refreshSourceImage();
     }
@@ -447,9 +446,9 @@ public class ImageWindow extends Window {
     }
 
     public synchronized void refreshSourceImage() {
-        
+
         if (checkServices()) {
-           
+
             refreshQueue.execute(new CallbackTask<Void, Void>()
                     .run(this::transformImage)
                     .then(this::updateImageAndOverlays)
@@ -458,32 +457,29 @@ public class ImageWindow extends Window {
     }
 
     private void transformImage() {
-        
+
         Timer t = timerService.getTimer(this.getClass());
         t.start();
-        
-        logger.info("Refreshing source image "+imageDisplay.getName());
+
+        logger.info("Refreshing source image " + imageDisplay.getName());
 
         //Retrieving buffered image from the dataset view
         BufferedImage bf = getDatasetview().getScreenImage().image();
-        
+
         t.elapsed("getScreenImage");
-        
+
         // getting a writableImage (previously created or not)
         WritableImage writableImage = getWrittableImage();
-        
-       
-        
+
         // if the size of the images are different, the buffer is recreated;
         if (bf.getWidth() != canvas.getCamera().getImageSpace().getWidth() || bf.getHeight() != canvas.getCamera().getImageSpace().getHeight()) {
-            
-            
+
             logger.info(String.format("Image size has changed :  %.0f x %.0f", writableImage.getWidth(), writableImage.getHeight()));
 
             // force buffer recreation
             wi = null;
             writableImage = getWrittableImage();
-            
+
         }
         t.elapsed("getWrittableImage");
         SwingFXUtils.toFXImage(bf, writableImage);
@@ -491,16 +487,16 @@ public class ImageWindow extends Window {
     }
 
     private void updateImageAndOverlays(Void v) {
-        
+
         Timer t = timerService.getTimer(this.getClass());
-        
+
         canvas.repaint();
         t.elapsed("canvas.repaint");
         updateInfoLabel();
         t.elapsed("updateInfoLabel");
         updateOverlays();
         t.elapsed("updateOverlays");
-       
+
     }
 
     private void updateOverlays() {
@@ -509,14 +505,20 @@ public class ImageWindow extends Window {
 
     public void updateOverlay(Overlay overlay) {
         try {
-            
+
             Timer t = timerService.getTimer(this.getClass());
             t.start();
-            Node node = getDrawer(overlay).update(overlay, canvas.getCamera());
+            if (overlay == null) {
+                return;
+            }
+            OverlayDrawer drawer = getDrawer(overlay);
+            if (drawer == null) {
+                logService.warn("No drawer found for %s", overlay.getClass().getSimpleName());
+            };
+            Node node = drawer.update(overlay, canvas.getCamera());
             node.setMouseTransparent(true);
             node.setUserData(overlay);
-            
-            
+
             if (anchorPane.getChildren().contains(node) == false) {
                 anchorPane.getChildren().add(node);
             }
@@ -531,7 +533,7 @@ public class ImageWindow extends Window {
             logger.log(Level.WARNING, "Couldn't draw overlay. Probably because of a lack of Drawer", e);
         }
     }
-    
+
     private void deleteOverlay(Overlay overlay) {
         anchorPane.getChildren().remove(getDrawer(overlay).update(overlay, canvas.getCamera()));
         anchorPane.getChildren().remove(getModifier(overlay).getModifiers(canvas.getCamera(), overlay));
@@ -541,9 +543,11 @@ public class ImageWindow extends Window {
 
     // add the MoveablePoints of a overlay in order to edit it
     private void setEdited(Overlay overlay) {
-        
-        if(getOverlays().contains(overlay) == false) return;
-        
+
+        if (getOverlays().contains(overlay) == false) {
+            return;
+        }
+
         // delete all the moveable points
         Node[] nodes = anchorPane.getChildren().stream().filter(node -> MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size -> new Node[size]);
         anchorPane.getChildren().removeAll(nodes);
@@ -606,7 +610,7 @@ public class ImageWindow extends Window {
     }
 
     public void setCurrentTool(FxTool tool) {
-
+         Platform.runLater(()->currentToolProperty.setValue(tool));
         if (tool == currentTool) {
             return;
         }
@@ -618,13 +622,14 @@ public class ImageWindow extends Window {
             tool.subscribe(canvas);
         }
         currentTool = tool;
+       
     }
 
     /*
      Overlay drawing
      */
     public List<Overlay> getOverlays() {
-       
+
         List<Overlay> overlays = overlayService.getOverlays(imageDisplay);
         if (overlays == null) {
             return new ArrayList<Overlay>();
@@ -661,9 +666,7 @@ public class ImageWindow extends Window {
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
         System.out.println(positionOnImage);
         logger.info(String.format("This image contains %s overlays", overlayService.getOverlays(imageDisplay).size()));
-        
-        
-        
+
         boolean wasOverlaySelected = false;
         /*
         for (Overlay o : overlayService.getOverlays(imageDisplay)) //.parallelStream().forEach(o -> 
@@ -677,23 +680,20 @@ public class ImageWindow extends Window {
                 overlaySelectionService.setOverlaySelection(imageDisplay, o, false);
             }
         };*/
-        
+
         List<Overlay> touchedOverlay = overlayService.getOverlays(imageDisplay).stream()
-                .filter(o->isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o))
+                .filter(o -> isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o))
                 .collect(Collectors.toList());
-        
+
         wasOverlaySelected = touchedOverlay.size() > 0;
-        
-        if(touchedOverlay.size() == 0) {
+
+        if (touchedOverlay.size() == 0) {
             overlaySelectionService.unselectedAll(imageDisplay);
-        }
-        else if (touchedOverlay.size() == 1) {
+        } else if (touchedOverlay.size() == 1) {
             overlaySelectionService.selectOnlyOneOverlay(imageDisplay, touchedOverlay.get(0));
-        }
-        else {
+        } else {
             // TODO: 
         }
-        
 
         if (!wasOverlaySelected) {
             setEdited(null);
@@ -735,11 +735,12 @@ public class ImageWindow extends Window {
     @EventHandler
     protected void onDatasetUpdated(DatasetUpdatedEvent event) {
         //imageDisplay.update();
-        if(event.getObject() != imageDisplayService.getActiveDataset(imageDisplay)) return;
+        if (event.getObject() != imageDisplayService.getActiveDataset(imageDisplay)) {
+            return;
+        }
         logger.info("DatasetChangedEvent : " + event.getObject());
         imageDisplay.update();
-        
-        
+
         //refreshSourceImage();
     }
 
@@ -752,20 +753,20 @@ public class ImageWindow extends Window {
         }
         logger.info("DisplayUpdatedEvent");
         refreshSourceImage();
-        
+
     }
-    
+
     protected void onWindowClosed(ActionEvent event) {
-          System.out.println("Closing dataset");
-            if(toolService.getCurrentTool() != null)
+        System.out.println("Closing dataset");
+        if (toolService.getCurrentTool() != null) {
             toolService.getCurrentTool().unsubscribe(canvas);
-            
-            datasetService.getDatasets().remove(datasetService.getDatasets(imageDisplay));
-            //mageDisplayService.getActiveDataset(imageDisplay).
-            imageDisplay.close();
-            eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
+        }
+
+        datasetService.getDatasets().remove(datasetService.getDatasets(imageDisplay));
+        //mageDisplayService.getActiveDataset(imageDisplay).
+        imageDisplay.close();
+        eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
     }
-   
 
     @EventHandler
     protected void onEvent(ToolChangeEvent event) {
@@ -774,51 +775,53 @@ public class ImageWindow extends Window {
 
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
-        if(event.getDisplay() != imageDisplay) return;
+        if (event.getDisplay() != imageDisplay) {
+            return;
+        }
         Platform.runLater(() -> setEdited(event.getOverlay()));
     }
-    
-    
-    @EventHandler 
-    protected void onOverlayCreated(OverlayCreatedEvent event) {
-        if(getOverlays().contains(event.getObject()))
-         Platform.runLater(()->updateOverlay(event.getObject()));
-    }
-    
+
     @EventHandler
-    void onOverlayModified(OverlayUpdatedEvent event) {
-        if(getOverlays().contains(event.getObject()))
-        Platform.runLater(()->updateOverlay(event.getObject()));
+    protected void onOverlayCreated(OverlayCreatedEvent event) {
+        if (getOverlays().contains(event.getObject())) {
+            Platform.runLater(() -> updateOverlay(event.getObject()));
+        }
     }
 
-    
-    
+    @EventHandler
+    void onOverlayModified(OverlayUpdatedEvent event) {
+        if (getOverlays().contains(event.getObject())) {
+            Platform.runLater(() -> updateOverlay(event.getObject()));
+        }
+    }
+
     @EventHandler
     protected void onOverlayDeleted(OverlayDeletedEvent event) {
-        
-        if(drawerMap.keySet().contains(event.getObject()) == false) return;
+
+        if (drawerMap.keySet().contains(event.getObject()) == false) {
+            return;
+        }
         setEdited(null);
-        
-        
+
         /*
         // removing the associated node
         anchorPane.getChildren()
                 .stream()
                 .filter(node->node.getUserData() == event.getObject())
                 .forEach(node->Platform.runLater(()->anchorPane.getChildren().remove(node)));
-               */
+         */
         //updateOverlays();
-        Platform.runLater(()->deleteOverlay(event.getObject()));
+        Platform.runLater(() -> deleteOverlay(event.getObject()));
     }
-    
+
     protected void updateDrawerList() {
-        
+
     }
-    
+
     protected OverlayDrawer getDrawer(Overlay overlay) {
         return drawerMap.computeIfAbsent(overlay, overlayDrawerService::createDrawer);
     }
-    
+
     protected OverlayModifier getModifier(Overlay overlay) {
         return modifierMap.computeIfAbsent(overlay, overlayDrawerService::createModifier);
     }
@@ -835,7 +838,6 @@ public class ImageWindow extends Window {
         }
     }
 
-
     protected boolean isWindowConcernedByModule(Module module) {
         return module.getInputs().values().stream().filter(obj -> (obj == imageDisplay || obj == getDataset())).count() > 0;
     }
@@ -843,9 +845,12 @@ public class ImageWindow extends Window {
     protected void onMoveablePointMoved(Observable obs, Point2D oldValue, Point2D newValue) {
         updateOverlays();
     }
-    
-    
 
-   
+    protected Cursor getToolDefaultCursor() {
+         
+        if(currentTool == null) return Cursor.DEFAULT;
+       
+        else return currentTool.getDefaultCursor();
+    }
     
 }

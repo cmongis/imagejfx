@@ -21,27 +21,25 @@
 package ijfx.ui.module.skin;
 
 import ijfx.ui.module.InputSkinPlugin;
-import ijfx.ui.module.input.AbstractInputSkin;
 import ijfx.ui.module.input.Input;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
-import javafx.util.StringConverter;
-import javafx.util.converter.FormatStringConverter;
+import javafx.scene.control.CheckBox;
 import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author Cyril MONGIS, 2015
+ * @author Tuan anh TRINH
  */
 @Plugin(type = InputSkinPlugin.class)
 public class BooleanInputSkin extends AbstractInputSkinPlugin<Boolean> {
 
     BooleanProperty value = new SimpleBooleanProperty();
-    ComboBox<String> choice;
+    CheckBox choice;
 
     public static final String YES = "Yes";
     public static final String NO = "No";
@@ -49,36 +47,18 @@ public class BooleanInputSkin extends AbstractInputSkinPlugin<Boolean> {
     @Override
     public void init(Input<Boolean> input) {
         
-        choice = new ComboBox();
-        
-         Bindings.bindBidirectional(choice.valueProperty(), value, new StringConverter<Boolean>() {
-
-            @Override
-            public String toString(Boolean object) {
-                if (object) {
-                    return YES;
-                } else {
-                    return NO;
-                }
-            }
-
-            @Override
-            public Boolean fromString(String string) {
-                return string.equals(YES);
-            }
-        });
-        choice.getItems().addAll(YES, NO);
+        choice = new CheckBox();
+         Bindings.bindBidirectional(choice.selectedProperty(), value);
+         
+         choice.textProperty().bind(Bindings.createStringBinding(this::getLabel, choice.selectedProperty()));
+         
     }
-    
-    
-    
+      
     @Override
     public Property<Boolean> valueProperty() {
         return value;
     }
-
-   
-
+    
     @Override
     public Node getNode() {
         return choice;
@@ -88,6 +68,10 @@ public class BooleanInputSkin extends AbstractInputSkinPlugin<Boolean> {
     public void dispose() {
     }
 
+    private String getLabel() {
+        return choice.isSelected() ? YES : NO;
+    }
+    
     @Override
     public boolean canHandle(Class<?> clazz) {
         return clazz == boolean.class || clazz == Boolean.class;

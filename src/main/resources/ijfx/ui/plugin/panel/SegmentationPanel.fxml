@@ -18,7 +18,8 @@
                   <String fx:value="down-arrow" />
                   <String fx:value="with-padding" />
                </styleClass></FontAwesomeIconView>
-            <VBox fx:id="resultbox" styleClass="vbox">
+            <VBox fx:id="paramVBox" prefHeight="200.0" prefWidth="100.0" />
+            <VBox fx:id="resultVBox" styleClass="vbox">
                <children>
                   <Button fx:id="testButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="warning" text="Test on one image">
                      <graphic>

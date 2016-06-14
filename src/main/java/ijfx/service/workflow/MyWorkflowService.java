@@ -20,7 +20,7 @@
  */
 package ijfx.service.workflow;
 
-import ijfx.service.workflow.Workflow;
+import java.io.File;
 import javafx.collections.ObservableList;
 import net.imagej.ImageJService;
 
@@ -37,6 +37,8 @@ public interface MyWorkflowService extends ImageJService{
     
     public boolean deleteWorkflow(Workflow workflow);
     
+    public boolean importWorkflow(Workflow workflow, File inputFile);
     
+    public boolean exportWorkflow(Workflow workflow, File outputFile);
     
 }
