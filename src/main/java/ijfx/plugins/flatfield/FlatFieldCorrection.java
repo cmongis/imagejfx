@@ -19,7 +19,9 @@
 package ijfx.plugins.flatfield;
 
 import ijfx.core.stats.IjfxStatisticService;
+import ijfx.core.utils.DatasetUtils;
 import ijfx.plugins.convertype.TypeChangerIJFX;
+import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.service.sampler.DatasetSamplerService;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +71,7 @@ public class FlatFieldCorrection implements Command {
     IjfxStatisticService ijfxStatisticService;
 
     @Parameter
-    DatasetSamplerService datasetSamplerService;
+    DatasetUtillsService datasetUtillsService;
 
     @Parameter
     Dataset flatFieldDataset;
@@ -87,12 +89,12 @@ public class FlatFieldCorrection implements Command {
 
     @Override
     public void run() {
-        flatFieldDataset = extractFlatfield(getImageDisplay(flatFieldDataset));//convertTo32(inputDataset);
+        flatFieldDataset = datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(flatFieldDataset));//convertTo32(inputDataset);
         inputDataset = convertTo32(inputDataset);
         flatFieldDataset = convertTo32(flatFieldDataset);
         median = ijfxStatisticService.getDatasetDescriptiveStatistics(inputDataset).getPercentile(50);
-        inputDataset = divideDatasetByValue(inputDataset, median);
-        outputDataset = divideDatasetByDataset(inputDataset, flatFieldDataset);
+        inputDataset = datasetUtillsService.divideDatasetByValue(inputDataset, median);
+        outputDataset = datasetUtillsService.divideDatasetByDataset(inputDataset, flatFieldDataset);
     }
 
     public boolean isCreateNewImage() {
@@ -131,30 +133,9 @@ public class FlatFieldCorrection implements Command {
         return data;
     }
 
-    private Dataset extractFlatfield(ImageDisplay imageDisplay) {
-        CalibratedAxis[] calibratedAxises = new CalibratedAxis[imageDisplay.numDimensions()];
-        int[] position = new int[imageDisplay.numDimensions()];
-        imageDisplay.localize(position);
-        Dataset dataset = (Dataset) imageDisplay.getActiveView().getData();
-        imageDisplay.axes(calibratedAxises);
-        for (int i = 2; i < position.length; i++) {
-            dataset = datasetSamplerService.isolateDimension(dataset, calibratedAxises[i].type(), position[i]);
-        }
-        return dataset;
-    }
 
-    private Dataset divideDatasetByValue(Dataset dataset, double value) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("value", value);
-        parameters.put("preview", false);
-        parameters.put("allPlanes", true);
-        parameters.put("display", getImageDisplay(dataset));
-        Module module = executeCommand(DivideDataValuesBy.class, parameters);
-        ImageDisplay imageDisplay = (ImageDisplay) module.getOutput("display");
-        Dataset datasetResult = (Dataset) imageDisplay.getActiveView().getData();
-        return datasetResult;
 
-    }
+ 
 
 //    private Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator) {
 //        Map<String, Object> parameters = new HashMap<>();
@@ -196,51 +177,8 @@ public class FlatFieldCorrection implements Command {
         return module;
     }
 
-    public ImageDisplay getImageDisplay(Dataset dataset) {
-        Optional<ImageDisplay> optional = imageDisplayService.getImageDisplays()
-                .parallelStream()
-                .filter((d) -> imageDisplayService.getActiveDataset(d) == dataset)
-                .findFirst();
-        return optional.get();
-    }
 
-    /**
-     * Divide 2 different Dataset with different dimensions
-     * @param <T>
-     * @param numerator
-     * @param denominator
-     * @return 
-     */
-    public < T extends RealType< T>> Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator) {
-        
-        Dataset resultDataset = numerator.duplicateBlank();
-        
-        RandomAccess<T> resultRandomAccess = (RandomAccess<T>) resultDataset.randomAccess();
-        Cursor<T> numeratorCursor = (Cursor<T>) numerator.cursor();
-        RandomAccess<T> denominatorRandomAccess = (RandomAccess<T>) denominator.randomAccess();
-        
-        int[] positionDenominator = new int[denominator.numDimensions()];
-        denominatorRandomAccess.localize(positionDenominator);
-        while (numeratorCursor.hasNext()) {
-            numeratorCursor.next();
-            //Set position
-            positionDenominator[0] = numeratorCursor.getIntPosition(0);
-            positionDenominator[1] = numeratorCursor.getIntPosition(1);
-            denominatorRandomAccess.setPosition(positionDenominator);
-            resultRandomAccess.setPosition(numeratorCursor);
-            
-            //Calculate value
-            try {
-                
-            resultRandomAccess.get().set(numeratorCursor.get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            Float f = numeratorCursor.get().getRealFloat()/denominatorRandomAccess.get().getRealFloat();
-            resultRandomAccess.get().setReal(f);
 
-        }
-        return resultDataset;
-    }
+    
 
 }

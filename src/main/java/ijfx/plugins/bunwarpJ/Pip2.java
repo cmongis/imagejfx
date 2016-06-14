@@ -26,17 +26,35 @@ import ij.plugin.SubstackMaker;
 import ij.process.ImageProcessor;
 import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
+import ijfx.plugins.flatfield.FlatFieldCorrection;
+import ijfx.plugins.stack.ImagesToStack;
+import ijfx.service.dataset.DatasetUtillsService;
 import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.command.Command;
+import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
+import org.scijava.module.MethodCallException;
+import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -62,6 +80,18 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
 
     @Parameter
     Dataset datasetTarget;
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
+
+    @Parameter
+    DatasetUtillsService datasetUtillsService;
+
+    @Parameter
+    ModuleService moduleService;
+
+    @Parameter
+    CommandService commandService;
     /*....................................................................
     	Private variables
  	....................................................................*/
@@ -173,7 +203,7 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     @Override
     public void run() {
         Runtime.getRuntime().gc();
-init();
+        init();
 //        //Set parameters
 //        int mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
 //        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
@@ -193,23 +223,10 @@ init();
         //transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
         //Apply transformation
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
-            ImagePlus[] imArray = new ImagePlus[2];
-            imArray[0] = imagePlus;
-            imArray[1] = imagePlus;
-            final MainDialog dialog = new MainDialog(imArray, mode,
-                    this.maxImageSubsamplingFactor, this.min_scale_deformation,
-                    this.max_scale_deformation, this.divWeight, this.curlWeight,
-                    this.landmarkWeight, this.imageWeight, this.consistencyWeight,
-                    this.stopThreshold, false, this.saveTransformation, "");
-
-            dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
-
-            //Display result
-            Img img = ImageJFunctions.wrap(imagePlus);
-            Dataset datasetPostTransformation = datasetService.create(img);
-            displayService.createDisplay(transformedTitle(imagePlus), datasetPostTransformation);
+            displayTransformedIP(applyTransformation(imagePlus, transformation));
         });
 
+        getMergedFeedback(transformation);
         if (richOutput) {
             Img img = ImageJFunctions.wrap(getFeedback(transformation));
             displayService.createDisplay("Feedback", img);
@@ -223,8 +240,8 @@ init();
         mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
         max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
         min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
-        this.sourceImp = getInput(datasetSource);//getImpParameter(datasetSource, position);
-        this.targetImp = getInput(datasetTarget);//getImpParameter(datasetTarget, position);
+        this.sourceImp = getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
+        this.targetImp = getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
     }
 
     @Override
@@ -280,4 +297,65 @@ init();
         result.setCalibration(imagePlus.getCalibration());
         return result;
     }
+
+    public void getMergedFeedback(Transformation transformation) {
+        ImagePlus sourceTransformed = applyTransformation(sourceImp, transformation);
+        Img img = ImageJFunctions.wrap(sourceTransformed);
+        Dataset datasetPostTransformation = datasetService.create(img);
+        Dataset[] datasetArray = {datasetPostTransformation, datasetTarget};
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("title", "Tuan anh est magique");
+        parameters.put("datasetArray", datasetArray);
+        parameters.put("axisType", Axes.CHANNEL);
+        Module module = executeCommand(ImagesToStack.class, parameters);
+        Dataset dataset = (Dataset) module.getOutput("outputDataset");
+        displayService.createDisplay(dataset);
+    }
+
+    private ImagePlus applyTransformation(ImagePlus imagePlus, Transformation transformation) {
+        ImagePlus[] imArray = new ImagePlus[2];
+        imArray[0] = imagePlus;
+        imArray[1] = imagePlus;
+        final MainDialog dialog = new MainDialog(imArray, mode,
+                this.maxImageSubsamplingFactor, this.min_scale_deformation,
+                this.max_scale_deformation, this.divWeight, this.curlWeight,
+                this.landmarkWeight, this.imageWeight, this.consistencyWeight,
+                this.stopThreshold, false, this.saveTransformation, "");
+
+        dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
+        return imagePlus;
+
+    }
+
+    private void displayTransformedIP(ImagePlus imagePlus) {
+        //Display result
+        Img img = ImageJFunctions.wrap(imagePlus);
+        Dataset datasetPostTransformation = datasetService.create(img);
+        displayService.createDisplay(transformedTitle(imagePlus), datasetPostTransformation);
+    }
+
+    private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
+        Module module = moduleService.createModule(commandService.getCommand(type));
+        try {
+            module.initialize();
+        } catch (MethodCallException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        parameters.forEach((k, v) -> {
+            module.setInput(k, v);
+            module.setResolved(k, true);
+        });
+
+        Future run = moduleService.run(module, false, parameters);
+
+        try {
+            run.get();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return module;
+    }
+
 }
