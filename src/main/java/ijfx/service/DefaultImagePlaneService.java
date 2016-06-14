@@ -79,7 +79,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         config.imgOpenerSetRange("0");
         
         Dataset virtualDataset = datasetIoService.open(file.getAbsolutePath(), config);
-        Dataset outputDataset = getEmptyPlaneDataset(virtualDataset);
+        Dataset outputDataset = createEmptyPlaneDataset(virtualDataset);
 
         RandomAccess<T> inputCursor = (RandomAccess<T>) virtualDataset.randomAccess();
         RandomAccess<T> outputCursor = (RandomAccess<T>) outputDataset.randomAccess();
@@ -142,14 +142,14 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         
         Dataset virtualDataset = datasetIoService.open(file.getAbsolutePath(), config);
         if(true) return virtualDataset;
-        Dataset outputDataset = getEmptyPlaneDataset(virtualDataset);
+        Dataset outputDataset = createEmptyPlaneDataset(virtualDataset);
         
         outputDataset.setPlane(0, virtualDataset.getPlane(planeIndex));
         return outputDataset;
         
     }
     
-    public Dataset getEmptyPlaneDataset(Dataset input) {
+    public Dataset createEmptyPlaneDataset(Dataset input) {
         AxisType[] axisTypeList = new AxisType[2];
 
         long width = input.max(0);
@@ -161,6 +161,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
        Dataset output = datasetService.create(dims, input.getName(), axisTypeList, input.getValidBits(), input.isSigned(), false);
         
+       
      
        
        return output;
@@ -168,7 +169,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
     @Override
     public <T extends RealType<T>> Dataset isolatePlane(Dataset dataset, long[] position) {
-        Dataset emptyDataset = getEmptyPlaneDataset(dataset);
+        Dataset emptyDataset = createEmptyPlaneDataset(dataset);
         
         RandomAccess<T> randomAccessOrigin = (RandomAccess<T>) dataset.randomAccess();
         RandomAccess<T> randomAccessOutput = (RandomAccess<T>) emptyDataset.randomAccess();
