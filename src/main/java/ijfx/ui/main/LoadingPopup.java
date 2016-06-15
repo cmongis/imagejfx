@@ -40,6 +40,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.PopupControl;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 /**
@@ -75,7 +76,13 @@ public class LoadingPopup extends PopupControl {
         taskRunningProperty.addListener(this::onRunningPropertyChanged);
         //setAutoFix(true);
         //setAutoHide(true);
+        if(ImageJFX.PRIMARY_STAGE != null)
+        ImageJFX.PRIMARY_STAGE.focusedProperty().addListener(this::onAttachedWindowShow);
 
+    }
+    public LoadingPopup(Stage stage) {
+        this();
+        stage.focusedProperty().addListener(this::onAttachedWindowShow);
     }
 
     public LoadingPopup attachTo(Scene scene) {
@@ -161,12 +168,13 @@ public class LoadingPopup extends PopupControl {
     }
 
     private void toggleListening(Window window, boolean shouldListen) {
+        /*
         if (shouldListen) {
            
             window.showingProperty().addListener(this::onAttachedWindowShow);
         } else {
             window.showingProperty().removeListener(this::onAttachedWindowShow);
-        }
+        }*/
     }
 
     private void onAttachedWindowShow(Observable obs, Boolean oldValue, Boolean isWindowShowing) {
