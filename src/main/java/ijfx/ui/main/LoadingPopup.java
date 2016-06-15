@@ -19,6 +19,8 @@
  */
 package ijfx.ui.main;
 
+import ijfx.ui.context.animated.Animations;
+import javafx.animation.Transition;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -38,6 +40,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.PopupControl;
+import javafx.stage.Window;
 
 /**
  *
@@ -70,14 +73,17 @@ public class LoadingPopup extends PopupControl {
         setSkin(new LoadingPopupSkinBase(this));
         taskProperty.addListener(this::onTaskChanged);
         taskRunningProperty.addListener(this::onRunningPropertyChanged);
+        //setAutoFix(true);
+        //setAutoHide(true);
 
     }
 
     public LoadingPopup attachTo(Scene scene) {
         lastScene = scene;
+
         return this;
     }
-    
+
     public LoadingPopup setOnCancel(EventHandler<? extends ActionEvent> eventHandler) {
         onCancel.setValue(eventHandler);
         return this;
@@ -99,8 +105,6 @@ public class LoadingPopup extends PopupControl {
     }
 
     public void onTaskChanged(Observable obs, Task oldValue, Task task) {
-
-       
 
         messageProperty.unbind();
         progressProperty.unbind();
@@ -140,17 +144,63 @@ public class LoadingPopup extends PopupControl {
         return this;
     }
 
+    Window attachedWindow;
+
+    private void listenToWindow(Window window) {
+
+        if (window == attachedWindow) {
+            return;
+        }
+        if (attachedWindow != null && window != attachedWindow) {
+            toggleListening(window, false);
+            attachedWindow = window;
+            
+        }
+        if(attachedWindow != null) toggleListening(attachedWindow, true);
+
+    }
+
+    private void toggleListening(Window window, boolean shouldListen) {
+        if (shouldListen) {
+           
+            window.showingProperty().addListener(this::onAttachedWindowShow);
+        } else {
+            window.showingProperty().removeListener(this::onAttachedWindowShow);
+        }
+    }
+
+    private void onAttachedWindowShow(Observable obs, Boolean oldValue, Boolean isWindowShowing) {
+
+        boolean isTaskRunning = taskRunningProperty.getValue();
+        boolean isPopupShowing = isShowing();
+
+        System.out.println(String.format("Window showign = %s, Popup showing = %s, Task runnign = %s", isWindowShowing, isPopupShowing, isTaskRunning));
+
+        if (isWindowShowing && isTaskRunning && !isPopupShowing) {
+            showOnScene(lastScene);
+        } else if (!isWindowShowing && isPopupShowing) {
+            hide();
+        }
+    }
+
+    private void stopListeningToWindow(Window window) {
+        window.showingProperty().removeListener(this::onAttachedWindowShow);
+    }
+
     public LoadingPopup showOnScene(Scene scene) {
         lastScene = scene;
-        
-        if(taskProperty.getValue() != null && taskProperty.getValue().isDone()) {
+
+        if (taskProperty.getValue() != null && taskProperty.getValue().isDone()) {
             return this;
         }
-        
+
         // Scene scene = node.getScene();
         //super.show(node.getScene().getWindow());
-        if(scene == null) return this;
+        if (scene == null) {
+            return this;
+        }
         super.show(scene.getWindow());
+        listenToWindow(scene.getWindow());
         double px, py, pw, ph, ww, wh;
 
         setPrefWidth(500);
@@ -201,8 +251,6 @@ public class LoadingPopup extends PopupControl {
         return taskRunningProperty;
     }
 
-    
-    
     public LoadingPopup closeOnFinished() {
         return closeOnFinished(Boolean.TRUE);
     }
@@ -233,9 +281,16 @@ public class LoadingPopup extends PopupControl {
         return this;
 
     }
-    
+
     public Property<Task> taskProperty() {
         return taskProperty;
+    }
+
+    @Override
+    public void hide() {
+        Transition configure = Animations.FADEOUT.configure(getSkin().getNode(), ImageJFX.getAnimationDurationAsDouble());
+        configure.setOnFinished(event -> super.hide());
+        configure.play();
     }
 
 }
