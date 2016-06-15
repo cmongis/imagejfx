@@ -238,10 +238,9 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
             }
 
             paneIconCellPreview.setOnMouseClicked(event -> {
-                CommandInfo commandInfo = new CommandInfo(paneIconCellPreview.getItem().getAction());
+                CommandInfo commandInfo = commandService.getCommand(paneIconCellPreview.getItem().getAction());
                 commandService.run(commandInfo, true);
                 System.out.println("Click Action " + paneIconCellPreview.getItem().getLabel() + paneIconCellPreview.getItem().getContext());
-
             });
 
         });

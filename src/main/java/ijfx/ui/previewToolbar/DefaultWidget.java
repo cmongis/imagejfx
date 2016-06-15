@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.preview.PreviewService;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.utils.FontAwesomeIconUtils;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +42,9 @@ public class DefaultWidget implements ItemWidget {
 
     @JsonIgnore
     private Image image;
+    
+    @JsonIgnore
+    private Logger logger = ImageJFX.getLogger();
     
     public DefaultWidget() {
     }
@@ -127,7 +131,7 @@ public class DefaultWidget implements ItemWidget {
                 return previewService.getImageDisplay(action, this.getParameters());
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log(Level.WARNING, "Error when loading preview", e);
                 FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.AMBULANCE);
                 return FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, size);
             }
@@ -156,9 +160,9 @@ public class DefaultWidget implements ItemWidget {
                 image = getIcon.get();
                 return image;
             } catch (InterruptedException ex) {
-                Logger.getLogger(DefaultWidget.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (ExecutionException ex) {
-                Logger.getLogger(DefaultWidget.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
             return null;
         }
