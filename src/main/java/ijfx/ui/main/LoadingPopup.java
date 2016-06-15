@@ -66,8 +66,12 @@ public class LoadingPopup extends PopupControl {
 
     private final BooleanProperty taskRunningProperty = new SimpleBooleanProperty();
 
-    Scene lastScene;
-
+    private final BooleanProperty stageFocused = new SimpleBooleanProperty(true);
+    
+    private final ObjectProperty<Stage> stageProperty = new SimpleObjectProperty();
+    
+    private Scene lastScene;
+    
     public LoadingPopup() {
         super();
 
@@ -76,13 +80,14 @@ public class LoadingPopup extends PopupControl {
         taskRunningProperty.addListener(this::onRunningPropertyChanged);
         //setAutoFix(true);
         //setAutoHide(true);
-        if(ImageJFX.PRIMARY_STAGE != null)
-        ImageJFX.PRIMARY_STAGE.focusedProperty().addListener(this::onAttachedWindowShow);
+        stageProperty.addListener(this::onStageChange);
+        stageFocused.addListener(this::onAttachedWindowShow);
+        
 
     }
     public LoadingPopup(Stage stage) {
         this();
-        stage.focusedProperty().addListener(this::onAttachedWindowShow);
+        stageProperty.setValue(stage);
     }
 
     public LoadingPopup attachTo(Scene scene) {
@@ -118,7 +123,7 @@ public class LoadingPopup extends PopupControl {
         canCancelProperty.unbind();
         taskRunningProperty.unbind();
         if (task != null) {
-            if (task.isRunning() && showingProperty().getValue() == false) {
+            if (task.isRunning() && showingProperty().getValue() == false && stageFocused.getValue()) {
                 showOnScene(lastScene);
             }
 
@@ -177,6 +182,10 @@ public class LoadingPopup extends PopupControl {
         }*/
     }
 
+    private void onStageChange(Observable ov, Stage oldValue, Stage newValue) {
+        stageFocused.bind(newValue.focusedProperty());
+    }
+    
     private void onAttachedWindowShow(Observable obs, Boolean oldValue, Boolean isWindowShowing) {
 
         boolean isTaskRunning = taskRunningProperty.getValue();
