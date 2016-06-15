@@ -39,6 +39,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
+import org.scijava.display.DisplayService;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
@@ -66,6 +67,9 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     @Parameter
     ModuleService moduleService;
 
+    @Parameter
+    DisplayService displayService;
+
     @Override
     public Dataset extractPlane(ImageDisplay imageDisplay) {
         CalibratedAxis[] calibratedAxises = new CalibratedAxis[imageDisplay.numDimensions()];
@@ -79,12 +83,18 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
         return dataset;
     }
 
+    @Override
     public ImageDisplay getImageDisplay(Dataset dataset) {
         Optional<ImageDisplay> optional = imageDisplayService.getImageDisplays()
                 .parallelStream()
                 .filter((d) -> imageDisplayService.getActiveDataset(d) == dataset)
                 .findFirst();
-        return optional.get();
+        if (optional.isPresent()){
+            return optional.get();
+        }
+        else{
+            return null;
+        }
     }
 
     /**
@@ -130,11 +140,15 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
 
     @Override
     public Dataset divideDatasetByValue(Dataset dataset, double value) {
+        ImageDisplay display = this.getImageDisplay(dataset);
+        if (display == null) {
+            display = (ImageDisplay) displayService.createDisplay(dataset.getName(), dataset);
+        }
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("value", value);
         parameters.put("preview", false);
         parameters.put("allPlanes", true);
-        parameters.put("display", this.getImageDisplay(dataset));
+        parameters.put("display", display);
         Module module = executeCommand(DivideDataValuesBy.class, parameters);
         ImageDisplay imageDisplay = (ImageDisplay) module.getOutput("display");
         Dataset datasetResult = (Dataset) imageDisplay.getActiveView().getData();

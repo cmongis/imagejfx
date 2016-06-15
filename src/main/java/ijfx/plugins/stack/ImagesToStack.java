@@ -79,6 +79,7 @@ public class ImagesToStack extends ContextCommand {
                 .forEach(i -> axisTypesArray[i] = firstElement.axis(i).type());
         axisTypesArray[2] = axisType;
         outputDataset = datasetService.create(dims, title, axisTypesArray, firstElement.getValidBits(), firstElement.isSigned(), false);
+        outputDataset.setName(title);
     }
     
     private void addPlane(Dataset datasetOutput, Dataset input, AxisType axisType, int i){
@@ -91,7 +92,7 @@ public class ImagesToStack extends ContextCommand {
             IntStream.range(0, input.numDimensions())
                     .forEach(j ->randomAccessOutput.setPosition(cursorInput.getIntPosition(j), j));
             randomAccessOutput.setPosition(i, 2);
-            randomAccessOutput.get().set(cursorInput.get());
+            randomAccessOutput.get().setReal(cursorInput.get().getRealFloat());
             
         }
     }

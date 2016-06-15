@@ -1,5 +1,5 @@
 /*
-    This file is part of ImageJ FX.
+    This imagesFolder is part of ImageJ FX.
 
     ImageJ FX is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,10 +22,9 @@ package ijfx.plugins.bunwarpJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.Opener;
-import ij.plugin.SubstackMaker;
 import ij.process.ImageProcessor;
 import ijfx.core.imagedb.ImageLoaderService;
-import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
+import ijfx.plugins.adapter.IJ1Service;
 import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
 import ijfx.service.dataset.DatasetUtillsService;
@@ -36,16 +35,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
-import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -63,12 +60,18 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class, menuPath = "Plugins>Pipeline2")
-public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
+public class Pip2 implements Command {
 
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
     public static String[] sMinScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine"};
     public static String[] sMaxScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
 
+    @Parameter
+    IJ1Service iJ1Service;
+    
+    @Parameter
+    DatasetService datasetService;
+    
     @Parameter
     ImageLoaderService imageLoaderService;
 
@@ -95,8 +98,7 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     /*....................................................................
     	Private variables
  	....................................................................*/
-    @Parameter
-    private int position;
+
     /**
      * Image representation for source image
      */
@@ -180,11 +182,15 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     @Parameter(choices = {"0", "1", "2", "3", "4", "5", "6", "7"})
     String img_subsamp_fact;
 
-    @Parameter
-    File file;
+    @Parameter(label = "Images Folder")
+    File imagesFolder;
 
-    @Parameter
+    @Parameter(label = "Landmarks File")
     File landmarksFile;
+    
+    @Parameter(label = "Flatfield Image")
+    Dataset flatfield;
+
     ImageProcessor targetMskIP = null;
     ImageProcessor sourceMskIP = null;
     int max_scale_deformation;
@@ -204,18 +210,11 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     public void run() {
         Runtime.getRuntime().gc();
         init();
-//        //Set parameters
-//        int mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
-//        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
-//        min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
-//        this.sourceImp = getInput(datasetSource);//getImpParameter(datasetSource, position);
-//        this.targetImp = getInput(datasetTarget);//getImpParameter(datasetTarget, position);
 
         //Load landmarks
         Stack<Point> sourcePoints = new Stack<>();
         Stack<Point> targetPoints = new Stack<>();
         MiscTools.loadPoints(landmarksFile.getAbsolutePath(), sourcePoints, targetPoints);
-        Param p = new Param();
         Param param = new Param(mode, maxImageSubsamplingFactor, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold);
 
         //Calcul transformation which have to be applied after
@@ -223,7 +222,11 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         //transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
         //Apply transformation
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
-            displayTransformedIP(applyTransformation(imagePlus, transformation));
+            Dataset afterTransformation = iJ1Service.wrapDataset(applyTransformation(imagePlus, transformation));
+            if (flatfield != null) {
+                afterTransformation = applyFlatFieldCorrection(afterTransformation,flatfield);
+            }
+            displayService.createDisplay(afterTransformation.getName(), afterTransformation);
         });
 
         getMergedFeedback(transformation);
@@ -240,20 +243,17 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
         max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
         min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
-        this.sourceImp = getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
-        this.targetImp = getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
+        this.sourceImp = iJ1Service.getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
+        this.targetImp = iJ1Service.getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
     }
 
-    @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+
 
     public List<ImagePlus> loadImagePlus() {
         Opener opener = new Opener();
 
         List<File> listFiles;
-        listFiles = (List<File>) imageLoaderService.getAllImagesFromDirectory(file.getParentFile());
+        listFiles = (List<File>) imageLoaderService.getAllImagesFromDirectory(imagesFolder.getParentFile());
         List<ImagePlus> listImagePlus = new ArrayList();
         listFiles.stream()
                 .forEach((f) -> {
@@ -279,25 +279,24 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         return title;
     }
 
-    /**
-     * Convert Dataset to ImagePlus and extract slice.
-     *
-     * @param dataset
-     * @param i
-     * @return
-     */
-    private ImagePlus getImpParameter(Dataset dataset, int i) {
-        ImagePlus imagePlus = getInput(dataset);
-        ImageStack imageStack = imagePlus.getStack();
-        ImageStack imageStack2 = new ImageStack(imagePlus.getWidth(), imagePlus.getHeight());
-        ImageProcessor imageProcessor2 = imageStack.getProcessor(i);
-        imageStack2.addSlice(imageStack.getShortSliceLabel(i), imageProcessor2);
-        ImagePlus result = imagePlus.createImagePlus();
-        result.setStack(imageStack);
-        result.setCalibration(imagePlus.getCalibration());
-        return result;
-    }
-
+//    /**
+//     * Convert Dataset to ImagePlus and extract slice.
+//     *
+//     * @param dataset
+//     * @param i
+//     * @return
+//     */
+//    private ImagePlus getImpParameter(Dataset dataset, int i) {
+//        ImagePlus imagePlus = getInput(dataset);
+//        ImageStack imageStack = imagePlus.getStack();
+//        ImageStack imageStack2 = new ImageStack(imagePlus.getWidth(), imagePlus.getHeight());
+//        ImageProcessor imageProcessor2 = imageStack.getProcessor(i);
+//        imageStack2.addSlice(imageStack.getShortSliceLabel(i), imageProcessor2);
+//        ImagePlus result = imagePlus.createImagePlus();
+//        result.setStack(imageStack);
+//        result.setCalibration(imagePlus.getCalibration());
+//        return result;
+//    }
     public void getMergedFeedback(Transformation transformation) {
         ImagePlus sourceTransformed = applyTransformation(sourceImp, transformation);
         Img img = ImageJFunctions.wrap(sourceTransformed);
@@ -310,6 +309,17 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         Module module = executeCommand(ImagesToStack.class, parameters);
         Dataset dataset = (Dataset) module.getOutput("outputDataset");
         displayService.createDisplay(dataset);
+    }
+
+    private Dataset applyFlatFieldCorrection(Dataset dataset, Dataset flatField) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("inputDataset", dataset);
+        parameters.put("flatFieldDataset", flatField);
+        Module module = executeCommand(FlatFieldCorrection.class, parameters);
+        dataset = (Dataset) module.getOutput("outputDataset");
+        return dataset;
+
     }
 
     private ImagePlus applyTransformation(ImagePlus imagePlus, Transformation transformation) {
