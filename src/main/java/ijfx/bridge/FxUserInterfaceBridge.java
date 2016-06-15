@@ -20,7 +20,10 @@
  */
 package ijfx.bridge;
 
+import ijfx.plugins.commands.AutoContrast;
 import ijfx.service.batch.BatchService;
+import ijfx.service.ui.CommandRunner;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
 import ijfx.ui.datadisplay.image.ImageWindow;
 import ijfx.ui.main.ImageJFX;
@@ -72,6 +75,9 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Parameter
     private BatchService batchService;
+    
+   @Parameter
+   private LoadingScreenService loadingScreenService;
     
     private static final Logger logger = ImageJFX.getLogger();
 
@@ -185,9 +191,13 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
         logger.info("Showing display");
         
         if (dspl instanceof ImageDisplay) {
-
+            
             displayService.setActiveDisplay(dspl);
-
+            
+            ImageDisplay imgDisplay = (ImageDisplay) dspl;
+            
+            
+            
             // we always assume that an image is displayed so we create an image window
             // in the image container (singleton pattern)
             final ImageWindow imageWindow = new ImageWindow(dspl);
@@ -199,7 +209,15 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
                 // refreshing the window for some reason I forgot
                 imageWindow.refreshSourceImage();
+                
+                //loadingScreenService.frontEndTask("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay);
+                
+                
+                
             });
+            
+            new CommandRunner(getContext()).run("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay,"channelDependant",true);
+            
         } else if (dspl instanceof TableDisplay) {
             Platform.runLater(() -> {
 
