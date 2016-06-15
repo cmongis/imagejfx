@@ -507,24 +507,29 @@ public class ArcItem<T> extends Control {
         
         
        
-        logger.info("event : "+event);
-        logger.info("firstEvent : "+firstEvent);
-        logger.info("lastEvent : "+lastEvent);
+        //logger.info("event : "+event);
+        //logger.info("firstEvent : "+firstEvent);
+        //logger.info("lastEvent : "+lastEvent);
+        //System.out.println(event.getX());
+        //System.out.println(event.getEventType());
         
+        System.out.println(getPolarCoordinates().yProperty().get());
+         
         if (getType() == ArcItemType.CLICK) {
             return;
         }
         if (firstEvent == null) {
             firstEvent = event;
-            lastEvent = event;
+            //lastEvent = event;
             originalValue = sliderValue.get();
 
             isSliding.set(true);
 
         }
+        //if(event.getX() <= 0) return;  
         
         double shift = event.getScreenX() - firstEvent.getScreenX();
-
+        //System.out.println(shift);
         if (lastEvent != null) {
             double diff = event.getScreenX() - lastEvent.getScreenX();
 
@@ -543,7 +548,7 @@ public class ArcItem<T> extends Control {
         }
         lastEvent = event;
         displayBar();
-        //event.consume();
+        event.consume();
 //
     }
     //event used for button click
@@ -554,7 +559,9 @@ public class ArcItem<T> extends Control {
         backToOrigin.setFromX(getTranslateX());
         backToOrigin.setToX(getPolarCoordinates().xProperty().doubleValue());
         backToOrigin.play();
-
+        backToOrigin.setOnFinished(e->{
+            arcMenu.hide();
+        });
         /*
         backToOrigin = new TranslateTransition(Duration.millis(200), selectionLabel);
         backToOrigin.setFromX(getTranslateX());

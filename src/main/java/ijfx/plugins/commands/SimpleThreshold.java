@@ -57,7 +57,6 @@ public class SimpleThreshold extends ContextCommand{
         cursor.reset();
         while(cursor.hasNext()) {
             cursor.fwd();
-           
             if(!upperCut && cursor.get().getRealDouble() < value) {
                 cursor.get().setReal(0);
             }
@@ -66,8 +65,6 @@ public class SimpleThreshold extends ContextCommand{
                     cursor.get().setReal(0);
                 }
             }
-            
-            
         }
     }
     
