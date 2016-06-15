@@ -24,7 +24,6 @@ import java.io.File;
 import net.imagej.Dataset;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 /**
@@ -32,20 +31,21 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter")
-public class DefaultWholeWrapper extends AbstractImageJ1PluginAdapter {
+public class DefaultWholeWrapper implements Command{
    @Parameter(type = ItemIO.BOTH)
     protected Dataset dataset;
    @Parameter
    File f;
-    @Override
+      @Parameter
+   IJ1Service iJ1Service;
+    
     public ImagePlus processImagePlus(ImagePlus input) {
         return input;
     }
 
     @Override
     public void run() {
-        setWholeWrap(true);
-        dataset = setOutput(getInput(dataset), dataset);
+        dataset = iJ1Service.setOutput(iJ1Service.getInput(dataset), dataset);
     }
 
 }

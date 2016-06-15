@@ -17,31 +17,27 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.stack;
+package ijfx.plugins.adapter;
 
-import java.util.stream.IntStream;
+import ij.ImagePlus;
 import net.imagej.Dataset;
-import org.scijava.ItemIO;
-import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+import net.imagej.ImageJService;
+import net.imagej.display.ImageDisplay;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins > Reverse Stack")
-public class ReverseStack extends ContextCommand{
+public interface IJ1Service extends ImageJService {
 
-    @Parameter (type = ItemIO.BOTH)
-    Dataset dataset;
-    
-    @Override
-    public void run() {
-        
-        Dataset duplicate = dataset.duplicateBlank();
+    public ImagePlus getInput(Dataset dataset);
 
-    }
-    
+    public Dataset setOutput(ImagePlus imp, Dataset dataset);
+
+    public Dataset wrapDataset(ImagePlus imp);
+
+    public ImagePlus unwrapDataset(Dataset dataset);
+
+    public void configureImagePlus(ImagePlus imp, ImageDisplay imageDisplay);
+
 }
