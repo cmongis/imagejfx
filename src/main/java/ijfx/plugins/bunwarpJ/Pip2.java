@@ -68,10 +68,10 @@ public class Pip2 implements Command {
 
     @Parameter
     IJ1Service iJ1Service;
-    
+
     @Parameter
     DatasetService datasetService;
-    
+
     @Parameter
     ImageLoaderService imageLoaderService;
 
@@ -187,8 +187,8 @@ public class Pip2 implements Command {
 
     @Parameter(label = "Landmarks File")
     File landmarksFile;
-    
-    @Parameter(label = "Flatfield Image")
+
+    @Parameter(label = "Flatfield Image", required = false)
     Dataset flatfield;
 
     ImageProcessor targetMskIP = null;
@@ -204,7 +204,6 @@ public class Pip2 implements Command {
     /**
      * Method to lunch the plugin.
      *
-     * @param commandLine command to determine the action
      */
     @Override
     public void run() {
@@ -224,7 +223,7 @@ public class Pip2 implements Command {
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
             Dataset afterTransformation = iJ1Service.wrapDataset(applyTransformation(imagePlus, transformation));
             if (flatfield != null) {
-                afterTransformation = applyFlatFieldCorrection(afterTransformation,flatfield);
+                afterTransformation = applyFlatFieldCorrection(afterTransformation, flatfield);
             }
             displayService.createDisplay(afterTransformation.getName(), afterTransformation);
         });
@@ -237,7 +236,9 @@ public class Pip2 implements Command {
 
     }
 
-    /* end run */
+    /**
+     * Init parameters
+     */
     public void init() {
         //Set parameters
         mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
@@ -247,8 +248,11 @@ public class Pip2 implements Command {
         this.targetImp = iJ1Service.getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
     }
 
-
-
+    /**
+     * Load ImagePlus from Folder
+     *
+     * @return
+     */
     public List<ImagePlus> loadImagePlus() {
         Opener opener = new Opener();
 
@@ -263,6 +267,12 @@ public class Pip2 implements Command {
         return listImagePlus;
     }
 
+    /**
+     * Return the matrix transformation
+     *
+     * @param transformation
+     * @return
+     */
     private ImagePlus getFeedback(Transformation transformation) {
         ImagePlus deformation = new ImagePlus();
         ImageStack imageStack = new ImageStack(sourceImp.getWidth(), sourceImp.getHeight());
@@ -279,24 +289,11 @@ public class Pip2 implements Command {
         return title;
     }
 
-//    /**
-//     * Convert Dataset to ImagePlus and extract slice.
-//     *
-//     * @param dataset
-//     * @param i
-//     * @return
-//     */
-//    private ImagePlus getImpParameter(Dataset dataset, int i) {
-//        ImagePlus imagePlus = getInput(dataset);
-//        ImageStack imageStack = imagePlus.getStack();
-//        ImageStack imageStack2 = new ImageStack(imagePlus.getWidth(), imagePlus.getHeight());
-//        ImageProcessor imageProcessor2 = imageStack.getProcessor(i);
-//        imageStack2.addSlice(imageStack.getShortSliceLabel(i), imageProcessor2);
-//        ImagePlus result = imagePlus.createImagePlus();
-//        result.setStack(imageStack);
-//        result.setCalibration(imagePlus.getCalibration());
-//        return result;
-//    }
+    /**
+     * Display the source and transformed target
+     *
+     * @param transformation
+     */
     public void getMergedFeedback(Transformation transformation) {
         ImagePlus sourceTransformed = applyTransformation(sourceImp, transformation);
         Img img = ImageJFunctions.wrap(sourceTransformed);
@@ -322,6 +319,12 @@ public class Pip2 implements Command {
 
     }
 
+    /**
+     *
+     * @param imagePlus
+     * @param transformation
+     * @return
+     */
     private ImagePlus applyTransformation(ImagePlus imagePlus, Transformation transformation) {
         ImagePlus[] imArray = new ImagePlus[2];
         imArray[0] = imagePlus;
@@ -333,17 +336,18 @@ public class Pip2 implements Command {
                 this.stopThreshold, false, this.saveTransformation, "");
 
         dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
+        imagePlus.setTitle(transformedTitle(imagePlus));
         return imagePlus;
 
     }
 
-    private void displayTransformedIP(ImagePlus imagePlus) {
-        //Display result
-        Img img = ImageJFunctions.wrap(imagePlus);
-        Dataset datasetPostTransformation = datasetService.create(img);
-        displayService.createDisplay(transformedTitle(imagePlus), datasetPostTransformation);
-    }
-
+    /**
+     *
+     * @param <C>
+     * @param type
+     * @param parameters
+     * @return
+     */
     private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
         Module module = moduleService.createModule(commandService.getCommand(type));
         try {

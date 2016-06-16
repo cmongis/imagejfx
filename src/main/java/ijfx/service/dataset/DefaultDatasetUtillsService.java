@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
-import net.imagej.ImageJService;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
