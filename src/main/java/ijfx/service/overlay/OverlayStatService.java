@@ -232,39 +232,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         return new HyperVolumePointSet(pt1, pt2);
     }
 
-    /*
-    
-    TODO: for Pierre
-    Modify the OverlayStatisticsService so it returns a OverlayStatistics object
-    from an ImageDisplay and an Overlay.
-    
-    Some statistics depends on the pixel values (you can already easily retrive
-    the pixel values using the method (getValueList) but shape related
-    statistics must be implemented by you. Pixel value reltated statistics
-    can also easily be calculated using DescriptiveStatistics objects
-    from Apache 3 Math library (already used in the project).
-    
-    Be careful becayse, the Overlay can be a PolygonOverlay, a LineOverlay,
-    or a Rectangle Overlay. Some shape statistics don't make sens in some case
-    so it the implementation should return 0;
-    
-    You can find quite close implementation of the this shape related statistics
-    at :
-    https://github.com/thorstenwagner/ij-blob/blob/master/src/main/java/ij/blob/Blob.java
-    
-    You can copy paste some of it code. You can use java.awt.* object in your
-    code but avoid using any ImageProcessor related object.
-    
-    Things to keep it mind in the implementations : 
-        - the statistics should be calculated only once
-        - retrieving the pixel value for the statistics is okay
-        but shouldn't be kept in memory. So don't keep any DescriptiveStatistics Object
-        in memory.
-    */
-    
-   
     public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
-        
         
         OverlayStatistics overlayStatistics;
         
@@ -281,6 +249,24 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         return overlayStatistics;
     }
+    
+    public OverlayStatistics getOverlayStatistics(Overlay overlay) {
+        
+        OverlayStatistics overlayStatistics;
+        
+        if(overlay instanceof LineOverlay)
+            overlayStatistics = new LineOverlayStatistics(overlay, this.context());
+            
+        else if(overlay instanceof RectangleOverlay)
+            overlayStatistics = new RectangleOverlayStatistics(overlay, this.context());
+        
+        else{
+            overlay = cleanOverlay(overlay);
+            overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());        
+        }
+        
+        return overlayStatistics;
+    }    
     
     
     public HashMap<String, Double> getStatistics(OverlayStatistics overlayStats) {
