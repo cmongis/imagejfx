@@ -54,7 +54,7 @@ public class PopArcMenu extends PopupControl {
         super();
         setSkin(createDefaultSkin());
         
-       
+        
      
         
         
@@ -223,12 +223,17 @@ public class PopArcMenu extends PopupControl {
         super.show(scene.getWindow(),wx,wy);
         setX(wx);
         setY(wy);
-        List<String> styleClasses = getScene().getRoot().getStyleClass();
+        setAnchorX(wx);
+        setAnchorY(wy);
         
+        List<String> styleClasses = getScene().getRoot().getStyleClass();
+        System.out.println("It does something !");
         if(styleClasses.contains(TRANSPARENT_CLASS) == false) styleClasses.add(TRANSPARENT_CLASS);
       
         //super.show(((Node)event.getTarget()).getScene().getWindow(),visualBounds.getMinX()+(margin/2),visualBounds.getMinY()+(margin / 2));
     }
+    
+    
     
     public static final String TRANSPARENT_CLASS = "transparent";
     

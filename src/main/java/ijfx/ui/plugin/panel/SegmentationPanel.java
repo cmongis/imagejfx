@@ -171,8 +171,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     public UiPlugin init() {
 
         workflowPanel = new WorkflowPanel(context);
-
-        setCenter(workflowPanel);
+        workflowPanel.setMinHeight(400);
+        workflowVBox.getChildren().add(workflowPanel);
 
         workflowPanel.addStep(GaussianBlur.class);
         workflowPanel.addStep(Binarize.class);

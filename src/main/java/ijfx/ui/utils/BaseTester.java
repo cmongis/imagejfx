@@ -38,6 +38,8 @@ public abstract class BaseTester extends Application {
 
     ToolBar toolbar = new ToolBar();
 
+    Stage primaryStage;
+    
     public BaseTester() {
 
        
@@ -55,6 +57,8 @@ public abstract class BaseTester extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        this.primaryStage = primaryStage;
+        
         borderPane.getStylesheets().add(ImageJFX.getStylesheet());
         borderPane.getStyleClass().add("explorer-filter");
 
@@ -83,4 +87,10 @@ public abstract class BaseTester extends Application {
     
     abstract public void initApp();
 
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    
+    
 }

@@ -198,7 +198,7 @@ public class MainWindowController extends AnchorPane {
     @Parameter
     ActivityService activityService;
 
-    LoadingPopup loadingPopup = new LoadingPopup();
+    LoadingPopup loadingPopup = new LoadingPopup(ImageJFX.PRIMARY_STAGE);
 
     Queue<Hint> hintQueue = new LinkedList<>();
 
