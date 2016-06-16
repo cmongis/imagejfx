@@ -22,7 +22,6 @@ package ijfx.service;
 import ijfx.core.metadata.MetaDataSet;
 import io.scif.MetadataLevel;
 import io.scif.config.SCIFIOConfig;
-import io.scif.img.ImageRegion;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
@@ -151,9 +150,11 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     
     public Dataset createEmptyPlaneDataset(Dataset input) {
         AxisType[] axisTypeList = new AxisType[2];
-
-        long width = input.max(0);
-        long height = input.max(1);
+        
+        long width = input.dimension(0);
+        long height = input.dimension(1);
+//        long width = input.max(0);
+//        long height = input.max(1);
         long[] dims = new long[]{width, height};
 
         axisTypeList[0] = input.getImgPlus().axis(0).type();
