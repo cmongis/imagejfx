@@ -19,12 +19,18 @@
  */
 package ijfx.plugins.segmentation;
 
-import javafx.geometry.Point2D;
+import ijfx.service.ImagePlaneService;
+import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.overlay.OverlayStatService;
+import java.util.List;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.overlay.PolygonOverlay;
+import net.imagej.display.OverlayService;
+import net.imagej.overlay.Overlay;
+import org.scijava.Context;
+import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -34,25 +40,24 @@ import org.scijava.plugin.Plugin;
  * @author Pierre BONNEAU
  */
 
-@Plugin(type = Command.class, menuPath = "Analyze>Segmentation")
-
-public class SegmentationCommandTester implements Command{
+@Plugin(type = Command.class, menuPath = "Analyze>Segmentation>Test Profiles selection")
+public class ProfilesCommandTester implements Command{
+    
+    @Parameter
+    OverlayService overlayService;
     
     @Parameter
     ImageDisplayService imageDisplayService;
     
     @Parameter
-    DatasetService datasetService;
+    Context context;
     
     @Override
     public void run() {
-        
         ImageDisplay display = imageDisplayService.getActiveImageDisplay();
-        Dataset ds = datasetService.getDatasets(display).get(0);
-        
-        MidPointCircle circle = new MidPointCircle(100.0, 100.0, 15);
-        circle.drawCircle(ds);
-        
-    }
     
+        List<Overlay> overlays = overlayService.getOverlays(display);
+        
+        ProfilesSet profilesSet = new DefaultProfilesSet(overlays, context);
+    }
 }

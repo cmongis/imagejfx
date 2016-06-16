@@ -19,56 +19,38 @@
  */
 package ijfx.plugins.segmentation;
 
+import java.util.ArrayList;
 import javafx.geometry.Point2D;
+import net.imagej.Dataset;
+import net.imglib2.RandomAccess;
+import net.imglib2.type.numeric.RealType;
 
 /**
- * Implementation of the Midpoint circle algorithm
- * 
+ *
  * @author Pierre BONNEAU
  */
-public class MidPointCircle extends AbstractSearchArea{
+public class SquaredFrame extends AbstractSearchArea{
     
-/**
- * Create a circle based on the Midpoint circle algorithm
- * @param cX X coordinate of the center
- * @param cY Y coordinate of the center
- * @param radius Radius of the circle
- */
-    public MidPointCircle(double cX, double cY, int radius) {
+    public SquaredFrame(double cX, double cY, int radius){
         
         super(cX, cY, radius);
         
         double currentX = cX + radius;
         double currentY = cY;
         
-        double dX = radius;
-        double dY = 0.0;
+        int dX = radius;
+        int dY = 0;
         
-        int err = 0;
-        
-        while(dX >= dY){
-            
+        for(int i = 0; i <= radius; i++){
             points.add(new Point2D(cX+dX, cY+dY));
             points.add(new Point2D(cX+dX, cY-dY));
-            
             points.add(new Point2D(cX-dX, cY+dY));
             points.add(new Point2D(cX-dX, cY-dY));
-
-            points.add(new Point2D(cX-dY, cY+dX));
-            points.add(new Point2D(cX-dY, cY-dX));
-
             points.add(new Point2D(cX+dY, cY+dX));
             points.add(new Point2D(cX+dY, cY-dX));
-            
-            err += 1 + 2*dY;
-            if(2*(err-dX) + 1 > 0){
-                currentX = currentX-1;
-                dX = dX-1;
-                err += 1 - 2*dX;                
-            }
-
-            currentY = currentY-1;
-            dY = dY+1;
+            points.add(new Point2D(cX-dY, cY+dX));
+            points.add(new Point2D(cX-dY, cY-dX));
+            dY++;
         }
     }
 }
