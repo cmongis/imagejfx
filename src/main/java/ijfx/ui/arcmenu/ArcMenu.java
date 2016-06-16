@@ -99,7 +99,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
         prefWidthProperty().bind(skinnable.prefWidthProperty());
         prefHeightProperty().bind(skinnable.prefHeightProperty());
         
-        addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
+        this.skinnable.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
         
     }
     

@@ -21,9 +21,13 @@
 package ijfx.service.ui;
 
 import ijfx.bridge.FxStatusBar;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import javafx.concurrent.Task;
 import net.imagej.ImageJService;
+import org.scijava.command.Command;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -41,12 +45,16 @@ public class LoadingScreenService extends AbstractService implements ImageJServi
     EventService eventService;
     
     
-    
+    @Parameter
+    CommandService commandService;
     
     
     public void frontEndTask(Task task){
         frontEndTask(task,false);
     }
+    
+    
+    
     
     public void frontEndTask(Task task, boolean canCancel) {
        eventService.publish(new FontEndTaskSubmitted().setCancelable(canCancel).setObject(task));

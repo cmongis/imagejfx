@@ -57,6 +57,8 @@ public class ImageJFX extends Application {
 
     public static boolean formatted = false;
 
+    public static Stage PRIMARY_STAGE;
+    
     public static Logger getLogger() {
         if (logger == null) {
             logger = Logger.getLogger("ImageJFX");
@@ -105,7 +107,9 @@ public class ImageJFX extends Application {
 
         Parent root;
         try {
-
+            
+            PRIMARY_STAGE = primaryStage;
+            
             LogRecorderService.getInstance();
 
             getLogger().info("You running Java " + System.getProperty("java.version"));

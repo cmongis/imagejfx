@@ -60,7 +60,7 @@ public class LoadingPopupTest extends BaseTester {
         
         helloWorld= new DragPanel("Drag something here. Because\n I need a longer text",FontAwesomeIcon.BANK);
         setContent(helloWorld);
-        loadingPopup = new LoadingPopup();
+        loadingPopup = new LoadingPopup(getPrimaryStage());
         loadingPopup.showCloseButtonProperty().setValue(true);
         loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
         loadingPopup.attachTo(helloWorld.getScene());
