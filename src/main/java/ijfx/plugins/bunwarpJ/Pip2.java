@@ -1,5 +1,5 @@
 /*
-    This file is part of ImageJ FX.
+    This imagesFolder is part of ImageJ FX.
 
     ImageJ FX is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,21 +22,36 @@ package ijfx.plugins.bunwarpJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.Opener;
-import ij.plugin.SubstackMaker;
 import ij.process.ImageProcessor;
 import ijfx.core.imagedb.ImageLoaderService;
-import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
+import ijfx.plugins.adapter.IJ1Service;
+import ijfx.plugins.flatfield.FlatFieldCorrection;
+import ijfx.plugins.stack.ImagesToStack;
+import ijfx.service.dataset.DatasetUtillsService;
 import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.axis.Axes;
+import net.imagej.display.ImageDisplayService;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.command.Command;
+import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
+import org.scijava.module.MethodCallException;
+import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -45,11 +60,17 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class, menuPath = "Plugins>Pipeline2")
-public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
+public class Pip2 implements Command {
 
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
     public static String[] sMinScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine"};
     public static String[] sMaxScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
+
+    @Parameter
+    IJ1Service iJ1Service;
+
+    @Parameter
+    DatasetService datasetService;
 
     @Parameter
     ImageLoaderService imageLoaderService;
@@ -62,11 +83,22 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
 
     @Parameter
     Dataset datasetTarget;
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
+
+    @Parameter
+    DatasetUtillsService datasetUtillsService;
+
+    @Parameter
+    ModuleService moduleService;
+
+    @Parameter
+    CommandService commandService;
     /*....................................................................
     	Private variables
  	....................................................................*/
-    @Parameter
-    private int position;
+
     /**
      * Image representation for source image
      */
@@ -114,12 +146,12 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
      * landmarks weight
      */
     @Parameter
-    private double landmarkWeight = 0;
+    private double landmarkWeight = 1.0;
     /**
      * image similarity weight
      */
     @Parameter
-    private double imageWeight = 1;
+    private double imageWeight = 0.0;
     /**
      * consistency weight
      */
@@ -128,8 +160,8 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     /**
      * flag for rich output (verbose option)
      */
-    @Parameter
-    private boolean richOutput = false;
+    //@Parameter
+    private boolean richOutput = true;
     /**
      * flag for save transformation option
      */
@@ -150,15 +182,20 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     @Parameter(choices = {"0", "1", "2", "3", "4", "5", "6", "7"})
     String img_subsamp_fact;
 
-    @Parameter
-    File file;
+    @Parameter(label = "Images Folder")
+    File imagesFolder;
 
-    @Parameter
+    @Parameter(label = "Landmarks File")
     File landmarksFile;
+
+    @Parameter(label = "Flatfield Image", required = false)
+    Dataset flatfield;
+
     ImageProcessor targetMskIP = null;
     ImageProcessor sourceMskIP = null;
     int max_scale_deformation;
     int min_scale_deformation;
+    int mode;
 
     /*....................................................................
        Public methods
@@ -167,19 +204,12 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
     /**
      * Method to lunch the plugin.
      *
-     * @param commandLine command to determine the action
      */
     @Override
     public void run() {
         Runtime.getRuntime().gc();
- 
-        //Set parameters
-        int mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
-        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
-        min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
-        this.sourceImp = getInput(datasetSource);//getImpParameter(datasetSource, position);
-        this.targetImp = getInput(datasetTarget);//getImpParameter(datasetTarget, position);
-        
+        init();
+
         //Load landmarks
         Stack<Point> sourcePoints = new Stack<>();
         Stack<Point> targetPoints = new Stack<>();
@@ -188,45 +218,46 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
 
         //Calcul transformation which have to be applied after
         Transformation transformation = bUnwarpJ_.computeTransformationBatch(targetImp, sourceImp, targetMskIP, sourceMskIP, sourcePoints, targetPoints, param);
-        transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
+        //transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
         //Apply transformation
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
-            ImagePlus[] imArray = new ImagePlus[2];
-            imArray[0] = imagePlus;
-            imArray[1] = imagePlus;
-            final MainDialog dialog = new MainDialog(imArray, mode,
-                    this.maxImageSubsamplingFactor, this.min_scale_deformation,
-                    this.max_scale_deformation, this.divWeight, this.curlWeight,
-                    this.landmarkWeight, this.imageWeight, this.consistencyWeight,
-                    this.stopThreshold, false, this.saveTransformation, "");
-
-            dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
-            
-            //Display result
-            Img img = ImageJFunctions.wrap(imagePlus);
-            displayService.createDisplay(transformedTitle(imagePlus), datasetService.create(img));
+            Dataset afterTransformation = iJ1Service.wrapDataset(applyTransformation(imagePlus, transformation));
+            if (flatfield != null) {
+                afterTransformation = applyFlatFieldCorrection(afterTransformation, flatfield);
+            }
+            displayService.createDisplay(afterTransformation.getName(), afterTransformation);
         });
 
+        getMergedFeedback(transformation);
         if (richOutput) {
             Img img = ImageJFunctions.wrap(getFeedback(transformation));
             displayService.createDisplay("Feedback", img);
         }
-	
+
     }
 
-    /* end run */
- 
-
-    @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    /**
+     * Init parameters
+     */
+    public void init() {
+        //Set parameters
+        mode = Arrays.asList(this.modesArray).indexOf(modeChoice);
+        max_scale_deformation = Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation_choice);
+        min_scale_deformation = Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation_choice);
+        this.sourceImp = iJ1Service.getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
+        this.targetImp = iJ1Service.getInput(datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(datasetSource)));
     }
 
+    /**
+     * Load ImagePlus from Folder
+     *
+     * @return
+     */
     public List<ImagePlus> loadImagePlus() {
         Opener opener = new Opener();
 
         List<File> listFiles;
-        listFiles = (List<File>) imageLoaderService.getAllImagesFromDirectory(file.getParentFile());
+        listFiles = (List<File>) imageLoaderService.getAllImagesFromDirectory(imagesFolder.getParentFile());
         List<ImagePlus> listImagePlus = new ArrayList();
         listFiles.stream()
                 .forEach((f) -> {
@@ -236,6 +267,12 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         return listImagePlus;
     }
 
+    /**
+     * Return the matrix transformation
+     *
+     * @param transformation
+     * @return
+     */
     private ImagePlus getFeedback(Transformation transformation) {
         ImagePlus deformation = new ImagePlus();
         ImageStack imageStack = new ImageStack(sourceImp.getWidth(), sourceImp.getHeight());
@@ -251,23 +288,88 @@ public class Pip2 extends AbstractImageJ1PluginAdapter implements Command {
         title = title.substring(0, index) + "-aligned" + title.substring(index);
         return title;
     }
-    
+
     /**
-     * Convert Dataset to ImagePlus and extract slice.
-     * @param dataset
-     * @param i
-     * @return 
+     * Display the source and transformed target
+     *
+     * @param transformation
      */
-    private ImagePlus getImpParameter(Dataset dataset, int i)
-    {
-        ImagePlus imagePlus = getInput(dataset);
-        ImageStack imageStack = imagePlus.getStack();
-        ImageStack imageStack2 = new ImageStack(imagePlus.getWidth(), imagePlus.getHeight());
-        ImageProcessor imageProcessor2 = imageStack.getProcessor(i);
-        imageStack2.addSlice(imageStack.getShortSliceLabel(i), imageProcessor2);
-        ImagePlus result = imagePlus.createImagePlus();
-        result.setStack(imageStack);
-        result.setCalibration(imagePlus.getCalibration());
-        return result;
+    public void getMergedFeedback(Transformation transformation) {
+        ImagePlus sourceTransformed = applyTransformation(sourceImp, transformation);
+        Img img = ImageJFunctions.wrap(sourceTransformed);
+        Dataset datasetPostTransformation = datasetService.create(img);
+        Dataset[] datasetArray = {datasetPostTransformation, datasetTarget};
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("title", "Tuan anh est magique");
+        parameters.put("datasetArray", datasetArray);
+        parameters.put("axisType", Axes.CHANNEL);
+        Module module = executeCommand(ImagesToStack.class, parameters);
+        Dataset dataset = (Dataset) module.getOutput("outputDataset");
+        displayService.createDisplay(dataset);
     }
+
+    private Dataset applyFlatFieldCorrection(Dataset dataset, Dataset flatField) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("inputDataset", dataset);
+        parameters.put("flatFieldDataset", flatField);
+        Module module = executeCommand(FlatFieldCorrection.class, parameters);
+        dataset = (Dataset) module.getOutput("outputDataset");
+        return dataset;
+
+    }
+
+    /**
+     *
+     * @param imagePlus
+     * @param transformation
+     * @return
+     */
+    private ImagePlus applyTransformation(ImagePlus imagePlus, Transformation transformation) {
+        ImagePlus[] imArray = new ImagePlus[2];
+        imArray[0] = imagePlus;
+        imArray[1] = imagePlus;
+        final MainDialog dialog = new MainDialog(imArray, mode,
+                this.maxImageSubsamplingFactor, this.min_scale_deformation,
+                this.max_scale_deformation, this.divWeight, this.curlWeight,
+                this.landmarkWeight, this.imageWeight, this.consistencyWeight,
+                this.stopThreshold, false, this.saveTransformation, "");
+
+        dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
+        imagePlus.setTitle(transformedTitle(imagePlus));
+        return imagePlus;
+
+    }
+
+    /**
+     *
+     * @param <C>
+     * @param type
+     * @param parameters
+     * @return
+     */
+    private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
+        Module module = moduleService.createModule(commandService.getCommand(type));
+        try {
+            module.initialize();
+        } catch (MethodCallException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        parameters.forEach((k, v) -> {
+            module.setInput(k, v);
+            module.setResolved(k, true);
+        });
+
+        Future run = moduleService.run(module, false, parameters);
+
+        try {
+            run.get();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return module;
+    }
+
 }

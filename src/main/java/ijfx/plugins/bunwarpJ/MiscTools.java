@@ -43,6 +43,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 /**
  * Different tools for the bUnwarpJ interface.
@@ -1534,61 +1536,61 @@ public class MiscTools
 			String yTarget;
 			int separatorIndex;
 			int k = 1;
-			if (!(line = br.readLine()).equals("Index\txSource\tySource\txTarget\tyTarget")) {
+			if (!(line = br.readLine()).equals("Index,xSource,ySource,xTarget,yTarget")) {
 				fr.close();
-				IJ.log("Line " + k + ": 'Index\txSource\tySource\txTarget\tyTarget'");
+				IJ.log("Line " + k + ": 'Index,xSource,ySource,xTarget,yTarget'");
 				return;
 			}
 			++k;
 			while ((line = br.readLine()) != null) {
 				line = line.trim();
-				separatorIndex = line.indexOf('\t');
+				separatorIndex = line.indexOf(',');
 				if (separatorIndex == -1) {
 					br.close();
 					fr.close();
 					IJ.log("Line " + k
-							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+							+ ": #Index# , #xSource# , #ySource# , #xTarget# , #yTarget#");
 					return;
 				}
 				index = line.substring(0, separatorIndex);
 				index = index.trim();
-				line = line.substring(separatorIndex);
+				line = line.substring(separatorIndex+1);
 				line = line.trim();
-				separatorIndex = line.indexOf('\t');
+				separatorIndex = line.indexOf(',');
 				if (separatorIndex == -1) {
 					br.close();
 					fr.close();
 					IJ.log("Line " + k
-							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+							+ ": #Index# , #xSource# , #ySource# , #xTarget# , #yTarget#");
 					return;
 				}
 				xSource = line.substring(0, separatorIndex);
 				xSource = xSource.trim();
-				line = line.substring(separatorIndex);
+				line = line.substring(separatorIndex+1);
 				line = line.trim();
-				separatorIndex = line.indexOf('\t');
+				separatorIndex = line.indexOf(',');
 				if (separatorIndex == -1) {
 					br.close();
 					fr.close();
 					IJ.log("Line " + k
-							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+							+ ": #Index# , #xSource# , #ySource# , #xTarget# , #yTarget#");
 					return;
 				}
 				ySource = line.substring(0, separatorIndex);
 				ySource = ySource.trim();
-				line = line.substring(separatorIndex);
+				line = line.substring(separatorIndex+1);
 				line = line.trim();
-				separatorIndex = line.indexOf('\t');
+				separatorIndex = line.indexOf(',');
 				if (separatorIndex == -1) {
 					br.close();
 					fr.close();
 					IJ.log("Line " + k
-							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+							+ ": #Index# , #xSource# , #ySource# , #xTarget# , #yTarget#");
 					return;
 				}
 				xTarget = line.substring(0, separatorIndex);
 				xTarget = xTarget.trim();
-				yTarget = line.substring(separatorIndex);
+				yTarget = line.substring(separatorIndex+1);
 				yTarget = yTarget.trim();
 				sourcePoint = new Point(Integer.valueOf(xSource).intValue(),
 						Integer.valueOf(ySource).intValue());
@@ -1598,16 +1600,11 @@ public class MiscTools
 				targetStack.push(targetPoint);
 			}
 			fr.close();
-		} catch (FileNotFoundException e) {
-			IJ.error("File not found exception" + e);
+		} catch (Exception e) {
+                        Alert alert = new Alert(AlertType.ERROR);
+                        alert.setHeaderText(e.getMessage());
 			return;
-		} catch (IOException e) {
-			IJ.error("IOException exception" + e);
-			return;
-		} catch (NumberFormatException e) {
-			IJ.error("Number format exception" + e);
-			return;
-		}
+		} 
 	}
 	
 	//------------------------------------------------------------------

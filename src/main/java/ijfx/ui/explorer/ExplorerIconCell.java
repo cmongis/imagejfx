@@ -19,6 +19,8 @@
  */
 package ijfx.ui.explorer;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import mongis.utils.panecell.PaneIconCell;
 import org.scijava.plugin.Parameter;

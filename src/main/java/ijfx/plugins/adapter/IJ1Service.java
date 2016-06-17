@@ -17,34 +17,27 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.adapter;
 
-import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
 import ij.ImagePlus;
 import net.imagej.Dataset;
-import org.scijava.command.Command;
-import org.scijava.plugin.Attr;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+import net.imagej.ImageJService;
+import net.imagej.display.ImageDisplay;
 
-@Plugin(type = Command.class, menuPath = "Plugins>UnwarpJ", attrs = {
-    @Attr(name = "no-legacy")})
-public class UnwarpJPlugin extends AbstractImageJ1PluginAdapter {
+/**
+ *
+ * @author Tuan anh TRINH
+ */
+public interface IJ1Service extends ImageJService {
 
-    @Parameter(label = "Source")
-    Dataset source;
-    
-    @Parameter(label = "Target")
-    Dataset target;
-            
-    @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        return input;
-    }
+    public ImagePlus getInput(Dataset dataset);
 
-    @Override
-    public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
+    public Dataset setOutput(ImagePlus imp, Dataset dataset);
+
+    public Dataset wrapDataset(ImagePlus imp);
+
+    public ImagePlus unwrapDataset(Dataset dataset);
+
+    public void configureImagePlus(ImagePlus imp, ImageDisplay imageDisplay);
+
 }

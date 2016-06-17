@@ -21,13 +21,9 @@
 package ijfx.plugins.adapter;
 
 import ij.ImagePlus;
-import static java.lang.Math.toIntExact;
-import java.util.stream.IntStream;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
-import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccessibleInterval;
@@ -35,17 +31,19 @@ import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 
 import net.imglib2.type.numeric.integer.UnsignedShortType;
-import org.scijava.ItemIO;
-import org.scijava.command.Command;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  * @author Tuan anh TRINH
  */
-public abstract class AbstractImageJ1PluginAdapter implements Command {
+@Plugin(type = Service.class)
+public class DefaultIJ1Service extends AbstractService implements IJ1Service {
 
     @Parameter
     public DatasetService datasetService;
@@ -56,46 +54,60 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
     @Parameter
     EventService eventService;
 
-    @Parameter
-    boolean createCopy;
 
-    boolean wholeWrap = false;
 
-    public abstract ImagePlus processImagePlus(ImagePlus input);
 
+
+    @Override
     public ImagePlus getInput(Dataset dataset) {
         return unwrapDataset(dataset);
     }
 
+    /**
+     *
+     * @param imp
+     * @param dataset
+     * @return
+     */
+    @Override
     public Dataset setOutput(ImagePlus imp, Dataset dataset) {
-        if (!wholeWrap) {
+//        if (true) {
             dataset = wrapDataset(imp);
-        } else {
-            ImagePlus resultCopy = imp.duplicate();
-            if (createCopy) {
-                dataset = emptyDataset(dataset, dataset.numDimensions());
-            }
-            Dataset dataset2 = wrapDataset(resultCopy);
-            for (int i = 0; i < getNumberOfSlices(dataset); i++) {
-                dataset.setPlane(i, dataset2.getPlane(i));
-            }
-
-        }
+//        } 
+//        else {
+//            ImagePlus resultCopy = imp.duplicate();
+//            if (createCopy) {
+//                dataset = emptyDataset(dataset, dataset.numDimensions());
+//            }
+//            Dataset dataset2 = wrapDataset(resultCopy);
+//            for (int i = 0; i < getNumberOfSlices(dataset); i++) {
+//                dataset.setPlane(i, dataset2.getPlane(i));
+//            }
+//
+//        }
         return dataset;
     }
 
-    public static ImagePlus unwrapDataset(Dataset dataset) {
+    /**
+     *
+     * @param dataset
+     * @return
+     */
+    @Override
+    public ImagePlus unwrapDataset(Dataset dataset) {
         RandomAccessibleInterval<UnsignedShortType> r = (RandomAccessibleInterval<UnsignedShortType>) dataset.getImgPlus();
         ImagePlus wrapImage = ImageJFunctions.wrap(r, "");
         return wrapImage;
     }
 
+    @Override
     public Dataset wrapDataset(ImagePlus imp) {
         Img img = ImageJFunctions.wrap(imp.duplicate());
         return datasetService.create(img);
     }
 
-    public static void configureImagePlus(ImagePlus imp, ImageDisplay imageDisplay) {
+    @Override
+    public void configureImagePlus(ImagePlus imp, ImageDisplay imageDisplay) {
 
         imp.setC(imageDisplay.getIntPosition(Axes.CHANNEL));
         imp.setZ(imageDisplay.getIntPosition(Axes.Z));
@@ -103,45 +115,45 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
 
     }
 
-    private Dataset emptyDataset(Dataset input, int sizeDims) {
-        AxisType[] axisType = new AxisType[input.numDimensions()];
-        CalibratedAxis[] axeArray = new CalibratedAxis[input.numDimensions()];
-        input.axes(axeArray);
+//    private Dataset emptyDataset(Dataset input, int sizeDims) {
+//        AxisType[] axisType = new AxisType[input.numDimensions()];
+//        CalibratedAxis[] axeArray = new CalibratedAxis[input.numDimensions()];
+//        input.axes(axeArray);
+//
+//        long[] dims = new long[sizeDims];
+//        for (int i = 0; i < sizeDims; i++) {
+//            axisType[i] = axeArray[i].type();
+//            dims[i] = toIntExact(input.max(i) + 1);
+//        }
+//        return datasetService.create(dims, input.getName(), axisType, input.getValidBits(), input.isSigned(), false);
+//    }
 
-        long[] dims = new long[sizeDims];
-        for (int i = 0; i < sizeDims; i++) {
-            axisType[i] = axeArray[i].type();
-            dims[i] = toIntExact(input.max(i) + 1);
-        }
-        return datasetService.create(dims, input.getName(), axisType, input.getValidBits(), input.isSigned(), false);
-    }
-
-    private Dataset chooseDataset(Dataset dataset) {
-        if (createCopy) {
-            return dataset.duplicateBlank();
-        }
-        return dataset;
-    }
+//    private Dataset chooseDataset(Dataset dataset) {
+//        if (createCopy) {
+//            return dataset.duplicateBlank();
+//        }
+//        return dataset;
+//    }
 
     public int getNumberOfSlices(Dataset dataset) {
 
         return (int) (dataset.getImgPlus().size() / (dataset.dimension(0) * dataset.dimension(1)));
 
     }
-
-    public Dataset processDataset(Dataset dataset) {
-        Dataset datasetToModify = chooseDataset(dataset);
-
-        for (int i = 0; i < getNumberOfSlices(dataset); i++) {
-            Dataset datasetOnePlane = emptyDataset(dataset, 2);
-            datasetOnePlane.setPlane(0, dataset.getPlane(i));
-            ImagePlus result = processImagePlus(getInput(datasetOnePlane));
-            setOutput(result.duplicate(), datasetOnePlane);
-            datasetToModify.setPlane(i, datasetOnePlane.getPlane(0));
-        }
-        dataset = datasetToModify;
-        return dataset;
-    }
+//
+//    public Dataset processDataset(Dataset dataset) {
+//        Dataset datasetToModify = chooseDataset(dataset);
+//
+//        for (int i = 0; i < getNumberOfSlices(dataset); i++) {
+//            Dataset datasetOnePlane = emptyDataset(dataset, 2);
+//            datasetOnePlane.setPlane(0, dataset.getPlane(i));
+//            ImagePlus result = processImagePlus(getInput(datasetOnePlane));
+//            setOutput(result.duplicate(), datasetOnePlane);
+//            datasetToModify.setPlane(i, datasetOnePlane.getPlane(0));
+//        }
+//        dataset = datasetToModify;
+//        return dataset;
+//    }
 //
 //    /**
 //     * Wrap the whole Dataset. Use more memory
@@ -162,11 +174,5 @@ public abstract class AbstractImageJ1PluginAdapter implements Command {
 //        return dataset;
 //    }
 
-    public boolean isWholeWrap() {
-        return wholeWrap;
-    }
 
-    public void setWholeWrap(boolean wholeWrap) {
-        this.wholeWrap = wholeWrap;
-    }
 }

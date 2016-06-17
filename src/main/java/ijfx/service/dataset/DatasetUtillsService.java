@@ -17,33 +17,25 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.adapter;
+package ijfx.service.dataset;
 
-import ij.ImagePlus;
 import net.imagej.Dataset;
-import org.scijava.ItemIO;
-import org.scijava.command.Command;
-import org.scijava.plugin.Attr;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+import net.imagej.ImageJService;
+import net.imagej.display.ImageDisplay;
+import net.imglib2.type.numeric.RealType;
+
 /**
- * 
+ *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>DefaultAdapter")
-public class DefaultImageJ1PluginAdapter extends AbstractImageJ1PluginAdapter {
-   @Parameter(type = ItemIO.BOTH)
-    protected Dataset dataset;
-    @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        return input;
-    }
-
-    @Override
-    public void run() {
-        dataset = processDataset(dataset);
-    }
-
-  
-
+public interface DatasetUtillsService extends ImageJService{
+    
+    public Dataset extractPlane(ImageDisplay imageDisplay);
+    
+    public ImageDisplay getImageDisplay(Dataset dataset);
+    
+    public  < T extends RealType< T>> Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator);
+    
+    public Dataset divideDatasetByValue(Dataset dataset, double value);
+    
 }
