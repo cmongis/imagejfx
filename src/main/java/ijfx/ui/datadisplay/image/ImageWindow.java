@@ -41,9 +41,11 @@ import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -105,6 +107,8 @@ import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.PluginService;
 import org.scijava.thread.ThreadService;
+import rx.functions.Action1;
+import rx.subjects.PublishSubject;
 
 /**
  *
@@ -206,6 +210,12 @@ public class ImageWindow extends Window {
 
     private final Property<FxTool> currentToolProperty = new SimpleObjectProperty();
     
+    
+    
+    private final PublishSubject<Overlay> overlayToUpdate = PublishSubject.create();
+    
+    private final PublishSubject<Boolean> displayUpdateRequest = PublishSubject.create();
+    
     public ImageWindow() {
         super();
         logger.info("Creating window.");
@@ -265,6 +275,13 @@ public class ImageWindow extends Window {
 
         canvas.getCamera().addListener(this::onViewPortChange);
 
+        //overlayToUpdate.thro
+        overlayToUpdate.buffer(500,TimeUnit.MILLISECONDS).filter(list->!list.isEmpty()).subscribe((Action1<List<Overlay>>)this::updateOverlays);
+        displayUpdateRequest.debounce(1000/24, TimeUnit.MILLISECONDS).subscribe((Action1 < Boolean >)list->{
+            //System.out.println(String.format("%s update request received",list.size()));
+            Platform.runLater(this::refreshSourceImage);
+                    
+                    });
     }
 
     public ImageWindow(Display<?> display) {
@@ -501,6 +518,15 @@ public class ImageWindow extends Window {
 
     private void updateOverlays() {
         getOverlays().forEach(this::updateOverlay);
+    }
+    
+    private void updateOverlays(List<Overlay> overlays) {
+        
+        System.out.println("Treating "+overlays.size());
+        
+        Platform.runLater(()->{
+           new HashSet<>(overlays).forEach(this::updateOverlay);
+        });
     }
 
     public void updateOverlay(Overlay overlay) {
@@ -745,14 +771,15 @@ public class ImageWindow extends Window {
     }
 
     @EventHandler
-    protected void onEvent(DisplayUpdatedEvent event) throws InterruptedException {
+    protected void onDisplayUpdated(DisplayUpdatedEvent event) throws InterruptedException {
         // imageDisplay.update();
 
         if (event.getDisplay() != imageDisplay) {
             return;
         }
         logger.info("DisplayUpdatedEvent");
-        refreshSourceImage();
+        displayUpdateRequest.onNext(Boolean.TRUE);
+        //refreshSourceImage();
 
     }
 
@@ -784,14 +811,16 @@ public class ImageWindow extends Window {
     @EventHandler
     protected void onOverlayCreated(OverlayCreatedEvent event) {
         if (getOverlays().contains(event.getObject())) {
-            Platform.runLater(() -> updateOverlay(event.getObject()));
+            //Platform.runLater(() -> updateOverlay(event.getObject()));
+            overlayToUpdate.onNext(event.getObject());
         }
     }
 
     @EventHandler
     void onOverlayModified(OverlayUpdatedEvent event) {
         if (getOverlays().contains(event.getObject())) {
-            Platform.runLater(() -> updateOverlay(event.getObject()));
+            //Platform.runLater(() -> updateOverlay(event.getObject()));
+            overlayToUpdate.onNext(event.getObject());
         }
     }
 
