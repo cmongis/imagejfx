@@ -180,7 +180,8 @@ public class DefaultWidget implements ItemWidget {
     
     
     public String toString() {
-        return String.format(String.for)
+        //return String.format(String.for)
+        return "Default Widget";
     }
     
 }

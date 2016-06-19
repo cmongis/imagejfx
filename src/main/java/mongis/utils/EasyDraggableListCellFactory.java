@@ -24,6 +24,7 @@ import ijfx.ui.main.ImageJFX;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.Observable;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -63,19 +64,20 @@ public abstract class EasyDraggableListCellFactory<T, C extends Node & ListCellC
                 return ctrl;
             }
 
+           
+           
+
             @Override
-            public void updateItem(T item, boolean isEmpty) {
+            protected void onItemChanged(Observable obs, T oldValue, T newValue) {
                 
-               
-                if (isEmpty) {
-                    setGraphic(null);
-                } else {
-                    
-                    getCtrl().setItem(item);
-                    if(getGraphic() == null)
-                        setGraphic(ctrl);
-                } 
-            } 
+                if(newValue == null) setGraphic(null);
+                else {
+                    getCtrl().setItem(newValue);
+                    setGraphic(getCtrl());
+                }
+                
+                
+            }
         };
     }
 

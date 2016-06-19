@@ -25,6 +25,7 @@ import ijfx.service.workflow.WorkflowStep;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import ijfx.ui.context.animated.Animations;
+import javafx.beans.Observable;
 
 
 /**
@@ -37,23 +38,30 @@ class HistoryStep extends DraggableListCell<WorkflowStep> {
             Context context;
 
             HistoryStepCtrl ctrl;
+
+    @Override
+    protected void onItemChanged(Observable obs, WorkflowStep oldValue, WorkflowStep newValue) {
+        
+        
+        if(ctrl == null) {
+            ctrl = new HistoryStepCtrl(context);
+        }
+        
+        
+        if(newValue == null) {
+            setGraphic(null);
+        }
+        else {
+            setGraphic(ctrl);
+            ctrl.setStep(newValue);
+        }
+        
+        
+    }
             
-            @Override
-            protected void updateItem(WorkflowStep item, boolean empty) {
-                
-                if(item == null && ctrl == null) return;
-                
-                if(ctrl == null) {
-                    ctrl = new HistoryStepCtrl(context);
-                }                
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    if(getGraphic() == null)
-                        setGraphic(ctrl);
-                    ctrl.setStep(item);
-                }
-            }
+            
+            
+            
+         
     
 }

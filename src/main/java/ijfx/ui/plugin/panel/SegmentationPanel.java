@@ -349,7 +349,11 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     
     @FXML
     public void close() {
-        uiContextService.leave("segment segmentation");
+        uiContextService.leave("segment");
+        uiContextService.leave("segmentation");
         uiContextService.update();
     }
+    
+   
+    
 }

@@ -236,13 +236,13 @@
     -fx-background-color: derive(-flatter-success,10%);   
 }
 
-.button.warning {
+.button.warning,.menu-button.warning {
     -fx-background-color:-flatter-warning;
 }
-.button.warning:default:focused {
+.button.warning:default:focused,.menu-button.warning:default:focused {
     -fx-background-color: derive(-flatter-warning, 30.0%);
 }
-.button.warning:hover {
+.button.warning:hover,.menu-button.warning:default:focused {
     -fx-background-color: derive(-flatter-warning,10%);   
 }
 
@@ -993,6 +993,10 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .tool-bar-button {
     -fx-font-size: 18px;
 }
+.tool-bar.smaller .button, .tool-bar.smaller .menu-button{
+    -fx-font-size:14px;
+}
+
 
 
 .image-window-titlebar {

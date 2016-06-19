@@ -531,7 +531,7 @@ public class MainWindowController extends AnchorPane {
         });
 
         //hintQueue.addAll(event.getHintList());
-        Platform.runLater(() -> nextHint());
+        Platform.runLater(this::nextHint);
     }
 
     @EventHandler
@@ -625,7 +625,7 @@ public class MainWindowController extends AnchorPane {
 
     public void onUiPluginDisplaed(ContextualWidget<Node> uiPlugin) {
 
-        hintService.displayHints(uiPlugin.getObject().getClass(), false);
+        //hintService.displayHints(uiPlugin.getObject().getClass(), false);
 
     }
     
@@ -643,7 +643,7 @@ public class MainWindowController extends AnchorPane {
 
     }
 
-    public void showHelpSequence(Hint hint) {
+    public synchronized void showHelpSequence(Hint hint) {
 
         if (hint == null) {
 

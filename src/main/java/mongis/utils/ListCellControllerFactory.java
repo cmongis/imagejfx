@@ -22,6 +22,7 @@ package mongis.utils;
 import ijfx.ui.main.ImageJFX;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
+import javafx.beans.Observable;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -60,7 +61,7 @@ public class ListCellControllerFactory<T> implements Callback<ListView<T>, ListC
                 }
                 return (Node)ctrl;
             }
-
+               /*
             @Override
             public void updateItem(T item, boolean isEmpty) {
                 
@@ -74,7 +75,17 @@ public class ListCellControllerFactory<T> implements Callback<ListView<T>, ListC
                     if(getGraphic() == null)
                         setGraphic(getCtrl());
                 } 
-            } 
+            } */
+
+            @Override
+            protected void onItemChanged(Observable obs, T oldValue, T newValue) {
+                if(newValue == null) {
+                    setGraphic(null);
+                }
+                else {
+                    setGraphic(getCtrl());
+                }
+            }
         };
     }
     

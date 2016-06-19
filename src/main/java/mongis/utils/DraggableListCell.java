@@ -20,6 +20,7 @@
  */
 package mongis.utils;
 
+import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -30,8 +31,6 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import jfxtras.util.NodeUtil;
-import jfxtras.util.PlatformUtil;
 
 /**
  *
@@ -47,7 +46,12 @@ public abstract class DraggableListCell<T extends Object> extends ListCell<T>{
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         makeNodeDraggable(this);
         
+        itemProperty().addListener(this::onItemChanged);
+        
     }
+    
+    
+    protected abstract void onItemChanged(Observable obs, T oldValue, T newValue);
     
     public DraggableListCell(Node node) {
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -55,6 +59,9 @@ public abstract class DraggableListCell<T extends Object> extends ListCell<T>{
         this.node = node;
     }
 
+    
+    
+    
     public void makeNodeDraggable(Node node) {
 
         this.node = node;
