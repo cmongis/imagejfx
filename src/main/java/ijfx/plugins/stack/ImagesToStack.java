@@ -38,7 +38,7 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  *
  */
-@Plugin(type = Command.class, menuPath = "Plugins > ImagesToStack")
+@Plugin(type = Command.class, menuPath = "Image>Stacks> ImagesToStack")
 public class ImagesToStack extends ContextCommand {
 
     @Parameter
