@@ -86,6 +86,11 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
+import net.imagej.axis.CalibratedAxis;
+import net.imagej.axis.VariableAxis;
+import net.imglib2.img.ImagePlusAdapter;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Attr;
@@ -122,10 +127,10 @@ public class StackReg_ implements Command {
     /**
      * *****************************************************************
      */
-    
+
     @Parameter
     UIService uIService;
-    
+
     @Parameter
     IJ1Service iJ1Service;
 
@@ -138,22 +143,21 @@ public class StackReg_ implements Command {
     @Parameter
     DisplayService displayService;
 
-    @Parameter (choices = {
+    @Parameter(choices = {
         "Translation",
         "Rigid Body",
         "Scaled Rotation",
         "Affine"
     })
     String transformationChoice;
-    
-    @Parameter(label ="Credits")
+
+    @Parameter(label = "Credits")
     boolean credits = false;
-    
+
     @Override
     public void run() {
         Runtime.getRuntime().gc();
-        if(credits)
-        {
+        if (credits) {
             uIService.showDialog(StackRegCredit.MESSAGE_CREDIT, DialogPrompt.MessageType.INFORMATION_MESSAGE);
         }
         ImagePlus imp = iJ1Service.getInput(dataset);
@@ -161,7 +165,7 @@ public class StackReg_ implements Command {
             IJ.error("No image available");
             return;
         }
- 
+
         final int transformation = Arrays.asList(TRANSFORMATION_ITEM).indexOf(transformationChoice);
 
         final int width = imp.getWidth();
@@ -304,9 +308,10 @@ public class StackReg_ implements Command {
                 return;
             }
         }
-        Dataset output = dataset.duplicate();
-        output.setImgPlus(iJ1Service.wrapDataset(imp).getImgPlus());
-        displayService.createDisplay("aligned-"+imp.getTitle(),output);
+        Dataset output = iJ1Service.wrapDataset(imp);
+        iJ1Service.copyAxesInto(dataset, output);
+        iJ1Service.copyColorTable(dataset, output);
+        displayService.createDisplay("aligned-" + imp.getTitle(), output);
 //        imp.setSlice(targetSlice);
 //        imp.updateAndDraw();
 //        imp.show();
@@ -317,8 +322,9 @@ public class StackReg_ implements Command {
  /*....................................................................
 	Private methods
 ....................................................................*/
+   
 
- /*------------------------------------------------------------------*/
+    /*------------------------------------------------------------------*/
     private void computeStatistics(
             final ImagePlus imp,
             final double[] average,
@@ -1895,4 +1901,3 @@ public class StackReg_ implements Command {
 }
 
 /* end class StackReg_ */
-
