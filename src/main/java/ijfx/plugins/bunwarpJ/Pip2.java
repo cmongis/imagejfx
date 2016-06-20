@@ -364,9 +364,7 @@ public class Pip2 implements Command {
 
         try {
             run.get();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
+        } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
         }
         return module;
