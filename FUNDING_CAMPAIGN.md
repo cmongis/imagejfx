@@ -1,8 +1,8 @@
 # ImageJ FX Funding campaign
 
-ImageJ FX is a new interface for ImageJ which aims to make image analysis easier for everyone by using state-of-art User Interface technlogy and the latest User Experience trends.
+ImageJ FX is a new interface for ImageJ which aims to make image analysis easier for scientists by using state-of-art User Interface technlogies and the latest User Experience trends.
 
-Even if the project is still young, it has the potential of becoming one of the best Image Analysis Software for life sciences. Thanks to it extremely modular environment, ImageJFX can be extended to cover a wide range of scientific requirements and help tons of scientists to analyse their image without going through of stip and hard learning curve. Arriving at the end of my PhD, I would like to maintain the software and raise a team dedicated to ImageJFX. To reach this goal, We are launching a crowd funding campaign to create an independant entity that will extend and maintain the project.
+Even if the project is still young, ImageJFX has the potential to become one of the best Image Analysis Software for life sciences. Thanks to it extremely modular environment, ImageJFX can be extended to cover a wide range of scientific requirements and help tons of scientists to analyse their images without going through a stip and hard learning curve. Arriving at the end of my PhD, I would like to maintain the software and raise a team dedicated to ImageJFX. To reach this goal, We are launching a crowd funding campaign to create an independant entity that will extend and maintain the project.
 
 ## What is already here
 This campaign aim to maintain an existing software, which means ImageJFX already offers numerous features that are beneficial for the user :
@@ -20,6 +20,13 @@ This campaign aim to maintain an existing software, which means ImageJFX already
  - Fast : Java is faster than Matlab, Python or Matlab
 
  
+## Not a software, a complete environment
+The ultimate goal of the ImageJFX project is to blend functionnality and information access. ImageJFX should not simply be an app where the user can execute actions, but should be a complete environment where the scientist grows through using the software. This is done by increasing the amount of information accessible inside the software and make making this access intuitive. ImageJFX plans to achieve it by integrating the following features :
+ 
+ - live chat where scientists can directly ask question and find help
+ - forum search also integrating in a software
+ - image analysis to theoretical courses : a click of a button and the user has access to a basic course on the specificity scientific images
+
 ## Fund and direct the future of the project
 In order to satisfy the community, the rewards proposed by the  crowding campaign can be predefined plugin that they want to be implemented. In other words, by funding ImageJFX, you also serve your own interest.
 

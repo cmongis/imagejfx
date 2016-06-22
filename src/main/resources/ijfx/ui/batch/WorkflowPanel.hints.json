@@ -1,0 +1,13 @@
+[
+   {
+        "text":"Load or save previous workflow by clicking on this button."
+        ,"target":"#workflowConfigButton"
+    }
+    ,{
+        "text":"Browser the different ImageJ2 plugins here and add them to your workflow."
+        ,"target":"#menuButton"
+    },{
+        "text":"Modify the parameters of each step by clicking on this button."
+        ,"target":"#configButton"
+    }
+]

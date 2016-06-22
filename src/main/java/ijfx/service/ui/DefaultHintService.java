@@ -115,7 +115,14 @@ public class DefaultHintService extends AbstractService implements HintService {
         try {
             String url = clazz.getSimpleName()+"Hints.json";
             
-            if(clazz.getResource(url) == null) return;
+            if(clazz.getResource(url) == null) {
+                 url = clazz.getSimpleName()+".hints.json";
+                 if(clazz.getResource(url) == null) return;
+            };
+            
+           
+            
+          
             
             List<DefaultHint> hintList = jsonToHintList(TextFileUtils.readFileFromJar(url,clazz));
             hintList.forEach(hint->hint.setId(clazz.getSimpleName()+hint.getTarget()));

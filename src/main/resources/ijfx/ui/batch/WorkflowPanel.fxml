@@ -15,7 +15,7 @@
       <Button fx:id="addButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onAddButtonClicked" text="Add" GridPane.columnIndex="2" GridPane.rowIndex="2" />
       <MenuButton fx:id="menuButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text=".... or find from the menu" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
       <FontAwesomeIconView glyphName="SEARCH" size="16.0" GridPane.rowIndex="1" />
-      <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" GridPane.columnIndex="2">
+      <MenuButton fx:id="workflowConfigButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" GridPane.columnIndex="2">
         <items>
             <MenuItem mnemonicParsing="false" onAction="#importFromHistory" text="Import from history">
                <graphic>
