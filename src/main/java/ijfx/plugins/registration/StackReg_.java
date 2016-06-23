@@ -101,7 +101,7 @@ import org.scijava.ui.UIService;
 /**
  * *****************************************************************
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Registration", attrs = {
+@Plugin(type = Command.class, menuPath = "Plugins > Stack Registration", attrs = {
     @Attr(name = "no-legacy")})
 public class StackReg_ extends ContextCommand {
 
