@@ -22,6 +22,7 @@ package ijfx.ui.explorer.view;
 import mongis.utils.panecell.ScrollBinderChildren;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.service.cluster.ClustererService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
 import ijfx.ui.explorer.ExplorerView;
@@ -57,10 +58,13 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     @Parameter
     UIService uIService;
-    
+
     @Parameter
     Context context;
-    
+
+    @Parameter
+    ClustererService clustererService;
+
     private VBox vBox = new VBox();
     private ScrollPane scrollPane;
     private ScrollBinderChildren scrollBinderChildren;
@@ -109,7 +113,7 @@ public class GridIconView extends BorderPane implements ExplorerView {
         List<String> metadataList = this.getMetaDataKey(items);
         comboBoxList.stream().forEach(c -> c.getItems().addAll(metadataList));
         initComboBox();
-
+        groupExplorable.setClustererService(clustererService);
         groupExplorable.setListItems(new CopyOnWriteArrayList(items));
         sortItems();
     }
@@ -140,7 +144,7 @@ public class GridIconView extends BorderPane implements ExplorerView {
     }
 
     private PaneCell<Iconazable> createIcon() {
-       PaneCell<Iconazable> cell = new ExplorerIconCell();
+        PaneCell<Iconazable> cell = new ExplorerIconCell();
         context.inject(cell);
         return cell;
     }

@@ -243,7 +243,7 @@ public class PreviewService extends AbstractService implements ImageJService {
             int minChannel = (int) activeDataview.getChannelMin(activePosition.getIntPosition(0));
             view.setChannelRange(0, minChannel, maxChannel);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         view.rebuild();
         BufferedImage bufferedImage = view.getScreenImage().image();
@@ -305,23 +305,16 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     public void setLUT(DatasetView input, DatasetView output) {
         Position activePosition = imageDisplayService.getActivePosition();
-        List<ColorTable> colorTable = input.getColorTables();
+        List<ColorTable> colorTables = input.getColorTables();
 
         long[] dimension = new long[output.getData().numDimensions() - 2];
         activePosition.localize(dimension);
 
         //Set LUT
         if (input.getData().getImgPlus().getCompositeChannelCount() == 1) {
-            output.setColorTable(colorTable.get(activePosition.getIntPosition(0)), 0);
+            output.setColorTable(colorTables.get(activePosition.getIntPosition(0)), 0);
         } else {
-            byte[][] values = ((ColorTable8) colorTable.get(0)).getValues().clone();
-            for (int i = 0; i < colorTable.size(); i++) {
-                byte[][] b = ((ColorTable8) colorTable.get(i)).getValues();
-                values[i] = b[i];
-
-            }
-            ColorTable8 colorTable8 = new ColorTable8(values);
-            output.setColorTable(colorTable8, 0);
+            output.setColorTable(colorTables.get(0), 0);
         }
     }
 

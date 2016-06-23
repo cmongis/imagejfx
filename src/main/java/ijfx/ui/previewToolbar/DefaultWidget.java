@@ -119,7 +119,6 @@ public class DefaultWidget implements ItemWidget {
         
         if(image != null) return image;
         
-        if(previewService == null) return null;
         
         if (previewService.getImageDisplayService().getActiveDataset()==null)
         {

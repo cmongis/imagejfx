@@ -187,10 +187,25 @@
            
         </dependency>
         <dependency>
-  <groupId>org.apache.commons</groupId>
-  <artifactId>commons-csv</artifactId>
-  <version>1.2</version>
-</dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.moa</groupId>
+            <artifactId>moa</artifactId>
+            <version>2012.05-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.apporiented</groupId>
+            <artifactId>hierarchical-clustering</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>XMeans</artifactId>
+            <version>1.0.4</version>
+        </dependency>
     </dependencies>
     
     <build>
