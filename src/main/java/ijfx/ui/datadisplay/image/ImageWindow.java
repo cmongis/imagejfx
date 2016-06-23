@@ -562,21 +562,25 @@ public class ImageWindow extends Window {
 
     private void deleteOverlay(Overlay overlay) {
         anchorPane.getChildren().remove(getDrawer(overlay).update(overlay, canvas.getCamera()));
-        anchorPane.getChildren().remove(getModifier(overlay).getModifiers(canvas.getCamera(), overlay));
+        if(getModifier(overlay) != null) anchorPane.getChildren().remove(getModifier(overlay).getModifiers(canvas.getCamera(), overlay));
         drawerMap.remove(overlay);
         modifierMap.remove(overlay);
     }
 
     // add the MoveablePoints of a overlay in order to edit it
     private void setEdited(Overlay overlay) {
-
+        
+        if(overlay == null) {
+            Platform.runLater(this::deleteAllModifiers); //deleteAllModifiers();
+            return;
+        }
+        
         if (getOverlays().contains(overlay) == false) {
             return;
         }
 
         // delete all the moveable points
-        Node[] nodes = anchorPane.getChildren().stream().filter(node -> MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size -> new Node[size]);
-        anchorPane.getChildren().removeAll(nodes);
+       deleteAllModifiers();
 
         // if an overlay has been selected
         if (overlay != null) {
@@ -593,6 +597,11 @@ public class ImageWindow extends Window {
             anchorPane.getChildren().addAll(modifiers);
         }
 
+    }
+    
+    private void deleteAllModifiers() {
+         Node[] nodes = anchorPane.getChildren().stream().filter(node -> MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size -> new Node[size]);
+        anchorPane.getChildren().removeAll(nodes);
     }
 
     public void onViewPortChange(ViewPort viewport) {
