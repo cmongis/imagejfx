@@ -35,7 +35,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = OverlayDrawer.class)
+
 public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
 
     Canvas canvas;
@@ -43,7 +43,6 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
     @Parameter
     OverlayDrawingService drawingService;
     
-    @Override
     public Node update(ThresholdOverlay overlay, ViewPort viewport) {
 
         if (canvas == null) {

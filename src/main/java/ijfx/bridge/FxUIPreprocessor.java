@@ -26,7 +26,9 @@ import ijfx.ui.module.InputSkinPluginService;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+import mongis.utils.CallbackTask;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 
@@ -72,14 +74,9 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
     InputSkinPluginService inputSkinPluginService;
 
     //@Parameter
-   // LegacyService legacyService;
-
-   
-
+    // LegacyService legacyService;
     @Override
     public void process(Module module) {
-
-        
 
         logger.info("Preprocessing : " + module.getDelegateObject().getClass().getSimpleName());
         logger.info(module.getDelegateObject().getClass().getName());
@@ -103,9 +100,9 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
             if (LegacyCommand.class.isAssignableFrom(module.getDelegateObject().getClass())) {
                 return;
             }*/
-
             // task displaying the generator
             // the generator is executed in the FXUIThread
+            /*
             Task<Boolean> displayDialogTask = new Task<Boolean>() {
 
                 @Override
@@ -119,19 +116,29 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
                     }
                     return true;
                 }
-            };
+            };*/
+            FXUtilities.runAndWait(() -> {
+                InputDialog dialog = new InputDialog(module, context);
+
+                if (InteractiveCommand.class.isAssignableFrom(module.getClass())) {
+                    dialog.show();
+
+                } else {
+                    dialog.showAndWait();
+                    //FXUtilities.runAndWait(dialog::showAndWait);
+
+                }
+
+            });
 
             // the dialog is started in a FX Thread
-            FXUtilities.runAndWait(displayDialogTask);
-
             //recorder.process(module);
-        } catch (InterruptedException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);
-        } catch (ExecutionException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
-        }
-        catch(Exception ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);
+            // } catch (InterruptedException ex) {
+            //   ImageJFX.getLogger().log(Level.SEVERE,null,ex);
+            // } catch (ExecutionException ex) {
+            //    ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+        } catch (Exception ex) {
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
     }
 
