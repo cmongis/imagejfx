@@ -24,9 +24,12 @@ import ij.ImagePlus;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
+import net.imagej.axis.CalibratedAxis;
+import net.imagej.axis.VariableAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 
@@ -102,7 +105,7 @@ public class DefaultIJ1Service extends AbstractService implements IJ1Service {
 
     @Override
     public Dataset wrapDataset(ImagePlus imp) {
-        Img img = ImageJFunctions.wrap(imp.duplicate());
+        Img img = ImagePlusAdapter.wrapImgPlus(imp.duplicate());
         return datasetService.create(img);
     }
 
@@ -139,6 +142,32 @@ public class DefaultIJ1Service extends AbstractService implements IJ1Service {
 
         return (int) (dataset.getImgPlus().size() / (dataset.dimension(0) * dataset.dimension(1)));
 
+    }
+    
+    @Override
+     public void copyColorTable(Dataset dataset, Dataset output) {
+        output.initializeColorTables(dataset.getColorTableCount());
+        for (int i = 0; i < dataset.getColorTableCount(); i++) {
+            output.setColorTable(dataset.getColorTable(i), i);
+        }
+    }
+    
+    @Override
+    public void copyAxesInto(Dataset dataset, Dataset output){
+        for (int d = 0; d < dataset.numDimensions(); d++) {
+            final CalibratedAxis axis = dataset.axis(d);
+            final CalibratedAxis axisOutput = output.axis(d);
+            axisOutput.setType(axis.type());
+            axisOutput.setUnit(axis.unit());
+            if (!(axisOutput instanceof VariableAxis)) {
+                continue; // nothing else to do
+            }
+            final VariableAxis varAxis = (VariableAxis) axisOutput;
+
+            varAxis.vars().stream().forEach((var) -> {
+                varAxis.set(var, varAxis.get(var));
+            });
+        }
     }
 //
 //    public Dataset processDataset(Dataset dataset) {

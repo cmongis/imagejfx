@@ -39,5 +39,9 @@ public interface IJ1Service extends ImageJService {
     public ImagePlus unwrapDataset(Dataset dataset);
 
     public void configureImagePlus(ImagePlus imp, ImageDisplay imageDisplay);
+    
+    public void copyColorTable(Dataset dataset, Dataset output);
+    
+    public void copyAxesInto(Dataset dataset, Dataset output);
 
 }
