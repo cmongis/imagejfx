@@ -50,15 +50,18 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
@@ -187,6 +190,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             folderListEmpty.addListener(this::onFolderListEmptyPropertyChange);
             explorerListEmpty.addListener(this::onExplorerListEmptyPropertyChange);
 
+            //fluentIconBinding(fileModeToggleButton,planeModeToggleButton,objectModeToggleButton);
+            
             EventStreams.valuesOf(filterTextField.textProperty()).successionEnds(Duration.ofSeconds(1))
                     .subscribe(this::updateTextFilter);
 
@@ -195,6 +200,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         }
 
     }
+    
+    
+    
 
     private void init() {
         if (view == null) {
@@ -599,5 +607,34 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             System.out.println("there is " + event.getObject().size());
         }
     }
+    
+    private static void fluentIconBinding(ButtonBase... buttons) {
+        for(ButtonBase b : buttons) fluenIconBinding(b);
+    }
+    
+    private static void fluenIconBinding(ButtonBase button) {
+        fluentIconBinding(button.textProperty(), button);
+    }
+    
+    private static void fluentIconBinding(StringProperty property, ButtonBase node) {
+        
+        final String initialString = property.getValue();
+        
+        property.bind(Bindings.createStringBinding(()->{
+            if(shouldHideText(node)) {
+                return "";
+            }
+            else {
+                return initialString;
+            }
+        }, node.widthProperty(),node.layoutXProperty()));
+        
+    }
+    
+    private static boolean shouldHideText(ButtonBase node) {
+        System.out.println("they are calling me");
+        return node.getWidth() < 40;
+    }
+    
 
 }
