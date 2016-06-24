@@ -23,21 +23,15 @@ import mongis.utils.panecell.ScrollBinderChildren;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ClustererService;
-import ijfx.ui.batch.WorkflowStepTitlePaneController;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.Iconazable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -48,7 +42,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import mongis.utils.FXUtilities;
 import mongis.utils.panecell.PaneCell;
 import mongis.utils.panecell.PaneCellController;
 import org.scijava.Context;
@@ -73,66 +66,39 @@ public class GridIconView extends BorderPane implements ExplorerView {
     @Parameter
     ClustererService clustererService;
 
-    @FXML
-    private VBox vBox;
-    
-    @FXML
+    private VBox vBox = new VBox();
     private ScrollPane scrollPane;
-    
     private ScrollBinderChildren scrollBinderChildren;
-    
-    @FXML
     private GridPane topBar;
-    
-    @FXML
-    ComboBox rowsComboBox;
-    @FXML
-    ComboBox columnsComboBox;
-    @FXML
-    ComboBox groupComboBox;
     private GroupExplorable groupExplorable;
     private List<ComboBox<String>> comboBoxList;
     private List<Label> listLabel;
-    
-    @FXML
     private CheckBox clusterCheckbox;
-    private PaneCellController<Iconazable> cellPaneCtrl;
+    private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(vBox);
 
     //TODO FXML
     public GridIconView() {
         super();
-        try {
-            FXUtilities.injectFXML(this,"/ijfx/ui/explorer/view/GridIconView.fxml");
-        } catch (IOException ex) {
-            Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
-        }
         comboBoxList = new ArrayList<>();
-        cellPaneCtrl = new PaneCellController<>(vBox);
-//        topBar = new GridPane();
-topBar.getChildren().stream().filter((node) -> (node.getClass().isAssignableFrom(ComboBox.class))).forEach((node) -> {
-    comboBoxList.add((ComboBox<String>) node);
-        });
-//        clusterCheckbox = new CheckBox("Cluster");
+        topBar = new GridPane();
+        clusterCheckbox = new CheckBox("Cluster");
         listLabel = new ArrayList<>();
         listLabel.add(new Label("Rows"));
         listLabel.add(new Label("Columns"));
         listLabel.add(new Label("Group by"));
-//        IntStream.range(0, listLabel.size()).forEach(i -> {
-//            topBar.add(listLabel.get(i), i, 0);
-//            comboBoxList.add(new ComboBox<>());
-//            topBar.add(comboBoxList.get(i), i, 1);
-//        });
-//        topBar.add(clusterCheckbox, listLabel.size(), 1);
-//        scrollPane = new ScrollPane();
-//        scrollPane.setContent(vBox);
+        IntStream.range(0, listLabel.size()).forEach(i -> {
+            topBar.add(listLabel.get(i), i, 0);
+            comboBoxList.add(new ComboBox<>());
+            topBar.add(comboBoxList.get(i), i, 1);
+        });
+        topBar.add(clusterCheckbox, listLabel.size(), 1);
+        scrollPane = new ScrollPane();
+        scrollPane.setContent(vBox);
         this.setTop(topBar);
         groupExplorable = new GroupExplorable(clusterCheckbox.selectedProperty());
-        clusterCheckbox.selectedProperty().addListener((obs, old,n) -> {
-//            System.out.println("ijfx.ui.explorer.view.GridIconView.<init>()");
-            sortItems();
-                });
+        clusterCheckbox.selectedProperty().addListener((obs, old,n) -> sortItems());
         this.setCenter(scrollPane);
-//        setPrefWidth(400);
+        setPrefWidth(400);
 
         cellPaneCtrl.setCellFactory(this::createIcon);
         scrollBinderChildren = new ScrollBinderChildren(scrollPane);
@@ -149,11 +115,7 @@ topBar.getChildren().stream().filter((node) -> (node.getClass().isAssignableFrom
     @Override
     public void setItem(List<? extends Explorable> items) {
         List<String> metadataList = this.getMetaDataKey(items);
-        
-        comboBoxList.stream().forEach(c -> {
-            c.getItems().clear();
-            c.getItems().addAll(metadataList);
-                });
+        comboBoxList.stream().forEach(c -> c.getItems().addAll(metadataList));
         initComboBox();
         groupExplorable.setClustererService(clustererService);
         groupExplorable.setListItems(new CopyOnWriteArrayList(items));
