@@ -19,21 +19,19 @@
  */
 package ijfx.ui.explorer.view;
 
-import ijfx.core.metadata.MetaData;
 import ijfx.ui.explorer.Explorable;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
  * @author Tuan anh TRINH
+ * @param <T>
  */
-public class SortListExplorable<T> {
+public class SortListExplorable<T extends Explorable> {
 
-    List<? extends Explorable> listItems;
-    List<List<? extends Explorable>> list2D;
+    List<T> listItems;
+    List<List<T>> list2D;
 
     String firstMetaData;
     String secondMetaData;
@@ -56,7 +54,7 @@ public class SortListExplorable<T> {
         sort2DList(secondMetaData);
     }
 
-    public SortListExplorable(List<? extends Explorable> list) {
+    public SortListExplorable(List<T> list) {
         this();
         listItems = list;
     }
@@ -69,21 +67,21 @@ public class SortListExplorable<T> {
         this.list2D.stream().forEach(l -> SortExplorableUtils.sort(metaDataName, l));
     }
 
-    public void setItems(List<? extends Explorable> list) {
+    public void setItems(List<T> list) {
         listItems = list;
     }
 
-    public List<? extends Explorable> getListItems() {
+    public List<T> getListItems() {
         return listItems;
     }
 
-    public List<List<? extends Explorable>> getList2D() {
+    public List<List<T>> getList2D() {
         return list2D;
     }
 
     public int getSizeList2D() {
         int size = 0;
-        for (List<? extends Explorable> list : list2D) {
+        for (List<T> list : list2D) {
             size = size + list.size();
         }
         return size;

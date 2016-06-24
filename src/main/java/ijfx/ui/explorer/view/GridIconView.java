@@ -22,6 +22,7 @@ package ijfx.ui.explorer.view;
 import mongis.utils.panecell.ScrollBinderChildren;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.service.cluster.ClustererService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
 import ijfx.ui.explorer.ExplorerView;
@@ -32,6 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -57,10 +59,13 @@ public class GridIconView extends BorderPane implements ExplorerView {
 
     @Parameter
     UIService uIService;
-    
+
     @Parameter
     Context context;
-    
+
+    @Parameter
+    ClustererService clustererService;
+
     private VBox vBox = new VBox();
     private ScrollPane scrollPane;
     private ScrollBinderChildren scrollBinderChildren;
@@ -68,27 +73,30 @@ public class GridIconView extends BorderPane implements ExplorerView {
     private GroupExplorable groupExplorable;
     private List<ComboBox<String>> comboBoxList;
     private List<Label> listLabel;
+    private CheckBox clusterCheckbox;
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(vBox);
 
+    //TODO FXML
     public GridIconView() {
         super();
-        groupExplorable = new GroupExplorable();
         comboBoxList = new ArrayList<>();
         topBar = new GridPane();
-
+        clusterCheckbox = new CheckBox("Cluster");
         listLabel = new ArrayList<>();
         listLabel.add(new Label("Rows"));
         listLabel.add(new Label("Columns"));
         listLabel.add(new Label("Group by"));
         IntStream.range(0, listLabel.size()).forEach(i -> {
             topBar.add(listLabel.get(i), i, 0);
-            comboBoxList.add(new ComboBox<String>());
+            comboBoxList.add(new ComboBox<>());
             topBar.add(comboBoxList.get(i), i, 1);
         });
+        topBar.add(clusterCheckbox, listLabel.size(), 1);
         scrollPane = new ScrollPane();
         scrollPane.setContent(vBox);
         this.setTop(topBar);
-
+        groupExplorable = new GroupExplorable(clusterCheckbox.selectedProperty());
+        clusterCheckbox.selectedProperty().addListener((obs, old,n) -> sortItems());
         this.setCenter(scrollPane);
         setPrefWidth(400);
 
@@ -109,7 +117,7 @@ public class GridIconView extends BorderPane implements ExplorerView {
         List<String> metadataList = this.getMetaDataKey(items);
         comboBoxList.stream().forEach(c -> c.getItems().addAll(metadataList));
         initComboBox();
-
+        groupExplorable.setClustererService(clustererService);
         groupExplorable.setListItems(new CopyOnWriteArrayList(items));
         sortItems();
     }
@@ -140,7 +148,7 @@ public class GridIconView extends BorderPane implements ExplorerView {
     }
 
     private PaneCell<Iconazable> createIcon() {
-       PaneCell<Iconazable> cell = new ExplorerIconCell();
+        PaneCell<Iconazable> cell = new ExplorerIconCell();
         context.inject(cell);
         return cell;
     }

@@ -85,7 +85,7 @@ public class LUTInvert implements Command {
         for (int k = 0; k < imageDisplay.size(); k++) {
             DatasetView datasetView = ((DatasetView) imageDisplay.get(k));
             for (int j = 0; j < datasetView.getColorTables().size(); j++) {
-                ColorTable colorTable = dataset.getColorTable(j);
+                ColorTable colorTable = datasetView.getColorTables().get(j);
                 ColorTable colorTableInverted = invertColorTable(colorTable);
                 datasetView.setColorTable(colorTableInverted, j);
             }
