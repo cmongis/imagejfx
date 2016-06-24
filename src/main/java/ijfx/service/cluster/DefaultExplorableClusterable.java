@@ -40,6 +40,7 @@ public class DefaultExplorableClusterable extends DenseInstance implements Explo
         super(instance);
         if (instance instanceof DefaultExplorableClusterable) {
             m_AttValues = ((DefaultExplorableClusterable) instance).m_AttValues;
+            this.explorable = ((DefaultExplorableClusterable) instance).getExplorable();
         } else {
             m_AttValues = instance.toDoubleArray();
         }

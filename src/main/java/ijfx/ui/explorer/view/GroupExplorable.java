@@ -19,12 +19,15 @@
  */
 package ijfx.ui.explorer.view;
 
+import ijfx.core.metadata.MetaData;
 import ijfx.service.cluster.ClustererService;
 import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import org.apache.commons.lang.NumberUtils;
 
 /**
@@ -45,39 +48,45 @@ public class GroupExplorable<T extends Explorable> {
 
     private ClustererService clustererService;
 
+    private BooleanProperty clusterProperty;
+
     public SortListExplorable<T> getSortListExplorable() {
         return sortListExplorable;
     }
 
-    public GroupExplorable() {
+    public GroupExplorable(BooleanProperty booleanProperty) {
         list3D = new CopyOnWriteArrayList<>();
         list2D = new CopyOnWriteArrayList<>();
         listItems = new CopyOnWriteArrayList<>();
         metaDataList = new ArrayList<>();
-        //TODO
+        clusterProperty = new SimpleBooleanProperty();
+//TODO
         metaDataList.add("1");
         metaDataList.add("2");
         metaDataList.add("3");
         sortListExplorable = new SortListExplorable<>();
-
+        booleanProperty.bindBidirectional(clusterProperty);
     }
 
     public void process() {
-        List<Explorable> list1D = new CopyOnWriteArrayList<>(filterExplorableWithList(listItems, metaDataList));
+        List<T> list1D = new CopyOnWriteArrayList<>(filterExplorableWithList(listItems, metaDataList));
         sortListExplorable.setMetaData(metaDataList.get(0), metaDataList.get(1));
 
         size = 0;
         list3D.clear();
         SortExplorableUtils.sort(metaDataList.get(2), list1D);
-//        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, list1D);
 
-        list2D = clustererService.buildClusterer(list1D, metaDataList.get(2));
+        if (clusterProperty.get()) {
+
+            list2D = clustererService.buildClusterer(list1D, metaDataList.get(2));
+        } else {
+            SortExplorableUtils.create2DList(metaDataList.get(2), list2D, list1D);
+        }
 
         list2D.stream().forEach((l2D) -> {
             sortListExplorable.setItems(l2D);
             sortListExplorable.process();
             if (!sortListExplorable.getList2D().isEmpty()) {
-
                 list3D.add(new CopyOnWriteArrayList<>(sortListExplorable.getList2D()));
                 size = sortListExplorable.getSizeList2D() + size;
             }
@@ -132,7 +141,6 @@ public class GroupExplorable<T extends Explorable> {
         return size;
     }
 
-    
     public void setClustererService(ClustererService clustererService) {
         this.clustererService = clustererService;
     }

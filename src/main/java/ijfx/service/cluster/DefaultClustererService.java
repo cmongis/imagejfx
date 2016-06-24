@@ -37,15 +37,14 @@ import weka.core.Instances;
 /**
  *
  * @author Explorableuan anh ExplorableRINH
- * @param <Explorable>
  */
 @Plugin(type = Service.class)
 public class DefaultClustererService extends AbstractService implements ClustererService<Explorable> {
 
-    private Clusterer clusterer;
+    private XMeans xmeans;
 
     public DefaultClustererService() {
-        clusterer = new XMeans();
+        xmeans = new XMeans();
     }
 
     /**
@@ -56,6 +55,7 @@ public class DefaultClustererService extends AbstractService implements Clustere
      */
     @Override
     public List<List<Explorable>> buildClusterer(List<Explorable> listExplorable, List<String> metadataKeys) {
+        xmeans.setMaxNumClusters(listExplorable.size());
         ArrayList<Attribute> attributes = metadataKeys.stream()
                 .map((s) -> new Attribute(s))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -67,8 +67,7 @@ public class DefaultClustererService extends AbstractService implements Clustere
         });
 
         try {
-            clusterer.buildClusterer(data);
-            System.out.println("ijfx.service.cluster.DefaultClustererService.buildClusterer()");
+            xmeans.buildClusterer(data);
         } catch (Exception ex) {
             Logger.getLogger(DefaultClustererService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -77,30 +76,28 @@ public class DefaultClustererService extends AbstractService implements Clustere
     }
 
     @Override
-    public  List<List<Explorable>> buildClusterer(List<Explorable> listExplorable, String metadataKey) {
+    public List<List<Explorable>> buildClusterer(List<Explorable> listExplorable, String metadataKey) {
         List<String> metadataKeys = new ArrayList<>();
         metadataKeys.add(metadataKey);
         return buildClusterer(listExplorable, metadataKeys);
     }
 
-    public   List<List<Explorable>> getClusters(Instances data) {
+    public List<List<Explorable>> getClusters(Instances data) {
         try {
-        List<List<Explorable>> result = new ArrayList<>(clusterer.numberOfClusters());
-            IntStream.range(0, clusterer.numberOfClusters())
+            List<List<Explorable>> result = new ArrayList<>(xmeans.numberOfClusters());
+            IntStream.range(0, xmeans.numberOfClusters())
                     .forEach(i -> result.add(i, new ArrayList<>()));
             for (int i = 0; i < data.numInstances(); i++) {
-                int position = clusterer.clusterInstance(data.instance(i));
-                if (data.instance(i) instanceof DefaultExplorableClusterable)
-                {
-                    
+                int position = xmeans.clusterInstance(data.instance(i));
+                if (data.instance(i) instanceof DefaultExplorableClusterable) {
+                    ExplorableClusterable e = (ExplorableClusterable) data.instance(i);
+                    Explorable explorable = e.getExplorable();
+                    result.get(position).add(explorable);
+
                 }
-                System.out.println(data.instance(i).toString());
-                ExplorableClusterable e = (ExplorableClusterable) data.instance(i);
-                Explorable explorable =  ((DefaultExplorableClusterable) data.instance(i)).getExplorable();
-                result.get(position).add(explorable);
             }
 
-        return result;
+            return result;
         } catch (Exception ex) {
             Logger.getLogger(DefaultClustererService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -118,7 +115,13 @@ public class DefaultClustererService extends AbstractService implements Clustere
         return result;
     }
 
+    @Override
     public void setClusterer(Clusterer clusterer) {
-        this.clusterer = clusterer;
+        try {
+            this.xmeans = (XMeans) clusterer;
+
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
     }
 }
