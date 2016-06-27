@@ -56,36 +56,39 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     EventService eventService;
 
     @Parameter
-            LoadingScreenService loadingScreenService;
-    
+    LoadingScreenService loadingScreenService;
+
     Predicate<MetaDataOwner> lastFilter;
     Predicate<MetaDataOwner> optionalFilter;
 
     private final IntegerProperty selected = new SimpleIntegerProperty(0);
-    
-    EventStream<Integer> selectEvents = EventStreams.changesOf((ObservableValue)selected);
-    
-    
+
+    EventStream<Integer> selectEvents = EventStreams.changesOf((ObservableValue) selected);
+
     @Override
     public void initialize() {
-        selectEvents.successionEnds(Duration.ofSeconds(1)).subscribe(i->{
+        selectEvents.successionEnds(Duration.ofSeconds(1)).subscribe(i -> {
             eventService.publish(new ExplorerSelectionChangedEvent().setObject(getSelectedItems()));
         });
-        
+
     }
-    
+
     @Override
     public void setItems(List<Explorable> items) {
 
-        if(explorableList != null) explorableList.forEach(this::stopListeningToExplorable);
-        
+        if (explorableList != null) {
+            explorableList.forEach(this::stopListeningToExplorable);
+        }
+
         explorableList = items;
-        
-        if(explorableList != null) explorableList.forEach(this::listenToExplorableSelection);
-        
+
+        if (explorableList != null) {
+            explorableList.forEach(this::listenToExplorableSelection);
+        }
+
         eventService.publish(new ExploredListChanged().setObject(items));
         applyFilter(lastFilter);
-        
+
     }
 
     @Override
@@ -102,11 +105,9 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
 
         if (predicate == null && optionalFilter == null) {
             return getItems();
-        }
-        else if(predicate == null && optionalFilter != null) {
+        } else if (predicate == null && optionalFilter != null) {
             predicate = optionalFilter;
-        }
-        else if (optionalFilter != null) {
+        } else if (optionalFilter != null) {
             predicate = predicate.and(optionalFilter);
         }
         return getItems().parallelStream().filter(predicate).collect(Collectors.toList());
@@ -129,15 +130,15 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
 
     @Override
     public void setOptionalFilter(Predicate<MetaDataOwner> additionalFilter) {
-       this.optionalFilter = additionalFilter;
-       applyFilter(lastFilter);
+        this.optionalFilter = additionalFilter;
+        applyFilter(lastFilter);
     }
 
     @Override
     public List<? extends Explorable> getSelectedItems() {
         return filteredList
                 .stream()
-                .filter(item->item.selectedProperty().getValue())
+                .filter(item -> item.selectedProperty().getValue())
                 .collect(Collectors.toList());
     }
 
@@ -145,45 +146,45 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     public void selectItem(Explorable explorable) {
         explorable.selectedProperty().setValue(true);
     }
-    
-    
-  
+
     private void listenToExplorableSelection(Explorable expl) {
         expl.selectedProperty().addListener(this::onExplorableSelected);
     }
-    
+
     private void stopListeningToExplorable(Explorable expl) {
         expl.selectedProperty().removeListener(this::onExplorableSelected);
     }
-    
+
     private void onExplorableSelected(Observable obs, Boolean oldVAlue, Boolean newValue) {
-        if(newValue) selected.add(1);
-        else selected.add(-1);
-    }
-    
-    public void open(Iconazable explorable){
-        
-        
-        new CallbackTask<Void,Boolean>()
-                    .setName("Opening file...")
-                    .run(vd ->  {
-                        try{ 
-                        explorable.open();
-                        return true;
-                            }
-                    catch(Exception e) {
-                        return false;
-                    }})
-                    .then(success->{
-                        if(success) {
-                            
-                        }
-                    })
-                    .submit(loadingScreenService)
-                    .start();
-        
-        
+        if (newValue) {
+            selected.add(1);
+        } else {
+            selected.add(-1);
+        }
     }
 
-    
+    public void open(Iconazable explorable) {
+
+        new CallbackTask<Void, Boolean>()
+                .setName("Opening file...")
+                .run((progress, vd) -> {
+                    try {
+                        progress.setProgress(1, 5);
+                        explorable.open();
+                        progress.setProgress(1,1);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .then(success -> {
+                    if (success) {
+
+                    }
+                })
+                .submit(loadingScreenService)
+                .start();
+
+    }
+
 }

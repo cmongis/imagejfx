@@ -76,6 +76,7 @@ import javafx.scene.layout.HBox;
 import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
+import mongis.utils.ProgressHandler;
 import org.reactfx.EventStreams;
 import org.scijava.app.StatusService;
 import org.scijava.event.EventHandler;
@@ -107,7 +108,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
     private ScrollPane filterScrollPane;
-    
+
     @FXML
     private ToggleButton fileModeToggleButton;
 
@@ -142,7 +143,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     private PluginService pluginService;
 
     @Parameter
-   private  UiContextService uiContextService;
+    private UiContextService uiContextService;
 
     private ExplorerView view;
 
@@ -156,11 +157,11 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     private DragPanel dragPanel;
 
-    private  final String NO_FOLDER_TEXT = "Click on \"Add folder\" or drop a\nfolder here to explorer it";
-    private  final FontAwesomeIcon NO_FOLDER_ICON = FontAwesomeIcon.DOWNLOAD;
-    private  final String EMPTY_FOLDER_TEXT = "Empty";
-    private  final FontAwesomeIcon EMPTY_FOLDER_ICON = FontAwesomeIcon.FROWN_ALT;
-    
+    private final String NO_FOLDER_TEXT = "Click on \"Add folder\" or drop a\nfolder here to explorer it";
+    private final FontAwesomeIcon NO_FOLDER_ICON = FontAwesomeIcon.DOWNLOAD;
+    private final String EMPTY_FOLDER_TEXT = "Empty";
+    private final FontAwesomeIcon EMPTY_FOLDER_ICON = FontAwesomeIcon.FROWN_ALT;
+
     public ExplorerActivity() {
         try {
             FXUtilities.injectFXML(this);
@@ -186,12 +187,11 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             currentView.valueProperty().addListener(this::onViewModeChanged);
 
             dragPanel = new DragPanel("No folder open", FontAwesomeIcon.DASHCUBE);
-            
+
             folderListEmpty.addListener(this::onFolderListEmptyPropertyChange);
             explorerListEmpty.addListener(this::onExplorerListEmptyPropertyChange);
 
             //fluentIconBinding(fileModeToggleButton,planeModeToggleButton,objectModeToggleButton);
-            
             EventStreams.valuesOf(filterTextField.textProperty()).successionEnds(Duration.ofSeconds(1))
                     .subscribe(this::updateTextFilter);
 
@@ -200,9 +200,6 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         }
 
     }
-    
-    
-    
 
     private void init() {
         if (view == null) {
@@ -251,8 +248,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     public void updateFolderList() {
-        
-        
+
         /*
         folderListView
                 .getItems()
@@ -262,10 +258,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
                         .stream()
                         .filter(this::isNotDisplayed)
                         .collect(Collectors.toList()));
-       */
-        
+         */
         CollectionUtils.syncronizeContent(folderManagerService.getFolderList(), folderListView.getItems());
-        
+
     }
 
     public void updateExplorerView(ExplorerView view) {
@@ -310,7 +305,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     @EventHandler
-    public void onFolderDeleted(FolderDeletedEvent event) {     
+    public void onFolderDeleted(FolderDeletedEvent event) {
         Platform.runLater(this::updateFolderList);
     }
 
@@ -402,19 +397,27 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     }
 
-    public List<MetaDataFilterWrapper> generateFilter(List<? extends Explorable> items) {
+    public List<MetaDataFilterWrapper> generateFilter(ProgressHandler handler, List<? extends Explorable> items) {
+
         MetaDataFilterFactory filterFactory = new DefaultMetaDataFilterFactory();
+
+        handler.setProgress(0.1);
+
         Set<String> keySet = new HashSet();
         items
                 .stream()
                 .map(owner -> owner.getMetaDataSet().keySet())
-                
                 .forEach(keys -> keySet.addAll(keys));
+
+        handler.setTotal(1);
 
         return keySet
                 .stream()
                 .filter(MetaData::canDisplay)
-                .map(key -> new MetaDataFilterWrapper(key, filterFactory.generateFilter(explorerService.getItems(), key)))
+                .map(key -> {
+                    handler.increment(0.9 / keySet.size());
+                    return new MetaDataFilterWrapper(key, filterFactory.generateFilter(explorerService.getItems(), key));
+                })
                 .filter(filter -> filter.getContent() != null)
                 .collect(Collectors.toList());
     }
@@ -549,13 +552,13 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void onExplorerListEmptyPropertyChange(Observable obs, Boolean oldV, Boolean isEmpty) {
         if (!isEmpty) {
             contentBorderPane.setCenter(currentView.getValue().getNode());
-           // getChildren().remove(dragPanel);
+            // getChildren().remove(dragPanel);
         } else {
             contentBorderPane.setCenter(dragPanel);
-            
+
             dragPanel.setLabel(EMPTY_FOLDER_TEXT)
                     .setIcon(EMPTY_FOLDER_ICON);
-            
+
         }
     }
 
@@ -607,34 +610,34 @@ public class ExplorerActivity extends AnchorPane implements Activity {
             System.out.println("there is " + event.getObject().size());
         }
     }
-    
+
     private static void fluentIconBinding(ButtonBase... buttons) {
-        for(ButtonBase b : buttons) fluenIconBinding(b);
+        for (ButtonBase b : buttons) {
+            fluenIconBinding(b);
+        }
     }
-    
+
     private static void fluenIconBinding(ButtonBase button) {
         fluentIconBinding(button.textProperty(), button);
     }
-    
+
     private static void fluentIconBinding(StringProperty property, ButtonBase node) {
-        
+
         final String initialString = property.getValue();
-        
-        property.bind(Bindings.createStringBinding(()->{
-            if(shouldHideText(node)) {
+
+        property.bind(Bindings.createStringBinding(() -> {
+            if (shouldHideText(node)) {
                 return "";
-            }
-            else {
+            } else {
                 return initialString;
             }
-        }, node.widthProperty(),node.layoutXProperty()));
-        
+        }, node.widthProperty(), node.layoutXProperty()));
+
     }
-    
+
     private static boolean shouldHideText(ButtonBase node) {
         System.out.println("they are calling me");
         return node.getWidth() < 40;
     }
-    
 
 }
