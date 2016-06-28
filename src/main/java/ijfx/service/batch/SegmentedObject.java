@@ -17,13 +17,18 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.overlay;
+package ijfx.service.batch;
+
+import ijfx.core.metadata.MetaDataSet;
+import net.imagej.overlay.Overlay;
+import ijfx.service.overlay.OverlayStatistics;
 
 /**
  *
  * @author cyril
  */
-public interface OverlayStatistics {
-    OverlayShapeStatistics getShapeStatistics();
-    PixelStatistics getPixelStatistics();
+public interface SegmentedObject extends OverlayStatistics {
+    
+    Overlay getOverlay();
+ 
 }

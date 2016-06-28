@@ -24,6 +24,9 @@ import ijfx.service.IjfxService;
 import ijfx.service.batch.SegmentationService.Output;
 import ijfx.service.batch.SegmentationService.Source;
 import ijfx.service.batch.input.BatchInputBuilder;
+import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.overlay.OverlayStatService;
+import ijfx.service.overlay.PixelDrawer;
 import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.ui.IjfxEvent;
 import ijfx.ui.explorer.Explorable;
@@ -38,6 +41,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.overlay.Overlay;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessible;
+import net.imglib2.type.numeric.RealType;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -49,7 +57,7 @@ import org.scijava.service.Service;
  * @author cyril
  */
 @Plugin(type = Service.class)
-public class SegmentationService extends AbstractService implements IjfxService{
+public class SegmentationService extends AbstractService implements IjfxService {
 
     @Parameter
     EventService eventService;
@@ -62,8 +70,12 @@ public class SegmentationService extends AbstractService implements IjfxService{
 
     @Parameter
     OverlayIOService overlayIoService;
-    
-    
+
+    @Parameter
+    OverlayDrawingService overlayDrawingService;
+
+    @Parameter
+    OverlayStatService overlayStatsService;
     
     public enum Source {
         EXPLORER_SELECTED, EXPLORER_ALL, IMAGEJ
@@ -103,7 +115,7 @@ public class SegmentationService extends AbstractService implements IjfxService{
                     .stream()
                     .map(this::prepareExplorable)
                     .map(this::applyOutputConfiguration)
-                    .map(builder->builder.getInput())
+                    .map(builder -> builder.getInput())
                     .collect(Collectors.toList());
 
         } else if (inputSource == Source.EXPLORER_ALL) {
@@ -112,7 +124,7 @@ public class SegmentationService extends AbstractService implements IjfxService{
                     .stream()
                     .map(this::prepareExplorable)
                     .map(this::applyOutputConfiguration)
-                    .map(builder->builder.getInput())
+                    .map(builder -> builder.getInput())
                     .collect(Collectors.toList());
         } else if (inputSource == Source.IMAGEJ) {
             inputs = Arrays.asList(
@@ -120,8 +132,7 @@ public class SegmentationService extends AbstractService implements IjfxService{
                     .from(imageDisplayService.getActiveImageDisplay())
                     .display()
                     .getInput());
-        }
-        else {
+        } else {
             inputs = new ArrayList<>();
         }
         return inputs;
@@ -157,8 +168,6 @@ public class SegmentationService extends AbstractService implements IjfxService{
     public void setOutputFormat(Output outputFormat) {
         this.outputFormat = outputFormat;
     }
-    
-    
-    
+
     
 }

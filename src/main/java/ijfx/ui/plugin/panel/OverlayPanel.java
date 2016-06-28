@@ -235,7 +235,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         Task<HashMap<String, Double>> task = new Task<HashMap<String, Double>>() {
             @Override
             protected HashMap<String, Double> call() throws Exception {
-                return statsService.getStat(event.getDisplay(), event.getOverlay());
+                return statsService.getStatisticsAsMap(event.getDisplay(), event.getOverlay());
             }
 
             @Override
@@ -315,7 +315,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
         Timer timer = timerService.getTimer(this.getClass());
         timer.start();
-        Double[] valueList = statsService.getValueList(currentDisplay(), overlay);
+        Double[] valueList = statsService.getValueListFromImageDisplay(currentDisplay(), overlay);
         timer.elapsed("Getting the stats");
         SummaryStatistics sumup = new SummaryStatistics();
         for (Double v : valueList) {
@@ -371,7 +371,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     
     protected XYChart.Series<Double, Double> getLineChartSerie(Overlay overlay) {
         System.out.println("Doing things ;-)");
-        Double[] valueList = statsService.getValueList(currentDisplay(), overlay);
+        Double[] valueList = statsService.getValueListFromImageDisplay(currentDisplay(), overlay);
         
         ArrayList<Data<Double, Double>> data = new ArrayList<>(valueList.length);
         for (int i = 0; i != valueList.length; i++) {

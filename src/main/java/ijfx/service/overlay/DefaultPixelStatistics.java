@@ -49,7 +49,7 @@ public class DefaultPixelStatistics implements PixelStatistics{
 
         context.inject(this);
         
-        Double[] valueList = overlayStatService.getValueList(display, overlay);
+        Double[] valueList = overlayStatService.getValueListFromImageDisplay(display, overlay);
         
         DescriptiveStatistics statistics = new DescriptiveStatistics(ArrayUtils.toPrimitive(valueList));
         

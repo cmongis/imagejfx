@@ -281,7 +281,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
                 .map(o -> {
                     try {
 
-                        return overlayStatsService.getStat(inputDisplay, o);
+                        return overlayStatsService.getStatisticsAsMap(inputDisplay, o);
                     } catch (Exception e) {
                         return null;
                     }
