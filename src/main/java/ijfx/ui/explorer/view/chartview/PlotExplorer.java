@@ -17,16 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.ui.explorer.view.chartview;
 
-import weka.core.Instance;
+import ijfx.ui.explorer.ExplorableWrapper;
+import javafx.scene.chart.XYChart.Data;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface ExplorableWrapper{
-
-    public Explorable getExplorable();
-
+interface PlotExplorer extends ExplorableWrapper{
+    
+    public Data getData();
 }

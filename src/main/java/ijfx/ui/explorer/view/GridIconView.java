@@ -63,7 +63,7 @@ import org.scijava.ui.UIService;
  * @author Tuan anh TRINH
  */
 @Plugin(type = ExplorerView.class)
-public class GridIconView extends AnchorPane implements ExplorerView {
+public class GridIconView extends FilterView implements ExplorerView {
     
     @Parameter
     UIService uIService;
@@ -92,7 +92,6 @@ public class GridIconView extends AnchorPane implements ExplorerView {
     @FXML
     ComboBox groupComboBox;
     private GroupExplorable groupExplorable;
-    private List<ComboBox<String>> comboBoxList;
     private List<Label> listLabel;
     
     @FXML
@@ -107,7 +106,6 @@ public class GridIconView extends AnchorPane implements ExplorerView {
         } catch (IOException ex) {
             Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
         }
-        comboBoxList = new ArrayList<>();
         cellPaneCtrl = new PaneCellController<>(vBox);
 //        topBar = new GridPane();
         comboBoxList.add(rowsComboBox);
@@ -148,6 +146,7 @@ public class GridIconView extends AnchorPane implements ExplorerView {
         sortItems();
     }
     
+    @Override
     public void initComboBox() {
         IntStream.range(0, comboBoxList.size())
                 .forEach(i -> {
@@ -211,20 +210,6 @@ public class GridIconView extends AnchorPane implements ExplorerView {
         
     }
     
-    public ArrayList<String> getMetaDataKey(List<? extends Explorable> items) {
-        
-        ArrayList<String> keyList = new ArrayList<String>();
-        
-        items.forEach(plane -> {
-            plane.getMetaDataSet().keySet().forEach(key -> {
-                
-                if (!keyList.contains(key)) {
-                    keyList.add(key);
-                }
-            });
-        });
-        
-        return keyList;
-    }
+    
     
 }
