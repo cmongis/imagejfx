@@ -32,7 +32,8 @@ import net.imagej.Dataset;
  */
 public class MetaDataSetExplorerWrapper extends AbstractExplorable implements Explorable{
 
-
+    private static Image bieber = new Image("http://www.billboard.com/files/styles/article_main_image/public/media/justin-bieber-shirtless-presents-onstage-at-fashion-rocks-2014-billboard-650.jpg");
+    
     public MetaDataSetExplorerWrapper(MetaDataSet metaDataSet) {
         getMetaDataSet().merge(metaDataSet);
     }
@@ -40,7 +41,7 @@ public class MetaDataSetExplorerWrapper extends AbstractExplorable implements Ex
     
     @Override
     public String getTitle() {
-        return getMetaDataSet().get(MetaData.NAME).getStringValue();
+        return getMetaDataSet().get(MetaData.FILE_NAME).getStringValue();
     }
 
     @Override
@@ -55,7 +56,7 @@ public class MetaDataSetExplorerWrapper extends AbstractExplorable implements Ex
 
     @Override
     public Image getImage() {
-        return null;
+        return bieber;
     }
 
     @Override

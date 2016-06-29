@@ -132,6 +132,7 @@ public class ChartView extends FilterView implements ExplorerView {
     }
 
     private void addDataToChart(List<Explorable> list, Node node) {
+       
         Series series = new Series();
         series.setNode(node);
 

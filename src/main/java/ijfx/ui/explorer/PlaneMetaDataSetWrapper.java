@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.bridge.ImageJContainer;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.ui.activity.ActivityService;
@@ -163,7 +164,8 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                 if (m.containsKey(MetaData.PLANE_INDEX) == false) {
                     return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
                 } else {
-                    return imagePlaneService.extractPlane(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue());
+                    long[] position = DimensionUtils.readLongArray(m.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue());
+                    return imagePlaneService.extractPlane(getFile(),position);
                 }
             } catch (Exception io) {
                 ImageJFX.getLogger().log(Level.SEVERE, null, io);
