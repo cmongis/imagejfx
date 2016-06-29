@@ -19,9 +19,12 @@
  */
 package ijfx.service.cluster;
 
+import ijfx.ui.explorer.ExplorableWrapper;
 import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -55,11 +58,17 @@ public class DefaultClustererService extends AbstractService implements Clustere
      */
     @Override
     public List<List<Explorable>> buildClusterer(List<Explorable> listExplorable, List<String> metadataKeys) {
-        xmeans.setMaxNumClusters(listExplorable.size());
+        xmeans.setMaxNumClusters(listExplorable.size() - 1);
         ArrayList<Attribute> attributes = metadataKeys.stream()
                 .map((s) -> new Attribute(s))
                 .collect(Collectors.toCollection(ArrayList::new));
 
+        Set<Attribute> setAttributes = new HashSet<>(attributes);
+        if (setAttributes.size() != attributes.size()) {
+            List<List<Explorable>> result = new ArrayList<>();
+            result.add(listExplorable);
+            return result;
+        }
         Instances data = new Instances("Cluster Service", attributes, listExplorable.size());
         listExplorable.stream().forEach(e -> {
             double[] values = getMetadatas(e, metadataKeys);
@@ -85,19 +94,23 @@ public class DefaultClustererService extends AbstractService implements Clustere
     public List<List<Explorable>> getClusters(Instances data) {
         try {
             List<List<Explorable>> result = new ArrayList<>(xmeans.numberOfClusters());
+            System.out.println("ijfx.service.cluster.DefaultClustererService.getClusters() " + xmeans.numberOfClusters());
             IntStream.range(0, xmeans.numberOfClusters())
                     .forEach(i -> result.add(i, new ArrayList<>()));
             for (int i = 0; i < data.numInstances(); i++) {
                 int position = xmeans.clusterInstance(data.instance(i));
                 if (data.instance(i) instanceof DefaultExplorableClusterable) {
-                    ExplorableClusterable e = (ExplorableClusterable) data.instance(i);
+                    ExplorableWrapper e = (ExplorableWrapper) data.instance(i);
                     Explorable explorable = e.getExplorable();
                     result.get(position).add(explorable);
 
                 }
             }
+            return result
+                    .stream()
+                    .filter(e -> !e.isEmpty())
+                    .collect(Collectors.toList());
 
-            return result;
         } catch (Exception ex) {
             Logger.getLogger(DefaultClustererService.class.getName()).log(Level.SEVERE, null, ex);
         }
