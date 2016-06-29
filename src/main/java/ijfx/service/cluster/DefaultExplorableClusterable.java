@@ -19,6 +19,7 @@
  */
 package ijfx.service.cluster;
 
+import ijfx.ui.explorer.ExplorableWrapper;
 import ijfx.ui.explorer.Explorable;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -27,7 +28,7 @@ import weka.core.Instance;
  *
  * @author Tuan anh TRINH
  */
-public class DefaultExplorableClusterable extends DenseInstance implements ExplorableClusterable {
+public class DefaultExplorableClusterable extends DenseInstance implements ExplorableWrapper {
 
     private Explorable explorable;
 

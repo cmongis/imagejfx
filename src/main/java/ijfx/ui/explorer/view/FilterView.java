@@ -17,17 +17,40 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.cluster;
+package ijfx.ui.explorer.view;
 
 import ijfx.ui.explorer.Explorable;
-import weka.core.Instance;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.scene.control.ComboBox;
+import javafx.scene.layout.AnchorPane;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface ExplorableClusterable extends Instance{
+public abstract class FilterView extends AnchorPane {
 
-    public Explorable getExplorable();
+    protected List<ComboBox<String>> comboBoxList;
 
+    public FilterView() {
+        super();
+        comboBoxList = new ArrayList<>();
+
+    }
+
+    public ArrayList<String> getMetaDataKey(List<? extends Explorable> items) {
+        ArrayList<String> keyList = new ArrayList<String>();
+        items.forEach(plane -> {
+            plane.getMetaDataSet().keySet().forEach(key -> {
+
+                if (!keyList.contains(key)) {
+                    keyList.add(key);
+                }
+            });
+        });
+        return keyList;
+    }
+    
+    public abstract void initComboBox();
 }
