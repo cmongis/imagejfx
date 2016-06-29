@@ -122,7 +122,7 @@
 .label.h4.toolbar {
     -fx-padding:14px;
     -fx-max-width:infinity;
-    
+
 }
 .text {
     -fx-font-family:'Open Sans';
@@ -199,7 +199,9 @@
     -fx-background-color: derive(-flatter-primary, -10.0%);
     -fx-text-fill: -txt-highlight;
 }
-
+.button,.toggle-button {
+    -fx-cursor:hand;
+}
 .button.danger {
     -fx-background-color:-flatter-danger;
 }
@@ -236,22 +238,25 @@
     -fx-background-color: derive(-flatter-success,10%);   
 }
 
-.button.warning {
+.button.warning,.menu-button.warning {
     -fx-background-color:-flatter-warning;
 }
-.button.warning:default:focused {
+.button.warning:default:focused,.menu-button.warning:default:focused {
     -fx-background-color: derive(-flatter-warning, 30.0%);
 }
-.button.warning:hover {
+.button.warning:hover,.menu-button.warning:default:focused {
     -fx-background-color: derive(-flatter-warning,10%);   
 }
-
-.toggle-group {
+.button.larger {
+    -fx-padding:9px;
    
+}
+.toggle-group {
+
 }
 .toggle-group .toggle-button{
     -fx-background-radius: 0.0 0 0 0.0;
-   
+
 }
 
 .toggle-group .toggle-button.first {
@@ -303,7 +308,7 @@
 .text-field.editable-label {
     -fx-background-color:transparent;
     -fx-effect:none;
-    
+
 }
 .text-field.editable-label {
     -fx-text-fill:white;
@@ -711,9 +716,9 @@
     -fx-background-color:-bg-dark;
 }
 .toolbar-label {
-    
-   
-    
+
+
+
 }
 
 /*
@@ -922,7 +927,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-background-color:white;
     -fx-padding:0.3em;
     -fx-text-fill:-dark;
- 
+
 }
 .list-view-fx .list-cell:filled:hover {
     -fx-background-color:derive(-dark,120%);
@@ -993,6 +998,10 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .tool-bar-button {
     -fx-font-size: 18px;
 }
+.tool-bar.smaller .button, .tool-bar.smaller .menu-button{
+    -fx-font-size:14px;
+}
+
 
 
 .image-window-titlebar {
@@ -1127,7 +1136,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-padding: 20 10 20 10;
 }
 .popoverToolBar{
-    
+
     -fx-background-color:-bg-darker;
     -fx-stroke-fill:null;
 }
@@ -1403,7 +1412,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-margin:10px
 }
 .module-config-pane .grid-pane > .label {
-    
+
     -fx-font-size:16px;
 }
 .module-config-pane .combo-box-base  {
@@ -1411,14 +1420,14 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     /*-fx-background-color:red;*/
     -fx-background-insets:0 0 0 0;
     -fx-font-size:0.9em;
-    
+
 }
 .module-config-pane .grid-pane .text-field {
     -fx-font-size:0.8em;
 }
 .module-config-pane .input-label {
-    
-    
+
+
 }
 
 .module-config-pane .editable-label:hover {
@@ -1430,15 +1439,15 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 
 .interval-input-skin {
-   
+
 }
 .interval-input-skin .label{
     -fx-pref-width:30px;
     -fx-font-size:0.8em;
-    
+
 }
 .interval-input-skin .range-slider {
-    
+
 }
 
 /*
@@ -1551,7 +1560,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-padding: 0;
 }
 .grid-pane-view {
--fx-border-color: -bg-darker;;
+    -fx-border-color: -bg-darker;;
 }
 .add-icon {
     -glyph-name: "PLUS";
@@ -1870,7 +1879,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-text-fill:-txt-normal;
 }
 .selectable{
-    
+
 }
 .selectable:hover {
     -fx-background-color:-bg-light;
@@ -1896,20 +1905,20 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-background-color:-bg-darker;
 }
 .explorer-filter .content{
-     -fx-max-height:250px;
+    -fx-max-height:250px;
 }
 .explorer-filter > .content{
     -fx-padding: 0.6em;
 }
 .explorer-filter .range-slider {
     -fx-padding:0 10 0 45px;
-   
+
 }
 #filterScrollPane {
     -fx-pref-width:300px;
 }
 #filterVBox {
-    
+
     -fx-pref-width:280px;
 }
 
@@ -1927,70 +1936,70 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 /*
      Explorer Activity
- */
- 
- .toolbar {
-     -fx-padding:10px;
-     -fx-background-color:-bg-darker;
- }
- .toolbar .label {
-     
-     -fx-padding:7px;
- }
- #viewHBox .toggle-button {
-     -fx-padding:0.5em;
- }
+*/
 
- /*
-    Segmentation Panel
- */
- 
- #inputHBox {
-      -fx-padding:1em;
-      -fx-background-color:-bg-darker;
- }
- 
- .down-arrow {
-     -fx-padding:10px;
-     -fx-font-size:20px;
- }
+.toolbar {
+    -fx-padding:10px;
+    -fx-background-color:-bg-darker;
+}
+.toolbar .label {
 
- /*
-    Drag Panel
- 
- */
- .drag-panel *{
-     -fx-fill:derive(-bg-light,50%);
-    
- }
- .drag-panel .label {
-     -fx-text-align:center;
- }
- .drag-panel .glyph {
-     
+    -fx-padding:7px;
+}
+#viewHBox .toggle-button {
+    -fx-padding:0.5em;
+}
+
+/*
+   Segmentation Panel
+*/
+
+#inputHBox {
+    -fx-padding:1em;
+    -fx-background-color:-bg-darker;
+}
+
+.down-arrow {
+    -fx-padding:10px;
+    -fx-font-size:20px;
+}
+
+/*
+   Drag Panel
+
+*/
+.drag-panel *{
+    -fx-fill:derive(-bg-light,50%);
+
+}
+.drag-panel .label {
+    -fx-text-align:center;
+}
+.drag-panel .glyph {
+
     -glyph-size:150;
     -fx-translate-x:10;
     -glyph-color:red;
- }
+}
 
- /*
-        Message Box
- 
- */
- .message-box {
-     -fx-padding:0.3em;
- }
- .message-box.danger {
-     -fx-background-color:-flatter-danger-bg;
-     
- }
-  .message-box.success {
-     -fx-background-color:-flatter-success-bg;   
- }
-  .message-box.warning {
-     -fx-background-color:-flatter-warning-bg;   
- }
- .message-box.label {
-     -fx-wrap-text:true;
-     
- }
+/*
+       Message Box
+
+*/
+.message-box {
+    -fx-padding:0.3em;
+}
+.message-box.danger {
+    -fx-background-color:-flatter-danger-bg;
+
+}
+.message-box.success {
+    -fx-background-color:-flatter-success-bg;   
+}
+.message-box.warning {
+    -fx-background-color:-flatter-warning-bg;   
+}
+.message-box.label {
+    -fx-wrap-text:true;
+
+}

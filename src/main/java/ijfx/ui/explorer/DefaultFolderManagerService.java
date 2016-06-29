@@ -182,7 +182,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
         AsyncCallable<List<Explorable>> task = new AsyncCallable<>();
         task.setTitle("Fetching elements...");
-
+       
         if (currentFolder == null) {
             return;
         } else {

@@ -19,6 +19,7 @@
  */
 package ijfx.ui.plugin.panel;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.bridge.ImageJContainer;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.batch.BatchService;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -97,10 +99,10 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     @FXML
     private Label titleLabel;
-  
+
     @FXML
     private VBox resultVBox;
-   
+
     @Parameter
     private Context context;
 
@@ -121,7 +123,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     private UiContextService uiContextService;
-    
+
     @Parameter
     private OverlayService overlayService;
 
@@ -136,8 +138,6 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     SegmentationService segmentationService;
-    
-   
 
     TaskButtonBinding taskButtonBinding;
 
@@ -148,19 +148,12 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     ObjectProperty<File> ouputFolderProperty;
 
     ReadOnlyBooleanProperty isExplorer;
-    
+
     private static final Boolean USE_ALL_PLANE = Boolean.TRUE;
 
     public SegmentationPanel() {
         try {
             FXUtilities.injectFXML(this);
-
-            taskButtonBinding = new TaskButtonBinding(testButton);
-            taskButtonBinding.setTaskFactory(this::createTaskButtonBinding);
-
-           
-
-            new TaskButtonBinding(startButton).setTaskFactory(this::generateTask);
 
         } catch (IOException ex) {
             Logger.getLogger(SegmentationPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -177,10 +170,20 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         workflowPanel.addStep(GaussianBlur.class);
         workflowPanel.addStep(Binarize.class);
 
-        isExplorer = new UiContextProperty(context, "segmentation");
-        
-        startButton.visibleProperty().bind(isExplorer);
-        
+        isExplorer = new UiContextProperty(context, "explorerActivity");
+
+        //startButton.visibleProperty().bind(isExplorer);
+        // Bindings buttons
+        new TaskButtonBinding(startButton)
+                .setTaskFactory(this::generateTask)
+                .setBaseIcon(FontAwesomeIcon.LIST_ALT)
+                .textBeforeTaskProperty().bind(Bindings.createStringBinding(this::getStartButtonText, isExplorer));
+
+        new TaskButtonBinding(testButton)
+                .setTaskFactory(this::createTaskButtonBinding)
+                .setBaseIcon(FontAwesomeIcon.CHECK_SQUARE)
+                .textBeforeTaskProperty().bind(Bindings.createStringBinding(this::getTestButtonText, isExplorer));
+
         return this;
     }
 
@@ -215,39 +218,35 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         if (handler == null) {
             handler = new SilentProgressHandler();
         }
-        
 
         // generating the batch service input from an image display
         BatchSingleInput input;
         ImageDisplay inputDisplay;
-        
+
         boolean isExplorer = activityService.getCurrentActivityAsClass() == ExplorerActivity.class;
-        
-        if(isExplorer) {
+
+        if (isExplorer) {
             Explorable explorable;
-            if(explorerService.getSelectedItems().size() > 0) {
+            if (explorerService.getSelectedItems().size() > 0) {
                 explorable = explorerService.getSelectedItems().get(0);
-            }
-            else {
+            } else {
                 explorable = explorerService.getItems().get(0);
             }
-                       
-                input = new BatchInputBuilder(context)
-                        .from(explorable)
-                        .getInput();
-                        
-                
+
+            input = new BatchInputBuilder(context)
+                    .from(explorable)
+                    .getInput();
+
             inputDisplay = new DefaultImageDisplay();
             context.inject(inputDisplay);
             inputDisplay.display(explorable.getDataset());
             uiService.show(inputDisplay);
-            
-        }
-        else {
+
+        } else {
             input = new ImageDisplayBatchInput(imageDisplayService.getActiveImageDisplay(), true);
             inputDisplay = imageDisplayService.getActiveImageDisplay();
         }
-        
+
         System.out.println("Executing");
 
         // applying the workflow
@@ -262,17 +261,17 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         Overlay[] overlay = BinaryToOverlay.transform(context, input.getDataset(), false);
         // giving a random color to each overlay
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
-        
+
         // deleting the overlay owned previously by the input
-        overlayService.getOverlays(inputDisplay).forEach(o->overlayService.removeOverlay(o));
+        overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
         // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();
         context.inject(outputDisplay);
         outputDisplay.display(input.getDataset());
-        
+
         // adding the overlay to the input dipslay
         overlayService.addOverlays(inputDisplay, Arrays.asList(overlay));
-        
+
         handler.setStatus("Gathering statistics...");
 
         handler.setProgress(-1);
@@ -281,7 +280,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         List<HashMap<String, Double>> map = Arrays.stream(overlay)
                 .map(o -> {
                     try {
-                        
+
                         return overlayStatsService.getStat(inputDisplay, o);
                     } catch (Exception e) {
                         return null;
@@ -292,12 +291,13 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
         DefaultGenericTable resultTable = new DefaultGenericTable();
         if (map.size() > 0) {
-            int headerNumber = map.get(0).keySet().size();
+            int headerNumber = map.get(0).keySet().size() + 1;
 
             String[] headers = map.get(0).keySet().toArray(new String[headerNumber]);
             resultTable.insertColumns(0, headers);
 
             for (int rowNumber = 0; rowNumber != map.size(); rowNumber++) {
+
                 final int finalRowNumber = rowNumber;
                 resultTable.insertRow(finalRowNumber);
                 map.get(rowNumber).forEach((key, value) -> {
@@ -309,7 +309,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
         }
 
-        if(isExplorer) {
+        if (isExplorer) {
             activityService.openByType(ImageJContainer.class);
         }
         uiService.show(resultTable);
@@ -324,32 +324,56 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
             final DefaultWorkflow workflow = new DefaultWorkflow(workflowPanel.stepListProperty());
 
-            
             List<BatchSingleInput> inputList = explorerService.getSelectedItems()
                     .stream()
-                    .map(explorable->new BatchInputBuilder(context)
+                    .map(explorable -> new BatchInputBuilder(context)
                             .from(explorable)
                             //.saveNextToSourceWithPrefix("_mask","png")
                             .onFinished(segmentationService::saveOverlaysNextToSourceFile)
                             .getInput()
                     )
                     .collect(Collectors.toList());
-                    
-            
 
-            return new CallbackTask<List<BatchSingleInput>, Boolean>(inputList)
+            Task<Boolean> task = new CallbackTask<List<BatchSingleInput>, Boolean>(inputList)
                     .run((progress, input) -> {
                         return batchService.applyWorkflow(progress, input, workflow);
                     });
+
+            loadingScreenService.frontEndTask(task);
+
+            return task;
+
         }
 
         return null;
 
     }
-    
+
+    private boolean isExplorer() {
+        return isExplorer.getValue();
+    }
+
+    private String getTestButtonText() {
+        if (!isExplorer()) {
+            return "Test on the current plane";
+        } else {
+            return "Test on one image";
+        }
+    }
+
+    private String getStartButtonText() {
+        if (!isExplorer()) {
+            return "Use whole image as input";
+        } else {
+            return "Process all images";
+        }
+    }
+
     @FXML
     public void close() {
-        uiContextService.leave("segment segmentation");
+        uiContextService.leave("segment");
+        uiContextService.leave("segmentation");
         uiContextService.update();
     }
+
 }

@@ -17,25 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package mongis.utils;
+package ijfx.ui.workflow;
+
+import ijfx.service.workflow.Workflow;
+import javafx.scene.control.Dialog;
 
 /**
  *
  * @author cyril
  */
-public interface ProgressHandler {
-    
-    
-    public void setProgress(double progress);
-    public void setProgress(double workDone,double total);
-    public void setProgress(long workDone,long total);
-    public void setStatus(String message);
-    public void setTotal(double total);
-    public void increment(double inc);
-    public boolean isCancelled();
-    
-    public static ProgressHandler check(ProgressHandler handler) {
-        return handler == null ? new SilentProgressHandler() : handler;
-    }
+public class WorkflowSelectionDialog extends Dialog<Workflow>{
     
 }

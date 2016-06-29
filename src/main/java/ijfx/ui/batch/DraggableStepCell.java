@@ -21,6 +21,7 @@ package ijfx.ui.batch;
 
 import ijfx.service.workflow.WorkflowStep;
 import java.util.function.Consumer;
+import javafx.beans.Observable;
 import mongis.utils.DraggableListCell;
 import org.scijava.Context;
 
@@ -43,19 +44,15 @@ public class DraggableStepCell extends DraggableListCell<WorkflowStep> {
         context.inject(ctrl);
     }
 
+    
+
     @Override
-    public void updateItem(WorkflowStep step, boolean isEmpty) {
-        super.updateItem(step, isEmpty);
-        if (isEmpty) {
+    protected void onItemChanged(Observable obs, WorkflowStep oldValue, WorkflowStep newValue) {
+        if(newValue == null) {
             setGraphic(null);
         }
-        if (step == null) {
-            setGraphic(null);
-            return;
-        } else {
-            if (ctrl.getItem() != step) {
-                ctrl.setItem(step);
-            }
+        else {
+            ctrl.setItem(newValue);
             setGraphic(ctrl);
         }
     }

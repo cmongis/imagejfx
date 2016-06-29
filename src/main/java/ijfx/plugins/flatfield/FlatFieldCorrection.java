@@ -52,7 +52,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>FlatField Correction")
+@Plugin(type = Command.class, menuPath = "Process > Correction > FlatField Correction")
 public class FlatFieldCorrection implements Command {
 
     @Parameter

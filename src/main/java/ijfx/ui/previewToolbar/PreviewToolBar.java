@@ -35,6 +35,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import mongis.utils.CallbackTask;
 import mongis.utils.panecell.PaneIconCellPreview;
 import org.controlsfx.control.PopOver;
 import org.reactfx.util.FxTimer;
@@ -66,18 +67,17 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     PluginService pluginService;
     @Parameter
     UiContextService contextService;
-    
+
     @Parameter
     TimerService stopWatchService;
-    
-    
+
     Logger logger = ImageJFX.getLogger();
-    
+
     private PopOver popOver;
     private JsonReader jsonReader;
 
     boolean created = false;
-    
+
     public PreviewToolBar() {
         super();
 
@@ -90,9 +90,11 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     @Override
     public UiPlugin init() {
-        
-        if(created) return this;
-        
+
+        if (created) {
+            return this;
+        }
+
         System.out.println("Creating toolbar");
         createToolBar();
 
@@ -147,7 +149,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.maxWidthProperty().bind(this.getScene().widthProperty());
         pane.setMinWidth(popOver.minWidthProperty().getValue());
         pane.setMaxWidth(popOver.minWidthProperty().getValue());
-       
+
         popOver.setDetached(false);
         popOver.setDetachable(false);
         popOver.setHideOnEscape(true);
@@ -163,7 +165,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.setAnchorY(anchorY);
         popOver.getStyleClass().clear();
         popOver.getStyleClass().add("popoverToolBar");
-        
+
     }
 
     /**
@@ -172,11 +174,11 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      * @param labelCategory
      */
     public void setMouseAction(LabelCategory labelCategory) {
-            Timer timer = FxTimer.create(java.time.Duration.ofMillis(250), () -> this.onEnter(labelCategory));
+        Timer timer = FxTimer.create(java.time.Duration.ofMillis(250), () -> this.onEnter(labelCategory));
         labelCategory.addEventFilter(MouseEvent.MOUSE_ENTERED, (ee) -> {
             timer.restart();
         });
-        
+
         labelCategory.addEventFilter(MouseEvent.MOUSE_EXITED, (e) -> {
             timer.stop();
         });
@@ -187,14 +189,13 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
      * @param labelCategory
      */
     public void onEnter(LabelCategory labelCategory) {
-        
-        logger.info("Activating category : "+labelCategory.getText());
-        
+
+        logger.info("Activating category : " + labelCategory.getText());
+
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCellPreview paneIconCellPreview = (PaneIconCellPreview) e;
-            
+
             //paneIconCellPreview
-            
             //Has to use forceUpdateImage
             //paneIconCellPreview.updateImageAsync(paneIconCellPreview.getItem());
             paneIconCellPreview.forceImageUpdate();
@@ -238,9 +239,18 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
             }
 
             paneIconCellPreview.setOnMouseClicked(event -> {
-                CommandInfo commandInfo = commandService.getCommand(paneIconCellPreview.getItem().getAction());
-                commandService.run(commandInfo, true);
-                System.out.println("Click Action " + paneIconCellPreview.getItem().getLabel() + paneIconCellPreview.getItem().getContext());
+
+                new CallbackTask<>()
+                        .run(() -> {
+                            logger.info(String.format("Running action : %s",paneIconCellPreview.getItem()));
+
+                            CommandInfo commandInfo = commandService.getCommand(paneIconCellPreview.getItem().getAction());
+                            commandService.run(commandInfo, true);
+                            //System.out.println("Click Action " + paneIconCellPreview.getItem().getLabel() + paneIconCellPreview.getItem().getContext());F
+
+                        })
+                        .start();
+
             });
 
         });

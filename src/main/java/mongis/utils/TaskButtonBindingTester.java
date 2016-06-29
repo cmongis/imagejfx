@@ -19,23 +19,41 @@
  */
 package mongis.utils;
 
+import ijfx.ui.utils.BaseTester;
+import javafx.concurrent.Task;
+import javafx.scene.control.Button;
+
 /**
  *
  * @author cyril
  */
-public interface ProgressHandler {
+public class TaskButtonBindingTester extends BaseTester{
+
+    Button button;
     
-    
-    public void setProgress(double progress);
-    public void setProgress(double workDone,double total);
-    public void setProgress(long workDone,long total);
-    public void setStatus(String message);
-    public void setTotal(double total);
-    public void increment(double inc);
-    public boolean isCancelled();
-    
-    public static ProgressHandler check(ProgressHandler handler) {
-        return handler == null ? new SilentProgressHandler() : handler;
+    @Override
+    public void initApp() {
+        
+        
+        button = new Button("Click me please :-)");
+        new TaskButtonBinding(button)
+                .setTextWhenRunning("I'm running man !")
+                .setTextWhenSucceed("I did it !")
+                .setTextWhenError("Damn, something happends")
+                .setTaskFactory(this::generateMe);
+        
+        
+        setContent(button);
+        
+        
     }
     
+    public static void main(String... args) {
+        launch(args);
+    }
+    
+    
+    private Task<Boolean> generateMe(TaskButtonBinding binding) {
+        return new FakeTask(4000);
+    }
 }

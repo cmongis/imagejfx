@@ -20,6 +20,7 @@
  */
 package ijfx.service.overlay;
 
+import ijfx.core.metadata.MetaData;
 import ijfx.ui.main.ImageJFX;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public final static String LBL_SOLIDITY = "Solidity";
     public final static String LBL_CIRCULARITY = "Circularity";
     public final static String LBL_THINNES_RATIO = "Thinnes ratio";
-
+    
     public HashMap<String, Double> getStat(ImageDisplay imageDisplay, Overlay overlay) {
 
        /*

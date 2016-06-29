@@ -153,17 +153,21 @@ public class BinaryToOverlay implements Command {
         // creating a list
         List<Overlay> listOverlays = new ArrayList<>(blobs.size());
 
-      
+        int count = 1;
 
         // converting each Blob into a PolygonOverlay
         for (Blob b : blobs) {
-
+            
+            
+            
             PolygonOverlay po = new PolygonOverlay(context);
-
+            po.setName(String.format("%d",count++));
+            
             // we modifiy the PolygonOverlay by modifying it region of interest
             PolygonRegionOfInterest roi = po.getRegionOfInterest();
 
             Polygon polygon = b.getOuterContour();
+            
             if (polygon.getBounds().getWidth() <= 2 && polygon.getBounds().getHeight() <= 2) {
                 
                 continue;

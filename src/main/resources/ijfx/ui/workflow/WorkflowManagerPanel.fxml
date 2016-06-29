@@ -10,4 +10,19 @@
    <center>
       <ListView fx:id="listView" maxHeight="1.7976931348623157E308" BorderPane.alignment="CENTER" />
    </center>
+   <top>
+      <HBox alignment="TOP_RIGHT" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" text="Import" />
+         </children>
+      </HBox>
+   </top>
+   <bottom>
+      <HBox alignment="TOP_RIGHT" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" onAction="#cancel" styleClass="danger" text="Cancel" />
+            <Button mnemonicParsing="false" onAction="#choose" styleClass="success" text="Choose" />
+         </children>
+      </HBox>
+   </bottom>
 </fx:root>
