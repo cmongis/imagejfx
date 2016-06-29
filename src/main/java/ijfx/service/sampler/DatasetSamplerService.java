@@ -64,7 +64,7 @@ public class DatasetSamplerService extends AbstractService implements IjfxServic
         AxisSubrange subrange = new AxisSubrange(position);
         
         def.constrain(axes, subrange);
-
+        
         Dataset output = createOutputImage(dataset, def);
 
         copyData(def, dataset, output);

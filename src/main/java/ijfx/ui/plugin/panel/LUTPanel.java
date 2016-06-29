@@ -21,7 +21,6 @@
 package ijfx.ui.plugin.panel;
 
 import ijfx.plugins.commands.ApplyLUT;
-import ijfx.plugins.commands.ApplyLUT;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;

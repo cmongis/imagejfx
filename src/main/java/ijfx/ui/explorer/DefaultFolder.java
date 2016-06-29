@@ -31,6 +31,7 @@ import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.batch.ObjectSegmentedEvent;
 import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.service.ui.LoadingScreenService;
@@ -58,6 +59,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.Incrementor;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
+import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.UIService;
@@ -185,14 +187,15 @@ public class DefaultFolder implements Folder, FileChangeListener {
         progress.setStatus("Reading folder...");
 
         progress.setTotal(records.size());
-
+        
         List<Explorable> explorables = records
                 .stream()
                 .map(record -> {
+                    
                     File overlayJsonFile = overlayIOService.getOverlayFileFromImageFile(record.getFile());
                     finalProgress.increment(0.5);
                     if (overlayJsonFile.exists()) {
-                        getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
+                        //getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
                     }
                     return record;
                 })
@@ -308,5 +311,17 @@ public class DefaultFolder implements Folder, FileChangeListener {
     public Property<Task> currentTaskProperty() {
         return currentTaskProperty;
     }
-
+    
+    @EventHandler
+    public void onObjectSegmented(ObjectSegmentedEvent event) {
+        if(event.getFile().getAbsolutePath().indexOf(file.getAbsolutePath()) == 0) {
+            System.out.println("Adding objects");
+            getObjectList().addAll(event
+                    .getObject()
+                    .stream()
+                    .map(o->new MetaDataSetExplorerWrapper(o.getMetaDataSet()))
+                    .collect(Collectors.toList())
+            ); 
+        }
+    }
 }

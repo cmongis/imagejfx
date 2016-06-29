@@ -199,7 +199,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     protected Task<Boolean> generateTestTask() {
 
-        Task<Boolean> task = new CallbackTask<ImageDisplay, Boolean>(imageDisplayService.getActiveImageDisplay())
+        Task<Boolean> task = new CallbackTask<ImageDisplay, Boolean>()
                 .run(this::runTestProcessing)
                 .then(this::whenTestFinished);
 
@@ -223,9 +223,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         BatchSingleInput input;
         ImageDisplay inputDisplay;
 
-        boolean isExplorer = activityService.getCurrentActivityAsClass() == ExplorerActivity.class;
 
-        if (isExplorer) {
+        if (isExplorer()) {
             Explorable explorable;
             if (explorerService.getSelectedItems().size() > 0) {
                 explorable = explorerService.getSelectedItems().get(0);
@@ -309,7 +308,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
         }
 
-        if (isExplorer) {
+        if (isExplorer()) {
             activityService.openByType(ImageJContainer.class);
         }
         uiService.show(resultTable);
@@ -318,6 +317,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     }
 
+    
+    
+    
     protected Task<Boolean> generateTask(TaskButtonBinding binding) {
 
         if (activityService.getCurrentActivity() instanceof ExplorerActivity) {
@@ -348,6 +350,10 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         return null;
 
     }
+    
+     
+    
+    
 
     private boolean isExplorer() {
         return isExplorer.getValue();

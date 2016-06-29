@@ -45,6 +45,8 @@ import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.roi.PolygonRegionOfInterest;
 import net.imglib2.type.numeric.RealType;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -145,10 +147,10 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
     }
     
-    public <T extends RealType<T>> Double[] getValueList(RandomAccessible<T> accessible, Overlay overlay,long[] position) {
+    public <T extends RealType<T>> Double[] getValueList(RandomAccessible<? extends RealType<?>> accessible, Overlay overlay,long[] position) {
         
         // we hack the PixelDrawingService to measure pixel inside the overlay by hacking the drawing method;
-        RandomAccess<T> randomAccess = accessible.randomAccess();
+        RandomAccess randomAccess = accessible.randomAccess();
         randomAccess.setPosition(position);
         PixelMeasurer<T> measurer = new PixelMeasurer<>(randomAccess);
         overlayDrawingService.drawOverlay(overlay, OverlayDrawingService.FILLER, measurer);
@@ -221,6 +223,8 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
         return new DefaultOverlayStatistics(display, overlay);
     }
+    
+    
    
     public OverlayShapeStatistics getShapeStatistics(Overlay overlay) {
         
@@ -245,18 +249,19 @@ public class OverlayStatService extends AbstractService implements ImageJService
     
     public HashMap<String,Double> getStatisticsAsMap(ImageDisplay imageDisplay, Overlay overlay) {
         
-        // first we create a overlay stats object
-        OverlayStatistics overlayStatistics = getOverlayStatistics(imageDisplay,overlay);
-        
-        // then an hash map containing the statistics
+      
+      
+        return getStatisticsAsMap(getOverlayStatistics(imageDisplay,overlay));
+    }
+    
+    public HashMap<String,Double> getStatisticsAsMap(OverlayStatistics overlayStatistics) {
+         // then an hash map containing the statistics
         HashMap<String, Double> statistics = getShapeStatisticsAsMap(overlayStatistics.getShapeStatistics());
         
         // then complete it with pixel statistics
         getPixelStatisticsAsMap(overlayStatistics.getPixelStatistics()).forEach((key,value)->{
             statistics.put(key, value);
         });
-        
-        // and return it
         return statistics;
     }
     
@@ -297,6 +302,15 @@ public class OverlayStatService extends AbstractService implements ImageJService
         return statistics;
     }
     
+    
+    
+        public <T extends RealType<T>> OverlayStatistics getStatistics(Overlay overlay, Dataset dataset, long[] position) {
+        
+        PixelStatistics pixelStats = new PixelStatisticsBase(new DescriptiveStatistics(ArrayUtils.toPrimitive(getValueList(dataset, overlay,position))));
+        OverlayShapeStatistics shapeState = getShapeStatistics(overlay);
+        
+        return new OverlayStatisticsBase(overlay,shapeState,pixelStats);
+    }
     
     public void setRandomColor(List<Overlay> overlays){
         

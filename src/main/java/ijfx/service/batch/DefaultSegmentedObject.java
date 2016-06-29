@@ -19,17 +19,17 @@
  */
 package ijfx.service.batch;
 
+import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.PixelStatistics;
 import ijfx.service.overlay.PixelStatisticsBase;
-import ijfx.service.overlay.PolygonOverlayStatistics;
 import net.imagej.overlay.Overlay;
-import net.imglib2.RandomAccessible;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import ijfx.service.overlay.OverlayShapeStatistics;
+import ijfx.service.overlay.OverlayStatistics;
 
 /**
  *
@@ -37,30 +37,36 @@ import ijfx.service.overlay.OverlayShapeStatistics;
  */
 public class DefaultSegmentedObject implements SegmentedObject {
 
+    
+    
+    private Overlay overlay;
+
+    
+    private MetaDataSet set = new MetaDataSet();
+    
+    
     @Parameter
-    OverlayStatService overlayStatsService;
-
-    @Parameter
-    Context context;
-
-    PixelStatistics pixelStats;
-
-    OverlayShapeStatistics shapeStatistics;
-
-    long[] position;
-
-    public DefaultSegmentedObject(Overlay overlay, long[] position, RandomAccessible r) {
-        overlay.getContext().inject(this);
-
-        this.position = position;
-        this.overlay = overlay;
-
-        pixelStats = new PixelStatisticsBase(new DescriptiveStatistics(ArrayUtils.toPrimitive(overlayStatsService.getValueList(r, overlay, position))));
-        shapeStatistics = overlayStatsService.getShapeStatistics(overlay);
-
+    private OverlayStatService overlayStatsService;
+    
+    
+    public DefaultSegmentedObject() {
+        
     }
 
-    Overlay overlay;
+    public void setOverlay(Overlay overlay) {
+        this.overlay = overlay;
+    }
+    
+    public void setMetaDataSet(MetaDataSet set) {
+        this.set = set;
+    }
+    
+    public DefaultSegmentedObject(Overlay overlay, OverlayStatistics overlayStatistics) {
+        overlay.getContext().inject(this);
+        
+        set.merge(overlayStatsService.getStatisticsAsMap(overlayStatistics));
+        
+    }
 
     @Override
     public Overlay getOverlay() {
@@ -68,17 +74,7 @@ public class DefaultSegmentedObject implements SegmentedObject {
     }
 
     @Override
-    public PixelStatistics getPixelStatistics() {
-        return pixelStats;
+    public MetaDataSet getMetaDataSet() {
+        return set;
     }
-
-    @Override
-    public OverlayShapeStatistics getShapeStatistics() {
-        shapeStatistics = new PolygonOverlayStatistics(overlay, context);
-        return shapeStatistics;
-    }
-
-  
-   
-
 }

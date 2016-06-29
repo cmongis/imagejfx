@@ -19,11 +19,14 @@
  */
 package ijfx.service.overlay;
 
+import net.imagej.overlay.Overlay;
+
 /**
  *
  * @author cyril
  */
 public interface OverlayStatistics {
+    Overlay getOverlay();
     OverlayShapeStatistics getShapeStatistics();
     PixelStatistics getPixelStatistics();
 }

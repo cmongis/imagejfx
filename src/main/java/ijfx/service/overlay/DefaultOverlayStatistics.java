@@ -40,6 +40,7 @@ public class DefaultOverlayStatistics implements OverlayStatistics {
     @Parameter
     private OverlayStatService overlayStatsService;
 
+    
     public DefaultOverlayStatistics(ImageDisplay imageDisplay, Overlay overlay) {
 
         imageDisplay.getContext().inject(this);
@@ -60,4 +61,9 @@ public class DefaultOverlayStatistics implements OverlayStatistics {
         return pixelStats;
     }
 
+    @Override
+    public Overlay getOverlay() {
+        return overlay;
+    }
+    
 }

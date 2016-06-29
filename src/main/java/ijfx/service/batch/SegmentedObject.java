@@ -19,7 +19,7 @@
  */
 package ijfx.service.batch;
 
-import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataOwner;
 import net.imagej.overlay.Overlay;
 import ijfx.service.overlay.OverlayStatistics;
 
@@ -27,8 +27,6 @@ import ijfx.service.overlay.OverlayStatistics;
  *
  * @author cyril
  */
-public interface SegmentedObject extends OverlayStatistics {
-    
+public interface SegmentedObject extends MetaDataOwner {
     Overlay getOverlay();
- 
 }

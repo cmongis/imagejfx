@@ -19,21 +19,40 @@
  */
 package ijfx.service.overlay;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import net.imagej.overlay.Overlay;
 
 /**
  *
- * @author Pierre BONNEAU
+ * @author cyril
  */
-@JsonDeserialize(as=PixelStatisticsBase.class)
-public interface PixelStatistics {
+public class OverlayStatisticsBase implements OverlayStatistics{
+    Overlay overlay;
+    
+    OverlayShapeStatistics shapeStatistics;
+    
+    PixelStatistics pixelStatistics;
 
-    double getMean();
-    double getMax();
-    double getMin();
-    double getStandardDeviation();
-    double getVariance();
-    double getMedian();
-    long getPixelCount();
+    public OverlayStatisticsBase(Overlay overlay, OverlayShapeStatistics shapeStatistics, PixelStatistics stats) {
+        this.overlay = overlay;
+        this.shapeStatistics = shapeStatistics;
+        this.pixelStatistics = stats;
+    }
+
+    public Overlay getOverlay() {
+        return overlay;
+    }
+
+    public OverlayShapeStatistics getShapeStatistics() {
+        return shapeStatistics;
+    }
+
+    public PixelStatistics getPixelStatistics() {
+        return pixelStatistics;
+    }
+    
+    
+    
+    
+    
     
 }

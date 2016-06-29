@@ -29,6 +29,7 @@ package ijfx.core.metadata;
 
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -54,6 +55,10 @@ public class MetaDataSet extends HashMap<String, MetaData> {
         return this;
     }
     
+    public <T extends Object> MetaDataSet merge(Map<String,T> map) {
+       map.forEach(this::putGeneric);
+       return this;
+    }
     
     public MetaData get(String key) {
         return super.getOrDefault(key, new GenericMetaData(key,null));

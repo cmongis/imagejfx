@@ -27,6 +27,7 @@ import net.imagej.overlay.Overlay;
  *
  * @author cyril
  */
+
 public interface OverlayShapeStatistics {
     
     

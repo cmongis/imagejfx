@@ -36,7 +36,19 @@ public class ImageWindowContainer extends AnchorPane {
         super();
 
         getChildren().addListener((ListChangeListener.Change<? extends Node> change) -> {
-            change.next();
+
+            while (change.next()) {
+                change.getAddedSubList()
+                        .stream()
+                        .filter(node -> node instanceof ImageWindow)
+                        .map(node -> (ImageWindow) node)
+                        .forEach(window -> {
+
+                            double move = getChildren().size() * 15;
+                            window.relocate(move, move);
+
+                        });
+            };
 
             if (getChildren().size() == 0) {
                 return;
