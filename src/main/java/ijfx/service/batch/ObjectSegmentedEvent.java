@@ -17,23 +17,36 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.overlay;
+package ijfx.service.batch;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import ijfx.ui.IjfxEvent;
+import java.io.File;
+import java.util.List;
 
 /**
  *
- * @author Pierre BONNEAU
+ * @author cyril
  */
-@JsonDeserialize(as=PixelStatisticsBase.class)
-public interface PixelStatistics {
+public class ObjectSegmentedEvent extends IjfxEvent<List<SegmentedObject>>{
+    
+    private File file;
 
-    double getMean();
-    double getMax();
-    double getMin();
-    double getStandardDeviation();
-    double getVariance();
-    double getMedian();
-    long getPixelCount();
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public File getFile() {
+        return file;
+    }
+    
+    
+    
+    
+    public ObjectSegmentedEvent(File file, List<SegmentedObject> objects) {
+        
+        setObject(objects);
+        setFile(file);
+        
+    }
     
 }

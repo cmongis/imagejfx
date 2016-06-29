@@ -25,6 +25,7 @@ import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
+import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
@@ -40,7 +41,7 @@ import org.scijava.ui.UIService;
  *
  * @author cyril
  */
-@Plugin(type = Command.class,menuPath = "Image > Stacks > Merge into channels...")
+@Plugin(type = Command.class, menuPath = "Image > Stacks > Merge into channels...")
 public class MergeStacks extends ContextCommand {
 
     @Parameter(type = ItemIO.INPUT, required = true, label = "Select datasets to merge")
@@ -55,8 +56,6 @@ public class MergeStacks extends ContextCommand {
     @Parameter
     DatasetService datasetService;
 
-    
-    
     @Override
     public void run() {
 
@@ -77,29 +76,34 @@ public class MergeStacks extends ContextCommand {
 
         Dataset firstDataset = inputs[0];
 
-        long width = firstDataset.max(0);
-        long height = firstDataset.max(1);
-        long depth = firstDataset.max(2);
+        long width = firstDataset.dimension(0);
+        long height = firstDataset.dimension(1);
+        long depth = firstDataset.numDimensions() > 2 ? firstDataset.max(2) : 0;
         long channelNumber = inputs.length;
         int total = 1 + inputs.length;
-        
+
         StatusBar statusBar = uiService.getDefaultUI().getStatusBar();
-        
+
         statusBar.setProgress(1, total);
         statusBar.setStatus("Creating dataset...");
-        
-        
-        
-        
-        
-        long[] dims = new long[]{width, height, channelNumber, depth};
-        AxisType[] axes = new AxisType[]{Axes.X, Axes.Y, Axes.CHANNEL, Axes.Z};
-        
+
+        long[] dims;
+        AxisType[] axes;
+        if (depth > 0) {
+            axes = new AxisType[]{Axes.X, Axes.Y, Axes.CHANNEL, Axes.Z};
+            dims = new long[]{width, height, channelNumber, depth};
+        } else {
+            axes = new AxisType[]{Axes.X, Axes.Y, Axes.CHANNEL};
+            dims = new long[]{width,height,channelNumber};
+        }
+
         output = datasetService.create(dims, firstDataset.getName(), axes, firstDataset.getValidBits(), firstDataset.isSigned(), false);
-          statusBar.setStatus("Copying data...");
+        output.initializeColorTables((int)channelNumber);
+                
+        statusBar.setStatus("Copying data...");
         for (int c = 0; c != channelNumber; c++) {
-            statusBar.setProgress(c+1, total);
-          
+            statusBar.setProgress(c + 1, total);
+
             copyDataset(c, inputs[c]);
         }
     }
@@ -121,35 +125,51 @@ public class MergeStacks extends ContextCommand {
 
     private <T extends RealType<T>> void copyDataset(int channel, Dataset dataset) {
 
-        long[] positionInput = new long[dataset.numDimensions()];
-        long[] positionOutput = new long[4];
+        if (output.numDimensions() == 4) {
 
-        positionOutput[2] = channel;
+            long[] positionInput = new long[dataset.numDimensions()];
+            long[] positionOutput = new long[4];
 
-        RandomAccess<T> randomAccessInput = (RandomAccess<T>) dataset.randomAccess();
-        RandomAccess<T> randomAccessOutput = (RandomAccess<T>) output.randomAccess();
+            positionOutput[2] = channel;
 
-        for (int x = 0; x != dataset.max(0); x++) {
-            for (int y = 0; y != dataset.max(1); y++) {
-                for (int z = 0; z != dataset.max(2); z++) {
+            RandomAccess<T> randomAccessInput = (RandomAccess<T>) dataset.randomAccess();
+            RandomAccess<T> randomAccessOutput = (RandomAccess<T>) output.randomAccess();
 
-                    positionInput[0] = x;
-                    positionInput[1] = y;
-                    positionInput[2] = z;
-                    positionOutput[0] = x;
-                    positionOutput[1] = y;
-                    positionOutput[3] = z;
+            for (int x = 0; x != dataset.dimension(0); x++) {
+                for (int y = 0; y != dataset.dimension(1); y++) {
+                    for (int z = 0; z != dataset.dimension(2); z++) {
 
-                    randomAccessInput.setPosition(positionInput);
-                    randomAccessOutput.setPosition(positionOutput);
-                    randomAccessOutput.get().set(randomAccessInput.get());
+                        positionInput[0] = x;
+                        positionInput[1] = y;
+                        positionInput[2] = z;
+                        positionOutput[0] = x;
+                        positionOutput[1] = y;
+                        positionOutput[3] = z;
 
+                        randomAccessInput.setPosition(positionInput);
+                        randomAccessOutput.setPosition(positionOutput);
+                        randomAccessOutput.get().set(randomAccessInput.get());
+
+                    }
                 }
             }
+        } else if (output.numDimensions() == 3) {
+            long[] position = new long[3];
+            RandomAccess<T> randomAccessOutput = (RandomAccess<T>) output.randomAccess();
+            
+            Cursor<T> cursor = (Cursor<T>)dataset.cursor();
+            cursor.reset();
+            
+            while (cursor.hasNext()) {
+               cursor.fwd();
+                cursor.localize(position);
+                 position[2] = channel;
+                 randomAccessOutput.setPosition(position);
+                randomAccessOutput.get().set(cursor.get());
+            }
+
         }
 
     }
-
-   
 
 }

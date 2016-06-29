@@ -131,9 +131,11 @@ public class ChartView extends FilterView implements ExplorerView {
     public void setSelectedItem(List<? extends Explorable> items) {
     }
 
+
     private void addDataToChart(List<Explorable> list, Color color) {
                         final Node node = new Rectangle(10, 10, color);
 
+                        
         Series series = new Series();
         series.setNode(new Rectangle(10, 10, color));
 

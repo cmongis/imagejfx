@@ -32,11 +32,11 @@ import org.scijava.Context;
  *
  * @author Pierre BONNEAU
  */
-abstract class AbstractOverlayStatistics implements OverlayStatistics{
+abstract class AbstractOverlayShapeStatistics implements OverlayShapeStatistics{
         
     private final Overlay overlay;
     
-    PixelStatistics pixelStatistics;
+   
     
     protected double area;
     protected Polygon minimumBoundingRectangle;
@@ -52,22 +52,15 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
     protected double thinnesRatio;
     
     
-    public AbstractOverlayStatistics(ImageDisplay display, Overlay overlay, Context context){
+    
+    
+    
+    public AbstractOverlayShapeStatistics(Overlay overlay, Context context){
         
         context.inject(this);
         
         this.overlay = overlay;
-        this.pixelStatistics = new DefaultPixelStatistics(display, overlay, context);
 
-    }
-    
-    
-    public AbstractOverlayStatistics(Overlay overlay, Context context){
-        
-        context.inject(this);
-        
-        this.overlay = overlay;
-        this.pixelStatistics = null;
 
     }    
     
@@ -77,10 +70,7 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
     }
     
     
-    @Override
-    public PixelStatistics getPixelStatistics(){
-        return this.pixelStatistics;
-    }
+  
     
     @Override
     public double getArea(){
@@ -168,7 +158,7 @@ abstract class AbstractOverlayStatistics implements OverlayStatistics{
     
     public String toString(){
         return "\nSTATISTICS"
-                +"\n\t Pixels Statistics : "+this.pixelStatistics.toString()
+
                 +"\n\t Area : "+this.area                
                 +"\n\t Minimum Bounding Rectangle : "+ this.minimumBoundingRectangle.toString()
                 +"\n\t Center of gravity : "+ this.centerOfGravity.toString()

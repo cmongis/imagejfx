@@ -179,12 +179,20 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
                 })
                 .then(success -> {
                     if (success) {
-
+                        
                     }
                 })
                 .submit(loadingScreenService)
                 .start();
 
+    }
+
+    @Override
+    public void openSelection() {
+        
+        getSelectedItems().forEach(this::open);
+       
+        
     }
 
 }

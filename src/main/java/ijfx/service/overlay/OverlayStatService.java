@@ -20,7 +20,6 @@
  */
 package ijfx.service.overlay;
 
-import ijfx.core.metadata.MetaData;
 import ijfx.ui.main.ImageJFX;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -37,15 +36,17 @@ import net.imagej.measure.StatisticsService;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
-import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessible;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.ops.pointset.RoiPointSet;
 import net.imglib2.roi.PolygonRegionOfInterest;
 import net.imglib2.type.numeric.RealType;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -57,6 +58,7 @@ import org.scijava.util.ColorRGB;
  *
  * @author Cyril MONGIS, 2015
  */
+
 @Plugin(type = Service.class)
 public class OverlayStatService extends AbstractService implements ImageJService {
 
@@ -72,6 +74,8 @@ public class OverlayStatService extends AbstractService implements ImageJService
     @Parameter
     private StatisticsService statService;
 
+    @Parameter
+    private OverlayDrawingService overlayDrawingService;
     
     
     final private Logger logger = ImageJFX.getLogger();
@@ -97,41 +101,10 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public final static String LBL_CIRCULARITY = "Circularity";
     public final static String LBL_THINNES_RATIO = "Thinnes ratio";
     
-    public HashMap<String, Double> getStat(ImageDisplay imageDisplay, Overlay overlay) {
 
-       /*
-         HashMap<String, ParallelMeasurement> measures = new HashMap<>();
-          HashMap<String, Double> stats = new HashMap<>();
-         DescriptiveStatistics statistics = new DescriptiveStatistics(ArrayUtils.toPrimitive(getValueList(imageDisplay, overlay)));
-        
-        measures.put(LBL_MIN, () -> statistics.getMin());
-        measures.put(LBL_MAX, () -> statistics.getMax());
-        measures.put(LBL_MEAN, () -> statistics.getMean());
-        measures.put("Std. Dev.", () -> statistics.getStandardDeviation());
-        measures.put("Variance", () -> statistics.getVariance());
-        measures.put(LBL_MEDIAN, () -> statistics.getPercentile(50));
-        
-        //measures.put(LBL_AREA, () -> statService.geometricMean(ds, rps));
-        
-        
-        for (String key : measures.keySet()) {
-
-            logger.fine("Calculating " + key);
-            ParallelMeasurement runnable = measures.get(key);
-            Double value = runnable.measure();
-
-            logger.fine(String.format("Calculated %s = %.0f", key, value));
-            stats.put(key, value);
-        };
-        logger.fine("finished");*/
-       
-       
-       
-        return getStatistics(getOverlayStatistics(imageDisplay, overlay));
-    }
    
     
-    public Double[] getValueList(ImageDisplay imageDisplay, Overlay overlay) {
+    public Double[] getValueListFromImageDisplay(ImageDisplay imageDisplay, Overlay overlay) {
         
          if(overlay instanceof LineOverlay) return getValueList(imageDisplay,(LineOverlay)overlay);
          
@@ -173,6 +146,19 @@ public class OverlayStatService extends AbstractService implements ImageJService
         return values.toArray(new Double[values.size()]);
         
     }
+    
+    public <T extends RealType<T>> Double[] getValueList(RandomAccessible<? extends RealType<?>> accessible, Overlay overlay,long[] position) {
+        
+        // we hack the PixelDrawingService to measure pixel inside the overlay by hacking the drawing method;
+        RandomAccess randomAccess = accessible.randomAccess();
+        randomAccess.setPosition(position);
+        PixelMeasurer<T> measurer = new PixelMeasurer<>(randomAccess);
+        overlayDrawingService.drawOverlay(overlay, OverlayDrawingService.FILLER, measurer);
+        return measurer.getValuesAsArray();
+        
+    }
+    
+    
     
     protected Double[] getValueList(ImageDisplay imageDisplay, LineOverlay overlay) {
         
@@ -232,70 +218,75 @@ public class OverlayStatService extends AbstractService implements ImageJService
         }
         return new HyperVolumePointSet(pt1, pt2);
     }
-
-    /*
+   
     
-    TODO: for Pierre
-    Modify the OverlayStatisticsService so it returns a OverlayStatistics object
-    from an ImageDisplay and an Overlay.
+    public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
+        return new DefaultOverlayStatistics(display, overlay);
+    }
     
-    Some statistics depends on the pixel values (you can already easily retrive
-    the pixel values using the method (getValueList) but shape related
-    statistics must be implemented by you. Pixel value reltated statistics
-    can also easily be calculated using DescriptiveStatistics objects
-    from Apache 3 Math library (already used in the project).
-    
-    Be careful becayse, the Overlay can be a PolygonOverlay, a LineOverlay,
-    or a Rectangle Overlay. Some shape statistics don't make sens in some case
-    so it the implementation should return 0;
-    
-    You can find quite close implementation of the this shape related statistics
-    at :
-    https://github.com/thorstenwagner/ij-blob/blob/master/src/main/java/ij/blob/Blob.java
-    
-    You can copy paste some of it code. You can use java.awt.* object in your
-    code but avoid using any ImageProcessor related object.
-    
-    Things to keep it mind in the implementations : 
-        - the statistics should be calculated only once
-        - retrieving the pixel value for the statistics is okay
-        but shouldn't be kept in memory. So don't keep any DescriptiveStatistics Object
-        in memory.
-    */
     
    
-    public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
+    public OverlayShapeStatistics getShapeStatistics(Overlay overlay) {
         
         
-        OverlayStatistics overlayStatistics;
+        OverlayShapeStatistics overlayStatistics;
         
         if(overlay instanceof LineOverlay)
-            overlayStatistics = new LineOverlayStatistics(display, overlay, this.context());
+            overlayStatistics = new LineOverlayStatistics(overlay, this.context());
             
         else if(overlay instanceof RectangleOverlay)
-            overlayStatistics = new RectangleOverlayStatistics(display, overlay, this.context());
+            overlayStatistics = new RectangleOverlayStatistics(overlay, this.context());
         
         else{
             overlay = cleanOverlay(overlay);
-            overlayStatistics = new PolygonOverlayStatistics(display, overlay, this.context());        
+            overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());        
         }
         
         return overlayStatistics;
     }
     
     
-    public HashMap<String, Double> getStatistics(OverlayStatistics overlayStats) {
+    
+    public HashMap<String,Double> getStatisticsAsMap(ImageDisplay imageDisplay, Overlay overlay) {
+        
+      
+      
+        return getStatisticsAsMap(getOverlayStatistics(imageDisplay,overlay));
+    }
+    
+    public HashMap<String,Double> getStatisticsAsMap(OverlayStatistics overlayStatistics) {
+         // then an hash map containing the statistics
+        HashMap<String, Double> statistics = getShapeStatisticsAsMap(overlayStatistics.getShapeStatistics());
+        
+        // then complete it with pixel statistics
+        getPixelStatisticsAsMap(overlayStatistics.getPixelStatistics()).forEach((key,value)->{
+            statistics.put(key, value);
+        });
+        return statistics;
+    }
+    
+    public HashMap<String,Double> getPixelStatisticsAsMap(PixelStatistics overlayStats) {
+        HashMap<String, Double> statistics = new HashMap<>();
+       // if(overlayStats.getPixelStatistics() != null) {
+        statistics.put(LBL_MEAN, overlayStats.getMean());
+        statistics.put(LBL_MIN, overlayStats.getMin());
+        statistics.put(LBL_MAX, overlayStats.getMax());
+        statistics.put(LBL_SD, overlayStats.getStandardDeviation());
+        statistics.put(LBL_VARIANCE, overlayStats.getVariance());
+        statistics.put(LBL_MEDIAN, overlayStats.getMedian());
+        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelCount());
+       // }
+       return statistics;
+    }
+    
+    public HashMap<String,Double> getShapeStatisticsAsMap(Overlay overlay) {
+        
+        return getShapeStatisticsAsMap(getShapeStatistics(overlay));
+    }
+    
+    public HashMap<String, Double> getShapeStatisticsAsMap(OverlayShapeStatistics overlayStats) {
         
         HashMap<String, Double> statistics = new HashMap<>();
-        if(overlayStats.getPixelStatistics() != null) {
-        statistics.put(LBL_MEAN, overlayStats.getPixelStatistics().getMean());
-        statistics.put(LBL_MIN, overlayStats.getPixelStatistics().getMin());
-        statistics.put(LBL_MAX, overlayStats.getPixelStatistics().getMax());
-        statistics.put(LBL_SD, overlayStats.getPixelStatistics().getStandardDeviation());
-        statistics.put(LBL_VARIANCE, overlayStats.getPixelStatistics().getVariance());
-        statistics.put(LBL_MEDIAN, overlayStats.getPixelStatistics().getMedian());
-        statistics.put(LBL_PIXEL_COUNT, (double)overlayStats.getPixelStatistics().getPixelCount());
-        }
         statistics.put(LBL_AREA, overlayStats.getArea());        
         
         statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
@@ -311,6 +302,15 @@ public class OverlayStatService extends AbstractService implements ImageJService
         return statistics;
     }
     
+    
+    
+        public <T extends RealType<T>> OverlayStatistics getStatistics(Overlay overlay, Dataset dataset, long[] position) {
+        
+        PixelStatistics pixelStats = new PixelStatisticsBase(new DescriptiveStatistics(ArrayUtils.toPrimitive(getValueList(dataset, overlay,position))));
+        OverlayShapeStatistics shapeState = getShapeStatistics(overlay);
+        
+        return new OverlayStatisticsBase(overlay,shapeState,pixelStats);
+    }
     
     public void setRandomColor(List<Overlay> overlays){
         
@@ -407,4 +407,36 @@ public class OverlayStatService extends AbstractService implements ImageJService
         
         return colinear;
     }
+    
+    
+    
+    private class PixelMeasurer<T extends RealType<T>> implements PixelDrawer {
+
+        private final RandomAccess<T> randomAccess;
+        
+        private final ArrayList<Double> stats = new ArrayList<Double>(10000);
+        
+        public PixelMeasurer(RandomAccess<T> r) {
+            this.randomAccess = r;
+        }
+        
+        
+        
+        @Override
+        public void drawPixel(long x, long y) {
+            
+            randomAccess.setPosition(x,0);
+            randomAccess.setPosition(y,1);
+            stats.add(randomAccess.get().getRealDouble());
+            
+            
+        }
+        
+        public Double[] getValuesAsArray() {
+            return stats.toArray(new Double[stats.size()]);
+        }
+
+    }
+    
+    
 }

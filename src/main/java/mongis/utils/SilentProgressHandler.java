@@ -45,5 +45,14 @@ public class SilentProgressHandler implements ProgressHandler{
     public boolean isCancelled() {
         return false;
     }
+
+    @Override
+    public void setTotal(double total) {
+        
+    }
+
+    @Override
+    public void increment(double inc) {
+    }
     
 }

@@ -20,6 +20,7 @@
 package ijfx.service;
 
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.utils.DimensionUtils;
 import io.scif.MetadataLevel;
 import io.scif.config.SCIFIOConfig;
 import io.scif.img.ImageRegion;
@@ -57,8 +58,21 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         return null;
     }
 
+    public Dataset openVirtualDataset(File file) throws IOException {
+         final SCIFIOConfig config = new SCIFIOConfig();
+
+        // skip min/max computation
+        config.imgOpenerSetComputeMinMax(false);
+
+        // prefer planar array structure, for ImageJ1 and ImgSaver compatibility
+        config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
+        config.parserSetLevel(MetadataLevel.ALL);
+        
+        return datasetIoService.open(file.getAbsolutePath(), config);
+    }
+    
     @Override
-    public <T extends RealType<T>> Dataset extractPlane(File file, long[] dims, long[] dimLengths) throws IOException {
+    public <T extends RealType<T>> Dataset extractPlane(File file, long[] nonPlanarPosition) throws IOException {
 
         final SCIFIOConfig config = new SCIFIOConfig();
 
@@ -68,15 +82,19 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         // prefer planar array structure, for ImageJ1 and ImgSaver compatibility
         config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
         config.parserSetLevel(MetadataLevel.ALL);
+         Dataset virtualDataset = datasetIoService.open(file.getAbsolutePath(), config);
+        return isolatePlane(virtualDataset, DimensionUtils.nonPlanarToPlanar(nonPlanarPosition));
         
-        long[] position = new long[dims.length+2];
-        long[] dimemsions = new long[dims.length+2];
+        
+        /*
+        long[] position = new long[nonPlanarPosition.length+2];
+        //long[] dimemsions = new long[nonPlanarPosition.length+2];
          
-        System.arraycopy(dims, 0, position, 2, dims.length);
-        System.arraycopy(dimLengths,0,dimemsions,2,dims.length);
+        System.arraycopy(nonPlanarPosition, 0, position, 2, nonPlanarPosition.length);
+        //System.arraycopy(dimLengths,0,dimemsions,2,dims.length);
         
         
-        config.imgOpenerSetRange("0");
+        //config.imgOpenerSetRange("0");
         
         Dataset virtualDataset = datasetIoService.open(file.getAbsolutePath(), config);
         Dataset outputDataset = createEmptyPlaneDataset(virtualDataset);
@@ -84,16 +102,16 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         RandomAccess<T> inputCursor = (RandomAccess<T>) virtualDataset.randomAccess();
         RandomAccess<T> outputCursor = (RandomAccess<T>) outputDataset.randomAccess();
         System.out.println("dims before");
-        System.out.println(ArrayUtils.toString(dims));
+        System.out.println(ArrayUtils.toString(nonPlanarPosition));
 
         
         
         System.out.println(ArrayUtils.toString(position));
-        System.arraycopy(dims, 0, position, 2, dims.length);
+        System.arraycopy(nonPlanarPosition, 0, position, 2, nonPlanarPosition.length);
         System.out.println(ArrayUtils.toString(position));
 
-        long width = outputDataset.max(0);
-        long height = outputDataset.max(1);
+        long width = outputDataset.dimension(0);
+        long height = outputDataset.dimension(1);
 
         System.out.printf("width = %d, height = %d\n", width, height);
         Timer lineTimer = timerService.getTimer("LineTimer");
@@ -124,7 +142,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         lineTimer.logAll();
 
         System.out.println("Dataset on the track !");
-        return outputDataset;
+        return outputDataset;*/
     }
 
     public Dataset extractPlane(File file, int planeIndex) throws IOException{

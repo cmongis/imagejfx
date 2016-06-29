@@ -939,17 +939,21 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .toggle-selection-list .toggle-button{
     -fx-background-radius:0;
     -fx-effect:null;
-    -fx-background-color:transparent;
+    -fx-background-color:white;
+    -fx-text-fill:#383f50;
     -fx-text-alignment:left!important;
     -fx-alignment:left;
+    
 }
 .toggle-selection-list .toggle-button:hover{
     -fx-translate-x:0;
     -fx-translate-y:0;
     -fx-background-color:-flatter-primary;
+    -fx-text-fill:-txt-highlight;
 }
 .toggle-selection-list .toggle-button:selected {
     -fx-background-color:derive(-flatter-warning,-15%);
+    -fx-text-fill:-txt-highlight;
 }
 
 .combo-box .list-cell {

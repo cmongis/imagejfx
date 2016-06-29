@@ -74,7 +74,7 @@ public class ThumbService extends AbstractService implements ImageJService {
     ImagePlaneService imagePlaneService;
     
     @Parameter
-            IjfxStatisticService statsService;
+    IjfxStatisticService statsService;
     
     Logger logger = ImageJFX.getLogger();
     

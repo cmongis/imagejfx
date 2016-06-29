@@ -527,8 +527,15 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
     public void openSelection() {
-        explorerService.getSelectedItems().forEach(System.out::println);
+        
+      
+        
+        explorerService.openSelection();
+        
+        
     }
+    
+    
 
     @FXML
     public void computeStatistics() {

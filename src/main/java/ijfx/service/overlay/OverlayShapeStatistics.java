@@ -19,21 +19,35 @@
  */
 package ijfx.service.overlay;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import javafx.geometry.Point2D;
+import javafx.scene.shape.Polygon;
+import net.imagej.overlay.Overlay;
 
 /**
  *
- * @author Pierre BONNEAU
+ * @author cyril
  */
-@JsonDeserialize(as=PixelStatisticsBase.class)
-public interface PixelStatistics {
 
-    double getMean();
-    double getMax();
-    double getMin();
-    double getStandardDeviation();
-    double getVariance();
-    double getMedian();
-    long getPixelCount();
+public interface OverlayShapeStatistics {
     
+    
+    
+    Overlay getOverlay();    
+    double getArea();
+    Polygon getMinimumBoundingRectangle();
+    Point2D getCenterOfGravity();
+    double getFeretDiameter();
+    double getMinFeretDiameter();
+//    double getOrientationMajorAxis();
+//    double getOrientationMinorAxis();
+    double getLongSideMBR();
+    double getShortSideMBR();
+    double getAspectRatio();
+    double getConvexity();
+    double getSolidity();
+    double getCircularity();
+    double getThinnesRatio();
+    
+    @Override
+    String toString();
 }

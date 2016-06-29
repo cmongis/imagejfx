@@ -19,8 +19,6 @@
  */
 package ijfx.service.overlay;
 
-import javafx.geometry.Point2D;
-import javafx.scene.shape.Polygon;
 import net.imagej.overlay.Overlay;
 
 /**
@@ -28,28 +26,7 @@ import net.imagej.overlay.Overlay;
  * @author cyril
  */
 public interface OverlayStatistics {
-    
-    
-    
     Overlay getOverlay();
-
+    OverlayShapeStatistics getShapeStatistics();
     PixelStatistics getPixelStatistics();
-    
-    double getArea();
-    Polygon getMinimumBoundingRectangle();
-    Point2D getCenterOfGravity();
-    double getFeretDiameter();
-    double getMinFeretDiameter();
-//    double getOrientationMajorAxis();
-//    double getOrientationMinorAxis();
-    double getLongSideMBR();
-    double getShortSideMBR();
-    double getAspectRatio();
-    double getConvexity();
-    double getSolidity();
-    double getCircularity();
-    double getThinnesRatio();
-    
-    @Override
-    String toString();
 }

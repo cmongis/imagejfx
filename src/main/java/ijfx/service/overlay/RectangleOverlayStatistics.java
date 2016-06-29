@@ -34,11 +34,12 @@ import org.scijava.Context;
  *
  * @author Pierre BONNEAU
  */
-public class RectangleOverlayStatistics extends AbstractOverlayStatistics{
+public class RectangleOverlayStatistics extends AbstractOverlayShapeStatistics{
     
     private Rectangle shape;
     
     
+    /*
     public RectangleOverlayStatistics(ImageDisplay display, Overlay overlay, Context context){
         
         super(display, overlay, context);
@@ -57,7 +58,7 @@ public class RectangleOverlayStatistics extends AbstractOverlayStatistics{
         super.solidity = setSolidity();
         super.circularity = setCircularity();
         super.thinnesRatio = setThinnesRatio();    
-    }
+    }*/
     
     
     public RectangleOverlayStatistics(Overlay overlay, Context context){
