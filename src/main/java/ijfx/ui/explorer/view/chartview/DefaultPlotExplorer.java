@@ -20,13 +20,18 @@
 package ijfx.ui.explorer.view.chartview;
 
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerService;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.ImageViewBuilder;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import mongis.utils.CallbackTask;
 import org.controlsfx.control.PopOver;
 
@@ -35,6 +40,8 @@ import org.controlsfx.control.PopOver;
  * @author Tuan anh TRINH
  */
 public class DefaultPlotExplorer implements PlotExplorer {
+
+    ExplorerService explorerService;
 
     private Explorable explorable;
 
@@ -48,25 +55,36 @@ public class DefaultPlotExplorer implements PlotExplorer {
 
     ImageView imageView;
 
-    public DefaultPlotExplorer(double width, double height) {
-
-    }
-
-    public DefaultPlotExplorer(Explorable explorable, double width, double height) {
-        this.explorable = explorable;
-    }
-
-    public DefaultPlotExplorer(Explorable explorable, String[] metadataKeys, Node node) {
+    public DefaultPlotExplorer(Explorable explorable, String[] metadataKeys, ExplorerService explorerService) {
+        this.explorerService = explorerService;
         this.explorable = explorable;
         x = explorable.getMetaDataSet().get(metadataKeys[0]).getDoubleValue();
         y = explorable.getMetaDataSet().get(metadataKeys[1]).getDoubleValue();
         this.data = new Data(x, y);
+        ToggleButton node = new ToggleButton();
+        node.setPrefSize(10, 10);
+        node.selectedProperty().bindBidirectional(this.explorable.selectedProperty());
+        node.selectedProperty().addListener((obs, old, n) -> {
+            String style;
+            style = (n) ? "-fx-background-color: blue" : "";
+            node.setStyle(style);
+            actionPopOver();
+        });
         this.data.setNode(node);
         setPopOver(this.data.getNode());
-        this.data.getNode().setOnMouseClicked(e -> {
-            actionPopOver();
-            this.explorable.selectedProperty().set(true);
-                });
+
+        this.explorable.selectedProperty().addListener(e -> {
+//                System.out.println("ijfx.ui.explorer.view.chartview.DefaultPlotExplorer.<init>()");
+            this.data.getNode().getStyleClass().remove("-fx-border-color: blue");
+
+        });
+//        this.data.getNode().setOnMouseClicked(e -> {
+//            this.data.getNode().getStyleClass().add("-fx-border-color: blue");
+////                    this.explorable.selectedProperty().setValue(!this.explorable.selectedProperty().getValue());
+//            actionPopOver();
+//            actionPopOver();
+//            actionPopOver();
+//        });
 
     }
 
@@ -95,18 +113,23 @@ public class DefaultPlotExplorer implements PlotExplorer {
         if (popOver.isShowing()) {
             popOver.hide();
         } else {
-            if (imageView == null) setContent();
+            if (imageView == null) {
+                setContent();
+            }
             popOver.show(this.data.getNode());
         }
     }
 
-   
-
     protected void setContent() {
         new CallbackTask<Explorable, Image>(explorable)
-                .run(( exp,e) -> e.getImage())
+                .run((exp, e) -> e.getImage())
                 .then(e -> {
                     imageView = ImageViewBuilder.create().image(e).build();
+                    BorderPane borderPane = new BorderPane(imageView);
+                    imageView.setOnMouseClicked(c -> {
+                        explorerService.open(explorable);
+                        popOver.hide();
+                            });
                     popOver.setContentNode(imageView);
                 })
                 .start();
