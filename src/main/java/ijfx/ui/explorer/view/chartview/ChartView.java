@@ -157,6 +157,7 @@ public class ChartView extends FilterView implements ExplorerView {
             ColorGenerator colorGenerator = new ColorGenerator(clustersList.size());
             colorGenerator.generateColor();
             List<Color> colors = colorGenerator.getColorList();
+            System.out.println("ijfx.ui.explorer.view.chartview.ChartView.computeItems():" + clustersList.size());
             for (int i = 0; i < clustersList.size(); i++) {
                 final Rectangle rectangle = new Rectangle(10, 10, colors.get(i));
                 System.out.println("ijfx.ui.explorer.view.chartview.ChartView.computeItems()");
