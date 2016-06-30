@@ -17,23 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.overlay;
+package ijfx.ui.workflow;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import ijfx.service.workflow.Workflow;
+import javafx.scene.control.Dialog;
 
 /**
  *
- * @author Pierre BONNEAU
+ * @author cyril
  */
-@JsonDeserialize(as=PixelStatisticsBase.class)
-public interface PixelStatistics {
-
-    double getMean();
-    double getMax();
-    double getMin();
-    double getStandardDeviation();
-    double getVariance();
-    double getMedian();
-    long getPixelCount();
+public class WorkflowSelectionDialog extends Dialog<Workflow>{
     
 }

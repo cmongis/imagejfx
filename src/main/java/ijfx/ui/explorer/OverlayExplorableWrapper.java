@@ -20,8 +20,8 @@
 package ijfx.ui.explorer;
 
 import ijfx.core.imagedb.ImageRecordService;
+import ijfx.core.metadata.MetaData;
 import ijfx.service.overlay.OverlayStatService;
-import ijfx.service.overlay.OverlayStatistics;
 import ijfx.service.overlay.PolygonOverlayStatistics;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawerService;
 import ijfx.ui.main.ImageJFX;
@@ -48,6 +48,7 @@ import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.roi.PolygonRegionOfInterest;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
+import ijfx.service.overlay.OverlayShapeStatistics;
 
 /**
  *
@@ -59,7 +60,7 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
 
     private final File source;
 
-    private OverlayStatistics statistics;
+    private OverlayShapeStatistics statistics;
 
     private boolean isValid;
 
@@ -82,12 +83,17 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
 
         getMetaDataSet().merge(imageRecordService.getRecord(source).getMetaDataSet());
 
+        for (String statsMetaData : MetaData.STATS_RELATED_METADATA) {
+            getMetaDataSet().remove(statsMetaData);
+        }
+
         if (overlay instanceof PolygonOverlay) {
             try {
                 this.statistics = new PolygonOverlayStatistics(overlay, context);
-                overlayStatService.getStatistics(statistics).forEach((key, value) -> {
+                overlayStatService.getShapeStatisticsAsMap(statistics).forEach((key, value) -> {
                     getMetaDataSet().putGeneric(key, value);
                 });
+
             } catch (Exception e) {
                 statistics = null;
                 ImageJFX.getLogger().log(Level.SEVERE, "Error when creating a wrapper for " + source.getAbsolutePath(), e);
@@ -120,46 +126,40 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
 
             PolygonRegionOfInterest roi = po.getRegionOfInterest();
             Polygon pol = new Polygon();
-            
-            
-            
-            
 
-            for(int i = 0; i!=roi.getVertexCount();i++) {
+            for (int i = 0; i != roi.getVertexCount(); i++) {
                 pol.addPoint(new Double(roi.getVertex(i).getDoublePosition(0)).intValue(), new Double(roi.getVertex(i).getDoublePosition(1)).intValue());
             }
-            
+
             Rectangle bounds = pol.getBounds();
-            
+
             //for(int i = 0;i!=)
-          
             int border = 10;
-            
-            Canvas canvas = new Canvas(bounds.getWidth()+border*2, bounds.getHeight()+border*2);
+
+            Canvas canvas = new Canvas(bounds.getWidth() + border * 2, bounds.getHeight() + border * 2);
             GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
-            
+
             final double xBounds = bounds.getX();
             final double yBounds = bounds.getY();
             System.out.println(bounds);
-            double[] xpoints = IntStream.of(pol.xpoints).mapToDouble(x->x-xBounds+border).toArray();
-            double[] ypoints = IntStream.of(pol.ypoints).mapToDouble(y->y-yBounds+border).toArray();
-            
+            double[] xpoints = IntStream.of(pol.xpoints).mapToDouble(x -> x - xBounds + border).toArray();
+            double[] ypoints = IntStream.of(pol.ypoints).mapToDouble(y -> y - yBounds + border).toArray();
+
             graphicsContext2D.setFill(Color.TRANSPARENT);
             graphicsContext2D.fill();
             graphicsContext2D.setFill(Color.WHITE);
-            
+
             graphicsContext2D.fillPolygon(xpoints, ypoints, xpoints.length);
-            
-                        
-            final WritableImage image = new WritableImage((int)canvas.getWidth(), (int)canvas.getHeight());
+
+            final WritableImage image = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
             final SnapshotParameters params = new SnapshotParameters();
-           
+
             params.setFill(Color.TRANSPARENT);
             CallbackTask run = new CallbackTask()
-                    .run(()->canvas.snapshot(params, image));
-            
+                    .run(() -> canvas.snapshot(params, image));
+
             Platform.runLater(run);
-            
+
             try {
                 run.get();
             } catch (InterruptedException ex) {
@@ -167,14 +167,10 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
             } catch (ExecutionException ex) {
                 Logger.getLogger(OverlayExplorableWrapper.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            return image;
-            
-           
-            
-        }
 
-    
+            return image;
+
+        }
 
         return null;
     }

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +33,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -43,6 +43,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
@@ -115,6 +116,10 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
             Bindings.bindBidirectional(lowTextField.textProperty(), rangeSlider.lowValueProperty(), converter);
             Bindings.bindBidirectional(highTextField.textProperty(), rangeSlider.highValueProperty(), converter);
             
+            lowTextField.addEventFilter(KeyEvent.KEY_RELEASED, this::updatePredicate);
+            highTextField.addEventHandler(KeyEvent.KEY_PRESSED,this::updatePredicate);
+            
+            
             rangeSlider.getStyleClass().add("range-slider");
             
             
@@ -152,11 +157,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         return predicateProperty;
     }
 
-    public void updatePredicate() {
-        final double min = minProperty().getValue();
-        final double max = minProperty().getValue();
-        predicateProperty.setValue(number -> number >= min && number <= max);
-    }
+
 
     public void update() {
         updateChart();
@@ -169,7 +170,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         double max; // maximum value
         double range; // max - min
         double binSize;
-        int binNumber = 20;
+        int binNumber = 30;
         int differentValuesCount = possibleValues
                 
                 .stream()
@@ -273,7 +274,13 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         // if it's currently changing we don't want to update the predicate
         if(newValue) return;
         
-        final double min = minProperty().getValue();
+        updatePredicate(null);
+       
+
+    }
+    
+    private void updatePredicate(Event event) {
+         final double min = minProperty().getValue();
         final double max = maxProperty().getValue();
         System.out.printf("Min : %.3f, Max : %.3f\n",min,max);
         // no predicate is necessary if there the range is full
@@ -284,7 +291,6 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         } else {
             predicateProperty.setValue(new IntervalPredicate(min, max));
         }
-
     }
 
     private class IntervalPredicate implements Predicate<Double> {

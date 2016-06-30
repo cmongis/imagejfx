@@ -19,8 +19,8 @@
  */
 package ijfx.service.overlay.io;
 
+import com.fasterxml.jackson.databind.Module;
 import ijfx.service.IjfxService;
-import ijfx.ui.utils.NamingUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -87,6 +87,9 @@ public interface OverlayIOService extends IjfxService{
             return listFiles[0];
         }
     }
+    
+    
+    public  Module getOverlayJsonModule();
     
     public List<Overlay> loadOverlays(File overlayJsonFile);
     

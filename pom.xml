@@ -46,7 +46,7 @@
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-api</artifactId>
-            <version>5.2.0-m3</version>
+            <version>5.1.10</version>
         </dependency>
         <dependency>
             <groupId>io.scif</groupId>
@@ -186,11 +186,7 @@
             <version>1.4.1</version>
            
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.2</version>
-        </dependency>
+        
         <dependency>
             <groupId>nz.ac.waikato.cms.moa</groupId>
             <artifactId>moa</artifactId>
@@ -205,6 +201,16 @@
             <groupId>nz.ac.waikato.cms.weka</groupId>
             <artifactId>XMeans</artifactId>
             <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivex</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>1.1.5</version>
         </dependency>
     </dependencies>
     

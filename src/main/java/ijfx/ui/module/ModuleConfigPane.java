@@ -31,7 +31,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -43,17 +42,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import net.imagej.Dataset;
 import net.imagej.widget.HistogramBundle;
 import org.scijava.ItemVisibility;
 import org.scijava.command.CommandService;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
+import org.scijava.module.ModuleService;
 
 /**
  * This pane generate a input fields for Module inputs.
- * 
+ *
  * @author Cyril MONGIS, 2015
  */
 public class ModuleConfigPane extends BorderPane {
@@ -70,17 +69,20 @@ public class ModuleConfigPane extends BorderPane {
     @FXML
     TextField editableLabel;
 
-    @FXML VBox messageBox;
-    @FXML FlowPane buttonBox;
-    
-    @FXML VBox graphicsBox;
-    
+    @FXML
+    VBox messageBox;
+    @FXML
+    FlowPane buttonBox;
+
+    @FXML
+    VBox graphicsBox;
+
     // number of fields added to the pane
     protected int fieldCount = -1;
-    
+
     // not sure if it's still used...
     protected final int fieldColumn = 1;
-    
+
     // same...
     protected int labelColumn = 0;
 
@@ -93,54 +95,51 @@ public class ModuleConfigPane extends BorderPane {
     // Workflow step currently configured
     WorkflowStep step;
 
-   
     @Parameter
     CommandService commandService;
 
     @Parameter
     DefaultInputSkinService inputSkinPluginService;
-    
-    
+
+    @Parameter
+    ModuleService moduleService;
+
     // Property indicating if the all the fields are filled correctly.
-     BooleanProperty validProperty = new SimpleBooleanProperty(true);
-    
-   
+    BooleanProperty validProperty = new SimpleBooleanProperty(true);
+
     public ModuleConfigPane() {
         super();
 
         try {
             FXUtilities.injectFXML(this);
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         }
 
         // add the necessary listener.
         // this one check the editableLabel (WorkflowSteps only)
         editableLabel.textProperty().addListener(this::onEditableLabelChange);
     }
-    
+
     // check if all fields are valid and change the valid property according to.
     public void checkField(ObservableValue<? extends Boolean> listener, Boolean oldValue, Boolean newValue) {
-       
+
         for (InputControl input : inputControlMap.values()) {
-           
+
             if (input.isValid() == false) {
                 validProperty.setValue(false);
-             
+
                 return;
             }
         }
         validProperty.setValue(true);
     }
 
-   
-
     //return the validProperty
     public BooleanProperty validProperty() {
         return validProperty;
     }
 
-  
     public GridPane getGridPane() {
         return gridPane;
     }
@@ -157,7 +156,7 @@ public class ModuleConfigPane extends BorderPane {
         gridPane.add(input, fieldColumn, fieldCount);
         return input;
     }
-    
+
     // Returns an input control with the id;
     public InputControl getField(String id) {
         return inputControlMap.get(id);
@@ -184,13 +183,13 @@ public class ModuleConfigPane extends BorderPane {
     public void configure(WorkflowStep step) {
 
         cleanUp();
-       
+
         setStep(step);
-        
+
         editableLabel.setText(step.getId());
-      
+
         configure(step.getModule());
-        
+
         step.getParameters().forEach((key, value) -> {
             InputControl input = getField(key);
             if (input != null) {
@@ -198,11 +197,11 @@ public class ModuleConfigPane extends BorderPane {
                 input.setValue(value);
             }
         });
-        
+
         editableLabel.setVisible(true);
 
     }
-    
+
     // Cleans up the pane by removing all the @InputControl.
     public void cleanUp() {
 
@@ -214,16 +213,15 @@ public class ModuleConfigPane extends BorderPane {
             input.removeEventHandler(InputEvent.FIELD_CHANGED, this::handleInputValueChanged);
         });
 
-        
-        if(step == null) editableLabel.setVisible(false);
-        
+        if (step == null) {
+            editableLabel.setVisible(false);
+        }
+
         // unbinding the labels
         titleLabel.textProperty().unbind();
         editableLabel.textProperty().unbind();
 
         gridPane.getChildren().clear();
-        
-        
 
     }
 
@@ -234,7 +232,6 @@ public class ModuleConfigPane extends BorderPane {
 
         // setting the module
         setModule(module);
-       
 
         // puting the module name as title
         getTitleLabel().setText(WorkflowService.getModuleLabel(module));
@@ -244,48 +241,53 @@ public class ModuleConfigPane extends BorderPane {
         // each value associated to a special skin
         module.getInfo().inputs().forEach(inputInfo -> {
 
-            
-            Input input = new ModuleInputWrapper(module,inputInfo);
+            Input input = new ModuleInputWrapper(module, inputInfo);
             
             // generating the input
             InputControl inputControl;
-          
-            if( inputInfo.getType() == Dataset.class && module.isResolved(inputInfo.getName()))
-                    return;
             
-            // if the creation service can handle this type of Input
-            if(inputSkinPluginService.canCreateSkinFor(input)) {
-                
-                // the control is created
-                inputControl = new InputControl(inputSkinPluginService,input);
-                
-                // setting the value to the control
-                inputControl.setValue(input.getValue());
+            System.out.println(inputInfo.getName() + " : " + inputInfo.getIOType());
+            
+            //if(inputInfo.getIOType() == ItemIO.INPUT || inputInfo.getIOType() == ItemIO.BOTH) return;
+            if (module.isResolved(inputInfo.getName()) && step == null) {
+                return;
+            }
+            
+            if(step != null && (inputInfo.getLabel() == null || inputInfo.getLabel().equals(""))) return;
+            
+            //if( inputInfo.getType() == Dataset.class && module.isResolved(inputInfo.getName()))
+            // return;
+            
+            {
+                if (inputSkinPluginService.canCreateSkinFor(input)) {
 
-                // if it's a message, the control is added to the MessageBox
-                if(inputInfo.getVisibility() == ItemVisibility.MESSAGE) {
-                    //inputControl.setSkin(new StringMessageInput());
-                    //inputControl.setDefaultValue(defaultInput);
-                    inputControl.getStyleClass().add("module-config-pane-message");
-                    messageBox.getChildren().add(inputControl);
-                }
-                // if it's an HistogramBundle, it's added to the GraphicsBox
-                else if ( inputInfo.getType() == HistogramBundle.class) {
-                    graphicsBox.getChildren().add(inputControl);
-                }
-                // if it's a Button, it's added to the Button Box
-                else if( inputInfo.getType() == org.scijava.widget.Button.class) {
-                    buttonBox.getChildren().add(inputControl);
-                }
-               
-                // other wise, it's added to the gridpane containing the other fields
-                else {
-                    addField(inputInfo.getName(), inputControl);
-                }
-                
-                // when a input is changed, the panel will be notified
-                inputControl.addEventHandler(InputEvent.ALL, this::handleInputValueChanged);
+                    // the control is created
+                    inputControl = new InputControl(inputSkinPluginService, input);
 
+                    // setting the value to the control
+                    inputControl.setValue(input.getValue());
+
+                    // if it's a message, the control is added to the MessageBox
+                    if (inputInfo.getVisibility() == ItemVisibility.MESSAGE) {
+                        //inputControl.setSkin(new StringMessageInput());
+                        //inputControl.setDefaultValue(defaultInput);
+                        inputControl.getStyleClass().add("module-config-pane-message");
+                        messageBox.getChildren().add(inputControl);
+                    } // if it's an HistogramBundle, it's added to the GraphicsBox
+                    else if (inputInfo.getType() == HistogramBundle.class) {
+                        graphicsBox.getChildren().add(inputControl);
+                    } // if it's a Button, it's added to the Button Box
+                    else if (inputInfo.getType() == org.scijava.widget.Button.class) {
+                        buttonBox.getChildren().add(inputControl);
+                    } // other wise, it's added to the gridpane containing the other fields
+                    else {
+                        addField(inputInfo.getName(), inputControl);
+                    }
+
+                    // when a input is changed, the panel will be notified
+                    inputControl.addEventHandler(InputEvent.ALL, this::handleInputValueChanged);
+
+                }
             }
 
         });
@@ -294,11 +296,11 @@ public class ModuleConfigPane extends BorderPane {
     // Fires a InputEvent (used by other components to act when a parameter is changed)
     private void handleInputValueChanged(InputEvent event) {
         fireEvent(event);
-        
-        if(step!=null) {
-            step.getParameters().put(event.getInput().getName(),event.getInput().getValue());
+
+        if (step != null) {
+            step.getParameters().put(event.getInput().getName(), event.getInput().getValue());
         }
-        
+
     }
 
     // Returns the editable label
@@ -338,8 +340,7 @@ public class ModuleConfigPane extends BorderPane {
     // Sets the current @WorkflowStep
     public void setStep(WorkflowStep step) {
         this.step = step;
-        
-        
+
     }
 
     // When the editable label is changed, the name of the step is updated
@@ -355,22 +356,22 @@ public class ModuleConfigPane extends BorderPane {
         Object object = module.getDelegateObject();
 
         try {
-           
+
             Method m = object.getClass().getMethod(callback);
 
             m.invoke(object);
             ImageJFX.getLogger().info("call back executed " + callback);
         } catch (NoSuchMethodException ex) {
-            ImageJFX.getLogger().log(Level.WARNING,null,ex);;
+            ImageJFX.getLogger().log(Level.WARNING, null, ex);;
 
         } catch (SecurityException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         } catch (IllegalAccessException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         } catch (IllegalArgumentException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         } catch (InvocationTargetException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         }
     }
 

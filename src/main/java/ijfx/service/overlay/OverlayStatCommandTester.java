@@ -74,7 +74,7 @@ public class OverlayStatCommandTester implements Command{
                 .map(o -> {
                     try {
                         
-                        return overlayStatService.getStatistics(overlayStatService.getOverlayStatistics(display, o));
+                        return overlayStatService.getStatisticsAsMap(display,o);
                     } catch (Exception e) {
                         return null;
                     }

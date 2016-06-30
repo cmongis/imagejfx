@@ -525,13 +525,13 @@ public class MainWindowController extends AnchorPane {
 
             logger.info(String.format("Displayint hint %s", hint.getId()));
 
-            if (hintQueue.parallelStream().filter(hint2 -> hint2.equals(hint)).count() == 0) {
+            if (hintQueue.stream().filter(hint2 -> hint2.equals(hint)).count() == 0) {
                 hintQueue.add(hint);
             }
         });
 
         //hintQueue.addAll(event.getHintList());
-        Platform.runLater(() -> nextHint());
+        Platform.runLater(this::nextHint);
     }
 
     @EventHandler
@@ -625,7 +625,7 @@ public class MainWindowController extends AnchorPane {
 
     public void onUiPluginDisplaed(ContextualWidget<Node> uiPlugin) {
 
-        hintService.displayHints(uiPlugin.getObject().getClass(), false);
+        //hintService.displayHints(uiPlugin.getObject().getClass(), false);
 
     }
     
@@ -643,7 +643,7 @@ public class MainWindowController extends AnchorPane {
 
     }
 
-    public void showHelpSequence(Hint hint) {
+    public synchronized void showHelpSequence(Hint hint) {
 
         if (hint == null) {
 

@@ -86,12 +86,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
-import net.imagej.ImgPlus;
-import net.imagej.axis.CalibratedAxis;
-import net.imagej.axis.VariableAxis;
-import net.imglib2.img.ImagePlusAdapter;
-import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
@@ -105,9 +101,9 @@ import org.scijava.ui.UIService;
 /**
  * *****************************************************************
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Registration", attrs = {
+@Plugin(type = Command.class, menuPath = "Plugins > Stack Registration", attrs = {
     @Attr(name = "no-legacy")})
-public class StackReg_ implements Command {
+public class StackReg_ extends ContextCommand {
 
     /* begin class StackReg_ */
 

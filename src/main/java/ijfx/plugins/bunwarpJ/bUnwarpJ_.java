@@ -47,6 +47,7 @@ import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -72,7 +73,7 @@ import org.scijava.widget.Button;
  * @author Ignacio Arganda-Carreras (ignacio.arganda at gmail.com)
  */
 @Plugin(type = Command.class, menuPath = "Plugins>bUnwarpJ")
-public class bUnwarpJ_ implements Command {
+public class bUnwarpJ_ extends ContextCommand {
 
     /* begin class bUnwarpJ_ */
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
@@ -157,7 +158,7 @@ public class bUnwarpJ_ implements Command {
      */
     @Parameter
     private static boolean richOutput;
-    /**
+    /**o
      * flag for save transformation option
      */
     @Parameter
@@ -182,8 +183,8 @@ public class bUnwarpJ_ implements Command {
     @Parameter(choices = {"Fast", "Accurate", "Mono"})
     String modeChoice;
 
-    @Parameter(callback = "chooseFile")
-    Button buttonFile;
+    @Parameter(label = "Flatfield image")
+    File flatfieldFile;
 
     String pathFile = "";
 
@@ -198,6 +199,12 @@ public class bUnwarpJ_ implements Command {
     @Override
     public void run() {
         Runtime.getRuntime().gc();
+        
+        
+        if(flatfieldFile != null) {
+            pathFile  = flatfieldFile.getAbsolutePath();
+        }
+        
         // Collect input values
         // Source and target image plus
         this.sourceImp = iJ1Service.getInput(sourceDataset);

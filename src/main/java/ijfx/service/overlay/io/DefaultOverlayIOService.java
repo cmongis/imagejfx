@@ -19,6 +19,8 @@
  */
 package ijfx.service.overlay.io;
 
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,6 +86,14 @@ public class DefaultOverlayIOService extends AbstractService implements OverlayI
             Logger.getLogger(DefaultOverlayIOService.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public Module getOverlayJsonModule() {
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Overlay.class,new OverlaySerializer());
+        module.addDeserializer(Overlay.class,new OverlayDeserializer(context));
+        return module;
     }
     
     

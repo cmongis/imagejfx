@@ -30,10 +30,10 @@ import org.scijava.Context;
  *
  * @author Pierre BONNEAU
  */
-public class LineOverlayStatistics extends AbstractOverlayStatistics{
-    
-    public LineOverlayStatistics(ImageDisplay display, Overlay overlay, Context context){
-        super(display, overlay, context);
+public class LineOverlayStatistics extends AbstractOverlayShapeStatistics{
+    /*
+    public LineOverlayStatistics(overlay, Context context){
+        super(overlay, context);
         
         super.area = setArea();
         super.minimumBoundingRectangle = setMinimumBoundingRectangle();
@@ -47,7 +47,7 @@ public class LineOverlayStatistics extends AbstractOverlayStatistics{
         super.solidity = setSolidity();
         super.circularity = setCircularity();
         super.thinnesRatio = setThinnesRatio();
-    }
+    }*/
     
     
     public LineOverlayStatistics(Overlay overlay, Context context){

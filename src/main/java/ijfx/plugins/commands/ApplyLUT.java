@@ -59,7 +59,7 @@ public class ApplyLUT extends ContextCommand{
     LUTService lutService;
     
     @Parameter(label="LUT min/max",required=false)
-    LongInterval axisInterval;
+    LongInterval displayRange;
     
     @Parameter
     DisplayRangeService displayRangeService;
@@ -74,19 +74,21 @@ public class ApplyLUT extends ContextCommand{
                 long max = Math.round(displayRangeService.getCurrentDatasetMaximum());
                 long low = Math.round(displayRangeService.getCurrentViewMinimum());
                 long high = Math.round(displayRangeService.getCurrentViewMaximum());
-                axisInterval = new DefaultInterval(low,high,min,max);
+                displayRange = new DefaultInterval(low,high,min,max);
             }
         }
     }
     @Override
     public void run() {
         input.setColorTable(colorTable, channelId);
+        ImageDisplay activeImageDisplay = imageDisplayService.getActiveImageDisplay();
         if(imageDisplayService.getActiveDataset() == input) {
             lutService.applyLUT(colorTable, imageDisplayService.getActiveImageDisplay());
         }
-        if(axisInterval != null) {
-            input.setChannelMinimum(channelId, axisInterval.getLowValue());
-            input.setChannelMaximum(channelId,axisInterval.getHighValue());
+        if(displayRange != null) {
+            
+            input.setChannelMinimum(channelId, displayRange.getLowValue());
+            input.setChannelMaximum(channelId,displayRange.getHighValue());
         }
        
        

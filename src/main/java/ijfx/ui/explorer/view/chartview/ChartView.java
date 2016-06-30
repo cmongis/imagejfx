@@ -131,13 +131,17 @@ public class ChartView extends FilterView implements ExplorerView {
     public void setSelectedItem(List<? extends Explorable> items) {
     }
 
-    private void addDataToChart(List<Explorable> list, Node node) {
+
+    private void addDataToChart(List<Explorable> list, Color color) {
+                        final Node node = new Rectangle(10, 10, color);
+
+                        
         Series series = new Series();
-        series.setNode(node);
+        series.setNode(new Rectangle(10, 10, color));
 
         List<Data> listExplorers = list
                 .stream()
-                .map(e -> new DefaultPlotExplorer(e, metadatas, node).getData())
+                .map(e -> new DefaultPlotExplorer(e, metadatas, new Rectangle(10, 10, color)).getData())
                 .collect(Collectors.toList());
         series.getData().addAll(listExplorers);
         scatterChart.getData().add(series);
@@ -159,9 +163,8 @@ public class ChartView extends FilterView implements ExplorerView {
             List<Color> colors = colorGenerator.getColorList();
             System.out.println("ijfx.ui.explorer.view.chartview.ChartView.computeItems():" + clustersList.size());
             for (int i = 0; i < clustersList.size(); i++) {
-                final Rectangle rectangle = new Rectangle(10, 10, colors.get(i));
                 System.out.println("ijfx.ui.explorer.view.chartview.ChartView.computeItems()");
-                addDataToChart(clustersList.get(i), rectangle);
+                addDataToChart(clustersList.get(i), colors.get(i));
             }
 
             Set<Node> items = scatterChart.lookupAll("Label.chart-legend-item");

@@ -176,4 +176,11 @@ public class DefaultWidget implements ItemWidget {
             return image;
         }
     }
+    
+    
+    public String toString() {
+        //return String.format(String.for)
+        return "Default Widget";
+    }
+    
 }

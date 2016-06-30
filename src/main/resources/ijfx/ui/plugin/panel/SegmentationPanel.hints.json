@@ -1,0 +1,14 @@
+[
+    {
+        "text":"This panel allows to set up a segmentation workflow"
+        ,"target":"#segmentation-panel"
+    }
+    ,{
+        "text":"Test your workflow on one image by clicking on this button."
+        ,"target":"#testButton"
+    }
+    ,{
+        "text":"When you are sure about your workflow, click here to process all the selected images."
+        ,"target":"startButton"
+    }
+]

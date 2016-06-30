@@ -22,7 +22,7 @@ package ijfx.ui.module.skin;
 import ijfx.plugins.AxisInterval;
 import ijfx.plugins.DefaultAxisInterval;
 import ijfx.plugins.LongInterval;
-import ijfx.plugins.RemoveSlice;
+import ijfx.plugins.commands.RemoveSlice;
 import ijfx.plugins.commands.AxisUtils;
 import ijfx.ui.module.InputSkinPlugin;
 import net.imagej.axis.AxisType;

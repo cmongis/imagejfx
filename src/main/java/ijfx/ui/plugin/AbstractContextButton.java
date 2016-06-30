@@ -23,6 +23,7 @@ package ijfx.ui.plugin;
 import ijfx.ui.UiPlugin;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.IjfxCss;
 import ijfx.ui.main.ImageJFX;
 import java.util.concurrent.Future;
@@ -51,16 +52,18 @@ public abstract class AbstractContextButton implements UiPlugin {
     }
     
     public AbstractContextButton(String text, FontAwesomeIcon icon) {
-        
+        this();
+        button.setText(text);
         setIcon(icon);
         
-        if(text == null) {
-            button = GlyphsDude.createIconButton(icon);
-            button.getStylesheets().addAll(IjfxCss.ICON_BUTTON,IjfxCss.ICON_WITH_SPACING);
-        }
-        else
-             button = GlyphsDude.createIconButton(icon, text);
+       
+         button.getStyleClass().addAll("larger");
+        
+       // button = GlyphsDude.createIconButton(icon, text);
         button.setOnAction(this::onAction);
+        
+        
+        
 
     }
 
@@ -84,6 +87,7 @@ public abstract class AbstractContextButton implements UiPlugin {
 
     public void setIcon(FontAwesomeIcon icon) {
         this.icon = icon;
+        button.setGraphic(new FontAwesomeIconView(icon));
     }
     
     protected void showProcessingIcon() {

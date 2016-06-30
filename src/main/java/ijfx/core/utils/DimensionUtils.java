@@ -19,6 +19,8 @@
  */
 package ijfx.core.utils;
 
+import mongis.ndarray.NDimensionalArray;
+
 /**
  * Set of methods easing dealing with dimension arrays in Datasets
  * @author cyril
@@ -33,6 +35,9 @@ public class DimensionUtils {
     public static long[] readLongArray(String str) {
         // the string is usually a string of type "[12,324,32]
         // deleting the []
+        
+        if(str == null) return new long[]{};
+        if(str.equals("null")) return new long[]{};
         int begin = 1;
         int end = str.length() - 1;
         str = str.substring(begin, end);
@@ -57,7 +62,32 @@ public class DimensionUtils {
       result[1] = 0;
       if(result.length == 2) return result;
       System.arraycopy(array, 0, result, 2, array.length);
+      
+      
+      
       return result;
     }
+    
+    public static long[] planarToNonPlanar(long[] array) {
+        if(array.length <= 2) return new long[0];
+        else {
+            
+            long[] result = new long[array.length -2];
+            System.arraycopy(array, 2, result, 0, array.length-2);
+            
+            return result;
+        }
+    }
+    
+    public static long[][] allNonPlanarPossibilities(long[] dimensions) {
+        dimensions = planarToNonPlanar(dimensions);
+        NDimensionalArray ndArray = new NDimensionalArray(dimensions);
+        return ndArray.getPossibilities();
+    }
+    
+    
+    
+    
+            
     
 }

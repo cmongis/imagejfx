@@ -21,61 +21,77 @@
 package ijfx.ui.workflow;
 
 import ijfx.service.workflow.MyWorkflowService;
-import ijfx.ui.main.Localization;
 import ijfx.service.workflow.Workflow;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
 import ijfx.ui.UiPlugin;
-import ijfx.ui.UiConfiguration;
 import ijfx.ui.main.ImageJFX;
+import java.util.function.Consumer;
+import mongis.utils.ListCellController;
+import mongis.utils.ListCellControllerFactory;
+import org.scijava.Context;
 
-/**
- *
- * @author Cyril MONGIS, 2015
- */
+public class WorkflowManagerPanel extends BorderPane {
 
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id="workflowManagerPanel",context="batch",localization=Localization.RIGHT)
-public class WorkflowManagerPanel extends BorderPane implements UiPlugin{
-
-    
     @FXML
     ListView<Workflow> listView;
-    
+
     @Parameter
     MyWorkflowService myWorkflowService;
-    
-    public WorkflowManagerPanel() {
+
+    @Parameter
+    Context context;
+
+    Consumer<Workflow> handler;
+
+    public WorkflowManagerPanel(Context context) {
         try {
             FXUtilities.injectFXML(this);
-            
-            
-            
+            context.inject(this);
+
+            listView.setItems(myWorkflowService.getWorkflowList());
+            listView.setCellFactory(new ListCellControllerFactory<>(this::createCell));
+
         } catch (IOException ex) {
-           ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
     }
+
     
-    
-    @Override
-    public Node getUiElement() {
-        return this;
+
+    private ListCellController<Workflow> createCell() {
+        WorkflowListCellController ctrl = new WorkflowListCellController();
+        context.inject(ctrl);
+        return ctrl;
     }
 
-    @Override
-    public UiPlugin init() {
-        
-        listView.setItems(myWorkflowService.getWorkflowList());
-        
-        return this;
+    public Consumer<Workflow> getHandler() {
+        return handler;
     }
-        
+
+    public void setHandler(Consumer<Workflow> handler) {
+        this.handler = handler;
+    }
+
+    @FXML
+    public void choose() {
+        handler.accept(listView.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    public void cancel() {
+        handler.accept(null);
+    }
+
+    @FXML
+    public void importWorkflow() {
+
+    }
+
 }
