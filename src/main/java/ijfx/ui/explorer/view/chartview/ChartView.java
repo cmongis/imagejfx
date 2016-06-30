@@ -148,11 +148,39 @@ public class ChartView extends FilterView implements ExplorerView {
         series.setName(node.toString());
 
     }
+    
+    public Data<Number,Number> transform(Explorable explorable) {
+        
+        String xKey = xComboBox.getSelectionModel().getSelectedItem();
+        String yKey = yComboBox.getSelectionModel().getSelectedItem();
+        
+        return new Data<>(explorable.getMetaDataSet().get(xKey).getDoubleValue(),explorable.getMetaDataSet().get(yKey).getDoubleValue());
+    }
 
     /**
      * Perform a clustering algorithm and load the series.
      */
     public void computeItems() {
+        
+        
+        if(xComboBox.getSelectionModel().getSelectedItem() == null) return;
+        if(yComboBox.getSelectionModel().getSelectedItem() == null) return;
+        
+        Series<Number,Number> series = new Series<>();
+        
+        series.getData().addAll(
+                
+                currentItems
+                        .parallelStream()
+                        .map(this::transform)
+                        .collect(Collectors.toList())
+        );
+        
+        scatterChart.getData().clear();
+        scatterChart.getData().add(series);
+       
+        
+        /*
         if (metadatas[0] != null && metadatas[1] != null) {
 
             scatterChart.getData().clear();
@@ -177,7 +205,7 @@ public class ChartView extends FilterView implements ExplorerView {
                 i++;
             }
 
-        }
+        }*/
     }
 
     @Override

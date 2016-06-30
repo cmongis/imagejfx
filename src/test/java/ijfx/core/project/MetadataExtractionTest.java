@@ -93,7 +93,7 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
         Assert.assertEquals(tCount * zCount*channelCount, mList.size());
     }
 
-   @Test
+   
     public void testPlaneExtraction() throws IOException {
         init();
 
