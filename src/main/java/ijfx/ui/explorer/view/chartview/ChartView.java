@@ -49,7 +49,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 @Plugin(type = ExplorerView.class)
 

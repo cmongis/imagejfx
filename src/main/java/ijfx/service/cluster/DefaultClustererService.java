@@ -39,7 +39,7 @@ import weka.core.Instances;
 
 /**
  *
- * @author Explorableuan anh ExplorableRINH
+ * @author Tuan anh TRINH
  */
 @Plugin(type = Service.class)
 public class DefaultClustererService extends AbstractService implements ClustererService<Explorable> {
