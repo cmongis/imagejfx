@@ -22,6 +22,7 @@ package ijfx.ui.explorer.view.chartview;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ClustererService;
+import ijfx.service.cluster.ExplorableClustererService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
@@ -56,7 +57,7 @@ import org.scijava.plugin.Plugin;
 public class ChartView extends FilterView implements ExplorerView {
 
     @Parameter
-    ClustererService clustererService;
+    ExplorableClustererService explorableClustererService;
 
     @Parameter
     ExplorerService explorerService;
@@ -131,7 +132,7 @@ public class ChartView extends FilterView implements ExplorerView {
     public void setSelectedItem(List<? extends Explorable> items) {
     }
 
-    private void addDataToChart(List<Explorable> list, Color color) {
+    private void addDataToChart(List<? extends Explorable> list, Color color) {
 
         Series series = new Series();
         series.setNode(new Button("e"));
@@ -158,7 +159,7 @@ public class ChartView extends FilterView implements ExplorerView {
 
             scatterChart.getData().clear();
 
-            List<List<Explorable>> clustersList = clustererService.buildClusterer(currentItems, Arrays.asList(metadatas));
+            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
             ColorGenerator colorGenerator = new ColorGenerator(clustersList.size());
             colorGenerator.generateColor();
             List<Color> colors = colorGenerator.getColorList();

@@ -19,29 +19,29 @@
  */
 package ijfx.service.cluster;
 
-import ijfx.ui.explorer.ExplorableWrapper;
 import ijfx.ui.explorer.Explorable;
 import weka.core.DenseInstance;
 import weka.core.Instance;
+import ijfx.ui.explorer.ObjectWrapper;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class DefaultExplorableClusterable extends DenseInstance implements ExplorableWrapper {
+public class ObjectClusterable extends DenseInstance implements ObjectWrapper{
 
-    private Explorable explorable;
+    private Object object;
 
-    public DefaultExplorableClusterable(Explorable explorable, double weight, double[] attValues) {
+    public ObjectClusterable(Object object, double weight, double[] attValues) {
         super(weight, attValues);
-        this.explorable = explorable;
+        this.object = object;
     }
 
-    public DefaultExplorableClusterable(Instance instance) {
+    public ObjectClusterable(Instance instance) {
         super(instance);
-        if (instance instanceof DefaultExplorableClusterable) {
-            m_AttValues = ((DefaultExplorableClusterable) instance).m_AttValues;
-            this.explorable = ((DefaultExplorableClusterable) instance).getExplorable();
+        if (instance instanceof ObjectClusterable) {
+            m_AttValues = ((ObjectClusterable) instance).m_AttValues;
+            this.object = ((ObjectClusterable) instance).getObject();
         } else {
             m_AttValues = instance.toDoubleArray();
         }
@@ -50,13 +50,13 @@ public class DefaultExplorableClusterable extends DenseInstance implements Explo
     }
 
     @Override
-    public Explorable getExplorable() {
-        return explorable;
+    public Object getObject() {
+        return object;
     }
 
     @Override
     public Object copy() {
-        DefaultExplorableClusterable result = new DefaultExplorableClusterable(this);
+        ObjectClusterable result = new ObjectClusterable(this);
         result.m_Dataset = m_Dataset;
         return result;
     }

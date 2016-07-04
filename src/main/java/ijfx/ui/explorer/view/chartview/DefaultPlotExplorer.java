@@ -72,7 +72,7 @@ public class DefaultPlotExplorer implements PlotExplorer {
     }
 
     @Override
-    public Explorable getExplorable() {
+    public Object getObject() {
         return explorable;
     }
 

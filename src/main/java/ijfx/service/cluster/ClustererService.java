@@ -20,7 +20,9 @@
 package ijfx.service.cluster;
 
 import ijfx.ui.explorer.Explorable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.imagej.ImageJService;
 import weka.clusterers.Clusterer;
 
@@ -31,9 +33,9 @@ import weka.clusterers.Clusterer;
  */
 public interface ClustererService<T> extends ImageJService {
 
-    public List<List<T>> buildClusterer(List<T> listExplorable, List<String> metadataKeys);
+    public List<List<T>> buildClusterer(Map<Object, double[]> map , List<String> attributsString);
 
-    public  List<List<T>> buildClusterer(List<T> listExplorable, String metadataKey);
+//    public  List<List<T>> buildClusterer(List<T> listExplorable, String metadataKey);
     
     public void setClusterer(Clusterer clusterer);
 }

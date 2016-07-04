@@ -25,8 +25,8 @@ import weka.core.Instance;
  *
  * @author Tuan anh TRINH
  */
-public interface ExplorableWrapper{
+public interface ObjectWrapper{
 
-    public Explorable getExplorable();
+    public Object getObject();
 
 }
