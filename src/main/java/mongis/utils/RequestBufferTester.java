@@ -17,39 +17,46 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.overlay;
+package mongis.utils;
 
-import javafx.geometry.Point2D;
-import javafx.scene.shape.Polygon;
-import net.imagej.overlay.Overlay;
+import ijfx.ui.utils.BaseTester;
 
 /**
  *
  * @author cyril
  */
+public class RequestBufferTester extends BaseTester{
 
-public interface OverlayShapeStatistics {
+    RequestBuffer buffer = new RequestBuffer(1);
+    
+    public RequestBufferTester() {
+        
+        super();
+        addAction("Launch", this::test);
+        
+    }
+
     
     
     
-    Overlay getOverlay();    
-    double getCenterX();
-    double getCenterY();
-    double getArea();
-    Polygon getMinimumBoundingRectangle();
-    Point2D getCenterOfGravity();
-    double getFeretDiameter();
-    double getMinFeretDiameter();
-//    double getOrientationMajorAxis();
-//    double getOrientationMinorAxis();
-    double getLongSideMBR();
-    double getShortSideMBR();
-    double getAspectRatio();
-    double getConvexity();
-    double getSolidity();
-    double getCircularity();
-    double getThinnesRatio();
     
     @Override
-    String toString();
+    public void initApp() {
+        
+    }
+    
+    
+    public void test() {
+        for(int i = 0;i!=20000;i++) {
+            buffer.queue(this::showSomething);
+        }
+    }
+    
+    public void showSomething() {
+        System.out.println("I'm the only one ?");
+    }
+    
+    public static void main(String[] args) {
+        launch(args);
+    }
 }

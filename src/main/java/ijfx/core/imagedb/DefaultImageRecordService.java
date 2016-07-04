@@ -34,11 +34,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import mercury.core.MercuryTimer;
+import mongis.utils.ProgressHandler;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.scijava.Priority;
 import org.scijava.app.StatusService;
@@ -49,6 +51,7 @@ import org.scijava.plugin.Plugin;
 import org.scijava.plugins.commands.io.OpenFile;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import rx.subjects.PublishSubject;
 
 /**
  *
@@ -71,7 +74,7 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
 
     @Parameter
     JsonPreferenceService jsonPreferenceService;
-    
+
     Logger logger = ImageJFX.getLogger();
 
     @Parameter
@@ -79,41 +82,51 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
 
     @Parameter
     StatusService statusService;
-    
+
     private static String FILE_ADDED = "%s images where analyzed.";
 
     private static String JSON_FILE = "image_record.json";
+
+    PublishSubject<ImageRecord> saveQueue = PublishSubject.create();
+    
+    
+    @Override
+    public void initialize() {
+        super.initialize();
+        
+        saveQueue
+                .filter(imageRecord->getRecordMap().containsValue(imageRecord) == false)
+                .buffer(10,TimeUnit.SECONDS)
+                .filter(list->list.isEmpty() == false)
+                .subscribe(list->save());
+        
+        
+    }
     
     @Override
     public boolean isPresent(File file) {
         return getRecordMap().containsKey(file);
     }
 
-    
-    private Map<File,DefaultImageRecord> getRecordMap() {
-        if(recordMap == null) {
+    private Map<File, DefaultImageRecord> getRecordMap() {
+        if (recordMap == null) {
             recordMap = new HashMap<>();
-            load().forEach(record->recordMap.put(record.getFile(),record));
+            load().forEach(record -> recordMap.put(record.getFile(), record));
         }
         return recordMap;
     }
-    
+
     @Override
     public void addRecord(ImageRecord imageRecord) {
-        
-        recordMap.put(imageRecord.getFile(), (DefaultImageRecord) imageRecord);
-
+        getRecordMap().put(imageRecord.getFile(), (DefaultImageRecord) imageRecord);
+        saveQueue.onNext(imageRecord);
     }
 
     @Override
-    public void addRecord(File file) {
-        fileQueue.add(file);
-        executor.execute(this::analyseQueue);
-    }
-
-    @Override
-    public void addRecord(File file, MetaDataSet metaDataSet) {
-        addRecord(new DefaultImageRecord(file, metaDataSet));
+    public ImageRecord addRecord(File file, MetaDataSet metaDataSet) {
+        ImageRecord record = new DefaultImageRecord(file, metaDataSet);
+        addRecord(record);
+        return record;
     }
 
     @Override
@@ -127,19 +140,20 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
     }
 
     public ImageRecord getRecord(File file) {
-        
+
         ImageRecord imageRecord;
-        if(getRecordMap().containsKey(file)==false) {
+        if (getRecordMap().containsKey(file) == false) {
             imageRecord = new DefaultImageRecord(file, metadataExtractorService.extractMetaData(file));
             addRecord(imageRecord);
-        }
-        else {
+        } else {
             imageRecord = getRecordMap().get(file);
         }
-        
+
         return imageRecord;
     }
     
+    
+    /*
     private void analyseQueue() {
 
         ArrayList<File> fileAdded = new ArrayList<>();
@@ -186,40 +200,39 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
             notificationService.publish(new DefaultNotification("Auto indexation", String.format(FILE_ADDED, fileAdded.size())));
             save();
         }
-    }
+    }*/
 
-    
-    
-    @EventHandler
-    public void onFileOpened(ModuleFinishedEvent event) {
-        logger.info("Module event !\n" + event.toString());
-        if (event.getModule().getDelegateObject().getClass().equals(OpenFile.class)) {
-            logger.info("A file was opened :-D");
-            File f = (File) event.getModule().getInput("inputFile");
-            logger.info("Checking " + f.getParentFile().getAbsolutePath());
+ 
 
-            addRecord(f.getParentFile());
-        }
-    }
-    
-    
     private void save() {
         jsonPreferenceService.savePreference(getRecords(), JSON_FILE);
     }
-    
+
     private List<DefaultImageRecord> load() {
         return jsonPreferenceService.loadListFromJson(JSON_FILE, DefaultImageRecord.class);
     }
 
     @Override
-    public synchronized Collection<? extends ImageRecord> getRecordsFromDirectory(File directory) {
-        
+    public synchronized Collection<? extends ImageRecord> getRecordsFromDirectory(ProgressHandler handler, File directory) {
+
         List<ImageRecord> records = new ArrayList<>();
-        
-        statusService.showStatus(1, 10, "Analyzing folder : "+directory.getName());
+
+        statusService.showStatus(1, 10, "Analyzing folder : " + directory.getName());
         Collection<File> files = imageLoaderService.getAllImagesFromDirectory(directory);
         int count = 0;
         int total = files.size();
+
+        handler.setTotal(total);
+
+        return files
+                .stream()
+                .map(f -> {
+                    handler.increment(1.0);
+                    return getRecord(f);
+                })
+                .collect(Collectors.toList());
+
+        /*
         for(File f : files) {
             if(isPresent(f)) {
                 records.add(getRecordMap().get(f));
@@ -230,14 +243,12 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
                 records.add(recordMap.get(f));
             }
             statusService.showProgress(count++, total);
-        }
-        
-        
-        return records;
+        }*/
+        // return records;
     }
 
     public void forceSave() {
         ImageJFX.getThreadPool().execute(this::save);
     }
-    
+
 }

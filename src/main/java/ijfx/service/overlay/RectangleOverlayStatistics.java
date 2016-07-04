@@ -79,13 +79,14 @@ public class RectangleOverlayStatistics extends AbstractOverlayShapeStatistics{
         super.solidity = setSolidity();
         super.circularity = setCircularity();
         super.thinnesRatio = setThinnesRatio();    
+        
     }    
     
     
     public Shape getShape(Overlay overlay){
         
         RectangleRegionOfInterest roi = (RectangleRegionOfInterest) overlay.getRegionOfInterest();
-        
+         
         return new Rectangle(roi.getOrigin(0), roi.getOrigin(1), roi.getExtent(0), roi.getExtent(1));        
     }
 
@@ -107,8 +108,11 @@ public class RectangleOverlayStatistics extends AbstractOverlayShapeStatistics{
         p[5] = shape.getY() + shape.getHeight();
         p[6] = shape.getX();
         p[7] = shape.getY() + shape.getHeight();
-
+        
         Polygon polygon = new Polygon();
+        
+       
+        
         polygon.getPoints().addAll(p);
         
         return polygon;

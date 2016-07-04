@@ -182,7 +182,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
 
         Timer timer = timerService.getTimer(this.getClass());
         timer.start();
-        Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(file);
+        Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(progress,file);
         timer.elapsed("record fetching");
         progress.setStatus("Reading folder...");
 

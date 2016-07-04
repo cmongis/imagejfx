@@ -471,9 +471,21 @@
     -fx-padding: 0.2em;
     -fx-effect:dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0, 1.0); 
 }
+#open-button .arrow{
+    -fx-background-color:transparent;
+    -fx-pref-width:0;
+    -fx-padding:0;
+    -fx-effect:0;
+    -fx-
+     -fx-disable:0;
+}
+#open-button{
+    -fx-max-width:20px;
+}
 .combo-box-base .list-view {
     -fx-background:-dark;
     -fx-background-color:-dark;
+   
 }
 
 .menu-bar {

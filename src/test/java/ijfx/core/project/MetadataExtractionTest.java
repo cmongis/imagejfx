@@ -99,14 +99,16 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
 
         Timer t = timerService.getTimer("Dataset open benchmarking");
         //String testFile = "/Users/cyril/test_img/psfj/gfp_nikon/gfp_nikon1_2048x2048.tif";
-        String testFile = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
+        //String testFile = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
+        String testFile = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif";
+        
         if(new File(testFile).exists() == false){
             return;
         }
         //String testFile = MetadataExtractionTest.testFile.getPath();//OMG!!!!"/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
         for (int i = 0; i != 100; i++) {
             t.start();
-            Dataset dataset = imagePlaneService.extractPlane(new File(testFile), new long[]{});
+            Dataset dataset = imagePlaneService.extractPlane(new File(testFile), new long[]{0,1});
             t.elapsed("Dataset reading"); 
         }
         t.logAll();

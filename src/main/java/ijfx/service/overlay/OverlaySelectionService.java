@@ -87,6 +87,7 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
 
     public List<Overlay> getSelectedOverlays(ImageDisplay imageDisplay) {
         ArrayList<Overlay> selected = new ArrayList<>();
+        if(imageDisplay == null) return selected;
         imageDisplay.forEach(view -> {
             if (view instanceof OverlayView) {
                 if (((OverlayView) view).isSelected()) {

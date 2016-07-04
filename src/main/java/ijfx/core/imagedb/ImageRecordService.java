@@ -24,6 +24,7 @@ import ijfx.service.IjfxService;
 import java.io.File;
 import java.util.Collection;
 import java.util.function.Predicate;
+import mongis.utils.ProgressHandler;
 
 /**
  *
@@ -39,10 +40,10 @@ public interface ImageRecordService extends IjfxService{
     
     // the database never returns record because every analysis
     // is done asynchronisily in a separate thread
-    public void addRecord(File file);
+    //public void addRecord(File file);
     
     // adds a record manually
-    public void addRecord(File file, MetaDataSet metaDataSet);
+    public ImageRecord addRecord(File file, MetaDataSet metaDataSet);
    
     // get the record, if doesn't exist, calculates it
     public ImageRecord getRecord(File file);
@@ -53,7 +54,7 @@ public interface ImageRecordService extends IjfxService{
     // query a list of record using the following condition
     public Collection<? extends ImageRecord> queryRecords(Predicate<ImageRecord> query);
     
-    public Collection<? extends ImageRecord> getRecordsFromDirectory(File file);
+    public Collection<? extends ImageRecord> getRecordsFromDirectory(ProgressHandler handler, File file);
  
     public void forceSave();
     

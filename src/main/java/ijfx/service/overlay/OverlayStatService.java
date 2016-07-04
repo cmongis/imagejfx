@@ -101,6 +101,9 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public final static String LBL_CIRCULARITY = "Circularity";
     public final static String LBL_THINNES_RATIO = "Thinnes ratio";
     
+    public final static String LBL_CENTER_X = "Center X";
+    public final static String LBL_CENTER_Y = "Center Y";
+    
 
    
     
@@ -298,6 +301,8 @@ public class OverlayStatService extends AbstractService implements ImageJService
         statistics.put(LBL_SOLIDITY, overlayStats.getSolidity());
         statistics.put(LBL_CIRCULARITY, overlayStats.getCircularity());
         statistics.put(LBL_THINNES_RATIO, overlayStats.getThinnesRatio());
+        statistics.put(LBL_CENTER_X,overlayStats.getCenterX());
+        statistics.put(LBL_CENTER_Y,overlayStats.getCenterY());
         
         return statistics;
     }

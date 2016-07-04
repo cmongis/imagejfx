@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -262,19 +263,22 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
 
         // deleting the overlay owned previously by the input
-        overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
+        
+        inputDisplay.addAll(Stream.of(overlay).map(o->imageDisplayService.createDataView(o)).collect(Collectors.toList()));
+        inputDisplay.update();
+        
+        //overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
         // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();
         context.inject(outputDisplay);
         outputDisplay.display(input.getDataset());
-
+        
         // adding the overlay to the input dipslay
         overlayService.addOverlays(inputDisplay, Arrays.asList(overlay));
-
+        //inputDisplay.update();
         handler.setStatus("Gathering statistics...");
 
         handler.setProgress(-1);
-
         // gathering statistics about the object from the input display
         List<HashMap<String, Double>> map = Arrays.stream(overlay)
                 .map(o -> {
@@ -379,6 +383,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     public void close() {
         uiContextService.leave("segment");
         uiContextService.leave("segmentation");
+        if(!isExplorer()) {
+            uiContextService.enter("imagej");
+        }
         uiContextService.update();
     }
 

@@ -1,3 +1,4 @@
+
 /*
  * /*
  *     This file is part of ImageJ FX.
@@ -23,21 +24,18 @@ package ijfx.service.uicontext;
 import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlaySelectionEvent;
+import mongis.utils.RequestBuffer;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
-import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.table.TableDisplay;
-import org.scijava.SciJava;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayActivatedEvent;
 import org.scijava.display.event.DisplayDeletedEvent;
-import org.scijava.display.event.DisplayEvent;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
@@ -76,41 +74,45 @@ public class UiContextCalculatorService extends AbstractService implements Image
     @Parameter
     UiContextService contextService;
 
+    private final RequestBuffer requestBuffer = new RequestBuffer(2);
+
     public void determineContext(Display display) {
-        if (overlaySelectionService == null) {
-            overlayService.getContext().inject(this);
-        }
+        requestBuffer.queue(() -> {
 
-        ImageDisplay imageDisplay = (ImageDisplay) display;
-
-        contextService.toggleContext(CTX_OVERLAY_SELECTED, display != null && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
-
-        contextService.toggleContext(CTX_MULTI_Z_IMAGE, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.Z));
-
-        contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.CHANNEL));
-
-        contextService.toggleContext(CTX_MULTI_TIME_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.TIME));
-
-        contextService.toggleContext(CTX_RGB_IMAGE, display != null && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
-
-        contextService.toggleContext(CTX_IMAGE_BINARY, display != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
-
-        contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
-
-        contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()));
-
-        Dataset dataset = null;
-        if (display != null) {
-            dataset = (Dataset) imageDisplay.getActiveView().getData();
-            for (int i = 1; i <= 32; i *= 2) {
-                contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", dataset.getValidBits() == i);
+            if (overlaySelectionService == null) {
+                overlayService.getContext().inject(this);
             }
-        } else {
-            for (int i = 1; i <= 32; i *= 2) {
-                contextService.toggleContext(String.valueOf(i) + "-bits", false);
-            }
-        }
 
+            ImageDisplay imageDisplay = (ImageDisplay) display;
+
+            contextService.toggleContext(CTX_OVERLAY_SELECTED, display != null && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
+
+            contextService.toggleContext(CTX_MULTI_Z_IMAGE, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.Z));
+
+            contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.CHANNEL));
+
+            contextService.toggleContext(CTX_MULTI_TIME_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.TIME));
+
+            contextService.toggleContext(CTX_RGB_IMAGE, display != null && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
+
+            contextService.toggleContext(CTX_IMAGE_BINARY, display != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
+
+            contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
+
+            contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()));
+
+            Dataset dataset = null;
+            if (display != null) {
+                dataset = (Dataset) imageDisplay.getActiveView().getData();
+                for (int i = 1; i <= 32; i *= 2) {
+                    contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", dataset.getValidBits() == i);
+                }
+            } else {
+                for (int i = 1; i <= 32; i *= 2) {
+                    contextService.toggleContext(String.valueOf(i) + "-bits", false);
+                }
+            }
+        });
     }
 
     @EventHandler
