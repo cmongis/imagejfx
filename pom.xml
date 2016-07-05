@@ -190,7 +190,7 @@
         <dependency>
             <groupId>nz.ac.waikato.cms.moa</groupId>
             <artifactId>moa</artifactId>
-            <version>2012.05-SNAPSHOT</version>
+            <version>2016.04</version>
         </dependency>
         <dependency>
             <groupId>com.apporiented</groupId>
