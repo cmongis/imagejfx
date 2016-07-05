@@ -89,9 +89,6 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         return scifio;
     }
 
-   
-    
-    
     
     @Override
     public MetaDataSet extractMetaData(File file) {
