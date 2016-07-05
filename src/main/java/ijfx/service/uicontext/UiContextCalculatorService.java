@@ -112,6 +112,9 @@ public class UiContextCalculatorService extends AbstractService implements Image
                     contextService.toggleContext(String.valueOf(i) + "-bits", false);
                 }
             }
+            
+            contextService.update();
+            
         });
     }
 
@@ -123,7 +126,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
 //            }
 //        });
         determineContext(event.getDisplay());
-        contextService.update();
+       // contextService.update();
 
     }
 
@@ -135,7 +138,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
             }
         });
         determineContext(event.getDisplay());
-        contextService.update();
+       // contextService.update();
 
     }
 
@@ -154,7 +157,6 @@ public class UiContextCalculatorService extends AbstractService implements Image
             determineContext(imageDisplayService.getImageDisplays().get(0));
         } else {
             determineContext(null);
-
         }
 
         /*
@@ -164,7 +166,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
                 determineContext(display);
             }
         });*/
-        contextService.update();
+        //contextService.update();
 
     }
 
