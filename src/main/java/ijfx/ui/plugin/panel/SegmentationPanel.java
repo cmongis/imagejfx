@@ -274,7 +274,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         outputDisplay.display(input.getDataset());
         
         // adding the overlay to the input dipslay
-        overlayService.addOverlays(inputDisplay, Arrays.asList(overlay));
+        //overlayService.addOverlays(inputDisplay, Arrays.asList(overlay));
         //inputDisplay.update();
         handler.setStatus("Gathering statistics...");
 

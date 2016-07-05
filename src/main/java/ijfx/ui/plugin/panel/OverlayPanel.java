@@ -393,9 +393,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         ImageDisplay display = displayService.getActiveDisplay(ImageDisplay.class);
 
         overlaySelectionService.getSelectedOverlays(display).forEach(overlay -> {
-
             overlayService.removeOverlay(display, overlay);
-            eventService.publishLater(new OverlayDeletedEvent(overlay));
+            //eventService.publishLater(new OverlayDeletedEvent(overlay));
         });
         
         
