@@ -46,14 +46,16 @@ public class PCAProcesser {
     }
 
     public List<ObjectClusterable> applyPCA(List<ObjectClusterable> objectClusterables, List<String> attributsString) throws Exception {
-//        ConverterUtils.DataSource c = new ConverterUtils.DataSource("/home/tuananh/Downloads/weka-3-8-0/data/iris.arff");
 
         ArrayList<Attribute> attributes = attributsString.stream().map(e -> new Attribute(e)).collect(Collectors.toCollection(ArrayList::new));
         Arrays.toString(attributes.toArray());
         Instances data = new Instances("Cluster Service", attributes, objectClusterables.size());
 
         data.addAll(objectClusterables);
-        System.out.println(data);
+        return mapToObjectClusterable(applyPCAtoInstances(data));
+    }
+
+    public Instances applyPCAtoInstances(Instances data) throws Exception {
         Ranker ranker = new Ranker();
         AttributeSelection selector = new AttributeSelection();
         selector.SelectAttributes(data);
@@ -63,10 +65,13 @@ public class PCAProcesser {
         selector.setSearch(ranker);
         pca.buildEvaluator(data);
         Instances instances = pca.transformedData(data);
-        System.out.println(instances.toString());
         setxAxe(instances.attribute(0).name());
         setyAxe(instances.attribute(1).name());
 
+        return instances;
+    }
+    
+    public List<ObjectClusterable> mapToObjectClusterable(Instances instances){
         return instances
                 .stream()
                 .map(e -> new ObjectClusterable(((ObjectClusterable) e).getObject(), 1, e.toDoubleArray()))

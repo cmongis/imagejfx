@@ -665,10 +665,7 @@ public class CustomPrincipalComponents extends UnsupervisedAttributeEvaluator
             output = new Instances(m_transformedFormat);
         }
         for (int i = 0; i < data.numInstances(); i++) {
-            System.out.println(data.instance(i).getClass().toString());
-
             Instance converted = convertInstance(data.instance(i));
-            System.out.println(converted.getClass().toString());
             output.add(converted);
         }
 
