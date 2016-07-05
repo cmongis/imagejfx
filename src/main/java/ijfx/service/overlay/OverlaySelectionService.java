@@ -20,8 +20,10 @@
  */
 package ijfx.service.overlay;
 
+import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import net.imagej.ImageJService;
 import net.imagej.display.DataView;
 import net.imagej.display.ImageDisplay;
@@ -51,6 +53,8 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
     @Parameter
     ImageDisplayService imageDisplayService;
     
+    Logger logger = ImageJFX.getLogger();
+    
     public void selectOnlyOneOverlay(ImageDisplay imageDisplay, Overlay overlay) {
         
         //System.out.println(overlay);
@@ -59,14 +63,16 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
             if (view instanceof OverlayView) {
                 OverlayView overlayView = (OverlayView) view;
                 overlayView.setSelected(overlay == overlayView.getData());
+                
             }
         }
-
+        logger.info("Selecting only "+overlay);
         eventService.publish(new OverlaySelectedEvent(imageDisplay, overlay));
 
     }
 
     public void selectedAll(ImageDisplay imageDisplay) {
+        logger.info("Select all overlay from "+imageDisplay);
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView) {
                 ((OverlayView) view).setSelected(true);
@@ -78,15 +84,16 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
 
     public void unselectedAll(ImageDisplay imageDisplay) {
         for (DataView view : imageDisplay) {
-            if (view instanceof OverlayView) {
+            if (view instanceof OverlayView && view.isSelected() == true) {
                 ((OverlayView) view).setSelected(false);
+                eventService.publish(new OverlaySelectionEvent(imageDisplay, (Overlay)view.getData()));
             }
         }
-        eventService.publish(new OverlaySelectionEvent(imageDisplay, null));
     }
 
     public List<Overlay> getSelectedOverlays(ImageDisplay imageDisplay) {
         ArrayList<Overlay> selected = new ArrayList<>();
+        if(imageDisplay == null) return selected;
         imageDisplay.forEach(view -> {
             if (view instanceof OverlayView) {
                 if (((OverlayView) view).isSelected()) {
@@ -117,15 +124,16 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
         return false;
     }
 
+    
     public void setOverlaySelection(ImageDisplay imageDisplay, Overlay selectedOverlay, boolean selected) {
         for (DataView view : imageDisplay) {
             
             if (view instanceof OverlayView && view.getData() == selectedOverlay) {
                 OverlayView overlayView = (OverlayView) view;
                 overlayView.setSelected(selected);
+                
                 if (selected) {
-                   
-                   
+                    logger.info("Selecting "+selected);
                     eventService.publishLater(new OverlaySelectedEvent(imageDisplay, selectedOverlay));
                 }
                 return;

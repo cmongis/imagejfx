@@ -110,7 +110,7 @@ public class PolygonOverlayStatistics extends AbstractOverlayShapeStatistics{
         }
         
         java.awt.Polygon shape = new java.awt.Polygon(xpoints, ypoints, npoints);
-
+        
         return shape;
     }
     

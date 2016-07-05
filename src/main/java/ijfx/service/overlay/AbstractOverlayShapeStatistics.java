@@ -50,8 +50,7 @@ abstract class AbstractOverlayShapeStatistics implements OverlayShapeStatistics{
     protected double solidity;
     protected double circularity;
     protected double thinnesRatio;
-    
-    
+   
     
     
     
@@ -173,4 +172,22 @@ abstract class AbstractOverlayShapeStatistics implements OverlayShapeStatistics{
                 +"\n\t Thinnes Ratio : "+this.thinnesRatio;
 
     }
+
+    
+
+    @Override
+    public double getCenterX() {
+        return getCenterOfGravity().getX();
+    }
+
+    @Override
+    public double getCenterY() {
+        return getCenterOfGravity().getY();
+    }
+    
+    
+    
+    
+    
+    
 }

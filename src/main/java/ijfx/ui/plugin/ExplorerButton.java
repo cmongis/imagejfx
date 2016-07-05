@@ -17,39 +17,37 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.overlay;
+package ijfx.ui.plugin;
 
-import javafx.geometry.Point2D;
-import javafx.scene.shape.Polygon;
-import net.imagej.overlay.Overlay;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.ui.UiConfiguration;
+import ijfx.ui.UiPlugin;
+import ijfx.ui.activity.ActivityService;
+import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.main.Localization;
+import javafx.event.ActionEvent;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type=UiPlugin.class)
+@UiConfiguration(context = "imagej",id="explorer-button",localization = Localization.TOP_LEFT)
+public class ExplorerButton extends AbstractContextButton{
 
-public interface OverlayShapeStatistics {
+    @Parameter
+    ActivityService activityService;
     
+    public ExplorerButton() {
+        super(null, FontAwesomeIcon.COMPASS);
+    }
     
-    
-    Overlay getOverlay();    
-    double getCenterX();
-    double getCenterY();
-    double getArea();
-    Polygon getMinimumBoundingRectangle();
-    Point2D getCenterOfGravity();
-    double getFeretDiameter();
-    double getMinFeretDiameter();
-//    double getOrientationMajorAxis();
-//    double getOrientationMinorAxis();
-    double getLongSideMBR();
-    double getShortSideMBR();
-    double getAspectRatio();
-    double getConvexity();
-    double getSolidity();
-    double getCircularity();
-    double getThinnesRatio();
     
     @Override
-    String toString();
+    public void onAction(ActionEvent event) {
+        activityService.openByType(ExplorerActivity.class);
+    }
+    
 }

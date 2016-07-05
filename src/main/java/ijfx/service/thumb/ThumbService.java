@@ -94,6 +94,8 @@ public class ThumbService extends AbstractService implements ImageJService {
         // we use SCIFIO initializer to get the right reader
         Reader reader = null;
         
+        if(planeIndex == -1) planeIndex = 0;
+        
         if (thumbExists(file, planeIndex, width, height)) {
             logger.info("Thumb already exists. Returning " + getThumbFile(file, planeIndex, width, height));
             return new Image("file:" + getThumbFile(file, planeIndex, width, height).getAbsolutePath(), true);

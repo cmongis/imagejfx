@@ -65,7 +65,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         config.imgOpenerSetComputeMinMax(false);
 
         // prefer planar array structure, for ImageJ1 and ImgSaver compatibility
-        config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
+        config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.PLANAR);
         config.parserSetLevel(MetadataLevel.ALL);
         
         return datasetIoService.open(file.getAbsolutePath(), config);
@@ -74,18 +74,31 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     @Override
     public <T extends RealType<T>> Dataset extractPlane(File file, long[] nonPlanarPosition) throws IOException {
 
+        Timer timer = timerService.getTimer(this.getClass());
+        
         final SCIFIOConfig config = new SCIFIOConfig();
-
+        config.imgOpenerSetComputeMinMax(false);
+        config.imgOpenerSetOpenAllImages(false);
+       
         // skip min/max computation
         config.imgOpenerSetComputeMinMax(false);
 
         // prefer planar array structure, for ImageJ1 and ImgSaver compatibility
         config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
-        config.parserSetLevel(MetadataLevel.ALL);
+        config.parserSetLevel(MetadataLevel.MINIMUM);
+        
+        
+        
          Dataset virtualDataset = datasetIoService.open(file.getAbsolutePath(), config);
-        return isolatePlane(virtualDataset, DimensionUtils.nonPlanarToPlanar(nonPlanarPosition));
+         
+         timer.elapsed("virtual plane opening");
+         
+        Dataset finalPlane =  isolatePlane(virtualDataset, DimensionUtils.nonPlanarToPlanar(nonPlanarPosition));
+        timer.elapsed("pixel reading");
         
         
+        timer.logAll();
+        return finalPlane;
         /*
         long[] position = new long[nonPlanarPosition.length+2];
         //long[] dimemsions = new long[nonPlanarPosition.length+2];

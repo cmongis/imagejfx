@@ -245,6 +245,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     public void onFolderSelectionChanged(Observable obs, Folder oldValue, Folder newValue) {
         folderManagerService.setCurrentFolder(newValue);
+        filterTextField.setText("");
     }
 
     public void updateFolderList() {

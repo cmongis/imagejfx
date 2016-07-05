@@ -29,6 +29,7 @@ import ijfx.ui.tool.ToolChangeEvent;
 import ijfx.ui.tool.DefaultFxToolService;
 import ijfx.service.uicontext.UiContextCalculatorService;
 import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.ui.arcmenu.PopArcMenu;
@@ -40,6 +41,7 @@ import ijfx.ui.main.ImageJFX;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -102,13 +104,12 @@ import org.scijava.display.event.DisplayDeletedEvent;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
+import org.scijava.event.SciJavaEvent;
 import org.scijava.log.LogService;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.PluginService;
 import org.scijava.thread.ThreadService;
-import rx.functions.Action1;
-import rx.subjects.PublishSubject;
 
 /**
  *
@@ -209,13 +210,9 @@ public class ImageWindow extends Window {
     private final HashMap<Overlay, OverlayModifier> modifierMap = new HashMap();
 
     private final Property<FxTool> currentToolProperty = new SimpleObjectProperty();
-    
-    
-    
-    private final PublishSubject<Overlay> overlayToUpdate = PublishSubject.create();
-    
-    private final PublishSubject<Boolean> displayUpdateRequest = PublishSubject.create();
-    
+
+    private final ImageWindowEventBus bus = new ImageWindowEventBus();
+
     public ImageWindow() {
         super();
         logger.info("Creating window.");
@@ -241,8 +238,8 @@ public class ImageWindow extends Window {
         // Adding clicking listening
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onCanvasClick);
 
-        canvas.cursorProperty().bind(Bindings.createObjectBinding(this::getToolDefaultCursor,currentToolProperty));
-        
+        canvas.cursorProperty().bind(Bindings.createObjectBinding(this::getToolDefaultCursor, currentToolProperty));
+
         // setting the window movable
         setMovable(true);
 
@@ -251,7 +248,7 @@ public class ImageWindow extends Window {
         hbox.onMousePressedProperty().addListener(event -> putInFront());
 
         // make sure to repaint the canvas when resizing the window
-        widthProperty().addListener((obj, old, nw) -> canvas.repaint());
+        widthProperty().addListener(this::onWindowSizeChanged);
 
         // I forgot why but it must be important
         anchorPane.setMinSize(0, 0);
@@ -275,13 +272,6 @@ public class ImageWindow extends Window {
 
         canvas.getCamera().addListener(this::onViewPortChange);
 
-        //overlayToUpdate.thro
-        overlayToUpdate.buffer(500,TimeUnit.MILLISECONDS).filter(list->!list.isEmpty()).subscribe((Action1<List<Overlay>>)this::updateOverlays);
-        displayUpdateRequest.debounce(1000/24, TimeUnit.MILLISECONDS).subscribe((Action1 < Boolean >)list->{
-            //System.out.println(String.format("%s update request received",list.size()));
-            Platform.runLater(this::refreshSourceImage);
-                    
-                    });
     }
 
     public ImageWindow(Display<?> display) {
@@ -304,9 +294,14 @@ public class ImageWindow extends Window {
         focusedProperty().addListener(this::onFocus);
 
         translateXProperty().addListener(event -> putInFront());
-        
-        
 
+        initEventBuffering();
+
+    }
+
+    public void onWindowSizeChanged(Observable obs) {
+        canvas.repaint();
+        updateOverlays(getOverlays());
     }
 
     public void onFocus(Observable focusProperty, Boolean oldValue, Boolean newValue) {
@@ -366,6 +361,55 @@ public class ImageWindow extends Window {
         arcMenu.build();
 
         refreshSourceImage();
+    }
+
+    protected void initEventBuffering() {
+
+        // stream intercepting all event causing a refresh of the display
+        bus.getStream(SciJavaEvent.class)
+                .filter(bus::doesDisplayRequireRefresh)
+                .buffer(1000 / 15, TimeUnit.MILLISECONDS)
+                .filter(list -> !list.isEmpty())
+                .subscribe(list -> {
+
+                    System.out.println(String.format("%s events that require image refresh", list.size()));
+                    Platform.runLater(this::refreshSourceImage);
+                });
+
+        // stream intercepting all event causing a redrawing of the overlay
+        bus.getStream(SciJavaEvent.class)
+                .filter(bus::isOverlayEvent) // filter all the events that should update an overlay
+                .buffer(1000 / 24, TimeUnit.MILLISECONDS) // we buffer them to avoid any overlap
+                .filter(list -> !list.isEmpty()) // we check for event that are not empty event
+                .map(list -> list.stream().map(this::extractOverlayFromEvent).collect(Collectors.toList())) // the list is map to overlay
+                .subscribe(this::updateOverlays);
+
+        
+        
+        // stream intercepting all the event causing a overlay to be deleted
+        bus.getStream(OverlayDeletedEvent.class)
+                .map(event -> event.getObject())
+                .buffer(1000 / 24, TimeUnit.MILLISECONDS)
+                .filter(list -> !list.isEmpty())
+                .subscribe(this::deleteOverlays);
+
+    }
+
+    protected Overlay extractOverlayFromEvent(SciJavaEvent event) {
+        logger.info("Mapping event to overlay");
+        if (event instanceof OverlayCreatedEvent) {
+            return ((OverlayCreatedEvent) event).getObject();
+        }
+        if (event instanceof OverlayUpdatedEvent) {
+            return ((OverlayUpdatedEvent) event).getObject();
+        }
+        if (event instanceof OverlaySelectionEvent) {
+            return ((OverlaySelectionEvent) event).getOverlay();
+        }
+        if(event instanceof OverlaySelectedEvent) {
+            return ((OverlaySelectedEvent) event).getOverlay();
+        }
+        return null;
     }
 
     public class AxisSlider extends Slider {
@@ -511,25 +555,23 @@ public class ImageWindow extends Window {
         t.elapsed("canvas.repaint");
         updateInfoLabel();
         t.elapsed("updateInfoLabel");
-        updateOverlays();
+        // updateOverlays();
         t.elapsed("updateOverlays");
 
     }
 
-    private void updateOverlays() {
-        getOverlays().forEach(this::updateOverlay);
-    }
-    
     private void updateOverlays(List<Overlay> overlays) {
-        
-        System.out.println("Treating "+overlays.size());
-        
-        Platform.runLater(()->{
-           new HashSet<>(overlays).forEach(this::updateOverlay);
+
+        Collection<Overlay> toTreat = new HashSet<>(overlays);
+
+        logger.info(String.format("Received %d, treating %d overlays", overlays.size(), toTreat.size()));
+
+        Platform.runLater(() -> {
+            toTreat.forEach(this::updateOverlay);
         });
     }
 
-    public void updateOverlay(Overlay overlay) {
+    protected void updateOverlay(Overlay overlay) {
         try {
 
             Timer t = timerService.getTimer(this.getClass());
@@ -560,27 +602,45 @@ public class ImageWindow extends Window {
         }
     }
 
-    private void deleteOverlay(Overlay overlay) {
-        anchorPane.getChildren().remove(getDrawer(overlay).update(overlay, canvas.getCamera()));
-        if(getModifier(overlay) != null) anchorPane.getChildren().remove(getModifier(overlay).getModifiers(canvas.getCamera(), overlay));
+    private Node deleteOverlay(Overlay overlay) {
+        Node toRemove = getDrawer(overlay).update(overlay, canvas.getCamera());
+
+        if (getModifier(overlay) != null) {
+            anchorPane.getChildren().remove(getModifier(overlay).getModifiers(canvas.getCamera(), overlay));
+        }
         drawerMap.remove(overlay);
         modifierMap.remove(overlay);
+        return toRemove;
+    }
+
+    private void deleteOverlays(List<Overlay> overlay) {
+        Platform.runLater(() -> {
+            logger.info(String.format("Deleting %d overlays",overlay.size()));
+            anchorPane
+                    .getChildren()
+                    .removeAll(
+                            overlay
+                            .stream()
+                            .map(this::deleteOverlay)
+                            .collect(Collectors.toList())
+                    );
+        });
     }
 
     // add the MoveablePoints of a overlay in order to edit it
     private void setEdited(Overlay overlay) {
-        
-        if(overlay == null) {
+
+        if (overlay == null) {
             Platform.runLater(this::deleteAllModifiers); //deleteAllModifiers();
             return;
         }
-        
+
         if (getOverlays().contains(overlay) == false) {
             return;
         }
 
         // delete all the moveable points
-       deleteAllModifiers();
+        deleteAllModifiers();
 
         // if an overlay has been selected
         if (overlay != null) {
@@ -598,14 +658,16 @@ public class ImageWindow extends Window {
         }
 
     }
-    
+
     private void deleteAllModifiers() {
-         Node[] nodes = anchorPane.getChildren().stream().filter(node -> MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size -> new Node[size]);
+        Node[] nodes = anchorPane.getChildren().stream().filter(node -> MoveablePoint.class.isAssignableFrom(node.getClass())).toArray(size -> new Node[size]);
         anchorPane.getChildren().removeAll(nodes);
     }
 
     public void onViewPortChange(ViewPort viewport) {
-        updateOverlays();
+        updateOverlays(getOverlays());
+        canvas.repaint();
+
     }
 
     public void updateInfoLabel() {
@@ -645,7 +707,7 @@ public class ImageWindow extends Window {
     }
 
     public void setCurrentTool(FxTool tool) {
-         Platform.runLater(()->currentToolProperty.setValue(tool));
+        Platform.runLater(() -> currentToolProperty.setValue(tool));
         if (tool == currentTool) {
             return;
         }
@@ -657,7 +719,7 @@ public class ImageWindow extends Window {
             tool.subscribe(canvas);
         }
         currentTool = tool;
-       
+
     }
 
     /*
@@ -720,34 +782,40 @@ public class ImageWindow extends Window {
                 .filter(o -> isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o))
                 .collect(Collectors.toList());
 
-        wasOverlaySelected = touchedOverlay.size() > 0;
+        touchedOverlay.forEach(o -> {
+            System.out.println("Overlay : " + o);
+        });
 
+        wasOverlaySelected = touchedOverlay.size() > 0;
+        logger.info(String.format("%d overlay touched", touchedOverlay.size()));
         if (touchedOverlay.size() == 0) {
             overlaySelectionService.unselectedAll(imageDisplay);
         } else if (touchedOverlay.size() == 1) {
             overlaySelectionService.selectOnlyOneOverlay(imageDisplay, touchedOverlay.get(0));
         } else {
-            // TODO: 
+
         }
 
         if (!wasOverlaySelected) {
             setEdited(null);
         }
         //contextCalculationService.determineContext(imageDisplay, true);
-        refreshSourceImage();
+        //refreshSourceImage();
+        canvas.repaint();
         updateInfoLabel();
 
     }
 
     @EventHandler
-    protected void onEvent(final AxisPositionEvent event) {
+    protected void onAxisPositionChanged(final AxisPositionEvent event) {
 
         if (imageDisplay != event.getDisplay()) {
             logger.info("Ignoring event");
             return;
         }
         logger.info("Changing a axis");
-        imageDisplay.update();
+        //bus.channel(event);
+        //imageDisplay.update();
         //refreshSourceImage();
         //refreshSourceImage();
     }
@@ -759,12 +827,15 @@ public class ImageWindow extends Window {
             return;
         }
         logger.info("LUTsChangedEvent");
+        bus.channel(event);
+
+        getOverlays().stream().map(o -> new OverlayUpdatedEvent(o)).forEach(bus::channel);
+
         //  System.out.println(event.getView());
         // System.out.println(getDatasetview());
         //imageDisplay.update();
-        imageDisplayService.getActiveDataset(imageDisplay).update();
+        // last one : imageDisplayService.getActiveDataset(imageDisplay).update();
         //refreshSourceImage();
-
     }
 
     @EventHandler
@@ -774,8 +845,8 @@ public class ImageWindow extends Window {
             return;
         }
         logger.info("DatasetChangedEvent : " + event.getObject());
-        imageDisplay.update();
-
+        //imageDisplay.update();
+        bus.channel(event);
         //refreshSourceImage();
     }
 
@@ -787,7 +858,9 @@ public class ImageWindow extends Window {
             return;
         }
         logger.info("DisplayUpdatedEvent");
-        displayUpdateRequest.onNext(Boolean.TRUE);
+        bus.channel(event);
+        //displayUpdateRequest.onNext(Boolean.TRUE);
+        //displayUpdateRequestBuffer.queue(this::refreshSourceImage);
         //refreshSourceImage();
 
     }
@@ -801,44 +874,55 @@ public class ImageWindow extends Window {
         datasetService.getDatasets().remove(datasetService.getDatasets(imageDisplay));
         //mageDisplayService.getActiveDataset(imageDisplay).
         imageDisplay.close();
+
         eventService.publishLater(new DisplayDeletedEvent(imageDisplay));
     }
 
     @EventHandler
-    protected void onEvent(ToolChangeEvent event) {
+    protected void onToolChangedEvent(ToolChangeEvent event) {
         setCurrentTool(event.getTool());
     }
 
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
+
         if (event.getDisplay() != imageDisplay) {
             return;
         }
+
+        logger.info("Channeling event");
+        bus.channel(event);
+
         Platform.runLater(() -> setEdited(event.getOverlay()));
+
     }
 
     @EventHandler
     protected void onOverlayCreated(OverlayCreatedEvent event) {
+        logger.info("Overlay created");
         if (getOverlays().contains(event.getObject())) {
             //Platform.runLater(() -> updateOverlay(event.getObject()));
-            overlayToUpdate.onNext(event.getObject());
+            bus.channel(event);
+
         }
     }
 
     @EventHandler
     void onOverlayModified(OverlayUpdatedEvent event) {
+        logger.info("Overlay modified");
         if (getOverlays().contains(event.getObject())) {
-            //Platform.runLater(() -> updateOverlay(event.getObject()));
-            overlayToUpdate.onNext(event.getObject());
+            bus.channel(event);
         }
     }
 
     @EventHandler
     protected void onOverlayDeleted(OverlayDeletedEvent event) {
-
+        logger.info("Overlay deleted");
         if (drawerMap.keySet().contains(event.getObject()) == false) {
             return;
         }
+
+        bus.channel(event);
         setEdited(null);
 
         /*
@@ -849,11 +933,7 @@ public class ImageWindow extends Window {
                 .forEach(node->Platform.runLater(()->anchorPane.getChildren().remove(node)));
          */
         //updateOverlays();
-        Platform.runLater(() -> deleteOverlay(event.getObject()));
-    }
-
-    protected void updateDrawerList() {
-
+        //Platform.runLater(() -> deleteOverlay(event.getObject()));
     }
 
     protected OverlayDrawer getDrawer(Overlay overlay) {
@@ -881,14 +961,16 @@ public class ImageWindow extends Window {
     }
 
     protected void onMoveablePointMoved(Observable obs, Point2D oldValue, Point2D newValue) {
-        updateOverlays();
+        getOverlays().forEach(this::updateOverlay);
     }
 
     protected Cursor getToolDefaultCursor() {
-         
-        if(currentTool == null) return Cursor.DEFAULT;
-       
-        else return currentTool.getDefaultCursor();
+
+        if (currentTool == null) {
+            return Cursor.DEFAULT;
+        } else {
+            return currentTool.getDefaultCursor();
+        }
     }
-    
+
 }

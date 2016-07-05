@@ -262,7 +262,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @EventHandler
     public void onOverlayUpdated(OverlayUpdatedEvent event) {
-    Platform.runLater(()->updateChart(event.getObject()));
+        if(overlaySelectionService.getSelectedOverlays(imageDisplay) == event.getObject())
+        Platform.runLater(()->updateChart(event.getObject()));
     }
 
     
@@ -392,9 +393,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         ImageDisplay display = displayService.getActiveDisplay(ImageDisplay.class);
 
         overlaySelectionService.getSelectedOverlays(display).forEach(overlay -> {
-
             overlayService.removeOverlay(display, overlay);
-            eventService.publishLater(new OverlayDeletedEvent(overlay));
+            //eventService.publishLater(new OverlayDeletedEvent(overlay));
         });
         
         

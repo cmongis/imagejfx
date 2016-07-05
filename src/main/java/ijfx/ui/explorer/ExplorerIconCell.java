@@ -36,7 +36,7 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
     
     public ExplorerIconCell() {
         super();
-        
+        showIconProperty().setValue(false);
         setTitleFactory(this::getTitle);
         setSubtitleFactory(this::getSubtitle);
         setImageFactory(this::getImage);

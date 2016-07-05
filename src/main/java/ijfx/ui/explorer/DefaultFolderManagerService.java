@@ -204,7 +204,8 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
             task.start();
             loadingScreenService.frontEndTask(task, false);
         }
-        logger.info("Exploration mode changed : " + mode.toString());
+        
+        logger.info("Exploration mode changed : " + mode != null ? mode.toString() : null);
     }
     private void setItems(List<Explorable> items) {
         explorerService.setItems(items);

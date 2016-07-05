@@ -23,6 +23,7 @@ package ijfx.ui.plugin;
 import ijfx.ui.UiPlugin;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.main.ImageJFX;
 import java.util.HashMap;
 import javafx.scene.Node;
@@ -37,16 +38,25 @@ import org.scijava.plugin.Plugin;
 import org.scijava.plugins.commands.io.OpenFile;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.activity.ActivityService;
+import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.explorer.FolderManagerService;
+import java.io.File;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Side;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import mongis.utils.FXUtilities;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "open-image-button", localization = "topLeftHBox", context = "imagej segment segmentation explorer-activity explorer")
+@UiConfiguration(id = "open-image-button", localization = "topLeftHBox", context = "imagej segment segmentation explorerActivity explorer")
 public class OpenImageBar extends HBox implements UiPlugin {
 
-    Button openButton;
+    MenuButton openButton;
 
     Button previousButton;
 
@@ -70,6 +80,9 @@ public class OpenImageBar extends HBox implements UiPlugin {
     @Parameter
     ActivityService activityService;
 
+    @Parameter
+    FolderManagerService folderManagerService;
+    
     public OpenImageBar() {
         super();
 
@@ -82,13 +95,17 @@ public class OpenImageBar extends HBox implements UiPlugin {
         previousButton.setOnAction(event -> activityService.back());
         
         
-        openButton = GlyphsDude.createIconButton(FontAwesomeIcon.FOLDER_OPEN);
+        openButton = new MenuButton(null, new FontAwesomeIconView(FontAwesomeIcon.FOLDER_ALT));
+        
+        addAction("Open image",FontAwesomeIcon.PICTURE_ALT,this::openImage);
+        addAction("Explore folder",FontAwesomeIcon.COMPASS,this::explorerFolder);
         openButton.setTooltip(new Tooltip(OPEN_BUTTON_TXT));
         //openButton.setText(" ");
         openButton.getStyleClass().add("icon");
         openButton.setId("open-button");
-        openButton.setOnAction(event -> openImage());
-
+       
+        openButton.setPopupSide(Side.BOTTOM);
+        
         nextButton = GlyphsDude.createIconButton(FontAwesomeIcon.ARROW_CIRCLE_RIGHT);
         nextButton.setTooltip(new Tooltip(NEXT_BUTTON_TXT));
         nextButton.getStyleClass().add("icon");
@@ -108,7 +125,7 @@ public class OpenImageBar extends HBox implements UiPlugin {
         return this;
     }
 
-    private void openImage() {
+    private void openImage(ActionEvent event) {
         commandService.run(OpenFile.class, true, new HashMap<String, Object>());
     }
 
@@ -119,4 +136,22 @@ public class OpenImageBar extends HBox implements UiPlugin {
     private void previousImage() {
         activityService.forward();
     }
+    
+    private void addAction(String action, FontAwesomeIcon icon, EventHandler<ActionEvent> event) {
+        MenuItem item = new MenuItem(action, new FontAwesomeIconView(icon));
+        item.setOnAction(event);
+        openButton.getItems().add(item);
+    }
+    
+    
+    private void explorerFolder(ActionEvent event) {
+        
+        
+        File openFolder = FXUtilities.openFolder("Explorer folder", null);
+        if(openFolder!=null) {
+            folderManagerService.addFolder(openFolder);
+            activityService.openByType(ExplorerActivity.class);
+        }
+    }
+    
 }
