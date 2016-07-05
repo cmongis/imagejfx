@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <main-class>ijfx.ui.main.ImageJFX</main-class>
     </properties>
     
     <repositories>
@@ -41,7 +42,12 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej</artifactId>
-            <version>2.0.0-rc-45-SNAPSHOT</version>
+            <version>2.0.0-rc-45</version>
+        </dependency>
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>imagej-deprecated</artifactId>
+            <version>0.1.1</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
@@ -226,7 +232,7 @@
                             -->
                             <classpathPrefix>lib/</classpathPrefix>
                             <!-- Configures the main class of the application -->
-                            <mainClass>ijfx.ui.main.ImageJFX</mainClass>
+                            <mainClass>${main-class}</mainClass>
                         </manifest>
                         
                         <manifestEntries>
@@ -254,6 +260,41 @@
         
     </build>
     
-    
-    
+    <profiles>
+        <!--
+        The exec profile provides an easy way to execute a defined ${main-class}
+        for manual testing purposes. It is declared in a profile to avoid clashing
+        with other potential uses of exec-maven-plugin during the main build.
+        -->
+        <profile>
+            <id>exec</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.5.0</version>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>${main-class}</argument>
+                            </arguments>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
