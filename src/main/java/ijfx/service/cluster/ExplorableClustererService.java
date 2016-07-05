@@ -19,6 +19,7 @@
  */
 package ijfx.service.cluster;
 
+import ijfx.core.listenableSystem.MetaDataSetUtils;
 import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,23 +59,12 @@ public class ExplorableClustererService extends AbstractService implements Image
             result.add(listExplorable);
             return result;
         }
-        Map<Explorable, double[]> explorableMap = new HashMap();
-        listExplorable.stream().forEach(e -> {
-            double[] values = getMetadatas(e, metadataKeys);
-            explorableMap.put(e, values);
+        List<ObjectClusterable> objectClusterables = 
+                listExplorable.stream()
+                .map(e -> new ObjectClusterable(e, 1, MetaDataSetUtils.getMetadatas(e, metadataKeys))).collect(Collectors.toList());
 
-        });
-
-        return clustererService.buildClusterer(explorableMap, metadataKeys);
+        return clustererService.buildClusterer(objectClusterables, metadataKeys);
     }
 
-    public double[] getMetadatas(Explorable explorable, List<String> metadataKeys) {
-
-        final double[] result = new double[metadataKeys.size()];
-        for (int i = 0; i < metadataKeys.size(); i++) {
-            String str = metadataKeys.get(i);
-            result[i] = explorable.getMetaDataSet().get(str).getDoubleValue();
-        }
-        return result;
-    }
+   
 }

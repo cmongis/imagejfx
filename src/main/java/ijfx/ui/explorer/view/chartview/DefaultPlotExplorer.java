@@ -51,12 +51,25 @@ public class DefaultPlotExplorer implements PlotExplorer {
 
     ImageView imageView;
 
+    public DefaultPlotExplorer(ExplorerService explorerService, Explorable explorable, double x, double y) {
+        this.explorerService = explorerService;
+        this.explorable = explorable;
+        this.x = x;
+        this.y = y;
+        this.data = new Data(x, y);
+        addNode();
+    }
+
     public DefaultPlotExplorer(Explorable explorable, String[] metadataKeys, ExplorerService explorerService) {
         this.explorerService = explorerService;
         this.explorable = explorable;
         x = explorable.getMetaDataSet().get(metadataKeys[0]).getDoubleValue();
         y = explorable.getMetaDataSet().get(metadataKeys[1]).getDoubleValue();
         this.data = new Data(x, y);
+        addNode();
+    }
+
+    public void addNode() {
         TogglePlot togglePlot = new TogglePlot();
         togglePlot.setPrefSize(10, 10);
         togglePlot.selectedProperty().bindBidirectional(this.explorable.selectedProperty());
@@ -67,7 +80,7 @@ public class DefaultPlotExplorer implements PlotExplorer {
         });
         this.data.setNode(togglePlot);
         setPopOver(this.data.getNode());
-        this.data.getNode().setOnMouseClicked(e ->actionPopOver());
+        this.data.getNode().setOnMouseClicked(e -> actionPopOver());
 
     }
 
@@ -112,7 +125,7 @@ public class DefaultPlotExplorer implements PlotExplorer {
                     imageView.setOnMouseClicked(c -> {
                         explorerService.open(explorable);
                         popOver.hide();
-                            });
+                    });
                     popOver.setContentNode(borderPane);
                 })
                 .start();

@@ -132,10 +132,10 @@ public class ChartView extends FilterView implements ExplorerView {
     public void setSelectedItem(List<? extends Explorable> items) {
     }
 
-    private void addDataToChart(List<? extends Explorable> list, Color color) {
+    private void addDataToChart(List<? extends Explorable> list) {
 
         Series series = new Series();
-        series.setNode(new Button("e"));
+//        series.setNode(new Button("e"));
         List<Data> listExplorers = list
                 .stream()
                 .map(e -> {
@@ -145,6 +145,8 @@ public class ChartView extends FilterView implements ExplorerView {
                 .collect(Collectors.toList());
         series.getData().addAll(listExplorers);
         scatterChart.getData().add(series);
+        
+    
         series.setName("Tuan anh is awesome");
 
     }
@@ -160,12 +162,10 @@ public class ChartView extends FilterView implements ExplorerView {
             scatterChart.getData().clear();
 
             List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
-            ColorGenerator colorGenerator = new ColorGenerator(clustersList.size());
-            colorGenerator.generateColor();
-            List<Color> colors = colorGenerator.getColorList();
-            for (int i = 0; i < clustersList.size(); i++) {
-                addDataToChart(clustersList.get(i), colors.get(i));
-            }
+        
+            clustersList
+                    .stream()
+                    .forEach(e -> addDataToChart(e));
 
             bindLegend();
         }

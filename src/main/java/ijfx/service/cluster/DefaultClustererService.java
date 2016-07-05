@@ -36,14 +36,13 @@ import weka.clusterers.XMeans;
 import weka.core.Attribute;
 import weka.core.Instances;
 import ijfx.ui.explorer.ObjectWrapper;
-import java.util.Map;
 
 /**
  *
  * @author Tuan anh TRINH
  */
 @Plugin(type = Service.class)
-public class DefaultClustererService extends AbstractService implements ClustererService<Object> {
+public class DefaultClustererService extends AbstractService implements ClustererService<ObjectClusterable> {
 
     private XMeans xmeans;
 
@@ -53,29 +52,27 @@ public class DefaultClustererService extends AbstractService implements Clustere
 
     /**
      *
-     * @param map
+     * @param objectWrappers
      * @param attributsString
      * @return
      */
     @Override
-    public List<List<Object>> buildClusterer(Map<Object, double[]> map, List<String> attributsString) {
-        Set<Object> objectSet = map.keySet();
-        xmeans.setMaxNumClusters(objectSet.size() - 1);
+    public List<List<Object>> buildClusterer(List<ObjectClusterable> objectWrappers, List<String> attributsString) {
+//        Set<Object> objectSet = map.keySet();
+        xmeans.setMaxNumClusters(objectWrappers.size() - 1);
 
-        ArrayList<Attribute> attributes = 
-                attributsString.stream()
-                        .map(e -> new Attribute(e))
-                        .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Attribute> attributes
+                = attributsString.stream()
+                .map(e -> new Attribute(e))
+                .collect(Collectors.toCollection(ArrayList::new));
         Set<Attribute> setAttributes = new HashSet<>(attributes);
         if (setAttributes.size() != attributes.size()) {
             List<List<Object>> result = new ArrayList<>();
-            result.add((List<Object>) objectSet);
+            result.add((List<Object>) objectWrappers.stream().map(e -> e.getObject()).collect(Collectors.toList()));
             return result;
         }
-        Instances data = new Instances("Cluster Service", attributes, objectSet.size());
-        objectSet.stream().forEach(e -> {
-            data.add(new ObjectClusterable(e, 1, map.get(e)));
-        });
+        Instances data = new Instances("Cluster Service", attributes, objectWrappers.size());
+        data.addAll(objectWrappers);
 
         try {
             xmeans.buildClusterer(data);
@@ -85,8 +82,13 @@ public class DefaultClustererService extends AbstractService implements Clustere
         return getClusters(data);
 
     }
-   
 
+    @Override
+    public List<List<Object>> buildClusterer(List<ObjectClusterable> listExplorable, String metadataKey) {
+        List<String> attributsList = new ArrayList<>();
+        attributsList.add(metadataKey);
+        return buildClusterer(listExplorable, attributsList);
+    }
 
     public List<List<Object>> getClusters(Instances data) {
         try {
@@ -131,4 +133,5 @@ public class DefaultClustererService extends AbstractService implements Clustere
             e.printStackTrace();
         }
     }
+
 }

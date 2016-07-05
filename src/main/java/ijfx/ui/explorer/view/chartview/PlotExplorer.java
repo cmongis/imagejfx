@@ -26,7 +26,7 @@ import ijfx.ui.explorer.ObjectWrapper;
  *
  * @author Tuan anh TRINH
  */
-interface PlotExplorer extends ObjectWrapper{
+public interface PlotExplorer extends ObjectWrapper{
     
     public Data getData();
 }

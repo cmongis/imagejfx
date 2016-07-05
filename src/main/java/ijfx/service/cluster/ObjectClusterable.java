@@ -19,7 +19,6 @@
  */
 package ijfx.service.cluster;
 
-import ijfx.ui.explorer.Explorable;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import ijfx.ui.explorer.ObjectWrapper;
