@@ -63,7 +63,7 @@ public class RequestBuffer {
     
     
     public void runOnce() {
-        Runnable runnable = queue.get(0);
+        Runnable runnable = queue.get(queue.size()-1);
         queue.clear();
         runnable.run();
     }
