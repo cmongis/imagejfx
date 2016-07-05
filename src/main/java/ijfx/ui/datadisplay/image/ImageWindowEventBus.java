@@ -20,20 +20,15 @@
 package ijfx.ui.datadisplay.image;
 
 import ijfx.service.overlay.OverlaySelectedEvent;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import javafx.application.Platform;
-import net.imagej.display.ImageDisplay;
+import ijfx.service.overlay.OverlaySelectionEvent;
 import net.imagej.display.event.AxisPositionEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
-import net.imagej.overlay.Overlay;
 import org.apache.commons.lang.ArrayUtils;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.SciJavaEvent;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 /**
@@ -51,7 +46,7 @@ public class ImageWindowEventBus {
     };
 
     private Class<?>[] overlayEvents = new Class<?>[]{
-        OverlayUpdatedEvent.class, OverlayCreatedEvent.class, OverlaySelectedEvent.class
+        OverlayUpdatedEvent.class, OverlayCreatedEvent.class, OverlaySelectionEvent.class,OverlaySelectedEvent.class
     };
 
     public ImageWindowEventBus() {

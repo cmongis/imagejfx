@@ -29,6 +29,7 @@ import ijfx.ui.tool.ToolChangeEvent;
 import ijfx.ui.tool.DefaultFxToolService;
 import ijfx.service.uicontext.UiContextCalculatorService;
 import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.ui.arcmenu.PopArcMenu;
@@ -297,11 +298,12 @@ public class ImageWindow extends Window {
         initEventBuffering();
 
     }
-    
+
     public void onWindowSizeChanged(Observable obs) {
         canvas.repaint();
         updateOverlays(getOverlays());
     }
+
     public void onFocus(Observable focusProperty, Boolean oldValue, Boolean newValue) {
         if (newValue) {
             putInFront();
@@ -377,21 +379,24 @@ public class ImageWindow extends Window {
         // stream intercepting all event causing a redrawing of the overlay
         bus.getStream(SciJavaEvent.class)
                 .filter(bus::isOverlayEvent) // filter all the events that should update an overlay
-                .buffer(1000/24, TimeUnit.MILLISECONDS) // we buffer them to avoid any overlap
+                .buffer(1000 / 24, TimeUnit.MILLISECONDS) // we buffer them to avoid any overlap
                 .filter(list -> !list.isEmpty()) // we check for event that are not empty event
                 .map(list -> list.stream().map(this::extractOverlayFromEvent).collect(Collectors.toList())) // the list is map to overlay
                 .subscribe(this::updateOverlays);
 
+        
+        
         // stream intercepting all the event causing a overlay to be deleted
         bus.getStream(OverlayDeletedEvent.class)
                 .map(event -> event.getObject())
-                .buffer(1000/24, TimeUnit.MILLISECONDS)
+                .buffer(1000 / 24, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
                 .subscribe(this::deleteOverlays);
 
     }
 
     protected Overlay extractOverlayFromEvent(SciJavaEvent event) {
+        logger.info("Mapping event to overlay");
         if (event instanceof OverlayCreatedEvent) {
             return ((OverlayCreatedEvent) event).getObject();
         }
@@ -400,6 +405,9 @@ public class ImageWindow extends Window {
         }
         if (event instanceof OverlaySelectionEvent) {
             return ((OverlaySelectionEvent) event).getOverlay();
+        }
+        if(event instanceof OverlaySelectedEvent) {
+            return ((OverlaySelectedEvent) event).getOverlay();
         }
         return null;
     }
@@ -553,14 +561,11 @@ public class ImageWindow extends Window {
     }
 
     private void updateOverlays(List<Overlay> overlays) {
-        
-        
-        
+
         Collection<Overlay> toTreat = new HashSet<>(overlays);
-        
+
         logger.info(String.format("Received %d, treating %d overlays", overlays.size(), toTreat.size()));
-        
-        
+
         Platform.runLater(() -> {
             toTreat.forEach(this::updateOverlay);
         });
@@ -609,16 +614,17 @@ public class ImageWindow extends Window {
     }
 
     private void deleteOverlays(List<Overlay> overlay) {
-
-        anchorPane
-                .getChildren()
-                .removeAll(
-                        overlay
-                        .stream()
-                        .map(this::deleteOverlay)
-                        .collect(Collectors.toList())
-                );
-
+        Platform.runLater(() -> {
+            logger.info(String.format("Deleting %d overlays",overlay.size()));
+            anchorPane
+                    .getChildren()
+                    .removeAll(
+                            overlay
+                            .stream()
+                            .map(this::deleteOverlay)
+                            .collect(Collectors.toList())
+                    );
+        });
     }
 
     // add the MoveablePoints of a overlay in order to edit it
@@ -660,6 +666,8 @@ public class ImageWindow extends Window {
 
     public void onViewPortChange(ViewPort viewport) {
         updateOverlays(getOverlays());
+        canvas.repaint();
+
     }
 
     public void updateInfoLabel() {
@@ -774,21 +782,26 @@ public class ImageWindow extends Window {
                 .filter(o -> isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o))
                 .collect(Collectors.toList());
 
-        wasOverlaySelected = touchedOverlay.size() > 0;
+        touchedOverlay.forEach(o -> {
+            System.out.println("Overlay : " + o);
+        });
 
+        wasOverlaySelected = touchedOverlay.size() > 0;
+        logger.info(String.format("%d overlay touched", touchedOverlay.size()));
         if (touchedOverlay.size() == 0) {
             overlaySelectionService.unselectedAll(imageDisplay);
         } else if (touchedOverlay.size() == 1) {
             overlaySelectionService.selectOnlyOneOverlay(imageDisplay, touchedOverlay.get(0));
         } else {
-            // TODO: 
+
         }
 
         if (!wasOverlaySelected) {
             setEdited(null);
         }
         //contextCalculationService.determineContext(imageDisplay, true);
-        refreshSourceImage();
+        //refreshSourceImage();
+        canvas.repaint();
         updateInfoLabel();
 
     }
@@ -815,15 +828,14 @@ public class ImageWindow extends Window {
         }
         logger.info("LUTsChangedEvent");
         bus.channel(event);
-        
-        getOverlays().stream().map(o->new OverlayUpdatedEvent(o)).forEach(bus::channel);
-        
+
+        getOverlays().stream().map(o -> new OverlayUpdatedEvent(o)).forEach(bus::channel);
+
         //  System.out.println(event.getView());
         // System.out.println(getDatasetview());
         //imageDisplay.update();
         // last one : imageDisplayService.getActiveDataset(imageDisplay).update();
         //refreshSourceImage();
-
     }
 
     @EventHandler
@@ -873,11 +885,16 @@ public class ImageWindow extends Window {
 
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
-        
+
         if (event.getDisplay() != imageDisplay) {
             return;
         }
+
+        logger.info("Channeling event");
+        bus.channel(event);
+
         Platform.runLater(() -> setEdited(event.getOverlay()));
+
     }
 
     @EventHandler
