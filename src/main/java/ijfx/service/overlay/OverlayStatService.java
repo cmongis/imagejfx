@@ -25,6 +25,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
@@ -368,10 +369,10 @@ public class OverlayStatService extends AbstractService implements ImageJService
     
     
     public Overlay cleanOverlay(Overlay overlay){
-
+        
         PolygonRegionOfInterest roi = (PolygonRegionOfInterest) overlay.getRegionOfInterest();
         int npoints = roi.getVertexCount();
-
+       
         if(npoints >= 3){
             
             int i;
@@ -395,7 +396,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
                     npoints--;
                 }
             }
-            
+        
         }
         
         return overlay;
