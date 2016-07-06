@@ -22,7 +22,9 @@ package ijfx.ui.datadisplay.image;
 import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import net.imagej.display.event.AxisPositionEvent;
+import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.display.event.LUTsChangedEvent;
+import net.imagej.event.DatasetUpdatedEvent;
 import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import org.apache.commons.lang.ArrayUtils;
@@ -41,8 +43,10 @@ public class ImageWindowEventBus {
 
     private Class<?>[] displayEvents = new Class<?>[]{
         DisplayUpdatedEvent.class,
+        DatasetUpdatedEvent.class,
         LUTsChangedEvent.class,
-        AxisPositionEvent.class
+        AxisPositionEvent.class,
+        DataViewUpdatedEvent.class 
     };
 
     private Class<?>[] overlayEvents = new Class<?>[]{
