@@ -29,7 +29,7 @@ import net.imglib2.type.numeric.RealType;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 public  class HyperStackConverter {
 

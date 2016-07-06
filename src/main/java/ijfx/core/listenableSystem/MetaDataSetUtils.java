@@ -20,6 +20,7 @@
 package ijfx.core.listenableSystem;
 
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.ui.explorer.Explorable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,5 +36,15 @@ public class MetaDataSetUtils {
             possibleKeys.addAll(set.keySet());
         });
         return possibleKeys;
+    }
+    
+     public static double[] getMetadatas(Explorable explorable, List<String> metadataKeys) {
+
+        final double[] result = new double[metadataKeys.size()];
+        for (int i = 0; i < metadataKeys.size(); i++) {
+            String str = metadataKeys.get(i);
+            result[i] = explorable.getMetaDataSet().get(str).getDoubleValue();
+        }
+        return result;
     }
 }

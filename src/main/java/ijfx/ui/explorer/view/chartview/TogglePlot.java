@@ -17,51 +17,39 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.filter.string;
+package ijfx.ui.explorer.view.chartview;
+
+import javafx.collections.ObservableList;
+import javafx.scene.control.ToggleButton;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class DefaultItem implements Item{
+public class TogglePlot extends ToggleButton {
 
-    private String name;
-    private boolean state;
-    private int number;
+    final static String DEFAULT_COLOR = "-fx-background-color: blue";
+    String colorBackGround;
 
-    public DefaultItem(String s, Integer i) {
-        this.name = s;
-        this.number = i;
-        this.state = false;
-    }
-    @Override
-    public String getName() {
-           return name;
+    public TogglePlot() {
+        super();
     }
 
-    @Override
-    public void setName(String name) {
-        this.name = name;
+    public TogglePlot(ObservableList<String> l) {
+        this.getStyleClass().addAll(l);
     }
 
-    @Override
-    public boolean getState() {
-        return this.state;
-    }
-
-    @Override
-    public void setState(boolean state) {
-        this.state = state;
-    }
-
-    @Override
-    public int getNumber() {
-        return this.number;
-    }
-
-    @Override
-    public void setNumber(int n) {
-        this.number = n;
+    public TogglePlot(TogglePlot togglePlot) {
+        super();
+        this.getStyleClass().clear();
+        this.getStyleClass().addAll(togglePlot.getStyleClass());
     }
     
+    public void bind(TogglePlot togglePlot){
+        this.selectedProperty().addListener((obs, old, n) -> {
+            togglePlot.selectedProperty().set(n);
+            this.setStyle(togglePlot.getStyle());
+        });
+    }
+
 }

@@ -17,16 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.data.cluster;
 
-import weka.core.Instance;
+import ijfx.core.project.BaseSciJavaTest;
+import ijfx.service.cluster.PCAProcesser;
+import org.junit.Test;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface ExplorableWrapper{
+public class PCAProcesserTest extends BaseSciJavaTest {
 
-    public Explorable getExplorable();
+    @Test
+    public void applyPCATest() throws Exception {
+        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource("/home/tuananh/Desktop/pcaTest.arff");
+        PCAProcesser pCAProcesser = new PCAProcesser();
+        Instances data = dataSource.getDataSet();
+        pCAProcesser.applyPCAtoInstances(data);
+    }
 
 }

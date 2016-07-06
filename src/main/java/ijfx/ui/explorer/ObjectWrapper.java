@@ -17,23 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.filter.string;
+package ijfx.ui.explorer;
+
+import weka.core.Instance;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface Item {
-    
-    public String getName();
+public interface ObjectWrapper{
 
-    public void setName(String name) ;
+    public Object getObject();
 
-    public boolean getState();
-
-    public void setState(boolean state);  
-    
-    public int getNumber();
-
-    public void setNumber(int n);
 }

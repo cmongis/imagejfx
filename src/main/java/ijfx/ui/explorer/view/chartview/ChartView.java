@@ -22,7 +22,9 @@ package ijfx.ui.explorer.view.chartview;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ClustererService;
+import ijfx.service.cluster.ExplorableClustererService;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.view.FilterView;
 import ijfx.ui.explorer.view.GridIconView;
@@ -35,34 +37,31 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Rectangle;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 @Plugin(type = ExplorerView.class)
 
 public class ChartView extends FilterView implements ExplorerView {
 
     @Parameter
-    ClustererService clustererService;
+    ExplorableClustererService explorableClustererService;
+
+    @Parameter
+    ExplorerService explorerService;
+
     @FXML
     ScatterChart<Number, Number> scatterChart;
 
@@ -86,8 +85,6 @@ public class ChartView extends FilterView implements ExplorerView {
         comboBoxList.add(xComboBox);
         comboBoxList.add(yComboBox);
         metadatas = new String[2];
-        final NumberAxis xAxis = new NumberAxis(0, 10, 1);
-        final NumberAxis yAxis = new NumberAxis(-100, 500, 100);
 
         scatterChart.setTitle("ChartView");
         scatterChart.getXAxis().labelProperty().bind(xComboBox.getSelectionModel().selectedItemProperty());
@@ -111,11 +108,15 @@ public class ChartView extends FilterView implements ExplorerView {
         computeItems();
 
         List<String> metadataList = this.getMetaDataKey(items);
+
         comboBoxList.stream().forEach(c -> {
+            String s = c.getSelectionModel().getSelectedItem();
             c.getItems().clear();
             c.getItems().addAll(metadataList);
+            if (metadataList.contains(s)) {
+                c.getSelectionModel().select(s);
+            }
         });
-
     }
 
     @Override
@@ -123,7 +124,7 @@ public class ChartView extends FilterView implements ExplorerView {
         return currentItems
                 .stream()
                 .map(item -> (Explorable) item)
-                .filter(item -> item.selectedProperty().getValue())
+                .filter(item -> item.selectedProperty().getValue() == true)
                 .collect(Collectors.toList());
     }
 
@@ -131,90 +132,85 @@ public class ChartView extends FilterView implements ExplorerView {
     public void setSelectedItem(List<? extends Explorable> items) {
     }
 
-    private void addDataToChart(List<Explorable> list, Node node) {
-       
-        Series series = new Series();
-        series.setNode(node);
+    private void addDataToChart(List<? extends Explorable> list) {
 
+        Series series = new Series();
+//        series.setNode(new Button("e"));
         List<Data> listExplorers = list
                 .stream()
-                .map(e -> new DefaultPlotExplorer(e, metadatas, node).getData())
+                .map(e -> {
+                    PlotExplorer plotExplorer = new DefaultPlotExplorer(e, metadatas, explorerService);
+                    return plotExplorer.getData();
+                })
                 .collect(Collectors.toList());
         series.getData().addAll(listExplorers);
         scatterChart.getData().add(series);
-        series.setName(node.toString());
-
-    }
+        
     
-    public Data<Number,Number> transform(Explorable explorable) {
-        
-        String xKey = xComboBox.getSelectionModel().getSelectedItem();
-        String yKey = yComboBox.getSelectionModel().getSelectedItem();
-        
-        return new Data<>(explorable.getMetaDataSet().get(xKey).getDoubleValue(),explorable.getMetaDataSet().get(yKey).getDoubleValue());
+        series.setName("Tuan anh is awesome");
+
     }
 
+//   
     /**
      * Perform a clustering algorithm and load the series.
      */
     public void computeItems() {
-        
-        
-        if(xComboBox.getSelectionModel().getSelectedItem() == null) return;
-        if(yComboBox.getSelectionModel().getSelectedItem() == null) return;
-        
-        Series<Number,Number> series = new Series<>();
-        
-        series.getData().addAll(
-                
-                currentItems
-                        .parallelStream()
-                        .map(this::transform)
-                        .collect(Collectors.toList())
-        );
-        
-        scatterChart.getData().clear();
-        scatterChart.getData().add(series);
-       
-        
-        /*
+
         if (metadatas[0] != null && metadatas[1] != null) {
 
             scatterChart.getData().clear();
 
-            List<List<Explorable>> clustersList = clustererService.buildClusterer(currentItems, Arrays.asList(metadatas));
-            ColorGenerator colorGenerator = new ColorGenerator(clustersList.size());
-            colorGenerator.generateColor();
-            List<Color> colors = colorGenerator.getColorList();
-            for (int i = 0; i < clustersList.size(); i++) {
-                final Rectangle rectangle = new Rectangle(10, 10, colors.get(i));
-                System.out.println("ijfx.ui.explorer.view.chartview.ChartView.computeItems()");
-                addDataToChart(clustersList.get(i), rectangle);
-            }
+            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
+        
+            clustersList
+                    .stream()
+                    .forEach(e -> addDataToChart(e));
 
-            Set<Node> items = scatterChart.lookupAll("Label.chart-legend-item");
-            int i = 0;
-            for (Node item : items) {
-                Label label = (Label) item;
-                final Rectangle rectangle = new Rectangle(10, 10, colors.get(i));
-
-                label.setGraphic(rectangle);
-                i++;
-            }
-
-        }*/
+            bindLegend();
+        }
     }
 
     @Override
     public void initComboBox() {
         xComboBox.getSelectionModel().selectedItemProperty().addListener((obs, old, n) -> {
             metadatas[0] = n;
+            deselecItems();
             computeItems();
         });
         yComboBox.getSelectionModel().selectedItemProperty().addListener((obs, old, n) -> {
             metadatas[1] = n;
+            deselecItems();
             computeItems();
         });
+    }
+
+    public void deselecItems() {
+        currentItems.stream()
+                .forEach(e -> e.selectedProperty().set(false));
+    }
+
+    public void bindLegend() {
+        for (Series series : scatterChart.getData()) {
+
+            Node node = scatterChart.lookup(".series" + scatterChart.getData().indexOf(series));
+            Set<Node> legendItems = scatterChart.lookupAll("Label.chart-legend-item");
+
+            for (Node legend : legendItems) {
+                Label labelLegend = (Label) legend;
+                if (node.getStyleClass().get(1).equals(labelLegend.getGraphic().getStyleClass().get(2))) {
+                    TogglePlot togglePlot = new TogglePlot();
+                    togglePlot.getStyleClass().clear();
+                    togglePlot.getStyleClass().addAll(labelLegend.getGraphic().getStyleClass());
+                    labelLegend.setGraphic(togglePlot);
+                    series.getData().stream().forEach(e -> {
+                        TogglePlot togglePlotData = (TogglePlot) ((Data) e).getNode();
+                        togglePlot.bind(togglePlotData);
+                    });
+                    break;
+                }
+            }
+        }
     }
 
 }

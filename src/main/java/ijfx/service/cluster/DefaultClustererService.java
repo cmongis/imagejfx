@@ -19,7 +19,6 @@
  */
 package ijfx.service.cluster;
 
-import ijfx.ui.explorer.ExplorableWrapper;
 import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,13 +35,14 @@ import weka.clusterers.Clusterer;
 import weka.clusterers.XMeans;
 import weka.core.Attribute;
 import weka.core.Instances;
+import ijfx.ui.explorer.ObjectWrapper;
 
 /**
  *
- * @author Explorableuan anh ExplorableRINH
+ * @author Tuan anh TRINH
  */
 @Plugin(type = Service.class)
-public class DefaultClustererService extends AbstractService implements ClustererService<Explorable> {
+public class DefaultClustererService extends AbstractService implements ClustererService<ObjectClusterable> {
 
     private XMeans xmeans;
 
@@ -52,28 +52,27 @@ public class DefaultClustererService extends AbstractService implements Clustere
 
     /**
      *
-     * @param listExplorable
-     * @param metadataKeys
+     * @param objectWrappers
+     * @param attributsString
      * @return
      */
     @Override
-    public List<List<Explorable>> buildClusterer(List<Explorable> listExplorable, List<String> metadataKeys) {
-        xmeans.setMaxNumClusters(listExplorable.size() - 1);
-        ArrayList<Attribute> attributes = metadataKeys.stream()
-                .map((s) -> new Attribute(s))
-                .collect(Collectors.toCollection(ArrayList::new));
+    public List<List<Object>> buildClusterer(List<ObjectClusterable> objectWrappers, List<String> attributsString) {
+//        Set<Object> objectSet = map.keySet();
+        xmeans.setMaxNumClusters(objectWrappers.size() - 1);
 
+        ArrayList<Attribute> attributes
+                = attributsString.stream()
+                .map(e -> new Attribute(e))
+                .collect(Collectors.toCollection(ArrayList::new));
         Set<Attribute> setAttributes = new HashSet<>(attributes);
         if (setAttributes.size() != attributes.size()) {
-            List<List<Explorable>> result = new ArrayList<>();
-            result.add(listExplorable);
+            List<List<Object>> result = new ArrayList<>();
+            result.add((List<Object>) objectWrappers.stream().map(e -> e.getObject()).collect(Collectors.toList()));
             return result;
         }
-        Instances data = new Instances("Cluster Service", attributes, listExplorable.size());
-        listExplorable.stream().forEach(e -> {
-            double[] values = getMetadatas(e, metadataKeys);
-            data.add(new DefaultExplorableClusterable(e, 1, values));
-        });
+        Instances data = new Instances("Cluster Service", attributes, objectWrappers.size());
+        data.addAll(objectWrappers);
 
         try {
             xmeans.buildClusterer(data);
@@ -85,24 +84,22 @@ public class DefaultClustererService extends AbstractService implements Clustere
     }
 
     @Override
-    public List<List<Explorable>> buildClusterer(List<Explorable> listExplorable, String metadataKey) {
-        List<String> metadataKeys = new ArrayList<>();
-        metadataKeys.add(metadataKey);
-        return buildClusterer(listExplorable, metadataKeys);
+    public List<List<Object>> buildClusterer(List<ObjectClusterable> listExplorable, String metadataKey) {
+        List<String> attributsList = new ArrayList<>();
+        attributsList.add(metadataKey);
+        return buildClusterer(listExplorable, attributsList);
     }
 
-    public List<List<Explorable>> getClusters(Instances data) {
+    public List<List<Object>> getClusters(Instances data) {
         try {
-            List<List<Explorable>> result = new ArrayList<>(xmeans.numberOfClusters());
-            System.out.println("ijfx.service.cluster.DefaultClustererService.getClusters() " + xmeans.numberOfClusters());
+            List<List<Object>> result = new ArrayList<>(xmeans.numberOfClusters());
             IntStream.range(0, xmeans.numberOfClusters())
                     .forEach(i -> result.add(i, new ArrayList<>()));
             for (int i = 0; i < data.numInstances(); i++) {
                 int position = xmeans.clusterInstance(data.instance(i));
-                if (data.instance(i) instanceof DefaultExplorableClusterable) {
-                    ExplorableWrapper e = (ExplorableWrapper) data.instance(i);
-                    Explorable explorable = e.getExplorable();
-                    result.get(position).add(explorable);
+                if (data.instance(i) instanceof ObjectClusterable) {
+                    ObjectWrapper e = (ObjectWrapper) data.instance(i);
+                    result.get(position).add(e.getObject());
 
                 }
             }
@@ -132,9 +129,9 @@ public class DefaultClustererService extends AbstractService implements Clustere
     public void setClusterer(Clusterer clusterer) {
         try {
             this.xmeans = (XMeans) clusterer;
-
         } catch (ClassCastException e) {
             e.printStackTrace();
         }
     }
+
 }

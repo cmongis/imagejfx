@@ -21,6 +21,8 @@ package ijfx.ui.explorer.view;
 
 import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
@@ -49,6 +51,7 @@ public abstract class FilterView extends AnchorPane {
                 }
             });
         });
+        Collections.sort(keyList);
         return keyList;
     }
     

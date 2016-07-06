@@ -33,7 +33,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author tuananh
+ * @author Tuan anh TRINH
  */
 //@Plugin(type = Command.class, menuPath = "Plugins>StacktoHS", label = "Test plugin")
 @Plugin(type = Command.class, menuPath = "Image > Hyperstacks > Stack to Hyperstack...", attrs = {

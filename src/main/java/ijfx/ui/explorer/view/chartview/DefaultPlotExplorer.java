@@ -20,13 +20,14 @@
 package ijfx.ui.explorer.view.chartview;
 
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerService;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.ImageViewBuilder;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.BorderPane;
 import mongis.utils.CallbackTask;
 import org.controlsfx.control.PopOver;
 
@@ -35,6 +36,8 @@ import org.controlsfx.control.PopOver;
  * @author Tuan anh TRINH
  */
 public class DefaultPlotExplorer implements PlotExplorer {
+
+    ExplorerService explorerService;
 
     private Explorable explorable;
 
@@ -48,33 +51,41 @@ public class DefaultPlotExplorer implements PlotExplorer {
 
     ImageView imageView;
 
-    public DefaultPlotExplorer(double width, double height) {
-
-    }
-
-    public DefaultPlotExplorer(Explorable explorable, double width, double height) {
+    public DefaultPlotExplorer(ExplorerService explorerService, Explorable explorable, double x, double y) {
+        this.explorerService = explorerService;
         this.explorable = explorable;
+        this.x = x;
+        this.y = y;
+        this.data = new Data(x, y);
+        addNode();
     }
 
-    public DefaultPlotExplorer(Explorable explorable, String[] metadataKeys, Node node) {
+    public DefaultPlotExplorer(Explorable explorable, String[] metadataKeys, ExplorerService explorerService) {
+        this.explorerService = explorerService;
         this.explorable = explorable;
         x = explorable.getMetaDataSet().get(metadataKeys[0]).getDoubleValue();
         y = explorable.getMetaDataSet().get(metadataKeys[1]).getDoubleValue();
         this.data = new Data(x, y);
-        this.data.setNode(node);
+        addNode();
+    }
+
+    public void addNode() {
+        TogglePlot togglePlot = new TogglePlot();
+        togglePlot.setPrefSize(10, 10);
+        togglePlot.selectedProperty().bindBidirectional(this.explorable.selectedProperty());
+        togglePlot.selectedProperty().addListener((obs, old, n) -> {
+            String style;
+            style = (n) ? TogglePlot.DEFAULT_COLOR : "";
+            togglePlot.setStyle(style);
+        });
+        this.data.setNode(togglePlot);
         setPopOver(this.data.getNode());
-        this.data.getNode().setOnMouseClicked(e -> {
-            actionPopOver();
-            this.explorable.selectedProperty().set(true);
-                });
+        this.data.getNode().setOnMouseClicked(e -> actionPopOver());
 
     }
 
-//    public void onAction(Explorable explorable, Data data) {
-//        data.getNode().setOnMouseClicked(e -> explorable.getImage());
-//    }
     @Override
-    public Explorable getExplorable() {
+    public Object getObject() {
         return explorable;
     }
 
@@ -95,19 +106,27 @@ public class DefaultPlotExplorer implements PlotExplorer {
         if (popOver.isShowing()) {
             popOver.hide();
         } else {
-            if (imageView == null) setContent();
+            if (imageView == null) {
+                setContent();
+            }
             popOver.show(this.data.getNode());
         }
     }
 
-   
-
     protected void setContent() {
         new CallbackTask<Explorable, Image>(explorable)
-                .run(( exp,e) -> e.getImage())
+                .run((exp, e) -> e.getImage())
                 .then(e -> {
                     imageView = ImageViewBuilder.create().image(e).build();
-                    popOver.setContentNode(imageView);
+                    BorderPane borderPane = new BorderPane(imageView);
+                    borderPane.setPrefWidth(imageView.getFitWidth());
+                    borderPane.setTop(new Label(explorable.getTitle()));
+                    borderPane.setCenter(imageView);
+                    imageView.setOnMouseClicked(c -> {
+                        explorerService.open(explorable);
+                        popOver.hide();
+                    });
+                    popOver.setContentNode(borderPane);
                 })
                 .start();
     }

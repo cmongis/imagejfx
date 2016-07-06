@@ -19,14 +19,14 @@
  */
 package ijfx.ui.explorer.view.chartview;
 
-import ijfx.ui.explorer.ExplorableWrapper;
 import javafx.scene.chart.XYChart.Data;
+import ijfx.ui.explorer.ObjectWrapper;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-interface PlotExplorer extends ExplorableWrapper{
+public interface PlotExplorer extends ObjectWrapper{
     
     public Data getData();
 }
