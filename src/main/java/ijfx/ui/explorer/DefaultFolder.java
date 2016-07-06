@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
-import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 
 import ijfx.core.stats.IjfxStatisticService;
@@ -32,6 +31,7 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.service.batch.ObjectSegmentedEvent;
+import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.service.ui.LoadingScreenService;
@@ -39,6 +39,7 @@ import ijfx.service.watch_dir.DirectoryWatchService;
 import ijfx.service.watch_dir.FileChangeListener;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
+import ijfx.ui.explorer.view.SegmentedObjectExplorerWrapper;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
@@ -54,9 +55,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
-import mongis.utils.SilentProgressHandler;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.Incrementor;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
 import org.scijava.event.EventHandler;
@@ -294,8 +292,8 @@ public class DefaultFolder implements Folder, FileChangeListener {
         logger.info("File was modified : " + filePath);
     }
 
-    private List<Explorable> loadOverlay(File imageFile, File overlayJsonFile) {
-        List<Explorable> collect = overlayIOService.loadOverlays(overlayJsonFile)
+    private List<? extends Explorable> loadOverlay(File imageFile, File overlayJsonFile) {
+        List<? extends Explorable> collect = overlayIOService.loadOverlays(overlayJsonFile)
                 .stream()
                 .filter(o -> o != null)
                 .map(overlay -> new OverlayExplorableWrapper(context, imageFile, overlay))
@@ -324,4 +322,24 @@ public class DefaultFolder implements Folder, FileChangeListener {
             ); 
         }
     }
+
+    @Override
+    public void addObjects(List<SegmentedObject> objects) {
+        
+        
+        logger.info(String.format("Adding %d objects",objects.size()));
+        
+        getObjectList().clear();
+        
+        getObjectList().addAll(objects.stream()
+        .map(o->new SegmentedObjectExplorerWrapper(o))
+        .collect(Collectors.toList()));
+        
+
+        
+        eventService.publishLater(new FolderUpdatedEvent().setObject(this));
+        
+    }
+    
+    
 }
