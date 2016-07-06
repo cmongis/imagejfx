@@ -168,7 +168,7 @@ public class ImageJFX extends Application {
         return new File(getConfigDirectory(),filename).getAbsolutePath();
     }
 
-    private static ExecutorService service = Executors.newFixedThreadPool(3);
+    private static ExecutorService service = Executors.newCachedThreadPool();
 
     public static ExecutorService getThreadPool() {
         return service;
