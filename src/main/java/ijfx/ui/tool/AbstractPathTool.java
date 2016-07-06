@@ -292,6 +292,7 @@ public abstract class AbstractPathTool implements FxTool {
     }
 
     public void update(FxTool tool) {
+        if(button != null)
         button.setSelected(tool == this);
     }
 
