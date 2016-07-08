@@ -95,6 +95,7 @@ public class HistoryService extends AbstractService implements ImageJService{
 
     public void setCurrentWorkflow(Workflow currentWorkflow) {
         this.currentWorkflow = currentWorkflow;
+        stepList.addAll(currentWorkflow.getStepList());
     }
 
     public ObservableList<WorkflowStep> getStepList() {
