@@ -19,45 +19,13 @@
  */
 package ijfx.service.cluster;
 
-import weka.core.DenseInstance;
-import weka.core.Instance;
 import ijfx.ui.explorer.ObjectWrapper;
+import weka.core.Instance;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class ObjectClusterable extends DenseInstance implements ObjectWrapper{
-
-    private Object object;
-
-    public ObjectClusterable(Object object, double weight, double[] attValues) {
-        super(weight, attValues);
-        this.object = object;
-    }
-
-    public ObjectClusterable(Instance instance) {
-        super(instance);
-        if (instance instanceof ObjectClusterable) {
-            m_AttValues = ((ObjectClusterable) instance).m_AttValues;
-            this.object = ((ObjectClusterable) instance).getObject();
-        } else {
-            m_AttValues = instance.toDoubleArray();
-        }
-        m_Weight = instance.weight();
-        m_Dataset = null;
-    }
-
-    @Override
-    public Object getObject() {
-        return object;
-    }
-
-    @Override
-    public Object copy() {
-        ObjectClusterable result = new ObjectClusterable(this);
-        result.m_Dataset = m_Dataset;
-        return result;
-    }
-
+public interface ObjectClusterable extends Instance, ObjectWrapper{
+    
 }

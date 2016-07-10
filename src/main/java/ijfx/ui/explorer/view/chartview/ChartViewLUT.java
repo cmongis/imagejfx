@@ -21,30 +21,24 @@ package ijfx.ui.explorer.view.chartview;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.ExplorableClustererService;
+import ijfx.service.ui.FxImageService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
-import ijfx.ui.explorer.view.FilterView;
 import ijfx.ui.explorer.view.GridIconView;
+import ijfx.ui.plugin.LUTComboBox;
+import ijfx.ui.plugin.LUTView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.chart.ScatterChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -54,37 +48,43 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = ExplorerView.class)
-
-public class ChartView extends AbstractChartView implements ExplorerView {
+public class ChartViewLUT extends AbstractChartView implements ExplorerView {
 
     @Parameter
     ExplorableClustererService explorableClustererService;
 
     @Parameter
     ExplorerService explorerService;
-    
-    String[] metadatas;
 
+    String[] metadatas;
     @FXML
     ComboBox<String> xComboBox;
 
     @FXML
     ComboBox<String> yComboBox;
 
+    @FXML
+    ComboBox<String> thirdComboBox;
+
+    @FXML
+    ComboBox<LUTView> lutComboBox;
     List<ComboBox<String>> comboBoxList;
 
-    public ChartView() {
+    public ChartViewLUT() {
         super();
+        lutComboBox = new LUTComboBox();
+
         comboBoxList = new ArrayList<>();
         metadatas = new String[2];
+
         try {
-            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/ChartView.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/ChartViewLUT.fxml");
         } catch (IOException ex) {
             Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
         }
         comboBoxList.add(xComboBox);
         comboBoxList.add(yComboBox);
-
+        comboBoxList.add(thirdComboBox);
         scatterChart.setTitle("ChartView");
         scatterChart.getXAxis().labelProperty().bind(xComboBox.getSelectionModel().selectedItemProperty());
         scatterChart.getYAxis().labelProperty().bind(yComboBox.getSelectionModel().selectedItemProperty());
@@ -104,7 +104,8 @@ public class ChartView extends AbstractChartView implements ExplorerView {
     @Override
     public void setItem(List<? extends Explorable> items) {
         currentItems = items;
-        computeItems();
+        lutComboBox.getItems().addAll(FxImageService.getLUTViewMap().values());
+//        computeItems();
         List<String> metadatas = explorerService.getMetaDataKey(currentItems);
 
         comboBoxList.stream().forEach(c -> {
@@ -113,9 +114,10 @@ public class ChartView extends AbstractChartView implements ExplorerView {
             c.getItems().addAll(metadatas);
             if (metadatas.contains(s)) {
                 c.getSelectionModel().select(s);
-            } 
+            }
+
         });
-        computeItems();
+//        computeItems();
     }
 
     @Override
@@ -129,27 +131,21 @@ public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
+        explorerService.context().inject(lutComboBox);
+
         currentItems
                 .stream()
                 .forEach(e -> e.selectedProperty().setValue(true));
     }
 
-//   
-    /**
-     * Perform a clustering algorithm and load the series.
-     */
+    @Override
     public void computeItems() {
 
         if (metadatas.length > 1) {
 
             scatterChart.getData().clear();
 
-            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
-            System.out.println("ijfx.ui.explorer.view.chartview.ChartView.computeItems()" + clustersList.size());
-            clustersList
-                    .stream()
-                    .forEach(e -> addDataToChart(e, Arrays.asList(metadatas)));
-
+            addDataToChart(currentItems, Arrays.asList(metadatas));
             bindLegend();
         }
     }

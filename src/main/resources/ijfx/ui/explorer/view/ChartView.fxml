@@ -11,10 +11,10 @@
          <center>
             <ScatterChart fx:id="scatterChart" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
               <xAxis>
-                <NumberAxis side="BOTTOM" />
+                <NumberAxis side="BOTTOM" forceZeroInRange="false" />
               </xAxis>
               <yAxis>
-                <NumberAxis side="LEFT" />
+                <NumberAxis side="LEFT" forceZeroInRange="false" />
               </yAxis>
             </ScatterChart>
          </center>

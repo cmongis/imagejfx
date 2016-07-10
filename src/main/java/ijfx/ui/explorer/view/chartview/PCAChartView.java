@@ -17,16 +17,20 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer.view;
+package ijfx.ui.explorer.view.chartview;
 
+import ijfx.ui.explorer.view.chartview.AbstractChartView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.listenableSystem.MetaDataSetUtils;
+import ijfx.service.cluster.ClustererService;
+import ijfx.service.cluster.DefaultObjectClusterable;
 import ijfx.service.cluster.ObjectClusterable;
 import ijfx.service.cluster.PCAProcesser;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
+import ijfx.ui.explorer.view.GridIconView;
 import ijfx.ui.explorer.view.chartview.DefaultPlotExplorer;
 import ijfx.ui.explorer.view.chartview.PlotExplorer;
 import ijfx.ui.explorer.view.chartview.TogglePlot;
@@ -62,22 +66,19 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = ExplorerView.class)
-public class PCAChartView extends AnchorPane implements ExplorerView {
-
-    @FXML
-    ScatterChart<Number, Number> scatterChart;
+public class PCAChartView extends AbstractChartView implements ExplorerView {
 
     @FXML
     ListView<String> listView;
 
     PCAProcesser pCAProcesser;
 
+    List<String> metadataList;
     @Parameter
     ExplorerService explorerService;
 
-    private List<String> metadataList;
-
-    private List<? extends Explorable> currentItems;
+    @Parameter
+    ClustererService clustererService;
 
     public PCAChartView() {
         super();
@@ -114,7 +115,7 @@ public class PCAChartView extends AnchorPane implements ExplorerView {
 
         String s = listView.getSelectionModel().getSelectedItem();
         listView.getItems().clear();
-        listView.setItems(FXCollections.observableArrayList(this.getMetaDataKey(items)));
+        listView.setItems(FXCollections.observableArrayList(explorerService.getMetaDataKey(items)));
         if (metadataList.contains(s)) {
             listView.getSelectionModel().select(s);
         }
@@ -123,88 +124,61 @@ public class PCAChartView extends AnchorPane implements ExplorerView {
 
     @Override
     public List<? extends Explorable> getSelectedItems() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return currentItems.stream()
+                .filter(e -> e.selectedProperty().get())
+                .collect(Collectors.toList());
     }
 
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public ArrayList<String> getMetaDataKey(List<? extends Explorable> items) {
-        ArrayList<String> keyList = new ArrayList<String>();
-        items.forEach(plane -> {
-            plane.getMetaDataSet().keySet().forEach(key -> {
-
-                if (!keyList.contains(key)) {
-                    keyList.add(key);
-                }
-            });
-        });
-        Collections.sort(keyList);
-        return keyList;
-    }
-
-    public void displayClusterable(List<ObjectClusterable> objectClusterables) {
-        List<Data> listExplorers = objectClusterables
+        currentItems
                 .stream()
-                .map(e -> {
-                    PlotExplorer plotExplorer = new DefaultPlotExplorer(explorerService, (Explorable) e.getObject(), e.value(0), e.value(1));
-                    return plotExplorer.getData();
-                })
+                .forEach(e -> e.selectedProperty().setValue(true));
+    }
+
+//    public void displayCluster(List<? extends Explorable> objectClusterables) {
+//        List<Data> listExplorers = objectClusterables
+//                .stream()
+//                .map(e -> {
+//                    PlotExplorer plotExplorer = new DefaultPlotExplorer(explorerService, (Explorable) e.getObject(), e.value(0), e.value(1));
+//                    return plotExplorer.getData();
+//                })
+//                .collect(Collectors.toList());
+//
+//        listExplorers.stream()
+//                .forEach(e -> System.out.println(e.getXValue()));
+//        Series series = new XYChart.Series();
+//
+//        series.getData().addAll(listExplorers);
+//        scatterChart.getData().add(series);
+//        series.setName("Tuan anh is awesome");
+//        bindLegend();
+//    }
+    @Override
+    protected void computeItems() {
+        List<ObjectClusterable> objectClusterables = currentItems
+                .stream()
+                .map(e -> new DefaultObjectClusterable(e, 1.0, MetaDataSetUtils.getMetadatas(e, metadataList)))
                 .collect(Collectors.toList());
-
-        listExplorers.stream()
-                .forEach(e -> System.out.println(e.getXValue()));
-        Series series = new XYChart.Series();
-
-        series.getData().addAll(listExplorers);
-        scatterChart.getData().add(series);
-        series.setName("Tuan anh is awesome");
-        bindLegend();
+        if (metadataList.size() > 1) {
+            try {
+                scatterChart.getData().clear();
+                List<ObjectClusterable> result = pCAProcesser.applyPCA(objectClusterables, metadataList);
+                List<List<Explorable>> explorables = clustererService.buildClusterer(result, metadataList);
+                explorables.stream().forEach(e -> addDataToChart(e, metadataList));
+            } catch (Exception ex) {
+                Logger.getLogger(PCAChartView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void listViewListener(ListChangeListener.Change<? extends String> change) {
-        System.out.println(listView.getSelectionModel().getSelectionMode().toString());
 //        listView.getSelectionModel().getSelectedItems().stream().forEach(e -> System.out.println(e));
         metadataList.clear();
         metadataList.addAll(change.getList());
         metadataList.stream().forEach(e -> System.out.println(e));
-        List<ObjectClusterable> objectClusterables = currentItems
-                .stream()
-                .map(e -> new ObjectClusterable(e, 1.0, MetaDataSetUtils.getMetadatas(e, metadataList)))
-                .collect(Collectors.toList());
-        try {
-            if (metadataList.size() > 1) {
-                scatterChart.getData().clear();
-                List<ObjectClusterable> result = pCAProcesser.applyPCA(objectClusterables, metadataList);
-                displayClusterable(result);
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(PCAChartView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-        public void bindLegend() {
-        for (Series series : scatterChart.getData()) {
+        computeItems();
 
-            Node node = scatterChart.lookup(".series" + scatterChart.getData().indexOf(series));
-            Set<Node> legendItems = scatterChart.lookupAll("Label.chart-legend-item");
-
-            for (Node legend : legendItems) {
-                Label labelLegend = (Label) legend;
-                if (node.getStyleClass().get(1).equals(labelLegend.getGraphic().getStyleClass().get(2))) {
-                    TogglePlot togglePlot = new TogglePlot();
-                    togglePlot.getStyleClass().clear();
-                    togglePlot.getStyleClass().addAll(labelLegend.getGraphic().getStyleClass());
-                    labelLegend.setGraphic(togglePlot);
-                    series.getData().stream().forEach(e -> {
-                        TogglePlot togglePlotData = (TogglePlot) ((Data) e).getNode();
-                        togglePlot.bind(togglePlotData);
-                    });
-                    break;
-                }
-            }
-        }
     }
+
 }

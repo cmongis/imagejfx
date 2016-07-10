@@ -80,7 +80,11 @@ public class DefaultPlotExplorer implements PlotExplorer {
         });
         this.data.setNode(togglePlot);
         setPopOver(this.data.getNode());
-        this.data.getNode().setOnMouseClicked(e -> actionPopOver());
+        this.data.getNode().setOnMouseClicked(e -> {
+            if (togglePlot.isSelected()) {
+                actionPopOver();
+            }
+        });
 
     }
 

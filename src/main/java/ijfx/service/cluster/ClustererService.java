@@ -27,13 +27,14 @@ import weka.clusterers.Clusterer;
 /**
  *
  * @author Tuan anh TRINH
+ * @param <S>
  * @param <T>
  */
-public interface ClustererService<T> extends ImageJService {
+public interface ClustererService<S,T> extends ImageJService {
 
-    public List<List<Object>> buildClusterer(List<T> objectWrappers , List<String> attributsString);
+    public List<List<S>> buildClusterer(List<T> objectWrappers , List<String> attributsString);
 
-    public  List<List<Object>> buildClusterer(List<T> listExplorable, String metadataKey);
+    public  List<List<S>> buildClusterer(List<T> listExplorable, String metadataKey);
     
     public void setClusterer(Clusterer clusterer);
 }
