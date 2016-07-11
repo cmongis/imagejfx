@@ -29,8 +29,6 @@ import ijfx.service.workflow.WorkflowStep;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.animation.Transition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -42,7 +40,7 @@ import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
-import ijfx.ui.context.animated.Animations;
+import javafx.animation.FadeTransition;
 
 /**
  *
@@ -105,18 +103,25 @@ public class HistoryStepCtrl extends BorderPane {
         addEventHandler(MouseEvent.MOUSE_ENTERED, this::showButtons);
         addEventHandler(MouseEvent.MOUSE_EXITED, this::hideButtons);
 
-        Transition tr = Animations.FADEOUT.configure(buttonHBox, 1000);
+         FadeTransition tr = new FadeTransition(ImageJFX.getAnimationDuration(), buttonHBox);
+        tr.setToValue(.3);
         tr.setDelay(Duration.millis(3000));
         tr.play();
 
     }
 
     public void showButtons(MouseEvent event) {
-        Animations.FADEIN.configure(buttonHBox, ImageJFX.getAnimationDurationAsDouble()).play();
+        
+        FadeTransition tr = new FadeTransition(ImageJFX.getAnimationDuration(), buttonHBox);
+        tr.setToValue(1.0);
+        tr.play();
+        //Animations.FADEIN.configure(buttonHBox, ImageJFX.getAnimationDurationAsDouble()).play();
     }
 
     public void hideButtons(MouseEvent event) {
-        Animations.FADEOUT.configure(buttonHBox, ImageJFX.getAnimationDurationAsDouble()).play();
+        FadeTransition tr = new FadeTransition(ImageJFX.getAnimationDuration(), buttonHBox);
+        tr.setToValue(.3);
+        tr.play();
     }
 
     public void onMouseOverTitle(MouseEvent event) {
