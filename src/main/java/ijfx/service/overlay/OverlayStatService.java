@@ -36,7 +36,6 @@ import net.imagej.measure.StatisticsService;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
-import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
