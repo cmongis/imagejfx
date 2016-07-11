@@ -37,13 +37,13 @@ public abstract class AbstractSearchArea implements SearchArea{
     protected Point2D centre;
     protected int radius;
     protected ArrayList<Point2D> points;
-    protected ArrayList<List<int[]>> possibleProfiles;
+    protected ArrayList<List<int[]>> profiles;
     
     public AbstractSearchArea(double centreX, double centreY, int radius){
         this.radius = radius;
         this.centre = new Point2D(centreX, centreY);
         this.points = new ArrayList();
-        this.possibleProfiles = new ArrayList<>();
+        this.profiles = new ArrayList<>();
     }
     
     @Override
@@ -53,18 +53,18 @@ public abstract class AbstractSearchArea implements SearchArea{
     
     @Override
     public ArrayList<List<int[]>> getProfilesSet(){
-        return this.possibleProfiles;
+        return this.profiles;
     }
     
     @Override
-    public void setPossibleProfiles(){
+    public void setAllPossibleProfiles(){
         
         for(int i = 0; i < points.size(); i++){
             int x = (int)points.get(i).getX();
             int y = (int)points.get(i).getY();
             
             List<int[]> line = Bresenham.findLine((int)centre.getX(), (int)centre.getY(), x, y);
-            possibleProfiles.add(line);
+            profiles.add(line);
         }
 
     }
@@ -81,8 +81,8 @@ public abstract class AbstractSearchArea implements SearchArea{
     
     @Override
     public void drawProfiles(Dataset ds){
-        for(int i = 0; i < possibleProfiles.size(); i++){
-            List<int[]> line = possibleProfiles.get(i);
+        for(int i = 0; i < profiles.size(); i++){
+            List<int[]> line = profiles.get(i);
             RandomAccess<RealType<?>> ra = ds.randomAccess();            
             for(int j = 0; j < line.size(); j++){
                 ra.setPosition(line.get(j)[0],0);

@@ -33,7 +33,7 @@ public interface SearchArea {
     ArrayList<Point2D> getPoints();
     ArrayList<List<int[]>> getProfilesSet();
     
-    void setPossibleProfiles();
+    void setAllPossibleProfiles();
     void drawArea(Dataset ds);
     void drawProfiles(Dataset ds);
 }

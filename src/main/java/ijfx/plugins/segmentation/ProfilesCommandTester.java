@@ -19,18 +19,8 @@
  */
 package ijfx.plugins.segmentation;
 
-import ijfx.service.ImagePlaneService;
-import ijfx.service.overlay.OverlayDrawingService;
-import ijfx.service.overlay.OverlayStatService;
-import java.util.List;
-import net.imagej.Dataset;
-import net.imagej.DatasetService;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import net.imagej.display.OverlayService;
-import net.imagej.overlay.Overlay;
-import org.scijava.Context;
-import org.scijava.ItemIO;
+import ijfx.plugins.segmentation.neural_network.LSTMRnn;
+import ijfx.plugins.segmentation.neural_network.NeuralNet;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -44,20 +34,17 @@ import org.scijava.plugin.Plugin;
 public class ProfilesCommandTester implements Command{
     
     @Parameter
-    OverlayService overlayService;
-    
-    @Parameter
-    ImageDisplayService imageDisplayService;
-    
-    @Parameter
-    Context context;
+    SegmentationService segmentationService;
     
     @Override
     public void run() {
-        ImageDisplay display = imageDisplayService.getActiveImageDisplay();
-    
-        List<Overlay> overlays = overlayService.getOverlays(display);
         
-        ProfilesSet profilesSet = new DefaultProfilesSet(overlays, context);
+        ProfilesSet trainingSet = segmentationService.generateTrainingSet();
+        segmentationService.generateConfirmationSet(trainingSet);
+        
+        NeuralNet nn = new LSTMRnn(1, 4, 1);
+        nn.initialize();
+        System.out.println("Network initialized!");
+        
     }
 }

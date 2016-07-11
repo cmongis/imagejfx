@@ -62,8 +62,8 @@ public class SearchAreaCommandTester implements Command{
         
         ds.update();        
         
-        area1.setPossibleProfiles();
-        area2.setPossibleProfiles();
+        area1.setAllPossibleProfiles();
+        area2.setAllPossibleProfiles();
         
         area1.drawProfiles(ds);
         area2.drawProfiles(ds);

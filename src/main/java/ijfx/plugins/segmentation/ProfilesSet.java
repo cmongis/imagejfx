@@ -19,7 +19,6 @@
  */
 package ijfx.plugins.segmentation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,5 +26,5 @@ import java.util.List;
  * @author Pierre BONNEAU
  */
 public interface ProfilesSet {
-    public List<List<Double>> getProfiles();
+    public List<List<int[]>> getProfiles();
 }

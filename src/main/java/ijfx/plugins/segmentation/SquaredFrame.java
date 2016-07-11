@@ -19,11 +19,7 @@
  */
 package ijfx.plugins.segmentation;
 
-import java.util.ArrayList;
 import javafx.geometry.Point2D;
-import net.imagej.Dataset;
-import net.imglib2.RandomAccess;
-import net.imglib2.type.numeric.RealType;
 
 /**
  *
