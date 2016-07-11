@@ -212,6 +212,17 @@
             <artifactId>rxjava</artifactId>
             <version>1.1.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.matrix-toolkits-java</groupId>
+            <artifactId>mtj</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>imagej-legacy</artifactId>
+            <version>0.21.0</version>
+            <classifier>tests</classifier>
+        </dependency>
     </dependencies>
     
     <build>
