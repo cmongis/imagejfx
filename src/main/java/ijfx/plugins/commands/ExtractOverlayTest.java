@@ -22,11 +22,12 @@ package ijfx.plugins.commands;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlaySelectionService;
+import java.util.List;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import net.imagej.display.OverlayService;
 import net.imagej.overlay.Overlay;
-import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -41,7 +42,10 @@ import org.scijava.plugin.Plugin;
 public class ExtractOverlayTest extends ContextCommand {
 
     @Parameter
-    OverlayDrawingService overlayService;
+    OverlayDrawingService overlayDrawingService;
+    
+    @Parameter
+    OverlayService overlayService;
     
     @Parameter
     OverlaySelectionService overlaySelectionService;
@@ -61,17 +65,18 @@ public class ExtractOverlayTest extends ContextCommand {
     @Override
     public void run() {
         
-        Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
+        Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);     
         
-        Overlay selected = overlaySelectionService.getSelectedOverlays(imageDisplay).get(0);
-        selected.setLineWidth(3.0);
-        long[] position = new long[dataset.numDimensions()];
-        imageDisplay.localize(position);
+//        long[] position = new long[dataset.numDimensions()];
+//        imageDisplay.localize(position);
         
         output = imagePlaneService.createEmptyPlaneDataset(dataset);
         
-        overlayService.drawOverlay(selected, OverlayDrawingService.OUTLINER, output, 65000);
+        List<Overlay> overlays = overlayService.getOverlays(imageDisplay);
         
+        for(int i = 0; i < overlays.size(); i++){
+            overlayDrawingService.drawOverlay(overlays.get(i), OverlayDrawingService.OUTLINER, output, 1);            
+        }           
     }
     
 }
