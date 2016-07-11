@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import ijfx.service.workflow.DefaultWorkflowStep;
 import java.io.IOException;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -33,6 +35,15 @@ import java.io.IOException;
  */
 public class WorkflowStepSerializer extends JsonSerializer<DefaultWorkflowStep> {
 
+    
+    @Parameter
+    Context context;
+    
+    public WorkflowStepSerializer() {
+       
+    }
+    
+    
     @Override
     public void serialize(DefaultWorkflowStep workflowStep, JsonGenerator jg, SerializerProvider sp) throws IOException, JsonProcessingException {
 

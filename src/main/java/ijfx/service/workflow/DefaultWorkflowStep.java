@@ -163,7 +163,7 @@ public class DefaultWorkflowStep implements WorkflowStep {
     }
 
     public void setModule(Module module) {
-        this.module = module;
+        //this.module = module;
         className = module.getInfo().getDelegateClassName();
     }
 
