@@ -32,14 +32,17 @@ import java.util.List;
  */
 public class DefaultWorkflow implements Workflow {
 
-    @JsonProperty("name")
+   
     protected String name;
 
-    @JsonProperty("description")
+  
     protected String description;
 
     protected boolean mustBeStopped;
 
+    
+    protected List<WorkflowStep> steps = new ArrayList<>();
+    
     public DefaultWorkflow() {
     }
 
@@ -49,12 +52,15 @@ public class DefaultWorkflow implements Workflow {
     }
 
     @Override
+    @JsonGetter("name")
     public String getName() {
         return name;
     }
+    
+   
 
-    @JsonProperty("stepList")
-    List<WorkflowStep> steps = new ArrayList<>();
+   
+  
 
     @JsonSetter("name")
     public void setName(String name) {
@@ -67,6 +73,7 @@ public class DefaultWorkflow implements Workflow {
     }
 
     @Override
+    @JsonGetter("description")
     public String getDescription() {
         return description;
     }
@@ -77,7 +84,7 @@ public class DefaultWorkflow implements Workflow {
         return steps;
     }
 
-    @Override
+
     public void setStepList(List<WorkflowStep> stepList) {
         steps.clear();
         steps.addAll(stepList);
@@ -88,7 +95,8 @@ public class DefaultWorkflow implements Workflow {
 
         //steps = stepList;
         steps.clear();
-        stepList.forEach(step -> steps.add(step));
+        steps.addAll(stepList);
+        //stepList.forEach(step -> steps.add(step));
 
     }
 
@@ -96,7 +104,8 @@ public class DefaultWorkflow implements Workflow {
     public boolean mustBeStopped() {
         return mustBeStopped;
     }
-
+    
+    
     public void setMustBeStopped(boolean mustBeStopped) {
         this.mustBeStopped = mustBeStopped;
     }

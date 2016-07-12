@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ijfx.service.ui.JsonPreferenceService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.workflow.DefaultWorkflow;
@@ -47,31 +48,33 @@ import mongis.utils.SimpleTask;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = Service.class)
-public class LocalWorkflowService extends AbstractService implements MyWorkflowService{
+public class LocalWorkflowService extends AbstractService implements MyWorkflowService {
 
-    
     private ObservableList<Workflow> workflowList = FXCollections.observableArrayList();
-    
-    
+
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final String JSON_FILE = "my_workflows.json";
     
-    private String paramFile = ImageJFX.getConfigFile("my_workflows.js");
     
     Logger logger = ImageJFX.getLogger();
-    
+
     @Parameter
     LoadingScreenService loadingScreenService;
-    
+
     @Parameter
     WorkflowIOService workflowIOService;
+
+    
+    @Parameter
+    JsonPreferenceService jsonService;
     
     @Override
     public void initialize() {
         super.initialize();
         load();
     }
-    
-    
+
     @Override
     public ObservableList<Workflow> getWorkflowList() {
         return workflowList;
@@ -80,45 +83,39 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
     @Override
     public boolean addWorkflow(Workflow workflow) {
         workflowList.add(workflow);
-        
+
         // start a new task in the background that saves the workflows
-        loadingScreenService.backgroundTask(new SimpleTask(()->save(),"Saving workflows...").startInNewThread(), false);
-        
+        loadingScreenService.backgroundTask(new SimpleTask(() -> save(), "Saving workflows...").startInNewThread(), false);
+
         return true;
     }
 
     @Override
     public boolean deleteWorkflow(Workflow workflow) {
         workflowList.remove(workflow);
-        
+
         // see addWorkflow
-        loadingScreenService.backgroundTask(new SimpleTask(()->save(),"Saving workflows...").startInNewThread(), false);
+        loadingScreenService.backgroundTask(new SimpleTask(() -> save(), "Saving workflows...").startInNewThread(), false);
         return true;
     }
-    
-    private void load()  {
-        
-        try {
-            objectMapper.readValue(new File(paramFile), WorkflowList.class);
-        } catch (IOException ex) {
-            logger.info("No workflows saved.");
-        }
-        
+
+    private void load() {
+        workflowList.addAll(jsonService.loadListFromJson(JSON_FILE, Workflow.class));
+        workflowList
+                .stream()
+                .flatMap(w->w.getStepList().stream())
+                .parallel()
+                .forEach(getContext()::inject);
     }
     
+    
+
     private void save() {
-        try {
-            File f = new File(paramFile);
-            f.mkdirs();
-            ImageJFX.getConfigDirectory();
-            objectMapper.writeValue(f, new WorkflowList(workflowList));
-        } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,"Error when saving workflow.",ex);;
-        }
+        jsonService.savePreference(new ArrayList(workflowList), JSON_FILE);
     }
 
     @Override
-    public boolean importWorkflow(Workflow workflow, File inputFile) {
+    public boolean importWorkflow(File inputFile) {
         return addWorkflow(workflowIOService.loadWorkflow(inputFile));
     }
 
@@ -127,35 +124,38 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
         try {
             workflowIOService.saveWorkflow(workflow, outputFile);
             return true;
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
-    
-    
-    private class WorkflowList {
+
+    public class WorkflowList {
+
+        
+        public WorkflowList() {
+            
+        }
         
         public WorkflowList(List<? extends Workflow> list) {
             setWorkflowList(workflows);
         }
-        
+
         @JsonIgnore
         private List<? extends Workflow> workflows = new ArrayList<Workflow>();
-        
+
         @JsonGetter("workflows")
         public List<? extends Workflow> getWorkflowList() {
             return workflows;
         }
-        
+
         public void setWorkflowList(List<? extends Workflow> workflowList) {
             this.workflows = workflowList;
         }
-        
+
         @JsonSetter("workflows")
         public void deserialize(ArrayList<DefaultWorkflow> workflowList) {
             workflows = workflowList;
         }
     }
-    
+
 }
