@@ -232,7 +232,7 @@ public class ModuleConfigPane extends BorderPane {
 
         // setting the module
         setModule(module);
-
+        
         // puting the module name as title
         getTitleLabel().setText(WorkflowService.getModuleLabel(module));
 
