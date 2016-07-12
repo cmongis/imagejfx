@@ -104,7 +104,6 @@ public class ChartView extends AbstractChartView implements ExplorerView {
     @Override
     public void setItem(List<? extends Explorable> items) {
         currentItems = items;
-        computeItems();
         List<String> metadatas = explorerService.getMetaDataKey(currentItems);
 
         comboBoxList.stream().forEach(c -> {
