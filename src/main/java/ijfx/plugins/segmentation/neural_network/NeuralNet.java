@@ -19,11 +19,13 @@
  */
 package ijfx.plugins.segmentation.neural_network;
 
+import java.util.List;
+
 /**
  *
  * @author Pierre BONNEAU
  */
 public interface NeuralNet {
     public void initialize();
-    public void forwardProp();
+    public void forwardProp(List<List<Double>> inputList);
 }
