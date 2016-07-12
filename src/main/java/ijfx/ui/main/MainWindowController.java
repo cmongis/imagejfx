@@ -625,7 +625,7 @@ public class MainWindowController extends AnchorPane {
 
     public void onUiPluginDisplaed(ContextualWidget<Node> uiPlugin) {
 
-        //hintService.displayHints(uiPlugin.getObject().getClass(), false);
+        hintService.displayHints(uiPlugin.getObject().getClass(), false);
 
     }
     

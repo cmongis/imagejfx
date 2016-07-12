@@ -20,6 +20,7 @@
 package ijfx.ui.explorer;
 
 import ijfx.core.metadata.MetaDataOwner;
+import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.event.DisplayedListChanged;
 import ijfx.ui.explorer.event.ExploredListChanged;
@@ -41,6 +42,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import sun.util.logging.resources.logging;
 
 /**
  *
@@ -59,6 +61,9 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     @Parameter
     LoadingScreenService loadingScreenService;
 
+    @Parameter
+            DefaultLoggingService loggerService;
+    
     Predicate<MetaDataOwner> lastFilter;
     Predicate<MetaDataOwner> optionalFilter;
 
@@ -94,7 +99,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
 
     @Override
     public void applyFilter(Predicate<MetaDataOwner> predicate) {
-
+        
         new CallbackTask<Predicate<MetaDataOwner>, List<Explorable>>(predicate)
                 .run(this::filter)
                 .then(this::setFilteredItems)
@@ -103,7 +108,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     }
 
     protected List<Explorable> filter(Predicate<MetaDataOwner> predicate) {
-
+        loggerService.info("Filtering %d items",getItems().size());
         if (predicate == null && optionalFilter == null) {
             return getItems();
         } else if (predicate == null && optionalFilter != null) {
@@ -111,7 +116,9 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         } else if (optionalFilter != null) {
             predicate = predicate.and(optionalFilter);
         }
-        return getItems().parallelStream().filter(predicate).collect(Collectors.toList());
+        List<Explorable> collect = getItems().parallelStream().filter(predicate).collect(Collectors.toList());
+        loggerService.info("Only %d items were kept",collect.size());
+        return collect;
     }
 
     @Override

@@ -19,6 +19,7 @@
  */
 package ijfx.service.batch;
 
+import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
@@ -37,14 +38,11 @@ import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.IjfxEvent;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
-import ijfx.ui.explorer.MetaDataSetExplorerWrapper;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javafx.scene.image.Image;
 import mongis.utils.ProgressHandler;
@@ -92,6 +90,9 @@ public class SegmentationService extends AbstractService implements IjfxService 
     @Parameter
     MetaDataExtractionService metadataExtractionService;
 
+    @Parameter
+    ImageRecordService imageRecordService;
+    
     public enum Source {
         EXPLORER_SELECTED, EXPLORER_ALL, IMAGEJ
     }
@@ -171,14 +172,21 @@ public class SegmentationService extends AbstractService implements IjfxService 
         return builder;
     }
 
+    public Consumer<BatchSingleInput> addObjectToList(List<SegmentedObject> objectList) {
+        return input -> {
+            Overlay[] overlay = BinaryToOverlay.transform(getContext(), input.getDataset(), false);
+            File file = new File(input.getSourceFile());
+            List<SegmentedObject> measure = measure(new SilentProgressHandler(), Arrays.asList(overlay), file);
+            objectList.addAll(measure);
+        };
+    }
+
     public void saveOverlaysNextToSourceFile(BatchSingleInput input) {
         Overlay[] overlay = BinaryToOverlay.transform(getContext(), input.getDataset(), false);
-        
-        
-        File file  = new File(input.getSourceFile());
-        
-        
-        List<SegmentedObject> measure = measure(new SilentProgressHandler(), Arrays.asList(overlay),file);
+
+        File file = new File(input.getSourceFile());
+
+        List<SegmentedObject> measure = measure(new SilentProgressHandler(), Arrays.asList(overlay), file);
         eventService.publish(new ObjectSegmentedEvent(file, measure));
         /*
         try {
@@ -187,9 +195,6 @@ public class SegmentationService extends AbstractService implements IjfxService 
             Logger.getLogger(SegmentationService.class.getName()).log(Level.SEVERE, null, ex);
         }*/
     }
-    
-    
-    
 
     public void setOutputFormat(Output outputFormat) {
         this.outputFormat = outputFormat;
@@ -209,10 +214,17 @@ public class SegmentationService extends AbstractService implements IjfxService 
         return overlays
                 .stream()
                 .map(overlay -> {
+                    try {
                     DefaultSegmentedObject segmentedObject = new DefaultSegmentedObject(overlay, overlayStatsService.getStatistics(overlay, dataset, position));
                     segmentedObject.getMetaDataSet().merge(planeMetaData);
                     return segmentedObject;
+                    }
+                    catch(Exception e) {
+                        loggerService.warn(e);
+                    }
+                    return null;
                 })
+                .filter(o->o!=null)
                 .collect(Collectors.toList());
 
     }
@@ -221,8 +233,8 @@ public class SegmentationService extends AbstractService implements IjfxService 
 
         try {
             Dataset dataset = imagePlaneService.openVirtualDataset(file);
-
-            List<MetaDataSet> extractPlaneMetaData = metadataExtractionService.extractPlaneMetaData(file);
+            MetaDataSet m = imageRecordService.getRecord(file).getMetaDataSet();
+            List<MetaDataSet> extractPlaneMetaData = metadataExtractionService.extractPlaneMetaData(m);
             handler.setTotal(extractPlaneMetaData.size());
             return extractPlaneMetaData
                     .stream()

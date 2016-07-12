@@ -17,35 +17,26 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.core.project;
 
-import ijfx.service.batch.SegmentedObject;
-import java.io.File;
-import java.util.List;
-import javafx.beans.property.Property;
-import javafx.concurrent.Task;
+import net.imagej.ops.OpService;
+import org.junit.Test;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
-public interface Folder {
+public class OverlayTest extends BaseSciJavaTest{
     
+    @Parameter
+    OpService opService;
     
-    public String getName();
-    
-    public void setName(String name);
-    
-    public File getDirectory();
-    
-    public List<Explorable> getFileList();
-    
-    public List<Explorable> getPlaneList();
-    
-    public List<Explorable> getObjectList();
-    
-    public Property<Task> currentTaskProperty();
-    
-    public void addObjects(List<SegmentedObject> objects);
+    @Test
+    public void test() {
+        
+       
+        
+    }
     
 }

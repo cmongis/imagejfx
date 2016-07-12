@@ -20,7 +20,6 @@
  */
 package ijfx.service.ui;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,9 +29,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import ijfx.ui.module.json.ModuleItemSerializer;
 import ijfx.ui.module.json.ModuleSerializer;
 import ijfx.ui.main.ImageJFX;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import mercury.core.AngularMethod;
 import mercury.core.JSONUtils;
@@ -77,17 +76,16 @@ public class ImageJInfoService extends AbstractService implements ImageJService 
            
             ArrayNode arrayNode = mapper.createArrayNode();
             
-            moduleService.getModules().forEach(module->{
-                
-                    //System.out.println("Adding "+module.getName());
-                    arrayNode.add(mapper.convertValue(module,JsonNode.class));
-                
-            });
+          
             
             //String json = mapper.writeValueAsString(moduleService.getModules());
             logger.fine("JSON done !");
-            
-            return JSONUtils.parseToJSON(appService.getCurrentWebEngine(), arrayNode.toString());
+            System.out.println(arrayNode.toString());
+            return JSONUtils.parseToJSON(appService.getCurrentWebEngine(), mapper.writeValueAsString(moduleService
+                    .getModules()
+            .stream()
+            .filter(m->m!=null)
+            .collect(Collectors.toList())));
             //return JSONUtils.parseToJSON(appService.getCurrentWebEngine(), json);
 
         } catch (Exception ex) {

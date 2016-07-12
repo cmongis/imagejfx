@@ -53,6 +53,8 @@ import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.beans.Observable;
@@ -72,7 +74,6 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import mongis.utils.CallbackTask;
 import net.imagej.display.ImageDisplay;
-import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
@@ -116,7 +117,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     TimerService timerService;
-    
+
     @Parameter
     Context context;
 
@@ -148,16 +149,16 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @FXML
     TitledPane chartTitledPane;
-    
+
     PopOver optionsPane;
-    
-    OverlayOptions overlayOptions;    
-    
+
+    OverlayOptions overlayOptions;
+
     Text gearIcon;
-    
+
     int TEXT_GAP = 160;
     double BASAL_OPACITY = 0.4;
-    
+
     private final static String EMPTY_FIELD = "Name your overlay here :-)";
 
     ObjectProperty<Overlay> overlayProperty = new SimpleObjectProperty<>();
@@ -180,26 +181,30 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         overlayProperty.addListener(this::onOverlaySelectionChanged);
 
         chartVBox.getChildren().removeAll(areaChart, lineChart);
-        
-        overlayOptions = new OverlayOptions();        
-        
+
+        overlayOptions = new OverlayOptions();
+
         optionsPane = new PopOver(overlayOptions);
         optionsPane.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
         optionsPane.setDetachable(true);
         optionsPane.setAutoHide(false);
         optionsPane.titleProperty().setValue("Overlay settings");
         optionsPane.setConsumeAutoHidingEvents(false);
-        
+
         gearIcon = GlyphsDude.createIcon(FontAwesomeIcon.GEAR, "15");
         gearIcon.setOpacity(BASAL_OPACITY);
-        gearIcon.setOnMouseEntered(e-> gearIcon.setOpacity(1.0));
-        gearIcon.setOnMouseExited(e-> gearIcon.setOpacity(BASAL_OPACITY));
+        gearIcon.setOnMouseEntered(e -> gearIcon.setOpacity(1.0));
+        gearIcon.setOnMouseExited(e -> gearIcon.setOpacity(BASAL_OPACITY));
         gearIcon.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onGearClicked);
-        gearIcon.addEventHandler(MouseEvent.MOUSE_PRESSED, e->{e.consume();});
-        gearIcon.addEventHandler(MouseEvent.MOUSE_RELEASED, e->{e.consume();});
-        
-        chartTitledPane.setGraphic(gearIcon);      
-        chartTitledPane.setContentDisplay(ContentDisplay.RIGHT);        
+        gearIcon.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            e.consume();
+        });
+        gearIcon.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+            e.consume();
+        });
+
+        chartTitledPane.setGraphic(gearIcon);
+        chartTitledPane.setContentDisplay(ContentDisplay.RIGHT);
         chartTitledPane.graphicTextGapProperty().setValue(TEXT_GAP);
     }
 
@@ -231,6 +236,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
             return;
         }
 
+        /*
         // task calculating the stats in a new thread
         Task<HashMap<String, Double>> task = new Task<HashMap<String, Double>>() {
             @Override
@@ -248,25 +254,56 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
                 });
 
             }
-        };
+        };*/
         overlayProperty.setValue(event.getOverlay());
-        Platform.runLater(()->updateChart(event.getOverlay()));
-        ImageJFX.getThreadPool().submit(task);
+        Platform.runLater(() -> updateChart(event.getOverlay()));
+        updateTable();
+
+    }
+
+    protected void updateTable() {
+
+        new CallbackTask<Overlay, Map<String, Double>>()
+                .setInput(overlayProperty.getValue())
+                .run(overlay -> {
+                    return statsService.getStatisticsAsMap(imageDisplay, overlay);
+                })
+                .then(map -> {
+                    tableView.getItems().clear();
+                    tableView.getItems().addAll(
+                            map.entrySet()
+                            .stream()
+                            .map(entry -> new MyEntry(entry.getKey(), entry.getValue()))
+                            .collect(Collectors.toList())
+                    );
+
+                })
+                .start();
 
     }
 
     @EventHandler
     public void onActiveDisplayChanged(DisplayActivatedEvent event) {
+        if (event.getDisplay() instanceof ImageDisplay) {
+            imageDisplay = (ImageDisplay) event.getDisplay();
+        }
         onOverlaySelectionChanged();
     }
 
     @EventHandler
     public void onOverlayUpdated(OverlayUpdatedEvent event) {
-        if(overlaySelectionService.getSelectedOverlays(imageDisplay) == event.getObject())
-        Platform.runLater(()->updateChart(event.getObject()));
+        System.out.println("Updating chart ?");
+
+        overlaySelectionService
+                .getSelectedOverlays(imageDisplay)
+                .forEach(o -> System.out.println("Selected overlay " + o.toString()));
+
+        if (overlaySelectionService.getSelectedOverlays(imageDisplay).contains(event.getObject())) {
+            Platform.runLater(() -> updateChart(event.getObject()));
+            updateTable();
+        }
     }
 
-    
     private void updateChart(Overlay overlay) {
 
         boolean isLineOverlay = overlay instanceof LineOverlay;
@@ -286,11 +323,9 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         }
     }
 
-    
     /*
         Area Chart related methods
-    */
-   
+     */
     private void updateAreaChart(Overlay overlay) {
 
         Timer timer = timerService.getTimer(this.getClass());
@@ -299,7 +334,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
                 .setInput(overlay)
                 .run(this::getOverlayHistogram)
                 .then(serie -> {
-                    
+
                     timer.start();
                     areaChart.getData().clear();
                     areaChart.getData().add(serie);
@@ -354,9 +389,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     /*
     
         Line Chart related methods
-    */
-    
-     private void updateLineChart(LineOverlay overlay) {
+     */
+    private void updateLineChart(LineOverlay overlay) {
         new CallbackTask<Overlay, XYChart.Series<Double, Double>>()
                 .setInput(overlay)
                 .run(this::getLineChartSerie)
@@ -369,11 +403,10 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         lineChart.getData().add(serie);
     }
 
-    
     protected XYChart.Series<Double, Double> getLineChartSerie(Overlay overlay) {
         System.out.println("Doing things ;-)");
         Double[] valueList = statsService.getValueListFromImageDisplay(currentDisplay(), overlay);
-        
+
         ArrayList<Data<Double, Double>> data = new ArrayList<>(valueList.length);
         for (int i = 0; i != valueList.length; i++) {
             data.add(new Data<>(new Double(i), valueList[i]));
@@ -386,7 +419,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     EventService eventService;
-    
+
     @FXML
     public void deleteOverlay() {
 
@@ -396,8 +429,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
             overlayService.removeOverlay(display, overlay);
             //eventService.publishLater(new OverlayDeletedEvent(overlay));
         });
-        
-        
+
     }
 
     @Override
@@ -449,22 +481,20 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
             overlayProperty.getValue().setName(newText);
         }
     }
-    
-    
-    public void onGearClicked(MouseEvent e){
-        if(!optionsPane.isShowing()){
+
+    public void onGearClicked(MouseEvent e) {
+        if (!optionsPane.isShowing()) {
             RotateTransition rotate = new RotateTransition(Duration.millis(500), gearIcon);
             rotate.setByAngle(180);
             rotate.play();
-            optionsPane.show(gearIcon);        
-        }
-        else{
+            optionsPane.show(gearIcon);
+        } else {
             RotateTransition rotate = new RotateTransition(Duration.millis(500), gearIcon);
             rotate.setByAngle(-180);
             rotate.play();
-            optionsPane.hide();            
+            optionsPane.hide();
         }
-        
+
         e.consume();
     }
 

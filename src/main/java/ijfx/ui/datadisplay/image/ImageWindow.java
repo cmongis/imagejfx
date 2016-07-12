@@ -72,6 +72,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
@@ -84,6 +85,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.display.event.AxisPositionEvent;
+import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import net.imagej.event.DatasetUpdatedEvent;
 import net.imagej.event.OverlayCreatedEvent;
@@ -371,9 +373,10 @@ public class ImageWindow extends Window {
                 .buffer(1000 / 15, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
                 .subscribe(list -> {
-
-                    System.out.println(String.format("%s events that require image refresh", list.size()));
-                    Platform.runLater(this::refreshSourceImage);
+                    
+                    logger.info(String.format("%s events that require image refresh", list.size()));
+                    list.forEach(event->System.out.println(event.getClass().getSimpleName()));
+                    refreshSourceImage();
                 });
 
         // stream intercepting all event causing a redrawing of the overlay
@@ -506,7 +509,7 @@ public class ImageWindow extends Window {
         return imageDisplay;
     }
 
-    public synchronized void refreshSourceImage() {
+    public void refreshSourceImage() {
 
         if (checkServices()) {
 
@@ -521,12 +524,15 @@ public class ImageWindow extends Window {
 
         Timer t = timerService.getTimer(this.getClass());
         t.start();
-
+       
         logger.info("Refreshing source image " + imageDisplay.getName());
 
+        
+      
+        
         //Retrieving buffered image from the dataset view
         BufferedImage bf = getDatasetview().getScreenImage().image();
-
+        
         t.elapsed("getScreenImage");
 
         // getting a writableImage (previously created or not)
@@ -590,10 +596,12 @@ public class ImageWindow extends Window {
             if (anchorPane.getChildren().contains(node) == false) {
                 anchorPane.getChildren().add(node);
             }
-
-            if (overlaySelectionService.getSelectedOverlays(imageDisplay).contains(overlay)) {
-                Shape shape = (Shape) node;
+            Shape shape = (Shape) node;
+            if (overlaySelectionService.isSelected(imageDisplay,overlay)) {
                 shape.setFill(shape.getStroke());
+            }
+            else {
+                shape.setFill(Color.TRANSPARENT);
             }
             t.elapsed("updateOverlay");
 
@@ -827,10 +835,10 @@ public class ImageWindow extends Window {
             return;
         }
         logger.info("LUTsChangedEvent");
-        bus.channel(event);
-
-        getOverlays().stream().map(o -> new OverlayUpdatedEvent(o)).forEach(bus::channel);
-
+        //imageDisplay.update();
+        //refreshSourceImage();
+        //getOverlays().stream().map(o -> new OverlayUpdatedEvent(o)).forEach(bus::channel);
+          imageDisplayService.getActiveDataset(imageDisplay).update();
         //  System.out.println(event.getView());
         // System.out.println(getDatasetview());
         //imageDisplay.update();
@@ -839,6 +847,14 @@ public class ImageWindow extends Window {
     }
 
     @EventHandler
+    public void onDatasetViewUpdated(DataViewUpdatedEvent event) {
+        if(event.getView() == getDatasetview()) {
+            bus.channel(event);
+             
+        }
+    }
+    
+    @EventHandler
     protected void onDatasetUpdated(DatasetUpdatedEvent event) {
         //imageDisplay.update();
         if (event.getObject() != imageDisplayService.getActiveDataset(imageDisplay)) {
@@ -846,6 +862,7 @@ public class ImageWindow extends Window {
         }
         logger.info("DatasetChangedEvent : " + event.getObject());
         //imageDisplay.update();
+        
         bus.channel(event);
         //refreshSourceImage();
     }
@@ -896,6 +913,12 @@ public class ImageWindow extends Window {
         Platform.runLater(() -> setEdited(event.getOverlay()));
 
     }
+    
+    @EventHandler
+    protected void onOverlaySelectedEvent(OverlaySelectedEvent event) {
+        logger.info("Overlay selected event");
+        bus.channel(event);
+    }
 
     @EventHandler
     protected void onOverlayCreated(OverlayCreatedEvent event) {
@@ -935,6 +958,11 @@ public class ImageWindow extends Window {
         //updateOverlays();
         //Platform.runLater(() -> deleteOverlay(event.getObject()));
     }
+    @EventHandler
+    protected void onAnyEvent(SciJavaEvent event) {
+        logger.info(event.getClass().getSimpleName());
+    }
+    
 
     protected OverlayDrawer getDrawer(Overlay overlay) {
         return drawerMap.computeIfAbsent(overlay, overlayDrawerService::createDrawer);

@@ -26,6 +26,7 @@ import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.ImageDisplayBatchInput;
 import ijfx.service.batch.SegmentationService;
+import ijfx.service.batch.SegmentedObject;
 import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.ui.LoadingScreenService;
@@ -37,11 +38,14 @@ import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
 import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorationMode;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
+import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.Localization;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -135,6 +139,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     private LoadingScreenService loadingScreenService;
 
     @Parameter
+    private FolderManagerService folderManagerService;
+    
+    @Parameter
     ActivityService activityService;
 
     @Parameter
@@ -224,7 +231,6 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         BatchSingleInput input;
         ImageDisplay inputDisplay;
 
-
         if (isExplorer()) {
             Explorable explorable;
             if (explorerService.getSelectedItems().size() > 0) {
@@ -263,16 +269,15 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
 
         // deleting the overlay owned previously by the input
-        
-        inputDisplay.addAll(Stream.of(overlay).map(o->imageDisplayService.createDataView(o)).collect(Collectors.toList()));
+        inputDisplay.addAll(Stream.of(overlay).map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
         inputDisplay.update();
-        
+
         //overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
         // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();
         context.inject(outputDisplay);
         outputDisplay.display(input.getDataset());
-        
+
         // adding the overlay to the input dipslay
         //overlayService.addOverlays(inputDisplay, Arrays.asList(overlay));
         //inputDisplay.update();
@@ -321,28 +326,36 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     }
 
-    
-    
-    
     protected Task<Boolean> generateTask(TaskButtonBinding binding) {
 
         if (activityService.getCurrentActivity() instanceof ExplorerActivity) {
 
             final DefaultWorkflow workflow = new DefaultWorkflow(workflowPanel.stepListProperty());
-
+            final List<SegmentedObject> objectFound = new ArrayList<>();
             List<BatchSingleInput> inputList = explorerService.getSelectedItems()
                     .stream()
                     .map(explorable -> new BatchInputBuilder(context)
                             .from(explorable)
                             //.saveNextToSourceWithPrefix("_mask","png")
-                            .onFinished(segmentationService::saveOverlaysNextToSourceFile)
+                            .onFinished(segmentationService.addObjectToList(objectFound))
+                            //.onFinished(segmentationService::saveOverlaysNextToSourceFile)
                             .getInput()
                     )
                     .collect(Collectors.toList());
 
             Task<Boolean> task = new CallbackTask<List<BatchSingleInput>, Boolean>(inputList)
                     .run((progress, input) -> {
-                        return batchService.applyWorkflow(progress, input, workflow);
+                        boolean result = batchService.applyWorkflow(progress, input, workflow);
+                        if (result == true) {
+                            
+                            uiService.showDialog(String.format("%d objects where segmented", objectFound.size()), "Segmentation over");
+                            folderManagerService.getCurrentFolder().addObjects(objectFound);
+                            folderManagerService.setExplorationMode(ExplorationMode.OBJECT);
+                            return result;
+                        } else {
+                            uiService.showDialog(String.format("Error when segmenting the objects"));
+                            return false;
+                        }
                     });
 
             loadingScreenService.frontEndTask(task);
@@ -354,10 +367,6 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         return null;
 
     }
-    
-     
-    
-    
 
     private boolean isExplorer() {
         return isExplorer.getValue();
@@ -383,7 +392,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     public void close() {
         uiContextService.leave("segment");
         uiContextService.leave("segmentation");
-        if(!isExplorer()) {
+        if (!isExplorer()) {
             uiContextService.enter("imagej");
         }
         uiContextService.update();

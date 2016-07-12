@@ -33,7 +33,7 @@ public class LogEntry {
     String title;
     String reason;
     String text;
-    Exception exception;
+    Throwable exception;
     
     long date;
     
@@ -54,7 +54,7 @@ public class LogEntry {
         setType(type);
     }
 
-    public LogEntry(Exception e) {
+    public LogEntry(Throwable e) {
         this(LogEntryType.ERROR);
         setException(e);
         setText(getStackTrace(e));
@@ -121,11 +121,11 @@ public class LogEntry {
         return this;
     }
 
-    public Exception getException() {
+    public Throwable getException() {
         return exception;
     }
 
-    public LogEntry setException(Exception exception) {
+    public LogEntry setException(Throwable exception) {
         this.exception = exception;
         return this;
     }

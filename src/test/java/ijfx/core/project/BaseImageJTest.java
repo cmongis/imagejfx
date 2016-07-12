@@ -17,35 +17,45 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.core.project;
 
-import ijfx.service.batch.SegmentedObject;
-import java.io.File;
-import java.util.List;
-import javafx.beans.property.Property;
-import javafx.concurrent.Task;
+import org.junit.After;
+import org.junit.Before;
+import org.scijava.Context;
+import org.scijava.jython.shaded.jnr.netdb.Service;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
-public interface Folder {
-    
-    
-    public String getName();
-    
-    public void setName(String name);
-    
-    public File getDirectory();
-    
-    public List<Explorable> getFileList();
-    
-    public List<Explorable> getPlaneList();
-    
-    public List<Explorable> getObjectList();
-    
-    public Property<Task> currentTaskProperty();
-    
-    public void addObjects(List<SegmentedObject> objects);
-    
+public abstract class BaseImageJTest {
+
+    @Parameter
+    Context context;
+
+    protected Context createContext(Class<? extends Service>... services) {
+
+        return new Context(services);
+
+    }
+
+    @Before
+    public void setUp() {
+
+        createContext(getService()).inject(this);
+
+    }
+
+    protected abstract Class[] getService();
+
+    @After
+    public synchronized void cleanUp() {
+        if (context != null) {
+            context.dispose();
+            context = null;
+
+        }
+    }
+
 }

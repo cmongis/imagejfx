@@ -66,7 +66,7 @@ public class TaskButtonBinding {
 
     private StringProperty textWhenSucceedProperty = new SimpleStringProperty("Done !");
 
-    private StringProperty textWhenErrorProperty = new SimpleStringProperty("Something went wrong");
+    private StringProperty textWhenErrorProperty = new SimpleStringProperty("Retry");
 
     private StringProperty textWhenRunningProperty = new SimpleStringProperty("Cancel");
 
@@ -115,18 +115,14 @@ public class TaskButtonBinding {
         return taskStateProperty.getValue();
     }
 
-    public String getButtonString() {
+    protected String getButtonString() {
         if (getWorkerState() == Worker.State.RUNNING) {
             return getTextWhenRunning();
         }
         if (getWorkerState() == Worker.State.FAILED) {
             return getTextWhenError();
         }
-        if (getWorkerState() == Worker.State.SUCCEEDED) {
-            return getTextWhenSucceed();
-        } else if (getWorkerState() == Worker.State.CANCELLED) {
-            return getTextBeforeTask();
-        } else {
+       else {
             return getTextBeforeTask();
         }
     }
@@ -189,7 +185,7 @@ public class TaskButtonBinding {
 
     public TaskButtonBinding setTextBeforeTask(String initialText) {
         this.textBeforeTaskProperty.setValue(initialText);
-        button.setText(initialText);
+        //button.setText(initialText);
         return this;
     }
 

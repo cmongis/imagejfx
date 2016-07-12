@@ -29,6 +29,7 @@ import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.thumb.ThumbService;
 import io.scif.MetadataLevel;
 import io.scif.config.SCIFIOConfig;
 import io.scif.services.DatasetIOService;
@@ -58,9 +59,12 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
     @Parameter
     ImagePlaneService imagePlaneService;
     
+    @Parameter
+    ThumbService thumberService;
+    
     private static File testFile = new File("./src/test/resources/multidim.tif");
     
-    @Test
+   // @Test
     public void testTiffFile() {
 
         init();
@@ -78,10 +82,14 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
       
     }
     
+   
+    
     @Test
-    public void testTransformation() {
+    public void testTransformation() throws IOException {
         init();
         File f = testFile;//OMG!!!!new File("/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif");//testFile;
+        
+        f  = new File("/Users/cyril/test_img/jasmin/hello.png");
         MetaDataSet m = extractorService.extractMetaData(f);
         int channelCount = m.get(MetaData.CHANNEL_COUNT).getIntegerValue();
         int tCount = m.get(MetaData.TIME_COUNT).getIntegerValue();
@@ -91,6 +99,10 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
         System.out.println(mList.get(0));
         
         Assert.assertEquals(tCount * zCount*channelCount, mList.size());
+        Assert.assertEquals((long)mList.get(mList.size()-1).get(MetaData.PLANE_INDEX).getIntegerValue(),mList.size()-1);
+        
+        
+        //thumberService.getThumb(f, 14, 100, 100);
     }
 
    

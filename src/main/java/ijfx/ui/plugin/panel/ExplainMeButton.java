@@ -48,22 +48,15 @@ public class ExplainMeButton extends AbstractContextButton {
     
     public ExplainMeButton() {
         super("Explain me", FontAwesomeIcon.INFO_CIRCLE);
-       
         //getButton().setText("Explain me");
         getButton().getStyleClass().add("success");
-        
-       
     }
     
     @Override
     public void onAction(ActionEvent event) {
-        
         playHint(SegmentationPanel.class);
-        
-        
-        
     }
-    
+     
     
     public void playHint(Class<?> clazz) {
         

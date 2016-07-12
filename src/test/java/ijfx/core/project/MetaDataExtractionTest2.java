@@ -17,35 +17,39 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.core.project;
 
-import ijfx.service.batch.SegmentedObject;
-import java.io.File;
-import java.util.List;
-import javafx.beans.property.Property;
-import javafx.concurrent.Task;
+import ijfx.core.imagedb.ImageRecordService;
+import ijfx.core.imagedb.MetaDataExtractionService;
+import org.junit.Assert;
+import org.junit.Test;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
-public interface Folder {
+public class MetaDataExtractionTest2 extends BaseImageJTest{
+
     
+    @Parameter
+    MetaDataExtractionService service;
     
-    public String getName();
+    @Parameter
+    ImageRecordService imageRecordService;
     
-    public void setName(String name);
+    @Override
+    protected Class[] getService() {
+        return new Class[]{
+            ImageRecordService.class
+                };
+    }
     
-    public File getDirectory();
+    @Test
+    public void testInjection() {
+        Assert.assertNotNull(imageRecordService);
+        Assert.assertNotNull(service);
+    }
     
-    public List<Explorable> getFileList();
-    
-    public List<Explorable> getPlaneList();
-    
-    public List<Explorable> getObjectList();
-    
-    public Property<Task> currentTaskProperty();
-    
-    public void addObjects(List<SegmentedObject> objects);
     
 }
