@@ -42,7 +42,7 @@ import net.imagej.DatasetService;
  *
  * @author cyril
  */
-public class MetadataExtractionTest extends BaseSciJavaTest {
+public class MetadataExtractionTest extends BaseImageJTest {
 
     @Parameter
     MetaDataExtractionService extractorService;
@@ -64,10 +64,16 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
     
     private static File testFile = new File("./src/test/resources/multidim.tif");
     
+    
+    @Override
+    protected Class[] getService() {
+        return new Class[]{TimerService.class,DatasetIOService.class,MetaDataExtractionService.class,ImagePlaneService.class,ThumbService.class};
+    }
+    
    // @Test
     public void testTiffFile() {
 
-        init();
+    
         File f = testFile;
         if (f.exists() == false) {
             System.out.println("File doesn't exist... skipping test");
@@ -86,7 +92,7 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
     
  
     public void testTransformation() throws IOException {
-        init();
+      
         File f = testFile;//OMG!!!!new File("/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif");//testFile;
         
         f  = new File("/Users/cyril/test_img/jasmin/hello.png");
@@ -107,7 +113,7 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
 
    
     public void testPlaneExtraction() throws IOException {
-        init();
+     
 
         Timer t = timerService.getTimer("Dataset open benchmarking");
         //String testFile = "/Users/cyril/test_img/psfj/gfp_nikon/gfp_nikon1_2048x2048.tif";

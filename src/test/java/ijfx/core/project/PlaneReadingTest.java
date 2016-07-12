@@ -19,9 +19,11 @@
  */
 package ijfx.core.project;
 
+import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.thumb.ThumbService;
 import io.scif.MetadataLevel;
 import io.scif.config.SCIFIOConfig;
 import io.scif.services.DatasetIOService;
@@ -41,7 +43,7 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public class PlaneReadingTest extends BaseSciJavaTest {
+public class PlaneReadingTest extends BaseImageJTest {
 
     @Parameter
     DatasetIOService datasetIOService;
@@ -55,10 +57,14 @@ public class PlaneReadingTest extends BaseSciJavaTest {
     @Parameter
     ImagePlaneService imagePlaneService;
 
+       @Override
+    protected Class[] getService() {
+        return new Class[]{TimerService.class,DatasetIOService.class,MetaDataExtractionService.class,ImagePlaneService.class,ThumbService.class};
+    }
     
     public void tiffPlaneReading() throws IOException {
 
-        init();
+        
 
         String file = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif";
         //String file = "./src/test/resources/multidim.tif";
