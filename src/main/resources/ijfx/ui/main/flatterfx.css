@@ -1405,6 +1405,11 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 }
 
+
+.workflow-list-cell.selected {
+    -fx-background-color:-bg-light;
+}
+
 .module-config-pane {
     -fx-padding:15px 15px 15px 15px;
     -fx-pref-width:500px;
