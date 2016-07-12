@@ -20,10 +20,15 @@
 package ijfx.ui.batch;
 
 import ijfx.service.history.HistoryService;
+import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.DefaultWorkflowStep;
+import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowStep;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.workflow.SaveWorkflowDialog;
+import ijfx.ui.workflow.WorkflowSelectionDialog;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -154,12 +159,21 @@ public class WorkflowPanel extends GridPane {
     
      @FXML
     public void loadWorkflow() {
+        Workflow workflow = new WorkflowSelectionDialog(context).showAndWait().orElse(null);
+        
+        if(workflow != null) {
+            stepList.addAll(workflow.getStepList());
+        }
+        
+        
+        
+        
         
     }
     
     @FXML
     public void saveWorkflow() {
-        
+        new SaveWorkflowDialog(context).save(new DefaultWorkflow(new ArrayList(stepList)));
     }
     
    @FXML
