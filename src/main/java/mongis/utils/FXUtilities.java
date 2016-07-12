@@ -388,7 +388,13 @@ public class FXUtilities {
         };
 
         try {
-            runAndWait(task);
+            if(Platform.isFxApplicationThread()) {
+                task.run();
+            }
+            
+            else {
+                runAndWait(task);
+            }
 
             return task.get();
         } catch (Exception ex) {
