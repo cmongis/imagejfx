@@ -19,15 +19,12 @@
  */
 package ijfx.ui.plugin;
 
-import ijfx.ui.main.ImageJFX;
 import ijfx.ui.module.ModuleConfigPane;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
