@@ -177,7 +177,9 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
     
     public boolean isSelected(ImageDisplay imageDisplay, Overlay overlay) {
         
-        return getOverlayViews(imageDisplay).stream().filter(view->view.getData()==overlay).count() > 0;
+        return getOverlayViews(imageDisplay)
+                .stream()
+                .filter(view->view.getData()==overlay && view.isSelected()).count() > 0;
         
     }
 
