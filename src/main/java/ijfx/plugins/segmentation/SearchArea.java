@@ -31,9 +31,9 @@ import net.imagej.Dataset;
 public interface SearchArea {
     
     ArrayList<Point2D> getPoints();
-    ArrayList<List<int[]>> getProfilesSet();
+    ArrayList<List<int[]>> getSegmentsSet();
     
-    void setAllPossibleProfiles();
+    void setAllPossibleSegments();
     void drawArea(Dataset ds);
     void drawProfiles(Dataset ds);
 }

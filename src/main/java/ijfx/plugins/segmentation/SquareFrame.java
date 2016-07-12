@@ -25,9 +25,9 @@ import javafx.geometry.Point2D;
  *
  * @author Pierre BONNEAU
  */
-public class SquaredFrame extends AbstractSearchArea{
+public class SquareFrame extends AbstractSearchArea{
     
-    public SquaredFrame(double cX, double cY, int radius){
+    public SquareFrame(double cX, double cY, int radius){
         
         super(cX, cY, radius);
         

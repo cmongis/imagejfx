@@ -43,6 +43,7 @@ public class ProfilesCommandTester implements Command{
         segmentationService.generateConfirmationSet(trainingSet);
         
         NeuralNet nn = new LSTMRnn(1, 4, 1);
+        
         nn.initialize();
         System.out.println("Network initialized!");
         

@@ -23,6 +23,7 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayStatService;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javafx.geometry.Point2D;
 import net.imagej.Dataset;
@@ -41,7 +42,7 @@ import org.scijava.ui.UIService;
  */
 public class DefaultProfilesSet implements ProfilesSet{
     
-    private List<List<int[]>> profiles;
+    private List<List<List<Double>>> profiles;
 
     @Parameter
     OverlayStatService overlayStatService;
@@ -71,26 +72,49 @@ public class DefaultProfilesSet implements ProfilesSet{
         Dataset dataset = imageDisplayService.getActiveDataset(display);
         Dataset labels = imagePlaneService.createEmptyPlaneDataset(dataset);
         
-        RandomAccess<RealType<?>> randomAccess = labels.randomAccess();
+        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
         
         for(Point2D c : centers){
             double cX = c.getX();
             double cY = c.getY();
             
             SearchArea area = new MidPointCircle(cX, cY, (int)lenght);
-//            SearchArea area = new SquaredFrame(cX, cY, (int)lenght);
-            area.setAllPossibleProfiles();
+            /*Alternative area shape to look for possible membrane patterns*/
+//            SearchArea area = new SquareFrame(cX, cY, (int)lenght);
+            area.setAllPossibleSegments();
             
-            for(int i = 0; i < area.getProfilesSet().size(); i++){
-                List<int[]> segment = area.getProfilesSet().get(i);
-                profiles.add(segment);
+            for(int i = 0; i < area.getSegmentsSet().size(); i++){
+                
+                List<int[]> segment = area.getSegmentsSet().get(i);
+                Iterator<int[]> it = segment.iterator();
+                
+                /*
+                Variable point contains all the caracteristics of a point in a sequence.
+                Thus we can still have several features for each element of the sequence, as so many inputs in a neural network.
+                For example, we just consider here the intensity of the point, but we could decide to add its coordinates.
+                */
+                List<Double> point = new ArrayList<>();
+                
+                List<List<Double>> profile = new ArrayList<>();
+                
+                while(it.hasNext()){
+                    int[] xy = it.next();
+                    randomAccess.setPosition(xy[0], 0);
+                    randomAccess.setPosition(xy[1], 1);
+                    Double pixelValue = new Double(randomAccess.get().getRealDouble());
+                    
+                    point.add(pixelValue);
+                    
+                    profile.add(point);
+                }
+                profiles.add(profile);
             }
         }
     }
     
     
     @Override
-    public List<List<int[]>> getProfiles(){
+    public List<List<List<Double>>> getProfiles(){
         return this.profiles;
     }
 }

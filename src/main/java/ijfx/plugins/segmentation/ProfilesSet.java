@@ -26,5 +26,5 @@ import java.util.List;
  * @author Pierre BONNEAU
  */
 public interface ProfilesSet {
-    public List<List<int[]>> getProfiles();
+    public List<List<List<Double>>> getProfiles();
 }
