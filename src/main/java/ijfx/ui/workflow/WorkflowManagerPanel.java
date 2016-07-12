@@ -22,17 +22,19 @@ package ijfx.ui.workflow;
 
 import ijfx.service.workflow.MyWorkflowService;
 import ijfx.service.workflow.Workflow;
+import ijfx.service.workflow.WorkflowIOService;
 import java.io.IOException;
 import java.util.logging.Level;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
-import ijfx.ui.UiPlugin;
 import ijfx.ui.main.ImageJFX;
-import java.util.function.Consumer;
+import java.io.File;
+import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.stage.FileChooser;
 import mongis.utils.ListCellController;
 import mongis.utils.ListCellControllerFactory;
 import org.scijava.Context;
@@ -45,10 +47,12 @@ public class WorkflowManagerPanel extends BorderPane {
     @Parameter
     MyWorkflowService myWorkflowService;
 
+    
+    
     @Parameter
     Context context;
 
-    Consumer<Workflow> handler;
+    Property<Workflow> selectedWorkflowProperty;
 
     public WorkflowManagerPanel(Context context) {
         try {
@@ -71,27 +75,28 @@ public class WorkflowManagerPanel extends BorderPane {
         return ctrl;
     }
 
-    public Consumer<Workflow> getHandler() {
-        return handler;
-    }
-
-    public void setHandler(Consumer<Workflow> handler) {
-        this.handler = handler;
-    }
-
-    @FXML
-    public void choose() {
-        handler.accept(listView.getSelectionModel().getSelectedItem());
-    }
-
-    @FXML
-    public void cancel() {
-        handler.accept(null);
-    }
+  
 
     @FXML
     public void importWorkflow() {
+        
+        
+        FileChooser fileChooser = new FileChooser();
 
+                File file = null;
+                fileChooser.setTitle("Import workflow from JSON");
+                //fileChooser.setInitialDirectory(new File(defaultFolder));
+                fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("JSON workflow", "json"));
+                file = fileChooser.showOpenDialog(null);
+               
+        if (file != null) {
+            myWorkflowService.importWorkflow(file);
+        }
     }
 
+    
+    public ReadOnlyObjectProperty<Workflow> selectedWorkflowProperty() {
+        return listView.getSelectionModel().selectedItemProperty();
+    }
+    
 }
