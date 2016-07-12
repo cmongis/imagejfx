@@ -42,7 +42,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
-import sun.util.logging.resources.logging;
 
 /**
  *

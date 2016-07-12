@@ -7,6 +7,7 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import ijfx.ui.plugin.*?>
 
 <fx:root id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <stylesheets>
@@ -30,14 +31,14 @@
             <bottom>
                 <ComboBox prefWidth="150.0" BorderPane.alignment="CENTER" fx:id="xComboBox" />
             </bottom>
-         <top>
-            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                      <ComboBox fx:id="thirdComboBox" prefWidth="150.0" />
-                  <ComboBox fx:id="lutComboBox" prefWidth="150.0" />
-               </children>
-            </HBox>
-         </top>
+            <top>
+                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <ComboBox fx:id="thirdComboBox" prefWidth="150.0" />
+                        <LUTComboBox fx:id="lutComboBox" prefWidth="150.0" />
+                    </children>
+                </HBox>
+            </top>
         </BorderPane>
     </children>
 </fx:root>

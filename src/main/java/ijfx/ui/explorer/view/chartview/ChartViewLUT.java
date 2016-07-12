@@ -36,10 +36,20 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.ComboBox;
+import javafx.scene.layout.BorderPane;
+import mongis.utils.ColorTableUtil;
 import mongis.utils.FXUtilities;
+import net.imglib2.converter.RealLUTConverter;
+import net.imglib2.display.ColorTable;
+import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.integer.UnsignedShortType;
+import net.imglib2.type.numeric.real.DoubleType;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -48,7 +58,7 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = ExplorerView.class)
-public class ChartViewLUT extends AbstractChartView implements ExplorerView {
+public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView implements ExplorerView {
 
     @Parameter
     ExplorableClustererService explorableClustererService;
@@ -67,15 +77,18 @@ public class ChartViewLUT extends AbstractChartView implements ExplorerView {
     ComboBox<String> thirdComboBox;
 
     @FXML
-    ComboBox<LUTView> lutComboBox;
+    LUTComboBox lutComboBox;
+
     List<ComboBox<String>> comboBoxList;
+    double min = 0;
+    double max = 0;
 
     public ChartViewLUT() {
         super();
         lutComboBox = new LUTComboBox();
 
         comboBoxList = new ArrayList<>();
-        metadatas = new String[2];
+        metadatas = new String[3];
 
         try {
             FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/ChartViewLUT.fxml");
@@ -105,7 +118,6 @@ public class ChartViewLUT extends AbstractChartView implements ExplorerView {
     public void setItem(List<? extends Explorable> items) {
         currentItems = items;
         lutComboBox.getItems().addAll(FxImageService.getLUTViewMap().values());
-//        computeItems();
         List<String> metadatas = explorerService.getMetaDataKey(currentItems);
 
         comboBoxList.stream().forEach(c -> {
@@ -141,13 +153,10 @@ public class ChartViewLUT extends AbstractChartView implements ExplorerView {
     @Override
     public void computeItems() {
 
-        if (metadatas.length > 1) {
+        scatterChart.getData().clear();
+        addDataToChart(currentItems, Arrays.asList(metadatas));
+        bindLegend();
 
-            scatterChart.getData().clear();
-
-            addDataToChart(currentItems, Arrays.asList(metadatas));
-            bindLegend();
-        }
     }
 
     public void initComboBox() {
@@ -161,6 +170,13 @@ public class ChartViewLUT extends AbstractChartView implements ExplorerView {
             deselecItems();
             computeItems();
         });
+        thirdComboBox.getSelectionModel().selectedItemProperty().addListener((obs, old, n) -> {
+            metadatas[2] = n;
+            deselecItems();
+            computeItems();
+            setMinMax(n);
+        });
+        lutComboBox.getSelectionModel().selectedItemProperty().addListener(this::onComboBoxChanged);
     }
 
     public void deselecItems() {
@@ -168,4 +184,33 @@ public class ChartViewLUT extends AbstractChartView implements ExplorerView {
                 .forEach(e -> e.selectedProperty().setValue(false));
     }
 
+    public void onComboBoxChanged(Observable observable, LUTView oldValue, LUTView newValue) {
+        ColorTable colorTable = newValue.getColorTable();
+        RealLUTConverter<T> realLUTConverter = new RealLUTConverter<>(min, max, colorTable);
+        scatterChart.getData().get(0).getData().stream()
+                .forEach((Data e) -> {
+                    double extraValue = (double) e.getExtraValue();
+                    ARGBType argbType = new ARGBType();
+                    realLUTConverter.convert((T) new DoubleType(extraValue), argbType);
+                    int value = argbType.get();
+
+                    final int red = (value >> 16) & 0xff;
+                    final int green = (value >> 8) & 0xff;
+                    final int blue = value & 0xff;
+//                    e.getNode().getStyleClass().clear();
+                    TogglePlot t = (TogglePlot) e.getNode();
+                    t.setStyle("-fx-background-color: rgb("+red+","+green+","+blue+")");
+            System.out.println(t.getStyle());
+                });
+//        realLUTConverter.convert(1, output);
+    }
+
+    private void setMinMax(String newValue) {
+        currentItems.stream()
+                .forEach(e -> {
+                    double value = e.getMetaDataSet().get(newValue).getDoubleValue();
+                    min = min > value ? value : min;
+                    max = max < value ? value : max;
+                });
+    }
 }

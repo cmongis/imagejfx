@@ -144,7 +144,6 @@ public class ChartView extends AbstractChartView implements ExplorerView {
             scatterChart.getData().clear();
 
             List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
-            System.out.println("ijfx.ui.explorer.view.chartview.ChartView.computeItems()" + clustersList.size());
             clustersList
                     .stream()
                     .forEach(e -> addDataToChart(e, Arrays.asList(metadatas)));

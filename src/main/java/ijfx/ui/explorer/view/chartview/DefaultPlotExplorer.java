@@ -60,12 +60,26 @@ public class DefaultPlotExplorer implements PlotExplorer {
         addNode();
     }
 
+    public DefaultPlotExplorer(ExplorerService explorerService, Explorable explorable, double x, double y, double extraValue) {
+        this(explorerService, explorable, x, y);
+        this.data.setExtraValue(extraValue);
+        addNode();
+    }
+
     public DefaultPlotExplorer(Explorable explorable, String[] metadataKeys, ExplorerService explorerService) {
         this.explorerService = explorerService;
         this.explorable = explorable;
         x = explorable.getMetaDataSet().get(metadataKeys[0]).getDoubleValue();
         y = explorable.getMetaDataSet().get(metadataKeys[1]).getDoubleValue();
-        this.data = new Data(x, y);
+        if (metadataKeys.length > 2) {
+            double extra = explorable.getMetaDataSet().get(metadataKeys[2]).getDoubleValue();
+
+            this.data = new Data(x, y, extra);
+
+        } else {
+
+            this.data = new Data(x, y);
+        }
         addNode();
     }
 
@@ -75,7 +89,7 @@ public class DefaultPlotExplorer implements PlotExplorer {
         togglePlot.selectedProperty().bindBidirectional(this.explorable.selectedProperty());
         togglePlot.selectedProperty().addListener((obs, old, n) -> {
             String style;
-            style = (n) ? TogglePlot.DEFAULT_COLOR : "";
+            style = (n) ? TogglePlot.DEFAULT_COLOR : togglePlot.getStyle();
             togglePlot.setStyle(style);
         });
         this.data.setNode(togglePlot);
