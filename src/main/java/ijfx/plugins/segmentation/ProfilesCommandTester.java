@@ -21,6 +21,8 @@ package ijfx.plugins.segmentation;
 
 import ijfx.plugins.segmentation.neural_network.LSTMRnn;
 import ijfx.plugins.segmentation.neural_network.NeuralNet;
+import java.util.ArrayList;
+import java.util.List;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -47,5 +49,12 @@ public class ProfilesCommandTester implements Command{
         nn.initialize();
         System.out.println("Network initialized!");
         
+        List<List<double[]>> results = new ArrayList<>(trainingSet.getProfiles().size());
+        for(int p = 0; p < trainingSet.getProfiles().size(); p++){
+            List<int[]> profile = trainingSet.getProfiles().get(p);
+            List<double[]> blabla = trainingSet.getPointsAsFeatures(profile);
+            results.add(nn.forwardProp(blabla));
+        }
+        System.out.println("Forward prop done");
     }
 }

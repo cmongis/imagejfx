@@ -42,7 +42,7 @@ import org.scijava.ui.UIService;
  */
 public class DefaultProfilesSet implements ProfilesSet{
     
-    private List<List<List<Double>>> profiles;
+    private List<List<int[]>> profiles;
 
     @Parameter
     OverlayStatService overlayStatService;
@@ -83,38 +83,39 @@ public class DefaultProfilesSet implements ProfilesSet{
 //            SearchArea area = new SquareFrame(cX, cY, (int)lenght);
             area.setAllPossibleSegments();
             
-            for(int i = 0; i < area.getSegmentsSet().size(); i++){
-                
-                List<int[]> segment = area.getSegmentsSet().get(i);
-                Iterator<int[]> it = segment.iterator();
-                
-                /*
-                Variable point contains all the caracteristics of a point in a sequence.
-                Thus we can still have several features for each element of the sequence, as so many inputs in a neural network.
-                For example, we just consider here the intensity of the point, but we could decide to add its coordinates.
-                */
-                List<Double> point = new ArrayList<>();
-                
-                List<List<Double>> profile = new ArrayList<>();
-                
-                while(it.hasNext()){
-                    int[] xy = it.next();
-                    randomAccess.setPosition(xy[0], 0);
-                    randomAccess.setPosition(xy[1], 1);
-                    Double pixelValue = new Double(randomAccess.get().getRealDouble());
-                    
-                    point.add(pixelValue);
-                    
-                    profile.add(point);
-                }
-                profiles.add(profile);
+            Iterator<List<int[]>> it_seg = area.getSegmentsSet().iterator();
+            
+            while(it_seg.hasNext()){
+                profiles.add(it_seg.next());
             }
         }
     }
     
-    
     @Override
-    public List<List<List<Double>>> getProfiles(){
+    public List<List<int[]>> getProfiles(){
         return this.profiles;
+    }
+
+    @Override
+    public List<double[]> getPointsAsFeatures(List<int[]> points) {
+        
+        List<double[]> intensities = new ArrayList<>(points.size());
+        
+        ImageDisplay display = imageDisplayService.getActiveImageDisplay();
+        Dataset dataset = imageDisplayService.getActiveDataset(display);
+        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
+        
+        for(int p = 0; p < points.size(); p++){
+            
+            double[] features = new double[1];
+            randomAccess.setPosition(points.get(p)[0], 0);
+            randomAccess.setPosition(points.get(p)[1], 1);
+            
+            double pixelValue = randomAccess.get().getRealDouble();
+            features[0] = pixelValue;
+            intensities.add(features);
+        }
+        
+        return intensities;
     }
 }

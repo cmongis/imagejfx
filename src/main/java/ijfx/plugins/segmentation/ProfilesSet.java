@@ -26,5 +26,6 @@ import java.util.List;
  * @author Pierre BONNEAU
  */
 public interface ProfilesSet {
-    public List<List<List<Double>>> getProfiles();
+    public List<List<int[]>> getProfiles();
+    public List<double[]> getPointsAsFeatures(List<int[]> points);
 }

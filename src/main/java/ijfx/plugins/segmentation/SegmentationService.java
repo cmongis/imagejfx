@@ -106,17 +106,22 @@ public class SegmentationService extends AbstractService implements ImageJServic
         RandomAccess<RealType<?>> randomAccess = this.labels.randomAccess();
         
         for(int i =  0; i < trainingSet.getProfiles().size(); i++){
-            List<List<Double>> profile = trainingSet.getProfiles().get(i);
+            List<int[]> profile = trainingSet.getProfiles().get(i);
             
             for(int j = 0; j < profile.size(); j++){
-//                int[] point = profile.get(j);
-//                randomAccess.setPosition(point[0], 0);
-//                randomAccess.setPosition(point[1], 1);
-                if(profile.get(j).get(0) == COLOR){
+                
+                int[] point = profile.get(j);
+                
+                randomAccess.setPosition(point[0], 0);
+                randomAccess.setPosition(point[1], 1);
+                
+                double pixelValue = randomAccess.get().getRealDouble();
+                
+                if(pixelValue == COLOR){
                     int[] labels = new int[profile.size()];
                     
                     for (int l = 0; l < labels.length; l++){
-                        labels[l] = -1;
+                        labels[l] = 0;
                     }
                     
                     for(int k = j-membrane_width/2; k <= j+membrane_width/2; k++){
