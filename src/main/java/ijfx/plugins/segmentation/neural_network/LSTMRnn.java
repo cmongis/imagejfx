@@ -33,27 +33,29 @@ import org.apache.commons.math3.random.RandomDataGenerator;
  */
 public class LSTMRnn implements NeuralNet{
     
-    public int inputs;
-    public int hidden;
-    public int outputs;
+    private final int inSize;
+    private final int hSize;
+    private final int outSize;
     
-    public List<List<double[]>> u;
-    public List<List<double[]>> w;
-    public List<double[]> p;
+    private List<List<double[]>> u;
+    private List<List<double[]>> w;
+    private List<double[]> p;
     
-    public double[] cell_states;
-    public double[] cell_outputs;
+    private List<double[]> z;
     
-    public final int GATES = 4;
-    public final int PEEPHOLES = 3;
+    private double[] cell_states;
+    private double[] cell_outputs;
+    
+    private final int GATES = 4;
+    private final int PEEPHOLES = 3;
 
     Sigmoid sigmoid;
     Tanh tanh;
     
     public LSTMRnn(int inputs, int hidden, int outputs){
-        this.inputs = inputs;
-        this.hidden = hidden;
-        this.outputs = outputs;
+        this.inSize = inputs;
+        this.hSize = hidden;
+        this.outSize = outputs;
         
         /*four matrices for the four gates: input, forget, output, cell state*/
         this.u = new ArrayList<>(GATES);
@@ -63,28 +65,34 @@ public class LSTMRnn implements NeuralNet{
         this.p = new ArrayList<>(PEEPHOLES);
         
         for(int i = 0; i < GATES; i++){
-            u.add(new ArrayList<>(this.inputs));
-            w.add(new ArrayList<>(this.hidden));
+            u.add(new ArrayList<>(this.inSize));
+            w.add(new ArrayList<>(this.hSize));
         }
         
-        this.cell_states = new double[this.hidden];
-        this.cell_outputs = new double[this.hidden];
+        this.z = new ArrayList<>(this.outSize);
+        
+        this.cell_states = new double[this.hSize];
+        this.cell_outputs = new double[this.hSize];
         
         sigmoid = new Sigmoid();
         tanh = new Tanh();
     }
     
     @Override
-    public void forwardProp(List<List<Double>> inputList){
+    public List<double[]> forwardProp(List<double[]> inputs){
+
+        List<double[]> outputs = new ArrayList<>(inputs.size());
         
-        double[] newStates = new double[this.hidden];
-        double[] newOutputs = new double[this.hidden];
+        double[] newStates = new double[this.hSize];
+        double[] newOutputs = new double[this.hSize];
         
-        Iterator<List<Double>> it_seq = inputList.iterator();
+        Iterator<double[]> it_step = inputs.iterator();
         
-        while(it_seq.hasNext()){
-            List<Double> inputs = it_seq.next();
-            for(int c = 0; c < this.hidden; c++){
+        while(it_step.hasNext()){
+            
+            double[] inputCells = it_step.next();
+            
+            for(int c = 0; c < this.hSize; c++){
                 
                 /*weighted external input for input, forget and output gates*/
                 double ig_inputWeight = 0.0;
@@ -92,9 +100,9 @@ public class LSTMRnn implements NeuralNet{
                 double og_inputWeight = 0.0;
                 double cell_inputWeight = 0.0;
                 
-                for(int i = 0; i < this.inputs; i++){
+                for(int i = 0; i < this.inSize; i++){
                     
-                    Double in = inputs.get(i);
+                    double in = inputCells[i];
                     
                     ig_inputWeight += u.get(0).get(i)[c] * in;
                     fg_inputWeight += u.get(1).get(i)[c] * in;
@@ -107,7 +115,7 @@ public class LSTMRnn implements NeuralNet{
                 double og_outputWeight = 0.0;
                 double cell_outputWeight = 0.0;
                 
-                for(int j = 0; j < this.hidden; j++){
+                for(int j = 0; j < this.hSize; j++){
                     ig_outputWeight += w.get(0).get(j)[c] * cell_outputs[c];
                     fg_outputWeight += w.get(1).get(j)[c] * cell_outputs[c];
                     og_outputWeight += w.get(2).get(j)[c] * cell_outputs[c];
@@ -118,7 +126,6 @@ public class LSTMRnn implements NeuralNet{
                 double ig_peephole = p.get(0)[c] * cell_states[c];
                 double fg_peephole = p.get(1)[c] * cell_states[c];
 
-                
                 double inputGate = sig(ig_inputWeight + ig_outputWeight + ig_peephole);
                 double forgetGate = sig(fg_inputWeight + fg_outputWeight + fg_peephole);
                 
@@ -137,7 +144,23 @@ public class LSTMRnn implements NeuralNet{
             }
             this.cell_states = newStates;
             this.cell_outputs = newOutputs;
+            
+            double[] outputCells = new double[this.outSize];
+            
+            for(int o = 0; o < this.outSize; o++){
+                /*Sum of the hiddenlayer outputs*/
+                double hWeightedOutput = 0.0;
+                
+                for(int h = 0; h < this.hSize; h++){
+                    double test = this.z.get(o)[h]*this.cell_outputs[h];
+                    hWeightedOutput += test;
+                }
+                outputCells[o] = sig(hWeightedOutput);
+            }
+            
+            outputs.add(outputCells);
         }
+      return outputs;  
     }
     
     public void backwardProp(){
@@ -151,27 +174,27 @@ public class LSTMRnn implements NeuralNet{
     @Override
     public void initialize(){
         
+        RandomDataGenerator generator = new RandomDataGenerator();
+        int lower = -1;
+        int upper = 1;
+
         /*initialize the cells state and outputs to 0*/
-        for(int s = 0; s < this.hidden; s++){
+        for(int s = 0; s < this.hSize; s++){
             cell_states[s] = 0.0;
             cell_outputs[s] = 0.0;
         }
         
         System.out.println("Cells states initialized");
         
-        RandomDataGenerator generator = new RandomDataGenerator();
-        int lower = -1;
-        int upper = 1;
-        
         /*initialize the input weight matrices u (0 to 3, respectively input, forget, output, cell gates)*/
-        for(int i = 0; i < this.inputs; i++){
+        for(int i = 0; i < this.inSize; i++){
             
-            double[] weightsU0 = new double[this.hidden];
-            double[] weightsU1 = new double[this.hidden];
-            double[] weightsU2 = new double[this.hidden];
-            double[] weightsU3 = new double[this.hidden];
+            double[] weightsU0 = new double[this.hSize];
+            double[] weightsU1 = new double[this.hSize];
+            double[] weightsU2 = new double[this.hSize];
+            double[] weightsU3 = new double[this.hSize];
         
-            for(int j = 0; j < this.hidden; j++){
+            for(int j = 0; j < this.hSize; j++){
                 
                 double rnd0 = generator.nextUniform(lower, upper);
                 double rnd1 = generator.nextUniform(lower, upper);
@@ -193,14 +216,14 @@ public class LSTMRnn implements NeuralNet{
         System.out.println("Input weights matrices initialized");
         
         /*initialize the recurrent weight matrices w (0 to 3, respectively input, forget, output, cell gates)*/        
-        for(int k = 0; k < this.hidden; k++){
+        for(int k = 0; k < this.hSize; k++){
             
-            double[] weightsW0 = new double[this.hidden];
-            double[] weightsW1 = new double[this.hidden];
-            double[] weightsW2 = new double[this.hidden];
-            double[] weightsW3 = new double[this.hidden];
+            double[] weightsW0 = new double[this.hSize];
+            double[] weightsW1 = new double[this.hSize];
+            double[] weightsW2 = new double[this.hSize];
+            double[] weightsW3 = new double[this.hSize];
             
-            for(int l = 0; l < this.hidden; l++){
+            for(int l = 0; l < this.hSize; l++){
                 
                 double rnd0 = generator.nextUniform(lower, upper);
                 double rnd1 = generator.nextUniform(lower, upper);
@@ -221,11 +244,11 @@ public class LSTMRnn implements NeuralNet{
         System.out.println("Recurrent weights matrices initialized");
         
         /*initialize the peephole connections weight matrices p (0 to 2, respectively input, forget, output gates)*/
-        double[] weightsP0 = new double[this.hidden];
-        double[] weightsP1 = new double[this.hidden];
-        double[] weightsP2 = new double[this.hidden];
+        double[] weightsP0 = new double[this.hSize];
+        double[] weightsP1 = new double[this.hSize];
+        double[] weightsP2 = new double[this.hSize];
         
-        for(int n = 0; n < this.hidden; n++){
+        for(int n = 0; n < this.hSize; n++){
             
             double rnd0 = generator.nextUniform(lower, upper);
             double rnd1 = generator.nextUniform(lower, upper);
@@ -237,10 +260,20 @@ public class LSTMRnn implements NeuralNet{
         }
         
         this.p.add(0, weightsP0);
-        this.p.add(1, weightsP0);
-        this.p.add(2, weightsP1);
+        this.p.add(1, weightsP1);
+        this.p.add(2, weightsP2);
         
         System.out.println("Peephole weights matrices initialized");
+        
+        /*initialize the ouptut layer weight matrix*/
+        for(int o = 0; o < this.outSize; o++){
+            double[] weights = new double[this.hSize];
+            for(int h = 0; h < this.hSize; h++){
+                double rnd = generator.nextUniform(lower, upper);
+                weights[h] = rnd;
+            }
+            this.z.add(weights);
+        }
     }
     
     public double sig(double x){

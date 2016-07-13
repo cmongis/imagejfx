@@ -27,5 +27,5 @@ import java.util.List;
  */
 public interface NeuralNet {
     public void initialize();
-    public void forwardProp(List<List<Double>> inputList);
+    public List<double[]> forwardProp(List<double[]> inputList);
 }
