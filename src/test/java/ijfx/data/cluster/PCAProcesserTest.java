@@ -19,9 +19,9 @@
  */
 package ijfx.data.cluster;
 
-import ijfx.core.project.BaseSciJavaTest;
+
+import ijfx.core.project.BaseImageJTest;
 import ijfx.service.cluster.PCAProcesser;
-import org.junit.Test;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 
@@ -29,7 +29,7 @@ import weka.core.converters.ConverterUtils;
  *
  * @author Tuan anh TRINH
  */
-public class PCAProcesserTest extends BaseSciJavaTest {
+public class PCAProcesserTest  {
 
     
     public void applyPCATest() throws Exception {
