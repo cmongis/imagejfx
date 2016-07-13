@@ -32,24 +32,51 @@ public class ColorGenerator {
 
     List<Color> colorList;
 
-    Random rand;
-
     int numColor;
 
-    public ColorGenerator(int n) {
-        rand = new Random();
+    public ColorGenerator(List<Color> colorList, int n) {
         numColor = n;
-        colorList = new ArrayList<>();
+        this.colorList = colorList;
     }
 
-    public void generateColor() {
-        for (int i = 0; i < 360; i += 360 / numColor) {
-            double h = i;
-            double s = (90 + rand.nextInt(10))/100.0;
-            double b = (50 + rand.nextInt(10))/100.0;
+    public Color generateColor(Color x, Color y) {
 
-            colorList.add(Color.hsb(h, s, b));
+        double blending = 1.0 / numColor;//set by you
+
+        double inverse_blending = 1 - blending;
+        double red = x.getRed() * blending + y.getRed() * inverse_blending;
+        double green = x.getGreen() * blending + y.getGreen() * inverse_blending;
+        double blue = x.getBlue() * blending + y.getBlue() * inverse_blending;
+
+        double max = 255;
+        Color blended = new Color(red / max, green / max, blue / max, 1.0);
+        return blended;
+    }
+
+    public static List<Color> generateColor(List<Color> colorList, int numColor) {
+        List<Color> result = new ArrayList<>();
+        for (int i = 0; i < colorList.size() - 1; i++) {
+            result.addAll(RgbLinearInterpolate(colorList.get(i), colorList.get(i + 1), numColor));
         }
+        return result;
+    }
+
+    public static List<Color> RgbLinearInterpolate(Color start, Color end, int colorCount) {
+        List<Color> colors = new ArrayList<>();
+
+        // linear interpolation lerp (r,a,b) = (1-r)*a + r*b = (1-r)*(ax,ay,az) + r*(bx,by,bz)
+        for (int n = 0; n < colorCount; n++) {
+            double r = (double) n / (double) (colorCount - 1);
+            double nr = 1.0 - r;
+            double alpha = (nr * start.getOpacity()) + (r * end.getOpacity());
+            double red = (nr * start.getRed()) + (r * end.getRed());
+            double green = (nr * start.getGreen()) + (r * end.getGreen());
+            double blue = (nr * start.getBlue()) + (r * end.getBlue());
+
+            colors.add(new Color(red, green, blue, alpha));
+        }
+
+        return colors;
     }
 
     public List<Color> getColorList() {

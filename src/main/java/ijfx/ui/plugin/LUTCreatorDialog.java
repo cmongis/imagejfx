@@ -38,11 +38,15 @@ public class LUTCreatorDialog extends Dialog<ColorTable> {
     LUTCreator lUTCreator;
     public LUTCreatorDialog() {
         super();
+        
         lUTCreator = new LUTCreator();
         this.getDialogPane().setContent(lUTCreator);
         this.getDialogPane().getButtonTypes().add(ButtonType.OK);
         this.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+        
        
     }
+    
+   
 
 }

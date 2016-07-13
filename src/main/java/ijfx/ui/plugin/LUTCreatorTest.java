@@ -19,13 +19,17 @@
  */
 package ijfx.ui.plugin;
 
+import com.sun.javafx.scene.control.skin.ColorPickerSkin;
+import com.sun.javafx.scene.control.skin.CustomColorDialog;
 import ijfx.ui.module.ModuleConfigPane;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+//import javafx.scene.control.ColorPicker;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 /**
@@ -43,11 +47,14 @@ public class LUTCreatorTest extends Application {
         root.getChildren().add(btn);
 
         Scene scene = new Scene(root, 300, 250);
-
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
-
+        ColorPicker colorPicker = new ColorPicker();
+        ColorPickerSkin colorPickerSkin =(ColorPickerSkin) colorPicker.getSkin();
+        colorPicker.getStyleClass().add("split-button");
+//        root.getChildren().add(colorPicker);
+//            new ColorPickerSkin(colorPicker).show();
         btn.setOnAction(event -> onAction(event));
     }
 public void onAction(ActionEvent event) {
