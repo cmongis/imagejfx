@@ -46,7 +46,7 @@
                             <items>
                                 <MenuItem fx:id="duplicateMenuItem" mnemonicParsing="false" onAction="#duplicate" text="Duplicate">
                                     <graphic>
-                                        <FontAwesomeIconView />
+                                        <FontAwesomeIconView glyphName="FILES_O" />
                                     </graphic>
                                 </MenuItem>
                                 <MenuItem fx:id="executeMenuItem" mnemonicParsing="false" onAction="#execute" text="Re-execute">
@@ -59,17 +59,26 @@
                                         <FontAwesomeIconView glyphName="PLAY" />
                                     </graphic>
                                 </MenuItem>
-                                <MenuItem fx:id="favoriteButton" mnemonicParsing="false" onAction="#addToFavorites" text="Unspecified Action">
+                                <MenuItem fx:id="favoriteButton" disable="true" mnemonicParsing="false" onAction="#addToFavorites" text="Add to favorite">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="STAR" />
                                     </graphic>
                                 </MenuItem>
-                                <MenuItem fx:id="playUntilMenuItem" mnemonicParsing="false" onAction="#playUntil" text="Execute all until this" />
-                                <MenuItem fx:id="playFromMenuItem" mnemonicParsing="false" onAction="#playFrom" text="Execute all beggining from this" />
-                                <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" onAction="#delete" text="Delete" />
+                                <MenuItem fx:id="playUntilMenuItem" mnemonicParsing="false" onAction="#playUntil" text="Execute all until this">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="STEP_FORWARD" />
+                           </graphic></MenuItem>
+                                <MenuItem fx:id="playFromMenuItem" mnemonicParsing="false" onAction="#playFrom" text="Execute all beggining from this">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="PLAY" />
+                           </graphic></MenuItem>
+                                <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" onAction="#delete" text="Delete">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="REMOVE" />
+                           </graphic></MenuItem>
                             </items>
                             <graphic>
-                                <FontAwesomeIconView glyphName="BARS" text="" />
+                                <FontAwesomeIconView glyphName="LIST" text="" />
                             </graphic>
                         </MenuButton>
                     </children>

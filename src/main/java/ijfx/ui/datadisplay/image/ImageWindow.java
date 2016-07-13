@@ -864,6 +864,7 @@ public class ImageWindow extends Window {
         //imageDisplay.update();
         
         bus.channel(event);
+        updateOverlays(getOverlays());
         //refreshSourceImage();
     }
 

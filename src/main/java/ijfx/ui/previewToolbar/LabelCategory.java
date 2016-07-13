@@ -37,13 +37,18 @@ import javafx.scene.layout.Pane;
 public class LabelCategory extends Label {
 
     private final PaneContextualView contextualView;
-    private final FontAwesomeIconView fontAwesomeIconView;
+    private FontAwesomeIconView fontAwesomeIconView;
     private Pane pane;
     private final String context;
 
     public LabelCategory(String s, String icon, UiContextService contextService, String context) {
         super(s);
-        fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
+        try {
+            fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon));
+        }
+        catch(Exception e) {
+            fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.REMOVE);
+        }
         WritableImage wi = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, (int) Double.parseDouble(fontAwesomeIconView.getSize()));
         this.setGraphic(new ImageView(wi));
         pane = new FlowPane();

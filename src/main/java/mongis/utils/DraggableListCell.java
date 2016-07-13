@@ -48,6 +48,9 @@ public abstract class DraggableListCell<T extends Object> extends ListCell<T>{
         
         itemProperty().addListener(this::onItemChanged);
         
+        
+        selectedProperty().addListener(this::onSelectionChanged);
+        
     }
     
     
@@ -59,7 +62,11 @@ public abstract class DraggableListCell<T extends Object> extends ListCell<T>{
         this.node = node;
     }
 
-    
+    public void onSelectionChanged(Observable obs) {
+       
+        if(getGraphic() != null)
+            FXUtilities.toggleCssStyle(getGraphic(),"selected",isSelected());
+    }
     
     
     public void makeNodeDraggable(Node node) {

@@ -73,11 +73,13 @@ import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.overlay.Overlay;
 import net.imagej.plugins.commands.binary.Binarize;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
 import net.imagej.table.DefaultGenericTable;
 import org.scijava.Context;
+import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.UIService;
@@ -140,6 +142,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     private FolderManagerService folderManagerService;
+    
+    @Parameter
+    EventService eventService;
     
     @Parameter
     ActivityService activityService;
@@ -271,7 +276,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         // deleting the overlay owned previously by the input
         inputDisplay.addAll(Stream.of(overlay).map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
         inputDisplay.update();
-
+        Stream.of(overlay).map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
         //overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
         // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();

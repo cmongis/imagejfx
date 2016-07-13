@@ -148,7 +148,7 @@ public class HistoryStepCtrl extends BorderPane {
 
         //titleLabel.textProperty().unbind();
         //titleLabel.setText(step.getId());
-
+        
         moduleConfigPane.configure(step);
         
         //titleLabel.setText(step.getId());

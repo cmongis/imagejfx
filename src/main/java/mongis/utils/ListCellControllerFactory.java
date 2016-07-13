@@ -61,21 +61,7 @@ public class ListCellControllerFactory<T> implements Callback<ListView<T>, ListC
                 }
                 return (Node)ctrl;
             }
-               /*
-            @Override
-            public void updateItem(T item, boolean isEmpty) {
-                
-                super.updateItem(item, isEmpty);
-               
-                if (isEmpty) {
-                    setGraphic(null);
-                } else {
-                    getCtrl();
-                    ctrl.setItem(item);
-                    if(getGraphic() == null)
-                        setGraphic(getCtrl());
-                } 
-            } */
+            
 
             @Override
             protected void onItemChanged(Observable obs, T oldValue, T newValue) {
@@ -84,6 +70,8 @@ public class ListCellControllerFactory<T> implements Callback<ListView<T>, ListC
                 }
                 else {
                     setGraphic(getCtrl());
+                    ctrl.setItem(newValue);
+                    
                 }
             }
         };

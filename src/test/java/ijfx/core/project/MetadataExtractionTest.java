@@ -84,7 +84,7 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
     
    
     
-    @Test
+ 
     public void testTransformation() throws IOException {
         init();
         File f = testFile;//OMG!!!!new File("/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif");//testFile;

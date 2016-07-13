@@ -39,6 +39,9 @@ public class WorkflowIOService extends AbstractService implements IjfxService {
     
     ObjectMapper mapper = new ObjectMapper();
     
+    
+    
+    
     public WorkflowIOService() {
         super();
         
@@ -50,9 +53,11 @@ public class WorkflowIOService extends AbstractService implements IjfxService {
         return null;
     }
     
-    public Workflow loadWorkflow(File workflow) {
+    public Workflow loadWorkflow(File file) {
         try {
-            return mapper.readValue(workflow, Workflow.class);
+            Workflow workflow =  mapper.readValue(file, Workflow.class);
+            workflow.getStepList().forEach(getContext()::inject);
+            return workflow;
         } catch (IOException ex) {
             Logger.getLogger(WorkflowIOService.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -23,6 +23,7 @@ import ijfx.service.workflow.Workflow;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -58,11 +59,27 @@ public class WorkflowListCellController extends VBox implements ListCellControll
     @Override
     public void setItem(Workflow t) {
         workflow = t;
+        titleLabel.setText(getDisplayedName(t));
+        descriptionLabel.setText(t
+                .getStepList()
+                .stream()
+                .map(s->s.getId())
+                .collect(Collectors.joining(", ")));
     }
 
     @Override
     public Workflow getItem() {
         return workflow;
     }
+    
+    public String getDisplayedName(Workflow w) {
+        if(w.getName() == null ||  w.getName().trim().equals("")) {
+            w.setName("No title :-(");
+            
+        }
+       
+        return w.getName();
+    }
+    
     
 }

@@ -2,7 +2,7 @@
     {
         "name": "Math"
         ,
-        "context": "image-open"
+        "context": "imagej+image-open"
         ,
         "icon": "CALCULATOR"
         ,
@@ -540,6 +540,20 @@
                 ,
                 "context": "binary"
 
+            }
+        ]
+    }
+    ,{
+        "name":"Overlay"
+        ,"context":"segmentation+image-open"
+        ,"icon":"BARCODE"
+        ,"items":[
+            {
+                "type":"Command"
+                ,"label":"Delete all"
+                ,"action":"ijfx.plugins.commands.RemoveAllOverlayls"
+                ,"icon":"REMOVE"
+                ,"context":"imagej"
             }
         ]
     }

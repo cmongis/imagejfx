@@ -25,6 +25,7 @@ import ijfx.service.workflow.WorkflowStep;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import ijfx.ui.context.animated.Animations;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 
 
@@ -42,6 +43,11 @@ class HistoryStep extends DraggableListCell<WorkflowStep> {
     @Override
     protected void onItemChanged(Observable obs, WorkflowStep oldValue, WorkflowStep newValue) {
         
+        
+        if(Platform.isFxApplicationThread() == false) {
+            Platform.runLater(()->onItemChanged(obs, oldValue, newValue));
+            return;
+        }
         
         if(ctrl == null) {
             ctrl = new HistoryStepCtrl(context);

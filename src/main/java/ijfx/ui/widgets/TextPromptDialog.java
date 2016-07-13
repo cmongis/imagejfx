@@ -17,45 +17,51 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.workflow;
+package ijfx.ui.widgets;
 
-import ijfx.service.workflow.Workflow;
 import ijfx.ui.main.ImageJFX;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import org.scijava.Context;
 
 /**
  *
  * @author cyril
  */
-public class WorkflowSelectionDialog extends Dialog<Workflow> {
+public class TextPromptDialog extends Dialog<String> {
 
-    WorkflowManagerPanel panel;
-
-    public WorkflowSelectionDialog(Context context) {
-
+    
+    TextPromptContent content;
+    
+    public TextPromptDialog() {
         super();
-
-        getDialogPane().getStylesheets().add(ImageJFX.STYLESHEET_ADDR);
-        panel = new WorkflowManagerPanel(context);
-        getDialogPane().setContent(panel);
         
+        getDialogPane().getStylesheets().add(ImageJFX.STYLESHEET_ADDR);
+        content = new TextPromptContent();
+        getDialogPane().setContent(content);
+
         getDialogPane().getButtonTypes().add(ButtonType.OK);
         getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
-        getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(panel.selectedWorkflowProperty().isNull());
+        getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(content.validProperty().not());
+        getDialogPane().lookupButton(ButtonType.OK).getStyleClass().add("success");
+        getDialogPane().lookupButton(ButtonType.CANCEL).getStyleClass().add("danger");
         setResultConverter(this::convert);
 
     }
 
-    public Workflow convert(ButtonType t) {
+    public TextPromptContent getContent() {
+        return content;
+    }
+    
+    
+    
+    
+
+    public String convert(ButtonType t) {
 
         if (t == ButtonType.OK) {
-            return panel.selectedWorkflowProperty().getValue();
+            return content.getText();
         } else {
             return null;
         }
-
     }
-
 }
