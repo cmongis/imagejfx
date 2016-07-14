@@ -31,7 +31,7 @@ import weka.core.converters.ConverterUtils;
  */
 public class PCAProcesserTest extends BaseSciJavaTest {
 
-    
+    @Test
     public void applyPCATest() throws Exception {
         ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource("./src/test/resources/pcaTest.arff");
         PCAProcesser pCAProcesser = new PCAProcesser();

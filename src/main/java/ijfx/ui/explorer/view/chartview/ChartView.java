@@ -89,6 +89,7 @@ public class ChartView extends AbstractChartView implements ExplorerView {
         scatterChart.getXAxis().labelProperty().bind(xComboBox.getSelectionModel().selectedItemProperty());
         scatterChart.getYAxis().labelProperty().bind(yComboBox.getSelectionModel().selectedItemProperty());
         initComboBox();
+        setGraphicSnapshot();
     }
 
     @Override
@@ -137,6 +138,7 @@ public class ChartView extends AbstractChartView implements ExplorerView {
     /**
      * Perform a clustering algorithm and load the series.
      */
+    @Override
     public void computeItems() {
 
         if (metadatas.length > 1) {

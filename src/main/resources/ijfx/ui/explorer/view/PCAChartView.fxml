@@ -27,6 +27,9 @@
          <left>
             <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
          </left>
+         <top>
+            <Button fx:id="snapshotButton" mnemonicParsing="false" onAction="#snapshot" BorderPane.alignment="CENTER" />
+         </top>
       </BorderPane>
    </children>
 </fx:root>

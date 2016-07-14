@@ -1806,6 +1806,15 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-background-color:red;
 }
 
+.list-view {
+    -fx-padding: 3px ;
+}
+
+.list-cell {
+    -fx-padding: 2px ;
+    -fx-background-insets: 0px, 2px ;
+}
+
 
 /* 
         Help label

@@ -11,10 +11,10 @@
          <center>
             <ScatterChart fx:id="scatterChart" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
               <xAxis>
-                <NumberAxis side="BOTTOM" forceZeroInRange="false" />
+                <NumberAxis forceZeroInRange="false" side="BOTTOM" />
               </xAxis>
               <yAxis>
-                <NumberAxis side="LEFT" forceZeroInRange="false" />
+                <NumberAxis forceZeroInRange="false" side="LEFT" />
               </yAxis>
             </ScatterChart>
          </center>
@@ -24,6 +24,9 @@
          <bottom>
             <ComboBox prefWidth="150.0" BorderPane.alignment="CENTER" fx:id="xComboBox" />
          </bottom>
+         <top>
+            <Button fx:id="snapshotButton" mnemonicParsing="false" onAction="#snapshot"  BorderPane.alignment="CENTER" />
+         </top>
       </BorderPane>
    </children>
 </fx:root>

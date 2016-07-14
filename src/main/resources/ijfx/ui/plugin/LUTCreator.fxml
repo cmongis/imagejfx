@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.shape.*?>
 <?import java.lang.*?>
 <?import java.net.*?>
@@ -8,21 +9,32 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-         <children>
-            <ListView fx:id="listViewSamples" orientation="HORIZONTAL" prefHeight="200.0" prefWidth="200.0" />
-            <TextField fx:id="colorNumberField" alignment="CENTER" prefHeight="10.0" prefWidth="200.0" promptText="Number" VBox.vgrow="NEVER" />
-            <ScrollPane prefHeight="200.0" prefWidth="200.0">
-               <content>
-                  <TilePane fx:id="resultTilePane" hgap="10.0" prefColumns="10" tileAlignment="TOP_LEFT" vgap="10.0" />
-               </content>
-            </ScrollPane>
-         </children>
-      </VBox>
-   </center>
-   <top>
-      <Button fx:id="addButton" mnemonicParsing="false" onMouseClicked="#onclick" text="Add color" BorderPane.alignment="CENTER" />
-   </top>
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <children>
+                <ListView fx:id="listViewSamples" orientation="HORIZONTAL" prefHeight="200.0" prefWidth="200.0">
+               <padding>
+                  <Insets right="10.0" />
+               </padding></ListView>
+                <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                    <content>
+                        <TilePane fx:id="resultTilePane" hgap="10.0" prefColumns="20" tileAlignment="TOP_LEFT" vgap="10.0" />
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </center>
+    <top>
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="addButton" mnemonicParsing="false" onMouseClicked="#onclick" text="Add color" />
+                <Button mnemonicParsing="false" onAction="#deleteColor" text="Delete color" />
+                <TextField fx:id="colorNumberField" alignment="CENTER" prefHeight="10.0" prefWidth="200.0" promptText="256" text="256" />
+            </children>
+            <BorderPane.margin>
+                <Insets />
+            </BorderPane.margin>
+        </HBox>
+    </top>
 </fx:root>

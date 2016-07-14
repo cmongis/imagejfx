@@ -19,34 +19,48 @@
  */
 package ijfx.ui.plugin;
 
-import ijfx.bridge.FxPromptDialog;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.module.FxFormDialog;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
+import java.util.List;
+import java.util.stream.IntStream;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import mongis.utils.FXUtilities;
+import javafx.scene.paint.Color;
 import net.imglib2.display.ColorTable;
+import net.imglib2.display.ColorTable16;
+import net.imglib2.display.ColorTable8;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class LUTCreatorDialog extends Dialog<ColorTable> {
+public class LUTCreatorDialog extends Dialog<LutViewChanger> {
 
     LUTCreator lUTCreator;
-    public LUTCreatorDialog() {
+
+    public LUTCreatorDialog(List<Color> colors) {
         super();
-        
-        lUTCreator = new LUTCreator();
+
+        lUTCreator = new LUTCreator(colors);
         this.getDialogPane().setContent(lUTCreator);
+        this.getDialogPane().getStylesheets().add(ImageJFX.STYLESHEET_ADDR);
         this.getDialogPane().getButtonTypes().add(ButtonType.OK);
         this.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
-        
-       
+        this.getDialogPane().lookupButton(ButtonType.OK).getStyleClass().add("success");
+        this.getDialogPane().lookupButton(ButtonType.CANCEL).getStyleClass().add("danger");
+        this.setResultConverter(this::convert);
+
     }
-    
-   
+
+    public LutViewChanger convert(ButtonType t) {
+
+        if (t == ButtonType.OK) {
+//                        return LUTCreator.colorsToColorTable(lUTCreator.getColors());
+            List<Color> sampleColors = lUTCreator.getColors();
+            LutViewChanger lutViewChanger = new LutViewChanger("LUT ", LUTCreator.colorsToColorTable(lUTCreator.getGeneratedColors()), sampleColors);
+            return lutViewChanger;
+
+        }
+        return null;
+    }
 
 }

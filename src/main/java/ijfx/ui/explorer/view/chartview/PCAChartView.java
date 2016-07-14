@@ -96,6 +96,7 @@ public class PCAChartView extends AbstractChartView implements ExplorerView {
 
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.getSelectionModel().getSelectedItems().addListener(this::listViewListener);
+        setGraphicSnapshot();
     }
 
     @Override

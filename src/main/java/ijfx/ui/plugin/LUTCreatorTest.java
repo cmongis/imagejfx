@@ -50,9 +50,9 @@ public class LUTCreatorTest extends Application {
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
-        ColorPicker colorPicker = new ColorPicker();
-        ColorPickerSkin colorPickerSkin =(ColorPickerSkin) colorPicker.getSkin();
-        colorPicker.getStyleClass().add("split-button");
+//        ColorPicker colorPicker = new ColorPicker();
+//        ColorPickerSkin colorPickerSkin =(ColorPickerSkin) colorPicker.getSkin();
+//        colorPicker.getStyleClass().add("split-button");
 //        root.getChildren().add(colorPicker);
 //            new ColorPickerSkin(colorPicker).show();
         btn.setOnAction(event -> onAction(event));
@@ -72,8 +72,8 @@ public void onAction(ActionEvent event) {
 
             //fxFormDialog.getField("blue").setDefaultValue(4.0);
         //fxFormDialog.getField("bla").setDefaultValue("go");
-        LUTCreatorDialog lUTCreatorDialog = new LUTCreatorDialog();
-        lUTCreatorDialog.showAndWait();
+//        LUTCreatorDialog lUTCreatorDialog = new LUTCreatorDialog();
+//        lUTCreatorDialog.showAndWait();
     }
 
     /**

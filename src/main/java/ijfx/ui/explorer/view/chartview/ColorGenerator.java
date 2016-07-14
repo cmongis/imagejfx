@@ -55,15 +55,16 @@ public class ColorGenerator {
 
     public static List<Color> generateColor(List<Color> colorList, int numColor) {
         List<Color> result = new ArrayList<>();
+
         for (int i = 0; i < colorList.size() - 1; i++) {
-            result.addAll(RgbLinearInterpolate(colorList.get(i), colorList.get(i + 1), numColor));
+            result.addAll(RgbLinearInterpolate(colorList.get(i), colorList.get(i + 1), ((Integer)numColor).doubleValue()/(colorList.size()-1)));
         }
         return result;
     }
 
-    public static List<Color> RgbLinearInterpolate(Color start, Color end, int colorCount) {
+    public static List<Color> RgbLinearInterpolate(Color start, Color end, double colorCount) {
         List<Color> colors = new ArrayList<>();
-
+        colorCount = Math.round(colorCount);
         // linear interpolation lerp (r,a,b) = (1-r)*a + r*b = (1-r)*(ax,ay,az) + r*(bx,by,bz)
         for (int n = 0; n < colorCount; n++) {
             double r = (double) n / (double) (colorCount - 1);

@@ -19,20 +19,31 @@
  */
 package ijfx.ui.explorer.view.chartview;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
-import ijfx.ui.explorer.view.chartview.DefaultPlotExplorer;
-import ijfx.ui.explorer.view.chartview.PlotExplorer;
-import ijfx.ui.explorer.view.chartview.TogglePlot;
+import ijfx.ui.utils.FontAwesomeIconUtils;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javax.imageio.ImageIO;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -45,15 +56,17 @@ public abstract class AbstractChartView extends AnchorPane {
     ExplorerService explorerService;
 
     @FXML
+    Button snapshotButton;
+    @FXML
     protected ScatterChart<Number, Number> scatterChart;
-
 
     protected List<? extends Explorable> currentItems;
 
     public AbstractChartView() {
         super();
+
     }
-    
+
     protected abstract void computeItems();
 
     protected void addDataToChart(List<? extends Explorable> list, List<String> metadataList) {
@@ -71,7 +84,7 @@ public abstract class AbstractChartView extends AnchorPane {
         series.getData().addAll(listExplorers);
         scatterChart.getData().add(series);
         System.out.println("ijfx.ui.explorer.view.AbstractChartView.addDataToChart()");
-        series.setName("Tuan anh is awesome");
+        series.setName("Series n° "+scatterChart.getData().size()+1);
 
     }
 
@@ -96,6 +109,26 @@ public abstract class AbstractChartView extends AnchorPane {
                 }
             }
         }
+    }
+
+    public void snapshot() throws IOException {
+
+        WritableImage image = scatterChart.snapshot(new SnapshotParameters(), null);
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("Image Files", "*.png"));
+        File selectedFile = fileChooser.showSaveDialog(null);
+
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", selectedFile);
+    }
+
+    protected void setGraphicSnapshot() {
+        FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.CAMERA);
+        Image image = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, 30);
+        ImageView imageView = new ImageView(image);
+        snapshotButton.setGraphic(imageView);
     }
 
 }

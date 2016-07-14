@@ -26,23 +26,24 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.event.EventHandler;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import mongis.utils.FXUtilities;
+import net.imglib2.display.ColorTable;
+import net.imglib2.display.ColorTable16;
+import net.imglib2.display.ColorTable8;
 
 /**
  *
@@ -51,7 +52,7 @@ import mongis.utils.FXUtilities;
 public class LUTCreator extends BorderPane {
 
     public final static int SIZE_BIG_RECTANGLE = 100;
-    public final static int SIZE_SMALL_RECTANGLE = 50;
+    public final static int SIZE_SMALL_RECTANGLE = 25;
 
     @FXML
     ListView<Shape> listViewSamples;
@@ -63,12 +64,25 @@ public class LUTCreator extends BorderPane {
     @FXML
     TextField colorNumberField;
 
-    public LUTCreator() {
+    List<Color> colors;
+
+    List<Color> generatedColors;
+
+    public LUTCreator(List<Color> colors) {
         try {
             FXUtilities.injectFXML(this, "/ijfx/ui/plugin/LUTCreator.fxml");
             listViewSamples.setItems(FXCollections.observableArrayList());
+
             listViewSamples.getItems().addListener((Observable e) -> updateResults());
             colorNumberField.textProperty().addListener(e -> updateResults());
+
+            colors.stream()
+                    .forEach(e -> {
+                        Shape shape = new Rectangle(SIZE_BIG_RECTANGLE, SIZE_BIG_RECTANGLE, e);
+                        addActionShape(shape);
+                        listViewSamples.getItems().add(shape);
+
+                    });
         } catch (IOException ex) {
             Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -78,36 +92,111 @@ public class LUTCreator extends BorderPane {
     @FXML
     public void onclick() {
         Shape shape = new Rectangle(SIZE_BIG_RECTANGLE, SIZE_BIG_RECTANGLE, Color.AQUA);
+        addActionShape(shape);
+        listViewSamples.getItems().add(shape);
+    }
+
+    public void addActionShape(Shape shape) {
         shape.fillProperty().addListener(e -> updateResults());
         shape.setOnMouseClicked(e -> {
-            if (e.getButton().equals(MouseButton.PRIMARY)) {
-                changeableColor(shape);
-                updateResults();
-            } else if (e.getButton().equals(MouseButton.SECONDARY)) {
+            if (e.getButton().equals(MouseButton.SECONDARY)) {
+                changeColor(shape);
+                Runnable runnable = () -> updateResults();
+                new Thread(new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        updateResults();
+                        return null;
+                    }
+                }).start();
+            } else if (e.getButton().equals(MouseButton.MIDDLE)) {
                 listViewSamples.getItems().remove(shape);
             }
         });
-        listViewSamples.getItems().add(shape);
+    }
+
+    @FXML
+    public void deleteColor() {
+        listViewSamples.getSelectionModel().getSelectedItems().stream().forEach(e -> listViewSamples.getItems().remove(e));
     }
 
     private void updateResults() {
         resultTilePane.getChildren().clear();
-        List<Color> colors = listViewSamples.getItems()
+        colors = listViewSamples.getItems()
                 .stream()
                 .map(e -> (Color) e.getFill())
                 .collect(Collectors.toList());
-        colors = ColorGenerator.generateColor(colors, Integer.valueOf(colorNumberField.getText()));
-        colors.stream()
+        generatedColors = ColorGenerator.generateColor(colors, Integer.valueOf(colorNumberField.getText()));
+        generatedColors.stream()
                 .forEach(e -> resultTilePane.getChildren().add(new Rectangle(SIZE_SMALL_RECTANGLE, SIZE_SMALL_RECTANGLE, e)));
 
     }
 
-    protected void changeableColor(Shape shape) {
+    protected void changeColor(Shape shape) {
+        long startTime = System.currentTimeMillis();
+
         MyCustomColorDialog customColorDialog = new MyCustomColorDialog(this.getScene().getWindow());
         customColorDialog.show();
         customColorDialog.setCurrentColor((Color) shape.getFill());
         customColorDialog.setCustomColor((Color) shape.getFill());
         shape.fillProperty().bind(customColorDialog.customColorProperty());
+        long estimatedTime = System.currentTimeMillis() - startTime;
+
+        System.out.println(estimatedTime);
     }
 
+    public List<Color> getColors() {
+        return colors;
+    }
+
+    public List<Color> getGeneratedColors() {
+        return generatedColors;
+    }
+
+    public static ColorTable colorsToColorTable(List<Color> colors) {
+        long startTime = System.currentTimeMillis();
+
+        if (colors.size() < 257) {
+            byte[][] values = new byte[3][256];
+            IntStream.range(0, colors.size())
+                    .forEach(e -> {
+                        Double red = ((Double) colors.get(e).getRed()) * 255;
+                        Double green = ((Double) colors.get(e).getGreen()) * 255;
+                        Double blue = ((Double) colors.get(e).getBlue()) * 255;
+
+                        values[0][e] = red.byteValue();
+                        values[1][e] = green.byteValue();
+                        values[2][e] = blue.byteValue();
+
+                    });
+            return new ColorTable8(values);
+
+        } else {
+            short[][] values = new short[3][65536];
+            Double redr = ((Double) colors.get(0).getRed()) * 255;
+            Double greenr = ((Double) colors.get(0).getGreen()) * 255;
+            Double bluer = ((Double) colors.get(0).getBlue()) * 255;
+
+            values[0][0] = redr.shortValue();
+            values[1][0] = greenr.shortValue();
+            values[2][0] = bluer.shortValue();
+            IntStream.range(0, colors.size())
+                    .forEach(e -> {
+                        Double red = ((Double) colors.get(e).getRed()) * 255;
+                        Double green = ((Double) colors.get(e).getGreen()) * 255;
+                        Double blue = ((Double) colors.get(e).getBlue()) * 255;
+
+                        values[0][e] = red.shortValue();
+                        values[1][e] = green.shortValue();
+                        values[2][e] = blue.shortValue();
+
+                    });
+            long estimatedTime = System.currentTimeMillis() - startTime;
+
+            System.out.println(estimatedTime);
+
+            return new ColorTable16(values);
+        }
+
+    }
 }

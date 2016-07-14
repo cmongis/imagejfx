@@ -28,7 +28,9 @@ import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.view.GridIconView;
 import ijfx.ui.plugin.LUTComboBox;
+import ijfx.ui.plugin.LUTCreatorDialog;
 import ijfx.ui.plugin.LUTView;
+import ijfx.ui.plugin.LutViewChanger;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,10 +42,12 @@ import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.ColorTableUtil;
 import mongis.utils.FXUtilities;
+import net.imagej.lut.LUTService;
 import net.imglib2.converter.RealLUTConverter;
 import net.imglib2.display.ColorTable;
 import net.imglib2.type.numeric.ARGBType;
@@ -66,6 +70,12 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     @Parameter
     ExplorerService explorerService;
 
+    @Parameter
+    LUTService lutService;
+
+    @Parameter
+    FxImageService fxImageService;
+
     String[] metadatas;
     @FXML
     ComboBox<String> xComboBox;
@@ -78,6 +88,11 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     @FXML
     LUTComboBox lutComboBox;
+
+    @FXML
+    Button newLUTButton;
+
+    private LutViewChanger lutViewChanger;
 
     List<ComboBox<String>> comboBoxList;
     double min = 0;
@@ -99,9 +114,11 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
         comboBoxList.add(yComboBox);
         comboBoxList.add(thirdComboBox);
         scatterChart.setTitle("ChartView");
+        scatterChart.setLegendVisible(false);
         scatterChart.getXAxis().labelProperty().bind(xComboBox.getSelectionModel().selectedItemProperty());
         scatterChart.getYAxis().labelProperty().bind(yComboBox.getSelectionModel().selectedItemProperty());
         initComboBox();
+        setGraphicSnapshot();
     }
 
     @Override
@@ -117,7 +134,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     @Override
     public void setItem(List<? extends Explorable> items) {
         currentItems = items;
-        lutComboBox.getItems().addAll(FxImageService.getLUTViewMap().values());
+//        lutComboBox.getItems().addAll(FxImageService.getLUTViewMap().values());
         List<String> metadatas = explorerService.getMetaDataKey(currentItems);
 
         comboBoxList.stream().forEach(c -> {
@@ -129,7 +146,6 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
             }
 
         });
-//        computeItems();
     }
 
     @Override
@@ -185,7 +201,11 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     }
 
     public void onComboBoxChanged(Observable observable, LUTView oldValue, LUTView newValue) {
-        ColorTable colorTable = newValue.getColorTable();
+        lutViewChanger = (LutViewChanger) newValue;
+        applyColorTable(lutViewChanger.getColorTable());
+    }
+
+    public void applyColorTable(ColorTable colorTable) {
         RealLUTConverter<T> realLUTConverter = new RealLUTConverter<>(min, max, colorTable);
         scatterChart.getData().get(0).getData().stream()
                 .forEach((Data e) -> {
@@ -197,20 +217,42 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
                     final int red = (value >> 16) & 0xff;
                     final int green = (value >> 8) & 0xff;
                     final int blue = value & 0xff;
-//                    e.getNode().getStyleClass().clear();
                     TogglePlot t = (TogglePlot) e.getNode();
-                    t.setStyle("-fx-background-color: rgb("+red+","+green+","+blue+")");
-            System.out.println(t.getStyle());
+                    t.setStyle("-fx-background-color: rgb(" + red + "," + green + "," + blue + ")");
+                    System.out.println(t.getStyle());
+
                 });
-//        realLUTConverter.convert(1, output);
     }
 
     private void setMinMax(String newValue) {
+        min = max = currentItems.get(0).getMetaDataSet().get(newValue).getDoubleValue();
         currentItems.stream()
                 .forEach(e -> {
                     double value = e.getMetaDataSet().get(newValue).getDoubleValue();
                     min = min > value ? value : min;
                     max = max < value ? value : max;
                 });
+    }
+
+    @FXML
+    public void newLUT() {
+        if (lutViewChanger == null) {
+            lutViewChanger = new LUTCreatorDialog(new ArrayList<>()).showAndWait().orElseThrow(IllegalArgumentException::new);
+            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()));
+
+        } else {
+            lutViewChanger = new LUTCreatorDialog(lutViewChanger.getObservableListColors()).showAndWait().orElseThrow(IllegalArgumentException::new);
+            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()));
+
+        }
+        applyColorTable(lutViewChanger.getColorTable());
+//        LUTView lUTView = new LUTView("Lut " + String.valueOf(lutComboBox.getItems().size()), lutView);
+        lutViewChanger.render(lutService, fxImageService);
+        lutComboBox.getItems().add(lutViewChanger);
+
+    }
+
+    public LUTView getLutView() {
+        return lutViewChanger;
     }
 }
