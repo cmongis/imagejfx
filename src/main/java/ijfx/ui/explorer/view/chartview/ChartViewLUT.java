@@ -171,6 +171,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
         scatterChart.getData().clear();
         addDataToChart(currentItems, Arrays.asList(metadatas));
+        applyColorTable(lutViewChanger.getColorTable());
         bindLegend();
 
     }

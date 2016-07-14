@@ -23,6 +23,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.ExplorableClustererService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
@@ -33,9 +34,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.ScatterChart;
@@ -45,6 +48,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -62,6 +66,9 @@ public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Parameter
     ExplorerService explorerService;
+
+    @Parameter
+    LoadingScreenService loadingScreenService;
     
     String[] metadatas;
 
@@ -113,7 +120,7 @@ public class ChartView extends AbstractChartView implements ExplorerView {
             c.getItems().addAll(metadatas);
             if (metadatas.contains(s)) {
                 c.getSelectionModel().select(s);
-            } 
+            }
         });
         computeItems();
     }
@@ -145,7 +152,13 @@ public class ChartView extends AbstractChartView implements ExplorerView {
 
             scatterChart.getData().clear();
 
-            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
+            List<List<? extends Explorable>> clustersList = new CallbackTask<Void,List<List<? extends Explorable>>>()
+                    .run((a,b) ->  explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas)))
+                    .submit(loadingScreenService)
+                    .call();
+            
+            
+//            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
             clustersList
                     .stream()
                     .forEach(e -> addDataToChart(e, Arrays.asList(metadatas)));

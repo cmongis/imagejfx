@@ -27,6 +27,7 @@ import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.DefaultObjectClusterable;
 import ijfx.service.cluster.ObjectClusterable;
 import ijfx.service.cluster.PCAProcesser;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
@@ -36,6 +37,7 @@ import ijfx.ui.explorer.view.chartview.PlotExplorer;
 import ijfx.ui.explorer.view.chartview.TogglePlot;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +59,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -76,6 +79,9 @@ public class PCAChartView extends AbstractChartView implements ExplorerView {
     List<String> metadataList;
     @Parameter
     ExplorerService explorerService;
+
+    @Parameter
+    LoadingScreenService loadingScreenService;
 
     @Parameter
     ClustererService clustererService;
@@ -162,14 +168,22 @@ public class PCAChartView extends AbstractChartView implements ExplorerView {
                 .map(e -> new DefaultObjectClusterable(e, 1.0, MetaDataSetUtils.getMetadatas(e, metadataList)))
                 .collect(Collectors.toList());
         if (metadataList.size() > 1) {
-            try {
-                scatterChart.getData().clear();
-                List<ObjectClusterable> result = pCAProcesser.applyPCA(objectClusterables, metadataList);
-                List<List<Explorable>> explorables = clustererService.buildClusterer(result, metadataList);
-                explorables.stream().forEach(e -> addDataToChart(e, metadataList));
-            } catch (Exception ex) {
-                Logger.getLogger(PCAChartView.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            scatterChart.getData().clear();
+
+            new CallbackTask<Void, Void>()
+                    .then((f) -> {
+                        try {
+                            List<ObjectClusterable> result;
+                            result = pCAProcesser.applyPCA(objectClusterables, metadataList);
+                            List<List<Explorable>> explorables = clustererService.buildClusterer(result, metadataList);
+                            explorables.stream().forEach(e -> addDataToChart(e, metadataList));
+                        } catch (Exception ex) {
+                            Logger.getLogger(PCAChartView.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    })
+                    .submit(loadingScreenService)
+                    .start();
+
         }
     }
 
