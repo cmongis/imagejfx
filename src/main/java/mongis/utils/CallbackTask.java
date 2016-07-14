@@ -32,7 +32,31 @@ import javafx.concurrent.Task;
 import javafx.util.Callback;
 
 /**
- *
+ * The callback task allows you to easily run a method/lambda in a new thread and use the result
+ * in the FX Application Thread.
+ * 
+ * E.g.
+ * 
+ * Let say I want to process a list and transform it into a node that I will later add
+ * to my view.
+ * 
+ * 
+ * HBox hbox = ...
+ * 
+ * List<String> myList = ...
+ * 
+ * new CallbackTask<List<String>>,List<Node>>()
+ *  .setInput(myList)
+ *  .run(list->list
+ *      .stream()
+ *      .map(str->new Label(str))
+ *      .collect(Collectors.toList()))
+ *  .then(hbox::addAll); // equivalent of .then(list->hbox.addAll(list));
+ *  .start();
+ * 
+ * 
+ * 
+ * 
  * @author cyril
  */
 public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler, Consumer<INPUT> {
