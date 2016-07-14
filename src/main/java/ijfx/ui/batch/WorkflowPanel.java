@@ -19,10 +19,16 @@
  */
 package ijfx.ui.batch;
 
+import ijfx.service.history.HistoryService;
+import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.DefaultWorkflowStep;
+import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowStep;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.workflow.SaveWorkflowDialog;
+import ijfx.ui.workflow.WorkflowSelectionDialog;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +50,6 @@ import org.scijava.Context;
 import org.scijava.command.CommandService;
 import org.scijava.menu.MenuService;
 import org.scijava.menu.ShadowMenu;
-import org.scijava.module.Module;
 import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
@@ -78,7 +83,10 @@ public class WorkflowPanel extends GridPane {
 
     @FXML
     private MenuButton menuButton;
-
+    
+    @Parameter
+            HistoryService historyService;
+    
     Logger logger = ImageJFX.getLogger();
 
     public WorkflowPanel(Context context) {
@@ -148,6 +156,31 @@ public class WorkflowPanel extends GridPane {
          modules.get(moduleSearchTextField.getText()).run();
                 moduleSearchTextField.setText("");
     }
+    
+     @FXML
+    public void loadWorkflow() {
+        Workflow workflow = new WorkflowSelectionDialog(context).showAndWait().orElse(null);
+        
+        if(workflow != null) {
+            stepList.addAll(workflow.getStepList());
+        }
+        
+        
+        
+        
+        
+    }
+    
+    @FXML
+    public void saveWorkflow() {
+        new SaveWorkflowDialog(context).save(new DefaultWorkflow(new ArrayList(stepList)));
+    }
+    
+   @FXML
+   public void importFromHistory() {
+       stepList.clear();
+       stepList.addAll(historyService.getStepList().filtered(step->step.getModule().getDelegateObject().getClass().getSimpleName().contains("OpenFile") == false));
+   }
     
     // handler used when clicked on a action in the menu list
     private void onAddStepButtonClicked(ShadowMenu shadowMenu) {

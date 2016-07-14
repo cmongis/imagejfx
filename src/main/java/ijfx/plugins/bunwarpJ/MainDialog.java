@@ -359,9 +359,9 @@ public class MainDialog {
 
         // We create a list of image titles to be used as source or target images
         String[] titles = new String[imageList.length];
-        for (int i = 0; i < titles.length; ++i) {
-            titles[i] = imageList[i].getTitle();
-        }
+//        for (int i = 0; i < titles.length; ++i) {
+//            titles[i] = imageList[i].getTitle();
+//        }
 
         // Source and target choices
 //		addChoice( "Source_Image", titles, titles[sourceChoiceIndex]);

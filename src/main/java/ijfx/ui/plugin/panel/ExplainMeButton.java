@@ -20,12 +20,15 @@
 package ijfx.ui.plugin.panel;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.service.ui.HintService;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
+import ijfx.ui.activity.ActivityService;
+import ijfx.ui.batch.WorkflowPanel;
 import ijfx.ui.main.Localization;
 import ijfx.ui.plugin.AbstractContextButton;
 import javafx.event.ActionEvent;
-import static net.imagej.axis.Axes.get;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -37,16 +40,29 @@ import org.scijava.plugin.Plugin;
 public class ExplainMeButton extends AbstractContextButton {
 
     
+    @Parameter
+    HintService hintService;
+    
+    @Parameter
+    ActivityService activityService;
+    
     public ExplainMeButton() {
-        super();
-        setIcon(FontAwesomeIcon.INFO_CIRCLE);
-        getButton().setText("Explain me");
+        super("Explain me", FontAwesomeIcon.INFO_CIRCLE);
+        //getButton().setText("Explain me");
         getButton().getStyleClass().add("success");
-       
     }
     
     @Override
     public void onAction(ActionEvent event) {
+        playHint(SegmentationPanel.class);
+    }
+     
+    
+    public void playHint(Class<?> clazz) {
+        
+        hintService.displayHints(clazz, true);
+        hintService.displayHints(WorkflowPanel.class,true);
+        
     }
     
 }

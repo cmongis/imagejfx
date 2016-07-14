@@ -21,8 +21,8 @@ package ijfx.plugins.segmentation;
 
 import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.overlay.OverlayShapeStatistics;
 import ijfx.service.overlay.OverlayStatService;
-import ijfx.service.overlay.OverlayStatistics;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Point2D;
@@ -86,7 +86,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
         List<Overlay> overlays = overlayService.getOverlays(display);
         
         for(Overlay o : overlays){
-            OverlayStatistics stats = overlayStatService.getOverlayStatistics(o);
+            OverlayShapeStatistics stats = overlayStatService.getShapeStatistics(o);
             centers.add(stats.getCenterOfGravity());
             if(stats.getFeretDiameter() > maxDiameter)
                 maxDiameter = stats.getFeretDiameter();

@@ -19,10 +19,13 @@
  */
 package ijfx.service.overlay;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  *
  * @author Pierre BONNEAU
  */
+@JsonDeserialize(as=PixelStatisticsBase.class)
 public interface PixelStatistics {
 
     double getMean();

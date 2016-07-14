@@ -30,26 +30,24 @@ package ijfx.plugins.bunwarpJ;
  */
 import ij.IJ;
 import ij.ImagePlus;
-import ij.WindowManager;
 import ij.io.FileSaver;
 import ij.io.Opener;
-import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
-import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
+import ijfx.plugins.adapter.IJ1Service;
 
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Stack;
-import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.ItemIO;
-import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -75,16 +73,22 @@ import org.scijava.widget.Button;
  * @author Ignacio Arganda-Carreras (ignacio.arganda at gmail.com)
  */
 @Plugin(type = Command.class, menuPath = "Plugins>bUnwarpJ")
-public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
+public class bUnwarpJ_ extends ContextCommand {
 
     /* begin class bUnwarpJ_ */
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
     public static String[] sMinScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine"};
     public static String[] sMaxScaleDeformationChoices = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
 
+    @Parameter
+    DatasetService datasetService;
+    
+    @Parameter
+    IJ1Service iJ1Service;
     /*....................................................................
     	Private variables
  	....................................................................*/
+    
     @Parameter(type = ItemIO.OUTPUT)
     Dataset outputDataset;
 
@@ -154,7 +158,7 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
      */
     @Parameter
     private static boolean richOutput;
-    /**
+    /**o
      * flag for save transformation option
      */
     @Parameter
@@ -179,8 +183,8 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
     @Parameter(choices = {"Fast", "Accurate", "Mono"})
     String modeChoice;
 
-    @Parameter(callback = "chooseFile")
-    Button buttonFile;
+    @Parameter(label = "Flatfield image")
+    File flatfieldFile;
 
     String pathFile = "";
 
@@ -195,10 +199,16 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
     @Override
     public void run() {
         Runtime.getRuntime().gc();
+        
+        
+        if(flatfieldFile != null) {
+            pathFile  = flatfieldFile.getAbsolutePath();
+        }
+        
         // Collect input values
         // Source and target image plus
-        this.sourceImp = this.getInput(sourceDataset);
-        this.targetImp = this.getInput(targetDataset);
+        this.sourceImp = iJ1Service.getInput(sourceDataset);
+        this.targetImp = iJ1Service.getInput(targetDataset);
         final ImagePlus[] imageList = createImageList();
 //        if (imageList.length < 2) {
 //            IJ.error("At least two (8, 16, 32-bit or RGB Color) images are required");
@@ -2652,10 +2662,7 @@ public class bUnwarpJ_ extends AbstractImageJ1PluginAdapter {
     }
 
     /* end adaptCoefficientsMacro */
-    @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        return input;
-    }
+
 
 }
 /* end class bUnwarpJ_ */

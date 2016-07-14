@@ -29,7 +29,10 @@ import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.FolderManagerService;
+import ijfx.ui.main.ImageJFX;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
@@ -58,6 +61,8 @@ public class ExplorerTableVie implements ExplorerView{
     @Parameter
     ExplorerService explorerService;
     
+   
+    
     @Parameter
             FolderManagerService folderService;
     
@@ -85,7 +90,7 @@ public class ExplorerTableVie implements ExplorerView{
     @Override
     public void setItem(List<? extends Explorable> items) {
         
-        
+        ImageJFX.getLogger().info(String.format("Setting %d items",items.size()));
         
         if(getPriority().length != helper.getPriority().length) {
             helper.setPriority(getPriority());

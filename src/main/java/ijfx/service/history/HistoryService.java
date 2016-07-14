@@ -95,6 +95,7 @@ public class HistoryService extends AbstractService implements ImageJService{
 
     public void setCurrentWorkflow(Workflow currentWorkflow) {
         this.currentWorkflow = currentWorkflow;
+        stepList.addAll(currentWorkflow.getStepList());
     }
 
     public ObservableList<WorkflowStep> getStepList() {
@@ -188,7 +189,8 @@ public class HistoryService extends AbstractService implements ImageJService{
     }
 
     public void repeatAll() {
-        new Thread(() -> workflowService.executeWorkflow(currentWorkflow)).start();
+        System.out.println("repeating all...");
+        new Thread(() -> workflowService.executeWorkflow(new DefaultWorkflow(stepList))).start();
     }
     
     public void setEnabled(boolean enabled) {

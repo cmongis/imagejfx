@@ -19,6 +19,7 @@
  */
 package ijfx.ui.explorer;
 
+import ijfx.service.batch.SegmentedObject;
 import java.io.File;
 import java.util.List;
 import javafx.beans.property.Property;
@@ -44,5 +45,7 @@ public interface Folder {
     public List<Explorable> getObjectList();
     
     public Property<Task> currentTaskProperty();
+    
+    public void addObjects(List<SegmentedObject> objects);
     
 }

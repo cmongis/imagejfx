@@ -1,6 +1,7 @@
 package ijfx.plugins.bunwarpJ;
 
 import ij.gui.GenericDialog;
+import org.scijava.plugin.Parameter;
 
 /**
  * bUnwarpJ plugin for ImageJ(C).
@@ -30,6 +31,7 @@ import ij.gui.GenericDialog;
 public class Param {
 
 	/** mode accuracy mode (0 - Fast, 1 - Accurate, 2 - Mono) */
+    @Parameter
 	public int mode = 2;
 	/** image subsampling factor (from 0 to 7, representing 2^0=1 to 2^7 = 128) */
 	public int img_subsamp_fact = 0;
@@ -106,60 +108,60 @@ public class Param {
 		this.stopThreshold = stopThreshold;		
 	}
 	
-	/**
-	 * Show modal dialog to collect bUnwarpJ parameters
-	 * 
-	 * @return false if the dialog was canceled or true if it was not.
-	 */
-	public boolean showDialog()
-	{
-		GenericDialog gd = new GenericDialog("Elastic Registration");
-		
-		gd.addChoice("Registration Mode", sRegistrationModes, sRegistrationModes[2]);
-		
-		// Maximum image pyramid resolution
-		gd.addSlider("Image_Subsample_Factor", 0, 7, 0);
-		
-		// Advanced Options
-		gd.addMessage("------ Advanced Options ------");
-		
-		gd.addChoice("Initial_Deformation :", sMinScaleDeformationChoices, sMinScaleDeformationChoices[this.min_scale_deformation]);		
-				
-		gd.addChoice("Final_Deformation :", sMaxScaleDeformationChoices, sMaxScaleDeformationChoices[this.max_scale_deformation]);		
-		
-		gd.addNumericField("Divergence_Weight :", this.divWeight, 1);
-		gd.addNumericField("Curl_Weight :", this.curlWeight, 1);
-		gd.addNumericField("Landmark_Weight :", this.landmarkWeight, 1);
-		gd.addNumericField("Image_Weight :", this.imageWeight, 1);
-		gd.addNumericField("Consistency_Weight :", this.consistencyWeight, 1);						
-		
-		gd.addNumericField("Stop_Threshold :", this.stopThreshold, 2);
-		
-		// Show generic dialog
-		gd.showDialog();
-
-		if (gd.wasCanceled()) 
-			return false;
-		
-		// Fast or accurate mode
-		this.mode = gd.getNextChoiceIndex();
-		// Image subsampling factor at highest resolution level		
-		this.img_subsamp_fact = (int) gd.getNextNumber();
-		  
-		// Min and max scale deformation level
-		this.min_scale_deformation = gd.getNextChoiceIndex();
-		this.max_scale_deformation = gd.getNextChoiceIndex();
-				  
-		// Weights
-		this.divWeight  			= gd.getNextNumber();
-		this.curlWeight 			= gd.getNextNumber();
-		this.landmarkWeight 		= gd.getNextNumber();
-		this.imageWeight			= gd.getNextNumber();
-		this.consistencyWeight		= gd.getNextNumber();
-		this.stopThreshold			= gd.getNextNumber();
-				
-		return true;
-	} // end method showDialog
+//	/**
+//	 * Show modal dialog to collect bUnwarpJ parameters
+//	 * 
+//	 * @return false if the dialog was canceled or true if it was not.
+//	 */
+//	public boolean showDialog()
+//	{
+//		GenericDialog gd = new GenericDialog("Elastic Registration");
+//		
+//		gd.addChoice("Registration Mode", sRegistrationModes, sRegistrationModes[2]);
+//		
+//		// Maximum image pyramid resolution
+//		gd.addSlider("Image_Subsample_Factor", 0, 7, 0);
+//		
+//		// Advanced Options
+//		gd.addMessage("------ Advanced Options ------");
+//		
+//		gd.addChoice("Initial_Deformation :", sMinScaleDeformationChoices, sMinScaleDeformationChoices[this.min_scale_deformation]);		
+//				
+//		gd.addChoice("Final_Deformation :", sMaxScaleDeformationChoices, sMaxScaleDeformationChoices[this.max_scale_deformation]);		
+//		
+//		gd.addNumericField("Divergence_Weight :", this.divWeight, 1);
+//		gd.addNumericField("Curl_Weight :", this.curlWeight, 1);
+//		gd.addNumericField("Landmark_Weight :", this.landmarkWeight, 1);
+//		gd.addNumericField("Image_Weight :", this.imageWeight, 1);
+//		gd.addNumericField("Consistency_Weight :", this.consistencyWeight, 1);						
+//		
+//		gd.addNumericField("Stop_Threshold :", this.stopThreshold, 2);
+//		
+//		// Show generic dialog
+//		gd.showDialog();
+//
+//		if (gd.wasCanceled()) 
+//			return false;
+//		
+//		// Fast or accurate mode
+//		this.mode = gd.getNextChoiceIndex();
+//		// Image subsampling factor at highest resolution level		
+//		this.img_subsamp_fact = (int) gd.getNextNumber();
+//		  
+//		// Min and max scale deformation level
+//		this.min_scale_deformation = gd.getNextChoiceIndex();
+//		this.max_scale_deformation = gd.getNextChoiceIndex();
+//				  
+//		// Weights
+//		this.divWeight  			= gd.getNextNumber();
+//		this.curlWeight 			= gd.getNextNumber();
+//		this.landmarkWeight 		= gd.getNextNumber();
+//		this.imageWeight			= gd.getNextNumber();
+//		this.consistencyWeight		= gd.getNextNumber();
+//		this.stopThreshold			= gd.getNextNumber();
+//				
+//		return true;
+//	} // end method showDialog
 	
 	/**
 	 * Print parameters into a String

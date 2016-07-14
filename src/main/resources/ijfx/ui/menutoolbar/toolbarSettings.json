@@ -2,7 +2,7 @@
     {
         "name": "Math"
         ,
-        "context": "image-open"
+        "context": "imagej+image-open"
         ,
         "icon": "CALCULATOR"
         ,
@@ -101,7 +101,7 @@
                 ,
                 "label": "Separate channels"
                 ,
-                "action": "net.imagej.plugins.commands.SeparateChannel"
+                "action": "ijfx.plugins.commands.SeparateChannels"
                 ,
                 "icon": "USERS"
                 ,
@@ -111,7 +111,13 @@
                 ,"label":"Stacks to multi-channel"
                 ,"action":"ijfx.plugins.commands.MergeStacks"
                 ,"icon":"USERS"
-                ,"context":"image-open"
+                ,"context":"multi-channel-img"
+            },{
+                "type":"Command"
+                ,"label":"Isolate Channel"
+                ,"action":"ijfx.plugins.commands.IsolateChannel"
+                ,"icon":"USER"
+                ,"context":"multi-channel-img"
             }
             
             
@@ -534,6 +540,20 @@
                 ,
                 "context": "binary"
 
+            }
+        ]
+    }
+    ,{
+        "name":"Overlay"
+        ,"context":"segmentation+image-open"
+        ,"icon":"BARCODE"
+        ,"items":[
+            {
+                "type":"Command"
+                ,"label":"Delete all"
+                ,"action":"ijfx.plugins.commands.RemoveAllOverlayls"
+                ,"icon":"REMOVE"
+                ,"context":"imagej"
             }
         ]
     }

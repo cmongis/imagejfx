@@ -41,15 +41,16 @@ import org.scijava.Context;
  *
  * @author Pierre BONNEAU
  */
-public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
+public class PolygonOverlayStatistics extends AbstractOverlayShapeStatistics{
     
     java.awt.Polygon shape;
     Polygon convexHull;
 
+    /*
     public PolygonOverlayStatistics(ImageDisplay display, Overlay overlay, Context context){
         
         
-        super(display, overlay, context);
+      
         
         
         this.shape = getShape(getOverlay());
@@ -67,7 +68,7 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         super.solidity = setSolidity();
         super.circularity = setCircularity();
         super.thinnesRatio = setThinnesRatio();
-    }
+    }*/
     
     
     public PolygonOverlayStatistics(Overlay overlay, Context context){
@@ -109,7 +110,7 @@ public class PolygonOverlayStatistics extends AbstractOverlayStatistics{
         }
         
         java.awt.Polygon shape = new java.awt.Polygon(xpoints, ypoints, npoints);
-
+        
         return shape;
     }
     

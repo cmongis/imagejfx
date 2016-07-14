@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mongis.ndarray.NDimensionalArray;
+import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
 import org.scijava.Priority;
@@ -88,6 +89,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         return scifio;
     }
 
+    
     @Override
     public MetaDataSet extractMetaData(File file) {
 
@@ -100,7 +102,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             t.elapsed("Metadata parser creation");
             long serieCount, timeCount, zCount, channelCount, width, height, imageSize, bitsPerPixel;
             String dimensionOrder;
-
+            
             serieCount = metadata.getImageCount();
             width = metadata.get(0).getAxisLength(Axes.X);
             height = metadata.get(0).getAxisLength(Axes.Y);

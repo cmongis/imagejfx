@@ -75,10 +75,10 @@ public class DefaultLoggingService extends AbstractService implements IjfxServic
         @Override
         public void publish(LogRecord record) {
             if (record.getLevel() == Level.SEVERE && record.getThrown() != null) {
-                notifyError(new LogEntry((Exception) record.getThrown()).setTitle(record.getMessage()));
+                notifyError(new LogEntry(record.getThrown()).setTitle(record.getMessage()));
             }
             if (record.getLevel() == Level.WARNING && record.getThrown() != null) {
-                notifyError(new LogEntry((Exception) record.getThrown()).setTitle(record.getMessage()).setType(LogEntryType.WARNING));
+                notifyError(new LogEntry(record.getThrown()).setTitle(record.getMessage()).setType(LogEntryType.WARNING));
             }
         }
 

@@ -21,61 +21,82 @@
 package ijfx.ui.workflow;
 
 import ijfx.service.workflow.MyWorkflowService;
-import ijfx.ui.main.Localization;
 import ijfx.service.workflow.Workflow;
+import ijfx.service.workflow.WorkflowIOService;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
-import ijfx.ui.UiPlugin;
-import ijfx.ui.UiConfiguration;
 import ijfx.ui.main.ImageJFX;
+import java.io.File;
+import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.stage.FileChooser;
+import mongis.utils.ListCellController;
+import mongis.utils.ListCellControllerFactory;
+import org.scijava.Context;
 
-/**
- *
- * @author Cyril MONGIS, 2015
- */
+public class WorkflowManagerPanel extends BorderPane {
 
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id="workflowManagerPanel",context="batch",localization=Localization.RIGHT)
-public class WorkflowManagerPanel extends BorderPane implements UiPlugin{
-
-    
     @FXML
     ListView<Workflow> listView;
-    
+
     @Parameter
     MyWorkflowService myWorkflowService;
+
     
-    public WorkflowManagerPanel() {
+    
+    @Parameter
+    Context context;
+
+    Property<Workflow> selectedWorkflowProperty;
+
+    public WorkflowManagerPanel(Context context) {
         try {
             FXUtilities.injectFXML(this);
-            
-            
-            
+            context.inject(this);
+
+            listView.setItems(myWorkflowService.getWorkflowList());
+            listView.setCellFactory(new ListCellControllerFactory<>(this::createCell));
+
         } catch (IOException ex) {
-           ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
     }
+
     
-    
-    @Override
-    public Node getUiElement() {
-        return this;
+
+    private ListCellController<Workflow> createCell() {
+        WorkflowListCellController ctrl = new WorkflowListCellController();
+        context.inject(ctrl);
+        return ctrl;
     }
 
-    @Override
-    public UiPlugin init() {
+  
+
+    @FXML
+    public void importWorkflow() {
         
-        listView.setItems(myWorkflowService.getWorkflowList());
         
-        return this;
+        FileChooser fileChooser = new FileChooser();
+
+                File file = null;
+                fileChooser.setTitle("Import workflow from JSON");
+                //fileChooser.setInitialDirectory(new File(defaultFolder));
+                fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("JSON workflow", "json"));
+                file = fileChooser.showOpenDialog(null);
+               
+        if (file != null) {
+            myWorkflowService.importWorkflow(file);
+        }
     }
-        
+
+    
+    public ReadOnlyObjectProperty<Workflow> selectedWorkflowProperty() {
+        return listView.getSelectionModel().selectedItemProperty();
+    }
+    
 }

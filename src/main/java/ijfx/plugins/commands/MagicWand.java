@@ -26,13 +26,12 @@ import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.Recorder;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
-import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
+import ijfx.plugins.adapter.IJ1Service;
 import ijfx.service.object_detection.ObjectDetectionService;
 import java.util.List;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.Position;
-import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
@@ -57,6 +56,9 @@ public class MagicWand implements Command{
 
     @Parameter
     private ImageDisplay imageDisplay;
+    
+    @Parameter
+    IJ1Service iJ1Service;
 
     @Parameter
     private ImageDisplayService imageDisplayService;
@@ -98,9 +100,9 @@ public class MagicWand implements Command{
 
         getPixelsNears(pos, dataset.randomAccess());
         
-        ImagePlus imp = AbstractImageJ1PluginAdapter.unwrapDataset(dataset);
+        ImagePlus imp = iJ1Service.unwrapDataset(dataset);
         
-        AbstractImageJ1PluginAdapter.configureImagePlus(imp, imageDisplay);
+        iJ1Service.configureImagePlus(imp, imageDisplay);
        
         
         doWand(imp, originX, originY, 1);

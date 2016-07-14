@@ -179,10 +179,10 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     private void updateExploredElements() {
 
         ExplorationMode mode = currentExplorationMode;
-
+        logger.info("Updating current elements");
         AsyncCallable<List<Explorable>> task = new AsyncCallable<>();
         task.setTitle("Fetching elements...");
-
+       
         if (currentFolder == null) {
             return;
         } else {
@@ -204,13 +204,12 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
             task.start();
             loadingScreenService.frontEndTask(task, false);
         }
-        logger.info("Exploration mode changed : " + mode.toString());
+        
+        logger.info("Exploration mode changed : " + mode != null ? mode.toString() : null);
     }
     private void setItems(List<Explorable> items) {
+        logger.info(String.format("Setting %d items",items.size()));
         explorerService.setItems(items);
-        
-       
-        
     }
     private Integer fetchMoreStatistics(ProgressHandler progress,List<Explorable> explorableList) {
         if(progress == null) progress = new SilentProgressHandler();

@@ -17,8 +17,10 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.plugins.commands;
 
+import ijfx.plugins.DefaultAxisInterval;
+import ijfx.plugins.LongInterval;
 import ijfx.plugins.commands.AxisUtils;
 import net.imagej.Dataset;
 import net.imagej.axis.AxisType;

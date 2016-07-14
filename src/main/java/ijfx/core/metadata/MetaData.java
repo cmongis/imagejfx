@@ -108,6 +108,8 @@ public interface MetaData {
     public final static String METADATA_SET_TYPE_PLANE = "plane";
     public final static String METADATA_SET_TYPE_OBJECT = "object";
     
+    public final static String NAME = "Name";
+    
     public static String FILE_SIZE = "File size";
 
     public final static String PLANE_INDEX = "Plane Index";

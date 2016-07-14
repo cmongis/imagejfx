@@ -119,7 +119,6 @@ public class DefaultWidget implements ItemWidget {
         
         if(image != null) return image;
         
-        if(previewService == null) return null;
         
         if (previewService.getImageDisplayService().getActiveDataset()==null)
         {
@@ -177,4 +176,11 @@ public class DefaultWidget implements ItemWidget {
             return image;
         }
     }
+    
+    
+    public String toString() {
+        //return String.format(String.for)
+        return "Default Widget";
+    }
+    
 }

@@ -37,7 +37,7 @@ public interface MyWorkflowService extends ImageJService{
     
     public boolean deleteWorkflow(Workflow workflow);
     
-    public boolean importWorkflow(Workflow workflow, File inputFile);
+    public boolean importWorkflow(File inputFile);
     
     public boolean exportWorkflow(Workflow workflow, File outputFile);
     

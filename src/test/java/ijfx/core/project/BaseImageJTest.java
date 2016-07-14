@@ -17,34 +17,45 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins;
+package ijfx.core.project;
 
-import ijfx.plugins.adapter.AbstractImageJ1PluginAdapter;
-import ij.ImagePlus;
-import net.imagej.Dataset;
-import org.scijava.command.Command;
-import org.scijava.plugin.Attr;
+import org.junit.After;
+import org.junit.Before;
+import org.scijava.Context;
+import org.scijava.jython.shaded.jnr.netdb.Service;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
-@Plugin(type = Command.class, menuPath = "Plugins>UnwarpJ", attrs = {
-    @Attr(name = "no-legacy")})
-public class UnwarpJPlugin extends AbstractImageJ1PluginAdapter {
+/**
+ *
+ * @author cyril
+ */
+public abstract class BaseImageJTest {
 
-    @Parameter(label = "Source")
-    Dataset source;
-    
-    @Parameter(label = "Target")
-    Dataset target;
-            
-    @Override
-    public ImagePlus processImagePlus(ImagePlus input) {
-        return input;
+    @Parameter
+    Context context;
+
+    protected Context createContext(Class<? extends Service>... services) {
+
+        return new Context(services);
+
     }
 
-    @Override
-    public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    @Before
+    public void setUp() {
+
+        createContext(getService()).inject(this);
+
     }
-    
+
+    protected abstract Class[] getService();
+
+    @After
+    public synchronized void cleanUp() {
+        if (context != null) {
+            context.dispose();
+            context = null;
+
+        }
+    }
+
 }

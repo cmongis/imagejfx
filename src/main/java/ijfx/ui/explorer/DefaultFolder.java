@@ -24,13 +24,14 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
-import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.batch.ObjectSegmentedEvent;
+import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.service.ui.LoadingScreenService;
@@ -38,6 +39,7 @@ import ijfx.service.watch_dir.DirectoryWatchService;
 import ijfx.service.watch_dir.FileChangeListener;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
+import ijfx.ui.explorer.view.SegmentedObjectExplorerWrapper;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
@@ -53,11 +55,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
-import mongis.utils.SilentProgressHandler;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.Incrementor;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
+import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.UIService;
@@ -66,7 +66,7 @@ import org.scijava.ui.UIService;
  *
  * @author Cyril MONGIS
  */
-public class DefaultFolder implements Folder,FileChangeListener{
+public class DefaultFolder implements Folder, FileChangeListener {
 
     private File file;
     private String name;
@@ -74,9 +74,8 @@ public class DefaultFolder implements Folder,FileChangeListener{
     private List<Explorable> planes;
     private List<Explorable> objects = new ArrayList<>();
 
-    
     Logger logger = ImageJFX.getLogger();
-    
+
     @Parameter
     ImageRecordService imageRecordService;
 
@@ -115,21 +114,19 @@ public class DefaultFolder implements Folder,FileChangeListener{
 
     @Parameter
     DirectoryWatchService dirWatchService;
-    
+
     @Parameter
     OverlayIOService overlayIOService;
-    
+
     @Parameter
     LoadingScreenService loadingScreenService;
-    
+
     Property<Task> currentTaskProperty = new SimpleObjectProperty<>();
-    
+
     public DefaultFolder() {
 
     }
 
-    
-    
     public DefaultFolder(File file) {
         setPath(file.getAbsolutePath());
     }
@@ -154,49 +151,57 @@ public class DefaultFolder implements Folder,FileChangeListener{
 
     @Override
     public List<Explorable> getFileList() {
-       
+
         if (files == null) {
 
             files = new ArrayList<>();
-            
-            
-            Task task = new CallbackTask<Void,List<Explorable>>()
-                    
+
+            Task task = new CallbackTask<Void, List<Explorable>>()
+                    .setName("Getting file list...")
                     .run(this::fetchFiles)
-                    .then(result->{
+                    .then(result -> {
                         files = result;
                         eventService.publish(new FolderUpdatedEvent().setObject(this));
                     })
                     .setIn(currentTaskProperty())
                     .start();
-            
+
             loadingScreenService.frontEndTask(task);
-            
+
         }
-         listenToDirectoryChange();
+        listenToDirectoryChange();
         return files;
     }
 
     private List<Explorable> fetchFiles(ProgressHandler progress, Void v) {
 
-        if(progress == null) progress = new SilentProgressHandler();
-        
-        
+        //if(progress == null) progress = new SilentProgressHandler();
+        final ProgressHandler finalProgress = ProgressHandler.check(progress);
+
         Timer timer = timerService.getTimer(this.getClass());
         timer.start();
-        Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(file);
+        Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(progress,file);
         timer.elapsed("record fetching");
         progress.setStatus("Reading folder...");
+
+        progress.setTotal(records.size());
+        
         List<Explorable> explorables = records
                 .stream()
-                .map(record->{
-                    File overlayJsonFile = overlayIOService.getOverlayFileFromImageFile(record.getFile());
+                .map(record -> {
                     
-                    if(overlayJsonFile.exists()) getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
+                    File overlayJsonFile = overlayIOService.getOverlayFileFromImageFile(record.getFile());
+                    finalProgress.increment(0.5);
+                    if (overlayJsonFile.exists()) {
+                        //getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
+                    }
                     return record;
                 })
-                
-                .map(record -> new ImageRecordIconizer(context, record))
+                .map(record -> {
+                    finalProgress.increment(0.5);
+                    return new ImageRecordIconizer(context, record);
+
+                })
                 .collect(Collectors
                         .toList());
 
@@ -221,11 +226,6 @@ public class DefaultFolder implements Folder,FileChangeListener{
         eventService.publish(new FolderUpdatedEvent().setObject(this));
     }
 
-    
-   
-
-
-
     @Override
     public List<Explorable> getPlaneList() {
 
@@ -238,7 +238,7 @@ public class DefaultFolder implements Folder,FileChangeListener{
             }
 
             planes = mList.stream()
-                    .map(m -> new PlaneMetaDataSetWrapper(context,m))
+                    .map(m -> new PlaneMetaDataSetWrapper(context, m))
                     .collect(Collectors.toList());
 
         }
@@ -249,67 +249,60 @@ public class DefaultFolder implements Folder,FileChangeListener{
     @Override
     public List<Explorable> getObjectList() {
         return objects;
-    } 
-    
-    
-    public void onFileAdded(List<Explorable> files) {
-       
-                
     }
-    
-    
+
+    public void onFileAdded(List<Explorable> files) {
+
+    }
+
     private boolean registered = false;
-    
+
     private void listenToDirectoryChange() {
-        
-        if(registered) return;
-        
+
+        if (registered) {
+            return;
+        }
+
         try {
-            System.out.println("Listening to "+getPath());
+            System.out.println("Listening to " + getPath());
             dirWatchService.register(this, getPath());
             registered = true;
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
-        
-        
+
     }
-    
+
     @Override
     public void onFileCreate(String filePath) {
-        logger.info("File added "+filePath);
-        
-        File file = new File(getDirectory(),filePath);
-        
-        if(file.getName().endsWith(OverlayIOService.OVERLAY_FILE_EXTENSION)) {
+        logger.info("File added " + filePath);
+
+        File file = new File(getDirectory(), filePath);
+
+        if (file.getName().endsWith(OverlayIOService.OVERLAY_FILE_EXTENSION)) {
             File imageFile = overlayIOService.getImageFileFromOverlayFile(file);
             System.out.println(imageFile.getAbsolutePath());
             getObjectList().addAll(loadOverlay(imageFile, file));
         }
-        
-       
-        
+
     }
-    
+
     @Override
     public void onFileModify(String filePath) {
-        logger.info("File was modified : "+filePath);
+        logger.info("File was modified : " + filePath);
     }
-    
-   
-    private List<Explorable> loadOverlay(File imageFile, File overlayJsonFile) {
-        List<Explorable> collect = overlayIOService.loadOverlays(overlayJsonFile)
+
+    private List<? extends Explorable> loadOverlay(File imageFile, File overlayJsonFile) {
+        List<? extends Explorable> collect = overlayIOService.loadOverlays(overlayJsonFile)
                 .stream()
-                .filter(o->o!=null)
-                .map(overlay->new OverlayExplorableWrapper(context, imageFile, overlay))
-                .filter(expl->expl.isValid())
-                
+                .filter(o -> o != null)
+                .map(overlay -> new OverlayExplorableWrapper(context, imageFile, overlay))
+                .filter(expl -> expl.isValid())
                 .collect(Collectors.toList());
-        
-        System.out.println("Overlay collecté : "+collect.size());
+
+        System.out.println("Overlay collecté : " + collect.size());
         return collect;
-                
-        
+
     }
 
     @Override
@@ -317,8 +310,36 @@ public class DefaultFolder implements Folder,FileChangeListener{
         return currentTaskProperty;
     }
     
-    
-    
+    @EventHandler
+    public void onObjectSegmented(ObjectSegmentedEvent event) {
+        if(event.getFile().getAbsolutePath().indexOf(file.getAbsolutePath()) == 0) {
+            System.out.println("Adding objects");
+            getObjectList().addAll(event
+                    .getObject()
+                    .stream()
+                    .map(o->new MetaDataSetExplorerWrapper(o.getMetaDataSet()))
+                    .collect(Collectors.toList())
+            ); 
+        }
+    }
+
+    @Override
+    public void addObjects(List<SegmentedObject> objects) {
+        
+        
+        logger.info(String.format("Adding %d objects",objects.size()));
+        
+        getObjectList().clear();
+        
+        getObjectList().addAll(objects.stream()
+        .map(o->new SegmentedObjectExplorerWrapper(o))
+        .collect(Collectors.toList()));
+        
+
+        
+        eventService.publishLater(new FolderUpdatedEvent().setObject(this));
+        
+    }
     
     
 }

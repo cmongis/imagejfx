@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.bridge.ImageJContainer;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.ui.activity.ActivityService;
@@ -34,6 +35,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import mongis.utils.AsyncCallable;
 import net.imagej.Dataset;
+import org.apache.commons.lang3.ArrayUtils;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.UIService;
@@ -104,6 +106,7 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                     .run(this::getDataset)
                     .then(dataset -> {
                         uiService.show(dataset);
+                        
                         activityService.openByType(ImageJContainer.class);
                     })
                     .start();
@@ -163,7 +166,11 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                 if (m.containsKey(MetaData.PLANE_INDEX) == false) {
                     return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
                 } else {
-                    return imagePlaneService.extractPlane(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue());
+                    long[] position = DimensionUtils.readLongArray(m.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue());
+                    
+                    System.out.println(ArrayUtils.toString(position));
+                    
+                    return imagePlaneService.extractPlane(getFile(),position);
                 }
             } catch (Exception io) {
                 ImageJFX.getLogger().log(Level.SEVERE, null, io);

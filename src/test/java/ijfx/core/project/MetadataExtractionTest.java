@@ -29,6 +29,7 @@ import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.thumb.ThumbService;
 import io.scif.MetadataLevel;
 import io.scif.config.SCIFIOConfig;
 import io.scif.services.DatasetIOService;
@@ -58,9 +59,12 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
     @Parameter
     ImagePlaneService imagePlaneService;
     
+    @Parameter
+    ThumbService thumberService;
+    
     private static File testFile = new File("./src/test/resources/multidim.tif");
     
-    @Test
+   // @Test
     public void testTiffFile() {
 
         init();
@@ -78,10 +82,14 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
       
     }
     
-    @Test
-    public void testTransformation() {
+   
+    
+ 
+    public void testTransformation() throws IOException {
         init();
         File f = testFile;//OMG!!!!new File("/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif");//testFile;
+        
+        f  = new File("/Users/cyril/test_img/jasmin/hello.png");
         MetaDataSet m = extractorService.extractMetaData(f);
         int channelCount = m.get(MetaData.CHANNEL_COUNT).getIntegerValue();
         int tCount = m.get(MetaData.TIME_COUNT).getIntegerValue();
@@ -91,6 +99,10 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
         System.out.println(mList.get(0));
         
         Assert.assertEquals(tCount * zCount*channelCount, mList.size());
+        Assert.assertEquals((long)mList.get(mList.size()-1).get(MetaData.PLANE_INDEX).getIntegerValue(),mList.size()-1);
+        
+        
+        //thumberService.getThumb(f, 14, 100, 100);
     }
 
    
@@ -99,10 +111,16 @@ public class MetadataExtractionTest extends BaseSciJavaTest {
 
         Timer t = timerService.getTimer("Dataset open benchmarking");
         //String testFile = "/Users/cyril/test_img/psfj/gfp_nikon/gfp_nikon1_2048x2048.tif";
-        String testFile = MetadataExtractionTest.testFile.getPath();//OMG!!!!"/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
+        //String testFile = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
+        String testFile = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif";
+        
+        if(new File(testFile).exists() == false){
+            return;
+        }
+        //String testFile = MetadataExtractionTest.testFile.getPath();//OMG!!!!"/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 1x 1b.tif";
         for (int i = 0; i != 100; i++) {
             t.start();
-            Dataset dataset = imagePlaneService.extractPlane(new File(testFile), new long[]{0},new long[]{3});
+            Dataset dataset = imagePlaneService.extractPlane(new File(testFile), new long[]{0,1});
             t.elapsed("Dataset reading"); 
         }
         t.logAll();

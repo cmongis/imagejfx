@@ -23,74 +23,110 @@ package mongis.utils;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.util.Callback;
+import javafx.util.Duration;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
 public class TaskButtonBinding {
-    
+
     private Button button;
 
-   
-    
-    private Callback<TaskButtonBinding,Task> taskFactory;
-    
+    private Callback<TaskButtonBinding, Task> taskFactory;
+
     private Runnable whenSucceed;
-    
-    
-    private FontAwesomeIcon baseIcon = null;
-    
+
+    private FontAwesomeIcon baseIcon = FontAwesomeIcon.ARROW_CIRCLE_RIGHT;
+
     private FontAwesomeIcon successIcon = FontAwesomeIcon.CHECK;
 
     private FontAwesomeIcon errorIcon = FontAwesomeIcon.REPEAT;
-    
+
     private Task currentTask;
-    
-    private String textBeforeTask;
-    
-    private String textWhenSucceed;
-    
-    private String textWhenError;
-    
-    private String textWhenRunning = "Cancel";
-   
+
+    private StringProperty textBeforeTaskProperty = new SimpleStringProperty("Run");
+
+    private StringProperty textWhenSucceedProperty = new SimpleStringProperty("Done !");
+
+    private StringProperty textWhenErrorProperty = new SimpleStringProperty("Retry");
+
+    private StringProperty textWhenRunningProperty = new SimpleStringProperty("Cancel");
+
+    private FontAwesomeIconView iconView = new FontAwesomeIconView(baseIcon);
+
     private ObjectProperty<EventType<WorkerStateEvent>> lastTaskStatus = new SimpleObjectProperty<>();
-    
-    
-    private static final EventType<WorkerStateEvent> TASK_READY = WorkerStateEvent.WORKER_STATE_READY;
-    private static final EventType<WorkerStateEvent> TASK_SUCCESS = WorkerStateEvent.WORKER_STATE_SUCCEEDED;
-    private static final EventType<WorkerStateEvent> TASK_FAILED = WorkerStateEvent.WORKER_STATE_FAILED;
-    private static final EventType<WorkerStateEvent> TASK_CANCELED = WorkerStateEvent.WORKER_STATE_CANCELLED;
-    private static final EventType<WorkerStateEvent> TASK_RUNNING = WorkerStateEvent.WORKER_STATE_RUNNING;
-    
-    
+
+    private final Property<Worker.State> taskStateProperty = new SimpleObjectProperty();
+
+    private final Property<FontAwesomeIcon> iconProperty = new SimpleObjectProperty();
+
     public static final String BUTTON_PRIMARY_CLASS = "primary";
     public static final String BUTTON_SUCCESS_CLASS = "success";
     public static final String BUTTON_DANGER_CLASS = "danger";
+
+    private final RotateTransition runningAnimation = new RotateTransition(Duration.seconds(1), iconView);
     
-     public TaskButtonBinding(Button button) {
+    public TaskButtonBinding(Button button) {
         this.button = button;
+
+        textBeforeTaskProperty.setValue(button.getText());
+        button.setGraphic(iconView);
+        button.setOnAction(this::onClick);
+
+        iconView.glyphNameProperty().bind(Bindings.createStringBinding(this::getCurrentIcon, taskStateProperty));
+        button.textProperty().bind(Bindings.createStringBinding(this::getButtonString, taskStateProperty,textBeforeTaskProperty,textWhenErrorProperty,textWhenRunningProperty,textWhenRunningProperty));
         
-        textBeforeTask = button.getText();
-         
-         button.setOnAction(this::onClick);
-         
-         lastTaskStatus.addListener(this::onLastTaskStatusChange);
-         
-     }
+        taskStateProperty.addListener(this::onTaskStateChanged);
+        runningAnimation.setByAngle(360);
+        runningAnimation.setCycleCount(-1);
+        runningAnimation.setInterpolator(Interpolator.LINEAR);
+    }
+
     
+    public void onTaskStateChanged(Observable obs) {
+        if(getWorkerState() == Worker.State.RUNNING) {
+            runningAnimation.play();
+        }
+        else {
+            runningAnimation.stop();
+           iconView.setRotate(0.0);
+        }
+    }
     
+    public Worker.State getWorkerState() {
+        return taskStateProperty.getValue();
+    }
+
+    protected String getButtonString() {
+        if (getWorkerState() == Worker.State.RUNNING) {
+            return getTextWhenRunning();
+        }
+        if (getWorkerState() == Worker.State.FAILED) {
+            return getTextWhenError();
+        }
+       else {
+            return getTextBeforeTask();
+        }
+    }
+
     public Callback<TaskButtonBinding, Task> getTaskFactory() {
         return taskFactory;
     }
@@ -99,8 +135,6 @@ public class TaskButtonBinding {
         this.taskFactory = onClick;
         return this;
     }
-
-    
 
     public FontAwesomeIcon getBaseIcon() {
         return baseIcon;
@@ -120,69 +154,69 @@ public class TaskButtonBinding {
         this.successIcon = successIcon;
         return this;
     }
-    
+
     protected void onClick(ActionEvent event) {
-       
-        
-        
-        if(currentTask == null || currentTask.isDone()) {
-            currentTask = taskFactory.call(this); 
-        }
-        
-        currentTask.addEventHandler(WorkerStateEvent.ANY, this::onTaskStatusChange);
-            
-        
-        if(currentTask.isRunning()) {
-            lastTaskStatus.set(TASK_RUNNING);
+        if (currentTask == null || currentTask.isRunning() == false) {
+            currentTask = taskFactory.call(this);
+            taskStateProperty.bind(currentTask.stateProperty());
+            if (!currentTask.isRunning()) {
+                new Thread(currentTask).start();
+            }
         }
         else {
-            new Thread(currentTask).start();
+            if(currentTask != null) currentTask.cancel();
         }
-        
-        
+    }
+
+    protected String getCurrentIcon() {
+        if (getWorkerState() == Worker.State.RUNNING) {
+            return FontAwesomeIcon.SPINNER.name();
+        }
+        if (getWorkerState() == Worker.State.SUCCEEDED) {
+            return successIcon.name();
+        } else {
+            return baseIcon.name();
+        }
     }
 
     public String getTextBeforeTask() {
-        return textBeforeTask;
+        return textBeforeTaskProperty.getValue();
     }
 
     public TaskButtonBinding setTextBeforeTask(String initialText) {
-        this.textBeforeTask = initialText;
-        button.setText(initialText);
+        this.textBeforeTaskProperty.setValue(initialText);
+        //button.setText(initialText);
         return this;
     }
 
     public String getTextWhenRunning() {
-        return textWhenRunning;
+        return textWhenRunningProperty.getValue();
     }
 
     public TaskButtonBinding setTextWhenRunning(String whenRunningText) {
-        this.textWhenRunning = whenRunningText;
+        this.textWhenRunningProperty.setValue(whenRunningText);;
         return this;
     }
 
     public String getTextWhenSucceed() {
-        return textWhenSucceed;
+        return textWhenSucceedProperty.getValue();
     }
 
     public TaskButtonBinding setTextWhenSucceed(String textWhenSucceed) {
-        this.textWhenSucceed = textWhenSucceed;
+        this.textWhenSucceedProperty.setValue(textWhenSucceed);
         return this;
-               
+
     }
 
     public String getTextWhenError() {
-        return textWhenError;
+        return textWhenErrorProperty.getValue();
     }
 
     public TaskButtonBinding setTextWhenError(String textWhenError) {
-        this.textWhenError = textWhenError;
+        this.textWhenErrorProperty.setValue(textWhenError);
         return this;
     }
 
-    
-    
-    
     public Runnable getWhenSucceed() {
         return whenSucceed;
     }
@@ -191,63 +225,25 @@ public class TaskButtonBinding {
         this.whenSucceed = whenSucceed;
         return this;
     }
-    
-    
-    
-    public void onTaskStatusChange(Event event) {
-        
-      
-             lastTaskStatus.setValue((EventType<WorkerStateEvent>)event.getEventType());
-        
-    }
-    
-    public void onLastTaskStatusChange(Observable obs, EventType<WorkerStateEvent> oldValue,  EventType<WorkerStateEvent> newValue) {
 
-        if(newValue == TASK_RUNNING) {
-            button.getStyleClass().removeAll(BUTTON_DANGER_CLASS,BUTTON_SUCCESS_CLASS);
-            button.setText(textWhenRunning);
-            button.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.SPINNER));
-            
-            
-            
-        }
-        else if(newValue == TASK_SUCCESS) {
-            
-            if(textWhenSucceed != null) {
-                button.getStyleClass().removeAll(BUTTON_DANGER_CLASS,BUTTON_PRIMARY_CLASS);
-                button.getStyleClass().add(BUTTON_SUCCESS_CLASS);
-                button.setGraphic(GlyphsDude.createIcon(successIcon));
-                button.setText(textWhenSucceed);
-            
-            }
-            else {
-                button.setText(textBeforeTask);
-                
-            }
-            
-            if(whenSucceed != null) whenSucceed.run();
-            
-        }
-        
-        else if(newValue == TASK_FAILED && textWhenError != null){
-            button.setText(textWhenError);
-            button.getStyleClass().removeAll(BUTTON_PRIMARY_CLASS,BUTTON_SUCCESS_CLASS);
-            button.getStyleClass().add(BUTTON_DANGER_CLASS);
-            button.setGraphic(GlyphsDude.createIcon(errorIcon));
-            
-            
-        }
-        else {
-            button.setText(textBeforeTask);
-            button.setGraphic(null);
-        }
-        
-        
+    public StringProperty textBeforeTaskProperty() {
+        return textBeforeTaskProperty;
     }
+
+    public StringProperty textWhenSucceedProperty() {
+        return textWhenSucceedProperty;
+    }
+
+    public StringProperty textWhenErrorProperty() {
+        return textWhenErrorProperty;
+    }
+
+    public StringProperty textWhenRunningProperty() {
+        return textWhenRunningProperty;
+    }
+
     
     
-    
-    
-    
-    
+   
+
 }

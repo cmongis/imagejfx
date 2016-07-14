@@ -21,8 +21,13 @@ package ijfx.ui.module.skin;
 
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -73,22 +78,34 @@ public class AxisTypeInputSkin extends AbstractInputSkinPlugin<AxisType> {
 
     @Override
     public boolean canHandle(Class<?> clazz) {
-        
+
         return clazz == AxisType.class;
     }
 
     public List<AxisType> getAxisList() {
         if (axisTypeList == null) {
             axisTypeList = new ArrayList();
-            Dataset dataset = imageDisplayService.getActiveDataset();
-            CalibratedAxis[] calibratedAxis = new CalibratedAxis[dataset.numDimensions()];
-            dataset.axes(calibratedAxis);
-            for (CalibratedAxis ca : calibratedAxis) {
-                if (ca.type() != Axes.X && ca.type() != Axes.Y) {
-                    axisTypeList.add(ca.type());
+//            Dataset dataset = imageDisplayService.getActiveDataset();
+//            CalibratedAxis[] calibratedAxis = new CalibratedAxis[dataset.numDimensions()];
+//            dataset.axes(calibratedAxis);
+//            for (CalibratedAxis ca : calibratedAxis) {
+//                if (ca.type() != Axes.X && ca.type() != Axes.Y) {
+//                    axisTypeList.add(ca.type());
+//                }
+//            }
+
+            Field[] fields = Axes.class.getFields();
+            for (Field f : fields) {
+                if (f.getType() == AxisType.class) {
+                    try {
+                        axisTypeList.add((AxisType) f.get(null));
+                    } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(AxisTypeInputSkin.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IllegalAccessException ex) {
+                        Logger.getLogger(AxisTypeInputSkin.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
-
         }
 
         return axisTypeList;

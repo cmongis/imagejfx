@@ -50,4 +50,6 @@ public interface ExplorerService extends IjfxService{
      * @param iconazable to open
      */
     void open(Iconazable iconazable);
+    
+    void openSelection();
 }

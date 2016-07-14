@@ -54,8 +54,12 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
 
     Consumer<OUTPUT> successHandler;
     
+    
+    
     private final static Logger logger = Logger.getLogger(CallbackTask.class.getName());
     
+    double total = 1.0;
+    double progress = 0;
     public CallbackTask() {
         super();
     }
@@ -286,5 +290,18 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         consumer.accept(this);
         return this;
     }
+
+    @Override
+    public void setTotal(double total) {
+        this.total = total;
+    }
+    
+    @Override
+    public void increment(double d) {
+        progress+=d;
+        setProgress(progress, total);
+    }
+    
+    
     
 }

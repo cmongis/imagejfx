@@ -30,6 +30,12 @@ public interface ProgressHandler {
     public void setProgress(double workDone,double total);
     public void setProgress(long workDone,long total);
     public void setStatus(String message);
+    public void setTotal(double total);
+    public void increment(double inc);
     public boolean isCancelled();
+    
+    public static ProgressHandler check(ProgressHandler handler) {
+        return handler == null ? new SilentProgressHandler() : handler;
+    }
     
 }

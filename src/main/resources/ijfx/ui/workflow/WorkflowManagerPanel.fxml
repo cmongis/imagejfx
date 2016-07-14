@@ -1,13 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root maxHeight="1.7976931348623157E308" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="1.7976931348623157E308" prefWidth="400.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <ListView fx:id="listView" maxHeight="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+      <ListView fx:id="listView" minWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
+   <top>
+      <BorderPane BorderPane.alignment="CENTER">
+         <right>
+            <Button mnemonicParsing="false" onAction="#importWorkflow" text="Import from file" BorderPane.alignment="CENTER">
+               <graphic>
+                  <FontAwesomeIconView glyphName="DOWNLOAD" />
+               </graphic>
+            </Button>
+         </right>
+         <left>
+            <Label styleClass="h3" text="My workflows : " BorderPane.alignment="CENTER" />
+         </left>
+         <bottom>
+            <Line endX="400.0" fill="WHITE" stroke="WHITE" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </BorderPane.margin>
+            </Line>
+         </bottom>
+      </BorderPane>
+   </top>
 </fx:root>

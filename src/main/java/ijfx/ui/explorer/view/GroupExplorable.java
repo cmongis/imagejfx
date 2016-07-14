@@ -19,91 +19,105 @@
  */
 package ijfx.ui.explorer.view;
 
+import ijfx.core.metadata.MetaData;
+import ijfx.service.cluster.ClustererService;
 import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import org.apache.commons.lang.NumberUtils;
 
 /**
  *
  * @author Tuan anh TRINH
+ * @param <T>
  */
-public class GroupExplorable<T> {
+public class GroupExplorable<T extends Explorable> {
 
-    private List<Explorable> listItems;
+    private List<T> listItems;
     private List<String> metaDataList;
 
-    private List<List<? extends Explorable>> list2D;
-    private List<List<List<? extends Explorable>>> list3D;
+    private List<List<T>> list2D;
+    private List<List<List<T>>> list3D;
 
-    private SortListExplorable<Explorable> sortListExplorable;
+    private SortListExplorable<T> sortListExplorable;
     private int size;
 
-    public SortListExplorable<Explorable> getSortListExplorable() {
+    private ClustererService clustererService;
+
+    private BooleanProperty clusterProperty;
+
+    public SortListExplorable<T> getSortListExplorable() {
         return sortListExplorable;
     }
 
-    public GroupExplorable() {
+    public GroupExplorable(BooleanProperty booleanProperty) {
         list3D = new CopyOnWriteArrayList<>();
         list2D = new CopyOnWriteArrayList<>();
         listItems = new CopyOnWriteArrayList<>();
         metaDataList = new ArrayList<>();
-        //TODO
+        clusterProperty = new SimpleBooleanProperty();
+//TODO
         metaDataList.add("1");
         metaDataList.add("2");
         metaDataList.add("3");
         sortListExplorable = new SortListExplorable<>();
-
+        booleanProperty.bindBidirectional(clusterProperty);
     }
 
     public void process() {
-        List<Explorable> list1D = new CopyOnWriteArrayList<>(filterExplorableWithList(listItems, metaDataList));
+        List<T> list1D = new CopyOnWriteArrayList<>(filterExplorableWithList(listItems, metaDataList));
         sortListExplorable.setMetaData(metaDataList.get(0), metaDataList.get(1));
 
         size = 0;
         list3D.clear();
         SortExplorableUtils.sort(metaDataList.get(2), list1D);
-        SortExplorableUtils.create2DList(metaDataList.get(2), list2D, list1D);
+
+        if (clusterProperty.get()) {
+
+            list2D = clustererService.buildClusterer(list1D, metaDataList.get(2));
+        } else {
+            SortExplorableUtils.create2DList(metaDataList.get(2), list2D, list1D);
+        }
+
         list2D.stream().forEach((l2D) -> {
             sortListExplorable.setItems(l2D);
             sortListExplorable.process();
             if (!sortListExplorable.getList2D().isEmpty()) {
-
                 list3D.add(new CopyOnWriteArrayList<>(sortListExplorable.getList2D()));
                 size = sortListExplorable.getSizeList2D() + size;
             }
         });
     }
 
-    public boolean checkNumber(String metaData){
-        if (!NumberUtils.isNumber(SortExplorableUtils.getValueMetaData(listItems.get(0), metaData))){
+    public boolean checkNumber(String metaData) {
+        if (!NumberUtils.isNumber(SortExplorableUtils.getValueMetaData(listItems.get(0), metaData))) {
             return true;
-        }
-        else
-        {
-            List<Explorable> filtered = filterExplorable(listItems, metaData);
+        } else {
+            List<T> filtered = filterExplorable(listItems, metaData);
             SortExplorableUtils.sort(metaData, filtered);
             return SortExplorableUtils.findLimits(metaData, filtered).size() <= 25;
         }
     }
-    
-     public List<Explorable> filterExplorableWithList(List<Explorable> arrayList, List<String> metaData) {
+
+    public List<T> filterExplorableWithList(List<T> arrayList, List<String> metaData) {
         return arrayList.stream().filter(p -> {
-            return metaData.stream().allMatch(m ->  p
+            return metaData.stream().allMatch(m -> p
                     .getMetaDataSet()
                     .containsKey(m));
         }).collect(Collectors.toList());
     }
-       
-    public List<Explorable> filterExplorable(List<Explorable> arrayList, String metaData) {
+
+    public List<T> filterExplorable(List<T> arrayList, String metaData) {
         return arrayList.stream().filter(p -> {
             return p.getMetaDataSet().containsKey(metaData);
         }).collect(Collectors.toList());
     }
 
-    public List<List<List<? extends Explorable>>> getList3D() {
+    public List<List<List<T>>> getList3D() {
         return list3D;
     }
 
@@ -115,11 +129,11 @@ public class GroupExplorable<T> {
         this.metaDataList = metaDataList;
     }
 
-    public List<Explorable> getListItems() {
+    public List<T> getListItems() {
         return listItems;
     }
 
-    public void setListItems(List<Explorable> listItems) {
+    public void setListItems(List<T> listItems) {
         this.listItems = listItems;
     }
 
@@ -127,4 +141,7 @@ public class GroupExplorable<T> {
         return size;
     }
 
+    public void setClustererService(ClustererService clustererService) {
+        this.clustererService = clustererService;
+    }
 }

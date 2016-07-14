@@ -45,12 +45,12 @@ public class SortExplorableUtils {
         return comparator;
     }
     
-    public static void create2DList(String metaDataName, List<List<? extends Explorable>> list2D, List<? extends Explorable> listItems) {
+    public static <T extends Explorable> void create2DList(String metaDataName, List<List<T>> list2D, List<T> listItems) {
         list2D.clear();
         List<Integer> limits = findLimits(metaDataName, listItems);
         
         for (int j = 0; j < limits.size() - 1; j++) {
-            List<? extends Explorable> l = new CopyOnWriteArrayList<>(listItems.subList(limits.get(j), limits.get(j + 1)));
+            List<T> l = new CopyOnWriteArrayList<>(listItems.subList(limits.get(j), limits.get(j + 1)));
             if (!l.isEmpty()) {
                 list2D.add(l);
                 
@@ -70,6 +70,10 @@ public class SortExplorableUtils {
             }
         }
         return limits;
+    }
+    
+    public static List<Integer> findClusters(String metaDataName, List<? extends Explorable> listItems) {
+    return null;
     }
 
     public static void sort(String metaDataName, List<? extends Explorable> listItems) {

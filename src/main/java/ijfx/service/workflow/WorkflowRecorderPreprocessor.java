@@ -72,6 +72,7 @@ public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin{
         }
         
         DefaultWorkflowStep step = new DefaultWorkflowStep(module);
+        context.inject(step);
         step.setParameters(module.getInputs());
         module.getInputs().forEach((key, value) -> {
             logger.fine("" + key + " = " + value);
