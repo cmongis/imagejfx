@@ -41,6 +41,7 @@ public class LUTCreatorDialog extends Dialog<LutViewChanger> {
         super();
 
         lUTCreator = new LUTCreator(colors);
+        this.setResizable(true);
         this.getDialogPane().setContent(lUTCreator);
         this.getDialogPane().getStylesheets().add(ImageJFX.STYLESHEET_ADDR);
         this.getDialogPane().getButtonTypes().add(ButtonType.OK);

@@ -20,6 +20,7 @@
 package ijfx.ui.explorer.view.chartview;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import javafx.scene.paint.Color;
@@ -43,17 +44,23 @@ public class ColorGenerator {
 
         double blending = 1.0 / numColor;//set by you
 
-        double inverse_blending = 1 - blending;
-        double red = x.getRed() * blending + y.getRed() * inverse_blending;
-        double green = x.getGreen() * blending + y.getGreen() * inverse_blending;
-        double blue = x.getBlue() * blending + y.getBlue() * inverse_blending;
+        double oppose_blending = 1 - blending;
+        double red = x.getRed() * blending + y.getRed() * oppose_blending;
+        double green = x.getGreen() * blending + y.getGreen() * oppose_blending;
+        double blue = x.getBlue() * blending + y.getBlue() * oppose_blending;
 
         double max = 255;
         Color blended = new Color(red / max, green / max, blue / max, 1.0);
         return blended;
     }
 
-    public static List<Color> generateColor(List<Color> colorList, int numColor) {
+    public static List<Color> generateColor(List<Color> colors, int numColor){
+        colors.stream().forEach(e -> {
+            Color[] tmpColors = new Color[colors.size()/numColor];
+            Arrays.fill(tmpColors, e);
+        });
+    }
+    public static List<Color> generateInterpolatedColor(List<Color> colorList, int numColor) {
         List<Color> result = new ArrayList<>();
 
         for (int i = 0; i < colorList.size() - 1; i++) {

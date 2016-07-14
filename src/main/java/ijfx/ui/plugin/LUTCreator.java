@@ -36,6 +36,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -57,12 +58,12 @@ public class LUTCreator extends BorderPane {
     @FXML
     ListView<Shape> listViewSamples;
     @FXML
-    TilePane resultTilePane;
+    FlowPane flowPane;
     @FXML
     Button addButton;
 
-    @FXML
-    TextField colorNumberField;
+//    @FXML
+//    TextField colorNumberField;
 
     List<Color> colors;
 
@@ -74,7 +75,7 @@ public class LUTCreator extends BorderPane {
             listViewSamples.setItems(FXCollections.observableArrayList());
 
             listViewSamples.getItems().addListener((Observable e) -> updateResults());
-            colorNumberField.textProperty().addListener(e -> updateResults());
+//            colorNumberField.textProperty().addListener(e -> updateResults());
 
             colors.stream()
                     .forEach(e -> {
@@ -121,14 +122,14 @@ public class LUTCreator extends BorderPane {
     }
 
     private void updateResults() {
-        resultTilePane.getChildren().clear();
+        flowPane.getChildren().clear();
         colors = listViewSamples.getItems()
                 .stream()
                 .map(e -> (Color) e.getFill())
                 .collect(Collectors.toList());
-        generatedColors = ColorGenerator.generateColor(colors, Integer.valueOf(colorNumberField.getText()));
+        generatedColors = ColorGenerator.generateInterpolatedColor(colors, 256);
         generatedColors.stream()
-                .forEach(e -> resultTilePane.getChildren().add(new Rectangle(SIZE_SMALL_RECTANGLE, SIZE_SMALL_RECTANGLE, e)));
+                .forEach(e -> flowPane.getChildren().add(new Rectangle(SIZE_SMALL_RECTANGLE, SIZE_SMALL_RECTANGLE, e)));
 
     }
 
