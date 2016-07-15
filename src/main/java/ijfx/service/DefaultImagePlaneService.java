@@ -29,11 +29,14 @@ import io.scif.img.cell.SCIFIOCellImgFactory;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.AxisType;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.type.NativeType;
@@ -233,6 +236,14 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
             hyperSlice = Views.hyperSlice(hyperSlice, 2, position[d]);
         }
         return hyperSlice;
+    }
+
+    @Override
+    public <T extends RealType<T>> RandomAccessibleInterval<T> openVirtualPlane(File file, long[] nonSpacialPosition) throws IOException {
+
+        Dataset dataset = openVirtualDataset(file);
+        return planeView(dataset, nonSpacialPosition);
+    
     }
 
     private class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
