@@ -19,11 +19,13 @@
  */
 package ijfx.service.preview;
 
+import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.DisplayBatchInput;
 import ijfx.service.log.DefaultLoggingService;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -38,10 +40,17 @@ import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplayService;
+import net.imagej.lut.LUTService;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.converter.RealLUTConverter;
 import net.imglib2.display.ColorTable;
 import net.imglib2.display.ColorTable8;
+import net.imglib2.img.Img;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.Views;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
 import org.scijava.module.Module;
@@ -75,10 +84,16 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     @Parameter
     private BatchService batchService;
-    
+
     @Parameter
     private DefaultLoggingService logService;
-    
+
+    @Parameter
+    private IjfxStatisticService ijfxStatsService;
+
+    @Parameter
+    private LUTService lutService;
+
     private int width;
     private int height;
     private int x;
@@ -249,6 +264,42 @@ public class PreviewService extends AbstractService implements ImageJService {
         BufferedImage bufferedImage = view.getScreenImage().image();
         return bufferedImage;
     }
+
+    
+    public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable) {
+        
+        
+        
+        SummaryStatistics summaryStatistics = ijfxStatsService.getSummaryStatistics(Views.iterable(dataset).cursor());
+        
+        return datasetToImage(dataset, colorTable, summaryStatistics.getMin(), summaryStatistics.getMax());
+        
+    }
+    
+    public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset) {
+        return datasetToImage(dataset, new ColorTable8());
+    }
+    
+    public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable, double min, double max) {
+
+        int width = (int) dataset.dimension(0);
+        int height = (int) dataset.dimension(1);
+        WritableImage image = new WritableImage(width, height);
+        RealLUTConverter<T> converter = new RealLUTConverter<T>(min, max, colorTable);
+        ARGBType argb = new ARGBType();
+        RandomAccess<T> ra = dataset.randomAccess();
+        for (int x = 0; x != width; x++) {
+            for (int y = 0; y != height; y++) {
+                ra.setPosition(x, 0);
+                ra.setPosition(y, 1);
+                converter.convert(ra.get(), argb);
+                image.getPixelWriter().setArgb(x, y, argb.get());
+            }
+        }
+        return image;
+    }
+
+ 
 
     /**
      * Apply the <code>command</code> to the <code>dataset</code> using
