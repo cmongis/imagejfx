@@ -42,6 +42,7 @@ public class BatchInputBuilder {
 
     BatchSingleInput input;
 
+    private static String suffixSeparator = "_";
     
     public BatchInputBuilder(Context context) {
         this.context = context;
@@ -117,7 +118,7 @@ public class BatchInputBuilder {
    }
    public BatchInputBuilder saveNextToSourceWithPrefix(String suffix, String extension) {
        if(extension.startsWith(".") == false) extension = new StringBuilder().append(".").append(extension).toString();
-       File f = NamingUtils.replaceWithExtension(new File(input.getSourceFile()),suffix+extension);
+       File f = NamingUtils.replaceWithExtension(new File(input.getSourceFile()),suffixSeparator+suffix+extension);
        input = new SaveToFileWrapper(context,input,f);
                return this;
    }
