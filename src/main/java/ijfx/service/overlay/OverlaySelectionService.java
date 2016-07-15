@@ -43,7 +43,7 @@ import org.scijava.service.Service;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = Service.class)
-public class OverlaySelectionService extends AbstractService implements ImageJService{
+public class OverlaySelectionService extends AbstractService implements ImageJService {
 
     @Parameter
     OverlayService overlayService;
@@ -53,13 +53,25 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
 
     @Parameter
     ImageDisplayService imageDisplayService;
-    
+
     Logger logger = ImageJFX.getLogger();
-    
+
     public void selectOnlyOneOverlay(ImageDisplay imageDisplay, Overlay overlay) {
-        
+
         //System.out.println(overlay);
-        
+        System.out.println("Calling me softly");
+        getOverlayViews(imageDisplay)
+                .stream()
+                .forEach(view -> {
+                    if (view.isSelected() && view.getData() != overlay) {
+
+                        setOverlaySelection(imageDisplay, view.getData(), false);
+                    } else if (view.isSelected() == false && view.getData() == overlay) {
+                        setOverlaySelection(imageDisplay, view.getData(), true);
+                    }
+                }
+                );
+        /*
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView) {
                 OverlayView overlayView = (OverlayView) view;
@@ -71,22 +83,15 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
                 if(before != after) {
                     eventService.publish(new OverlaySelectedEvent(imageDisplay,overlay));
                 }
-                
-               
-                
-                
-                
-                
                 //eventService.publish(new OverlaySelectedEvent(imageDisplay, overlay));
             }
-        }
-        logger.info("Selecting only "+overlay);
-        
+        }*/
+        logger.info("Selecting only " + overlay);
 
     }
 
     public void selectedAll(ImageDisplay imageDisplay) {
-        logger.info("Select all overlay from "+imageDisplay);
+        logger.info("Select all overlay from " + imageDisplay);
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView) {
                 ((OverlayView) view).setSelected(true);
@@ -100,25 +105,25 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView && view.isSelected() == true) {
                 ((OverlayView) view).setSelected(false);
-                eventService.publish(new OverlaySelectionEvent(imageDisplay, (Overlay)view.getData()));
+                eventService.publish(new OverlaySelectionEvent(imageDisplay, (Overlay) view.getData()));
             }
         }
     }
 
     public List<Overlay> getSelectedOverlays(ImageDisplay imageDisplay) {
-            
-        if(imageDisplay == null) return new ArrayList<>();
-        
+
+        if (imageDisplay == null) {
+            return new ArrayList<>();
+        }
+
         return new ArrayList<>(imageDisplay)
                 .parallelStream()
-                .filter(o->o instanceof OverlayView)
-                .map(o->(OverlayView)o)
-                .filter(view->view.isSelected())
-                .map(view->(Overlay)view.getData())
+                .filter(o -> o instanceof OverlayView)
+                .map(o -> (OverlayView) o)
+                .filter(view -> view.isSelected())
+                .map(view -> (Overlay) view.getData())
                 .collect(Collectors.toList());
-        
-        
-       
+
     }
 
     public boolean isMultipleSelection(ImageDisplay imageDisplay) {
@@ -141,46 +146,46 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
         return false;
     }
 
-    
+    public void setOverlaySelection(ImageDisplay imageDisplay, OverlayView view, boolean selected) {
+        view.setSelected(selected);
+        eventService.publishLater(new OverlaySelectedEvent(imageDisplay, view.getData()));
+    }
+
     public void setOverlaySelection(ImageDisplay imageDisplay, Overlay selectedOverlay, boolean selected) {
-        
-        
-        
-        
+
         OverlayView overlayView = getOverlayViews(imageDisplay)
                 .stream()
-                .filter(view->view.getData() == selectedOverlay)
+                .filter(view -> view.getData() == selectedOverlay)
                 .findFirst()
                 .orElse(null);
-                
-        if(overlayView != null) { overlayView.setSelected(true);
-        
-            eventService.publishLater(new OverlaySelectedEvent(imageDisplay,selectedOverlay));
-            
-        }
-        else {
+
+        if (overlayView != null) {
+            overlayView.setSelected(selected);
+
+            eventService.publishLater(new OverlaySelectedEvent(imageDisplay, selectedOverlay));
+
+        } else {
             logger.warning(("Couldn't find Overlay in this ImageDisplay"));
         }
-       
+
     }
 
     protected List<OverlayView> getOverlayViews(ImageDisplay display) {
-        
-        return 
-                display
-                        .stream()
-                        .filter(o->o instanceof OverlayView)
-                        .map(o->(OverlayView)o)
-                        .collect(Collectors.toList());
-        
+
+        return display
+                .stream()
+                .filter(o -> o instanceof OverlayView)
+                .map(o -> (OverlayView) o)
+                .collect(Collectors.toList());
+
     }
-    
+
     public boolean isSelected(ImageDisplay imageDisplay, Overlay overlay) {
-        
+
         return getOverlayViews(imageDisplay)
                 .stream()
-                .filter(view->view.getData()==overlay && view.isSelected()).count() > 0;
-        
+                .filter(view -> view.getData() == overlay && view.isSelected()).count() > 0;
+
     }
 
 }
