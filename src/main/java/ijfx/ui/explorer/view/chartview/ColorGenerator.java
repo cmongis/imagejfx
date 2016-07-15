@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import javafx.scene.paint.Color;
 
 /**
@@ -54,17 +55,30 @@ public class ColorGenerator {
         return blended;
     }
 
-    public static List<Color> generateColor(List<Color> colors, int numColor){
-        colors.stream().forEach(e -> {
-            Color[] tmpColors = new Color[colors.size()/numColor];
-            Arrays.fill(tmpColors, e);
-        });
+    public static List<Color> generateColor(List<Color> colors, int numColor) {
+        int intervalSize = (int) Math.ceil((double)numColor/colors.size() );
+        List<Color> result = new ArrayList<>();
+        colors.stream()
+                .forEach(e -> {
+                    Color[] tmpColors = new Color[intervalSize];
+                    Arrays.fill(tmpColors, e);
+                    result.addAll(Arrays.asList(tmpColors));
+                });
+        result.subList(numColor, result.size()).clear();
+        return result;
     }
+
     public static List<Color> generateInterpolatedColor(List<Color> colorList, int numColor) {
         List<Color> result = new ArrayList<>();
 
         for (int i = 0; i < colorList.size() - 1; i++) {
-            result.addAll(RgbLinearInterpolate(colorList.get(i), colorList.get(i + 1), ((Integer)numColor).doubleValue()/(colorList.size()-1)));
+            result.addAll(RgbLinearInterpolate(colorList.get(i), colorList.get(i + 1), ((Integer) numColor).doubleValue() / (colorList.size() - 1)));
+        }
+        
+        if (result.size()<numColor){
+            Color[] tmpColors = new Color[numColor - result.size()];
+                    Arrays.fill(tmpColors, colorList.get(colorList.size()-1));
+                    result.addAll(Arrays.asList(tmpColors));
         }
         return result;
     }

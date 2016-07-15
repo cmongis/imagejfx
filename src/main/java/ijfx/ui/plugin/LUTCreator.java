@@ -32,6 +32,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
@@ -62,9 +63,11 @@ public class LUTCreator extends BorderPane {
     @FXML
     Button addButton;
 
+    @FXML
+    CheckBox choiceCheckBox;
+
 //    @FXML
 //    TextField colorNumberField;
-
     List<Color> colors;
 
     List<Color> generatedColors;
@@ -75,7 +78,7 @@ public class LUTCreator extends BorderPane {
             listViewSamples.setItems(FXCollections.observableArrayList());
 
             listViewSamples.getItems().addListener((Observable e) -> updateResults());
-//            colorNumberField.textProperty().addListener(e -> updateResults());
+            choiceCheckBox.selectedProperty().addListener((Observable e) -> updateResults());
 
             colors.stream()
                     .forEach(e -> {
@@ -127,7 +130,11 @@ public class LUTCreator extends BorderPane {
                 .stream()
                 .map(e -> (Color) e.getFill())
                 .collect(Collectors.toList());
-        generatedColors = ColorGenerator.generateInterpolatedColor(colors, 256);
+        if (choiceCheckBox.isSelected()) {
+            generatedColors = ColorGenerator.generateInterpolatedColor(colors, 256);
+        } else {
+            generatedColors = ColorGenerator.generateColor(colors, 256);
+        }
         generatedColors.stream()
                 .forEach(e -> flowPane.getChildren().add(new Rectangle(SIZE_SMALL_RECTANGLE, SIZE_SMALL_RECTANGLE, e)));
 

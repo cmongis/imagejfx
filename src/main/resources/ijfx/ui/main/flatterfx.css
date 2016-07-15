@@ -920,7 +920,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .list-cell:even{ /* <=== changed to even */
 
-    -fx-background-color: transparent;
+    -fx-background-color: white;
 }
 
 .list-cell:filled:hover{
