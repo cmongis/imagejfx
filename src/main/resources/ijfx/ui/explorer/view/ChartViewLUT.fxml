@@ -34,7 +34,7 @@
             <top>
                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
                     <children>
-                        <ComboBox fx:id="thirdComboBox" prefWidth="150.0" />
+                        <ComboBox fx:id="thirdComboBox" />
                         <LUTComboBox fx:id="lutComboBox" prefWidth="150.0" />
                               <Button mnemonicParsing="false" onMouseClicked="#newLUT" text="Custom LUT" />
                   <Button fx:id="snapshotButton" mnemonicParsing="false" onAction="#snapshot" />

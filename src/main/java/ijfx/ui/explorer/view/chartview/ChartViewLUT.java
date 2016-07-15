@@ -191,7 +191,6 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
             metadatas[2] = n;
             deselecItems();
             computeItems();
-            setMinMax(n);
         });
         lutComboBox.getSelectionModel().selectedItemProperty().addListener(this::onComboBoxChanged);
     }
@@ -207,6 +206,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     }
 
     public void applyColorTable(ColorTable colorTable) {
+        setMinMax(metadatas[2]);
         RealLUTConverter<T> realLUTConverter = new RealLUTConverter<>(min, max, colorTable);
         scatterChart.getData().get(0).getData().stream()
                 .forEach((Data e) -> {
@@ -250,6 +250,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 //        LUTView lUTView = new LUTView("Lut " + String.valueOf(lutComboBox.getItems().size()), lutView);
         lutViewChanger.render(lutService, fxImageService);
         lutComboBox.getItems().add(lutViewChanger);
+        lutComboBox.getSelectionModel().select(lutViewChanger);
 
     }
 

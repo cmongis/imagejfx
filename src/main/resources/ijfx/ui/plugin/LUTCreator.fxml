@@ -17,7 +17,7 @@
                <padding>
                   <Insets right="10.0" />
                </padding></ListView>
-            <FlowPane fx:id="flowPane" alignment="CENTER" hgap="10.0" prefHeight="200.0" prefWidth="200.0" rowValignment="TOP" vgap="10.0" />
+            <FlowPane fx:id="flowPane" alignment="CENTER_LEFT" hgap="10.0" prefHeight="200.0" prefWidth="200.0" rowValignment="TOP" vgap="10.0" />
             </children>
         </VBox>
     </center>
