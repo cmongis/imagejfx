@@ -17,15 +17,32 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.cluster;
-
-import ijfx.ui.explorer.ObjectWrapper;
-import weka.core.Instance;
+package ijfx.ui.plugin;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface ObjectClusterable extends Instance, ObjectWrapper{
-    
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
+/**
+ *
+ */
+public class IntegerField extends InputField {
+    /**
+     * The value of the IntegerField. If null, the value will be treated as "0", but
+     * will still actually be null.
+     */
+    private IntegerProperty value = new SimpleIntegerProperty(this, "value");
+    public final int getValue() { return value.get(); }
+    public final void setValue(int value) { this.value.set(value); }
+    public final IntegerProperty valueProperty() { return value; }
+
+    /**
+     * Creates a new IntegerField. The style class is set to "money-field".
+     */
+    public IntegerField() {
+        getStyleClass().setAll("integer-field");
+    }
 }

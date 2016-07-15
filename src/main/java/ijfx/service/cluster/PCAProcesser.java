@@ -74,7 +74,7 @@ public class PCAProcesser {
     public List<ObjectClusterable> mapToObjectClusterable(Instances instances){
         return instances
                 .stream()
-                .map(e -> new ObjectClusterable(((ObjectClusterable) e).getObject(), 1, e.toDoubleArray()))
+                .map(e -> new DefaultObjectClusterable(((DefaultObjectClusterable) e).getObject(), 1, e.toDoubleArray()))
                 .collect(Collectors.toList());
     }
 

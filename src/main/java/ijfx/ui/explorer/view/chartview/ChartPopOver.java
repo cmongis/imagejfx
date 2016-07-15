@@ -17,15 +17,18 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.cluster;
+package ijfx.ui.explorer.view.chartview;
 
-import ijfx.ui.explorer.ObjectWrapper;
-import weka.core.Instance;
+import javafx.scene.layout.BorderPane;
+import org.controlsfx.control.PopOver;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface ObjectClusterable extends Instance, ObjectWrapper{
+public class ChartPopOver {
+    PopOver popOver;
+    
+    BorderPane borderPane;
     
 }

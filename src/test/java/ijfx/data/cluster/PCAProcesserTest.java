@@ -31,9 +31,9 @@ import weka.core.converters.ConverterUtils;
  */
 public class PCAProcesserTest  {
 
-    
+    @Test
     public void applyPCATest() throws Exception {
-        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource("/home/tuananh/Desktop/pcaTest.arff");
+        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource("./src/test/resources/pcaTest.arff");
         PCAProcesser pCAProcesser = new PCAProcesser();
         Instances data = dataSource.getDataSet();
         pCAProcesser.applyPCAtoInstances(data);

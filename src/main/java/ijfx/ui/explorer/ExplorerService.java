@@ -21,6 +21,7 @@ package ijfx.ui.explorer;
 
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.service.IjfxService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -52,4 +53,6 @@ public interface ExplorerService extends IjfxService{
     void open(Iconazable iconazable);
     
     void openSelection();
+    
+    public ArrayList<String> getMetaDataKey(List<? extends Explorable> items);
 }

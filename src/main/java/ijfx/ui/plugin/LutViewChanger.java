@@ -17,24 +17,41 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.cluster;
+package ijfx.ui.plugin;
 
-import ijfx.ui.explorer.ObjectWrapper;
 import java.util.List;
-import net.imagej.ImageJService;
-import weka.clusterers.Clusterer;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
+import net.imglib2.display.ColorTable;
+import net.imglib2.display.ColorTable8;
 
 /**
  *
  * @author Tuan anh TRINH
- * @param <S>
- * @param <T>
  */
-public interface ClustererService<S,T> extends ImageJService {
+public class LutViewChanger extends LUTView {
 
-    public List<List<S>> buildClusterer(List<T> objectWrappers , List<String> attributsString);
+    private List<Color> listColors;
 
-    public  List<List<S>> buildClusterer(List<T> listExplorable, String metadataKey);
-    
-    public void setClusterer(Clusterer clusterer);
+    public LutViewChanger(String name, ColorTable table, List<Color> colors) {
+        super(name, table);
+        listColors = colors;
+
+    }
+
+    public List<Color> getObservableListColors() {
+        return listColors;
+    }
+//    public LutViewChanger(List<Color> colors, byte[]  
+//        ... values) {
+//        super(values);
+//    }
+//    
+
+    public void setElements(List<Color> colors) {
+        listColors.clear();
+        listColors.addAll(colors);
+    }
 }

@@ -26,6 +26,7 @@ import ijfx.ui.explorer.event.DisplayedListChanged;
 import ijfx.ui.explorer.event.ExploredListChanged;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -41,7 +42,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
-import sun.util.logging.resources.logging;
 
 /**
  *
@@ -154,6 +154,21 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         explorable.selectedProperty().setValue(true);
     }
 
+    @Override
+    public ArrayList<String> getMetaDataKey(List<? extends Explorable> items) {
+        ArrayList<String> keyList = new ArrayList<String>();
+        items.forEach(plane -> {
+            plane.getMetaDataSet().keySet().forEach(key -> {
+
+                if (!keyList.contains(key)) {
+                    keyList.add(key);
+                }
+            });
+        });
+        Collections.sort(keyList);
+        return keyList;
+    }
+    
     private void listenToExplorableSelection(Explorable expl) {
         expl.selectedProperty().addListener(this::onExplorableSelected);
     }

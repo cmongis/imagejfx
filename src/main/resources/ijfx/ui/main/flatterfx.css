@@ -920,7 +920,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .list-cell:even{ /* <=== changed to even */
 
-    -fx-background-color: transparent;
+    -fx-background-color: white;
 }
 
 .list-cell:filled:hover{
@@ -1804,6 +1804,15 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 #overlayListView .list-cell:checked, #overlayListView .list-cell:armed, #overlayListView .list-cell:hover {
     -fx-background-color:red;
+}
+
+.list-view {
+    -fx-padding: 3px ;
+}
+
+.list-cell {
+    -fx-padding: 2px ;
+    -fx-background-insets: 0px, 2px ;
 }
 
 

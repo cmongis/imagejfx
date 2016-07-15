@@ -28,11 +28,12 @@ import javafx.scene.control.ToggleButton;
  */
 public class TogglePlot extends ToggleButton {
 
-    final static String DEFAULT_COLOR = "-fx-background-color: blue";
+    static String DEFAULT_COLOR = "-fx-background-color: blue";
     String colorBackGround;
 
     public TogglePlot() {
         super();
+        this.setStyle("-fx-background: black");
     }
 
     public TogglePlot(ObservableList<String> l) {
@@ -47,8 +48,9 @@ public class TogglePlot extends ToggleButton {
     
     public void bind(TogglePlot togglePlot){
         this.selectedProperty().addListener((obs, old, n) -> {
-            togglePlot.selectedProperty().set(n);
+            togglePlot.selectedProperty().setValue(n);
             this.setStyle(togglePlot.getStyle());
+            System.out.println("rer"+togglePlot.getStyle());
         });
     }
 
