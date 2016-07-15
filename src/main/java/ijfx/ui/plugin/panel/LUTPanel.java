@@ -70,10 +70,16 @@ import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
 import ijfx.ui.widgets.PopoverToggleButton;
+import java.text.NumberFormat;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.event.Event;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.util.converter.NumberStringConverter;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
@@ -157,14 +163,17 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     GridPane gridPane = new GridPane();
 
-    Label minLabel = new Label();
-    Label maxLabel = new Label();
+    TextField minTextField = new TextField();
+    TextField maxTextField = new TextField();
 
     public static final String LUT_COMBOBOX_CSS_ID = "lut-panel-lut-combobox";
 
     protected DoubleProperty minValue = new SimpleDoubleProperty(0);
     protected DoubleProperty maxValue = new SimpleDoubleProperty(255);
 
+    
+    
+    
     public LUTPanel() {
 
         logger.info("Loading FXML");
@@ -190,8 +199,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             gridPane.add(new Label("Min : "), 0, 0);
             gridPane.add(new Label("Max : "), 0, 1);
-            gridPane.add(minLabel, 1, 0);
-            gridPane.add(maxLabel, 1, 1);
+            gridPane.add(minTextField, 1, 0);
+            gridPane.add(maxTextField, 1, 1);
 
             gridPane.setHgap(15);
             gridPane.setVgap(15);
@@ -201,15 +210,14 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             rangeSlider.highValueChangingProperty().addListener(event -> onHighValueChanging());
             rangeSlider.lowValueChangingProperty().addListener(event -> onLowValueChanging());
-
-            minValue.addListener((obs, oldValue, newValue) -> {
-                minLabel.setText(newValue.intValue() + "");
-
-            });
-            maxValue.addListener((obs, oldValue, newValue) -> {
-                maxLabel.setText(newValue.intValue() + "");
-
-            });
+            
+            
+            NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
+            
+            Bindings.bindBidirectional(minTextField.textProperty(), minValue, converter);
+            Bindings.bindBidirectional(maxTextField.textProperty(),maxValue,converter);
+            minTextField.addEventHandler(KeyEvent.KEY_TYPED,this::updateModelRangeFromView);
+            maxTextField.addEventHandler(KeyEvent.KEY_TYPED,this::updateModelRangeFromView);
             // setting some insets... should be done int the FXML
             vboxp.setPadding(new Insets(15));
 
@@ -279,6 +287,11 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return this;
     }
 
+    
+    public void updateModelRangeFromView(Event event) {
+        updateModelRangeFromView();
+    }
+    
     public void updateModelRangeFromView() {
         //System.out.println(minValue);
         //System.out.println(maxValue);

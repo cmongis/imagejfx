@@ -56,7 +56,8 @@ public class HistoryStepCtrl extends BorderPane {
     @Parameter
     HistoryService editService;
 
-   
+   @Parameter
+   Context context;
 
     @FXML
     Label subtitleLabel;
@@ -148,9 +149,17 @@ public class HistoryStepCtrl extends BorderPane {
 
         //titleLabel.textProperty().unbind();
         //titleLabel.setText(step.getId());
-        
+        try {
         moduleConfigPane.configure(step);
-        
+        }
+        catch(NullPointerException e) {
+            try {
+                context.inject(step);
+            }
+            catch(Exception e2) {
+                
+            }
+        }
         //titleLabel.setText(step.getId());
         titleLabel.textProperty().unbind();
         titleLabel.textProperty().bind(moduleConfigPane.getEditableLabel().textProperty());

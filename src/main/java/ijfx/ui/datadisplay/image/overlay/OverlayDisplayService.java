@@ -33,7 +33,7 @@ import org.scijava.service.SciJavaService;
  * @author cyril
  */
 @Plugin(type = SciJavaService.class)
-public class OverlayDrawerService extends AbstractService implements IjfxService {
+public class OverlayDisplayService extends AbstractService implements IjfxService {
 
     //HashMap<Overlay, OverlayDrawer> drawerMap = new HashMap<>();
     //HashMap<Overlay, OverlayModifier> modifierMap = new HashMap<>();

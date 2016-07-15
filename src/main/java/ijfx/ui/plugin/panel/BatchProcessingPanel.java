@@ -100,8 +100,9 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
     @FXML
     private VBox resultVBox;
 
-   
-    
+    @FXML
+    private VBox workflowVBox;
+
     private ToggleButton toggleButton;
 
     @Parameter
@@ -125,22 +126,24 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
     @Parameter
     private ActivityService activityService;
 
-    WorkflowPanel workflowPanel;
+    protected WorkflowPanel workflowPanel;
 
-    SaveOptions saveOption;
+    protected SaveOptions saveOption;
 
-    MessageBox messageBox = new DefaultMessageBox();
+    protected MessageBox messageBox = new DefaultMessageBox();
 
-    IntegerProperty selectedItems = new SimpleIntegerProperty();
+    protected IntegerProperty selectedItems = new SimpleIntegerProperty();
 
-    Label label = new Label();
+    protected Label label = new Label();
 
-    PrettyStats stepCount = new PrettyStats("Steps");
-    PrettyStats selectedItemCount = new PrettyStats("Items selected.");
+    protected PrettyStats stepCount = new PrettyStats("Steps");
+    protected PrettyStats selectedItemCount = new PrettyStats("Items selected.");
 
-    VBox vBox = new VBox();
+    /**
+     * VBox
+     */
+    protected VBox countVBox = new VBox();
 
- 
     public BatchProcessingPanel() {
 
         try {
@@ -154,12 +157,10 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
             new TaskButtonBinding(startButton)
                     .setBaseIcon(FontAwesomeIcon.LIST_ALT)
                     .setTaskFactory(this::generateBatchTask);
-            saveOption = new DefaultSaveOptions();
 
-            paramVBox.getChildren().addAll(saveOption.getContent());
-            resultVBox.getChildren().add(0, messageBox.getContent());
-            // paramVBox.setSpacing(40);
+            paramVBox.setPrefHeight(20);
 
+            //paramVBox.setSpacing(40);
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, "Error when creating the BatchProcessingPanel", ex);
         }
@@ -168,34 +169,60 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
 
     @Override
     public UiPlugin init() {
+
+        // creating the workflow panel
         workflowPanel = new WorkflowPanel(context);
+        workflowPanel.setPrefHeight(400);
+
+        // creating the toggle button displaying the workflow panel
         toggleButton = new ToggleButton("Edit workflow");
         toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.GEARS));
         toggleButton.setMaxWidth(Double.POSITIVE_INFINITY);
+
+        // binding the toggle button to the workflow panel
         PopoverToggleButton.bind(toggleButton, workflowPanel, PopOver.ArrowLocation.RIGHT_CENTER);
 
+        // changing the title of the workflwo panel
         titleLabel.setText("Batch processing");
         titleLabel.getStyleClass().add("toolbar");
+
+        // creating a SaveOption element
+        saveOption = new DefaultSaveOptions();
+
+        // creating a message box
         messageBox.messageProperty().setValue(getMessage());
         messageBox.messageProperty().bind(Bindings.createObjectBinding(this::getMessage, saveOption.saveType(), workflowPanel.stepListProperty(), saveOption.folder(), saveOption.suffix(), selectedItems));
 
-        workflowPanel.setPrefHeight(400);
-
+        // hooking start and test button to workflow states
         startButton.disableProperty().bind(Bindings.createBooleanBinding(this::canStart, saveOption.saveType(), saveOption.folder(), workflowPanel.stepListProperty()).not());
         testButton.disableProperty().setValue(false);
         testButton.disableProperty().bind(Bindings.createBooleanBinding(() -> (getStepCount() > 0 && getItems().size() > 0), workflowPanel.stepListProperty()).not());
 
-        setCenter(vBox);
-
-        vBox.setSpacing(5);
-        vBox.getChildren().addAll(stepCount, selectedItemCount, toggleButton);
-
-      
-        
-        // the pretty counts
+        // setting the 
+        // binding the counters to the right property
         selectedItemCount.valueProperty().bind(selectedItems);
         stepCount.valueProperty().bind(Bindings.createIntegerBinding(() -> workflowPanel.stepListProperty().size(), workflowPanel.stepListProperty()));
+       
+        Platform.runLater(this::initUi);
+        
         return this;
+    }
+
+    public void initUi() {
+
+        // placing
+        // assembling the box containing the different count and the toggle button
+        countVBox.setSpacing(5);
+        countVBox.getChildren().addAll(stepCount, selectedItemCount, toggleButton);
+
+        // adding the box to the workflow panel
+        workflowVBox.getChildren().add(countVBox);
+
+        // adding the save option to the VBox containing the parameters
+        paramVBox.getChildren().addAll(saveOption.getContent());
+        
+        // adding the message box just before the buttons
+        resultVBox.getChildren().add(0, messageBox.getContent());
     }
 
     public Task<Boolean> generateBatchTask(TaskButtonBinding binding) {
@@ -339,7 +366,7 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
         } else if (saveOption.folder().getValue() == null) {
             return new DefaultMessage("If you don't select a\ndirectory, the created images\nwill be saved in their original\ndirectory.", MessageType.WARNING);
         } else {
-            return null; 
+            return null;
         }
     }
 
@@ -347,6 +374,5 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
     public void onExplorerSelectionChanged(ExplorerSelectionChangedEvent event) {
         Platform.runLater(() -> selectedItems.setValue(event.getObject().size()));
     }
-    
-    
+
 }

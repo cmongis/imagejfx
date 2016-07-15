@@ -20,6 +20,7 @@
 package ijfx.ui.plugin.panel;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.bridge.ImageJContainer;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.batch.BatchService;
@@ -41,6 +42,7 @@ import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorationMode;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
+import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.Localization;
 import java.io.File;
@@ -58,6 +60,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -69,10 +72,12 @@ import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import mongis.utils.TaskButtonBinding;
+import net.imagej.Dataset;
 import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.display.OverlayView;
 import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.overlay.Overlay;
 import net.imagej.plugins.commands.binary.Binarize;
@@ -142,10 +147,10 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     private FolderManagerService folderManagerService;
-    
+
     @Parameter
     EventService eventService;
-    
+
     @Parameter
     ActivityService activityService;
 
@@ -197,6 +202,15 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
                 .setBaseIcon(FontAwesomeIcon.CHECK_SQUARE)
                 .textBeforeTaskProperty().bind(Bindings.createStringBinding(this::getTestButtonText, isExplorer));
 
+        
+        Button button = new Button("Segment more");
+        button.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.COMPASS));
+        button.setOnAction(this::segmentMore);
+        button.setMaxWidth(Double.POSITIVE_INFINITY);
+        button.visibleProperty().bind(isExplorer.not());
+        
+        resultVBox.getChildren().add(2, button);
+        
         return this;
     }
 
@@ -272,11 +286,18 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         Overlay[] overlay = BinaryToOverlay.transform(context, input.getDataset(), false);
         // giving a random color to each overlay
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
+        
+       inputDisplay
+                .stream()
+                .filter(o -> o instanceof OverlayView)
+                .map(o -> (OverlayView) o)
+                .map(o->o.getData())
+                .forEach(o->overlayService.removeOverlay(inputDisplay, o));
 
         // deleting the overlay owned previously by the input
         inputDisplay.addAll(Stream.of(overlay).map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
         inputDisplay.update();
-        Stream.of(overlay).map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
+        Stream.of(overlay).map(o -> new OverlayCreatedEvent(o)).forEach(eventService::publish);
         //overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
         // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();
@@ -352,7 +373,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
                     .run((progress, input) -> {
                         boolean result = batchService.applyWorkflow(progress, input, workflow);
                         if (result == true) {
-                            
+
                             uiService.showDialog(String.format("%d objects where segmented", objectFound.size()), "Segmentation over");
                             folderManagerService.getCurrentFolder().addObjects(objectFound);
                             folderManagerService.setExplorationMode(ExplorationMode.OBJECT);
@@ -401,6 +422,32 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             uiContextService.enter("imagej");
         }
         uiContextService.update();
+    }
+    
+    
+   
+    public void segmentMore(ActionEvent event) {
+        
+        ImageDisplay activeImageDisplay = imageDisplayService.getActiveImageDisplay();
+        
+        Dataset activeDataset = imageDisplayService.getActiveDataset(activeImageDisplay);
+        
+        String source = activeDataset.getSource();
+        
+        Folder folderContainingFile = folderManagerService.getFolderContainingFile(new File(source));
+        
+        if(folderContainingFile == null) {
+            folderContainingFile  = folderManagerService.addFolder(new File(source).getParentFile());    
+        }
+        
+        folderManagerService.setCurrentFolder(folderContainingFile);
+        
+        folderManagerService.setExplorationMode(ExplorationMode.FILE);
+        
+        activityService.openByType(ExplorerActivity.class);
+        
+        
+        
     }
 
 }
