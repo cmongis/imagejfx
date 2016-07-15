@@ -19,16 +19,14 @@
  */
 package ijfx.core.project;
 
-import ijfx.core.imagedb.MetaDataExtractionService;
+import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
-import ijfx.service.thumb.ThumbService;
-import io.scif.MetadataLevel;
-import io.scif.config.SCIFIOConfig;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
+import junit.framework.Assert;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imglib2.Cursor;
@@ -36,6 +34,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 import org.scijava.plugin.Parameter;
 
@@ -57,61 +56,72 @@ public class PlaneReadingTest extends BaseImageJTest {
     @Parameter
     ImagePlaneService imagePlaneService;
 
-       @Override
+    @Parameter
+    IjfxStatisticService statsService;
+    
+    @Override
     protected Class[] getService() {
-        return new Class[]{TimerService.class,DatasetIOService.class,MetaDataExtractionService.class,ImagePlaneService.class,ThumbService.class};
+        return null;
+    }
+
+    //String file = "/Users/cyril/test_img/metadata/WellA06_Point0002_Seq0003.tif";
+    //String file = "/Users/cyril/test_img/metadata/YDK60-1-1_R3D.dv";
+    String file = "./src/test/resources/multidim.tif";
+    long[] planePosition = new long[] {2,2,1};
+    
+    @Test
+    public void SinglePlaneReading() throws IOException {
+        
+        //String file = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif";
+        
+        //String file = "/Users/cyril/test_img/metadata/WellA06_Point0002_Seq0003.tif";
+        usedMemory("before dataset reading");
+        Dataset dataset = imagePlaneService.extractPlane(new File(file), planePosition);
+        usedMemory("after dataset reading");
+        Assert.assertEquals(2,dataset.numDimensions());
+        
+        SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
+        System.out.println(stats);
+        Assert.assertTrue(stats.getMean() > 0);
+        
+        
     }
     
-    public void tiffPlaneReading() throws IOException {
+    
+    public void planeReadingBenchMark() throws IOException {
 
-        
-
-        String file = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif";
+        //String file = "/Users/cyril/test_img/jasmin/Sec63cherry GFPPho8truncHDEL/Sec63cherry GFPPho8truncHDEL 3-4x 1 stack.tif";
         //String file = "./src/test/resources/multidim.tif";
         System.out.println("File found : " + new File(file).exists());
         Timer t = timerService.getTimer("plane reading");
 
-        for (int i = 0; i != 100; i++) {
-            
+        for (int i = 0; i != 20; i++) {
+
             resetMem();
             System.gc();
-           
-            usedMemory("after gc");
-            
-            //creatig the config
-            SCIFIOConfig config = new SCIFIOConfig();
-            config.imgOpenerSetComputeMinMax(false);
-            config.imgOpenerSetOpenAllImages(false);
-            config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL,SCIFIOConfig.ImgMode.PLANAR);
-            config.parserSetLevel(MetadataLevel.ALL);
 
+            usedMemory("after gc");
+
+            //creatig the config
             // starting timer
             t.start();
-            
-            
+
             // dataset representing the opened image
-            Dataset virtual = datasetIOService.open(file, config);
-            
-            
-            
+            Dataset virtual = imagePlaneService.openVirtualDataset(new File(file));
+
             usedMemory("after opening the dataset");
             t.elapsed("virtual dataset opening");
 
             // dimension of the extracted plane
-            long[] copyDims = new long[]{virtual.dimension(0), virtual.dimension(1)};
-            
-            
+            //long[] copyDims = new long[]{virtual.dimension(0), virtual.dimension(1)};
+
             // creating an empty dataset for the copied plane
             Dataset copy = imagePlaneService.createEmptyPlaneDataset(virtual);
-            
-          
-            
+
             usedMemory("after empty dataset creation");
-            
-            copy(virtual, copy, new long[]{1, 2});
-            
-       
-            
+
+            copy(virtual, copy, planePosition);
+
             usedMemory("after copy");
             t.elapsed("plane copy creation");
 
@@ -122,20 +132,19 @@ public class PlaneReadingTest extends BaseImageJTest {
     }
 
     static long last = 0;
-    
-    
+
     public void resetMem() {
         last = 0;
     }
-    
+
     public void usedMemory(String text) {
         Runtime runtime = Runtime.getRuntime();
         long mem = (runtime.totalMemory() - runtime.freeMemory()) / 1000 / 1000;
-        long diff = mem-last;
-        
-        System.out.println(String.format("INFO: [memory] Used memory %s : %dM (+%dM)",text,mem,diff));
+        long diff = mem - last;
+
+        System.out.println(String.format("INFO: [memory] Used memory %s : %dM (+%dM)", text, mem, diff));
         last = mem;
-        
+
     }
 
     public <T extends RealType<T>> void copy(Dataset source, Dataset target, long[] position) {
@@ -150,7 +159,6 @@ public class PlaneReadingTest extends BaseImageJTest {
 
         cursor.reset();
 
-       
         RandomAccess<T> randomAccess = (RandomAccess<T>) target.randomAccess();
         while (cursor.hasNext()) {
             cursor.fwd();
