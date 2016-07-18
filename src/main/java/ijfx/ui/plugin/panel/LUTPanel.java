@@ -335,7 +335,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     @EventHandler
     public void handleEvent(DisplayActivatedEvent event) {
-
+        if(event.getDisplay() instanceof ImageDisplay == false) return;
         updateViewRangeFromModel();
         updateLabel();
         mergedViewToggleButton.selectedProperty().setValue(getCurrentDatasetView().getColorMode() == ColorMode.COMPOSITE);
