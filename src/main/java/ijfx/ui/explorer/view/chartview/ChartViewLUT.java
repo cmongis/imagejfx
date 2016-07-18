@@ -134,9 +134,12 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     @Override
     public void setItem(List<? extends Explorable> items) {
         currentItems = items;
-//        lutComboBox.getItems().addAll(FxImageService.getLUTViewMap().values());
         List<String> metadatas = explorerService.getMetaDataKey(currentItems);
 
+        
+        /**
+         * Try to keep the same metadatas 
+         */
         comboBoxList.stream().forEach(c -> {
             String s = c.getSelectionModel().getSelectedItem();
             c.getItems().clear();
@@ -220,6 +223,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
                     final int blue = value & 0xff;
                     TogglePlot t = (TogglePlot) e.getNode();
                     t.setStyle("-fx-background-color: rgb(" + red + "," + green + "," + blue + ")");
+                    t.setOriginStyle(t.getStyle());
                     System.out.println(t.getStyle());
 
                 });
@@ -239,11 +243,11 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     public void newLUT() {
         if (lutViewChanger == null) {
             lutViewChanger = new LUTCreatorDialog(new ArrayList<>()).showAndWait().orElseThrow(IllegalArgumentException::new);
-            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()));
+            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()+1));
 
         } else {
             lutViewChanger = new LUTCreatorDialog(lutViewChanger.getObservableListColors()).showAndWait().orElseThrow(IllegalArgumentException::new);
-            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()));
+            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()+1));
 
         }
         applyColorTable(lutViewChanger.getColorTable());

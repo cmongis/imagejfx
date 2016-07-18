@@ -29,7 +29,8 @@ import javafx.scene.control.ToggleButton;
 public class TogglePlot extends ToggleButton {
 
     static String DEFAULT_COLOR = "-fx-background-color: blue";
-    String colorBackGround;
+    String originStyle = "";
+
 
     public TogglePlot() {
         super();
@@ -54,4 +55,11 @@ public class TogglePlot extends ToggleButton {
         });
     }
 
+    public String getOriginStyle() {
+        return originStyle;
+    }
+
+    public void setOriginStyle(String originStyle) {
+        this.originStyle = originStyle;
+    }
 }

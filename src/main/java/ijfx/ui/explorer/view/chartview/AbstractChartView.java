@@ -1,3 +1,4 @@
+
 /*
     This file is part of ImageJ FX.
 
@@ -27,6 +28,7 @@ import ijfx.ui.utils.FontAwesomeIconUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javafx.embed.swing.SwingFXUtils;
@@ -72,7 +74,6 @@ public abstract class AbstractChartView extends AnchorPane {
     protected void addDataToChart(List<? extends Explorable> list, List<String> metadataList) {
 
         XYChart.Series series = new XYChart.Series();
-//        series.setNode(new Button("e"));
         List<XYChart.Data> listExplorers = new ArrayList<>();
         list.stream()
                 .map(e -> {
@@ -83,8 +84,7 @@ public abstract class AbstractChartView extends AnchorPane {
                 .forEach(e -> listExplorers.add(e));
         series.getData().addAll(listExplorers);
         scatterChart.getData().add(series);
-        System.out.println("ijfx.ui.explorer.view.AbstractChartView.addDataToChart()");
-        series.setName("Series n° "+scatterChart.getData().size()+1);
+        series.setName("Series n° " + scatterChart.getData().size());
 
     }
 
@@ -93,13 +93,14 @@ public abstract class AbstractChartView extends AnchorPane {
 
             Node node = scatterChart.lookup(".series" + scatterChart.getData().indexOf(series));
             Set<Node> legendItems = scatterChart.lookupAll("Label.chart-legend-item");
-
             for (Node legend : legendItems) {
                 Label labelLegend = (Label) legend;
+//                labelLegend.setStyle("-fx-background-color: blue");
                 if (node.getStyleClass().get(1).equals(labelLegend.getGraphic().getStyleClass().get(2))) {
                     TogglePlot togglePlot = new TogglePlot();
                     togglePlot.getStyleClass().clear();
                     togglePlot.getStyleClass().addAll(labelLegend.getGraphic().getStyleClass());
+                    System.err.println(Arrays.toString(togglePlot.getStyleClass().toArray()));
                     labelLegend.setGraphic(togglePlot);
                     series.getData().stream().forEach(e -> {
                         TogglePlot togglePlotData = (TogglePlot) ((XYChart.Data) e).getNode();
@@ -126,7 +127,7 @@ public abstract class AbstractChartView extends AnchorPane {
 
     protected void setGraphicSnapshot() {
         FontAwesomeIconView fontAwesomeIconView = new FontAwesomeIconView(FontAwesomeIcon.CAMERA);
-        Image image = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, 30);
+        Image image = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, 25);
         ImageView imageView = new ImageView(image);
         snapshotButton.setGraphic(imageView);
     }
