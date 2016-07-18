@@ -26,6 +26,7 @@ import ijfx.service.ui.CommandRunner;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
 import ijfx.ui.datadisplay.image.ImageWindow;
+import ijfx.ui.datadisplay.table.TableDisplayWindow;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.datadisplay.table.TableWindow;
 import ijfx.ui.datadisplay.text.TextWindow;
@@ -219,9 +220,15 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
             new CommandRunner(getContext()).run("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay,"channelDependant",true);
             
         } else if (dspl instanceof TableDisplay) {
+            
+            TableDisplayWindow window = new TableDisplayWindow(getContext());
+            
+            
+            
             Platform.runLater(() -> {
-
-                ImageWindowContainer.getInstance().getChildren().add(new TableWindow((TableDisplay) dspl));
+                
+                ImageWindowContainer.getInstance().getChildren().add(window);
+                window.show((TableDisplay)dspl);
             });
 
         } 
