@@ -22,16 +22,12 @@ package ijfx.ui.plugin;
 import ijfx.ui.explorer.view.GridIconView;
 import ijfx.ui.explorer.view.chartview.ColorGenerator;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -76,14 +72,13 @@ public class LUTCreator extends BorderPane {
 //    TextField colorNumberField;
     List<Color> colors;
 
-    List<ObjectProperty<Color>> generatedColors;
+    List<Color> generatedColors;
 
     public LUTCreator(List<Color> colors) {
         try {
             FXUtilities.injectFXML(this, "/ijfx/ui/plugin/LUTCreator.fxml");
             listViewSamples.setItems(FXCollections.observableArrayList());
 
-            generatedColors = new ArrayList<>();
             listViewSamples.getItems().addListener((Observable e) -> updateResults());
             choiceCheckBox.selectedProperty().addListener((Observable e) -> updateResults());
             colors.stream()
@@ -132,20 +127,18 @@ public class LUTCreator extends BorderPane {
 
     private void updateResults() {
         flowPane.getChildren().clear();
-        generatedColors.clear();
         colors = listViewSamples.getItems()
                 .stream()
                 .map(e -> (Color) e.getFill())
                 .collect(Collectors.toList());
         if (choiceCheckBox.isSelected()) {
-            ColorGenerator.generateInterpolatedColor(colors, 256).stream().forEach(e -> generatedColors.add(new SimpleObjectProperty<>(e)));
+            generatedColors = ColorGenerator.generateInterpolatedColor(colors, 256);
         } else {
-            ColorGenerator.generateColor(colors, 256).stream().forEach(e -> generatedColors.add(new SimpleObjectProperty<>(e)));
+            generatedColors = ColorGenerator.generateColor(colors, 256);
         }
         generatedColors.stream()
                 .forEach(e -> {
-                    Shape shape = new Rectangle(SIZE_SMALL_RECTANGLE, SIZE_SMALL_RECTANGLE, e.get());
-                    shape.fillProperty().bind(e);
+                    Shape shape = new Rectangle(SIZE_SMALL_RECTANGLE, SIZE_SMALL_RECTANGLE, e);
                     shape.setOnMouseClicked((f) -> {
                         changeColor(shape);
                     });
@@ -162,10 +155,9 @@ public class LUTCreator extends BorderPane {
         customColorDialog.setCurrentColor((Color) shape.getFill());
         customColorDialog.setCustomColor((Color) shape.getFill());
         shape.fillProperty().bind(customColorDialog.customColorProperty());
-//        shape.fillProperty().addListener(e -> {
-//            System.out.println(generatedColors.indexOf(shape));
-//            generatedColors.set(generatedColors.indexOf(shape.getFill()), (Color) shape.getFill());
-//                });
+        shape.fillProperty().addListener(e -> {
+            generatedColors.set(flowPane.getChildren().indexOf(shape), (Color) shape.getFill());
+                });
 
         long estimatedTime = System.currentTimeMillis() - startTime;
 
@@ -177,7 +169,7 @@ public class LUTCreator extends BorderPane {
     }
 
     public List<Color> getGeneratedColors() {
-        return generatedColors.stream().map(e -> e.get()).collect(Collectors.toList());
+        return generatedColors;
     }
 
     public static ColorTable colorsToColorTable(List<Color> colors) {
