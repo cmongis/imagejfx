@@ -46,7 +46,11 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
 
     @Parameter
     DisplayService displayService;
-    
+
+    static String TITLE_CLASS_NAME = "ijfx-window-titlebar";
+
+    static String WINDOW_CLASS_NAME = "ijfx-window";
+
     public AbstractDisplayWindow(Context context) {
         context.inject(this);
         setContentPane(init());
@@ -63,7 +67,10 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         getRightIcons().add(closeIcon);
 
         setOnCloseAction(this::onWindowClosed);
-        
+
+        getStyleClass().add(WINDOW_CLASS_NAME);
+        setTitleBarStyleClass(TITLE_CLASS_NAME);
+
     }
 
     abstract protected void display(T display);
@@ -74,7 +81,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         return display;
     }
 
-    public void show(T display) { 
+    public void show(T display) {
         this.display = display;
         display(display);
     }
@@ -87,7 +94,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         eventService.publishLater(new DisplayDeletedEvent(getDisplay()));
     }
 
-    void putInFront(Event event) {        
+    void putInFront(Event event) {
         displayService.setActiveDisplay(getDisplay());
 
     }
