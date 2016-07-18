@@ -19,11 +19,18 @@
  */
 package ijfx.core.listenableSystem;
 
+import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataKeyPrioritizer;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.ui.explorer.Explorable;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  *
@@ -47,4 +54,46 @@ public class MetaDataSetUtils {
         }
         return result;
     }
+     
+     public String exportToCSV(List<MetaDataSet> mList, String separator,boolean includeHheader,String[] priority) {
+         
+         // getting all the possible keys of the list of metadataset
+         Collection<String> keys = getAllPossibleKeys(mList);
+         
+         if(priority == null) {
+             priority = new String[0];
+         }
+         
+         
+         // getting ordering the keys by priority
+         List<String> orderedKeys = keys
+                 .stream()
+                 .sorted(
+                         new MetaDataKeyPrioritizer(Stream.of(priority).collect(Collectors.toSet())))
+                 .collect(Collectors.toList());
+         
+         //
+         return IntStream
+                 .range(0,mList.size())
+                 .parallel()
+                 .mapToObj(i->{
+                     
+                     // for each key, we get the associated string value
+                     return orderedKeys
+                             .stream()
+                             .map(key->mList.get(i).getOrDefault(key, MetaData.NULL)
+                                     .getStringValue())
+                             .collect(Collectors.toList());
+                     
+                 })
+                 .map(valueList->valueList.stream().collect(Collectors.joining(separator)))
+                 .collect(Collectors.joining("\n"));
+         
+         
+         
+         
+     }
+     
+     
+     
 }
