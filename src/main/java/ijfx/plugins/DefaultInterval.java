@@ -55,7 +55,7 @@ public class DefaultInterval implements LongInterval{
    public DefaultInterval(long lowValue, long highValue, long minValue, long maxValue) {
        this(lowValue,highValue);
        min.setValue(minValue);
-       max.setValue(maxValue);
+       max.setValue(maxValue);  
    }
    
    
