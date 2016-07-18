@@ -264,7 +264,7 @@ public class ImageWindow extends Window {
 
         setOnCloseAction(this::onWindowClosed);
 
-        setPrefSize(300, 300);
+        setPrefSize(400, 400);
 
         //putting an unused hbox...
         borderPane.setBottom(bottomHBox);
