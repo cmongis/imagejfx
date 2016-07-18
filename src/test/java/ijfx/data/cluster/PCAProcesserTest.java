@@ -20,8 +20,8 @@
 package ijfx.data.cluster;
 
 
-import ijfx.core.project.BaseImageJTest;
 import ijfx.service.cluster.PCAProcesser;
+import org.junit.Test;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 
@@ -31,7 +31,7 @@ import weka.core.converters.ConverterUtils;
  */
 public class PCAProcesserTest  {
 
-    @Test
+    
     public void applyPCATest() throws Exception {
         ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource("./src/test/resources/pcaTest.arff");
         PCAProcesser pCAProcesser = new PCAProcesser();
