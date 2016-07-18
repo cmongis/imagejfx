@@ -249,7 +249,7 @@
 }
 .button.larger {
     -fx-padding:9px;
-   
+
 }
 .toggle-group {
 
@@ -477,7 +477,7 @@
     -fx-padding:0;
     -fx-effect:0;
     -fx-
-     -fx-disable:0;
+    -fx-disable:0;
 }
 #open-button{
     -fx-max-width:20px;
@@ -485,7 +485,7 @@
 .combo-box-base .list-view {
     -fx-background:-dark;
     -fx-background-color:-dark;
-   
+
 }
 
 .menu-bar {
@@ -955,7 +955,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-text-fill:#383f50;
     -fx-text-alignment:left!important;
     -fx-alignment:left;
-    
+
 }
 .toggle-selection-list .toggle-button:hover{
     -fx-translate-x:0;
@@ -2032,4 +2032,13 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .message-box.label {
     -fx-wrap-text:true;
 
+}
+
+/*
+    
+    Chart
+
+*/
+Label.chart-legend-item{
+    -fx-text-fill:-flatter-blue;   
 }
