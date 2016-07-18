@@ -97,7 +97,7 @@ public class PCAChartView extends AbstractChartView implements ExplorerView {
 
     @Override
     public Node getIcon() {
-        return new FontAwesomeIconView(FontAwesomeIcon.BED);
+        return new FontAwesomeIconView(FontAwesomeIcon.CALCULATOR);
     }
 
     @Override

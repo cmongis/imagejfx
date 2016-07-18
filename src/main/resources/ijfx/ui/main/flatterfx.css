@@ -2041,4 +2041,5 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 */
 Label.chart-legend-item{
     -fx-text-fill:-flatter-blue;   
+    
 }

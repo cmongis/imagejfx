@@ -77,7 +77,6 @@ public abstract class AbstractChartView extends AnchorPane {
         List<XYChart.Data> listExplorers = new ArrayList<>();
         list.stream()
                 .map(e -> {
-                    System.out.println(metadataList.get(0));
                     PlotExplorer plotExplorer = new DefaultPlotExplorer(e, metadataList.toArray(new String[0]), explorerService);
                     return plotExplorer.getData();
                 })
@@ -95,12 +94,10 @@ public abstract class AbstractChartView extends AnchorPane {
             Set<Node> legendItems = scatterChart.lookupAll("Label.chart-legend-item");
             for (Node legend : legendItems) {
                 Label labelLegend = (Label) legend;
-//                labelLegend.setStyle("-fx-background-color: blue");
                 if (node.getStyleClass().get(1).equals(labelLegend.getGraphic().getStyleClass().get(2))) {
                     TogglePlot togglePlot = new TogglePlot();
                     togglePlot.getStyleClass().clear();
                     togglePlot.getStyleClass().addAll(labelLegend.getGraphic().getStyleClass());
-                    System.err.println(Arrays.toString(togglePlot.getStyleClass().toArray()));
                     labelLegend.setGraphic(togglePlot);
                     series.getData().stream().forEach(e -> {
                         TogglePlot togglePlotData = (TogglePlot) ((XYChart.Data) e).getNode();
@@ -121,7 +118,6 @@ public abstract class AbstractChartView extends AnchorPane {
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter("Image Files", "*.png"));
         File selectedFile = fileChooser.showSaveDialog(null);
-
         ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", selectedFile);
     }
 

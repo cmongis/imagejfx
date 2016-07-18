@@ -106,7 +106,7 @@ public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Override
     public Node getIcon() {
-        return new FontAwesomeIconView(FontAwesomeIcon.MUSIC);
+        return new FontAwesomeIconView(FontAwesomeIcon.FIGHTER_JET);
     }
 
     @Override

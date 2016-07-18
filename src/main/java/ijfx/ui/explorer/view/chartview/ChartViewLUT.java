@@ -128,7 +128,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     @Override
     public Node getIcon() {
-        return new FontAwesomeIconView(FontAwesomeIcon.MUSIC);
+        return new FontAwesomeIconView(FontAwesomeIcon.SIGNAL);
     }
 
     @Override
