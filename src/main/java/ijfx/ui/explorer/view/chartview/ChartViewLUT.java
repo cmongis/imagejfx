@@ -106,7 +106,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
         metadatas = new String[3];
 
         try {
-            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/ChartViewLUT.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/chartview/ChartViewLUT.fxml");
         } catch (IOException ex) {
             Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -260,5 +260,11 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     public LUTView getLutView() {
         return lutViewChanger;
+    }
+
+    @Override
+    @FXML
+    protected void help() {
+        hintService.displayHints(this.getClass(), true);
     }
 }

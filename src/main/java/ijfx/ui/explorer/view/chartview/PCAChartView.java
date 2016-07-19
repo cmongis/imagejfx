@@ -55,72 +55,72 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = ExplorerView.class)
 public class PCAChartView extends AbstractChartView implements ExplorerView {
-
+    
     @FXML
     ListView<String> listView;
-
+    
     PCAProcesser pCAProcesser;
-
+    
     List<String> metadataList;
     @Parameter
     ExplorerService explorerService;
-
+    
     @Parameter
     LoadingScreenService loadingScreenService;
-
+    
     @Parameter
     ClustererService clustererService;
-
+    
     public PCAChartView() {
         super();
         metadataList = new ArrayList<>();
         pCAProcesser = new PCAProcesser();
         try {
-            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/PCAChartView.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/chartview/PCAChartView.fxml");
         } catch (IOException ex) {
             Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
-
+            
         }
         scatterChart.setTitle("PCAChartView");
         scatterChart.getXAxis().labelProperty().bind(pCAProcesser.xAxeProperty());
         scatterChart.getYAxis().labelProperty().bind(pCAProcesser.yAxeProperty());
-
+        
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.getSelectionModel().getSelectedItems().addListener(this::listViewListener);
         setGraphicSnapshot();
     }
-
+    
     @Override
     public Node getNode() {
         return this;
     }
-
+    
     @Override
     public Node getIcon() {
         return new FontAwesomeIconView(FontAwesomeIcon.CALCULATOR);
     }
-
+    
     @Override
     public void setItem(List<? extends Explorable> items) {
         currentItems = items;
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+        
         String s = listView.getSelectionModel().getSelectedItem();
         listView.getItems().clear();
         listView.setItems(FXCollections.observableArrayList(explorerService.getMetaDataKey(items)));
         if (metadataList.contains(s)) {
             listView.getSelectionModel().select(s);
         }
-
+        
     }
-
+    
     @Override
     public List<? extends Explorable> getSelectedItems() {
         return currentItems.stream()
                 .filter(e -> e.selectedProperty().get())
                 .collect(Collectors.toList());
     }
-
+    
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
         currentItems
@@ -154,7 +154,7 @@ public class PCAChartView extends AbstractChartView implements ExplorerView {
                 .collect(Collectors.toList());
         if (metadataList.size() > 1) {
             scatterChart.getData().clear();
-
+            
             new CallbackTask<Void, Void>()
                     .then((f) -> {
                         try {
@@ -169,16 +169,22 @@ public class PCAChartView extends AbstractChartView implements ExplorerView {
                     })
                     .submit(loadingScreenService)
                     .start();
-
+            
         }
     }
-
+    
     public void listViewListener(ListChangeListener.Change<? extends String> change) {
 //        listView.getSelectionModel().getSelectedItems().stream().forEach(e -> System.out.println(e));
         metadataList.clear();
         metadataList.addAll(change.getList());
         computeItems();
-
+        
     }
-
+    
+    @Override
+    @FXML
+    protected void help() {
+        hintService.displayHints(this.getClass(), true);
+    }
+    
 }

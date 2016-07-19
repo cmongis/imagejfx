@@ -36,8 +36,8 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type=UiPlugin.class,priority=1.0)
-@UiConfiguration(context = "segment segmentation",id="explain-me-button",localization = Localization.TOP_RIGHT)
-public class ExplainMeButton extends AbstractContextButton {
+@UiConfiguration(context = "segment segmentation",id="explain-me-segmentation-button",localization = Localization.TOP_RIGHT)
+public class ExplainMeSegmentationButton extends AbstractContextButton {
 
     
     @Parameter
@@ -46,7 +46,7 @@ public class ExplainMeButton extends AbstractContextButton {
     @Parameter
     ActivityService activityService;
     
-    public ExplainMeButton() {
+    public ExplainMeSegmentationButton() {
         super("Explain me", FontAwesomeIcon.INFO_CIRCLE);
         //getButton().setText("Explain me");
         getButton().getStyleClass().add("success");

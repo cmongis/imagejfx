@@ -56,7 +56,7 @@ import org.controlsfx.control.GridView;
 public class LUTCreator extends BorderPane {
 
     public final static int SIZE_BIG_RECTANGLE = 100;
-    public final static int SIZE_SMALL_RECTANGLE = 25;
+    public final static int SIZE_SMALL_RECTANGLE = 20;
 
     @FXML
     ListView<Shape> listViewSamples;
@@ -104,7 +104,7 @@ public class LUTCreator extends BorderPane {
     public void addActionShape(Shape shape) {
         shape.fillProperty().addListener(e -> updateResults());
         shape.setOnMouseClicked(e -> {
-            if (e.getButton().equals(MouseButton.SECONDARY)) {
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
                 changeColor(shape);
                 Runnable runnable = () -> updateResults();
                 new Thread(new Task<Void>() {
@@ -114,7 +114,7 @@ public class LUTCreator extends BorderPane {
                         return null;
                     }
                 }).start();
-            } else if (e.getButton().equals(MouseButton.MIDDLE)) {
+            } else if (e.getButton().equals(MouseButton.SECONDARY)) {
                 listViewSamples.getItems().remove(shape);
             }
         });

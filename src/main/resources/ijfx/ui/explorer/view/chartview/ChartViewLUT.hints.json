@@ -1,0 +1,11 @@
+
+
+[
+{ "text":"Create a new LUT",
+"target":"#newLUTButton"
+},
+   {
+        "text":"Add a color to each point depending on the third parameter value and the custom LUT"
+        ,"target":"#scatterChart"
+    }
+]

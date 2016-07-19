@@ -25,18 +25,16 @@
             </ScatterChart>
          </center>
          <left>
-            <VBox BorderPane.alignment="CENTER">
-               <children>
-                  <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" />
-                  <HBox alignment="TOP_CENTER" spacing="10.0">
-                     <children>
-                        <Button fx:id="snapshotButton" mnemonicParsing="false" onAction="#snapshot" />
-                        <Button fx:id="explainMe" mnemonicParsing="false" onMouseClicked="#help" text="Explain Me" />
-                     </children>
-                  </HBox>
-               </children>
-            </VBox>
+            <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
          </left>
+         <bottom>
+            <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="snapshotButton" mnemonicParsing="false" onAction="#snapshot" />
+                  <Button fx:id="explainMe" mnemonicParsing="false" onMouseClicked="#help" text="Explain Me" />
+               </children>
+            </HBox>
+         </bottom>
       </BorderPane>
    </children>
 </fx:root>

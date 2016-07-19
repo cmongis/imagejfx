@@ -23,6 +23,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.ExplorableClustererService;
+import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
@@ -30,6 +31,8 @@ import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.view.FilterView;
 import ijfx.ui.explorer.view.GridIconView;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,9 +61,11 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = ExplorerView.class)
-
 public class ChartView extends AbstractChartView implements ExplorerView {
 
+    @Parameter
+    HintService hintService;
+    
     @Parameter
     ExplorableClustererService explorableClustererService;
 
@@ -85,14 +90,14 @@ public class ChartView extends AbstractChartView implements ExplorerView {
         comboBoxList = new ArrayList<>();
         metadatas = new String[2];
         try {
-            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/ChartView.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/chartview/ChartView.fxml");
         } catch (IOException ex) {
             Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
         }
         comboBoxList.add(xComboBox);
         comboBoxList.add(yComboBox);
 
-        scatterChart.setTitle("ChartView");
+        scatterChart.setTitle("ChartView: XMeans Clustering");
         scatterChart.getXAxis().labelProperty().bind(xComboBox.getSelectionModel().selectedItemProperty());
         scatterChart.getYAxis().labelProperty().bind(yComboBox.getSelectionModel().selectedItemProperty());
         initComboBox();
@@ -106,7 +111,7 @@ public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Override
     public Node getIcon() {
-        return new FontAwesomeIconView(FontAwesomeIcon.FIGHTER_JET);
+        return new FontAwesomeIconView(FontAwesomeIcon.TIMES);
     }
 
     @Override
@@ -183,6 +188,12 @@ public class ChartView extends AbstractChartView implements ExplorerView {
     public void deselecItems() {
         currentItems.stream()
                 .forEach(e -> e.selectedProperty().setValue(false));
+    }
+    
+    @Override
+    @FXML
+    protected void help(){
+        hintService.displayHints(ChartView.class, true);
     }
 
 }

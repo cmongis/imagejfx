@@ -22,6 +22,7 @@ package ijfx.ui.explorer.view.chartview;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.service.ui.HintService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.utils.FontAwesomeIconUtils;
@@ -56,12 +57,18 @@ public abstract class AbstractChartView extends AnchorPane {
 
     @Parameter
     ExplorerService explorerService;
+    
+    @Parameter
+    HintService hintService;
 
     @FXML
     Button snapshotButton;
+    
     @FXML
     protected ScatterChart<Number, Number> scatterChart;
 
+    @FXML
+    protected Button explainMe;
     protected List<? extends Explorable> currentItems;
 
     public AbstractChartView() {
@@ -127,5 +134,8 @@ public abstract class AbstractChartView extends AnchorPane {
         ImageView imageView = new ImageView(image);
         snapshotButton.setGraphic(imageView);
     }
+    
+//    @FXML
+    protected abstract void help();
 
 }

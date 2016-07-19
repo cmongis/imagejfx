@@ -9,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="800.0" minWidth="800.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="800.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <center>
         <VBox fx:id="vBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
             <children>
@@ -17,7 +17,7 @@
                <padding>
                   <Insets right="10.0" />
                </padding></ListView>
-            <FlowPane fx:id="flowPane" alignment="CENTER_LEFT" hgap="10.0" prefHeight="200.0" prefWidth="200.0" rowValignment="TOP" vgap="10.0" />
+            <FlowPane fx:id="flowPane" alignment="CENTER_LEFT" hgap="5.0" prefHeight="200.0" prefWidth="200.0" rowValignment="TOP" vgap="5.0" />
             </children>
         </VBox>
     </center>
