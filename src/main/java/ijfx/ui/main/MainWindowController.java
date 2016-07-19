@@ -91,6 +91,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
+import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
 import javafx.scene.Scene;
@@ -773,7 +774,7 @@ public class MainWindowController extends AnchorPane {
 
         addSideMenuButton("Explore", FontAwesomeIcon.COMPASS, ExplorerActivity.class);
 
-        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class);
+        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class).setOnAction(e -> uiContextService.enter("explore"));
         addSideMenuButton("Segment", FontAwesomeIcon.EYE, null).setOnAction(event -> {
             uiContextService.enter("segment", "segmentation");
             uiContextService.update();
@@ -788,6 +789,7 @@ public class MainWindowController extends AnchorPane {
                 hideSideMenu();
             }
         });
+        addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, CorrectionActivity.class);
 
         /*
         
