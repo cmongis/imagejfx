@@ -19,16 +19,56 @@
  */
 package ijfx.ui.correction;
 
+import ijfx.core.imagedb.ImageLoaderService;
 import io.datafx.controller.ViewController;
-
+import java.io.File;
+import java.util.List;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import static net.imglib2.ops.types.ConnectedType.value;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-@ViewController(value = "FlatfieldWorkflow.fxml", title = "Wizard: Flatfield")
-public class FlatfieldWorkflow extends AbstractCorrectionActivity{
-
-
+@ViewController(value = "FlatfieldWorkflow.fxml")
+public class FlatfieldWorkflow extends AbstractCorrectionActivity {
+    
+    @Inject
+    WorkflowModel workflowModel;
+    
+    @FXML
+    Button folderButton;
+    
+    @Parameter
+    ImageLoaderService imageLoaderService;
+    
+    public FlatfieldWorkflow() {
+        CorrectionActivity.getStaticContext().inject(this);
+    }
+    
+    @PostConstruct
+    public void init() {
+        folderButton.setOnAction(this::onClick);
+//        workflowModel.print("FlatfieldWorkflow");
+//        nextButton.setDisable(true);
+//        finishButton.setDisable(true);
+    }
+    
+    private void onClick(ActionEvent e) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File file = directoryChooser.showDialog(null);
+        List<File> files = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
+        folderButton.setText("Folder : "+file.getName());
+        System.out.println(files);
+    }
     
 }

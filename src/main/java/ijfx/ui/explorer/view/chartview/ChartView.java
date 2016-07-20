@@ -25,6 +25,7 @@ import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.ExplorableClustererService;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.ui.correction.WorkflowModel;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
@@ -63,6 +64,8 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = ExplorerView.class)
 public class ChartView extends AbstractChartView implements ExplorerView {
 
+    @Parameter
+    WorkflowModel workflowModel;
     @Parameter
     HintService hintService;
     

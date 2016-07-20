@@ -18,14 +18,7 @@
     <center>
         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
             <children>
-                <Label text="Welcome">
-                    <StackPane.margin>
-                        <Insets bottom="32.0" left="32.0" right="32.0" top="32.0" />
-                    </StackPane.margin>
-                    <font>
-                        <Font size="24.0" />
-                    </font>
-                </Label>
+            <Button fx:id="folderButton" mnemonicParsing="false" text="Choose Folder" />
             </children>
         </StackPane>
     </center>

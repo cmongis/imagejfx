@@ -20,8 +20,6 @@
 package ijfx.ui.correction;
 
 import io.datafx.controller.ViewController;
-import io.datafx.controller.ViewNode;
-import io.datafx.controller.flow.action.ActionMethod;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -29,24 +27,28 @@ import javax.inject.Inject;
  *
  * @author Tuan anh TRINH
  */
+
 @ViewController(value = "WelcomeWorkflow.fxml")
-public class WelcomeWorkflow extends AbstractCorrectionActivity {
+public class WelcomeWorkflow extends AbstractCorrectionActivity{
 
     @Inject
     WorkflowModel workflowModel;
 
+
+
     public WelcomeWorkflow() {
+        CorrectionActivity.getStaticContext().inject(this);
 
     }
 
 //    
     @PostConstruct
     public void init() {
-        this.workflowModel.print("WelcomeWorkflow");
-    }
-    @ActionMethod("nextAction")
-    public void onAction() {
 
     }
 
+//    @ActionMethod("nextAction")
+//    public void onAction() {
+//        System.out.println("ijfx.ui.correction.WelcomeWorkflow.onAction()");
+//    }
 }

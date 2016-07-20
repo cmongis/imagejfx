@@ -32,15 +32,13 @@ import javax.inject.Inject;
 @ViewController(value = "EndWorkflow.fxml", title = "Wizard: Finish")
 public class EndWorkflow extends AbstractCorrectionActivity {
  
-    @FXML
-    private Button nextButton;
+  
     
     @Inject  WorkflowModel workflowModel;
 
     @PostConstruct
     public void init() {
-        workflowModel.print("EndWorkflow");
         nextButton.setDisable(true);
-        getFinishButton().setDisable(true);
+        finishButton.setDisable(true);
     }
 }

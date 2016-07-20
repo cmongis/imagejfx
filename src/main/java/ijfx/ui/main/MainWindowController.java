@@ -204,7 +204,7 @@ public class MainWindowController extends AnchorPane {
     Queue<Hint> hintQueue = new LinkedList<>();
 
     TaskList2 taskList = new TaskList2();
-    
+
     boolean isHintDisplaying = false;
 
     private Thread memoryThread = new Thread(() -> {
@@ -268,10 +268,9 @@ public class MainWindowController extends AnchorPane {
         mainBorderPane.setCenter(new Label("Loading..."));
 
         loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
-        
-        
+
         memoryProgressBar.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMemoryProgressBarClicked);
-        
+
     }
 
     private Scene myScene;
@@ -293,7 +292,6 @@ public class MainWindowController extends AnchorPane {
                 .closeOnFinished()
                 .attachTo(this.getScene());
 
-        
         taskList.submitTask(task);
         hideSideMenu();
 
@@ -303,7 +301,7 @@ public class MainWindowController extends AnchorPane {
         ImageJFX.getLogger().log(Level.SEVERE, "Error when starting ImageJ", t);
         new Alert(Alert.AlertType.ERROR, t.getMessage(), ButtonType.CLOSE).show();
     }
-    
+
     public Boolean init(ProgressHandler handler) {
         handler.setStatus("Initializing ImageJ....");
         handler.setProgress(1, 3);
@@ -365,7 +363,6 @@ public class MainWindowController extends AnchorPane {
         logger.info("Start over");
 
     }
-
 
     public void registerWidgetControllers() {
         registerPaneCtrl(topLeftHBox)
@@ -460,7 +457,6 @@ public class MainWindowController extends AnchorPane {
 
     }
 
-    
     protected void loadWidget(UiPlugin uiPlugin) {
 
         // getting the localization from the Localization Plugin (which gets
@@ -559,12 +555,12 @@ public class MainWindowController extends AnchorPane {
     @EventHandler
     public void onFrontEndTaskSubmitted(FontEndTaskSubmitted event) {
 
-       
-
         if (event.getObject() != null) {
             Platform.runLater(() -> {
                 System.out.println("front end task submitted");
-                if(event.getObject() == null) return;
+                if (event.getObject() == null) {
+                    return;
+                }
                 taskList.submitTask(event.getObject());
             });
         }
@@ -607,9 +603,9 @@ public class MainWindowController extends AnchorPane {
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
-        
+
         System.out.println(rightVBox.getChildren());
-        
+
     }
 
     // animating the disapearance of the menu
@@ -617,7 +613,7 @@ public class MainWindowController extends AnchorPane {
     public void hideSideMenu() {
         final Timeline timeline = new Timeline();
 
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * (sideMenu.getWidth()+20), Interpolator.EASE_IN);
+        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * (sideMenu.getWidth() + 20), Interpolator.EASE_IN);
         KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
         timeline.getKeyFrames().add(kf);
         timeline.play();
@@ -629,7 +625,7 @@ public class MainWindowController extends AnchorPane {
         hintService.displayHints(uiPlugin.getObject().getClass(), false);
 
     }
-    
+
     private void onMemoryProgressBarClicked(MouseEvent event) {
         System.gc();
     }
@@ -774,17 +770,17 @@ public class MainWindowController extends AnchorPane {
 
         addSideMenuButton("Explore", FontAwesomeIcon.COMPASS, ExplorerActivity.class);
 
-        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class).setOnAction(e -> uiContextService.enter("explore"));
+        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class);
         addSideMenuButton("Segment", FontAwesomeIcon.EYE, null).setOnAction(event -> {
             uiContextService.enter("segment", "segmentation");
             uiContextService.update();
             hideSideMenu();
 
         });
-        addSideMenuButton("Batch process",FontAwesomeIcon.LIST,null).setOnAction(event->{
+        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, null).setOnAction(event -> {
             uiContextService.enter("batch");
             uiContextService.update();
-            if(activityService.getCurrentActivityAsClass() != ExplorerActivity.class) {
+            if (activityService.getCurrentActivityAsClass() != ExplorerActivity.class) {
                 activityService.openByType(ExplorerActivity.class);
                 hideSideMenu();
             }

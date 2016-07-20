@@ -19,32 +19,43 @@
  */
 package ijfx.ui.correction;
 
+import ijfx.ui.activity.Activity;
+import io.datafx.controller.flow.action.ActionMethod;
+import io.datafx.controller.flow.action.ActionTrigger;
 import io.datafx.controller.flow.action.BackAction;
 import io.datafx.controller.flow.action.LinkAction;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public class AbstractCorrectionActivity{
+
+public class AbstractCorrectionActivity {
+
+//    @Parameter
+//    Context context;
+    
     @FXML
     BorderPane borderPane;
+
     @FXML
     @BackAction
-    private Button backButton;
- 
+    protected Button backButton;
+
     @FXML
-    @LinkAction(EndWorkflow.class)
-    private Button finishButton;
- 
-    public Button getBackButton() {
-        return backButton;
-    }
- 
-    public Button getFinishButton() {
-        return finishButton;
-    }
+    @ActionTrigger("nextAction")
+    protected Button nextButton;
+
+    @FXML
+    @ActionTrigger("finishAction")
+    protected Button finishButton;
+
 }

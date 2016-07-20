@@ -23,16 +23,13 @@ import ijfx.ui.activity.Activity;
 import io.datafx.controller.flow.Flow;
 import io.datafx.controller.flow.FlowException;
 
-import io.datafx.core.DataFXUtils;
-//import io.datafx.core.DataFXUtils;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
-import javafx.scene.layout.BorderPane;
 import mongis.utils.CallbackTask;
-import mongis.utils.FXUtilities;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -42,30 +39,50 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Activity.class, name = "imagej", label = "Correction")
 public class CorrectionActivity implements Activity {
 
+    @Parameter
+    Context context;
+
     private Node node;
 
-//    WorkflowModel workflowModel;
+    private static Context staticContext;
 
-    public CorrectionActivity() {
-//WorkflowModel workflowModel = new WorkflowModel();
-        try {
-//            this.workflowModel = workflowModel;
-            node = new Flow(WelcomeWorkflow.class).withLink(WelcomeWorkflow.class, "finish", EndWorkflow.class).start();
-//            System.out.println(this.workflowModel.toString());
-        } catch (FlowException ex) {
-            Logger.getLogger(CorrectionActivity.class.getName()).log(Level.SEVERE, null, ex);
+    public Flow flow;
+
+    public CorrectionActivity() throws FlowException {
+    }
+
+    public void init() {
+        if (staticContext == null) {
+            staticContext = context;
         }
+        if (flow == null) {
+            flow = new Flow(WelcomeWorkflow.class)
+                    .withLink(WelcomeWorkflow.class, "nextAction", FlatfieldWorkflow.class)
+                    .withLink(FlatfieldWorkflow.class, "nextAction", BUnwarpJWorkflow.class)
+                    .withGlobalLink("finishAction", EndWorkflow.class);
+            try {
+                node = flow.start();
+            } catch (FlowException ex) {
+                Logger.getLogger(CorrectionActivity.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
     }
 
     @Override
     public Node getContent() {
+        init();
         return node;
     }
 
     @Override
     public Task updateOnShow() {
-
         return new CallbackTask<Void, Void>();
+    }
+
+    public static Context getStaticContext() {
+        return staticContext;
     }
 
 }
