@@ -20,6 +20,7 @@
 package ijfx.plugins.segmentation.neural_network;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -83,12 +84,12 @@ public class LSTMRnn implements NeuralNet{
 
         List<double[]> outputs = new ArrayList<>(inputs.size());
         
-        double[] newStates = new double[this.hSize];
-        double[] newOutputs = new double[this.hSize];
-        
         Iterator<double[]> it_step = inputs.iterator();
         
         while(it_step.hasNext()){
+            
+            double[] newStates = new double[this.hSize];
+            double[] newOutputs = new double[this.hSize];
             
             double[] inputCells = it_step.next();
             
@@ -147,17 +148,28 @@ public class LSTMRnn implements NeuralNet{
             
             double[] outputCells = new double[this.outSize];
             
+            /*inputs for the output layer*/
             for(int o = 0; o < this.outSize; o++){
-                /*Sum of the hiddenlayer outputs*/
+                
                 double hWeightedOutput = 0.0;
                 
                 for(int h = 0; h < this.hSize; h++){
-                    double test = this.z.get(o)[h]*this.cell_outputs[h];
-                    hWeightedOutput += test;
+                    hWeightedOutput += this.z.get(o)[h]*this.cell_outputs[h];
                 }
-                outputCells[o] = sig(hWeightedOutput);
+                outputCells[o] = hWeightedOutput;
             }
-            
+            if(this.outSize == 1){
+                for(int o = 0; o < this.outSize; o++){
+                    outputCells[o] = sig(outputCells[o]);
+                }
+            }
+            else{
+                double[] newOutputCells = new double[this.outSize];
+                for(int o = 0; o < this.outSize; o++){
+                    newOutputCells[o] = softmax(outputCells, o);
+                }
+                outputCells = newOutputCells;
+            }
             outputs.add(outputCells);
         }
       return outputs;  
@@ -179,10 +191,8 @@ public class LSTMRnn implements NeuralNet{
         int upper = 1;
 
         /*initialize the cells state and outputs to 0*/
-        for(int s = 0; s < this.hSize; s++){
-            cell_states[s] = 0.0;
-            cell_outputs[s] = 0.0;
-        }
+        Arrays.fill(cell_states,0.0);
+        Arrays.fill(cell_outputs,0.0);
         
         System.out.println("Cells states initialized");
         
@@ -282,5 +292,13 @@ public class LSTMRnn implements NeuralNet{
     
     public double tanh(double x){
         return this.tanh.value(x);
+    }
+    
+    public double softmax(double[] z , int i){
+        double sum = 0.0;
+        for(int j = 0; j < z.length; j++){
+            sum += Math.exp(z[j]);
+        }
+        return Math.exp(z[i])/sum;
     }
 }
