@@ -22,6 +22,7 @@ package ijfx.ui.correction;
 import io.datafx.controller.ViewController;
 import io.datafx.controller.ViewNode;
 import io.datafx.controller.flow.action.ActionMethod;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 /**
@@ -35,12 +36,17 @@ public class WelcomeWorkflow extends AbstractCorrectionActivity {
     WorkflowModel workflowModel;
 
     public WelcomeWorkflow() {
+
     }
 
 //    
+    @PostConstruct
+    public void init() {
+        this.workflowModel.print("WelcomeWorkflow");
+    }
     @ActionMethod("nextAction")
     public void onAction() {
-//        System.out.println(workflowModel.toString());
+
     }
 
 }

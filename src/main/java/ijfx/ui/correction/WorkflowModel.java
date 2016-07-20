@@ -22,17 +22,19 @@ package ijfx.ui.correction;
 import io.datafx.controller.injection.scopes.ApplicationScoped;
 import io.datafx.controller.injection.scopes.FlowScoped;
 
-
 /**
  *
  * @author Tuan anh TRINH
  */
 @FlowScoped
 public class WorkflowModel {
-String s = "e";
+  private int counter = 0;
+
     public WorkflowModel() {
-        System.out.println("ijfx.ui.correction.WorkflowModel.<init>()");
+        System.out.println("Constructor");
     }
-    
-    
+
+    public void print(String from) {
+        System.out.println(from + ": counter = " + counter++);
+    }
 }

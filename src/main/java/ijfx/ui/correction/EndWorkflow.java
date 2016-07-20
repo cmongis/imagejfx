@@ -19,27 +19,27 @@
  */
 package ijfx.ui.correction;
 
-import io.datafx.controller.FXMLController;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import io.datafx.controller.ViewController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javax.annotation.PostConstruct;
-import mongis.utils.FXUtilities;
+import javax.inject.Inject;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-@FXMLController(value = "EndWorkflow.fxml", title = "Wizard: Finish")
+@ViewController(value = "EndWorkflow.fxml", title = "Wizard: Finish")
 public class EndWorkflow extends AbstractCorrectionActivity {
  
     @FXML
     private Button nextButton;
+    
+    @Inject  WorkflowModel workflowModel;
 
     @PostConstruct
     public void init() {
+        workflowModel.print("EndWorkflow");
         nextButton.setDisable(true);
         getFinishButton().setDisable(true);
     }

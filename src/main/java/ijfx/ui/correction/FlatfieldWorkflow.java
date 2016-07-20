@@ -19,13 +19,14 @@
  */
 package ijfx.ui.correction;
 
-import io.datafx.controller.FXMLController;
+import io.datafx.controller.ViewController;
+
 
 /**
  *
  * @author Tuan anh TRINH
  */
-@FXMLController(value = "FlatfieldWorkflow.fxml", title = "Wizard: Flatfield")
+@ViewController(value = "FlatfieldWorkflow.fxml", title = "Wizard: Flatfield")
 public class FlatfieldWorkflow extends AbstractCorrectionActivity{
 
 

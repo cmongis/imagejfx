@@ -47,10 +47,10 @@ public class CorrectionActivity implements Activity {
 //    WorkflowModel workflowModel;
 
     public CorrectionActivity() {
-WorkflowModel workflowModel = new WorkflowModel();
+//WorkflowModel workflowModel = new WorkflowModel();
         try {
 //            this.workflowModel = workflowModel;
-            node = new Flow(WelcomeWorkflow.class).start();
+            node = new Flow(WelcomeWorkflow.class).withLink(WelcomeWorkflow.class, "finish", EndWorkflow.class).start();
 //            System.out.println(this.workflowModel.toString());
         } catch (FlowException ex) {
             Logger.getLogger(CorrectionActivity.class.getName()).log(Level.SEVERE, null, ex);
