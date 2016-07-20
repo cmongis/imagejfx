@@ -21,12 +21,14 @@ package ijfx.ui.datadisplay.image;
 
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.ui.datadisplay.table.AbstractDisplayWindow;
+import ijfx.ui.tool.ToolChangeEvent;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.layout.Pane;
 import net.imagej.display.ImageDisplay;
 import org.scijava.Context;
+import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -66,5 +68,16 @@ public class DefaultImageWindow extends AbstractDisplayWindow<ImageDisplay>{
         } 
     
     return pane;
+    }
+    
+        /**
+     *
+     * SciJava Events
+     *
+     */
+    @EventHandler
+    protected void onToolChangedEvent(ToolChangeEvent event) {
+        if(pane != null)
+        pane.setCurrentTool(event.getTool());
     }
 }

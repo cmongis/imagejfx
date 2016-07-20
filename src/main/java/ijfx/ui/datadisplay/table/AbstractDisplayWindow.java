@@ -52,6 +52,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
     static String WINDOW_CLASS_NAME = "ijfx-window";
 
     public AbstractDisplayWindow(Context context) {
+        super();
         context.inject(this);
         setContentPane(init());
 
@@ -70,7 +71,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
 
         getStyleClass().add(WINDOW_CLASS_NAME);
         setTitleBarStyleClass(TITLE_CLASS_NAME);
-        
+        setMovable(true);
         setPrefSize(500, 500);
         
     }

@@ -515,15 +515,7 @@ public class ImageDisplayPane extends AnchorPane {
         getOverlays().forEach(this::updateOverlay);
     }
 
-    /**
-     *
-     * SciJava Events
-     *
-     */
-    @EventHandler
-    protected void onToolChangedEvent(ToolChangeEvent event) {
-        setCurrentTool(event.getTool());
-    }
+
 
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
