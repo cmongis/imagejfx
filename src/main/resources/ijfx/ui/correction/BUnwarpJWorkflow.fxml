@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="Deformation">
+               <content>
+                  <TilePane alignment="CENTER" hgap="10.0" prefColumns="10" prefRows="10" vgap="10.0">
+                     <children>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Minimum scale deformation" />
+                              <ComboBox fx:id="min_scale_deformation_choice" prefWidth="150.0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Maximum scale deformation" />
+                              <ComboBox fx:id="max_scale_deformation_choice" prefWidth="150.0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Algorithm mode" />
+                              <ComboBox fx:id="modeChoice" prefWidth="150.0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="img_subsamp_fact" />
+                              <ComboBox fx:id="img_subsamp_fact" prefWidth="150.0" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </TilePane>
+               </content>
+                </Tab>
+                <Tab text="Weight">
+               <content>
+                  <TilePane alignment="CENTER" hgap="20.0" prefColumns="10" prefRows="1" vgap="10.0">
+                     <children>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Divergence weight" />
+                              <TextField fx:id="divWeight" prefWidth="50.0" text="0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Curl Weight" />
+                              <TextField fx:id="curlWeight" prefWidth="50.0" text="0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Landmark weight" />
+                              <TextField fx:id="divWeight11" prefWidth="50.0" text="1.0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Image weight" />
+                              <TextField fx:id="divWeight12" prefWidth="50.0" text="0.0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Label text="Consistency weight" />
+                              <TextField fx:id="divWeight13" prefWidth="50.0" text="10" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </TilePane>
+               </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <bottom>
+        <fx:include source="./ActionBar.fxml" />
+    </bottom>
+</BorderPane>
