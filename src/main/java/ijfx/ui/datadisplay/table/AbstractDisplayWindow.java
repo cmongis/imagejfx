@@ -70,7 +70,9 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
 
         getStyleClass().add(WINDOW_CLASS_NAME);
         setTitleBarStyleClass(TITLE_CLASS_NAME);
-
+        
+        setPrefSize(500, 500);
+        
     }
 
     abstract protected void display(T display);
