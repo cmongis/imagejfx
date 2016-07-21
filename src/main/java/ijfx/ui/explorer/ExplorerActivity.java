@@ -415,6 +415,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         return keySet
                 .stream()
                 .filter(MetaData::canDisplay)
+                .sorted((k1,k2)->k1.compareTo(k2))
                 .map(key -> {
                     handler.increment(0.9 / keySet.size());
                     return new MetaDataFilterWrapper(key, filterFactory.generateFilter(explorerService.getItems(), key));

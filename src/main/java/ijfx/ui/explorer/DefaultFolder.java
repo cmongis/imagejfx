@@ -342,4 +342,8 @@ public class DefaultFolder implements Folder, FileChangeListener {
     }
     
     
+    public boolean isFilePartOf(File f) {
+        return f.getAbsolutePath().startsWith(file.getAbsolutePath());
+    }
+    
 }

@@ -17,26 +17,40 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.project;
+package ijfx.ui.datadisplay.table;
 
-import net.imagej.ops.OpService;
-import org.junit.Test;
-import org.scijava.plugin.Parameter;
+import javafx.scene.layout.Pane;
+import net.imagej.table.Table;
+import net.imagej.table.TableDisplay;
+import org.scijava.Context;
 
 /**
  *
  * @author cyril
  */
-public class OverlayTest extends BaseSciJavaTest{
-    
-    @Parameter
-    OpService opService;
-    
-    @Test
-    public void test() {
-        
-       
-        
+public class TableDisplayWindow extends AbstractDisplayWindow<TableDisplay> {
+
+    TableDisplayView view;
+
+    public TableDisplayWindow(Context context) {
+        super(context);
     }
+
     
+    
+    
+    @Override
+    protected void display(TableDisplay display) {
+        view.display(display);
+       
+    }
+
+    @Override
+    protected Pane init() {
+
+        view = new TableDisplayView();
+
+        return view;
+    }
+
 }

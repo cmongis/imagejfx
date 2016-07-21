@@ -17,39 +17,44 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.project;
+package ijfx.core.metadata;
 
-import ijfx.core.imagedb.ImageRecordService;
-import ijfx.core.imagedb.MetaDataExtractionService;
-import org.junit.Assert;
-import org.junit.Test;
-import org.scijava.plugin.Parameter;
+import java.util.Comparator;
+import java.util.Set;
 
 /**
+ * Orders metadata by priority list
  *
  * @author cyril
  */
-public class MetaDataExtractionTest2 extends BaseImageJTest{
+public class MetaDataKeyPrioritizer implements Comparator<String> {
 
-    
-    @Parameter
-    MetaDataExtractionService service;
-    
-    @Parameter
-    ImageRecordService imageRecordService;
-    
+    final Set<String> priority;
+
+    public MetaDataKeyPrioritizer(Set<String> priority) {
+        this.priority = priority;
+    }
+
     @Override
-    protected Class[] getService() {
-        return new Class[]{
-            ImageRecordService.class
-                };
+    public int compare(String s1, String s2) {
+
+        Integer is1 = priorityIndex(priority, s1);
+        Integer is2 = priorityIndex(priority, s2);
+
+        Integer c = s1.compareTo(s2);
+
+        return 100 * (is2 - is1) + c;
     }
-    
-    @Test
-    public void testInjection() {
-        Assert.assertNotNull(imageRecordService);
-        Assert.assertNotNull(service);
+
+    public int priorityIndex(Set<String> set, String element) {
+        int i = 0;
+        for (String s : set) {
+            if (s.equals(element)) {
+                return 100 - i;
+            }
+            i++;
+        }
+        return 0;
     }
-    
-    
+
 }

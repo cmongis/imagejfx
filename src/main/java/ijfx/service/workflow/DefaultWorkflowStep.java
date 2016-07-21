@@ -124,6 +124,7 @@ public class DefaultWorkflowStep implements WorkflowStep {
 
     public DefaultWorkflowStep createModule(CommandService commandService, ModuleService moduleService) {
         CommandInfo infos = commandService.getCommand(getClassName());
+        if(infos != null)
         module = moduleService.createModule(infos);
         return this;
     }

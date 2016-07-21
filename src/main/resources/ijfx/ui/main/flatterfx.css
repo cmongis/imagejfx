@@ -1020,14 +1020,14 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 
 
-.image-window-titlebar {
+.ijfx-window-titlebar {
     -fx-font-weight:400;
     -fx-font-size:14px;
     -fx-alignment: center;
     -fx-padding: 5px;
 }
 
-.image-window {
+.ijfx-window {
     -fx-stroke-width: 4px;
     -fx-stroke-fill:derive(-dark,70%);
     -fx-fill: derive(-dark,70%);

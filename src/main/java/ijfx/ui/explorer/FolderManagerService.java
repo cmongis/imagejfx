@@ -46,4 +46,5 @@ public interface FolderManagerService extends IjfxService{
     
     public void removeFolder(Folder folder);
     
+    public Folder getFolderContainingFile(File f);
 }

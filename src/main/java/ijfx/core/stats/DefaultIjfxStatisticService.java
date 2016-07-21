@@ -33,6 +33,7 @@ import net.imagej.axis.Axes;
 import net.imagej.sampler.AxisSubrange;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessible;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -59,7 +60,7 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     
 
     @Override
-    public SummaryStatistics getDatasetSummaryStatistics(Dataset dataset) {
+    public SummaryStatistics getSummaryStatistics(Dataset dataset) {
         SummaryStatistics summary = new SummaryStatistics();
         Cursor<RealType<?>> cursor = dataset.cursor();
         cursor.reset();
@@ -79,7 +80,7 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
             t.start();
             Dataset dataset = datasetIoService.open(file.getAbsolutePath());
             t.elapsed("open dataset");
-            SummaryStatistics stats = getDatasetSummaryStatistics(dataset);
+            SummaryStatistics stats = getSummaryStatistics(dataset);
             t.elapsed("read dataset");
             return stats;
         } catch (IOException e) {
@@ -131,6 +132,18 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
             }
         }
         return stats;
+    }
+
+    @Override
+    public <T extends RealType<T>> SummaryStatistics getSummaryStatistics(Cursor<T> cursor) {
+        SummaryStatistics stats = new SummaryStatistics();
+        cursor.reset();
+        while(cursor.hasNext()) {
+            cursor.fwd();
+            stats.addValue(cursor.get().getRealDouble());
+        }
+        return stats;
+        
     }
 
 }

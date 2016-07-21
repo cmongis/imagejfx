@@ -20,6 +20,8 @@
  */
 package ijfx.service.overlay;
 
+import ijfx.core.utils.DimensionUtils;
+import ijfx.service.ImagePlaneService;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 
@@ -27,7 +29,6 @@ import net.imagej.overlay.Overlay;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.RealRandomAccess;
 import net.imglib2.RealRandomAccessibleRealInterval;
@@ -38,6 +39,7 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.RandomAccessibleOnRealRandomAccessible;
 import net.imglib2.view.Views;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
@@ -53,6 +55,10 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class OverlayDrawingService extends AbstractService implements ImageJService {
 
+    
+    @Parameter
+    ImagePlaneService imagePlaneService;
+    
     public void drawOverlay(Overlay o, Drawer drawer, PixelDrawer tool) {
         drawer.draw(o, tool);
     }
@@ -65,7 +71,69 @@ public class OverlayDrawingService extends AbstractService implements ImageJServ
         drawOverlay(o,drawer, new DoubleRandomAccessDrawer(dataset.randomAccess(),value));
     } 
     
+     
+     public <T extends RealType<T>> Dataset extractObject(Overlay o, Dataset source, long[] nonSpacialPosition) {
+         
+         
+         //imagePlaneService.isolatePlane(source, DimensionUtils.nonPlanarToPlanar(nonSpacialPosition));
+         
+         long minX = Math.round(o.getRegionOfInterest().realMin(0));
+         long minY = Math.round(o.getRegionOfInterest().realMin(1));
+         
+         long maxX = Math.round(o.getRegionOfInterest().realMax(0));
+         long maxY = Math.round(o.getRegionOfInterest().realMax(1));
+         
+         long width = maxX-minX;
+         long height = maxY-minY;
+         
+        Dataset overlayDataset = imagePlaneService.createEmptyPlaneDataset(source,width,height);
+        
+        FILLER.draw(o, new RandomAccessCopier(imagePlaneService.planeView(source, nonSpacialPosition).randomAccess(), overlayDataset.randomAccess(), -minX, -minY));
+        
+         //drawOverlay(o,new RandomAccessCopier<>(source, overlayDataset, -minX, -minY),FILLER);
+         return overlayDataset;
+     }
     
+     
+     
+    private class RandomAccessCopier<T extends RealType<T>> implements PixelDrawer {
+
+        
+        final private RandomAccess<T> source;
+        final private RandomAccess<T> target;
+        
+        
+        final private long xTranslation;
+        final private long yTranslation;
+
+        
+        
+        public RandomAccessCopier(RandomAccess source, RandomAccess target) {
+            this(source,target,0,0);
+        }
+        
+        public RandomAccessCopier(RandomAccess<T> source, RandomAccess<T> target, long xTranslation, long yTranslation) {
+            this.source = source;
+            this.target = target;
+            this.xTranslation = xTranslation;
+            this.yTranslation = yTranslation;
+        }
+        
+
+        @Override
+        public void drawPixel(long x, long y) {
+            
+            source.setPosition(x, 0);
+            source.setPosition(y, 1);
+            
+            target.setPosition(x+xTranslation,0);
+            target.setPosition(y+yTranslation,1);
+            
+            target.get().set(source.get());
+            
+        }
+        
+    }
      
     private class RandomAccessDrawer<T extends RealType<T>> implements PixelDrawer {
 

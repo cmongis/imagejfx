@@ -21,9 +21,11 @@ package ijfx.ui.explorer;
 
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.utils.DimensionUtils;
+import ijfx.service.ImagePlaneService;
+import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.PolygonOverlayStatistics;
-import ijfx.ui.datadisplay.image.overlay.OverlayDrawerService;
 import ijfx.ui.main.ImageJFX;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -39,7 +41,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Path;
 import mongis.utils.CallbackTask;
 
 import net.imagej.Dataset;
@@ -49,6 +50,8 @@ import net.imglib2.roi.PolygonRegionOfInterest;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import ijfx.service.overlay.OverlayShapeStatistics;
+import net.imagej.display.DefaultImageDisplay;
+import net.imagej.display.ImageDisplayService;
 
 /**
  *
@@ -71,8 +74,14 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
     private ImageRecordService imageRecordService;
 
     @Parameter
-    private OverlayDrawerService drawerService;
+    private OverlayDrawingService drawerService;
 
+    @Parameter
+    private ImageDisplayService imageDisplayService;
+    
+    @Parameter
+    private ImagePlaneService imagePlaneService;
+    
     public OverlayExplorableWrapper(Context context, File source, Overlay overlay) {
 
         context.inject(this);
@@ -177,6 +186,27 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
 
     @Override
     public void open() {
+        
+        
+        
+        
+        long[] position = DimensionUtils.readLongArray(getMetaDataSet().get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue());
+        try {
+        
+        Dataset dataset = imagePlaneService.extractPlane(source, position);
+        
+        DefaultImageDisplay imageDisplay = new DefaultImageDisplay();
+        imageDisplay.display(dataset);
+        imageDisplay.display(overlay);
+        
+        
+        
+        //overlayDrawingService.extractObject(overlay, source, position);
+        }
+        catch(Exception e) {
+            
+        }
+        
     }
 
     @Override

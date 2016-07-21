@@ -47,6 +47,7 @@ import mongis.utils.FXUtilities;
  *
  * @author Cyril MONGIS, 2015
  */
+
 public class TableDisplayView extends BorderPane {
 
     @FXML
@@ -75,10 +76,14 @@ public class TableDisplayView extends BorderPane {
 
     }
 
-    public TableDisplayView(TableDisplay display) {
+    public TableDisplayView(TableDisplay tableDisplay) {
         this();
-        this.tableDisplay = display;
-        ImageJFX.getThreadPool().submit(() -> renderTable());
+       display(tableDisplay);
+    }
+    
+    public void display(TableDisplay display) {
+         this.tableDisplay = display;
+        ImageJFX.getThreadPool().submit(this::renderTable);
         logger.info("table rendered");
     }
 
