@@ -90,7 +90,20 @@ import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
 
 /**
- *
+ * This render an ImageDisplay as a JavaFX object.
+ * 
+ * e.g. :
+ * 
+ * 
+ * Dataset dataset = ...
+ * 
+ * DefaultImageDispay imageDisplay = new DefaultImageDisplay();
+ * imageDisplay.display(dataset);
+ * ImageDisplayPane pane = new ImageDisplayPane(context);
+ * pane.show(imageDisplay);
+ * 
+ * 
+ * 
  * @author cyril
  */
 public class ImageDisplayPane extends AnchorPane {
@@ -121,13 +134,13 @@ public class ImageDisplayPane extends AnchorPane {
 
     @Parameter
     private DisplayService displayService;
-    
+
     @Parameter
     private TimerService timerService;
 
     @Parameter
     private FxToolService toolService;
-    
+
     private FxTool currentTool;
 
     private PopArcMenu arcMenu;
@@ -150,7 +163,7 @@ public class ImageDisplayPane extends AnchorPane {
     private final ImageWindowEventBus bus = new ImageWindowEventBus();
 
     private final StringProperty titleProperty = new SimpleStringProperty();
-    
+
     public ImageDisplayPane(Context context) throws IOException {
 
         FXUtilities.injectFXML(this);
@@ -172,20 +185,20 @@ public class ImageDisplayPane extends AnchorPane {
         canvas.cursorProperty().bind(Bindings.createObjectBinding(this::getToolDefaultCursor, currentToolProperty));
 
         canvas.getCamera().addListener(this::onViewPortChange);
-        
+
         canvas.widthProperty().bind(stackPane.widthProperty());
         canvas.heightProperty().bind(stackPane.heightProperty());
-        
+
     }
 
     public void display(ImageDisplay display) {
-         imageDisplay = (ImageDisplay) display;
+        imageDisplay = (ImageDisplay) display;
         build();
         setCurrentTool(toolService.getCurrentTool());
         initEventBuffering();
+        canvas.setImageDisplay(imageDisplay);
     }
-    
-    
+
     public DatasetView getDatasetview() {
         return imageDisplayService.getActiveDatasetView(imageDisplay);
     }
@@ -202,16 +215,14 @@ public class ImageDisplayPane extends AnchorPane {
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
     }
-    
+
     public void setTitle(String title) {
         titleProperty.setValue(title);
     }
-    
+
     public StringProperty titleProperty() {
         return titleProperty;
     }
-    
-    
 
     private WritableImage wi;
 
@@ -317,11 +328,14 @@ public class ImageDisplayPane extends AnchorPane {
             if (anchorPane.getChildren().contains(node) == false) {
                 anchorPane.getChildren().add(node);
             }
-            Shape shape = (Shape) node;
-            if (overlaySelectionService.isSelected(imageDisplay, overlay)) {
-                shape.setFill(shape.getStroke());
-            } else {
-                shape.setFill(Color.TRANSPARENT);
+
+            if (Shape.class.isAssignableFrom(node.getClass())) {
+                Shape shape = (Shape) node;
+                if (overlaySelectionService.isSelected(imageDisplay, overlay)) {
+                    shape.setFill(shape.getStroke());
+                } else {
+                    shape.setFill(Color.TRANSPARENT);
+                }
             }
             t.elapsed("updateOverlay");
 
@@ -410,24 +424,22 @@ public class ImageDisplayPane extends AnchorPane {
         }
         arcMenu = new PopArcMenu();
         anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, arcMenu::show);
-       
 
-            double min = getDatasetview().getChannelMin(0);
-            double max = getDatasetview().getChannelMax(0);
+        double min = getDatasetview().getChannelMin(0);
+        double max = getDatasetview().getChannelMax(0);
 
-            logService.info(String.format("Adding slider %.1f %.1f ", min, max));
-            for (int i = 0; i != imageDisplay.numDimensions(); i++) {
+        logService.info(String.format("Adding slider %.1f %.1f ", min, max));
+        for (int i = 0; i != imageDisplay.numDimensions(); i++) {
 
-                if (imageDisplay.axis(i).type().isXY()) {
-                    continue;
-                }
-
-                Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
-
-                arcMenu.addAll(new AxisArcItem(imageDisplay, i));
-                //hbox.getChildren().add(new AxisSlider(imageDisplay, i));
+            if (imageDisplay.axis(i).type().isXY()) {
+                continue;
             }
-        
+
+            Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
+
+            arcMenu.addAll(new AxisArcItem(imageDisplay, i));
+            //hbox.getChildren().add(new AxisSlider(imageDisplay, i));
+        }
 
         arcMenu.build();
 
@@ -469,8 +481,8 @@ public class ImageDisplayPane extends AnchorPane {
                 .subscribe(this::deleteOverlays);
 
     }
-    
-     protected Overlay extractOverlayFromEvent(SciJavaEvent event) {
+
+    protected Overlay extractOverlayFromEvent(SciJavaEvent event) {
         logService.info("Mapping event to overlay");
         if (event instanceof OverlayCreatedEvent) {
             return ((OverlayCreatedEvent) event).getObject();
@@ -481,7 +493,7 @@ public class ImageDisplayPane extends AnchorPane {
         if (event instanceof OverlaySelectionEvent) {
             return ((OverlaySelectionEvent) event).getOverlay();
         }
-        if(event instanceof OverlaySelectedEvent) {
+        if (event instanceof OverlaySelectedEvent) {
             return ((OverlaySelectedEvent) event).getOverlay();
         }
         return null;
@@ -506,16 +518,14 @@ public class ImageDisplayPane extends AnchorPane {
             return currentTool.getDefaultCursor();
         }
     }
-    
-       protected boolean isWindowConcernedByModule(Module module) {
+
+    protected boolean isWindowConcernedByModule(Module module) {
         return module.getInputs().values().stream().filter(obj -> (obj == imageDisplay || obj == getDataset())).count() > 0;
     }
 
     protected void onMoveablePointMoved(Observable obs, Point2D oldValue, Point2D newValue) {
         getOverlays().forEach(this::updateOverlay);
     }
-
-
 
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
@@ -609,17 +619,28 @@ public class ImageDisplayPane extends AnchorPane {
     }
 
     private boolean isOnOverlay(double x, double y, Overlay overlay) {
-
+        
+        
+         
+        OverlayDrawer drawer = getDrawer(overlay);
+        
+        if(drawer == null) return false;
+        else {
+            return drawer.isOnOverlay(overlay, canvas.getCamera(), x, y);
+        }
+        /*
+        return drawer.isOnOverlay(overlay,canvas.getCamera(),x,y);
+        
         double x1 = overlay.getRegionOfInterest().realMin(0);
         double y1 = overlay.getRegionOfInterest().realMin(1);
         double x2 = overlay.getRegionOfInterest().realMax(0);
         double y2 = overlay.getRegionOfInterest().realMax(1);
-
+        
         //System.out.println(String.format("(%.0f,%.0f), (%.0f,%.0f)", x1, y1, x2, y2));
         Rectangle2D r = new Rectangle2D(x1, y1, x2 - x1, y2 - y1);
         //System.out.println(String.format("contains  (%.0f,%.0f) ? : %b",x,y,r.contains(x,y)));
         return (r.contains(x, y));
-
+        */
     }
 
     /*
@@ -661,14 +682,10 @@ public class ImageDisplayPane extends AnchorPane {
         return overlayService.getOverlays(imageDisplay);
     }
 
-
-
     public Overlay getSelectedOverlay() {
         return overlayService.getActiveOverlay(imageDisplay);
     }
 
-    
-          
     /*
      Event handling
      */
@@ -720,6 +737,7 @@ public class ImageDisplayPane extends AnchorPane {
         updateInfoLabel();
 
     }
+
     /*
       
     Helper Classes
@@ -756,10 +774,7 @@ public class ImageDisplayPane extends AnchorPane {
                 logService.info(String.format("Changing %s to %.3f", axis.type().getLabel(), newValue.doubleValue()));
             });
         }
-        
-        
-  
 
     }
-    
+
 }
