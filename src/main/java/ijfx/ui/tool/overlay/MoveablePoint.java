@@ -124,6 +124,7 @@ public class MoveablePoint extends Rectangle{
         
         positionOnScreen.setValue(new Point2D(getX(),getY()));
         
+        event.consume();
          
          System.out.println(positionOnImage.getValue());
     }
