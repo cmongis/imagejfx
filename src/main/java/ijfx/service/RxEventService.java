@@ -1,6 +1,7 @@
 package ijfx.service;
 
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -48,9 +50,18 @@ public class RxEventService extends AbstractService implements EventService {
 
     PublishSubject<SciJavaEvent> eventBus = PublishSubject.create();
 
+    
+    public RxEventService() {
+        
+        
+        
+        
+    }
+    
+    
     @Override
     public <E extends SciJavaEvent> void publish(E e) {
-
+        eventBus.onNext(e);
     }
 
     @Override
@@ -74,18 +85,20 @@ public class RxEventService extends AbstractService implements EventService {
 
     @Override
     public void unsubscribe(Collection<EventSubscriber<?>> subscribers) {
+        
     }
 
     @Override
     public <E extends SciJavaEvent> List<EventSubscriber<E>> getSubscribers(Class<E> c) {
-        return null;
+        return handlerMap.get(c).stream().map(h->(EventSubscriber<E>)h).collect(Collectors.toList());
     }
-
+    
+    
    
-
+    
     public class Handler<T extends SciJavaEvent> implements EventSubscriber<T>{
 
-        Object object;
+        WeakReference<Object> object;
         Method method;
 
         Class<T> eventClass;
@@ -146,7 +159,6 @@ public class RxEventService extends AbstractService implements EventService {
     }
 
     
-   
     
     protected List<Handler> addHandler(Handler handler){
 
@@ -158,6 +170,9 @@ public class RxEventService extends AbstractService implements EventService {
 
         return list;
 
+    }
+    
+    protected void execute(EventSubscriber e) {
     }
 
 }
