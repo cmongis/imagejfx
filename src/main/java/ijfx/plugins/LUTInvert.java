@@ -82,15 +82,17 @@ public class LUTInvert implements Command {
             ColorTable colorTableInverted = invertColorTable(colorTable);
             dataset.setColorTable(colorTableInverted, i);
         }
-        for (int k = 0; k < imageDisplay.size(); k++) {
-            DatasetView datasetView = ((DatasetView) imageDisplay.get(k));
-            for (int j = 0; j < datasetView.getColorTables().size(); j++) {
-                ColorTable colorTable = datasetView.getColorTables().get(j);
-                ColorTable colorTableInverted = invertColorTable(colorTable);
-                datasetView.setColorTable(colorTableInverted, j);
-            }
-
-        }
+//        for (int k = 0; k < imageDisplay.size(); k++) {
+//            DatasetView datasetView = ((DatasetView) imageDisplay.get(k));
+//            for (int j = 0; j < datasetView.getColorTables().size(); j++) {
+//                ColorTable colorTable = datasetView.getColorTables().get(j);
+//                ColorTable colorTableInverted = invertColorTable(colorTable);
+//                datasetView.setColorTable(colorTableInverted, j);
+//                datasetView.update();
+//            }
+//
+//        }
+        
         dataset.update();
         imageDisplay.update();
     }
@@ -105,7 +107,7 @@ public class LUTInvert implements Command {
         //Couldn't find a generic way...
         if (colorTable instanceof ColorTable8) {
             ColorTable8 colorTable8 = (ColorTable8) colorTable;
-            byte[][] values = colorTable8.getValues();
+            byte[][] values = colorTable8.getValues().clone();
             for (byte[] value : values) {
                 ArrayUtils.reverse(value);
             }
