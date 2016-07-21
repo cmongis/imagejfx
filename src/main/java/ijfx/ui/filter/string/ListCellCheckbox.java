@@ -30,7 +30,7 @@ import javafx.scene.layout.HBox;
  *
  * @author Tuan anh TRINH
  */
-class ListCellCheckbox extends ListCell<Item> {
+public class ListCellCheckbox extends ListCell<Item> {
 
     CheckBox checkbox = new CheckBox();
 

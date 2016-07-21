@@ -20,9 +20,17 @@
 package ijfx.ui.correction;
 
 import ijfx.core.imagedb.ImageLoaderService;
+import ijfx.service.dataset.DatasetUtillsService;
+import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -31,9 +39,17 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.display.DefaultImageDisplay;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import static net.imglib2.ops.types.ConnectedType.value;
 import org.scijava.Context;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  *
@@ -51,24 +67,51 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
     @Parameter
     ImageLoaderService imageLoaderService;
     
+    @Parameter
+    CommandService commandService;
+    
+    @Parameter
+    Context context;
+    
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
+    
+    
+    
+    @Parameter
+    DatasetUtillsService datasetUtillsService;
+    
     public FlatfieldWorkflow() {
         CorrectionActivity.getStaticContext().inject(this);
     }
     
     @PostConstruct
     public void init() {
-        folderButton.setOnAction(this::onClick);
+        folderButton.setOnAction(this::openImage);
 //        workflowModel.print("FlatfieldWorkflow");
 //        nextButton.setDisable(true);
 //        finishButton.setDisable(true);
     }
     
-    private void onClick(ActionEvent e) {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File file = directoryChooser.showDialog(null);
-        List<File> files = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
-        folderButton.setText("Folder : "+file.getName());
-        System.out.println(files);
+    protected void openImage(ActionEvent e) {
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(null);
+        
+        Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile",file);
+        try {
+            Dataset dataset  = (Dataset) run.get().getOutput("data");
+            ImageDisplayPane imageDisplayPane = new ImageDisplayPane(context);
+            ImageDisplay imageDisplay = new DefaultImageDisplay();
+            context.inject(imageDisplay);
+            imageDisplay.display(dataset);
+            imageDisplayPane.display(imageDisplay);
+            borderPane.setCenter(imageDisplayPane);
+        } catch (Exception ex) {
+            Logger.getLogger(FlatfieldWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+//        List<File> files = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
+//        folderButton.setText("Folder : "+file.getName());
     }
     
 }

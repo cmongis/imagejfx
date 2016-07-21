@@ -11,15 +11,15 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
         <fx:include source="./ActionBar.fxml" />
     </bottom>
-    <center>
+   <top>
         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
             <children>
             <Button fx:id="folderButton" mnemonicParsing="false" text="Choose Folder" />
             </children>
         </StackPane>
-    </center>
+   </top>
 </BorderPane>
