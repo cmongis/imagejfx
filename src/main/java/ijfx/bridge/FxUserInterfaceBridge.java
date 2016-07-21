@@ -24,11 +24,10 @@ import ijfx.plugins.commands.AutoContrast;
 import ijfx.service.batch.BatchService;
 import ijfx.service.ui.CommandRunner;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.ui.datadisplay.image.DefaultImageWindow;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
-import ijfx.ui.datadisplay.image.ImageWindow;
 import ijfx.ui.datadisplay.table.TableDisplayWindow;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.datadisplay.table.TableWindow;
 import ijfx.ui.datadisplay.text.TextWindow;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -201,15 +200,19 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
             
             // we always assume that an image is displayed so we create an image window
             // in the image container (singleton pattern)
-            final ImageWindow imageWindow = new ImageWindow(dspl);
+            final DefaultImageWindow imageWindow = new DefaultImageWindow(dspl.getContext());
+            
+            imageWindow.show((ImageDisplay)imgDisplay);
 
+            
+            
+            
             Platform.runLater(() -> {
                 // creating the @ImageWindow 
                 // getting the @ImageWindowContainer unique instance
                 ImageWindowContainer.getInstance().getChildren().add(imageWindow);
 
-                // refreshing the window for some reason I forgot
-                imageWindow.refreshSourceImage();
+              
                 
                 //loadingScreenService.frontEndTask("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay);
                 

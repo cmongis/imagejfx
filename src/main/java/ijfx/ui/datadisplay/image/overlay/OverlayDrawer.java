@@ -20,6 +20,7 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
@@ -41,6 +42,8 @@ public interface OverlayDrawer<T extends Overlay> extends ClassHandler<Overlay> 
     // with size and position depending on the viewport
     public Node update(T overlay, ViewPort viewport);
 
+   
+    
     public static Color toFxColor(ColorRGB color) {
         return toFxColor(color,1.0);
     }
@@ -53,12 +56,27 @@ public interface OverlayDrawer<T extends Overlay> extends ClassHandler<Overlay> 
         //return new fillColor
         return new Color(red, green, blue, alpha);
     }
+    
+    public default boolean isOnOverlay(Overlay overlay, ViewPort viewport, double xOnImage, double yOnImage) {
+        double x1 = overlay.getRegionOfInterest().realMin(0);
+        double y1 = overlay.getRegionOfInterest().realMin(1);
+        double x2 = overlay.getRegionOfInterest().realMax(0);
+        double y2 = overlay.getRegionOfInterest().realMax(1);
+        
+        //System.out.println(String.format("(%.0f,%.0f), (%.0f,%.0f)", x1, y1, x2, y2));
+        Rectangle2D r = new Rectangle2D(x1, y1, x2 - x1, y2 - y1);
+        //System.out.println(String.format("contains  (%.0f,%.0f) ? : %b",x,y,r.contains(x,y)));
+        return (r.contains(xOnImage, yOnImage));
+        
+        
+    }
+    
 
     public static void color(Overlay overlay, Shape shape) {
         ColorRGB fillColor = overlay.getFillColor();
         Color fxFillColor = toFxColor(fillColor,0).deriveColor(1.0, 0, 0, 0.0);
         shape.setFill(fxFillColor);
-        shape.setStroke(toFxColor(overlay.getLineColor(),1));
+        shape.setStroke(toFxColor(overlay.getLineColor(),1.0));
        
         shape.setStrokeWidth(overlay.getLineWidth());
         shape.setOpacity(1.0);

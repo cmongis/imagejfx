@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.image.Image;
+import javax.swing.UIManager;
 import mongis.utils.panecell.PaneIconCell;
 import org.scijava.plugin.Parameter;
 
@@ -47,6 +48,10 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
     @Override
     public void setItem(Iconazable icon) {
         
+        
+        if(icon == getItem()) return;
+            
+        
         // we must bind the selected property
         if(getItem() != null) {
             getItem().selectedProperty().unbindBidirectional(selectedProperty());
@@ -54,7 +59,7 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
         
         super.setItem(icon);
         if(icon != null) {
-            icon.selectedProperty().bindBidirectional(selectedProperty());
+            selectedProperty().bindBidirectional(icon.selectedProperty());
         }
     }
     
@@ -73,7 +78,8 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
     @Override
     public void onSimpleClick() {
         super.onSimpleClick();
-        getItem().selectedProperty().setValue(selectedProperty().getValue());
+        explorerService.selectItem((Explorable)getItem());
+        //getItem().selectedProperty().setValue(!getItem().selectedProperty().getValue());
     }
     
     @Override

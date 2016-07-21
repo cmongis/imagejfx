@@ -22,6 +22,8 @@ package ijfx.ui.datadisplay.image;
 
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.batch.BatchSingleInput;
+import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.ui.canvas.FxImageCanvas;
@@ -40,6 +42,7 @@ import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -122,7 +125,6 @@ public class ImageWindow extends Window {
 
     private Dataset dataset;
 
-    private DatasetView datasetView;
 
     @Parameter
     private DisplayService displayService;
@@ -197,9 +199,9 @@ public class ImageWindow extends Window {
 
     private PopArcMenu arcMenu;
 
-    static String TITLE_CLASS_NAME = "image-window-titlebar";
+    static String TITLE_CLASS_NAME = "ijfx-window-titlebar";
 
-    static String WINDOW_CLASS_NAME = "image-window";
+    static String WINDOW_CLASS_NAME = "ijfx-window";
 
     static String INFO_LABEL_CLASS_NAME = "info-label";
 
@@ -361,7 +363,7 @@ public class ImageWindow extends Window {
                 //hbox.getChildren().add(new AxisSlider(imageDisplay, i));
             }
         }
-
+         
         arcMenu.build();
 
         refreshSourceImage();
@@ -487,7 +489,7 @@ public class ImageWindow extends Window {
         this.dataset = dataset;
     }
 
-    WritableImage wi;
+    private WritableImage wi;
 
     public WritableImage getWrittableImage() {
         if (wi == null) {
@@ -497,7 +499,7 @@ public class ImageWindow extends Window {
         return wi;
     }
 
-    ARGBScreenImage currentScreenImage;
+ 
 
     public DisplayService getDisplayService() {
         return displayService;
