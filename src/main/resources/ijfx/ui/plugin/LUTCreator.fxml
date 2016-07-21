@@ -26,7 +26,7 @@
             <children>
                 <Button fx:id="addButton" mnemonicParsing="false" onMouseClicked="#onclick" text="Add color" />
                 <Button mnemonicParsing="false" onAction="#deleteColor" text="Delete color" />
-            <CheckBox fx:id="choiceCheckBox" mnemonicParsing="false" text="Interpolation" />
+            <CheckBox fx:id="choiceCheckBox" mnemonicParsing="false" selected="true" text="Interpolation" />
             </children>
             <BorderPane.margin>
                 <Insets />
