@@ -248,8 +248,8 @@ public class PreviewService extends AbstractService implements ImageJService {
 
             //Has to be rebuil to create colorTable
             view.rebuild();
-            long[] dimension = new long[dataset.numDimensions() - 2];
-            activePosition.localize(dimension);
+//            long[] dimension = new long[dataset.numDimensions() - 2];
+//            activePosition.localize(dimension);
 
             //Set LUT
             setLUT(activeDataview, view);
@@ -358,8 +358,8 @@ public class PreviewService extends AbstractService implements ImageJService {
         Position activePosition = imageDisplayService.getActivePosition();
         List<ColorTable> colorTables = input.getColorTables();
 
-        long[] dimension = new long[output.getData().numDimensions() - 2];
-        activePosition.localize(dimension);
+//        long[] dimension = new long[output.getData().numDimensions() - 2];
+//        activePosition.localize(dimension);
 
         //Set LUT
         if (input.getData().getImgPlus().getCompositeChannelCount() == 1) {
