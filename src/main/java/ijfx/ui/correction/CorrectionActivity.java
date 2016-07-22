@@ -36,7 +36,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Activity.class, name = "CorrectionWorkflow", label = "Correction")
+@Plugin(type = Activity.class, name = "imagej", label = "Correction")
 public class CorrectionActivity implements Activity {
 
     @Parameter
@@ -57,8 +57,7 @@ public class CorrectionActivity implements Activity {
         }
         if (flow == null) {
             flow = new Flow(WelcomeWorkflow.class)
-                    .withLink(WelcomeWorkflow.class, "nextAction", InputWorkflow.class)
-                    .withLink(InputWorkflow.class, "nextAction", FlatfieldWorkflow.class)
+                    .withLink(WelcomeWorkflow.class, "nextAction", FlatfieldWorkflow.class)
                     .withLink(FlatfieldWorkflow.class, "nextAction", BUnwarpJWorkflow.class)
                     .withLink(BUnwarpJWorkflow.class, "nextAction", EndWorkflow.class)
                     .withGlobalLink("finishAction", EndWorkflow.class);

@@ -91,19 +91,18 @@ import org.scijava.plugin.Parameter;
 
 /**
  * This render an ImageDisplay as a JavaFX object.
- * 
+ *
  * e.g. :
- * 
- * 
+ *
+ *
  * Dataset dataset = ...
- * 
+ *
  * DefaultImageDispay imageDisplay = new DefaultImageDisplay();
- * imageDisplay.display(dataset);
- * ImageDisplayPane pane = new ImageDisplayPane(context);
- * pane.show(imageDisplay);
- * 
- * 
- * 
+ * imageDisplay.display(dataset); ImageDisplayPane pane = new
+ * ImageDisplayPane(context); pane.show(imageDisplay);
+ *
+ *
+ *
  * @author cyril
  */
 public class ImageDisplayPane extends AnchorPane {
@@ -619,13 +618,12 @@ public class ImageDisplayPane extends AnchorPane {
     }
 
     private boolean isOnOverlay(double x, double y, Overlay overlay) {
-        
-        
-         
+
         OverlayDrawer drawer = getDrawer(overlay);
-        
-        if(drawer == null) return false;
-        else {
+
+        if (drawer == null) {
+            return false;
+        } else {
             return drawer.isOnOverlay(overlay, canvas.getCamera(), x, y);
         }
         /*
@@ -640,7 +638,7 @@ public class ImageDisplayPane extends AnchorPane {
         Rectangle2D r = new Rectangle2D(x1, y1, x2 - x1, y2 - y1);
         //System.out.println(String.format("contains  (%.0f,%.0f) ? : %b",x,y,r.contains(x,y)));
         return (r.contains(x, y));
-        */
+         */
     }
 
     /*
@@ -736,6 +734,10 @@ public class ImageDisplayPane extends AnchorPane {
         canvas.repaint();
         updateInfoLabel();
 
+    }
+
+    public FxImageCanvas getCanvas() {
+        return canvas;
     }
 
     /*

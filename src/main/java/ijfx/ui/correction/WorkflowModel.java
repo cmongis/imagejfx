@@ -24,8 +24,10 @@ import ijfx.ui.main.ImageJFX;
 import io.datafx.controller.injection.scopes.FlowScoped;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.display.ImageDisplay;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 
@@ -35,6 +37,11 @@ import org.scijava.plugin.Parameter;
  */
 @FlowScoped
 public class WorkflowModel {
+    
+    protected ImageDisplay flatFieldImageDisplay;
+
+
+   
 
     @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine"})
     private String min_scale_deformation_choice;
@@ -147,12 +154,13 @@ public class WorkflowModel {
         this.context = context;
     }
 
-    public Dataset getFlatField() {
-        return flatField;
+  
+    public Optional<ImageDisplay> getFlatFieldImageDisplay() {
+        return Optional.ofNullable(flatFieldImageDisplay);
     }
 
-    public void setFlatField(Dataset flatField) {
-        this.flatField = flatField;
+    public void setFlatFieldImageDisplay(ImageDisplay flatFieldImageDisplay) {
+        this.flatFieldImageDisplay = flatFieldImageDisplay;
     }
 
 }

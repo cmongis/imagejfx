@@ -58,4 +58,6 @@ public class AbstractCorrectionActivity {
     @ActionTrigger("finishAction")
     protected Button finishButton;
 
+    
+    
 }

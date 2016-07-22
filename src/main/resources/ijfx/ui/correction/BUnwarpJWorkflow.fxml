@@ -13,6 +13,21 @@
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
+            <Tab text="Images">
+               <content>
+                  <BorderPane fx:id="imagesContainer" prefHeight="200.0" prefWidth="200.0">
+                     <left>
+                        <Button fx:id="leftButton" mnemonicParsing="false" text="Button" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <Button fx:id="rightButton" mnemonicParsing="false" text="Button" BorderPane.alignment="CENTER" />
+                     </right>
+                     <bottom>
+                        <Button fx:id="bottomButton" mnemonicParsing="false" text="Button" BorderPane.alignment="CENTER" />
+                     </bottom>
+                  </BorderPane>
+               </content>
+            </Tab>
                 <Tab text="Deformation">
                <content>
                   <GridPane>
