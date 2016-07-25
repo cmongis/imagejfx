@@ -20,7 +20,6 @@
  */
 package mongis.utils;
 
-import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.Interpolator;
@@ -36,7 +35,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.util.Callback;
@@ -74,7 +72,7 @@ public class TaskButtonBinding {
 
     private ObjectProperty<EventType<WorkerStateEvent>> lastTaskStatus = new SimpleObjectProperty<>();
 
-    private final Property<Worker.State> taskStateProperty = new SimpleObjectProperty();
+    private final Property<Worker.State> taskStateProperty = new SimpleObjectProperty(Worker.State.READY);
 
     private final Property<FontAwesomeIcon> iconProperty = new SimpleObjectProperty();
 
@@ -158,6 +156,13 @@ public class TaskButtonBinding {
     protected void onClick(ActionEvent event) {
         if (currentTask == null || currentTask.isRunning() == false) {
             currentTask = taskFactory.call(this);
+            
+            if(currentTask == null) {
+                
+                throw new NullPointerException("The TaskFactory returned a null pointer");
+                
+            }
+            
             taskStateProperty.bind(currentTask.stateProperty());
             if (!currentTask.isRunning()) {
                 new Thread(currentTask).start();
