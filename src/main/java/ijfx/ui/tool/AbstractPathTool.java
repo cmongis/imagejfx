@@ -21,7 +21,6 @@
 package ijfx.ui.tool;
 
 import ijfx.ui.canvas.FxImageCanvas;
-import ijfx.ui.main.ImageJFX;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.ui.plugin.panel.OverlayOptionsService;
@@ -43,12 +42,14 @@ import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.lut.LUTService;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.RealPoint;
 import org.scijava.Context;
 import org.scijava.display.DisplayService;
+import org.scijava.event.EventService;
 
 import org.scijava.plugin.Parameter;
 
@@ -93,13 +94,16 @@ public abstract class AbstractPathTool implements FxTool {
     private OverlaySelectionService overlaySelectionService;
     
     @Parameter
-    LUTService lutService;
+    private LUTService lutService;
 
     @Parameter
-    DisplayRangeService displayRangeService;
+    private DisplayRangeService displayRangeService;
 
     @Parameter
-    Context context;
+    protected Context context;
+    
+    @Parameter
+    private EventService eventService;
     
     @Parameter
     OverlayOptionsService overlayOptionsService;
@@ -127,6 +131,8 @@ public abstract class AbstractPathTool implements FxTool {
         currentPath = null;
     }
     public void onMouseDragged(MouseEvent event) {
+        canvas = (FxImageCanvas)event.getTarget();
+        System.out.println(canvas);
         elongPath(event);
         event.consume();
         duringDrawing(currentPath);
@@ -152,10 +158,16 @@ public abstract class AbstractPathTool implements FxTool {
             for (int i = 0; i != dimCount; i++) {
                 final long pos = getActiveImageDisplay().getLongPosition(i);
                 overlay.setAxis(getActiveImageDisplay().axis(i), i);
-
+                
+                
+                
             }
 
+           
         }
+         overlayService.addOverlays(display, list);
+         list.stream().map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
+        /*
         ImageJFX.getThreadQueue().execute(() -> {
 
             double rangeMin = displayRangeService.getCurrentViewMinimum();
@@ -166,7 +178,10 @@ public abstract class AbstractPathTool implements FxTool {
                 overlaySelectionService.setOverlaySelection(display, list.get(0), true);
             }
             displayRangeService.updateCurrentDisplayRange(rangeMin, rangeMax);
-        });
+            
+            new OverlayCreatedEvent(overlay);
+            
+        });*/
     }
 
     
@@ -262,7 +277,7 @@ public abstract class AbstractPathTool implements FxTool {
 
     @Override
     public void subscribe(FxImageCanvas canvas) {
-        this.canvas = canvas;
+        
         //canvas.addEventHandler(DragEvent.DRAG_ENTERED, this::onMousePressed);
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, onMouseReleased);
