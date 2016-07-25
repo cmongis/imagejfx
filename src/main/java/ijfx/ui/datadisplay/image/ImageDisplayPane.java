@@ -31,6 +31,7 @@ import ijfx.ui.canvas.utils.ViewPort;
 import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
 import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.FxToolService;
 import ijfx.ui.tool.ToolChangeEvent;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
@@ -139,6 +141,8 @@ public class ImageDisplayPane extends AnchorPane {
 
     @Parameter
     private FxToolService toolService;
+
+    Logger logger = ImageJFX.getLogger();
 
     private FxTool currentTool;
 
@@ -412,7 +416,7 @@ public class ImageDisplayPane extends AnchorPane {
      */
     public void build() {
         setTitle(imageDisplay.getName());
-        //   System.out.println(getDatasetview().getPlanePosition().numDimensions());
+        System.out.println(getDatasetview().getPlanePosition().numDimensions());
 
         logService.setLevel(LogService.INFO);
 
@@ -567,7 +571,18 @@ public class ImageDisplayPane extends AnchorPane {
     @EventHandler
     void onDataViewUpdated(DataViewUpdatedEvent event) {
         logService.info("DataView updated");
+                bus.channel(event);
+        try {
+            
         if (imageDisplay.contains(event.getView())) {
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    @EventHandler
+    public void onDatasetViewUpdated(DataViewUpdatedEvent event) {
+        if (event.getView() == getDatasetview()) {
             bus.channel(event);
         }
     }

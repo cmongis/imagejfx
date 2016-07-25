@@ -24,6 +24,8 @@ import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
@@ -31,69 +33,71 @@ import javafx.geometry.Rectangle2D;
  *
  * @author Cyril MONGIS, 2015
  */
-public class CanvasCamera implements ViewPort  {
+public class CanvasCamera implements ViewPort {
 
     // coordinates of the center of the camera
-    double x = Double.NaN;
-    double y = Double.NaN;
+    final DoubleProperty xCenterProperty = new SimpleDoubleProperty(Double.NaN);
+    final DoubleProperty yCenterProperty = new SimpleDoubleProperty(Double.NaN);
 
     // width and heiht of the camera
     double width;
     double height;
 
-    double zoom = 1.0;
+    final DoubleProperty zoomProperty = new SimpleDoubleProperty(1.0);
 
     Rectangle2D imageSpace;
 
     public CanvasCamera() {
-        
+        zoomProperty.addListener(e -> fireValueChangedEvent());
+        xCenterProperty.addListener(e -> fireValueChangedEvent());
+        yCenterProperty.addListener(e -> fireValueChangedEvent());
+
     }
-    
+
     // define the bounds of the images regardless of zoom level
     public Rectangle2D getImageSpace() {
         return imageSpace;
     }
 
     public void setImageSpace(Rectangle2D imageSpace) {
-       // System.out.println("Setting image space : " + imageSpace);
+        // System.out.println("Setting image space : " + imageSpace);
         this.imageSpace = imageSpace;
-        x = Double.NaN;
-        y = Double.NaN;
+        xCenterProperty.set(Double.NaN);
+        yCenterProperty.set(Double.NaN);
     }
 
     // width of the part extracted from the picture after taking account the zoom effect
     @Override
     public double getEffectiveWidth() {
-        return width / zoom;
+        return width / zoomProperty.get();
     }
 
     // height of the part extracted from the picture after taking account the zoom effect
     @Override
     public double getEffectiveHeight() {
-        return height / zoom;
+        return height / zoomProperty.get();
     }
 
     public double getX() {
-        if (Double.isNaN(x)) {
-            x = imageSpace.getWidth() / 2;
+        if (Double.isNaN(xCenterProperty.get())) {
+            xCenterProperty.set(imageSpace.getWidth() / 2);
         }
-        return x;
+        return xCenterProperty.get();
     }
 
     public void setX(double x) {
-
-        this.x = x;
+        this.xCenterProperty.set(x);
     }
 
     public double getY() {
-        if (Double.isNaN(y)) {
-            y = imageSpace.getHeight() / 2;
+        if (Double.isNaN(yCenterProperty.get())) {
+            yCenterProperty.set(imageSpace.getHeight() / 2);
         }
-        return y;
+        return yCenterProperty.get();
     }
 
     public void setY(double y) {
-        this.y = y;
+        this.yCenterProperty.set(y);
     }
 
     public double getWidth() {
@@ -114,25 +118,26 @@ public class CanvasCamera implements ViewPort  {
 
     @Override
     public double getZoom() {
-        return zoom;
+        return zoomProperty.get();
     }
 
     @Override
     public void setZoom(double zoom) {
-        this.zoom = zoom;
+        this.zoomProperty.set(zoom);
         fireValueChangedEvent();
     }
 
     public void zoomIn() {
-        zoom *= 1.1;
+        double value = zoomProperty.get();
+        zoomProperty.set(value *= 1.1);
         fireValueChangedEvent();
-       // System.out.println(zoom);
+        // System.out.println(zoom);
     }
 
     public void zoomOut() {
-        zoom *= 0.9;
+        double value = zoomProperty.get();
+        zoomProperty.set(value *= 0.9);
         fireValueChangedEvent();
-       // System.out.println(zoom);
     }
 
     private double getCameraLeftLimit() {
@@ -161,7 +166,7 @@ public class CanvasCamera implements ViewPort  {
 
     public CanvasCamera moveX(double x) {
 
-        double newX = this.x + x;
+        double newX = this.xCenterProperty.get() + x;
         if (newX >= getCameraRightLimit()) {
             newX = getCameraRightLimit() - 1;
         }
@@ -175,7 +180,7 @@ public class CanvasCamera implements ViewPort  {
 
     public CanvasCamera moveY(double y) {
 
-        double newY = this.y + y;
+        double newY = this.yCenterProperty.get() + y;
         if (newY >= getCameraDownLimit()) {
             newY = getCameraDownLimit() - 1;
         }
@@ -224,70 +229,75 @@ public class CanvasCamera implements ViewPort  {
         accordToSpace(imageSpace);
     }
 
-
     @Override
     public Point2D getPositionOnImage(Point2D point) {
         final double mouseX = point.getX();
         final double mouseY = point.getY();
-        
-        final double dx = ((mouseX) - (getWidth()/2))/getZoom();
-        final double dy = ((mouseY) - (getHeight()/2))/getZoom();
-        
-        
-        return new Point2D(getX()+dx,getY()+dy);
+
+        final double dx = ((mouseX) - (getWidth() / 2)) / getZoom();
+        final double dy = ((mouseY) - (getHeight() / 2)) / getZoom();
+
+        return new Point2D(getX() + dx, getY() + dy);
     }
-    
+
     @Override
     public Point2D getPositionOnCamera(Point2D point) {
-        
+
         Rectangle2D r = getSeenRectangle();
-        
-        if(point == null) {
+
+        if (point == null) {
             ImageJFX.getLogger().warning("Error ! Position null");
-            
-            return new Point2D(-1,-1);
-            
-            
+
+            return new Point2D(-1, -1);
+
         }
-        
-       double x,y;
-        
+
+        double x, y;
+
         //double x = (point.getX() - getX()) * zoom + (width/2);
-        x = (point.getX()-r.getMinX())*zoom;
-        y = (point.getY()-r.getMinY())*zoom;
-       
-       // double y = (point.getY() - getY()) * zoom + (height/2);
-        
-        return new Point2D(x,y);
-        
-    }
-    
-     public boolean isVisibleOnCamera(Point2D p) {
-        
-        return p.getX() >= 0 && p.getX() <= width && p.getY() >= 0  && p.getY() <= height;
-        
-    }
-    
+        x = (point.getX() - r.getMinX()) * zoomProperty.get();
+        y = (point.getY() - r.getMinY()) * zoomProperty.get();
 
+        // double y = (point.getY() - getY()) * zoom + (height/2);
+        return new Point2D(x, y);
 
-   
+    }
+
+    public boolean isVisibleOnCamera(Point2D p) {
+
+        return p.getX() >= 0 && p.getX() <= width && p.getY() >= 0 && p.getY() <= height;
+
+    }
+
     @Override
     public void addListener(Consumer<CanvasCamera> listener) {
         listeners.add(listener);
     }
+
     public void removeListener(Consumer<CanvasCamera> listener) {
         listeners.remove(listener);
     }
-    
+
+    public DoubleProperty zoomProperty() {
+        return zoomProperty;
+    }
+
+    public DoubleProperty xProperty() {
+        return xCenterProperty;
+    }
+
+    public DoubleProperty yProperty() {
+        return yCenterProperty;
+    }
+
     public void fireValueChangedEvent() {
-        
-        for(Consumer<CanvasCamera> listener : listeners) {
+
+        for (Consumer<CanvasCamera> listener : listeners) {
             listener.accept(this);
         }
-        
+
     }
-    
+
     List<Consumer<CanvasCamera>> listeners = new ArrayList<>();
 
-   
 }
