@@ -33,6 +33,7 @@ import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.DefaultWorkflow;
+import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
@@ -280,9 +281,18 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         if (!batchResult) {
             return false;
         }
-
+        
+        
+        detectObjectsAndDisplay(handler, inputDisplay, input);
+        
+        return true;
+    }
+    protected void detectObjectsAndDisplay(ProgressHandler handler, ImageDisplay inputDisplay,BatchSingleInput input) {
         // detecting objects
         handler.setStatus("Detecting objects...");
+        
+       
+        
         Overlay[] overlay = BinaryToOverlay.transform(context, input.getDataset(), false);
         // giving a random color to each overlay
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
@@ -348,7 +358,6 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         }
         uiService.show(resultTable);
         uiService.show(outputDisplay);
-        return true;
 
     }
 
@@ -389,8 +398,26 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             return task;
 
         }
-
-        return null;
+        
+        else {
+            
+             Task<Boolean> task = new WorkflowBuilder(context)
+                    .addInput(imageDisplayService.getActiveDataset())
+                    .execute(workflowPanel.stepListProperty())
+                    .then(input->detectObjectsAndDisplay(new SilentProgressHandler(), imageDisplayService.getActiveImageDisplay(), input))
+                    .start();
+           
+            
+            loadingScreenService.frontEndTask(
+                   task
+                    , true);
+            
+            return task;
+            
+            
+        }
+        
+       
 
     }
 

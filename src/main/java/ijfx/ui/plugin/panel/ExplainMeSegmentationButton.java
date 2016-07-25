@@ -21,6 +21,7 @@ package ijfx.ui.plugin.panel;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.service.ui.HintService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
@@ -46,6 +47,9 @@ public class ExplainMeSegmentationButton extends AbstractContextButton {
     @Parameter
     ActivityService activityService;
     
+    @Parameter
+    UiContextService uiContextService;
+    
     public ExplainMeSegmentationButton() {
         super("Explain me", FontAwesomeIcon.INFO_CIRCLE);
         //getButton().setText("Explain me");
@@ -59,6 +63,14 @@ public class ExplainMeSegmentationButton extends AbstractContextButton {
      
     
     public void playHint(Class<?> clazz) {
+        
+        
+        if(uiContextService.isCurrent("explorerActivity")) {
+            
+            hintService.displayHints("/ijfx/ui/hints/SegmentationInExplorer.json", true);
+            
+            
+        }
         
         hintService.displayHints(clazz, true);
         hintService.displayHints(WorkflowPanel.class,true);
