@@ -41,20 +41,6 @@ public class ProfilesCommandTester implements Command{
     @Override
     public void run() {
         
-        ProfilesSet trainingSet = segmentationService.generateTrainingSet();
-        segmentationService.generateConfirmationSet(trainingSet);
-        
-        NeuralNet nn = new LSTMRnn(1, 4, 1);
-        
-        nn.initialize();
-        System.out.println("Network initialized!");
-        
-        List<List<double[]>> results = new ArrayList<>(trainingSet.getProfiles().size());
-        for(int p = 0; p < trainingSet.getProfiles().size(); p++){
-            List<int[]> profile = trainingSet.getProfiles().get(p);
-            List<double[]> blabla = trainingSet.getPointsAsFeatures(profile);
-            results.add(nn.forwardProp(blabla));
-        }
-        System.out.println("Forward prop done");
+        segmentationService.generateTrainingSet();
     }
 }

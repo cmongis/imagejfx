@@ -24,9 +24,11 @@ import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayShapeStatistics;
 import ijfx.service.overlay.OverlayStatService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javafx.geometry.Point2D;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
 import net.imagej.ImageJService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -51,8 +53,8 @@ public class SegmentationService extends AbstractService implements ImageJServic
     private final double COLOR = 1.0;
     public final int membrane_width = 6;
     
-    private Dataset labels;
-    private List<int[]> confirmationSet;
+    private List<ProfilesSet> trainingData;
+    private List<List<int[]>> confirmationSet;
     
     @Parameter
     OverlayService overlayService;
@@ -75,38 +77,59 @@ public class SegmentationService extends AbstractService implements ImageJServic
     @Parameter
     UIService uIService;
     
-    public ProfilesSet generateTrainingSet(){
-        System.out.println("START : Generate profiles for training dataset");
-        ArrayList<Point2D> centers = new ArrayList<>();
+    @Parameter
+    UIService uis;
+    
+    public void generateTrainingSet(){
+        
+        trainingData = new ArrayList<>();
+        confirmationSet = new ArrayList<>();
+        
         double maxDiameter = 0.0;
         
-        ImageDisplay display = imageDisplayService.getActiveImageDisplay();
-        Dataset dataset = imageDisplayService.getActiveDataset(display);
-        labels = imagePlaneService.createEmptyPlaneDataset(dataset);
-        List<Overlay> overlays = overlayService.getOverlays(display);
+        List<ImageDisplay> displays = imageDisplayService.getImageDisplays();
+        List<Dataset> datasets = new ArrayList<>(displays.size());
+        List<Dataset> labeledDs = new ArrayList<>(displays.size());
+        List<List<Overlay>> overlaySet = new ArrayList<>();
+
+        displays.stream().forEach(id -> {
+            datasets.add(imageDisplayService.getActiveDataset(id));
+            overlaySet.add(overlayService.getOverlays(id));
+        });
         
-        for(Overlay o : overlays){
-            OverlayShapeStatistics stats = overlayStatService.getShapeStatistics(o);
-            centers.add(stats.getCenterOfGravity());
-            if(stats.getFeretDiameter() > maxDiameter)
-                maxDiameter = stats.getFeretDiameter();
-            overlayDrawingService.drawOverlay(o, OverlayDrawingService.OUTLINER, labels, COLOR);
+        for(int ds = 0; ds < datasets.size(); ds++){
+            
+            labeledDs.add(imagePlaneService.createEmptyPlaneDataset(datasets.get(ds)));
+            ArrayList<Point2D> centers = new ArrayList<>();
+            
+            for(Overlay o : overlaySet.get(ds)){
+                
+                OverlayShapeStatistics stats = overlayStatService.getShapeStatistics(o);
+                centers.add(stats.getCenterOfGravity());
+                
+                if(stats.getFeretDiameter() > maxDiameter)
+                    maxDiameter = stats.getFeretDiameter();
+                
+                overlayDrawingService.drawOverlay(o, OverlayDrawingService.OUTLINER, labeledDs.get(ds), COLOR);
+                uis.show(labeledDs.get(ds));
+            }
+            ProfilesSet profiles = new DefaultProfilesSet(centers, (int)maxDiameter, context);
+            generateConfirmationSet(profiles, labeledDs.get(ds));
+            trainingData.add(profiles);
         }
-        System.out.printf("\tData retrieved from %d overlays\n", overlays.size());
-        
-        ProfilesSet profiles = new DefaultProfilesSet(centers, (int)maxDiameter, context);
-        System.out.printf("END : %d profiles computed\n", profiles.getProfiles().size());
-        
-        return profiles;
     }
     
-    public void generateConfirmationSet(ProfilesSet trainingSet){
+    public void generateConfirmationSet(ProfilesSet trainingSet, Dataset labeledDs){
         
-        confirmationSet = new ArrayList<>();
-        RandomAccess<RealType<?>> randomAccess = this.labels.randomAccess();
+        RandomAccess<RealType<?>> randomAccess = labeledDs.randomAccess();
+        
+        List<int[]> labeledProfiles = new ArrayList<>(trainingSet.getProfiles().size());
         
         for(int i =  0; i < trainingSet.getProfiles().size(); i++){
+            
             List<int[]> profile = trainingSet.getProfiles().get(i);
+            int[] labels = new int[profile.size()];
+            Arrays.fill(labels, 0);
             
             for(int j = 0; j < profile.size(); j++){
                 
@@ -118,11 +141,6 @@ public class SegmentationService extends AbstractService implements ImageJServic
                 double pixelValue = randomAccess.get().getRealDouble();
                 
                 if(pixelValue == COLOR){
-                    int[] labels = new int[profile.size()];
-                    
-                    for (int l = 0; l < labels.length; l++){
-                        labels[l] = 0;
-                    }
                     
                     for(int k = j-membrane_width/2; k <= j+membrane_width/2; k++){
                         if(k < 0 ||  k > labels.length)
@@ -131,10 +149,11 @@ public class SegmentationService extends AbstractService implements ImageJServic
                             labels[k] = 1;
                     }
                     
-                    confirmationSet.add(labels);
                     break;
                 }
+                labeledProfiles.add(labels);
             }
+            confirmationSet.add(labeledProfiles);
         }
     }
     
@@ -154,3 +173,5 @@ public class SegmentationService extends AbstractService implements ImageJServic
         
     }
 }
+
+/*Hi guys, I'm trying to build a network with a GraveLSTM layer. I'd like to associate each element of a sequence to a label. So I have a set of profiles made of pixel intensities (List<double[]>), and would like to give a class to each of those intensities. But I'm not sure of what I should use to build my DataSet object. Should I use a single profile or all of them ?*/

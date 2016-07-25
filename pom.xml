@@ -224,6 +224,21 @@
             <version>0.21.0</version>
             <classifier>tests</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>canova-api</artifactId>
+            <version>0.0.0.17</version>
+        </dependency>
     </dependencies>
     
     <build>
