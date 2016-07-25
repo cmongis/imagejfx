@@ -46,7 +46,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ExplorerView.class)
+@Plugin(type = ExplorerView.class,priority=0.9)
 public class TableViewView implements ExplorerView{
 
     TableView<Explorable> tableView = new TableView<>();

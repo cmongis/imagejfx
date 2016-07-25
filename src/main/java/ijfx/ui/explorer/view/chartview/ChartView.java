@@ -61,7 +61,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class)
+@Plugin(type = ExplorerView.class,priority=0.5)
 public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Parameter
