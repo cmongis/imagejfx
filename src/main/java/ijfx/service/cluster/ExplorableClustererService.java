@@ -61,9 +61,10 @@ public class ExplorableClustererService extends AbstractService implements Image
         }
         List<ObjectClusterable> objectClusterables = 
                 listExplorable.stream()
-                .map(e -> new ObjectClusterable(e, 1, MetaDataSetUtils.getMetadatas(e, metadataKeys))).collect(Collectors.toList());
+                .map(e -> new DefaultObjectClusterable(e, 1, MetaDataSetUtils.getMetadatas(e, metadataKeys))).collect(Collectors.toList());
 
         return clustererService.buildClusterer(objectClusterables, metadataKeys);
+       
     }
 
    

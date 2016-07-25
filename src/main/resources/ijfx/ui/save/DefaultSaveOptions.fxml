@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root alignment="BASELINE_CENTER" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="BASELINE_CENTER" minHeight="150.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <RadioButton fx:id="replaceFilesBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Replace File" />
       <RadioButton fx:id="newFilesBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Add suffix" />
@@ -22,6 +22,9 @@
             <TextField fx:id="newSuffix" maxWidth="1.7976931348623157E308" promptText="new suffix" />
             <Label fx:id="extension" text=".tiff" GridPane.columnIndex="1" />
          </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
       </GridPane>
       <Button fx:id="destinationFolderBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button">
          <VBox.margin>

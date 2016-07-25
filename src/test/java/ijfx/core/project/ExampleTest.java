@@ -19,30 +19,37 @@
  */
 package ijfx.core.project;
 
-import junit.framework.Assert;
+import ijfx.core.imagedb.ImageRecordService;
+import ijfx.core.imagedb.MetaDataExtractionService;
+import org.junit.Assert;
 import org.junit.Test;
-import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
-public class ExampleTest extends BaseSciJavaTest{
+public class ExampleTest extends BaseImageJTest{
+
     
     @Parameter
-    CommandService commandService;
+    MetaDataExtractionService service;
     
+    @Parameter
+    ImageRecordService imageRecordService;
+    
+    @Override
+    protected Class[] getService() {
+        return new Class[]{
+            ImageRecordService.class
+                };
+    }
     
     @Test
-    public void testRunCommand() {
-        
-        init();
-        
-        Assert.assertNotNull(commandService);
-        
+    public void testInjection() {
+        Assert.assertNotNull(imageRecordService);
+        Assert.assertNotNull(service);
     }
-            
-            
+    
     
 }

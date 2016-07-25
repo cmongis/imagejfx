@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import ijfx.ui.plugin.*?>
+
+<fx:root xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" type="AnchorPane" xmlns="http://javafx.com/javafx/8" >
+    <stylesheets>
+        <URL value="@/ijfx/ui/main/flatterfx.css" />
+    </stylesheets>
+    <children>
+        <BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <center>
+                <ScatterChart fx:id="scatterChart" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+                    <xAxis>
+                        <NumberAxis forceZeroInRange="false" side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis forceZeroInRange="false" side="LEFT" />
+                    </yAxis>
+                </ScatterChart>
+            </center>
+            <left>
+                <ComboBox fx:id="yComboBox" prefWidth="96.0" rotate="-90.0" BorderPane.alignment="CENTER" />
+            </left>
+            <top>
+                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <ComboBox fx:id="thirdComboBox" />
+                        <LUTComboBox fx:id="lutComboBox" prefWidth="150.0" />
+                        <Button fx:id="newLUTButton" mnemonicParsing="false" onMouseClicked="#newLUT" text="Custom LUT"   />
+
+                    </children>
+                </HBox>
+            </top>
+            <bottom>
+                <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <ComboBox prefWidth="150.0" fx:id="xComboBox" />
+                        <Button fx:id="snapshotButton" mnemonicParsing="false" onAction="#snapshot" />
+                        <Button fx:id="explainMe" mnemonicParsing="false" onMouseClicked="#help" text="Explain Me" />
+                    </children>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </children>
+</fx:root>

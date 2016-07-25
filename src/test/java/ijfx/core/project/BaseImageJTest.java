@@ -35,14 +35,17 @@ public abstract class BaseImageJTest {
     Context context;
 
     protected Context createContext(Class<? extends Service>... services) {
-
+        if(services == null) {
+            return new Context();
+        }
+        else {
         return new Context(services);
-
+        }
     }
 
     @Before
     public void setUp() {
-
+        
         createContext(getService()).inject(this);
 
     }

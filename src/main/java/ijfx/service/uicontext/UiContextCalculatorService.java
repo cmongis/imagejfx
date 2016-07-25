@@ -82,39 +82,41 @@ public class UiContextCalculatorService extends AbstractService implements Image
             if (overlaySelectionService == null) {
                 overlayService.getContext().inject(this);
             }
-
-            ImageDisplay imageDisplay = (ImageDisplay) display;
-
-            contextService.toggleContext(CTX_OVERLAY_SELECTED, display != null && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
-
-            contextService.toggleContext(CTX_MULTI_Z_IMAGE, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.Z));
-
-            contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.CHANNEL));
-
-            contextService.toggleContext(CTX_MULTI_TIME_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.TIME));
-
-            contextService.toggleContext(CTX_RGB_IMAGE, display != null && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
-
-            contextService.toggleContext(CTX_IMAGE_BINARY, display != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
+            ImageDisplay imageDisplay;
 
             contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
-
             contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()));
 
-            Dataset dataset = null;
-            if (display != null) {
-                dataset = (Dataset) imageDisplay.getActiveView().getData();
-                for (int i = 1; i <= 32; i *= 2) {
-                    contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", dataset.getValidBits() == i);
-                }
-            } else {
-                for (int i = 1; i <= 32; i *= 2) {
-                    contextService.toggleContext(String.valueOf(i) + "-bits", false);
+            // calculation specific to iamge display
+            if (display instanceof ImageDisplay) {
+                imageDisplay = (ImageDisplay) display;
+
+                contextService.toggleContext(CTX_OVERLAY_SELECTED, display != null && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
+
+                contextService.toggleContext(CTX_MULTI_Z_IMAGE, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.Z));
+
+                contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.CHANNEL));
+
+                contextService.toggleContext(CTX_MULTI_TIME_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.TIME));
+
+                contextService.toggleContext(CTX_RGB_IMAGE, display != null && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
+
+                contextService.toggleContext(CTX_IMAGE_BINARY, display != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
+
+                Dataset dataset = null;
+                if (display != null) {
+                    dataset = (Dataset) imageDisplay.getActiveView().getData();
+                    for (int i = 1; i <= 32; i *= 2) {
+                        contextService.toggleContext(String.valueOf(dataset.getValidBits()) + "-bits", dataset.getValidBits() == i);
+                    }
+                } else {
+                    for (int i = 1; i <= 32; i *= 2) {
+                        contextService.toggleContext(String.valueOf(i) + "-bits", false);
+                    }
                 }
             }
-            
             contextService.update();
-            
+
         });
     }
 
@@ -126,7 +128,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
 //            }
 //        });
         determineContext(event.getDisplay());
-       // contextService.update();
+        // contextService.update();
 
     }
 
@@ -138,7 +140,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
             }
         });
         determineContext(event.getDisplay());
-       // contextService.update();
+        // contextService.update();
 
     }
 
@@ -167,7 +169,6 @@ public class UiContextCalculatorService extends AbstractService implements Image
             }
         });*/
         //contextService.update();
-
     }
 
 }

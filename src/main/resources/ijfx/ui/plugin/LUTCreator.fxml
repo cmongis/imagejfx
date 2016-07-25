@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="800.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <VBox fx:id="vBox" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <children>
+                <ListView fx:id="listViewSamples" orientation="HORIZONTAL">
+               <padding>
+                  <Insets right="10.0" />
+               </padding></ListView>
+            <FlowPane fx:id="flowPane" alignment="CENTER_LEFT" hgap="5.0" prefHeight="200.0" prefWidth="200.0" rowValignment="TOP" vgap="5.0" />
+            </children>
+        </VBox>
+    </center>
+    <top>
+        <HBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="addButton" mnemonicParsing="false" onMouseClicked="#onclick" text="Add color" />
+                <Button mnemonicParsing="false" onAction="#deleteColor" text="Delete color" />
+            <CheckBox fx:id="choiceCheckBox" mnemonicParsing="false" selected="true" text="Interpolation" />
+            </children>
+            <BorderPane.margin>
+                <Insets />
+            </BorderPane.margin>
+        </HBox>
+    </top>
+</fx:root>

@@ -23,18 +23,26 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.ExplorableClustererService;
+import ijfx.service.ui.HintService;
+import ijfx.service.ui.LoadingScreenService;
+import ijfx.ui.correction.WorkflowModel;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.view.FilterView;
 import ijfx.ui.explorer.view.GridIconView;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.ScatterChart;
@@ -44,6 +52,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -52,18 +61,24 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class)
+@Plugin(type = ExplorerView.class,priority=0.5)
+public class ChartView extends AbstractChartView implements ExplorerView {
 
-public class ChartView extends FilterView implements ExplorerView {
-
+    @Parameter
+    WorkflowModel workflowModel;
+    @Parameter
+    HintService hintService;
+    
     @Parameter
     ExplorableClustererService explorableClustererService;
 
     @Parameter
     ExplorerService explorerService;
 
-    @FXML
-    ScatterChart<Number, Number> scatterChart;
+    @Parameter
+    LoadingScreenService loadingScreenService;
+    
+    String[] metadatas;
 
     @FXML
     ComboBox<String> xComboBox;
@@ -71,25 +86,25 @@ public class ChartView extends FilterView implements ExplorerView {
     @FXML
     ComboBox<String> yComboBox;
 
-    String[] metadatas;
-    private List<? extends Explorable> currentItems;
+    List<ComboBox<String>> comboBoxList;
 
     public ChartView() {
         super();
+        comboBoxList = new ArrayList<>();
+        metadatas = new String[2];
         try {
-            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/ChartView.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/chartview/ChartView.fxml");
         } catch (IOException ex) {
             Logger.getLogger(GridIconView.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         comboBoxList.add(xComboBox);
         comboBoxList.add(yComboBox);
-        metadatas = new String[2];
 
-        scatterChart.setTitle("ChartView");
+        scatterChart.setTitle("ChartView: XMeans Clustering");
         scatterChart.getXAxis().labelProperty().bind(xComboBox.getSelectionModel().selectedItemProperty());
         scatterChart.getYAxis().labelProperty().bind(yComboBox.getSelectionModel().selectedItemProperty());
         initComboBox();
+        setGraphicSnapshot();
     }
 
     @Override
@@ -99,24 +114,23 @@ public class ChartView extends FilterView implements ExplorerView {
 
     @Override
     public Node getIcon() {
-        return new FontAwesomeIconView(FontAwesomeIcon.MUSIC);
+        return new FontAwesomeIconView(FontAwesomeIcon.TIMES);
     }
 
     @Override
     public void setItem(List<? extends Explorable> items) {
         currentItems = items;
-        computeItems();
-
-        List<String> metadataList = this.getMetaDataKey(items);
+        List<String> metadatas = explorerService.getMetaDataKey(currentItems);
 
         comboBoxList.stream().forEach(c -> {
             String s = c.getSelectionModel().getSelectedItem();
             c.getItems().clear();
-            c.getItems().addAll(metadataList);
-            if (metadataList.contains(s)) {
+            c.getItems().addAll(metadatas);
+            if (metadatas.contains(s)) {
                 c.getSelectionModel().select(s);
             }
         });
+        computeItems();
     }
 
     @Override
@@ -130,48 +144,37 @@ public class ChartView extends FilterView implements ExplorerView {
 
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
-    }
-
-    private void addDataToChart(List<? extends Explorable> list) {
-
-        Series series = new Series();
-//        series.setNode(new Button("e"));
-        List<Data> listExplorers = list
+        currentItems
                 .stream()
-                .map(e -> {
-                    PlotExplorer plotExplorer = new DefaultPlotExplorer(e, metadatas, explorerService);
-                    return plotExplorer.getData();
-                })
-                .collect(Collectors.toList());
-        series.getData().addAll(listExplorers);
-        scatterChart.getData().add(series);
-        
-    
-        series.setName("Tuan anh is awesome");
-
+                .forEach(e -> e.selectedProperty().setValue(true));
     }
 
 //   
     /**
      * Perform a clustering algorithm and load the series.
      */
+    @Override
     public void computeItems() {
 
-        if (metadatas[0] != null && metadatas[1] != null) {
+        if (metadatas.length > 1) {
 
             scatterChart.getData().clear();
 
-            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
-        
+            List<List<? extends Explorable>> clustersList = new CallbackTask<Void,List<List<? extends Explorable>>>()
+                    .run((a,b) ->  explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas)))
+                    .submit(loadingScreenService)
+                    .call();
+            
+            
+//            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
             clustersList
                     .stream()
-                    .forEach(e -> addDataToChart(e));
+                    .forEach(e -> addDataToChart(e, Arrays.asList(metadatas)));
 
             bindLegend();
         }
     }
 
-    @Override
     public void initComboBox() {
         xComboBox.getSelectionModel().selectedItemProperty().addListener((obs, old, n) -> {
             metadatas[0] = n;
@@ -187,30 +190,13 @@ public class ChartView extends FilterView implements ExplorerView {
 
     public void deselecItems() {
         currentItems.stream()
-                .forEach(e -> e.selectedProperty().set(false));
+                .forEach(e -> e.selectedProperty().setValue(false));
     }
-
-    public void bindLegend() {
-        for (Series series : scatterChart.getData()) {
-
-            Node node = scatterChart.lookup(".series" + scatterChart.getData().indexOf(series));
-            Set<Node> legendItems = scatterChart.lookupAll("Label.chart-legend-item");
-
-            for (Node legend : legendItems) {
-                Label labelLegend = (Label) legend;
-                if (node.getStyleClass().get(1).equals(labelLegend.getGraphic().getStyleClass().get(2))) {
-                    TogglePlot togglePlot = new TogglePlot();
-                    togglePlot.getStyleClass().clear();
-                    togglePlot.getStyleClass().addAll(labelLegend.getGraphic().getStyleClass());
-                    labelLegend.setGraphic(togglePlot);
-                    series.getData().stream().forEach(e -> {
-                        TogglePlot togglePlotData = (TogglePlot) ((Data) e).getNode();
-                        togglePlot.bind(togglePlotData);
-                    });
-                    break;
-                }
-            }
-        }
+    
+    @Override
+    @FXML
+    protected void help(){
+        hintService.displayHints(ChartView.class, true);
     }
 
 }

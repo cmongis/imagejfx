@@ -17,26 +17,28 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.project;
+package ijfx.ui.correction;
 
-import net.imagej.ops.OpService;
-import org.junit.Test;
-import org.scijava.plugin.Parameter;
+import io.datafx.controller.ViewController;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 /**
  *
- * @author cyril
+ * @author Tuan anh TRINH
  */
-public class OverlayTest extends BaseSciJavaTest{
+@ViewController(value = "EndWorkflow.fxml", title = "Wizard: Finish")
+public class EndWorkflow extends AbstractCorrectionActivity {
+ 
+  
     
-    @Parameter
-    OpService opService;
-    
-    @Test
-    public void test() {
-        
-       
-        
+    @Inject  WorkflowModel workflowModel;
+
+    @PostConstruct
+    public void init() {
+        nextButton.setDisable(true);
+        finishButton.setDisable(true);
     }
-    
 }

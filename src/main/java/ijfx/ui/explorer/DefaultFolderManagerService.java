@@ -208,7 +208,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         logger.info("Exploration mode changed : " + mode != null ? mode.toString() : null);
     }
     private void setItems(List<Explorable> items) {
-        logger.info(String.format("Setting %d items",items.size()));
+        
+        if(items != null) logger.info(String.format("Setting %d items",items.size()));
+        else logger.info("Items are null");
         explorerService.setItems(items);
     }
     private Integer fetchMoreStatistics(ProgressHandler progress,List<Explorable> explorableList) {
@@ -230,7 +232,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
                     elementAnalyzedCount++;
                 }
                 if(e instanceof PlaneMetaDataSetWrapper) {
-                    SummaryStatistics stats = statsService.getDatasetSummaryStatistics(e.getDataset());
+                    SummaryStatistics stats = statsService.getSummaryStatistics(e.getDataset());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
@@ -280,6 +282,15 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     public void removeFolder(Folder folder) {
         folderList.remove(folder);
         eventService.publish(new FolderDeletedEvent().setObject(folder));
+    }
+
+    @Override
+    public Folder getFolderContainingFile(File f) {
+        return getFolderList()
+                .stream()
+                .filter(folder->folder.isFilePartOf(f))
+                .findFirst()
+                .orElse(null);
     }
     
 }

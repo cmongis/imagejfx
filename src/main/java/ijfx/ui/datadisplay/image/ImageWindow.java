@@ -22,24 +22,27 @@ package ijfx.ui.datadisplay.image;
 
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.batch.BatchSingleInput;
+import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.log.DefaultLoggingService;
+import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.ToolChangeEvent;
 import ijfx.ui.tool.DefaultFxToolService;
 import ijfx.service.uicontext.UiContextCalculatorService;
-import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.utils.ViewPort;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
-import ijfx.ui.datadisplay.image.overlay.OverlayDrawerService;
+import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -72,7 +75,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.Window;
@@ -123,7 +125,6 @@ public class ImageWindow extends Window {
 
     private Dataset dataset;
 
-    private DatasetView datasetView;
 
     @Parameter
     private DisplayService displayService;
@@ -166,13 +167,16 @@ public class ImageWindow extends Window {
     private OverlayService overlayService;
 
     @Parameter
-    private OverlayDrawingService overlayDrawer;
+    private OverlayDisplayService overlayDrawer;
 
     @Parameter
     private PluginService pluginService;
 
     @Parameter
-    private OverlayDrawerService overlayDrawerService;
+    private OverlayDisplayService overlayDisplayService;
+    
+    @Parameter
+    private OverlayDrawingService overlayDrawingService;
 
     @Parameter
     private TimerService timerService;
@@ -195,9 +199,9 @@ public class ImageWindow extends Window {
 
     private PopArcMenu arcMenu;
 
-    static String TITLE_CLASS_NAME = "image-window-titlebar";
+    static String TITLE_CLASS_NAME = "ijfx-window-titlebar";
 
-    static String WINDOW_CLASS_NAME = "image-window";
+    static String WINDOW_CLASS_NAME = "ijfx-window";
 
     static String INFO_LABEL_CLASS_NAME = "info-label";
 
@@ -262,7 +266,7 @@ public class ImageWindow extends Window {
 
         setOnCloseAction(this::onWindowClosed);
 
-        setPrefSize(300, 300);
+        setPrefSize(400, 400);
 
         //putting an unused hbox...
         borderPane.setBottom(bottomHBox);
@@ -359,7 +363,7 @@ public class ImageWindow extends Window {
                 //hbox.getChildren().add(new AxisSlider(imageDisplay, i));
             }
         }
-
+         
         arcMenu.build();
 
         refreshSourceImage();
@@ -485,7 +489,7 @@ public class ImageWindow extends Window {
         this.dataset = dataset;
     }
 
-    WritableImage wi;
+    private WritableImage wi;
 
     public WritableImage getWrittableImage() {
         if (wi == null) {
@@ -495,7 +499,7 @@ public class ImageWindow extends Window {
         return wi;
     }
 
-    ARGBScreenImage currentScreenImage;
+ 
 
     public DisplayService getDisplayService() {
         return displayService;
@@ -850,7 +854,6 @@ public class ImageWindow extends Window {
     public void onDatasetViewUpdated(DataViewUpdatedEvent event) {
         if(event.getView() == getDatasetview()) {
             bus.channel(event);
-             
         }
     }
     
@@ -938,6 +941,14 @@ public class ImageWindow extends Window {
             bus.channel(event);
         }
     }
+    
+    @EventHandler
+    void onDataViewUpdated(DataViewUpdatedEvent event) {
+        logger.info("DataView updated");
+        if(imageDisplay.contains(event.getView())) {
+            bus.channel(event);
+        }
+    }
 
     @EventHandler
     protected void onOverlayDeleted(OverlayDeletedEvent event) {
@@ -966,11 +977,11 @@ public class ImageWindow extends Window {
     
 
     protected OverlayDrawer getDrawer(Overlay overlay) {
-        return drawerMap.computeIfAbsent(overlay, overlayDrawerService::createDrawer);
+        return drawerMap.computeIfAbsent(overlay, overlayDisplayService::createDrawer);
     }
 
     protected OverlayModifier getModifier(Overlay overlay) {
-        return modifierMap.computeIfAbsent(overlay, overlayDrawerService::createModifier);
+        return modifierMap.computeIfAbsent(overlay, overlayDisplayService::createModifier);
     }
 
     @EventHandler

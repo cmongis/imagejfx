@@ -31,13 +31,14 @@ import net.imglib2.display.ColorTable;
  * @author Cyril MONGIS, 2015
  */
 public class LUTView {
+
     String name;
+
     ColorTable table;
     protected ImageView imageView;
 
-
     public LUTView(String name, ColorTable table) {
-       
+
         this.table = table;
         this.name = name;
     }
@@ -46,6 +47,10 @@ public class LUTView {
         final Dataset dataset = lutService.createDataset(name, table);
         imageView = new ImageView(fxImageService.datasetToImage(dataset));
         return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public ImageView getImageView() {
@@ -59,5 +64,5 @@ public class LUTView {
     public ColorTable getColorTable() {
         return table;
     }
-    
+
 }

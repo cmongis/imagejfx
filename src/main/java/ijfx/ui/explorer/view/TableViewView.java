@@ -31,8 +31,6 @@ import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
@@ -48,8 +46,8 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ExplorerView.class)
-public class ExplorerTableVie implements ExplorerView{
+@Plugin(type = ExplorerView.class,priority=0.9)
+public class TableViewView implements ExplorerView{
 
     TableView<Explorable> tableView = new TableView<>();
     
@@ -72,12 +70,13 @@ public class ExplorerTableVie implements ExplorerView{
     
     private static final String[] PLANE_PRIORITY = {MetaData.FILE_NAME, MetaData.PLANE_INDEX, MetaData.CHANNEL, MetaData.TIME, MetaData.Z_POSITION};
     
-    public ExplorerTableVie() {
+    public TableViewView() {
         System.out.println("Listening now");
        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
        tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
        tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
        tableView.setRowFactory(this::createRow);
+       
     }
 
     
@@ -105,7 +104,8 @@ public class ExplorerTableVie implements ExplorerView{
                 .stream()
                 .filter(item->item.selectedProperty().getValue())
                 .collect(Collectors.toList());
-                
+        
+        setSelectedItem(selected);
         
         //tableView.getSelectionModel().getSelectedItems().addAll(selected);
         
@@ -134,7 +134,7 @@ public class ExplorerTableVie implements ExplorerView{
     private void onListChange(ListChangeListener.Change<? extends Explorable> changes) {
         
         while(changes.next()) {
-          
+           
             changes.getAddedSubList()
                     .stream()
                     .map(owner->(Explorable)owner)
@@ -144,6 +144,9 @@ public class ExplorerTableVie implements ExplorerView{
                     .stream()
                     .map(owner->(Explorable)owner)
                     .forEach(explo->explo.selectedProperty().setValue(false));
+            
+            
+            
         }
     }
     

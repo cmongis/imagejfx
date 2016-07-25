@@ -57,7 +57,7 @@ import ijfx.ui.UiConfiguration;
  */
 
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "log-panel", context = "webapp imagej", localization = Localization.TOP_LEFT)
+@UiConfiguration(id = "log-panel", context = "webapp imagej explorerActivity", localization = Localization.TOP_LEFT)
 public class LogPanel extends BorderPane implements UiPlugin {
 
     @FXML

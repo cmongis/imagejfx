@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <center>
+                <ScatterChart fx:id="scatterChart" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+                    <xAxis>
+                        <NumberAxis forceZeroInRange="false" side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis forceZeroInRange="false" side="LEFT" />
+                    </yAxis>
+                </ScatterChart>
+            </center>
+            <left>
+                <ComboBox fx:id="yComboBox" prefWidth="96.0" rotate="-90.0" BorderPane.alignment="CENTER" />
+            </left>
+            <bottom>
+                <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <ComboBox prefWidth="150.0" fx:id="xComboBox" />
+                        <Button fx:id="snapshotButton" mnemonicParsing="false" onAction="#snapshot" />
+                        <Button fx:id="explainMe" mnemonicParsing="false" onMouseClicked="#help" text="Explain Me">
+                            <HBox.margin>
+                                <Insets />
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </children>
+</fx:root>

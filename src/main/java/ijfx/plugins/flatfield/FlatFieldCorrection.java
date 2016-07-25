@@ -74,6 +74,9 @@ public class FlatFieldCorrection implements Command {
     DatasetUtillsService datasetUtillsService;
 
     @Parameter
+    ImageDisplay flatFieldImageDisplay;
+
+    @Parameter
     Dataset flatFieldDataset;
 
     @Parameter
@@ -89,7 +92,7 @@ public class FlatFieldCorrection implements Command {
 
     @Override
     public void run() {
-        flatFieldDataset = datasetUtillsService.extractPlane(datasetUtillsService.getImageDisplay(flatFieldDataset));//convertTo32(inputDataset);
+        flatFieldDataset = datasetUtillsService.extractPlane(flatFieldImageDisplay);//datasetUtillsService.getImageDisplay(flatFieldDataset));//convertTo32(inputDataset);;
         inputDataset = convertTo32(inputDataset);
         flatFieldDataset = convertTo32(flatFieldDataset);
         median = ijfxStatisticService.getDatasetDescriptiveStatistics(inputDataset).getPercentile(50);
@@ -133,10 +136,6 @@ public class FlatFieldCorrection implements Command {
         return data;
     }
 
-
-
- 
-
 //    private Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator) {
 //        Map<String, Object> parameters = new HashMap<>();
 //        parameters.put("input1", numerator);
@@ -176,9 +175,5 @@ public class FlatFieldCorrection implements Command {
         }
         return module;
     }
-
-
-
-    
 
 }

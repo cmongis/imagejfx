@@ -26,6 +26,7 @@ import ijfx.service.cluster.ClustererService;
 import ijfx.ui.batch.WorkflowStepTitlePaneController;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.Iconazable;
 import java.io.IOException;
@@ -62,29 +63,32 @@ import org.scijava.ui.UIService;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class)
-public class GridIconView extends FilterView implements ExplorerView {
-    
+@Plugin(type = ExplorerView.class,priority = 0.6)
+public class GridIconView extends AnchorPane implements ExplorerView {
+
     @Parameter
     UIService uIService;
-    
+
     @Parameter
     Context context;
-    
+
     @Parameter
     ClustererService clustererService;
-    
+
+    @Parameter
+    ExplorerService explorerService;
+
     @FXML
     private VBox vBox;
-    
+
     @FXML
     private ScrollPane scrollPane;
-    
+
     private ScrollBinderChildren scrollBinderChildren;
-    
+
     @FXML
     private GridPane topBar;
-    
+
     @FXML
     ComboBox rowsComboBox;
     @FXML
@@ -93,7 +97,9 @@ public class GridIconView extends FilterView implements ExplorerView {
     ComboBox groupComboBox;
     private GroupExplorable groupExplorable;
     private List<Label> listLabel;
-    
+
+    private List<ComboBox<String>> comboBoxList;
+
     @FXML
     private CheckBox clusterCheckbox;
     private PaneCellController<Iconazable> cellPaneCtrl;
@@ -101,6 +107,7 @@ public class GridIconView extends FilterView implements ExplorerView {
     //TODO FXML
     public GridIconView() {
         super();
+        comboBoxList = new ArrayList<>();
         try {
             FXUtilities.injectFXML(this, "/ijfx/ui/explorer/view/GridIconView.fxml");
         } catch (IOException ex) {
@@ -122,20 +129,20 @@ public class GridIconView extends FilterView implements ExplorerView {
 
         cellPaneCtrl.setCellFactory(this::createIcon);
         scrollBinderChildren = new ScrollBinderChildren(scrollPane);
-        
+
         addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
-        
+
     }
-    
+
     @Override
     public Node getNode() {
         return this;
     }
-    
+
     @Override
     public void setItem(List<? extends Explorable> items) {
-        List<String> metadataList = this.getMetaDataKey(items);
-        
+        List<String> metadataList = explorerService.getMetaDataKey(items);
+
         comboBoxList.stream().forEach(c -> {
             c.getItems().clear();
             c.getItems().addAll(metadataList);
@@ -145,8 +152,7 @@ public class GridIconView extends FilterView implements ExplorerView {
         groupExplorable.setListItems(new CopyOnWriteArrayList(items));
         sortItems();
     }
-    
-    @Override
+
     public void initComboBox() {
         IntStream.range(0, comboBoxList.size())
                 .forEach(i -> {
@@ -166,18 +172,18 @@ public class GridIconView extends FilterView implements ExplorerView {
                             });
                 });
     }
-    
+
     private void sortItems() {
         groupExplorable.process();
         cellPaneCtrl.update3DList(new CopyOnWriteArrayList<>(groupExplorable.getList3D()), groupExplorable.getSizeList3D(), groupExplorable.getMetaDataList());
     }
-    
+
     private PaneCell<Iconazable> createIcon() {
         PaneCell<Iconazable> cell = new ExplorerIconCell();
         context.inject(cell);
         return cell;
     }
-    
+
     @Override
     public List<? extends Explorable> getSelectedItems() {
         return cellPaneCtrl
@@ -187,29 +193,27 @@ public class GridIconView extends FilterView implements ExplorerView {
                 .filter(item -> item.selectedProperty().getValue())
                 .collect(Collectors.toList());
     }
-    
+
     public void onMouseClick(MouseEvent event) {
         System.out.println(event);
         if (event.getTarget() == vBox) {
             cellPaneCtrl.getItems().forEach(item -> item.selectedProperty().setValue(false));
         }
     }
-    
+
     public void onMouseDrag(DragEvent event) {
         System.out.println(event);
-        
+
     }
-    
+
     @Override
     public Node getIcon() {
         return new FontAwesomeIconView(FontAwesomeIcon.ARCHIVE);
     }
-    
+
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
-        
+
     }
-    
-    
-    
+
 }

@@ -89,7 +89,7 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
 
         
         
-        if(true) return this;
+        //if(true) return this;
         
         /*
         ij1PluginService.getCommandListFromMenu().forEach(command -> {

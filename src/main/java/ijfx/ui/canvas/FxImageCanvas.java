@@ -31,6 +31,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import net.imagej.display.ImageDisplay;
 import net.imagej.overlay.Overlay;
 
 /**
@@ -67,6 +68,8 @@ public class FxImageCanvas extends Canvas {
     // Boolean refreshLock = Boolean.TRUE;
     Pane container;
 
+    ImageDisplay imageDisplay;
+    
     /**
      * Creates an FxImageCanvas
      */
@@ -286,5 +289,16 @@ public class FxImageCanvas extends Canvas {
     public void setOverlays(ArrayList<Overlay> overlays) {
         this.overlays = overlays;
     }
+
+    public void setImageDisplay(ImageDisplay imageDisplay) {
+        this.imageDisplay = imageDisplay;
+    }
+
+    public ImageDisplay getImageDisplay() {
+        return imageDisplay;
+    }
+    
+    
+    
 
 }

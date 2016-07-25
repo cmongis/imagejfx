@@ -73,7 +73,7 @@ public class AutoContrast extends ContextCommand {
                 }
             }
             else {
-                SummaryStatistics stats = statsService.getDatasetSummaryStatistics(dataset);
+                SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
                 setMinMax(stats, 0);
 
             }

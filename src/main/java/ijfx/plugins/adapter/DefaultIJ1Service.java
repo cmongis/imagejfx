@@ -32,8 +32,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-
-import net.imglib2.type.numeric.integer.UnsignedShortType;
+import net.imglib2.type.numeric.NumericType;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -97,9 +96,9 @@ public class DefaultIJ1Service extends AbstractService implements IJ1Service {
      * @return
      */
     @Override
-    public ImagePlus unwrapDataset(Dataset dataset) {
-        RandomAccessibleInterval<UnsignedShortType> r = (RandomAccessibleInterval<UnsignedShortType>) dataset.getImgPlus();
-        ImagePlus wrapImage = ImageJFunctions.wrap(r, "");
+    public <T extends NumericType<T>> ImagePlus  unwrapDataset(Dataset dataset) {
+        RandomAccessibleInterval<T> r = (RandomAccessibleInterval<T>) dataset.<T>getImgPlus();
+        ImagePlus wrapImage = ImageJFunctions.wrap((RandomAccessibleInterval<T>)dataset, "");
         return wrapImage;
     }
 

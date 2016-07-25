@@ -1,0 +1,7 @@
+
+[
+   {
+        "text":"Cluster the data with the XMeans algorithm"
+        ,"target":"#scatterChart"
+    }
+]

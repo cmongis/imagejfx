@@ -17,39 +17,27 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.project;
+package ijfx.ui.datadisplay.image.overlay;
 
-import ijfx.core.imagedb.ImageRecordService;
-import ijfx.core.imagedb.MetaDataExtractionService;
-import org.junit.Assert;
-import org.junit.Test;
-import org.scijava.plugin.Parameter;
+import javafx.geometry.Point2D;
+import net.imagej.overlay.PointOverlay;
 
 /**
  *
  * @author cyril
  */
-public class MetaDataExtractionTest2 extends BaseImageJTest{
+public final class PointOverlayHelper {
 
-    
-    @Parameter
-    MetaDataExtractionService service;
-    
-    @Parameter
-    ImageRecordService imageRecordService;
-    
-    @Override
-    protected Class[] getService() {
-        return new Class[]{
-            ImageRecordService.class
-                };
+    public static Point2D getOverlayPosition(PointOverlay pointOverlay) {
+        double[] point = pointOverlay.getPoint(0);
+        
+        return new Point2D(point[0],point[1]);
+        
     }
     
-    @Test
-    public void testInjection() {
-        Assert.assertNotNull(imageRecordService);
-        Assert.assertNotNull(service);
+    public static void setOverlayPosition(PointOverlay overlay, Point2D point2DonImage) {
+        overlay.setPoint(0, new double[] {point2DonImage.getX(),point2DonImage.getY()});
     }
     
-    
+   
 }

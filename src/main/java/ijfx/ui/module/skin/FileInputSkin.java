@@ -24,6 +24,7 @@ package ijfx.ui.module.skin;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import java.io.File;
+import java.nio.file.Path;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -34,6 +35,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+import org.apache.commons.io.FilenameUtils;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -99,8 +101,8 @@ public class FileInputSkin extends AbstractInputSkinPlugin<File> {
     public void onButtonClick(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         Input moduleItem = getSkinnable().getInput();
-        boolean save = moduleItem.getLabel().contains("output") || moduleItem.getName().contains("output")
-                || moduleItem.getName().contains("save") || moduleItem.getLabel().contains("save");
+        boolean save = moduleItem.getLabel().toLowerCase().contains("output") || moduleItem.getName().toLowerCase().contains("output")
+                || moduleItem.getName().toLowerCase().contains("save") || moduleItem.getLabel().toLowerCase().contains("save");
 
         File selected;
         if (save) {
@@ -109,6 +111,11 @@ public class FileInputSkin extends AbstractInputSkinPlugin<File> {
             selected = chooser.showOpenDialog(null);
         }
         if (selected != null) {
+            
+            if(selected.getName().endsWith(".csv") == false) {
+                selected = new File(selected.getParentFile(),selected.getName()+".csv");
+            }
+            
             selectedFolder.setValue(selected);
         }
     }

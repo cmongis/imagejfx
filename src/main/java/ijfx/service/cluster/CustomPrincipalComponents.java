@@ -865,8 +865,8 @@ public class CustomPrincipalComponents extends UnsupervisedAttributeEvaluator
 
         if (inst instanceof SparseInstance) {
             return new SparseInstance(inst.weight(), newVals);
-        } else if (inst instanceof ObjectClusterable) {
-            return new ObjectClusterable(((ObjectClusterable) inst).getObject(), inst.weight(), newVals);
+        } else if (inst instanceof DefaultObjectClusterable) {
+            return new DefaultObjectClusterable(((DefaultObjectClusterable) inst).getObject(), inst.weight(), newVals);
         } else if (inst instanceof DenseInstance) {
             return new DenseInstance(inst.weight(), newVals);
         } else {
@@ -947,8 +947,8 @@ public class CustomPrincipalComponents extends UnsupervisedAttributeEvaluator
         if (!m_transBackToOriginal) {
             if (instance instanceof SparseInstance) {
                 return new SparseInstance(instance.weight(), newVals);
-            } else if (instance instanceof ObjectClusterable) {
-                return new ObjectClusterable(((ObjectClusterable) instance).getObject(), instance.weight(), newVals);
+            } else if (instance instanceof DefaultObjectClusterable) {
+                return new DefaultObjectClusterable(((DefaultObjectClusterable) instance).getObject(), instance.weight(), newVals);
             } else if (instance instanceof DenseInstance) {
                 return new DenseInstance(instance.weight(), newVals);
 
@@ -961,8 +961,8 @@ public class CustomPrincipalComponents extends UnsupervisedAttributeEvaluator
         } else if (instance instanceof DenseInstance) {
             return convertInstanceToOriginal(new DenseInstance(instance.weight(),
                     newVals));
-        } else if (instance instanceof ObjectClusterable) {
-            return convertInstanceToOriginal(new ObjectClusterable(((ObjectClusterable) instance).getObject(), instance.weight(), newVals));
+        } else if (instance instanceof DefaultObjectClusterable) {
+            return convertInstanceToOriginal(new DefaultObjectClusterable(((DefaultObjectClusterable) instance).getObject(), instance.weight(), newVals));
         } else {
             return null;
         }

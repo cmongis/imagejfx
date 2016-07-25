@@ -23,6 +23,7 @@ import ij.ImagePlus;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.display.ImageDisplay;
+import net.imglib2.type.numeric.NumericType;
 
 /**
  *
@@ -36,7 +37,7 @@ public interface IJ1Service extends ImageJService {
 
     public Dataset wrapDataset(ImagePlus imp);
 
-    public ImagePlus unwrapDataset(Dataset dataset);
+    public <T extends NumericType<T>> ImagePlus unwrapDataset(Dataset dataset);
 
     public void configureImagePlus(ImagePlus imp, ImageDisplay imageDisplay);
     

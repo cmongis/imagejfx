@@ -10,7 +10,7 @@
 
 <fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <VBox fx:id="workflowVBox" />
             <FontAwesomeIconView glyphName="ARROW_DOWN" layoutX="46.0" layoutY="104.0" size="30">

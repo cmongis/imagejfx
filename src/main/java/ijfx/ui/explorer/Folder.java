@@ -48,4 +48,6 @@ public interface Folder {
     
     public void addObjects(List<SegmentedObject> objects);
     
+    public boolean isFilePartOf(File f);
+    
 }

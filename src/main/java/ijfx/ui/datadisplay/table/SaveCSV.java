@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import net.imagej.table.Table;
 import net.imagej.table.TableDisplay;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -43,7 +45,7 @@ import org.scijava.ui.UIService;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>SaveCSV", attrs = {
+@Plugin(type = Command.class, menuPath = "Plugins > Table >  Save as CSV", attrs = {
     @Attr(name = "no-legacy")})
 public class SaveCSV implements Command {
 
@@ -53,9 +55,9 @@ public class SaveCSV implements Command {
     DisplayService displayService;
 
     @Parameter(label = "Delimiter")
-    String delimiter;
+    String delimiter = ",";
 
-    @Parameter(label = "File")
+    @Parameter(label = "Save as")
     File file;
 
     @Parameter(label = "Header")
@@ -76,17 +78,23 @@ public class SaveCSV implements Command {
                 tableDisplay = (TableDisplay) displayService.getActiveDisplay();
                 fileWriter = new FileWriter(file.getAbsolutePath());
                 csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
-                String[] headers = header.split(delimiter);
-                
+                String[] headers;
+                if (header == null || header.trim().equals("")) {
+
+                    headers = getColumnHeader(tableDisplay);
+
+                }
+                else {
+                    headers = header.split(delimiter);
+                }
                 if (headers.length != tableDisplay.get(0).size() && !header.equals("")) {
                     String message = "The number of header doesn't match with the number of columns";
                     uIService.showDialog(message, DialogPrompt.MessageType.ERROR_MESSAGE);
                     return;
-                }
-                else {
+                } else {
                     csvFilePrinter.printRecord(Arrays.stream(headers).collect(Collectors.toList()));
                 }
-                
+
                 for (int i = 0; i < tableDisplay.get(0).get(0).size(); i++) {
                     List line = new ArrayList();
                     for (int j = 0; j < tableDisplay.get(0).size(); j++) {
@@ -105,6 +113,16 @@ public class SaveCSV implements Command {
             }
 
         }
+    }
+
+    public String[] getColumnHeader(TableDisplay display) {
+
+        Table table = display.get(0);
+
+        return IntStream.range(0, table.getColumnCount())
+                .mapToObj(i -> table.getColumnHeader(i))
+                .toArray(size -> new String[size]);
+
     }
 
 }

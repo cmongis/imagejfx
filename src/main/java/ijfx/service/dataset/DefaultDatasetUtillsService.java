@@ -84,16 +84,10 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
 
     @Override
     public ImageDisplay getImageDisplay(Dataset dataset) {
-        Optional<ImageDisplay> optional = imageDisplayService.getImageDisplays()
+        return imageDisplayService.getImageDisplays()
                 .parallelStream()
                 .filter((d) -> imageDisplayService.getActiveDataset(d) == dataset)
-                .findFirst();
-        if (optional.isPresent()){
-            return optional.get();
-        }
-        else{
-            return null;
-        }
+                .findFirst().orElse(null);
     }
 
     /**

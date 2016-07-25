@@ -1,0 +1,11 @@
+
+[
+{
+"text" :"Select different items"
+, "target":"#listView"
+},
+   {
+        "text":"Apply a Principal Component Analysis"
+        ,"target":"#scatterChart"
+    }
+]

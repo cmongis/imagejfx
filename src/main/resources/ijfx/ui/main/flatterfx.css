@@ -249,7 +249,7 @@
 }
 .button.larger {
     -fx-padding:9px;
-   
+
 }
 .toggle-group {
 
@@ -477,7 +477,7 @@
     -fx-padding:0;
     -fx-effect:0;
     -fx-
-     -fx-disable:0;
+    -fx-disable:0;
 }
 #open-button{
     -fx-max-width:20px;
@@ -485,7 +485,7 @@
 .combo-box-base .list-view {
     -fx-background:-dark;
     -fx-background-color:-dark;
-   
+
 }
 
 .menu-bar {
@@ -920,7 +920,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .list-cell:even{ /* <=== changed to even */
 
-    -fx-background-color: transparent;
+    -fx-background-color: white;
 }
 
 .list-cell:filled:hover{
@@ -955,7 +955,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-text-fill:#383f50;
     -fx-text-alignment:left!important;
     -fx-alignment:left;
-    
+
 }
 .toggle-selection-list .toggle-button:hover{
     -fx-translate-x:0;
@@ -1020,14 +1020,14 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 
 
-.image-window-titlebar {
+.ijfx-window-titlebar {
     -fx-font-weight:400;
     -fx-font-size:14px;
     -fx-alignment: center;
     -fx-padding: 5px;
 }
 
-.image-window {
+.ijfx-window {
     -fx-stroke-width: 4px;
     -fx-stroke-fill:derive(-dark,70%);
     -fx-fill: derive(-dark,70%);
@@ -1806,6 +1806,15 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-background-color:red;
 }
 
+.list-view {
+    -fx-padding: 3px ;
+}
+
+.list-cell {
+    -fx-padding: 2px ;
+    -fx-background-insets: 0px, 2px ;
+}
+
 
 /* 
         Help label
@@ -2023,4 +2032,14 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .message-box.label {
     -fx-wrap-text:true;
 
+}
+
+/*
+    
+    Chart
+
+*/
+Label.chart-legend-item{
+    -fx-text-fill:-flatter-blue;   
+    
 }

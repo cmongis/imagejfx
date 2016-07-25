@@ -56,6 +56,7 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     public void setItem(List<? extends T> mList) {
         tableView.getItems().clear();
         tableView.getItems().addAll(mList);
+        
     }
 
     public Set<String> getCurrentColumns() {

@@ -92,7 +92,11 @@ public class PlaneMetaDataSetWrapper implements Explorable{
         @Override
         public Image getImage() {
             try {
-                return thumbService.getThumb(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue()-1, 100, 100);
+               // return thumbService.getThumb(getFile(), m.get(MetaData.PLANE_INDEX).getIntegerValue()-1, 100, 100);
+               
+                long[] position = DimensionUtils.readLongArray(m.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue());
+               return thumbService.getThumb(getFile(), position, 100, 100);
+            
             } catch (Exception e) {
                 ImageJFX.getLogger().log(Level.SEVERE, "Error when loading preview for Plane", e);
             }
