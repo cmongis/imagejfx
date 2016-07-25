@@ -208,7 +208,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         logger.info("Exploration mode changed : " + mode != null ? mode.toString() : null);
     }
     private void setItems(List<Explorable> items) {
-        logger.info(String.format("Setting %d items",items.size()));
+        
+        if(items != null) logger.info(String.format("Setting %d items",items.size()));
+        else logger.info("Items are null");
         explorerService.setItems(items);
     }
     private Integer fetchMoreStatistics(ProgressHandler progress,List<Explorable> explorableList) {
