@@ -91,6 +91,18 @@ public class NaiveBatchInput implements BatchSingleInput {
 
     @Override
     public String getName() {
+        
+        if(name == null) {
+            if(dataset != null) {
+                name = dataset.getName();
+            }
+            if(imageDisplay != null) {
+                name = imageDisplay.getName();
+            }
+            
+        }
+        
+        
         return name;
     }
 
