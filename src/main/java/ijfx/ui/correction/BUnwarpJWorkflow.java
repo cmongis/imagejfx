@@ -19,19 +19,28 @@
  */
 package ijfx.ui.correction;
 
+import ijfx.plugins.commands.ChannelMerger;
+import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
 import ijfx.service.ImagePlaneService;
+import ijfx.service.batch.BatchService;
+import ijfx.service.batch.BatchSingleInput;
+import ijfx.service.batch.DisplayBatchInput;
+import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,6 +49,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import mongis.utils.CallbackTask;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
@@ -47,11 +57,18 @@ import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.event.DataViewUpdatedEvent;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.Context;
+import org.scijava.command.Command;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
 import org.scijava.event.EventHandler;
+import org.scijava.event.SciJavaEvent;
+import org.scijava.io.IOService;
+import org.scijava.module.MethodCallException;
+import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugins.commands.io.OpenFile;
 
@@ -61,6 +78,9 @@ import org.scijava.plugins.commands.io.OpenFile;
  */
 @ViewController(value = "BUnwarpJWorkflow.fxml")
 public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
+
+    @Parameter
+    IOService iOService;
 
     @Parameter
     DatasetUtillsService datasetUtillsService;
@@ -82,6 +102,12 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
 
     @Parameter
     ImagePlaneService imagePlaneService;
+
+    @Parameter
+    BatchService batchService;
+
+    @Parameter
+    ModuleService moduleService;
 
     protected ImageDisplayPane imageDisplayPaneLeft;
 
@@ -120,43 +146,26 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
     @PostConstruct
     public void init() {
         imagesContainer.add(imageDisplayPaneBottom, 0, 1);
-//        imageDisplayPaneList.stream().forEach((ImageDisplayPane e) -> {
-//            try {
-//                e = initDisplayPane();
-//            } catch (IOException ex) {
-//                Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        });
-        imageDisplayPaneRight.getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneBottom.getCanvas().getCamera().zoomProperty());
-        imageDisplayPaneRight.getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneLeft.getCanvas().getCamera().zoomProperty());
-
-        imageDisplayPaneLeft.getCanvas().getCamera().xProperty().bindBidirectional(imageDisplayPaneRight.getCanvas().getCamera().xProperty());
-        imageDisplayPaneLeft.getCanvas().getCamera().xProperty().bindBidirectional(imageDisplayPaneBottom.getCanvas().getCamera().xProperty());
-
-        imageDisplayPaneLeft.getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPaneRight.getCanvas().getCamera().yProperty());
-        imageDisplayPaneLeft.getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPaneBottom.getCanvas().getCamera().yProperty());
+        bindProperty();
 
         rightButton.setOnAction(e -> {
-            try {
-                imagesContainer.add(imageDisplayPaneRight, 1, 0);
-                openImage(imageDisplayPaneRight);
-                extractAndMerge();
-            } catch (InterruptedException | ExecutionException ex) {
-                Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+            imagesContainer.add(imageDisplayPaneRight, 1, 0);
+            openImage(imageDisplayPaneRight);
         });
         leftButton.setOnAction(e -> {
             imagesContainer.add(imageDisplayPaneLeft, 0, 0);
             openImage(imageDisplayPaneLeft);
-//            imageDisplayPaneLeft.getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneRight.getCanvas().getCamera().zoomProperty());
-
         });
 
     }
 
     protected ImageDisplay displayDataset(Dataset dataset, ImageDisplayPane imageDisplayPane) {
-        ImageDisplay imageDisplay = (ImageDisplay) displayService.createDisplay(dataset);
+        try {
+
+            imageDisplayPane.getImageDisplay().clear();
+        } catch (Exception e) {
+        }
+        SilentImageDisplay imageDisplay = new SilentImageDisplay(context, dataset);
         imageDisplay.display(dataset);
         imageDisplayPane.display(imageDisplay);
         return imageDisplay;
@@ -166,13 +175,13 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
 
-        Dataset flatFieldDataset = null;
+        Dataset dataset = null;
         try {
-            flatFieldDataset = imagePlaneService.openVirtualDataset(file);
+            dataset = (Dataset) iOService.open(file.getAbsolutePath());
         } catch (IOException ex) {
             Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return displayDataset(flatFieldDataset, imageDisplayPane);
+        return displayDataset(dataset, imageDisplayPane);
 
     }
 
@@ -182,24 +191,97 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
         return imageDisplayPane;
     }
 
-    protected void extractAndMerge() throws InterruptedException, ExecutionException {
+    protected void extractAndMerge() {
         Dataset[] datasets = new Dataset[2];
-        datasets[0] = datasetUtillsService.extractPlane(imageDisplayPaneLeft.getImageDisplay());
-        datasets[1] = datasetUtillsService.extractPlane(imageDisplayPaneRight.getImageDisplay());
+        ImageDisplay imageDisplayLeft = imageDisplayPaneLeft.getImageDisplay();
+        datasets[0] = datasetUtillsService.extractPlane(imageDisplayLeft);
 
-        Future<CommandModule> run = commandService.run(ImagesToStack.class, true, "datasetArray", datasets, "axisType", Axes.CHANNEL);
-        CommandModule commandModule = run.get();
-        Dataset dataset = (Dataset) commandModule.getOutput("outputDataset");
-        displayDataset(dataset, imageDisplayPaneBottom);
+        ImageDisplay imageDisplayRight = imageDisplayPaneRight.getImageDisplay();
+        datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
+
+//        Future<CommandModule> run = commandService.run(ImagesToStack.class, true, "datasetArray", datasets, "axisType", Axes.CHANNEL);
+        new CallbackTask<Object, Object>().run(() -> {
+            try {
+                CommandModule commandModule;
+                Platform.runLater(() -> imagesContainer.getChildren().remove(imageDisplayPaneBottom));
+                imageDisplayPaneBottom = initDisplayPane();
+                bindProperty();
+                BatchSingleInput batchSingleInput = new DisplayBatchInput();
+                this.context.inject(batchSingleInput);
+                batchSingleInput.setDataset(datasets[1]);
+
+//                Module module = moduleService.createModule(commandService.getCommand(ImagesToStack.class));
+                try {
+//                    this.context.inject(module.getDelegateObject());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Map<String, Object> inputMap = new HashMap();
+                inputMap.put("datasetArray", datasets);
+                inputMap.put("axisType", Axes.CHANNEL);
+                Module module = executeCommand(ImagesToStack.class, inputMap);
+                Dataset result = (Dataset) module.getOutput("outputDataset");
+//                batchService.executeModule(batchSingleInput, module, inputMap);
+//                Dataset result = batchSingleInput.getDataset();
+                Platform.runLater(() -> imagesContainer.add(imageDisplayPaneBottom, 0, 1));
+                
+//                ChannelMerger<? extends RealType<?>> merger = new ChannelMerger(context);
+//   merger.setInput(result);
+//   merger.run();
+//   Dataset output = merger.getOutput();
+                displayDataset(result, imageDisplayPaneBottom);
+            } catch (IOException ex) {
+                Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }).start();
+
     }
-    
-        @EventHandler
+
+    @EventHandler
     public void handleEvent(DataViewUpdatedEvent event) {
-        try {
-            extractAndMerge();
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+        if (imageDisplayPaneLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneRight.getImageDisplay().contains(event.getView())) {
+            try {
+                extractAndMerge();
+            } catch (Exception ex) {
+                Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         }
 
     }
+
+    public void bindProperty() {
+        imageDisplayPaneBottom.getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneRight.getCanvas().getCamera().zoomProperty());
+        imageDisplayPaneRight.getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneLeft.getCanvas().getCamera().zoomProperty());
+
+        imageDisplayPaneLeft.getCanvas().getCamera().xProperty().bindBidirectional(imageDisplayPaneRight.getCanvas().getCamera().xProperty());
+        imageDisplayPaneBottom.getCanvas().getCamera().xProperty().bindBidirectional(imageDisplayPaneLeft.getCanvas().getCamera().xProperty());
+
+        imageDisplayPaneLeft.getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPaneRight.getCanvas().getCamera().yProperty());
+        imageDisplayPaneBottom.getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPaneLeft.getCanvas().getCamera().yProperty());
+    }
+
+    private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
+        Module module = moduleService.createModule(commandService.getCommand(type));
+        try {
+            module.initialize();
+        } catch (MethodCallException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        parameters.forEach((k, v) -> {
+            module.setInput(k, v);
+            module.setResolved(k, true);
+        });
+
+        Future run = moduleService.run(module, false, parameters);
+
+        try {
+            run.get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return module;
+    }
+
 }

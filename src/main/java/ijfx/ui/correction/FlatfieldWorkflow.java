@@ -94,7 +94,6 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
 
-        Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile", file);
         try {
             Dataset flatFieldDataset = imagePlaneService.openVirtualDataset(file);
             ImageDisplay imageDisplay = displayDataset(flatFieldDataset);

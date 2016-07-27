@@ -571,10 +571,10 @@ public class ImageDisplayPane extends AnchorPane {
     @EventHandler
     void onDataViewUpdated(DataViewUpdatedEvent event) {
         logService.info("DataView updated");
-                bus.channel(event);
         try {
             
         if (imageDisplay.contains(event.getView())) {
+                bus.channel(event);
             }
         } catch (Exception e) {
         }

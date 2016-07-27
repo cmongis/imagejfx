@@ -61,6 +61,7 @@ public class ImagesToStack extends ContextCommand {
         initOutput();
         for (int i = 0; i < datasetArray.length; i++) {
             addPlane(outputDataset, datasetArray[i], axisType, i);
+            copyColorTable(datasetArray[i], outputDataset, 0);
         }
     }
 
@@ -96,6 +97,10 @@ public class ImagesToStack extends ContextCommand {
             randomAccessOutput.get().setReal(cursorInput.get().getRealFloat());
 
         }
+    }
+    
+    private void copyColorTable(Dataset input, Dataset output, int cpt){
+        output.setColorTable(input.getColorTable(cpt), cpt);
     }
 
 }
