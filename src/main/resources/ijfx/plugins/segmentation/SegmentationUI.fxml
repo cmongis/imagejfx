@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" type="TabPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <tabs>
+    <Tab text="Untitled Tab 1">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <center>
+                  <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label prefHeight="15.0" prefWidth="470.0" text="1. Draw the menbrane of that will be used for the training with the Free Hand Tool" />
+                        <Label prefHeight="15.0" prefWidth="232.0" text="2. Set the width of the membrane" />
+                     </children>
+                  </VBox>
+               </center>
+            </BorderPane>
+         </content>
+    </Tab>
+    <Tab text="Untitled Tab 2">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <center>
+                  <Label text="Label" BorderPane.alignment="CENTER" />
+               </center>
+            </BorderPane>
+         </content>
+    </Tab>
+  </tabs>
+</fx:root>
