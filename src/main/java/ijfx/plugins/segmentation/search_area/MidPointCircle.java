@@ -17,8 +17,9 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.segmentation;
+package ijfx.plugins.segmentation.search_area;
 
+import ijfx.plugins.segmentation.search_area.AbstractSearchArea;
 import javafx.geometry.Point2D;
 
 /**

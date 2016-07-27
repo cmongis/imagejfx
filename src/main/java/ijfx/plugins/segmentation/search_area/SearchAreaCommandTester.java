@@ -17,8 +17,11 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.segmentation;
+package ijfx.plugins.segmentation.search_area;
 
+import ijfx.plugins.segmentation.search_area.MidPointCircle;
+import ijfx.plugins.segmentation.search_area.SquareFrame;
+import ijfx.plugins.segmentation.search_area.SearchArea;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplay;
