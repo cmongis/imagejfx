@@ -19,10 +19,6 @@
  */
 package ijfx.plugins.segmentation;
 
-import ijfx.plugins.segmentation.neural_network.LSTMRnn;
-import ijfx.plugins.segmentation.neural_network.NeuralNet;
-import java.util.ArrayList;
-import java.util.List;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;

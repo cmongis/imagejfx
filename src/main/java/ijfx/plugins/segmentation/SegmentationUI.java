@@ -19,15 +19,32 @@
  */
 package ijfx.plugins.segmentation;
 
-import java.util.List;
-import net.imagej.Dataset;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.control.TabPane;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public interface ProfilesSet {
-    public List<List<int[]>> getProfiles();
+public class SegmentationUI extends TabPane{
+    public SegmentationUI(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SegmentationUI.fxml"));
+            loader.setRoot(this);
+            loader.setController(this);
+            loader.load();
+        }
+        catch (IOException ex) {
+            Logger.getLogger(SegmentationUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     
-    public List<double[]> getPointsAsFeatures(int index, Dataset ds);
+    public Node getNode(){
+        return this;
+    }
 }

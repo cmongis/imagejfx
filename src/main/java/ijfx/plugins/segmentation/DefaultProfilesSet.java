@@ -19,6 +19,8 @@
  */
 package ijfx.plugins.segmentation;
 
+import ijfx.plugins.segmentation.search_area.MidPointCircle;
+import ijfx.plugins.segmentation.search_area.SearchArea;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayStatService;
@@ -68,12 +70,6 @@ public class DefaultProfilesSet implements ProfilesSet{
         
         context.inject(this);
         
-        ImageDisplay display = imageDisplayService.getActiveImageDisplay();
-        Dataset dataset = imageDisplayService.getActiveDataset(display);
-        Dataset labels = imagePlaneService.createEmptyPlaneDataset(dataset);
-        
-        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
-        
         for(Point2D c : centers){
             double cX = c.getX();
             double cY = c.getY();
@@ -97,13 +93,12 @@ public class DefaultProfilesSet implements ProfilesSet{
     }
 
     @Override
-    public List<double[]> getPointsAsFeatures(List<int[]> points) {
+    public List<double[]> getPointsAsFeatures(int index, Dataset ds) {
         
+        List<int[]> points = profiles.get(index);
         List<double[]> intensities = new ArrayList<>(points.size());
-        
-        ImageDisplay display = imageDisplayService.getActiveImageDisplay();
-        Dataset dataset = imageDisplayService.getActiveDataset(display);
-        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
+
+        RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
         
         for(int p = 0; p < points.size(); p++){
             

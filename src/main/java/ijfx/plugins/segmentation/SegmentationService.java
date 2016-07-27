@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import javafx.geometry.Point2D;
 import net.imagej.Dataset;
-import net.imagej.DatasetService;
 import net.imagej.ImageJService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -51,6 +50,10 @@ import org.scijava.ui.UIService;
 public class SegmentationService extends AbstractService implements ImageJService{
 
     private final double COLOR = 1.0;
+
+    /**
+     * Width of the membrane pattern
+     */
     public final int membrane_width = 6;
     
     private List<ProfilesSet> trainingData;
@@ -80,6 +83,9 @@ public class SegmentationService extends AbstractService implements ImageJServic
     @Parameter
     UIService uis;
     
+    /**
+     * Generate the different intensity profiles from drawn objects for each ImageDisplay
+     */
     public void generateTrainingSet(){
         
         trainingData = new ArrayList<>();
@@ -111,14 +117,21 @@ public class SegmentationService extends AbstractService implements ImageJServic
                     maxDiameter = stats.getFeretDiameter();
                 
                 overlayDrawingService.drawOverlay(o, OverlayDrawingService.OUTLINER, labeledDs.get(ds), COLOR);
-                uis.show(labeledDs.get(ds));
+                
             }
+            uis.show(labeledDs.get(ds));
             ProfilesSet profiles = new DefaultProfilesSet(centers, (int)maxDiameter, context);
             generateConfirmationSet(profiles, labeledDs.get(ds));
             trainingData.add(profiles);
         }
     }
     
+    /**
+     * Generate for a set of profiles the corresponding sequences of labels (0, 1) depending on if the pixel belongs to the membrane or not
+     * 
+     * @param trainingSet Set of intensity profiles extracted from an image, for the training of the neural network and for that we need to label.
+     * @param labeledDs Dataset where pixels belonging to membranes have been drawn.
+     */
     public void generateConfirmationSet(ProfilesSet trainingSet, Dataset labeledDs){
         
         RandomAccess<RealType<?>> randomAccess = labeledDs.randomAccess();
@@ -157,21 +170,19 @@ public class SegmentationService extends AbstractService implements ImageJServic
         }
     }
     
-    public ProfilesSet generateTestSet(){
-        return null;
-    }
-    
-    public void saveParameters(){
-        
-    }
-    
-    public void loadParameter(){
-        
-    }
-    
-    public void clearAll(){
-        
-    }
+//    public ProfilesSet generateTestSet(){
+//        return null;
+//    }
+//    
+//    public void saveParameters(){
+//        
+//    }
+//    
+//    public void loadParameter(){
+//        
+//    }
+//    
+//    public void clearAll(){
+//        
+//    }
 }
-
-/*Hi guys, I'm trying to build a network with a GraveLSTM layer. I'd like to associate each element of a sequence to a label. So I have a set of profiles made of pixel intensities (List<double[]>), and would like to give a class to each of those intensities. But I'm not sure of what I should use to build my DataSet object. Should I use a single profile or all of them ?*/
