@@ -21,6 +21,7 @@ package ijfx.ui.correction;
 
 import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.service.ImagePlaneService;
+import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
@@ -43,6 +44,7 @@ import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
+import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugins.commands.io.OpenFile;
 
@@ -78,6 +80,9 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
     @Parameter
     DatasetUtillsService datasetUtillsService;
 
+    @Parameter
+    DisplayService displayService;
+
     public FlatfieldWorkflow() throws IOException {
         CorrectionActivity.getStaticContext().inject(this);
         imageDisplayPane = new ImageDisplayPane(context);
@@ -85,6 +90,7 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
 
     @PostConstruct
     public void init() {
+        imageDisplayPane.setOnMouseClicked(e -> displayService.setActiveDisplay(imageDisplayPane.getImageDisplay()));
         borderPane.setCenter(imageDisplayPane);
         folderButton.setOnAction(this::openImage);
         workflowModel.getFlatFieldImageDisplay().ifPresent((e) -> imageDisplayPane.display(e));
@@ -104,8 +110,7 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
     }
 
     protected ImageDisplay displayDataset(Dataset flatFieldDataset) {
-        ImageDisplay imageDisplay = new DefaultImageDisplay();
-        context.inject(imageDisplay);
+        ImageDisplay imageDisplay = new SilentImageDisplay(context, flatFieldDataset);
         imageDisplay.display(flatFieldDataset);
         imageDisplayPane.display(imageDisplay);
         return imageDisplay;

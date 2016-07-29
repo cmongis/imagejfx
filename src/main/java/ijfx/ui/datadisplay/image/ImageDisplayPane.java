@@ -146,6 +146,8 @@ public class ImageDisplayPane extends AnchorPane {
 
     private FxTool currentTool;
 
+    private javafx.event.EventHandler<MouseEvent> myHandler;
+
     private PopArcMenu arcMenu;
 
     private FxImageCanvas canvas;
@@ -421,12 +423,15 @@ public class ImageDisplayPane extends AnchorPane {
         logService.setLevel(LogService.INFO);
 
         if (arcMenu != null) {
-            anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, arcMenu::show);
+            anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, myHandler);
             arcMenu = null;
 
         }
         arcMenu = new PopArcMenu();
-        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, arcMenu::show);
+        myHandler = (MouseEvent event) -> {
+            arcMenu.show(event);
+        };
+        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, myHandler);
 
         double min = getDatasetview().getChannelMin(0);
         double max = getDatasetview().getChannelMax(0);
@@ -572,8 +577,8 @@ public class ImageDisplayPane extends AnchorPane {
     void onDataViewUpdated(DataViewUpdatedEvent event) {
         logService.info("DataView updated");
         try {
-            
-        if (imageDisplay.contains(event.getView())) {
+
+            if (imageDisplay.contains(event.getView())) {
                 bus.channel(event);
             }
         } catch (Exception e) {
@@ -687,8 +692,12 @@ public class ImageDisplayPane extends AnchorPane {
      Overlay drawing
      */
     public List<Overlay> getOverlays() {
+        List<Overlay> overlays = null;
+        try {
+            overlays = overlayService.getOverlays(imageDisplay);
 
-        List<Overlay> overlays = overlayService.getOverlays(imageDisplay);
+        } catch (Exception e) {
+        }
         if (overlays == null) {
             return new ArrayList<Overlay>();
         }
