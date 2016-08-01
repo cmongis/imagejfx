@@ -19,18 +19,42 @@
  */
 package ijfx.plugins.segmentation;
 
+import ijfx.plugins.segmentation.neural_network.NNEnum;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author Pierre BONNEAU
  */
 public class SegmentationUI extends TabPane{
+    
+    @Parameter
+    SegmentationService segmentationService;
+    
+    @FXML
+    Button trainingDataBtn;
+    
+    @FXML
+    TextField membraneWidthField;
+    
+    @FXML
+    Text dataSetSizeTxt;
+    
+    @FXML
+    ChoiceBox nnChoice;
+    
     public SegmentationUI(){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("SegmentationUI.fxml"));
@@ -42,9 +66,27 @@ public class SegmentationUI extends TabPane{
             Logger.getLogger(SegmentationUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        trainingDataBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onTrainingDataBtnClicked);
+        
+        nnChoice.getItems().setAll(NNEnum.values());
     }
     
     public Node getNode(){
         return this;
+    }
+    
+    public void onTrainingDataBtnClicked(MouseEvent e){
+        
+        int mbWidth = Integer.parseInt(membraneWidthField.textProperty().getValue());
+        segmentationService.membraneWidthProperty().setValue(mbWidth);
+        
+        segmentationService.generateTrainingSet();
+        
+        int dataSetSize = 0;
+        for (ProfilesSet trainingSet : segmentationService.getTrainingSet()) {
+            dataSetSize += trainingSet.getProfiles().size();
+        }
+        dataSetSizeTxt.textProperty().setValue(dataSetSize + " profiles generated from " + segmentationService.getTrainingSet().size() +" dataset(s).");
+        
     }
 }

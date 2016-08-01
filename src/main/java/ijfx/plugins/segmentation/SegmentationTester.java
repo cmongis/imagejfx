@@ -24,7 +24,9 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.scijava.Context;
 import org.scijava.command.Command;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -35,25 +37,35 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Segmentation with NN")
 
 public class SegmentationTester implements Command{
+    
+    @Parameter
+    Context context;
                     
     @Override
     public void run(){
         
         Platform.runLater(()-> {
+
 //            Popup popup = new Popup();
 //            PopupControl popup = new PopupControl();
+//            popup.getScene().setRoot(new SegmentationUI());
+//            popup.getContent().add(new SegmentationUI());
+//            popup.show(ImageJFX.PRIMARY_STAGE);
+
             Stage stage = new Stage(StageStyle.UTILITY);
-            Scene scene = new Scene(new SegmentationUI());
+            
+            SegmentationUI segmentationUI = new SegmentationUI();
+            
+            context.inject(segmentationUI);
+            
+            Scene scene = new Scene(segmentationUI);
 
             String style = ImageJFX.class.getResource("flatterfx.css").toExternalForm();
             
             scene.getStylesheets().add(style);
             stage.setScene(scene);
             stage.sizeToScene();
-            stage.show();
-//            popup.getScene().setRoot(new SegmentationUI());
-//            popup.getContent().add(new SegmentationUI());
-//            popup.show(ImageJFX.PRIMARY_STAGE);
+            stage.show();            
         });
     }
     

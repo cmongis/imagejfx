@@ -26,6 +26,8 @@ import ijfx.service.overlay.OverlayStatService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
@@ -54,7 +56,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
     /**
      * Width of the membrane pattern
      */
-    public final int membrane_width = 6;
+    private final Property<Integer> membraneWidth = new SimpleObjectProperty<>(0);
     
     private List<ProfilesSet> trainingData;
     private List<List<int[]>> confirmationSet;
@@ -127,7 +129,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
     }
     
     /**
-     * Generate for a set of profiles the corresponding sequences of labels (0, 1) depending on if the pixel belongs to the membrane or not
+     * Generate the corresponding sequences of labels (0, 1) for a set of profiles, depending on if the pixel belongs to the membrane or not
      * 
      * @param trainingSet Set of intensity profiles extracted from an image, for the training of the neural network and for that we need to label.
      * @param labeledDs Dataset where pixels belonging to membranes have been drawn.
@@ -155,7 +157,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
                 
                 if(pixelValue == COLOR){
                     
-                    for(int k = j-membrane_width/2; k <= j+membrane_width/2; k++){
+                    for(int k = j-membraneWidth.getValue()/2; k <= j+membraneWidth.getValue()/2; k++){
                         if(k < 0 ||  k > labels.length)
                             continue;
                         else
@@ -168,6 +170,14 @@ public class SegmentationService extends AbstractService implements ImageJServic
             }
             confirmationSet.add(labeledProfiles);
         }
+    }
+    
+    public Property<Integer> membraneWidthProperty(){
+        return this.membraneWidth;
+    }
+    
+    public List<ProfilesSet> getTrainingSet(){
+        return this.trainingData;
     }
     
 //    public ProfilesSet generateTestSet(){
