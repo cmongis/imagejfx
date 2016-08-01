@@ -54,6 +54,7 @@ public class LSTM implements INN{
     public MultiLayerConfiguration configure() {
         
         //TEMPORARY CONFIGURATION VALUE
+        int input = 1;
         int lstmLayerSize = 200;
         int output = 1;
         
@@ -67,10 +68,10 @@ public class LSTM implements INN{
                 .weightInit(WeightInit.XAVIER)
                 .updater(Updater.RMSPROP)
                 .list()
-                        .layer(0, new GravesLSTM.Builder().nIn(lstmLayerSize).nOut(output)
+                        .layer(0, new GravesLSTM.Builder().nIn(input).nOut(lstmLayerSize)
 					.activation("tanh").build())
 			.layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.XENT).activation("softmax")
-					.nIn(output).nOut(output).build())
+					.nIn(lstmLayerSize).nOut(output).build())
                 .backpropType(BackpropType.Standard)
                 .pretrain(false)
                 .backprop(true)
