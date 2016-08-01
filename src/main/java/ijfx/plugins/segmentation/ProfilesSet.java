@@ -29,5 +29,7 @@ import net.imagej.Dataset;
 public interface ProfilesSet {
     public List<List<int[]>> getProfiles();
     
-    public List<double[]> getPointsAsFeatures(int index, Dataset ds);
+    public int size();
+    
+    public List<double[]> getPointsAsIntensities(Dataset ds);
 }

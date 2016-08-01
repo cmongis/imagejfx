@@ -34,6 +34,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
+import org.netlib.util.doubleW;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.UIService;
@@ -93,24 +94,32 @@ public class DefaultProfilesSet implements ProfilesSet{
     }
 
     @Override
-    public List<double[]> getPointsAsFeatures(int index, Dataset ds) {
+    public List<double[]> getPointsAsIntensities(Dataset ds) {
         
-        List<int[]> points = profiles.get(index);
-        List<double[]> intensities = new ArrayList<>(points.size());
+        List<double[]> values = new ArrayList<>();
+        
+        for(List<int[]> points : profiles){
+            
+            double[] intensities = new double[points.size()];
 
-        RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
+            RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
         
-        for(int p = 0; p < points.size(); p++){
+            for(int p = 0; p < points.size(); p++){
             
-            double[] features = new double[1];
-            randomAccess.setPosition(points.get(p)[0], 0);
-            randomAccess.setPosition(points.get(p)[1], 1);
+                randomAccess.setPosition(points.get(p)[0], 0);
+                randomAccess.setPosition(points.get(p)[1], 1);
             
-            double pixelValue = randomAccess.get().getRealDouble();
-            features[0] = pixelValue;
-            intensities.add(features);
+                double pixelValue = randomAccess.get().getRealDouble();
+
+                intensities[p] = pixelValue;
+            }
+            values.add(intensities);
         }
-        
-        return intensities;
+        return values;
+    }
+
+    @Override
+    public int size() {
+        return profiles.size();
     }
 }
