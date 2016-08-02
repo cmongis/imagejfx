@@ -60,12 +60,16 @@ public abstract class AbstractSearchArea implements SearchArea{
     @Override
     public void setAllPossibleSegments(){
         
+        int cX = (int)centre.getX();
+        int cY = (int)centre.getY();
+        
         for(int i = 0; i < points.size(); i++){
             int x = (int)points.get(i).getX();
             int y = (int)points.get(i).getY();
             
-            List<int[]> line = Bresenham.findLine((int)centre.getX(), (int)centre.getY(), x, y);
+            List<int[]> line = Bresenham.findLine(cX, cY, x, y);
             segments.add(line);
+            System.out.println(line.size());
         }
 
     }

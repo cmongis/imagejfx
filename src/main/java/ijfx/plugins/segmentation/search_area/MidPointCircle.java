@@ -39,16 +39,11 @@ public class MidPointCircle extends AbstractSearchArea{
         
         super(cX, cY, radius);
         
-        double currentX = cX + radius;
-        double currentY = cY;
+        int d = (5 - radius * 4)/4;
+        int dX = 0;
+        int dY = radius;
         
-        double dX = radius;
-        double dY = 0.0;
-        
-        int err = 0;
-        
-        while(dX >= dY){
-            
+        do {
             points.add(new Point2D(cX+dX, cY+dY));
             points.add(new Point2D(cX+dX, cY-dY));
             
@@ -61,15 +56,48 @@ public class MidPointCircle extends AbstractSearchArea{
             points.add(new Point2D(cX+dY, cY+dX));
             points.add(new Point2D(cX+dY, cY-dX));
             
-            err += 1 + 2*dY;
-            if(2*(err-dX) + 1 > 0){
-                currentX = currentX-1;
-                dX = dX-1;
-                err += 1 - 2*dX;                
-            }
 
-            currentY = currentY-1;
-            dY = dY+1;
-        }
+            if (d < 0) {
+                d += 2 * dX + 1;
+            }
+            else {
+                d += 2 * (dX - dY) + 1;
+                dY--;
+            }
+            dX++;
+        } while (dX <= dY);
+        
+//        double currentX = cX + radius;
+//        double currentY = cY;
+//        
+//        double dX = radius;
+//        double dY = 0.0;
+//        
+//        int err = 0;
+//        
+//        while(dX >= dY){
+//            
+//            points.add(new Point2D(cX+dX, cY+dY));
+//            points.add(new Point2D(cX+dX, cY-dY));
+//            
+//            points.add(new Point2D(cX-dX, cY+dY));
+//            points.add(new Point2D(cX-dX, cY-dY));
+//
+//            points.add(new Point2D(cX-dY, cY+dX));
+//            points.add(new Point2D(cX-dY, cY-dX));
+//
+//            points.add(new Point2D(cX+dY, cY+dX));
+//            points.add(new Point2D(cX+dY, cY-dX));
+//            
+//            err += 1 + 2*dY;
+//            if(2*(err-dX) + 1 > 0){
+//                currentX = currentX-1;
+//                dX = dX-1;
+//                err += 1 - 2*dX;                
+//            }
+//
+//            currentY = currentY-1;
+//            dY = dY+1;
+//        }
     }
 }

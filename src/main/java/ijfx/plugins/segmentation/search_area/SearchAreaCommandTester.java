@@ -61,15 +61,15 @@ public class SearchAreaCommandTester implements Command{
         area1.drawArea(ds);
         
         SearchArea area2= new SquareFrame(cX2, cY2, r2);
-        area2.drawArea(ds);
+//        area2.drawArea(ds);
         
         ds.update();        
         
         area1.setAllPossibleSegments();
-        area2.setAllPossibleSegments();
+//        area2.setAllPossibleSegments();
         
         area1.drawProfiles(ds);
-        area2.drawProfiles(ds);
+//        area2.drawProfiles(ds);
         
         ds.update();
     }
