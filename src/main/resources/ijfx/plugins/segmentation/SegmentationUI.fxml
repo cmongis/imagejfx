@@ -38,7 +38,7 @@
                         <TextField fx:id="membraneWidthField" prefHeight="25.0" prefWidth="224.0" />
                         <Button fx:id="trainingDataBtn" mnemonicParsing="false" text="Generate Training data" />
                         <Text fx:id="dataSetSizeTxt" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="583.7294921875" />
-                        <Button mnemonicParsing="false" text="TRAIN" />
+                        <Button fx:id="trainNetBtn" mnemonicParsing="false" text="TRAIN" />
                      </children>
                   </VBox>
                </center>
