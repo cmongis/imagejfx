@@ -57,6 +57,8 @@ public class SegmentationTester implements Command{
             SegmentationUI segmentationUI = new SegmentationUI();
             
             context.inject(segmentationUI);
+
+            segmentationUI.init();
             
             Scene scene = new Scene(segmentationUI);
 

@@ -25,16 +25,15 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayStatService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javafx.geometry.Point2D;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
-import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
-import org.netlib.util.doubleW;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.UIService;
@@ -46,6 +45,8 @@ import org.scijava.ui.UIService;
 public class DefaultProfilesSet implements ProfilesSet{
     
     private List<List<int[]>> profiles;
+    private List<int[]> masks;
+    private int maxLenght;
 
     @Parameter
     OverlayStatService overlayStatService;
@@ -68,6 +69,8 @@ public class DefaultProfilesSet implements ProfilesSet{
     public DefaultProfilesSet(List<Point2D> centers, int lenght, Context context) {
         
         profiles = new ArrayList<>();
+        masks = new ArrayList<>();
+        maxLenght = 0;
         
         context.inject(this);
         
@@ -83,8 +86,15 @@ public class DefaultProfilesSet implements ProfilesSet{
             Iterator<List<int[]>> it_seg = area.getSegmentsSet().iterator();
             
             while(it_seg.hasNext()){
-                profiles.add(it_seg.next());
+                List<int[]> seg = it_seg.next();
+                if(seg.size() > maxLenght)
+                    maxLenght = seg.size();
+                profiles.add(seg);
             }
+
+            area.getSegmentsSet().stream().forEach((s) -> {
+                masks.add(newMask(s, maxLenght));
+            });
         }
     }
     
@@ -99,9 +109,11 @@ public class DefaultProfilesSet implements ProfilesSet{
         List<double[]> values = new ArrayList<>();
         
         for(List<int[]> points : profiles){
+            // We pad the shorter series so all of them are the same lenght.
+            double[] intensities = new double[maxLenght];
             
-            double[] intensities = new double[points.size()];
-
+            Arrays.fill(intensities, 0.0);
+            
             RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
         
             for(int p = 0; p < points.size(); p++){
@@ -121,5 +133,27 @@ public class DefaultProfilesSet implements ProfilesSet{
     @Override
     public int size() {
         return profiles.size();
+    }
+
+    @Override
+    public int getMaxLenght() {
+        return maxLenght;
+    }
+
+    @Override
+    public List<int[]> getMasks() {
+        return masks;
+    }
+
+    public int[] newMask(List<int[]> line, int maxSize) {
+        
+        int[] mask = new int[maxSize];
+        Arrays.fill(mask, 1);
+        
+        if(maxSize > line.size())
+            for(int i = line.size(); i < maxSize; i++)
+                mask[i] = 0;
+        
+        return mask;
     }
 }

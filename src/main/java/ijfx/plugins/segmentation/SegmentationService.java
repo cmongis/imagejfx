@@ -19,6 +19,9 @@
  */
 package ijfx.plugins.segmentation;
 
+import ijfx.plugins.segmentation.neural_network.INN;
+import ijfx.plugins.segmentation.neural_network.LSTM;
+import ijfx.plugins.segmentation.neural_network.NNType;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayShapeStatistics;
@@ -37,6 +40,8 @@ import net.imagej.display.OverlayService;
 import net.imagej.overlay.Overlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
+import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -60,6 +65,11 @@ public class SegmentationService extends AbstractService implements ImageJServic
     
     private List<ProfilesSet> trainingData;
     private List<List<int[]>> confirmationSet;
+    private List<Dataset> imgDatasets;
+    
+    private INN nn;
+    
+    private Property<NNType> nnType =  new SimpleObjectProperty<>();
     
     @Parameter
     OverlayService overlayService;
@@ -96,18 +106,18 @@ public class SegmentationService extends AbstractService implements ImageJServic
         double maxDiameter = 0.0;
         
         List<ImageDisplay> displays = imageDisplayService.getImageDisplays();
-        List<Dataset> datasets = new ArrayList<>(displays.size());
+        imgDatasets = new ArrayList<>(displays.size());
         List<Dataset> labeledDs = new ArrayList<>(displays.size());
         List<List<Overlay>> overlaySet = new ArrayList<>();
 
         displays.stream().forEach(id -> {
-            datasets.add(imageDisplayService.getActiveDataset(id));
+            imgDatasets.add(imageDisplayService.getActiveDataset(id));
             overlaySet.add(overlayService.getOverlays(id));
         });
         
-        for(int ds = 0; ds < datasets.size(); ds++){
+        for(int ds = 0; ds < imgDatasets.size(); ds++){
             
-            labeledDs.add(imagePlaneService.createEmptyPlaneDataset(datasets.get(ds)));
+            labeledDs.add(imagePlaneService.createEmptyPlaneDataset(imgDatasets.get(ds)));
             ArrayList<Point2D> centers = new ArrayList<>();
             
             for(Overlay o : overlaySet.get(ds)){
@@ -143,7 +153,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
         for(int i =  0; i < trainingSet.getProfiles().size(); i++){
             
             List<int[]> profile = trainingSet.getProfiles().get(i);
-            int[] labels = new int[profile.size()];
+            int[] labels = new int[trainingSet.getMaxLenght()];
             Arrays.fill(labels, 0);
             
             for(int j = 0; j < profile.size(); j++){
@@ -180,6 +190,31 @@ public class SegmentationService extends AbstractService implements ImageJServic
         return this.trainingData;
     }
     
+    public INN buildNN(NNType nnType){
+        INN nn = null;
+        switch (nnType){
+            case LSTM : nn = new LSTM(); break;
+            case BLSTM : nn = new LSTM(); break;
+        }
+        return nn;
+    }
+    
+    public Property<NNType> nnType(){
+        return this.nnType;
+    }
+    
+    public void train(){
+        this.nn = buildNN(nnType().getValue());
+        
+        DataSetIterator iter = new ProfileIterator(trainingData, confirmationSet, imgDatasets);
+        
+        boolean next = iter.hasNext();
+        while(iter.hasNext()){
+            DataSet ds = iter.next();
+            nn.train(ds);
+        }
+        System.out.println("Fitting : DONE");
+    }
 //    public ProfilesSet generateTestSet(){
 //        return null;
 //    }

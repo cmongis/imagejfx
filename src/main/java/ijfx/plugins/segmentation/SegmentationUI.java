@@ -19,10 +19,13 @@
  */
 package ijfx.plugins.segmentation;
 
-import ijfx.plugins.segmentation.neural_network.NNEnum;
+import ijfx.plugins.segmentation.neural_network.NNType;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -43,17 +46,26 @@ public class SegmentationUI extends TabPane{
     @Parameter
     SegmentationService segmentationService;
     
+    // TAB 1
+
+    @FXML
+    ChoiceBox nnChoice;
+    
+    // TAB 2
+    
     @FXML
     Button trainingDataBtn;
+    
+    @FXML
+    Button trainNetBtn;
     
     @FXML
     TextField membraneWidthField;
     
     @FXML
-    Text dataSetSizeTxt;
+    Text dataSetSizeTxt;    
     
-    @FXML
-    ChoiceBox nnChoice;
+    // TAB 3
     
     public SegmentationUI(){
         try {
@@ -67,8 +79,10 @@ public class SegmentationUI extends TabPane{
         }
         
         trainingDataBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onTrainingDataBtnClicked);
-        
-        nnChoice.getItems().setAll(NNEnum.values());
+        trainNetBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onTrainBtnClicked);
+
+        nnChoice.getItems().setAll(NNType.values());
+        nnChoice.valueProperty().addListener(this::updateNNType);
     }
     
     public Node getNode(){
@@ -88,5 +102,20 @@ public class SegmentationUI extends TabPane{
         }
         dataSetSizeTxt.textProperty().setValue(dataSetSize + " profiles generated from " + segmentationService.getTrainingSet().size() +" dataset(s).");
         
+    }
+    
+    public void updateNNType(Observable obs){
+        String name = nnChoice.valueProperty().getValue().toString();
+        switch(name){
+            case "LSTM" : segmentationService.nnType().setValue(NNType.LSTM); break;
+            case "BLSTM" : segmentationService.nnType().setValue(NNType.BLSTM); break;
+        }
+    }
+    
+    public void onTrainBtnClicked(MouseEvent e){
+        segmentationService.train();
+    }
+    
+    public void init(){
     }
 }

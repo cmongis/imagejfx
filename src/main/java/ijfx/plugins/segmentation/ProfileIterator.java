@@ -54,7 +54,7 @@ public class ProfileIterator implements DataSetIterator{
 
     @Override
     public boolean hasNext() {
-        return currentDatasetIdx == allProfilesSet.size();
+        return allProfilesSet.size() - currentDatasetIdx > 0 ;
     }
 
     @Override
@@ -65,24 +65,28 @@ public class ProfileIterator implements DataSetIterator{
     public DataSet next(int num) {
         ProfilesSet profiles = allProfilesSet.get(num);
         List<double[]> intensities = profiles.getPointsAsIntensities(imgDatasets.get(num));
+        profileLength = profiles.getMaxLenght();
         
         INDArray input = Nd4j.create(new int[]{profiles.size(), NUM_CLASSES, profileLength}, 'f');
         INDArray labels = Nd4j.create(new int[]{profiles.size(), NUM_CLASSES, profileLength}, 'f');
+        INDArray masks = Nd4j.create(new int[]{profiles.size(), profileLength}, 'f');
         
         for(int i = 0; i < profiles.size(); i++){
             
             double[] p = intensities.get(i);
             int[] l = labelsSet.get(num).get(i);
+            int[] m = profiles.getMasks().get(i);
             
             for(int j = 0; j < profileLength; j++){
                 input.putScalar(new int[]{i, 0, j}, p[j]);
                 labels.putScalar(new int[]{i, 0, j}, l[j]);
+                masks.putScalar(new int[]{i, j}, m[j]);
             }
         }
         
         currentDatasetIdx++;
         
-        return new DataSet(input, labels);
+        return new DataSet(input, labels, masks, masks);
     }
 
     @Override
