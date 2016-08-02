@@ -23,7 +23,7 @@ package ijfx.plugins.segmentation.neural_network;
  *
  * @author Pierre BONNEAU
  */
-public enum NNEnum {
-    LSTMM,
-    BLSTM
+public enum NNType {
+    LSTM,
+    BLSTM;
 }

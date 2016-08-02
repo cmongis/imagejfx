@@ -19,6 +19,7 @@
  */
 package ijfx.plugins.segmentation.neural_network;
 
+import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -28,9 +29,10 @@ import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-
 /**
  *
  * @author Pierre BONNEAU
@@ -43,6 +45,16 @@ public class LSTM implements INN{
         MultiLayerConfiguration conf = configure();
         net = new MultiLayerNetwork(conf);
         net.init();
+        
+        //Print the  number of parameters in the network (and for each layer)
+        Layer[] layers = net.getLayers();
+        int totalNumParams = 0;
+        for( int i=0; i<layers.length; i++ ){
+            int nParams = layers[i].numParams();
+//            System.out.println("Number of parameters in layer " + i + ": " + nParams);
+            totalNumParams += nParams;
+        }
+        System.out.println("Total number of network parameters: " + totalNumParams);
     }
     
     @Override
@@ -55,7 +67,7 @@ public class LSTM implements INN{
         
         //TEMPORARY CONFIGURATION VALUE
         int input = 1;
-        int lstmLayerSize = 200;
+        int lstmLayerSize = 10;
         int output = 1;
         
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -80,8 +92,9 @@ public class LSTM implements INN{
     }
 
     @Override
-    public void train() {
-        
+    public void train(DataSet ds) {
+        System.out.println("Fitting...");
+        net.fit(ds);
     }
 
     @Override
