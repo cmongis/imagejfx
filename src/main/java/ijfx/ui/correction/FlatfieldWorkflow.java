@@ -103,7 +103,7 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
         try {
             Dataset flatFieldDataset = imagePlaneService.openVirtualDataset(file);
             ImageDisplay imageDisplay = displayDataset(flatFieldDataset);
-            workflowModel.setFlatFieldImageDisplay(imageDisplay);
+            workflowModel.setFlatFieldImageDisplay1(imageDisplay);
         } catch (IOException ex) {
             Logger.getLogger(FlatfieldWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }

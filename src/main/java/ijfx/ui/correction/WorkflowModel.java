@@ -20,15 +20,44 @@
 package ijfx.ui.correction;
 
 import ij.process.ImageProcessor;
+import ijfx.service.batch.SilentImageDisplay;
+import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.main.ImageJFX;
 import io.datafx.controller.injection.scopes.FlowScoped;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.Label;
+import javafx.stage.FileChooser;
+import javafx.util.converter.NumberStringConverter;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
+import net.imagej.table.DefaultResultsTable;
+import net.imagej.table.DefaultTableDisplay;
+import net.imagej.table.ResultsTable;
+import net.imagej.table.TableDisplay;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang.StringUtils;
 import org.scijava.Context;
+import org.scijava.io.IOService;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -37,90 +66,79 @@ import org.scijava.plugin.Parameter;
  */
 @FlowScoped
 public class WorkflowModel {
-    
-    protected ImageDisplay flatFieldImageDisplay;
 
+    protected ImageDisplay flatFieldImageDisplay1;
 
-   
+    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneLeftProperty = new SimpleObjectProperty<>();
 
-    @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine"})
-    private String min_scale_deformation_choice;
+    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneRightProperty = new SimpleObjectProperty<>();
+
+    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneBottomProperty = new SimpleObjectProperty<>();
+
+    @Parameter
+    IOService iOService;
+
+    private StringProperty min_scale_deformation_choice = new SimpleStringProperty("Very Fine");
 
     /**
      * maximum scale deformation
      */
-    @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"})
-    private String max_scale_deformation_choice;
+    private StringProperty max_scale_deformation_choice = new SimpleStringProperty("Super Fine");
 
     /**
      * algorithm mode (fast, accurate or mono)
      */
-    @Parameter(choices = {"Fast", "Accurate", "Mono"})
-    private String modeChoice = "Mono";
+    private StringProperty modeChoice = new SimpleStringProperty("Mono");
     /**
      * image subsampling factor at the highest pyramid level
      */
-    @Parameter
-    private int maxImageSubsamplingFactor = 0;
+    private IntegerProperty maxImageSubsamplingFactor = new SimpleIntegerProperty(0);
 
     // Transformation parameters
     /**
      * divergence weight
      */
-    @Parameter
-    private double divWeight = 0;
+    private DoubleProperty divWeight = new SimpleDoubleProperty(0);
     /**
      * curl weight
      */
-    @Parameter
-    private double curlWeight = 0;
+    private DoubleProperty curlWeight = new SimpleDoubleProperty(0);
     /**
      * landmarks weight
      */
-    @Parameter
-    private double landmarkWeight = 1.0;
+    private DoubleProperty landmarkWeight = new SimpleDoubleProperty(1.0);
     /**
      * image similarity weight
      */
-    @Parameter
-    private double imageWeight = 0.0;
+    private DoubleProperty imageWeight = new SimpleDoubleProperty(0.0);
     /**
      * consistency weight
      */
-    @Parameter
-    private double consistencyWeight = 10;
+    private DoubleProperty consistencyWeight = new SimpleDoubleProperty(10.0);
     /**
      * flag for rich output (verbose option)
      */
-    //@Parameter
-    private boolean richOutput = true;
+    private BooleanProperty richOutput = new SimpleBooleanProperty(true);
     /**
      * flag for save transformation option
      */
-    @Parameter
-    private boolean saveTransformation = false;
+    private BooleanProperty saveTransformation = new SimpleBooleanProperty(true);
 
     /**
      * minimum image scale
      */
-    @Parameter
-    private int min_scale_image = 0;
+    private IntegerProperty min_scale_image = new SimpleIntegerProperty(0);
     /**
      * stopping threshold
      */
-    @Parameter
-    private static double stopThreshold = 1e-2;
+    private DoubleProperty stopThreshold = new SimpleDoubleProperty(1e-2);
 
-    @Parameter(choices = {"0", "1", "2", "3", "4", "5", "6", "7"})
-    String img_subsamp_fact;
+    private StringProperty img_subsamp_fact = new SimpleStringProperty("0");
 
-    @Parameter(label = "Images Folder")
     File imagesFolder;
 
-    @Parameter(label = "Landmarks File")
     File landmarksFile;
 
-    @Parameter(label = "Flatfield Image", required = false)
     Dataset flatfield;
 
     ImageProcessor targetMskIP = null;
@@ -151,16 +169,122 @@ public class WorkflowModel {
     }
 
     public void setContext(Context context) {
+        if (context!=this.context){
         this.context = context;
+            context.inject(this);
+            
+        }
     }
 
-  
     public Optional<ImageDisplay> getFlatFieldImageDisplay() {
-        return Optional.ofNullable(flatFieldImageDisplay);
+        return Optional.ofNullable(flatFieldImageDisplay1);
     }
 
-    public void setFlatFieldImageDisplay(ImageDisplay flatFieldImageDisplay) {
-        this.flatFieldImageDisplay = flatFieldImageDisplay;
+    public void setFlatFieldImageDisplay1(ImageDisplay flatFieldImageDisplay1) {
+        this.flatFieldImageDisplay1 = flatFieldImageDisplay1;
     }
 
+    /**
+     * 
+     * @param header
+     * @param fileLabel
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    public TableDisplay loadTable(String[] header, Label fileLabel) throws FileNotFoundException, IOException {
+
+        FileChooser fileChooser = new FileChooser();
+
+        Reader in;
+        List<double[]> points = new ArrayList<>();
+        File file = fileChooser.showOpenDialog(null);
+        fileLabel.setText(file.getName());
+        in = new FileReader(file.getAbsolutePath());
+        Iterable<CSVRecord> records = CSVFormat.EXCEL.withHeader(header).parse(in);
+        for (CSVRecord record : records) {
+            double[] sourceArray = new double[header.length];
+            if (!StringUtils.isNumeric(record.get(header[0]))) {
+                continue;
+            }
+            points.add(sourceArray);
+            for (int i = 0; i < header.length; i++) {
+                sourceArray[i] = Double.valueOf(record.get(header[i]));
+
+            }
+        }
+        ResultsTable resultsTable = new DefaultResultsTable(header.length, points.size());
+        for (int col = 0; col < header.length; col++) {
+            resultsTable.setColumnHeader(col, header[col]);
+            for (int row = 0; row < points.size(); row++) {
+                resultsTable.setValue(col, row, points.get(row)[col]);
+            }
+        }
+        TableDisplay tableDisplay = new DefaultTableDisplay();
+        tableDisplay.add(resultsTable);
+        return tableDisplay;
+    }
+
+    /**
+     * 
+     * @param imageDisplayPaneProperty
+     * @return 
+     */
+    public ImageDisplay openImage(ObjectProperty<ImageDisplayPane> imageDisplayPaneProperty) {
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(null);
+
+        Dataset dataset = null;
+        try {
+            dataset = (Dataset) iOService.open(file.getAbsolutePath());
+        } catch (IOException ex) {
+            Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return displayDataset(dataset, imageDisplayPaneProperty.get());
+
+    }
+
+    /**
+     * 
+     * @param dataset
+     * @param imageDisplayPane
+     * @return 
+     */
+    public ImageDisplay displayDataset(Dataset dataset, ImageDisplayPane imageDisplayPane) {
+        try {
+            imageDisplayPane.getImageDisplay().clear();
+        } catch (Exception e) {
+        }
+        SilentImageDisplay imageDisplay = new SilentImageDisplay(context, dataset);
+        imageDisplay.display(dataset);
+        imageDisplayPane.display(imageDisplay);
+        return imageDisplay;
+    }
+
+    /**
+     * 
+     * @param bUnwarpJWorkflow 
+     */
+    public void bindView(BUnwarpJWorkflow bUnwarpJWorkflow) {
+        bUnwarpJWorkflow.consistencyWeightTextField.textProperty().bindBidirectional(consistencyWeight, new NumberStringConverter());
+        bUnwarpJWorkflow.curlWeightTextField.textProperty().bindBidirectional(curlWeight, new NumberStringConverter());
+        bUnwarpJWorkflow.divWeightTextField.textProperty().bindBidirectional(divWeight, new NumberStringConverter());
+        bUnwarpJWorkflow.imageWeightTextField.textProperty().bindBidirectional(imageWeight, new NumberStringConverter());
+        bUnwarpJWorkflow.landmarkWeightTextField.textProperty().bindBidirectional(landmarkWeight, new NumberStringConverter());
+        bUnwarpJWorkflow.stopThresholdTextField.textProperty().bindBidirectional(stopThreshold, new NumberStringConverter());
+
+        bUnwarpJWorkflow.richOutput.selectedProperty().bindBidirectional(richOutput);
+
+        bUnwarpJWorkflow.saveTransformation.selectedProperty().bindBidirectional(saveTransformation);
+
+        bUnwarpJWorkflow.modeChoiceComboBox.valueProperty().bindBidirectional(modeChoice);
+        bUnwarpJWorkflow.img_subsamp_factComboBox.valueProperty().bindBidirectional(img_subsamp_fact);
+        bUnwarpJWorkflow.min_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(min_scale_deformation_choice);
+        bUnwarpJWorkflow.max_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(max_scale_deformation_choice);
+
+        bUnwarpJWorkflow.imageDisplayPaneLeftProperty.bindBidirectional(imageDisplayPaneLeftProperty);
+        bUnwarpJWorkflow.imageDisplayPaneRightProperty.bindBidirectional(imageDisplayPaneRightProperty);
+//        bUnwarpJWorkflow.imageDisplayPaneLeftProperty.bindBidirectional(imageDisplayPaneLeftBo);
+
+    }
 }
