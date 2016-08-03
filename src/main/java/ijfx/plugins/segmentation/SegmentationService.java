@@ -209,9 +209,21 @@ public class SegmentationService extends AbstractService implements ImageJServic
         DataSetIterator iter = new ProfileIterator(trainingData, confirmationSet, imgDatasets);
         
         boolean next = iter.hasNext();
+        System.out.println("Fitting : DONE");
+        int iEpoch = 0;
+        int nEpochs = 3;
+        
+        while(iEpoch < nEpochs){
+            System.out.printf("* = * = * = * = * = * = * = * = * = ** EPOCH %d ** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n",iEpoch);
+
         while(iter.hasNext()){
             DataSet ds = iter.next();
             nn.train(ds);
+        }
+        iter.reset();
+        nEpochs++;
+                    System.out.printf("* = * = * = * = * = * = * = * = * = ** EPOCH COMPLETE** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n",iEpoch);
+
         }
         System.out.println("Fitting : DONE");
     }

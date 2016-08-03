@@ -106,7 +106,7 @@ public class ProfileIterator implements DataSetIterator{
 
     @Override
     public void reset() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        currentDatasetIdx = 0;
     }
 
     @Override
