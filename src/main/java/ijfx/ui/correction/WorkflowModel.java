@@ -50,10 +50,14 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 import net.imagej.Dataset;
+import net.imagej.Position;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.table.DefaultResultsTable;
@@ -81,7 +85,9 @@ import org.scijava.plugin.Parameter;
 @FlowScoped
 public class WorkflowModel {
 
-    protected ImageDisplay flatFieldImageDisplay1;
+    protected ObjectProperty<ImageDisplayPane> flatFieldImageDisplayProperty1;
+
+    protected ObjectProperty<ImageDisplayPane> flatFieldImageDisplayProperty2;
 
     protected ObjectProperty<ImageDisplayPane> imageDisplayPaneTopLeftProperty;
 
@@ -102,7 +108,7 @@ public class WorkflowModel {
 
     @Parameter
     ImageDisplayService imageDisplayService;
-    
+
     @Parameter
     ModuleService moduleService;
 
@@ -207,6 +213,11 @@ public class WorkflowModel {
         imageDisplayPaneBottomLeftProperty = initDisplayPane();
 
         imageDisplayPaneBottomRightProperty = initDisplayPane();
+
+        flatFieldImageDisplayProperty1 = initDisplayPane();
+
+        flatFieldImageDisplayProperty2 = initDisplayPane();
+
     }
 
     public void setContext(Context context) {
@@ -222,14 +233,13 @@ public class WorkflowModel {
 //        init();
     }
 
-    public Optional<ImageDisplay> getFlatFieldImageDisplay() {
-        return Optional.ofNullable(flatFieldImageDisplay1);
-    }
-
-    public void setFlatFieldImageDisplay1(ImageDisplay flatFieldImageDisplay1) {
-        this.flatFieldImageDisplay1 = flatFieldImageDisplay1;
-    }
-
+//    public Optional<ImageDisplay> getFlatFieldImageDisplay() {
+//        return Optional.ofNullable(flatFieldImageDisplayProperty1);
+//    }
+//
+//    public void setFlatFieldImageDisplayProperty(ImageDisplay flatFieldImageDisplayProperty) {
+//        this.flatFieldImageDisplayProperty1 = flatFieldImageDisplayProperty;
+//    }
     /**
      *
      * @param header
@@ -244,7 +254,7 @@ public class WorkflowModel {
 
         Reader in;
         List<double[]> points = new ArrayList<>();
-        landmarksFile.set( fileChooser.showOpenDialog(null));
+        landmarksFile.set(fileChooser.showOpenDialog(null));
         fileLabel.setText(landmarksFile.getName());
         in = new FileReader(landmarksFile.get().getAbsolutePath());
         Iterable<CSVRecord> records = CSVFormat.EXCEL.withHeader(header).parse(in);
@@ -272,10 +282,11 @@ public class WorkflowModel {
 
     /**
      *
-     * @param imageDisplayPane1,ObjectProperty<ImageDisplayPane> imageDisplayPaneProperty2
+     * @param imageDisplayPane1,ObjectProperty<ImageDisplayPane>
+     * imageDisplayPaneProperty2
      * @return
      */
-    public void openImage(ImageDisplayPane imageDisplayPane1,ImageDisplayPane imageDisplayPane2) {
+    public void openImage(ImageDisplayPane imageDisplayPane1, ImageDisplayPane imageDisplayPane2) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
 
@@ -312,7 +323,7 @@ public class WorkflowModel {
      *
      * @param bUnwarpJWorkflow
      */
-    public void bindView(BUnwarpJWorkflow bUnwarpJWorkflow) {
+    public void bindBunwarpJ(BUnwarpJWorkflow bUnwarpJWorkflow) {
         bUnwarpJWorkflow.consistencyWeightTextField.textProperty().bindBidirectional(consistencyWeight, new NumberStringConverter());
         bUnwarpJWorkflow.curlWeightTextField.textProperty().bindBidirectional(curlWeight, new NumberStringConverter());
         bUnwarpJWorkflow.divWeightTextField.textProperty().bindBidirectional(divWeight, new NumberStringConverter());
@@ -337,15 +348,23 @@ public class WorkflowModel {
 
     }
 
+    public void bindFlatfield(FlatfieldWorkflow flatfieldWorkflow) {
+        flatfieldWorkflow.flatFieldProperty1.bindBidirectional(flatFieldImageDisplayProperty1);
+        flatfieldWorkflow.flatFieldProperty2.bindBidirectional(flatFieldImageDisplayProperty2);
+
+    }
+
     protected ObjectProperty<ImageDisplayPane> initDisplayPane() {
         ObjectProperty<ImageDisplayPane> objectProperty = null;
         try {
             ImageDisplayPane imageDisplayPane = new ImageDisplayPane(context);
 
-            imageDisplayPane.setOnMouseClicked(e -> {
-                System.out.println("ijfx.ui.correction.WorkflowModel.initDisplayPane()");
-                displayService.setActiveDisplay(imageDisplayPane.getImageDisplay());
-                    });
+            imageDisplayPane.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
+
+                if (e.getButton() == MouseButton.PRIMARY) {
+                    displayService.setActiveDisplay(imageDisplayPane.getImageDisplay());
+                }
+            });
 
             objectProperty = new SimpleObjectProperty<>();
             objectProperty.set(imageDisplayPane);
@@ -376,12 +395,12 @@ public class WorkflowModel {
         map.put("img_subsamp_fact", img_subsamp_fact.get());
         map.put("landmarksFile", landmarksFile.get());
 
-        Module module = executeCommand(BunwarpJCommand.class,  map);
+        Module module = executeCommand(BunwarpJCommand.class, map);
         Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
         return outputDataset;
     }
-    
-     public <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
+
+    public <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
         Module module = moduleService.createModule(commandService.getCommand(type));
         try {
             module.initialize();

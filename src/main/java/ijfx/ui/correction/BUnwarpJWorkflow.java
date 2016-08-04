@@ -200,7 +200,7 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
 //            extractAndMerge(datasets, imageDisplayPaneBottomRightProperty.get());
 //        });
         workflowModel.setContext(context);
-        workflowModel.bindView(this);
+        workflowModel.bindBunwarpJ(this);
         imagesContainer.add(imageDisplayPaneTopLeftProperty.get(), 0, 1);
         imagesContainer.add(imageDisplayPaneBottomLeftProperty.get(), 0, 2);
         imagesContainer.add(imageDisplayPaneTopRightProperty.get(), 1, 1);
@@ -262,23 +262,23 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
 
     }
 
-    @EventHandler
-    public void handleEvent(DataViewUpdatedEvent event) {
-        if (imageDisplayPaneTopLeftProperty.get().getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRightProperty.get().getImageDisplay().contains(event.getView())) {
-            Dataset[] datasets = new Dataset[2];
-            ImageDisplay imageDisplayLeft = imageDisplayPaneTopLeftProperty.get().getImageDisplay();
-            datasets[0] = datasetUtillsService.extractPlane(imageDisplayLeft);
-
-            ImageDisplay imageDisplayRight = imageDisplayPaneTopRightProperty.get().getImageDisplay();
-            datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
-            extractAndMerge(datasets, imageDisplayPaneBottomLeftProperty.get());
-//            datasets[1] = workflowModel.getTransformedImage();
+//    @EventHandler
+//    public void handleEvent(DataViewUpdatedEvent event) {
+//        if (imageDisplayPaneTopLeftProperty.get().getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRightProperty.get().getImageDisplay().contains(event.getView())) {
+//            Dataset[] datasets = new Dataset[2];
+//            ImageDisplay imageDisplayLeft = imageDisplayPaneTopLeftProperty.get().getImageDisplay();
+//            datasets[0] = datasetUtillsService.extractPlane(imageDisplayLeft);
 //
-//            extractAndMerge(datasets, imageDisplayPaneBottomRightProperty.get());
-
-        }
-
-    }
+//            ImageDisplay imageDisplayRight = imageDisplayPaneTopRightProperty.get().getImageDisplay();
+//            datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
+//            extractAndMerge(datasets, imageDisplayPaneBottomLeftProperty.get());
+////            datasets[1] = workflowModel.getTransformedImage();
+////
+////            extractAndMerge(datasets, imageDisplayPaneBottomRightProperty.get());
+//
+//        }
+//
+//    }
     public void bindProperty() {
         imageDisplayPaneBottomLeftProperty.get().getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneTopRightProperty.get().getCanvas().getCamera().zoomProperty());
         imageDisplayPaneTopRightProperty.get().getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneTopLeftProperty.get().getCanvas().getCamera().zoomProperty());

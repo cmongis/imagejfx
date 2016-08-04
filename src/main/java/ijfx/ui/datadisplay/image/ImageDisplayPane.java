@@ -39,6 +39,7 @@ import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -65,6 +67,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -423,13 +426,15 @@ public class ImageDisplayPane extends AnchorPane {
         logService.setLevel(LogService.INFO);
 
         if (arcMenu != null) {
-            anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, myHandler);
+            anchorPane.removeEventHandler(MouseEvent.MOUSE_PRESSED, myHandler);
             arcMenu = null;
 
         }
         arcMenu = new PopArcMenu();
         myHandler = (MouseEvent event) -> {
-            arcMenu.show(event);
+            if (event.getButton() == MouseButton.SECONDARY) {
+                arcMenu.show(event);
+            }
         };
         anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, myHandler);
 
@@ -632,8 +637,20 @@ public class ImageDisplayPane extends AnchorPane {
 
         long width = getDataset().dimension(0);
         long height = getDataset().dimension(1);
+        CalibratedAxis[] axes = new CalibratedAxis[imageDisplay.numDimensions()];
+        int[] position = new int[imageDisplay.numDimensions()];
+        imageDisplay.axes(axes);
+        imageDisplay.localize(position);
+        StringBuilder stringBuilder = new StringBuilder();
+        IntStream.range(2, position.length)
+                .forEach(e -> {
+                    stringBuilder.append(axes[e].type().toString());
+                    stringBuilder.append(": ");
+                    stringBuilder.append(position[e]);
+                    stringBuilder.append("");
 
-        infoLabel.setText(String.format("%s - %d x %d", imageType, width, height));
+                });
+        infoLabel.setText(String.format("%s - %d x %d - %s", imageType, width, height, stringBuilder));
 
     }
 

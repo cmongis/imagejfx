@@ -31,9 +31,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -59,8 +62,14 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
     WorkflowModel workflowModel;
 
     @FXML
-    Button folderButton;
+    Button folderButton1;
+    
+    @FXML
+    Button folderButton2;
 
+    @FXML
+    GridPane gridPane;
+    
     @Parameter
     ImageLoaderService imageLoaderService;
 
@@ -75,7 +84,8 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
 
     @Parameter
     ImagePlaneService imagePlaneService;
-    protected ImageDisplayPane imageDisplayPane;
+    protected ObjectProperty<ImageDisplayPane> flatFieldProperty1 = new SimpleObjectProperty<>();
+    protected ObjectProperty<ImageDisplayPane> flatFieldProperty2 = new SimpleObjectProperty<>();
 
     @Parameter
     DatasetUtillsService datasetUtillsService;
@@ -85,26 +95,28 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
 
     public FlatfieldWorkflow() throws IOException {
         CorrectionActivity.getStaticContext().inject(this);
-        imageDisplayPane = new ImageDisplayPane(context);
     }
 
     @PostConstruct
     public void init() {
-        imageDisplayPane.setOnMouseClicked(e -> displayService.setActiveDisplay(imageDisplayPane.getImageDisplay()));
-        borderPane.setCenter(imageDisplayPane);
-        folderButton.setOnAction(this::openImage);
-        workflowModel.getFlatFieldImageDisplay().ifPresent((e) -> imageDisplayPane.display(e));
+        workflowModel.bindFlatfield(this);
+        gridPane.add(flatFieldProperty1.get(),0,1);
+                gridPane.add(flatFieldProperty2.get(),1,1);
+
+//        borderPane.setRight(flatFieldProperty2.get());
+        folderButton1.setOnAction(e-> openImage(flatFieldProperty1.get()));
+        folderButton2.setOnAction(e-> openImage(flatFieldProperty2.get()));
     }
 
-    protected void openImage(ActionEvent e) {
+    protected void openImage(ImageDisplayPane imageDisplayPane) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
 
         try {
             Dataset flatFieldDataset = imagePlaneService.openVirtualDataset(file);
             ImageDisplay imageDisplay = displayDataset(flatFieldDataset);
-            workflowModel.setFlatFieldImageDisplay1(imageDisplay);
-        } catch (IOException ex) {
+            imageDisplayPane.display(imageDisplay);
+           } catch (IOException ex) {
             Logger.getLogger(FlatfieldWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -112,7 +124,6 @@ public class FlatfieldWorkflow extends AbstractCorrectionActivity {
     protected ImageDisplay displayDataset(Dataset flatFieldDataset) {
         ImageDisplay imageDisplay = new SilentImageDisplay(context, flatFieldDataset);
         imageDisplay.display(flatFieldDataset);
-        imageDisplayPane.display(imageDisplay);
         return imageDisplay;
     }
 
