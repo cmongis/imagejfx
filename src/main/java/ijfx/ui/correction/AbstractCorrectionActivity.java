@@ -53,6 +53,10 @@ public class AbstractCorrectionActivity {
     @FXML
     @ActionTrigger("nextAction")
     protected Button nextButton;
+    
+    @FXML
+    @ActionTrigger("reset")
+    protected Button resetButton;
 
     @FXML
     @ActionTrigger("finishAction")

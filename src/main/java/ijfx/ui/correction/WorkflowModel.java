@@ -20,6 +20,8 @@
 package ijfx.ui.correction;
 
 import ij.process.ImageProcessor;
+import ijfx.plugins.bunwarpJ.BunwarpJCommand;
+import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.main.ImageJFX;
@@ -30,8 +32,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
@@ -49,6 +55,7 @@ import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import net.imagej.table.DefaultResultsTable;
 import net.imagej.table.DefaultTableDisplay;
 import net.imagej.table.ResultsTable;
@@ -57,7 +64,14 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
 import org.scijava.Context;
+import org.scijava.command.Command;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
+import org.scijava.display.DisplayService;
 import org.scijava.io.IOService;
+import org.scijava.module.MethodCallException;
+import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -69,14 +83,28 @@ public class WorkflowModel {
 
     protected ImageDisplay flatFieldImageDisplay1;
 
-    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneLeftProperty = new SimpleObjectProperty<>();
+    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneTopLeftProperty;
 
-    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneRightProperty = new SimpleObjectProperty<>();
+    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneTopRightProperty;
 
-    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneBottomProperty = new SimpleObjectProperty<>();
+    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneBottomLeftProperty;
+
+    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneBottomRightProperty;
 
     @Parameter
     IOService iOService;
+
+    @Parameter
+    DisplayService displayService;
+
+    @Parameter
+    CommandService commandService;
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
+    @Parameter
+    ModuleService moduleService;
 
     private StringProperty min_scale_deformation_choice = new SimpleStringProperty("Very Fine");
 
@@ -137,7 +165,7 @@ public class WorkflowModel {
 
     File imagesFolder;
 
-    File landmarksFile;
+    private ObjectProperty<File> landmarksFile = new SimpleObjectProperty<>();
 
     Dataset flatfield;
 
@@ -166,14 +194,32 @@ public class WorkflowModel {
 
     public WorkflowModel() {
         LOGGER.info("Init WorkflowModel");
+        CorrectionActivity.getStaticContext().inject(this);
+        init();
+    }
+
+    public void init() {
+
+        imageDisplayPaneTopLeftProperty = initDisplayPane();
+
+        imageDisplayPaneTopRightProperty = initDisplayPane();
+
+        imageDisplayPaneBottomLeftProperty = initDisplayPane();
+
+        imageDisplayPaneBottomRightProperty = initDisplayPane();
     }
 
     public void setContext(Context context) {
-        if (context!=this.context){
-        this.context = context;
-            context.inject(this);
-            
+        if (context != this.context) {
+            this.context = context;
+            try {
+                context.inject(this);
+
+            } catch (Exception e) {
+            }
+
         }
+//        init();
     }
 
     public Optional<ImageDisplay> getFlatFieldImageDisplay() {
@@ -185,12 +231,12 @@ public class WorkflowModel {
     }
 
     /**
-     * 
+     *
      * @param header
      * @param fileLabel
      * @return
      * @throws FileNotFoundException
-     * @throws IOException 
+     * @throws IOException
      */
     public TableDisplay loadTable(String[] header, Label fileLabel) throws FileNotFoundException, IOException {
 
@@ -198,9 +244,9 @@ public class WorkflowModel {
 
         Reader in;
         List<double[]> points = new ArrayList<>();
-        File file = fileChooser.showOpenDialog(null);
-        fileLabel.setText(file.getName());
-        in = new FileReader(file.getAbsolutePath());
+        landmarksFile.set( fileChooser.showOpenDialog(null));
+        fileLabel.setText(landmarksFile.getName());
+        in = new FileReader(landmarksFile.get().getAbsolutePath());
         Iterable<CSVRecord> records = CSVFormat.EXCEL.withHeader(header).parse(in);
         for (CSVRecord record : records) {
             double[] sourceArray = new double[header.length];
@@ -210,7 +256,6 @@ public class WorkflowModel {
             points.add(sourceArray);
             for (int i = 0; i < header.length; i++) {
                 sourceArray[i] = Double.valueOf(record.get(header[i]));
-
             }
         }
         ResultsTable resultsTable = new DefaultResultsTable(header.length, points.size());
@@ -226,11 +271,11 @@ public class WorkflowModel {
     }
 
     /**
-     * 
-     * @param imageDisplayPaneProperty
-     * @return 
+     *
+     * @param imageDisplayPane1,ObjectProperty<ImageDisplayPane> imageDisplayPaneProperty2
+     * @return
      */
-    public ImageDisplay openImage(ObjectProperty<ImageDisplayPane> imageDisplayPaneProperty) {
+    public void openImage(ImageDisplayPane imageDisplayPane1,ImageDisplayPane imageDisplayPane2) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
 
@@ -240,20 +285,22 @@ public class WorkflowModel {
         } catch (IOException ex) {
             Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return displayDataset(dataset, imageDisplayPaneProperty.get());
+        displayDataset(dataset, imageDisplayPane1);
+        displayDataset(dataset, imageDisplayPane2);
 
     }
 
     /**
-     * 
+     *
      * @param dataset
      * @param imageDisplayPane
-     * @return 
+     * @return
      */
     public ImageDisplay displayDataset(Dataset dataset, ImageDisplayPane imageDisplayPane) {
         try {
             imageDisplayPane.getImageDisplay().clear();
         } catch (Exception e) {
+            e.printStackTrace();
         }
         SilentImageDisplay imageDisplay = new SilentImageDisplay(context, dataset);
         imageDisplay.display(dataset);
@@ -262,8 +309,8 @@ public class WorkflowModel {
     }
 
     /**
-     * 
-     * @param bUnwarpJWorkflow 
+     *
+     * @param bUnwarpJWorkflow
      */
     public void bindView(BUnwarpJWorkflow bUnwarpJWorkflow) {
         bUnwarpJWorkflow.consistencyWeightTextField.textProperty().bindBidirectional(consistencyWeight, new NumberStringConverter());
@@ -282,9 +329,77 @@ public class WorkflowModel {
         bUnwarpJWorkflow.min_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(min_scale_deformation_choice);
         bUnwarpJWorkflow.max_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(max_scale_deformation_choice);
 
-        bUnwarpJWorkflow.imageDisplayPaneLeftProperty.bindBidirectional(imageDisplayPaneLeftProperty);
-        bUnwarpJWorkflow.imageDisplayPaneRightProperty.bindBidirectional(imageDisplayPaneRightProperty);
-//        bUnwarpJWorkflow.imageDisplayPaneLeftProperty.bindBidirectional(imageDisplayPaneLeftBo);
+        bUnwarpJWorkflow.imageDisplayPaneTopLeftProperty.bindBidirectional(imageDisplayPaneTopLeftProperty);
+        bUnwarpJWorkflow.imageDisplayPaneTopRightProperty.bindBidirectional(imageDisplayPaneTopRightProperty);
+        bUnwarpJWorkflow.imageDisplayPaneBottomLeftProperty.bindBidirectional(imageDisplayPaneBottomLeftProperty);
+        bUnwarpJWorkflow.imageDisplayPaneBottomRightProperty.bindBidirectional(imageDisplayPaneBottomRightProperty);
+        bUnwarpJWorkflow.landmarksFile.bindBidirectional(landmarksFile);
 
+    }
+
+    protected ObjectProperty<ImageDisplayPane> initDisplayPane() {
+        ObjectProperty<ImageDisplayPane> objectProperty = null;
+        try {
+            ImageDisplayPane imageDisplayPane = new ImageDisplayPane(context);
+
+            imageDisplayPane.setOnMouseClicked(e -> {
+                System.out.println("ijfx.ui.correction.WorkflowModel.initDisplayPane()");
+                displayService.setActiveDisplay(imageDisplayPane.getImageDisplay());
+                    });
+
+            objectProperty = new SimpleObjectProperty<>();
+            objectProperty.set(imageDisplayPane);
+        } catch (IOException ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return objectProperty;
+    }
+
+    public Dataset getTransformedImage() {
+        ImageDisplay imageDisplay = imageDisplayPaneTopRightProperty.get().getImageDisplay();
+        Dataset activeDataset = imageDisplayService.getActiveDataset(imageDisplay);
+        Map<String, Object> map = new HashMap<>();
+        map.put("inputDataset", activeDataset);
+        map.put("min_scale_deformation_choice", min_scale_deformation_choice.get());
+        map.put("max_scale_deformation_choice", max_scale_deformation_choice.get());
+        map.put("modeChoice", modeChoice.get());
+        map.put("maxImageSubsamplingFactor", maxImageSubsamplingFactor.get());
+        map.put("divWeight", divWeight.get());
+        map.put("curlWeight", curlWeight.get());
+        map.put("landmarkWeight", landmarkWeight.get());
+        map.put("imageWeight", imageWeight.get());
+        map.put("consistencyWeight", consistencyWeight.get());
+        map.put("richOutput", richOutput.get());
+        map.put("saveTransformation", saveTransformation.get());
+        map.put("min_scale_image", min_scale_image.get());
+        map.put("stopThreshold", stopThreshold.get());
+        map.put("img_subsamp_fact", img_subsamp_fact.get());
+        map.put("landmarksFile", landmarksFile.get());
+
+        Module module = executeCommand(BunwarpJCommand.class,  map);
+        Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
+        return outputDataset;
+    }
+    
+     public <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
+        Module module = moduleService.createModule(commandService.getCommand(type));
+        try {
+            module.initialize();
+        } catch (MethodCallException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        parameters.forEach((k, v) -> {
+            module.setInput(k, v);
+            module.setResolved(k, true);
+        });
+
+        Future run = moduleService.run(module, false, parameters);
+
+        try {
+            run.get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return module;
     }
 }

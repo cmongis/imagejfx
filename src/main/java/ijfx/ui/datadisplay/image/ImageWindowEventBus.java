@@ -81,7 +81,7 @@ public class ImageWindowEventBus {
 
     }
 
-    void channel(SciJavaEvent event) {
+    public void channel(SciJavaEvent event) {
         //System.out.println("Channeling ! " + event.getClass().getSimpleName());
         bus.onNext(event);
     }
