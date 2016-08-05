@@ -196,7 +196,12 @@ public class ImageDisplayPane extends AnchorPane {
 
         canvas.widthProperty().bind(stackPane.widthProperty());
         canvas.heightProperty().bind(stackPane.heightProperty());
+        this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
+            if (e.getButton() == MouseButton.PRIMARY && this.getImageDisplay() != null) {
+                displayService.setActiveDisplay(this.getImageDisplay());
+            }
+        });
     }
 
     public void display(ImageDisplay display) {

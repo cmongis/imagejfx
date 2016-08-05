@@ -15,7 +15,7 @@
     <bottom>
         <fx:include source="./ActionBar.fxml" />
     </bottom>
-    <center>
+   <top>
         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
             <children>
                 <Label text="Welcome">
@@ -28,5 +28,13 @@
                 </Label>
             </children>
         </StackPane>
-    </center>
+   </top>
+   <left>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="chooseFolder" mnemonicParsing="false" onAction="#addFiles" text="Choose folder..." />
+            <ListView fx:id="listView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+         </children>
+      </VBox>
+   </left>
 </BorderPane>
