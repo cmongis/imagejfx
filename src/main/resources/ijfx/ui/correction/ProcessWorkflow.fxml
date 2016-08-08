@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <bottom>
+        <fx:include source="./ActionBar.fxml" />
+    </bottom>
+    <top>
+        <Button fx:id="processButton" mnemonicParsing="false" onAction="#process" text="Choose folder..." />
+    </top>
+   <center>
+      <HBox fx:id="hBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" />
+         </children>
+      </HBox>
+   </center>
+   
+</BorderPane>
