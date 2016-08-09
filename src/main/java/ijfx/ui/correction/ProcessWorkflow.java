@@ -105,6 +105,7 @@ public class ProcessWorkflow extends CorrectionFlow {
     @FXML
     public void process() {
         List<File> files = workflowModel.getFiles();
+        listView.getItems().clear();
         workflowModel.getMapImages().clear();
         files.stream().forEach((File file) -> {
             try {
@@ -149,15 +150,9 @@ public class ProcessWorkflow extends CorrectionFlow {
 
     public void selectPosition(ImageDisplay imageDisplay, int[] firstPosition, int[] secondPosition, ImageDisplayPane imageDisplayPane) {
         workflowModel.setPosition(firstPosition, imageDisplay);
-//        imageDisplay.setPosition(firstPosition);
         imageDisplayService.getActiveDatasetView(imageDisplay).setColorMode(ColorMode.COLOR);
         Dataset datasetFirstSlide = datasetUtillsService.extractPlane(imageDisplay);
         workflowModel.setPosition(secondPosition, imageDisplay);
-        System.out.println("ijfx.ui.correction.ProcessWorkflow.selectPosition()");
-        System.out.println(Arrays.toString(firstPosition));
-        System.out.println(Arrays.toString(secondPosition));
-
-//        imageDisplay.setPosition(secondPosition);
         Dataset datasetSecondSlide = datasetUtillsService.extractPlane(imageDisplay);
         workflowModel.extractAndMerge(new Dataset[]{datasetFirstSlide, datasetSecondSlide}, imageDisplayPane);
     }

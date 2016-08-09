@@ -46,10 +46,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.Dataset;
@@ -222,11 +224,10 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
                     workflowModel.extractAndMerge(datasets, imageDisplayPaneBottomLeft);
                 });
 
+        setCellFactory(listView);
         listView.getItems().addAll(workflowModel.getFiles());
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
             workflowModel.openImage(this.imageDisplayPaneTopRight, this.imageDisplayPaneTopLeft, newValue);
-            System.out.println("ijfx.ui.correction.BUnwarpJWorkflow.init()");
-            System.out.println(Arrays.toString(workflowModel.getPositionRight()));
             workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeft.getImageDisplay());
             workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRight.getImageDisplay());
 
@@ -244,17 +245,6 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
     public void handleEvent(DataViewEvent event) {
         if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
             bus.channel(event);
-//            Dataset[] datasets = new Dataset[2];
-//            ImageDisplay imageDisplayLeft = imageDisplayPaneTopLeftProperty.get().getImageDisplay();
-//            datasets[0] = datasetUtillsService.extractPlane(imageDisplayLeft);
-//
-//            ImageDisplay imageDisplayRight = imageDisplayPaneTopRightProperty.get().getImageDisplay();
-//            datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
-//            extractAndMerge(datasets, imageDisplayPaneBottomLeftProperty.get());
-//            datasets[1] = workflowModel.getTransformedImage();
-//
-//            extractAndMerge(datasets, imageDisplayPaneBottomRightProperty.get());
-//
         }
 
     }
@@ -263,24 +253,8 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
     public void handleEvent(LUTsChangedEvent event) {
         if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
             bus.channel(event);
-//            DatasactAndMerge(datasets, imageDisplayPaneBottomRightProperty.get());
-//
         }
 
-    }
-
-    private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) throws MethodCallException, InterruptedException, ExecutionException {
-        Module module = moduleService.createModule(commandService.getCommand(type));
-        module.initialize();
-
-        parameters.forEach((k, v) -> {
-            module.setInput(k, v);
-            module.setResolved(k, true);
-        });
-        Future run = moduleService.run(module, false, parameters);
-        run.get();
-
-        return module;
     }
 
     public void copyLUT(List<ImageDisplay> list, Dataset output) {

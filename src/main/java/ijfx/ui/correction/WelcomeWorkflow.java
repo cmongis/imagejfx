@@ -24,6 +24,7 @@ import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +33,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.stage.DirectoryChooser;
+import javafx.util.Callback;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.display.ImageDisplay;
@@ -94,19 +97,9 @@ public class WelcomeWorkflow extends CorrectionFlow {
         workflowModel.bindWelcome(this);
         borderPane.setCenter(imageDisplayPaneLeft);
         borderPane.setRight(imageDisplayPaneRight);
-        listView.getItems().addAll(listProperty.get());
-        listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> obs, File old, File newValue) -> {
-            workflowModel.openImage(imageDisplayPaneLeft, imageDisplayPaneRight, newValue);
-            if (workflowModel.getPositionLeft().length == imageDisplayPaneLeft.getImageDisplay().numDimensions()) {
-                workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneLeft.getImageDisplay());
-                workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneRight.getImageDisplay());
-            } else {
-                savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
-                savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
-            }
-
-        });
-
+        initListView();
+        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft,imageDisplayPaneRight};
+        bindPaneProperty(Arrays.asList(imageDisplayPanes));
         //Only when the user come back
 //        if (listProperty.get().size() > 0) {
 //            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, listProperty.get().get(0));
@@ -140,6 +133,23 @@ public class WelcomeWorkflow extends CorrectionFlow {
         int[] position = new int[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
         property.set(position);
+    }
+
+    private void initListView() {
+        listView.getItems().addAll(listProperty.get());
+        setCellFactory(listView);
+        
+        listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> obs, File old, File newValue) -> {
+            workflowModel.openImage(imageDisplayPaneLeft, imageDisplayPaneRight, newValue);
+            if (workflowModel.getPositionLeft().length == imageDisplayPaneLeft.getImageDisplay().numDimensions()) {
+                workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneLeft.getImageDisplay());
+                workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneRight.getImageDisplay());
+            } else {
+                savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
+                savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
+            }
+
+        });
     }
 
 }

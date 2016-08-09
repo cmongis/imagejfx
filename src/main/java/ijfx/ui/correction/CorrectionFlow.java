@@ -24,9 +24,12 @@ import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.flow.action.ActionMethod;
 import io.datafx.controller.flow.action.ActionTrigger;
 import io.datafx.controller.flow.action.BackAction;
+import java.io.File;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import org.scijava.plugin.Parameter;
 
@@ -77,6 +80,22 @@ public class CorrectionFlow {
         System.out.println("ijfx.ui.correction.CorrectionFlow.reset()");
 //        CorrectionActivity correctionActivity = objectService.getObjects(CorrectionActivity.class).get(0);
         correctionActivity.reset();
+    }
+
+    public void setCellFactory(ListView<File> listView) {
+        listView.setCellFactory((ListView<File> param) -> {
+            ListCell<File> cell = new ListCell<File>() {
+                @Override
+                protected void updateItem(File file, boolean b) {
+                    super.updateItem(file, b);
+                    if (file != null) {
+                        setText(file.getName());
+                    }
+                }
+
+            };
+            return cell;
+        });
     }
 
 }
