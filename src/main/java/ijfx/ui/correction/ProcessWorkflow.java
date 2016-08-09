@@ -34,6 +34,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -77,6 +78,9 @@ public class ProcessWorkflow extends CorrectionFlow {
     @FXML
     HBox hBox;
 
+    @FXML
+    GridPane gridPane;
+
     ImageDisplayPane imageDisplayPaneLeft;
 
     ImageDisplayPane imageDisplayPaneRight;
@@ -96,8 +100,8 @@ public class ProcessWorkflow extends CorrectionFlow {
     @PostConstruct
     public void init() {
         bindListView();
-        hBox.getChildren().add(imageDisplayPaneLeft);
-        hBox.getChildren().add(imageDisplayPaneRight);
+        gridPane.add(imageDisplayPaneLeft, 1, 0);
+        gridPane.add(imageDisplayPaneRight, 2, 0);
         ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
         bindPaneProperty(Arrays.asList(imageDisplayPanes));
     }
@@ -112,7 +116,7 @@ public class ProcessWorkflow extends CorrectionFlow {
                 Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
                 ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
                 imageDisplay.setPosition(workflowModel.positionRightProperty.get());
-                Dataset outputDataset = inputDataset.duplicate();//workflowModel.getTransformedImage(imageDisplay);;
+                Dataset outputDataset = workflowModel.getTransformedImage(imageDisplay);
                 workflowModel.getMapImages().put(file.getAbsolutePath(), outputDataset);
             } catch (IOException ex) {
                 Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);

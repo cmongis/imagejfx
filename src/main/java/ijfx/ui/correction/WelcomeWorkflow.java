@@ -32,9 +32,14 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Callback;
 import javax.annotation.PostConstruct;
@@ -68,6 +73,9 @@ public class WelcomeWorkflow extends CorrectionFlow {
     ListView<File> listView;
 
     @FXML
+    GridPane gridPane;
+
+    @FXML
     Button chooseFolder;
 
     ImageDisplayPane imageDisplayPaneLeft;
@@ -95,10 +103,12 @@ public class WelcomeWorkflow extends CorrectionFlow {
     @PostConstruct
     public void init() {
         workflowModel.bindWelcome(this);
-        borderPane.setCenter(imageDisplayPaneLeft);
-        borderPane.setRight(imageDisplayPaneRight);
+        gridPane.add(imageDisplayPaneLeft, 1, 0);
+        gridPane.add(imageDisplayPaneRight, 2, 0);
+
+//        gridPane.getChildren().addAll(new Node[]{imageDisplayPaneLeft, imageDisplayPaneRight});
         initListView();
-        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft,imageDisplayPaneRight};
+        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
         bindPaneProperty(Arrays.asList(imageDisplayPanes));
         //Only when the user come back
 //        if (listProperty.get().size() > 0) {
@@ -138,7 +148,7 @@ public class WelcomeWorkflow extends CorrectionFlow {
     private void initListView() {
         listView.getItems().addAll(listProperty.get());
         setCellFactory(listView);
-        
+
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> obs, File old, File newValue) -> {
             workflowModel.openImage(imageDisplayPaneLeft, imageDisplayPaneRight, newValue);
             if (workflowModel.getPositionLeft().length == imageDisplayPaneLeft.getImageDisplay().numDimensions()) {
