@@ -31,7 +31,7 @@ public interface ProfilesSet {
     
     public int size();
     
-    public List<double[]> getPointsAsIntensities(Dataset ds);
+    public List<double[]> getPointsAsIntensities(Dataset ds, int startIdx, int endIdx);
     
     public int getMaxLenght();
     

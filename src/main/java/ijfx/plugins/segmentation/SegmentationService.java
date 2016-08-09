@@ -40,6 +40,8 @@ import net.imagej.display.OverlayService;
 import net.imagej.overlay.Overlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
+import org.deeplearning4j.eval.Evaluation;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.scijava.Context;
@@ -67,7 +69,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
     private List<List<int[]>> confirmationSet;
     private List<Dataset> imgDatasets;
     
-    private INN nn;
+    private INN net;
     
     private Property<NNType> nnType =  new SimpleObjectProperty<>();
     
@@ -204,26 +206,28 @@ public class SegmentationService extends AbstractService implements ImageJServic
     }
     
     public void train(){
-        this.nn = buildNN(nnType().getValue());
+        this.net = buildNN(nnType().getValue());
         
         DataSetIterator iter = new ProfileIterator(trainingData, confirmationSet, imgDatasets);
-        
-        boolean next = iter.hasNext();
-        System.out.println("Fitting : DONE");
         int iEpoch = 0;
-        int nEpochs = 3;
+        int nEpochs = 100;
         
         while(iEpoch < nEpochs){
-            System.out.printf("* = * = * = * = * = * = * = * = * = ** EPOCH %d ** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n",iEpoch);
+            System.out.printf("EPOCH %d\n",iEpoch);
 
-        while(iter.hasNext()){
-            DataSet ds = iter.next();
-            nn.train(ds);
-        }
-        iter.reset();
-        nEpochs++;
-                    System.out.printf("* = * = * = * = * = * = * = * = * = ** EPOCH COMPLETE** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n",iEpoch);
+            Evaluation eval = new Evaluation();
+            while(iter.hasNext()){
+                DataSet ds = iter.next();
+                net.train(ds);
+//                
+                INDArray predict2 = net.output(ds.getFeatureMatrix());
+                INDArray labels2 = ds.getLabels();
+//                eval.evalTimeSeries(labels2, predict2);                
+            }
 
+            iter.reset();
+//            System.out.println(eval.stats());
+            iEpoch++;
         }
         System.out.println("Fitting : DONE");
     }

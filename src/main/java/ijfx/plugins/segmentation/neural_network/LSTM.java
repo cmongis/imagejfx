@@ -29,8 +29,9 @@ import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.ui.UiConnectionInfo;
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.weights.HistogramIterationListener;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -47,9 +48,8 @@ public class LSTM implements INN{
         MultiLayerConfiguration conf = configure();
         net = new MultiLayerNetwork(conf);
         net.init();
-//        net.setListeners(new HistogramIterationListener(new UiConnectionInfo(), 1));
         net.setListeners(new HistogramIterationListener(1));
-        
+//        net.setListeners(new ScoreIterationListener(1));
         //Print the  number of parameters in the network (and for each layer)
         Layer[] layers = net.getLayers();
         int totalNumParams = 0;
@@ -121,4 +121,8 @@ public class LSTM implements INN{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    
+    public INDArray output(INDArray input){
+        return net.output(input);
+    }
 }

@@ -69,7 +69,6 @@ public abstract class AbstractSearchArea implements SearchArea{
             
             List<int[]> line = Bresenham.findLine(cX, cY, x, y);
             segments.add(line);
-            System.out.println(line.size());
         }
 
     }

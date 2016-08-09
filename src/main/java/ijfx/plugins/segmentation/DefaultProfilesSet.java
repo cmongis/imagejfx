@@ -104,11 +104,12 @@ public class DefaultProfilesSet implements ProfilesSet{
     }
 
     @Override
-    public List<double[]> getPointsAsIntensities(Dataset ds) {
+    public List<double[]> getPointsAsIntensities(Dataset ds, int startIdx, int endIdx) {
         
         List<double[]> values = new ArrayList<>();
         
-        for(List<int[]> points : profiles){
+        for(int i = startIdx; i < endIdx; i++){
+            List<int[]> points = profiles.get(i);
             // We pad the shorter series so all of them are the same lenght.
             double[] intensities = new double[maxLenght];
             

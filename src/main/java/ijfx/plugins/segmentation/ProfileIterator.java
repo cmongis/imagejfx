@@ -34,12 +34,14 @@ import org.nd4j.linalg.factory.Nd4j;
 public class ProfileIterator implements DataSetIterator{
     
     private final int NUM_CLASSES = 1;
+    private final int MINIBATCH_SIZE = 50;
     
     private List<ProfilesSet> allProfilesSet;
     private List<List<int[]>> labelsSet;
     private List<Dataset> imgDatasets;
-
-    private int currentDatasetIdx;
+    
+    private int currDatasetIdx;
+    private int currProfileIdx;
     private int profileLength;
     
     public ProfileIterator(List<ProfilesSet> allProfilesSet, List<List<int[]>> labelsSet, List<Dataset> imgDatasets){
@@ -48,43 +50,72 @@ public class ProfileIterator implements DataSetIterator{
         this.labelsSet = labelsSet;
         this.imgDatasets = imgDatasets;
         
-        currentDatasetIdx = 0;
+        currDatasetIdx = 0;
+        currProfileIdx = 0;
         profileLength = 0;
     }
 
     @Override
     public boolean hasNext() {
-        return allProfilesSet.size() - currentDatasetIdx > 0 ;
+        boolean hasNext = false;
+        if (allProfilesSet.size() - currDatasetIdx > 0)
+            hasNext = true;
+//        else if (currProfileIdx <= allProfilesSet.get(currDatasetIdx - 1).size())
+//            hasNext = true;
+        
+        return hasNext;
     }
 
     @Override
     public DataSet next() {
-        return next(currentDatasetIdx);
+        return next(currDatasetIdx);
     }
     @Override
     public DataSet next(int num) {
         ProfilesSet profiles = allProfilesSet.get(num);
-        List<double[]> intensities = profiles.getPointsAsIntensities(imgDatasets.get(num));
+        
+        int startIdx = currProfileIdx;
+        int endIdx;
+        int currMinibatchSize;
+        if(profiles.size() - currProfileIdx >= MINIBATCH_SIZE){
+            endIdx = currProfileIdx + MINIBATCH_SIZE;
+            currMinibatchSize = MINIBATCH_SIZE;
+        }
+        else{
+            endIdx = profiles.size();
+            currMinibatchSize = profiles.size() - currProfileIdx;
+            currDatasetIdx++;
+        }
+            
+        List<double[]> intensities = profiles.getPointsAsIntensities(imgDatasets.get(num), startIdx, endIdx);
+        
         profileLength = profiles.getMaxLenght();
         
-        INDArray input = Nd4j.create(new int[]{profiles.size(), NUM_CLASSES, profileLength}, 'f');
-        INDArray labels = Nd4j.create(new int[]{profiles.size(), NUM_CLASSES, profileLength}, 'f');
-        INDArray masks = Nd4j.create(new int[]{profiles.size(), profileLength}, 'f');
+        INDArray input = Nd4j.create(new int[]{currMinibatchSize, NUM_CLASSES, profileLength}, 'f');
+        INDArray labels = Nd4j.create(new int[]{currMinibatchSize, NUM_CLASSES, profileLength}, 'f');
+        INDArray masks = Nd4j.create(new int[]{currMinibatchSize, profileLength}, 'f');        
+//        INDArray input = Nd4j.create(new int[]{profiles.size(), profileLength}, 'f');
+//        INDArray labels = Nd4j.create(new int[]{profiles.size(),profileLength}, 'f');        
+
+        int c = 0;
         
-        for(int i = 0; i < profiles.size(); i++){
+        for(int i = currProfileIdx; i < currProfileIdx+currMinibatchSize; i++, c++){
             
-            double[] p = intensities.get(i);
+            double[] p = intensities.get(c);
             int[] l = labelsSet.get(num).get(i);
             int[] m = profiles.getMasks().get(i);
             
             for(int j = 0; j < profileLength; j++){
-                input.putScalar(new int[]{i, 0, j}, p[j]);
-                labels.putScalar(new int[]{i, 0, j}, l[j]);
-                masks.putScalar(new int[]{i, j}, m[j]);
+                input.putScalar(new int[]{c, 0, j}, p[j]);
+                labels.putScalar(new int[]{c, 0, j}, l[j]);
+                masks.putScalar(new int[]{c, j}, m[j]);
+//                input.putScalar(i, j, p[j]);
+//                labels.putScalar(i, j, l[j]);
+//                masks.putScalar(i, j, m[j]);
             }
         }
         
-        currentDatasetIdx++;
+        currProfileIdx = endIdx;
         
         return new DataSet(input, labels, masks, masks);
     }
@@ -106,7 +137,8 @@ public class ProfileIterator implements DataSetIterator{
 
     @Override
     public void reset() {
-        currentDatasetIdx = 0;
+        currDatasetIdx = 0;
+        currProfileIdx = 0;
     }
 
     @Override
