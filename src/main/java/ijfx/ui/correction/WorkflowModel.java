@@ -24,20 +24,16 @@ import ijfx.plugins.bunwarpJ.BunwarpJCommand;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
-import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.main.ImageJFX;
 import io.datafx.controller.injection.scopes.ApplicationScoped;
-import io.datafx.controller.injection.scopes.FlowScoped;
-import io.datafx.controller.injection.scopes.ViewScoped;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +41,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -56,7 +51,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
@@ -94,11 +88,6 @@ public class WorkflowModel {
 
     protected ObjectProperty<ImageDisplayPane> flatFieldImageDisplayProperty2;
 
-    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneTopLeftProperty;
-
-    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneTopRightProperty;
-
-    protected ObjectProperty<ImageDisplayPane> imageDisplayPaneBottomLeftProperty;
 
     protected Map<String, Dataset> mapImages;
 
@@ -212,11 +201,6 @@ public class WorkflowModel {
 
     public void init() {
 
-        imageDisplayPaneTopLeftProperty = initDisplayPane();
-
-        imageDisplayPaneTopRightProperty = initDisplayPane();
-
-        imageDisplayPaneBottomLeftProperty = initDisplayPane();
 
         flatFieldImageDisplayProperty1 = initDisplayPane();
 
@@ -372,9 +356,6 @@ public class WorkflowModel {
         bUnwarpJWorkflow.min_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(min_scale_deformation_choice);
         bUnwarpJWorkflow.max_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(max_scale_deformation_choice);
 
-        bUnwarpJWorkflow.imageDisplayPaneTopLeftProperty.bindBidirectional(imageDisplayPaneTopLeftProperty);
-        bUnwarpJWorkflow.imageDisplayPaneTopRightProperty.bindBidirectional(imageDisplayPaneTopRightProperty);
-        bUnwarpJWorkflow.imageDisplayPaneBottomLeftProperty.bindBidirectional(imageDisplayPaneBottomLeftProperty);
         bUnwarpJWorkflow.landmarksFile.bindBidirectional(landmarksFile);
     }
 
@@ -447,21 +428,10 @@ public class WorkflowModel {
         welcomeWorkflow.listProperty.bindBidirectional(listProperty);
         welcomeWorkflow.positionLeftProperty.bindBidirectional(positionLeftProperty);
         welcomeWorkflow.positionRightProperty.bindBidirectional(positionRightProperty);
-
-        positionLeftProperty.addListener(e -> {
-            System.out.println("ijfx.ui.correction.WorkflowModel.bindWelcome()");
-            System.out.println(Arrays.toString(positionLeftProperty.get()));
-        });
-
     }
 
     public void extractAndMerge(Dataset[] datasets, ImageDisplayPane imageDisplayPane) {
-//ImageDisplay d = new DefaultImageDisplay();
-//imagePlaneService.getContext().inject(d);
-//d.display(datasets[0]);
-//Arrays.stream(datasets).forEach(e -> e.set);
         new CallbackTask<Void, Void>().run(() -> {
-//            bindProperty();
             Map<String, Object> inputMap = new HashMap();
             inputMap.put("datasetArray", datasets);
             inputMap.put("axisType", Axes.CHANNEL);
