@@ -29,7 +29,6 @@ import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.weights.HistogramIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
@@ -48,7 +47,7 @@ public class LSTM implements INN{
         MultiLayerConfiguration conf = configure();
         net = new MultiLayerNetwork(conf);
         net.init();
-        net.setListeners(new HistogramIterationListener(1));
+//        net.setListeners(new HistogramIterationListener(1));
 //        net.setListeners(new ScoreIterationListener(1));
         //Print the  number of parameters in the network (and for each layer)
         Layer[] layers = net.getLayers();
@@ -124,5 +123,10 @@ public class LSTM implements INN{
     
     public INDArray output(INDArray input){
         return net.output(input);
+    }
+
+    @Override
+    public INDArray output(DataSetIterator iter) {
+        return net.output(iter);
     }
 }

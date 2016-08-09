@@ -35,6 +35,7 @@ public interface INN {
     public MultiLayerConfiguration configure();
     public void train(DataSet ds);
     public INDArray output(INDArray input);
+    public INDArray output(DataSetIterator iter);
     public void predict();
     public void save();
     public void load();

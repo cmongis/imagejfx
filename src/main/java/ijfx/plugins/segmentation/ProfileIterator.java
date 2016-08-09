@@ -40,30 +40,31 @@ public class ProfileIterator implements DataSetIterator{
     private List<List<int[]>> labelsSet;
     private List<Dataset> imgDatasets;
     
+    boolean train;
+    
     private int currDatasetIdx;
     private int currProfileIdx;
     private int profileLength;
     
-    public ProfileIterator(List<ProfilesSet> allProfilesSet, List<List<int[]>> labelsSet, List<Dataset> imgDatasets){
-        
+    public ProfileIterator(List<ProfilesSet> allProfilesSet, List<List<int[]>> labelsSet, List<Dataset> imgDatasets, boolean train){
         this.allProfilesSet = allProfilesSet;
         this.labelsSet = labelsSet;
         this.imgDatasets = imgDatasets;
+        
+        this.train = train;
         
         currDatasetIdx = 0;
         currProfileIdx = 0;
         profileLength = 0;
     }
+    
+    public ProfileIterator(List<ProfilesSet> allProfilesSet, List<Dataset> imgDatasets){
+        this(allProfilesSet, null, imgDatasets, false);        
+    }
 
     @Override
     public boolean hasNext() {
-        boolean hasNext = false;
-        if (allProfilesSet.size() - currDatasetIdx > 0)
-            hasNext = true;
-//        else if (currProfileIdx <= allProfilesSet.get(currDatasetIdx - 1).size())
-//            hasNext = true;
-        
-        return hasNext;
+        return allProfilesSet.size() - currDatasetIdx > 0;
     }
 
     @Override
@@ -94,24 +95,30 @@ public class ProfileIterator implements DataSetIterator{
         INDArray input = Nd4j.create(new int[]{currMinibatchSize, NUM_CLASSES, profileLength}, 'f');
         INDArray labels = Nd4j.create(new int[]{currMinibatchSize, NUM_CLASSES, profileLength}, 'f');
         INDArray masks = Nd4j.create(new int[]{currMinibatchSize, profileLength}, 'f');        
-//        INDArray input = Nd4j.create(new int[]{profiles.size(), profileLength}, 'f');
-//        INDArray labels = Nd4j.create(new int[]{profiles.size(),profileLength}, 'f');        
 
         int c = 0;
-        
-        for(int i = currProfileIdx; i < currProfileIdx+currMinibatchSize; i++, c++){
-            
-            double[] p = intensities.get(c);
-            int[] l = labelsSet.get(num).get(i);
-            int[] m = profiles.getMasks().get(i);
-            
-            for(int j = 0; j < profileLength; j++){
-                input.putScalar(new int[]{c, 0, j}, p[j]);
-                labels.putScalar(new int[]{c, 0, j}, l[j]);
-                masks.putScalar(new int[]{c, j}, m[j]);
-//                input.putScalar(i, j, p[j]);
-//                labels.putScalar(i, j, l[j]);
-//                masks.putScalar(i, j, m[j]);
+        if(train){
+            for(int i = currProfileIdx; i < currProfileIdx+currMinibatchSize; i++, c++){
+                double[] p = intensities.get(c);
+                int[] l = labelsSet.get(num).get(i);
+                int[] m = profiles.getMasks().get(i);
+                
+                for(int j = 0; j < profileLength; j++){
+                    input.putScalar(new int[]{c, 0, j}, p[j]);
+                    labels.putScalar(new int[]{c, 0, j}, l[j]);
+                    masks.putScalar(new int[]{c, j}, m[j]);
+                }
+            }
+        }
+        else{
+            for(int i = currProfileIdx; i < currProfileIdx+currMinibatchSize; i++, c++){
+                double[] p = intensities.get(c);
+                int[] m = profiles.getMasks().get(i);
+                
+                for(int j = 0; j < profileLength; j++){
+                    input.putScalar(new int[]{c, 0, j}, p[j]);
+                    masks.putScalar(new int[]{c, j}, m[j]);
+                }
             }
         }
         
@@ -143,7 +150,7 @@ public class ProfileIterator implements DataSetIterator{
 
     @Override
     public int batch() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return MINIBATCH_SIZE;
     }
 
     @Override

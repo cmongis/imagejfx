@@ -26,6 +26,8 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayShapeStatistics;
 import ijfx.service.overlay.OverlayStatService;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,9 +40,11 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.PointOverlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -63,8 +67,10 @@ public class SegmentationService extends AbstractService implements ImageJServic
     /**
      * Width of the membrane pattern
      */
-    private final Property<Integer> membraneWidth = new SimpleObjectProperty<>(0);
+    private Property<Integer> membraneWidth = new SimpleObjectProperty<>(0);
+    private Property<Integer> searchRadius = new SimpleObjectProperty<>(40);
     
+    private List<ProfilesSet> testData;
     private List<ProfilesSet> trainingData;
     private List<List<int[]>> confirmationSet;
     private List<Dataset> imgDatasets;
@@ -208,7 +214,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
     public void train(){
         this.net = buildNN(nnType().getValue());
         
-        DataSetIterator iter = new ProfileIterator(trainingData, confirmationSet, imgDatasets);
+        DataSetIterator iter = new ProfileIterator(trainingData, confirmationSet, imgDatasets, true);
         int iEpoch = 0;
         int nEpochs = 100;
         
@@ -219,7 +225,7 @@ public class SegmentationService extends AbstractService implements ImageJServic
             while(iter.hasNext()){
                 DataSet ds = iter.next();
                 net.train(ds);
-//                
+                
                 INDArray predict2 = net.output(ds.getFeatureMatrix());
                 INDArray labels2 = ds.getLabels();
 //                eval.evalTimeSeries(labels2, predict2);                
@@ -231,19 +237,87 @@ public class SegmentationService extends AbstractService implements ImageJServic
         }
         System.out.println("Fitting : DONE");
     }
-//    public ProfilesSet generateTestSet(){
-//        return null;
-//    }
-//    
-//    public void saveParameters(){
-//        
-//    }
-//    
-//    public void loadParameter(){
-//        
-//    }
-//    
-//    public void clearAll(){
-//        
-//    }
+    
+    public List<List<Point2D>> seeding(){
+        //TODO seeding algorithm. Temp manual alternative
+        
+        List<List<Point2D>> seeds = new ArrayList();
+        
+        List<ImageDisplay> displays = imageDisplayService.getImageDisplays();
+        imgDatasets = new ArrayList<>(displays.size());
+        List<List<Overlay>> overlaySet = new ArrayList<>();
+        
+        displays.stream().forEach(id -> {
+            imgDatasets.add(imageDisplayService.getActiveDataset(id));
+            overlaySet.add(overlayService.getOverlays(id));
+        });
+        
+        for(int ds = 0; ds < imgDatasets.size(); ds++){
+            List<Point2D> currSeeds = new ArrayList();
+            
+            for(Overlay o : overlaySet.get(ds)){
+                if(o instanceof PointOverlay){
+                    double[]point = ((PointOverlay) o).getPoints().get(0);
+                    Point2D point2D = new Point2D(point[0], point[1]);
+                    currSeeds.add(point2D);
+                }
+            }
+            seeds.add(currSeeds);
+        }
+        return seeds;
+    }
+    
+    public void generateTestSet(){
+        testData = new ArrayList<>();
+        
+        List<ImageDisplay> displays = imageDisplayService.getImageDisplays();
+        imgDatasets = new ArrayList<>(displays.size());
+        List<Dataset> labeledDs = new ArrayList<>(displays.size());
+        List<List<Overlay>> overlaySet = new ArrayList<>();
+
+        displays.stream().forEach(id -> {
+            imgDatasets.add(imageDisplayService.getActiveDataset(id));
+            overlaySet.add(overlayService.getOverlays(id));
+        });
+        
+        List<List<Point2D>> seeds = seeding();
+        
+        for(int ds = 0; ds < imgDatasets.size(); ds++){
+            
+            List<Point2D> centers = seeds.get(ds);
+
+            ProfilesSet profiles = new DefaultProfilesSet(centers, searchRadius.getValue(), context);
+            testData.add(profiles);
+        }
+    }
+    
+    public void classify(){
+        DataSetIterator iter = new ProfileIterator(testData, imgDatasets);
+        INDArray predict = net.output(iter);
+    }
+
+    public void saveModel(){
+        try{
+            File tmpFile = File.createTempFile("model", null);
+            ModelSerializer.writeModel(net.getNN(), tmpFile, true);
+        }
+        catch(IOException ioe){
+        }
+    }
+    
+    public void loadModel(File file){
+        try{
+            ModelSerializer.restoreMultiLayerNetwork(file);
+        }
+        catch(IOException ioe){
+        }
+    }
+    
+    public void clearAll(){
+        testData = null;
+        trainingData = null;
+        confirmationSet = null;
+        imgDatasets = null;
+        net = null;
+    }
 }
