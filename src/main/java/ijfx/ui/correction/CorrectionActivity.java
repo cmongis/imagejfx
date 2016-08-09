@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import mongis.utils.CallbackTask;
+import org.reactfx.StateMachine;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -59,7 +60,8 @@ public class CorrectionActivity implements Activity {
             flow = new Flow(WelcomeWorkflow.class)
                     .withLink(WelcomeWorkflow.class, "nextAction", FlatfieldWorkflow.class)
                     .withLink(FlatfieldWorkflow.class, "nextAction", BUnwarpJWorkflow.class)
-                    .withLink(BUnwarpJWorkflow.class, "nextAction", EndWorkflow.class)
+                    .withLink(BUnwarpJWorkflow.class, "nextAction", ProcessWorkflow.class)
+                    .withLink(ProcessWorkflow.class, "nextAction", EndWorkflow.class)
                     .withGlobalLink("finishAction", EndWorkflow.class);
             try {
                 node = flow.start();
@@ -84,6 +86,16 @@ public class CorrectionActivity implements Activity {
 
     public static Context getStaticContext() {
         return staticContext;
+    }
+
+    public void reset() {
+        flow = null;
+        init();
+        try {
+            node = flow.start();
+        } catch (FlowException ex) {
+            Logger.getLogger(CorrectionActivity.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

@@ -56,7 +56,7 @@ import org.scijava.plugins.commands.io.OpenFile;
  * @author Tuan anh TRINH
  */
 @ViewController(value = "FlatfieldWorkflow.fxml")
-public class FlatfieldWorkflow extends AbstractCorrectionActivity {
+public class FlatfieldWorkflow extends CorrectionFlow {
 
     @Inject
     WorkflowModel workflowModel;

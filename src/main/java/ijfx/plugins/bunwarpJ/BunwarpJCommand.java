@@ -60,7 +60,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Pipeline2")
+@Plugin(type = Command.class, menuPath = "Plugins>BUnwarpJCommand")
 public class BunwarpJCommand implements Command {
 
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
@@ -84,7 +84,6 @@ public class BunwarpJCommand implements Command {
 //
 //    @Parameter
 //    Dataset datasetTarget;
-
     @Parameter
     ImageDisplayService imageDisplayService;
 
@@ -103,11 +102,7 @@ public class BunwarpJCommand implements Command {
     /**
      * Image representation for source image
      */
-    private ImagePlus sourceImp;
-    /**
-     * Image representation for target image
-     */
-    private ImagePlus targetImp;
+    private ImagePlus imagePlus;
 
     /**
      * minimum scale deformation
@@ -213,9 +208,7 @@ public class BunwarpJCommand implements Command {
     public void run() {
         Runtime.getRuntime().gc();
         init();
-
-        ImagePlus imagePlus = loadImagePlus();
-        //Load landmarks
+        imagePlus = loadImagePlus();
         Stack<Point> sourcePoints = new Stack<>();
         Stack<Point> targetPoints = new Stack<>();
         MiscTools.loadPoints(landmarksFile.getAbsolutePath(), sourcePoints, targetPoints);
@@ -230,7 +223,7 @@ public class BunwarpJCommand implements Command {
         //Apply transformation
 
         outputDataset = iJ1Service.wrapDataset(applyTransformation(imagePlus, transformation));
-
+        imagePlus.setDimensions(1, imagePlus.getChannel(), 1);
 //        getMergedFeedback(transformation);
         if (richOutput) {
             Img img = ImageJFunctions.wrap(getFeedback(transformation));
@@ -259,12 +252,15 @@ public class BunwarpJCommand implements Command {
     public ImagePlus loadImagePlus() {
         if (inputDataset == null && inputFile == null) {
             throw new IllegalArgumentException("Set at least one image");
-        } else if (inputFile != null) {
-            Opener opener = new Opener();
-            ImagePlus imagePlus = opener.openImage(inputFile.getAbsolutePath());
+        } else if (inputDataset != null) {
+            ImagePlus imagePlus = iJ1Service.unwrapDataset(inputDataset);
+            imagePlus.setTitle(inputDataset.getName());
             return imagePlus;
         } else {
-            return iJ1Service.unwrapDataset(inputDataset);
+            Opener opener = new Opener();
+            ImagePlus imagePlus = opener.openImage(inputFile.getAbsolutePath());
+            imagePlus.setTitle(inputFile.getName());
+            return imagePlus;
         }
     }
 
@@ -276,7 +272,7 @@ public class BunwarpJCommand implements Command {
      */
     private ImagePlus getFeedback(Transformation transformation) {
         ImagePlus deformation = new ImagePlus();
-        ImageStack imageStack = new ImageStack(sourceImp.getWidth(), sourceImp.getHeight());
+        ImageStack imageStack = new ImageStack(imagePlus.getWidth(), imagePlus.getHeight());
         transformation.computeDeformationVectors(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
         transformation.computeDeformationGrid(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
         deformation.setStack(imageStack);
@@ -308,7 +304,6 @@ public class BunwarpJCommand implements Command {
 //        Dataset dataset = (Dataset) module.getOutput("outputDataset");
 //        displayService.createDisplay(dataset);
 //    }
-
     private Dataset applyFlatFieldCorrection(Dataset dataset, Dataset flatField) {
 
         Map<String, Object> parameters = new HashMap<>();

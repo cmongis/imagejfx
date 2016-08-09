@@ -24,7 +24,6 @@ import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,8 +36,8 @@ import javafx.scene.control.ListView;
 import javafx.stage.DirectoryChooser;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import net.imagej.display.ImageDisplay;
 import net.imagej.display.event.AxisPositionEvent;
-import net.imagej.display.event.DataViewUpdatedEvent;
 import org.scijava.Context;
 import org.scijava.event.EventHandler;
 import org.scijava.io.IOService;
@@ -49,7 +48,7 @@ import org.scijava.plugin.Parameter;
  * @author Tuan anh TRINH
  */
 @ViewController(value = "WelcomeWorkflow.fxml")
-public class WelcomeWorkflow extends AbstractCorrectionActivity {
+public class WelcomeWorkflow extends CorrectionFlow {
 
     @Inject
     WorkflowModel workflowModel;
@@ -96,13 +95,23 @@ public class WelcomeWorkflow extends AbstractCorrectionActivity {
         borderPane.setCenter(imageDisplayPaneLeft);
         borderPane.setRight(imageDisplayPaneRight);
         listView.getItems().addAll(listProperty.get());
-        listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> obs, File old, File newValue) -> workflowModel.openImage(imageDisplayPaneLeft, imageDisplayPaneRight, newValue));
-        
+        listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> obs, File old, File newValue) -> {
+            workflowModel.openImage(imageDisplayPaneLeft, imageDisplayPaneRight, newValue);
+            if (workflowModel.getPositionLeft().length == imageDisplayPaneLeft.getImageDisplay().numDimensions()) {
+                workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneLeft.getImageDisplay());
+                workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneRight.getImageDisplay());
+            } else {
+                savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
+                savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
+            }
+
+        });
+
         //Only when the user come back
-        if (listProperty.get().size() > 0) {
-            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, listProperty.get().get(0));
-            applyPosition();
-        }
+//        if (listProperty.get().size() > 0) {
+//            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, listProperty.get().get(0));
+//            applyPosition();
+//        }
     }
 
     @FXML
@@ -116,22 +125,21 @@ public class WelcomeWorkflow extends AbstractCorrectionActivity {
     }
 
     @EventHandler
-    public void handleEvent(DataViewUpdatedEvent event) {
-        if (imageDisplayPaneLeft.getImageDisplay().contains(event.getView())) {
-            int[] position = new int[event.getView().numDimensions()];
-            event.getView().localize(position);
-            positionLeftProperty.set(position);
-        } else if (imageDisplayPaneRight.getImageDisplay().contains(event.getView())) {
-            int[] position = new int[event.getView().numDimensions()];
-            event.getView().localize(position);
-            positionRightProperty.set(position);
+    public void handleEvent(AxisPositionEvent event) {
+        System.out.println(imageDisplayPaneLeft.getImageDisplay());
+        if (imageDisplayPaneLeft.getImageDisplay() == event.getDisplay()) {
+            savePosition(event.getDisplay(), positionLeftProperty);
+        } else if (imageDisplayPaneRight.getImageDisplay() == event.getDisplay()) {
+            savePosition(event.getDisplay(), positionRightProperty);
+
         }
 
     }
 
-    public void applyPosition() {
-        imageDisplayPaneLeft.getImageDisplay().setPosition(positionLeftProperty.get());
-        imageDisplayPaneRight.getImageDisplay().setPosition(positionRightProperty.get());
+    private void savePosition(ImageDisplay imageDisplay, ObjectProperty<int[]> property) {
+        int[] position = new int[imageDisplay.numDimensions()];
+        imageDisplay.localize(position);
+        property.set(position);
     }
 
 }

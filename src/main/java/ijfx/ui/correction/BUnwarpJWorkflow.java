@@ -84,115 +84,115 @@ import org.scijava.plugin.Parameter;
  * @author Tuan anh TRINH
  */
 @ViewController(value = "BUnwarpJWorkflow.fxml")
-public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
-
+public class BUnwarpJWorkflow extends CorrectionFlow {
+    
     @Parameter
     IOService iOService;
-
+    
     @Parameter
     DatasetUtillsService datasetUtillsService;
-
+    
     @Parameter
     ImageDisplayService imageDisplayService;
-
+    
     @Parameter
     CommandService commandService;
-
+    
     @Parameter
     DisplayService displayService;
-
+    
     @Inject
     WorkflowModel workflowModel;
-
+    
     @Parameter
     Context context;
-
+    
     @Parameter
     ImagePlaneService imagePlaneService;
-
+    
     @Parameter
     BatchService batchService;
-
+    
     @Parameter
     ModuleService moduleService;
-
+    
     @Parameter
     OverlayService overlayService;
-
+    
     @Parameter
     LoadingScreenService loadingScreenService;
-
+    
     ObjectProperty<ImageDisplayPane> imageDisplayPaneTopLeftProperty = new SimpleObjectProperty<>();
-
+    
     ObjectProperty<ImageDisplayPane> imageDisplayPaneTopRightProperty = new SimpleObjectProperty<>();
-
+    
     ObjectProperty<ImageDisplayPane> imageDisplayPaneBottomLeftProperty = new SimpleObjectProperty<>();
-
+    
     ObjectProperty<File> landmarksFile = new SimpleObjectProperty<>(new File(""));
-
+    
     public final static String[] HEADER = {"Index", "xSource", "ySource", "xTarget", "yTarget"};
-
+    
     @FXML
     TableDisplayView tableDisplayView;
-
+    
     @FXML
     GridPane imagesContainer;
-
+    
     @FXML
     Button leftButton;
-
+    
     @FXML
     Button rightButton;
-
+    
     @FXML
     Button loadPointsButton;
-
+    
     @FXML
     BorderPane borderPaneTableView;
-
+    
     @FXML
     Label fileLabel;
-
+    
     @FXML
     TextField stopThresholdTextField;
-
+    
     @FXML
     TextField divWeightTextField;
-
+    
     @FXML
     TextField curlWeightTextField;
-
+    
     @FXML
     TextField landmarkWeightTextField;
-
+    
     @FXML
     TextField imageWeightTextField;
-
+    
     @FXML
     TextField consistencyWeightTextField;
-
+    
     @FXML
     CheckBox richOutput;
-
+    
     @FXML
     CheckBox saveTransformation;
-
+    
     @FXML
     ComboBox modeChoiceComboBox, min_scale_deformation_choiceComboBox, max_scale_deformation_choiceComboBox, img_subsamp_factComboBox;
-
+    
     @FXML
     Button mergeButton;
-
+    
     @FXML
     ListView<File> listView;
-
+    
     private final ImageWindowEventBus bus = new ImageWindowEventBus();
-
+    
     public BUnwarpJWorkflow() {
         CorrectionActivity.getStaticContext().inject(this);
-
+        
     }
-
+    
     @PostConstruct
     public void init() {
 //        foo();
@@ -214,23 +214,23 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
         imagesContainer.add(imageDisplayPaneTopLeftProperty.get(), 0, 1);
         imagesContainer.add(imageDisplayPaneBottomLeftProperty.get(), 0, 2);
         imagesContainer.add(imageDisplayPaneTopRightProperty.get(), 1, 1);
-
         loadPointsButton.setOnAction(e -> {
             try {
                 tableDisplayView.display(workflowModel.loadTable(HEADER, fileLabel));
             } catch (IOException ex) {
                 Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
         });
-
+        
         rightButton.setOnAction(e -> {
             workflowModel.openImage(this.imageDisplayPaneTopRightProperty.get(), this.imageDisplayPaneTopLeftProperty.get());
         });
 //        leftButton.setOnAction(e -> {
 //            workflowModel.openImage(this.imageDisplayPaneTopLeftProperty);
 //        });
-        bindProperty();
+        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneTopLeftProperty.get(), imageDisplayPaneTopRightProperty.get(), imageDisplayPaneBottomLeftProperty.get()};
+        bindPaneProperty(Arrays.asList(imageDisplayPanes));
 //  bus.getStream(SciJavaEvent.class)
 //               .forEach(e ->{
 //
@@ -240,29 +240,30 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
 
 //Try to get the last one!
         bus.getStream(DataViewEvent.class)
-//                .filter(bus::doesDisplayRequireRefresh)
+                //                .filter(bus::doesDisplayRequireRefresh)
                 .buffer(1000 / 15, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
-//                .first()
-//                .replay(1)
-//                .doOnTerminate(() -> System.out.println("ijfx.ui.correction.BUnwarpJWorkflow.init()"))
+                //                .first()
+                //                .replay(1)
+                //                .doOnTerminate(() -> System.out.println("ijfx.ui.correction.BUnwarpJWorkflow.init()"))
                 .subscribe(onCompleted -> {
-                    System.out.println("ijfx.ui.correction.BUnwarpJWorkflow.handleEvent()");
                     Dataset[] datasets = new Dataset[2];
                     ImageDisplay imageDisplayLeft = imageDisplayPaneTopLeftProperty.get().getImageDisplay();
                     datasets[0] = datasetUtillsService.extractPlane(imageDisplayLeft);
-
+                    
                     ImageDisplay imageDisplayRight = imageDisplayPaneTopRightProperty.get().getImageDisplay();
                     datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
-                    extractAndMerge(datasets, imageDisplayPaneBottomLeftProperty.get());
+                    workflowModel.extractAndMerge(datasets, imageDisplayPaneBottomLeftProperty.get());
                 });
-
-        
-        
         
         listView.getItems().addAll(workflowModel.getFiles());
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
             workflowModel.openImage(this.imageDisplayPaneTopRightProperty.get(), this.imageDisplayPaneTopLeftProperty.get(), newValue);
+            System.out.println("ijfx.ui.correction.BUnwarpJWorkflow.init()");
+            System.out.println(Arrays.toString(workflowModel.getPositionRight()));
+            workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeftProperty.get().getImageDisplay());
+            workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRightProperty.get().getImageDisplay());
+            
         });
         if (workflowModel.getLandMarksFile() != null) {
             try {
@@ -272,35 +273,7 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
             }
         }
     }
-
-    protected void extractAndMerge(Dataset[] datasets, ImageDisplayPane imageDisplayPane) {
-ImageDisplay d = new DefaultImageDisplay();
-imagePlaneService.getContext().inject(d);
-d.display(datasets[0]);
-
-new CallbackTask<Void, Void>().run(() -> {
-            bindProperty();
-            Map<String, Object> inputMap = new HashMap();
-            inputMap.put("datasetArray", datasets);
-            inputMap.put("axisType", Axes.CHANNEL);
-            Module module = null;
-            try {
-                module = executeCommand(ImagesToStack.class, inputMap);
-            } catch (Exception e) {
-            }
-            Dataset result = (Dataset) module.getOutput("outputDataset");
-//            DatasetView datasetView = imageDisplayService.getActiveDatasetView(imageDisplayPane.getImageDisplay());
-//            datasetView.setColorMode(ColorMode.COMPOSITE);
-//                ChannelMerger<? extends RealType<?>> merger = new ChannelMerger(context);
-//                merger.setInput(result);
-//                merger.run();
-//                Dataset output = merger.getOutput();
-//            copyLUT(Arrays.asList(imageDisplayPaneTopLeftProperty.get().getImageDisplay(), imageDisplayPaneTopRightProperty.get().getImageDisplay()), result);;
-            workflowModel.displayDataset(result, imageDisplayPane);
-        }).submit(loadingScreenService).start();
-
-    }
-
+    
     @EventHandler
     public void handleEvent(DataViewEvent event) {
         if (imageDisplayPaneTopLeftProperty.get().getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRightProperty.get().getImageDisplay().contains(event.getView())) {
@@ -317,9 +290,8 @@ new CallbackTask<Void, Void>().run(() -> {
 //            extractAndMerge(datasets, imageDisplayPaneBottomRightProperty.get());
 //
         }
-
+        
     }
-
     
     @EventHandler
     public void handleEvent(LUTsChangedEvent event) {
@@ -328,35 +300,25 @@ new CallbackTask<Void, Void>().run(() -> {
 //            DatasactAndMerge(datasets, imageDisplayPaneBottomRightProperty.get());
 //
         }
-
+        
     }
-    public void bindProperty() {
-        imageDisplayPaneBottomLeftProperty.get().getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneTopRightProperty.get().getCanvas().getCamera().zoomProperty());
-        imageDisplayPaneTopRightProperty.get().getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPaneTopLeftProperty.get().getCanvas().getCamera().zoomProperty());
-
-        imageDisplayPaneTopLeftProperty.get().getCanvas().getCamera().xProperty().bindBidirectional(imageDisplayPaneTopRightProperty.get().getCanvas().getCamera().xProperty());
-        imageDisplayPaneBottomLeftProperty.get().getCanvas().getCamera().xProperty().bindBidirectional(imageDisplayPaneTopLeftProperty.get().getCanvas().getCamera().xProperty());
-
-        imageDisplayPaneTopLeftProperty.get().getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPaneTopRightProperty.get().getCanvas().getCamera().yProperty());
-        imageDisplayPaneBottomLeftProperty.get().getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPaneTopLeftProperty.get().getCanvas().getCamera().yProperty());
-    }
-
+    
     private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) throws MethodCallException, InterruptedException, ExecutionException {
         Module module = moduleService.createModule(commandService.getCommand(type));
         module.initialize();
-
+        
         parameters.forEach((k, v) -> {
             module.setInput(k, v);
             module.setResolved(k, true);
         });
         Future run = moduleService.run(module, false, parameters);
         run.get();
-
+        
         return module;
     }
-
+    
     public void copyLUT(List<ImageDisplay> list, Dataset output) {
-
+        
         if (list.stream().allMatch(imageDisplay -> imageDisplayService.getActiveDatasetView(imageDisplay).getColorTables().isEmpty())) {
             return;
         }
@@ -364,7 +326,7 @@ new CallbackTask<Void, Void>().run(() -> {
             DatasetView datasetView = imageDisplayService.getActiveDatasetView(list.get(i));
             imageDisplayService.getActiveDatasetView(imageDisplayPaneBottomLeftProperty.get().getImageDisplay()).setColorTable(datasetView.getColorTables().get(0), i);
         });
-
+        
     }
 
 //    public void foo() {

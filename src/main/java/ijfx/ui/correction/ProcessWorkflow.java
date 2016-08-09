@@ -25,6 +25,8 @@ import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +38,10 @@ import javafx.scene.layout.HBox;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.Dataset;
+import net.imagej.display.ColorMode;
+import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
 import org.scijava.io.IOService;
 import org.scijava.object.ObjectService;
@@ -49,6 +54,11 @@ import org.scijava.plugin.Parameter;
 @ViewController(value = "ProcessWorkflow.fxml")
 public class ProcessWorkflow extends CorrectionFlow {
 
+    @Inject
+    WorkflowModel workflowModel;
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
     @Parameter
     DatasetUtillsService datasetUtillsService;
 
@@ -66,9 +76,6 @@ public class ProcessWorkflow extends CorrectionFlow {
 
     @FXML
     HBox hBox;
-
-    @Inject
-    WorkflowModel workflowModel;
 
     ImageDisplayPane imageDisplayPaneLeft;
 
@@ -91,7 +98,8 @@ public class ProcessWorkflow extends CorrectionFlow {
         bindListView();
         hBox.getChildren().add(imageDisplayPaneLeft);
         hBox.getChildren().add(imageDisplayPaneRight);
-
+        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
+        bindPaneProperty(Arrays.asList(imageDisplayPanes));
     }
 
     @FXML
@@ -103,7 +111,7 @@ public class ProcessWorkflow extends CorrectionFlow {
                 Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
                 ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
                 imageDisplay.setPosition(workflowModel.positionRightProperty.get());
-                Dataset outputDataset = workflowModel.getTransformedImage(imageDisplay);
+                Dataset outputDataset = inputDataset.duplicate();//workflowModel.getTransformedImage(imageDisplay);;
                 workflowModel.getMapImages().put(file.getAbsolutePath(), outputDataset);
             } catch (IOException ex) {
                 Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
@@ -117,16 +125,20 @@ public class ProcessWorkflow extends CorrectionFlow {
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             try {
                 Dataset datasetTarget = workflowModel.getMapImages().get(newValue);
-                ImageDisplay imageDisplayTarget = new SilentImageDisplay(context, datasetTarget);
+                ImageDisplay imageDisplayTarget = new DefaultImageDisplay();
+                context.inject(imageDisplayTarget);
+                imageDisplayTarget.display(datasetTarget);
 //                imageDisplayTarget.setPosition(workflowModel.positionLeftProperty.get());
 //                imageDisplayPaneLeft.display(imageDisplayTarget);
-                selectPosition(imageDisplayTarget, workflowModel.positionLeftProperty.get(), workflowModel.positionRightProperty.get(), imageDisplayPaneRight);
+                selectPosition(imageDisplayTarget, workflowModel.getPositionLeft(), workflowModel.getPositionRight(), imageDisplayPaneRight);
 
                 Dataset datasetSource = (Dataset) iOService.open(newValue);
-                ImageDisplay imageDisplaySource = new SilentImageDisplay(context, datasetSource);
+                ImageDisplay imageDisplaySource = new DefaultImageDisplay();
+                context.inject(imageDisplaySource);
+                imageDisplaySource.display(datasetSource);
 //                imageDisplaySource.setPosition(workflowModel.positionLeftProperty.get());
 //                imageDisplayPaneRight.display(imageDisplaySource);
-                selectPosition(imageDisplaySource, workflowModel.positionLeftProperty.get(), workflowModel.positionRightProperty.get(), imageDisplayPaneLeft);
+                selectPosition(imageDisplaySource, workflowModel.getPositionLeft(), workflowModel.getPositionRight(), imageDisplayPaneLeft);
 
             } catch (IOException ex) {
                 Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
@@ -136,10 +148,16 @@ public class ProcessWorkflow extends CorrectionFlow {
     }
 
     public void selectPosition(ImageDisplay imageDisplay, int[] firstPosition, int[] secondPosition, ImageDisplayPane imageDisplayPane) {
-        imageDisplay.setPosition(firstPosition);
+        workflowModel.setPosition(firstPosition, imageDisplay);
+//        imageDisplay.setPosition(firstPosition);
+        imageDisplayService.getActiveDatasetView(imageDisplay).setColorMode(ColorMode.COLOR);
         Dataset datasetFirstSlide = datasetUtillsService.extractPlane(imageDisplay);
+        workflowModel.setPosition(secondPosition, imageDisplay);
+        System.out.println("ijfx.ui.correction.ProcessWorkflow.selectPosition()");
+        System.out.println(Arrays.toString(firstPosition));
+        System.out.println(Arrays.toString(secondPosition));
 
-        imageDisplay.setPosition(secondPosition);
+//        imageDisplay.setPosition(secondPosition);
         Dataset datasetSecondSlide = datasetUtillsService.extractPlane(imageDisplay);
         workflowModel.extractAndMerge(new Dataset[]{datasetFirstSlide, datasetSecondSlide}, imageDisplayPane);
     }

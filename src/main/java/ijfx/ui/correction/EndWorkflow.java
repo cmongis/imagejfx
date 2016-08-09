@@ -30,7 +30,7 @@ import javax.inject.Inject;
  * @author Tuan anh TRINH
  */
 @ViewController(value = "EndWorkflow.fxml", title = "Wizard: Finish")
-public class EndWorkflow extends AbstractCorrectionActivity {
+public class EndWorkflow extends CorrectionFlow {
  
   
     

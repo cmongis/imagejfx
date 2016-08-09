@@ -2167,6 +2167,8 @@ public class BSplineModel implements Runnable
 		 y *= row.length;
 		 for (int i = 0; (i < row.length); i++)
 			 row[i] = (double)array[y++];
+                         
+                     
 	 } /* end extractRow */
 
 	 //------------------------------------------------------------------
