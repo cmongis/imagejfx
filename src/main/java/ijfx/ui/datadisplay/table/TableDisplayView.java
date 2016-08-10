@@ -106,7 +106,7 @@ public class TableDisplayView extends BorderPane {
         }
 
         public void display(Table table) {
-
+            rows.clear();
             ArrayList<RowModel> rows = new ArrayList<>();
 
             for (int row = 0; row < table.getRowCount(); row++) {

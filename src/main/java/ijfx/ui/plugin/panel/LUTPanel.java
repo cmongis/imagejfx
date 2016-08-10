@@ -251,13 +251,12 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     public void applyLUT(ColorTable table) {
+        DatasetView datasetView = imageDisplayService.getActiveDatasetView();
         HashMap<String, Object> params = new HashMap<>();
         params.put("colorTable", table);
         int channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
         channel = channel == -1 ? 0 : channel;
-        commandService.run(ApplyLUT.class, true, "input",imageDisplayService.getActiveDataset(),"colorTable",table,"channelId",channel);
-
-        //lutService.applyLUT(table, displayService.getActiveDisplay(ImageDisplay.class));
+        datasetView.setColorTable(table, channel);
     }
 
     @Override
@@ -388,9 +387,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     private DatasetView autoContrast(DatasetView view) {
         try {
             commandService.run(AutoContrast.class, true, "imageDisplay",view,"channelDependant",true).get();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(LUTPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
+        } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(LUTPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         return view;

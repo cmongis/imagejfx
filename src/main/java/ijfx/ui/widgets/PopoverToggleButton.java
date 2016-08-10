@@ -24,6 +24,7 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
@@ -93,7 +94,7 @@ public class PopoverToggleButton extends ToggleButton {
     public static void bind(ToggleButton button, PopOver popover) {
         
 
-         popover.addEventHandler(POPOVER_CLOSE_REQUEST, event -> {
+         popover.addEventFilter(POPOVER_CLOSE_REQUEST, event -> {
             popover.hide();
 
         });
@@ -152,7 +153,7 @@ public class PopoverToggleButton extends ToggleButton {
 
     }
 
-    public static final EventType POPOVER_CLOSE_REQUEST = new EventType("Error Button popover close request");
+    public static final EventType<? extends Event> POPOVER_CLOSE_REQUEST = new EventType("Error Button popover close request");
     /*
     public static void bind(ToggleButton button, Node panel, ArrowLocation location) {
         bind(button, new PopOver(panel),location);

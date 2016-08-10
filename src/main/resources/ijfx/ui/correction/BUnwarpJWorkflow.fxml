@@ -8,140 +8,208 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.collections.*?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-            <Tab text="Images">
-               <content>
-                  <GridPane fx:id="imagesContainer" alignment="CENTER">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Button fx:id="leftButton" mnemonicParsing="false" text="Button" />
-                        <Button fx:id="rightButton" contentDisplay="RIGHT" mnemonicParsing="false" text="Button" GridPane.columnIndex="1" />
-                     </children>
-                  </GridPane>
-               </content>
-            </Tab>
+                <Tab text="Landmarks">
+                    <content>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                            <top>
+                                <Button fx:id="loadPointsButton" mnemonicParsing="false" text="Load Landmarks" BorderPane.alignment="CENTER" />
+                            </top>
+                            <center>
+                                <ijfx.ui.datadisplay.table.TableDisplayView fx:id="tableDisplayView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                            </center>
+                            <bottom>
+                                <Label fx:id="fileLabel" text="" BorderPane.alignment="CENTER" />
+                            </bottom>
+                        </BorderPane>
+                    </content>
+                </Tab>
+            
                 <Tab text="Deformation">
-               <content>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <HBox alignment="CENTER" spacing="10.0">
-                           <children>
-                              <Label text="Stop threshold" />
-                              <TextField fx:id="stopThreshold" prefWidth="50.0" text="0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
-                           <children>
-                              <Label text="Algorithm mode" />
-                              <ComboBox fx:id="modeChoice" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="1">
-                           <children>
-                              <Label text="Maximum scale deformation" />
-                              <ComboBox fx:id="max_scale_deformation_choice" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                           <children>
-                              <Label text="Minimum scale deformation" />
-                              <ComboBox fx:id="min_scale_deformation_choice" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="2">
-                           <children>
-                              <Label text="img_subsamp_fact" />
-                              <ComboBox fx:id="img_subsamp_fact" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </GridPane>
-               </content>
+                    <content>
+                        <GridPane>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <HBox alignment="CENTER" spacing="10.0">
+                                    <children>
+                                        <Label text="Stop threshold" />
+                                        <TextField fx:id="stopThresholdTextField" prefWidth="50.0" text="0" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
+                                    <children>
+                                        <Label text="Algorithm mode" />
+                                        <ComboBox fx:id="modeChoiceComboBox" prefWidth="150.0">
+                                            <items>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <String fx:value="Mono" />
+                                                    <String fx:value="Accurate" />
+                                                    <String fx:value="Fast" />
+                                                </FXCollections>
+                                            </items>
+                                            <value>
+                                                <String fx:value="Mono" />
+                                            </value>
+                                        </ComboBox>
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Maximum scale deformation" />
+                                        <ComboBox fx:id="max_scale_deformation_choiceComboBox" prefWidth="150.0">
+                                            <items>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <String fx:value="Very Coarse" />
+                                                    <String fx:value="Coarse" />
+                                                    <String fx:value="Fine" />
+                                                    <String fx:value="Very Fine" />
+                                                    <String fx:value="Super Fine" />
+                                                </FXCollections>
+                                            </items>
+                                            <value>
+                                                <String fx:value="Super Fine" />
+                                            </value>
+                                        </ComboBox>
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Minimum scale deformation" />
+                                        <ComboBox fx:id="min_scale_deformation_choiceComboBox" prefWidth="150.0">
+                                            <items>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <String fx:value="Very Coarse" />
+                                                    <String fx:value="Coarse" />
+                                                    <String fx:value="Fine" />
+                                                    <String fx:value="Very Fine" />
+                                                </FXCollections>
+                                            </items>
+                                            <value>
+                                                <String fx:value="Very Fine" />
+                                            </value>
+                                        </ComboBox>
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label text="img_subsamp_fact" />
+                                        <ComboBox fx:id="img_subsamp_factComboBox" prefWidth="150.0">
+                                            <items>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <String fx:value="0" />
+                                                    <String fx:value="1" />
+                                                    <String fx:value="2" />
+                                                    <String fx:value="3" />
+                                                    <String fx:value="4" />
+                                                    <String fx:value="5" />
+                                                    <String fx:value="6" />
+                                                    <String fx:value="7" />
+                                                </FXCollections>
+                                            </items>
+                                            <value>
+                                                <String fx:value="0" />
+                                            </value>
+                                        </ComboBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </GridPane>
+                    </content>
                 </Tab>
                 <Tab text="Weight">
-               <content>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <HBox alignment="CENTER" spacing="10.0">
-                           <children>
-                              <Label text="Divergence weight" />
-                              <TextField fx:id="divWeight" prefWidth="50.0" text="0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
-                           <children>
-                              <Label text="Curl Weight" />
-                              <TextField fx:id="curlWeight" prefWidth="50.0" text="0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="1">
-                           <children>
-                              <Label text="Landmark weight" />
-                              <TextField fx:id="landmarkWeight" prefWidth="50.0" text="1.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                           <children>
-                              <Label text="Image weight" />
-                              <TextField fx:id="imageWeight" prefWidth="50.0" text="0.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="2">
-                           <children>
-                              <Label text="Consistency weight" />
-                              <TextField fx:id="consistencyWeight" prefWidth="50.0" text="10" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </GridPane>
-               </content>
+                    <content>
+                        <GridPane>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <HBox alignment="CENTER" spacing="10.0">
+                                    <children>
+                                        <Label text="Divergence weight" />
+                                        <TextField fx:id="divWeightTextField" prefWidth="50.0" text="0" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
+                                    <children>
+                                        <Label text="Curl Weight" />
+                                        <TextField fx:id="curlWeightTextField" prefWidth="50.0" text="0" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Landmark weight" />
+                                        <TextField fx:id="landmarkWeightTextField" prefWidth="50.0" text="1.0" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Image weight" />
+                                        <TextField fx:id="imageWeightTextField" prefWidth="50.0" text="0.0" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label text="Consistency weight" />
+                                        <TextField fx:id="consistencyWeightTextField" prefWidth="50.0" text="10" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </GridPane>
+                    </content>
                 </Tab>
-            <Tab text="Output">
-               <content>
-                  <GridPane alignment="CENTER">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <CheckBox fx:id="richOutput" mnemonicParsing="false" text="Rich output" GridPane.columnIndex="1" />
-                        <CheckBox fx:id="saveTransformation" mnemonicParsing="false" text="Save transformation" />
-                     </children>
-                  </GridPane>
-               </content>
-            </Tab>
+                <Tab text="Output">
+                    <content>
+                        <GridPane alignment="CENTER">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <CheckBox fx:id="richOutput" mnemonicParsing="false" text="Rich output" GridPane.columnIndex="1" />
+                                <CheckBox fx:id="saveTransformation" mnemonicParsing="false" text="Save transformation" />
+                            </children>
+                        </GridPane>
+                    </content>
+                </Tab>
+                <Tab text="Images">
+                    <content>
+                        <GridPane fx:id="imagesContainer" alignment="CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                        <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            </children>
+                        </GridPane>
+                    </content>
+                </Tab>
             </tabs>
         </TabPane>
     </center>

@@ -183,7 +183,7 @@ public class bUnwarpJ_ extends ContextCommand {
     @Parameter(choices = {"Fast", "Accurate", "Mono"})
     String modeChoice;
 
-    @Parameter(label = "Flatfield image")
+    @Parameter(label = "Flatfield image", required = false)
     File flatfieldFile;
 
     String pathFile = "";

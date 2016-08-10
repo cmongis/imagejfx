@@ -42,6 +42,7 @@ import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
+import org.scijava.command.ContextCommand;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
@@ -53,7 +54,7 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class, menuPath = "Process > Correction > FlatField Correction")
-public class FlatFieldCorrection implements Command {
+public class FlatFieldCorrection extends ContextCommand{
 
     @Parameter
     CommandService commandService;
@@ -93,11 +94,11 @@ public class FlatFieldCorrection implements Command {
     @Override
     public void run() {
         flatFieldDataset = datasetUtillsService.extractPlane(flatFieldImageDisplay);//datasetUtillsService.getImageDisplay(flatFieldDataset));//convertTo32(inputDataset);;
-        inputDataset = convertTo32(inputDataset);
-        flatFieldDataset = convertTo32(flatFieldDataset);
+        Dataset dataset32 = convertTo32(inputDataset);
+        Dataset flatFieldDataset32 = convertTo32(flatFieldDataset);
         median = ijfxStatisticService.getDatasetDescriptiveStatistics(inputDataset).getPercentile(50);
-        inputDataset = datasetUtillsService.divideDatasetByValue(inputDataset, median);
-        outputDataset = datasetUtillsService.divideDatasetByDataset(inputDataset, flatFieldDataset);
+        Dataset datasetDividedByValue = datasetUtillsService.divideDatasetByValue(dataset32, median);
+        outputDataset = datasetUtillsService.divideDatasetByDataset(datasetDividedByValue, flatFieldDataset32);
     }
 
     public boolean isCreateNewImage() {
@@ -116,7 +117,7 @@ public class FlatFieldCorrection implements Command {
         } catch (MethodCallException ex) {
             Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
         }
-        module.setInput("data", dataset);
+        module.setInput("data", dataset.duplicate());
         module.setResolved("data", true);
         module.setInput("typeName", type);
         module.setResolved("typeName", true);

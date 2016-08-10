@@ -41,7 +41,7 @@ import org.scijava.plugin.Parameter;
  * @author Tuan anh TRINH
  */
 @ViewController(value = "InputWorkflow.fxml")
-public class InputWorkflow extends AbstractCorrectionActivity {
+public class InputWorkflow extends CorrectionFlow {
 
     @Inject
     WorkflowModel workflowModel;

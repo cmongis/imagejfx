@@ -39,6 +39,7 @@ import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -65,6 +67,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -146,6 +149,8 @@ public class ImageDisplayPane extends AnchorPane {
 
     private FxTool currentTool;
 
+    private javafx.event.EventHandler<MouseEvent> myHandler;
+
     private PopArcMenu arcMenu;
 
     private FxImageCanvas canvas;
@@ -191,7 +196,12 @@ public class ImageDisplayPane extends AnchorPane {
 
         canvas.widthProperty().bind(stackPane.widthProperty());
         canvas.heightProperty().bind(stackPane.heightProperty());
+        this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
+            if (e.getButton() == MouseButton.PRIMARY && this.getImageDisplay() != null) {
+                displayService.setActiveDisplay(this.getImageDisplay());
+            }
+        });
     }
 
     public void display(ImageDisplay display) {
@@ -421,12 +431,17 @@ public class ImageDisplayPane extends AnchorPane {
         logService.setLevel(LogService.INFO);
 
         if (arcMenu != null) {
-            anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, arcMenu::show);
+            anchorPane.removeEventHandler(MouseEvent.MOUSE_PRESSED, myHandler);
             arcMenu = null;
 
         }
         arcMenu = new PopArcMenu();
-        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, arcMenu::show);
+        myHandler = (MouseEvent event) -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                arcMenu.show(event);
+            }
+        };
+        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, myHandler);
 
         double min = getDatasetview().getChannelMin(0);
         double max = getDatasetview().getChannelMax(0);
@@ -571,10 +586,10 @@ public class ImageDisplayPane extends AnchorPane {
     @EventHandler
     void onDataViewUpdated(DataViewUpdatedEvent event) {
         logService.info("DataView updated");
-                bus.channel(event);
         try {
-            
-        if (imageDisplay.contains(event.getView())) {
+
+            if (imageDisplay.contains(event.getView())) {
+                bus.channel(event);
             }
         } catch (Exception e) {
         }
@@ -627,8 +642,20 @@ public class ImageDisplayPane extends AnchorPane {
 
         long width = getDataset().dimension(0);
         long height = getDataset().dimension(1);
+        CalibratedAxis[] axes = new CalibratedAxis[imageDisplay.numDimensions()];
+        int[] position = new int[imageDisplay.numDimensions()];
+        imageDisplay.axes(axes);
+        imageDisplay.localize(position);
+        StringBuilder stringBuilder = new StringBuilder();
+        IntStream.range(2, position.length)
+                .forEach(e -> {
+                    stringBuilder.append(axes[e].type().toString());
+                    stringBuilder.append(": ");
+                    stringBuilder.append(position[e]);
+                    stringBuilder.append("");
 
-        infoLabel.setText(String.format("%s - %d x %d", imageType, width, height));
+                });
+        infoLabel.setText(String.format("%s - %d x %d - %s", imageType, width, height, stringBuilder));
 
     }
 
@@ -687,8 +714,12 @@ public class ImageDisplayPane extends AnchorPane {
      Overlay drawing
      */
     public List<Overlay> getOverlays() {
+        List<Overlay> overlays = null;
+        try {
+            overlays = overlayService.getOverlays(imageDisplay);
 
-        List<Overlay> overlays = overlayService.getOverlays(imageDisplay);
+        } catch (Exception e) {
+        }
         if (overlays == null) {
             return new ArrayList<Overlay>();
         }
