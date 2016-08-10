@@ -5191,10 +5191,10 @@ public class Transformation
 		IJ.showStatus("Calculating result window...");
 		ImagePlus result_imp = applyTransformationMultiThread(intervals, cx, cy, bIsReverse);
 		
-		output_ip.close();
+//		output_ip.close();
 		output_ip = result_imp;
 			
-		output_ip.show();				
+//		output_ip.show();				
 		output_ip.updateAndRepaintWindow();
 				
 	} /* end showTransformationMultiThread */
@@ -6008,12 +6008,12 @@ public class Transformation
 			output_ip.setStack("Registered " + s + " Image", is);
 			output_ip.setSlice(1);
 			output_ip.getProcessor().resetMinAndMax();
-			if (outputLevel > -1)
-				output_ip.updateAndRepaintWindow();					
+//			if (outputLevel > -1)
+//				output_ip.updateAndRepaintWindow();					
 		} // end caculate warped color image
 		
-		if(auxSource.isSubOutput())
-			output_ip.show();
+//		if(auxSource.isSubOutput())
+//			output_ip.show();
 		
 	}	// end showTransformation 
 	

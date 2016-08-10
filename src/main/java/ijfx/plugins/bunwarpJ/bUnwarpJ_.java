@@ -93,7 +93,7 @@ public class bUnwarpJ_ extends ContextCommand {
     Dataset outputDataset;
 
     @Parameter(type = ItemIO.INPUT)
-    Dataset sourceDataset;
+    private Dataset sourceDataset;
 
     @Parameter(type = ItemIO.INPUT)
     Dataset targetDataset;
@@ -110,7 +110,7 @@ public class bUnwarpJ_ extends ContextCommand {
      * minimum scale deformation
      */
     @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine"})
-    private String min_scale_deformation;
+    String min_scale_deformation;
     /**
      * maximum scale deformation
      */
@@ -119,8 +119,8 @@ public class bUnwarpJ_ extends ContextCommand {
     /**
      * algorithm mode (fast, accurate or mono)
      */
-    @Parameter
-    private static int mode = MainDialog.ACCURATE_MODE;
+//    @Parameter
+//    private static int mode = MainDialog.MONO_MODE;
     /**
      * image subsampling factor at the highest pyramid level
      */
@@ -183,8 +183,8 @@ public class bUnwarpJ_ extends ContextCommand {
     @Parameter(choices = {"Fast", "Accurate", "Mono"})
     String modeChoice;
 
-    @Parameter(label = "Flatfield image", required = false)
-    File flatfieldFile;
+    @Parameter(label = "Landmarks", required = false)
+    File landmarksFile;
 
     String pathFile = "";
 
@@ -201,9 +201,10 @@ public class bUnwarpJ_ extends ContextCommand {
         Runtime.getRuntime().gc();
         
         
-        if(flatfieldFile != null) {
-            pathFile  = flatfieldFile.getAbsolutePath();
+        if(landmarksFile != null) {
+            pathFile  = landmarksFile.getAbsolutePath();
         }
+        
         
         // Collect input values
         // Source and target image plus
@@ -219,7 +220,7 @@ public class bUnwarpJ_ extends ContextCommand {
                 bUnwarpJ_.maxImageSubsamplingFactor, Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation),
                 Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation), bUnwarpJ_.divWeight, bUnwarpJ_.curlWeight,
                 bUnwarpJ_.landmarkWeight, bUnwarpJ_.imageWeight, bUnwarpJ_.consistencyWeight,
-                bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation, ""
+                bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation, pathFile
         );
 //        dialog.showDialog();
 
@@ -278,7 +279,7 @@ public class bUnwarpJ_ extends ContextCommand {
                 dialog.getSourceAffineMatrix(), dialog.getTargetAffineMatrix(),
                 Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation), Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation),
                 min_scale_image, divWeight, curlWeight, landmarkWeight, imageWeight,
-                consistencyWeight, stopThreshold, outputLevel, showMarquardtOptim, mode);
+                consistencyWeight, stopThreshold, outputLevel, showMarquardtOptim, Arrays.asList(modesArray).indexOf(modeChoice));
 
         dialog.setFinalActionLaunched(true);
         dialog.setToolbarAllUp();

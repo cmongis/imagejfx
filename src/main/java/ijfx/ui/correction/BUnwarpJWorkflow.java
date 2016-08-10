@@ -41,6 +41,7 @@ import java.util.stream.IntStream;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -227,9 +228,12 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
         setCellFactory(listView);
         listView.getItems().addAll(workflowModel.getFiles());
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
-            workflowModel.openImage(this.imageDisplayPaneTopRight, this.imageDisplayPaneTopLeft, newValue);
-            workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeft.getImageDisplay());
-            workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRight.getImageDisplay());
+            workflowModel.openImage(this.imageDisplayPaneTopRight, this.imageDisplayPaneTopLeft, newValue)
+                    .thenRunnable(() -> {
+                        workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeft.getImageDisplay());
+                        workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRight.getImageDisplay());
+                    })
+                    .start();
 
         });
         if (workflowModel.getLandMarksFile() != null) {
@@ -243,17 +247,21 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
 
     @EventHandler
     public void handleEvent(DataViewEvent event) {
-        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
-            bus.channel(event);
+        //To be changed
+        if (imageDisplayPaneTopLeft.getImageDisplay() != null && imageDisplayPaneTopRight.getImageDisplay() != null) {
+            if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
+                bus.channel(event);
+            }
+
         }
 
     }
 
     @EventHandler
     public void handleEvent(LUTsChangedEvent event) {
-        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
-            bus.channel(event);
-        }
+//        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
+//            bus.channel(event);
+//        }
 
     }
 

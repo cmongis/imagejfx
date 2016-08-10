@@ -20,9 +20,8 @@
 package ijfx.ui.correction;
 
 import ij.process.ImageProcessor;
-import ijfx.plugins.bunwarpJ.BunwarpJCommand;
+import ijfx.plugins.bunwarpJ.bUnwarpJ_;
 import ijfx.plugins.commands.AutoContrast;
-import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
@@ -37,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -87,7 +87,6 @@ public class WorkflowModel {
     protected ObjectProperty<ImageDisplayPane> flatFieldImageDisplayProperty1;
 
     protected ObjectProperty<ImageDisplayPane> flatFieldImageDisplayProperty2;
-
 
     protected Map<String, Dataset> mapImages;
 
@@ -185,11 +184,6 @@ public class WorkflowModel {
     protected ObjectProperty<int[]> positionLeftProperty = new SimpleObjectProperty<>(new int[]{-1});
     protected ObjectProperty<int[]> positionRightProperty = new SimpleObjectProperty<>(new int[]{-1});
 
-//    ObservableList<Integer> observableList = FX;
-    public List<File> getFiles() {
-        return listProperty.get();
-    }
-
     protected final static Logger LOGGER = ImageJFX.getLogger();
 
     public WorkflowModel() {
@@ -200,7 +194,6 @@ public class WorkflowModel {
     }
 
     public void init() {
-
 
         flatFieldImageDisplayProperty1 = initDisplayPane();
 
@@ -218,16 +211,8 @@ public class WorkflowModel {
             }
 
         }
-//        init();
     }
 
-//    public Optional<ImageDisplay> getFlatFieldImageDisplay() {
-//        return Optional.ofNullable(flatFieldImageDisplayProperty1);
-//    }
-//
-//    public void setFlatFieldImageDisplayProperty(ImageDisplay flatFieldImageDisplayProperty) {
-//        this.flatFieldImageDisplayProperty1 = flatFieldImageDisplayProperty;
-//    }
     /**
      *
      * @param header
@@ -244,7 +229,7 @@ public class WorkflowModel {
     }
 
     /**
-     *
+     * Load a table and diplay it in the TableDisplay
      * @param header
      * @param fileLabel
      * @param file
@@ -281,33 +266,28 @@ public class WorkflowModel {
         return tableDisplay;
     }
 
+
     /**
-     *
-     * @param imageDisplayPane1,ObjectProperty<ImageDisplayPane>
-     * imageDisplayPaneProperty2
-     * @return
+     * Open an image in an other thread. And display the image in the different ImageDisplayPane
+     * @param imageDisplayPane1
+     * @param imageDisplayPane2
+     * @param file
+     * @return 
      */
-    public void openImage(ImageDisplayPane imageDisplayPane1, ImageDisplayPane imageDisplayPane2) {
-        FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(null);
+    public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane1, ImageDisplayPane imageDisplayPane2, File file) {
 
-        openImage(imageDisplayPane1, imageDisplayPane2, file);
-
-    }
-
-    public void openImage(ImageDisplayPane imageDisplayPane1, ImageDisplayPane imageDisplayPane2, File file) {
-//        new CallbackTask<Void, Void>().run(() -> {
-            Dataset dataset = null;
+        CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
             try {
+                Dataset dataset;
                 dataset = (Dataset) iOService.open(file.getAbsolutePath());
+                displayDataset(dataset, imageDisplayPane1);
+                displayDataset(dataset, imageDisplayPane2);
             } catch (IOException ex) {
-                Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
             }
-            displayDataset(dataset, imageDisplayPane1);
-            displayDataset(dataset, imageDisplayPane2);
-//        })
-//                .submit(loadingScreenService)
-//                .start();
+        })
+                .submit(loadingScreenService);
+        return task;
     }
 
     /**
@@ -377,12 +357,18 @@ public class WorkflowModel {
         return objectProperty;
     }
 
-    public Dataset getTransformedImage(ImageDisplay imageDisplay) {
-        Dataset activeDataset = imageDisplayService.getActiveDataset(imageDisplay);
+    /**
+     * Call the bUnwarpJ_ Command
+     * @param sourceDataset
+     * @param targetDataset
+     * @return 
+     */
+    public Dataset getTransformedImage(Dataset sourceDataset, Dataset targetDataset) {
         Map<String, Object> map = new HashMap<>();
-        map.put("inputDataset", activeDataset);
-        map.put("min_scale_deformation_choice", min_scale_deformation_choice.get());
-        map.put("max_scale_deformation_choice", max_scale_deformation_choice.get());
+        map.put("sourceDataset", sourceDataset);
+        map.put("targetDataset", targetDataset);
+        map.put("min_scale_deformation", min_scale_deformation_choice.get());
+        map.put("max_scale_deformation", max_scale_deformation_choice.get());
         map.put("modeChoice", modeChoice.get());
         map.put("maxImageSubsamplingFactor", maxImageSubsamplingFactor.get());
         map.put("divWeight", divWeight.get());
@@ -394,34 +380,37 @@ public class WorkflowModel {
         map.put("saveTransformation", saveTransformation.get());
         map.put("min_scale_image", min_scale_image.get());
         map.put("stopThreshold", stopThreshold.get());
-        map.put("img_subsamp_fact", img_subsamp_fact.get());
+//        map.put("img_subsamp_fact", img_subsamp_fact.get());
         map.put("landmarksFile", landmarksFile.get());
 
-        Module module = executeCommand(BunwarpJCommand.class, map);
+        Module module = executeCommand(bUnwarpJ_.class, map).orElseThrow(NullPointerException::new);
         Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
         return outputDataset;
     }
 
-    public <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
+    /**
+     * 
+     * @param <C>
+     * @param type
+     * @param parameters
+     * @return 
+     */
+    public <C extends Command> Optional<Module> executeCommand(Class<C> type, Map<String, Object> parameters) {
         Module module = moduleService.createModule(commandService.getCommand(type));
         try {
             module.initialize();
-        } catch (MethodCallException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        parameters.forEach((k, v) -> {
-            module.setInput(k, v);
-            module.setResolved(k, true);
-        });
+            parameters.forEach((k, v) -> {
+                module.setInput(k, v);
+                module.setResolved(k, true);
+            });
 
-        Future run = moduleService.run(module, false, parameters);
+            Future run = moduleService.run(module, false, parameters);
 
-        try {
             run.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MethodCallException | InterruptedException | ExecutionException ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return module;
+        return Optional.of(module);
     }
 
     public void bindWelcome(WelcomeWorkflow welcomeWorkflow) {
@@ -430,16 +419,18 @@ public class WorkflowModel {
         welcomeWorkflow.positionRightProperty.bindBidirectional(positionRightProperty);
     }
 
+    /**
+     * Concatenate the different Dataset and display them in the ImageDisplayPane
+     * @param datasets
+     * @param imageDisplayPane 
+     */
     public void extractAndMerge(Dataset[] datasets, ImageDisplayPane imageDisplayPane) {
         new CallbackTask<Void, Void>().run(() -> {
             Map<String, Object> inputMap = new HashMap();
             inputMap.put("datasetArray", datasets);
             inputMap.put("axisType", Axes.CHANNEL);
             Module module = null;
-            try {
-                module = executeCommand(ImagesToStack.class, inputMap);
-            } catch (Exception e) {
-            }
+            module = executeCommand(ImagesToStack.class, inputMap).orElseThrow(NullPointerException::new);
             Dataset result = (Dataset) module.getOutput("outputDataset");
 //            DatasetView datasetView = imageDisplayService.getActiveDatasetView(imageDisplayPane.getImageDisplay());
 //            datasetView.setColorMode(ColorMode.COMPOSITE);
@@ -472,5 +463,9 @@ public class WorkflowModel {
 
     public Map<String, Dataset> getMapImages() {
         return mapImages;
+    }
+
+    public List<File> getFiles() {
+        return listProperty.get();
     }
 }

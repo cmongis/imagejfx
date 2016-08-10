@@ -59,7 +59,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Pipeline2")
+@Plugin(type = Command.class, menuPath = "Plugins>Pip2")
 public class Pip2 implements Command {
 
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
@@ -221,7 +221,7 @@ public class Pip2 implements Command {
         //transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
         //Apply transformation
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
-            Dataset afterTransformation = iJ1Service.wrapDataset(applyTransformation(imagePlus, transformation));
+            Dataset afterTransformation = iJ1Service.wrapDataset(applyTransformation(sourceImp, transformation));
             if (flatfield != null) {
                 afterTransformation = applyFlatFieldCorrection(afterTransformation, flatfield);
             }
@@ -284,8 +284,8 @@ public class Pip2 implements Command {
 
     private String transformedTitle(ImagePlus imagePlus) {
         String title = imagePlus.getTitle();
-        int index = title.indexOf(".");
-        title = title.substring(0, index) + "-aligned" + title.substring(index);
+//        int index = title.indexOf(".");
+//        title = title.substring(0, index) + "-aligned" + title.substring(index);
         return title;
     }
 

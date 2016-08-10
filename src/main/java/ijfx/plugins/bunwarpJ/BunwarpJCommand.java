@@ -211,7 +211,7 @@ public class BunwarpJCommand implements Command {
         imagePlus = loadImagePlus();
         Stack<Point> sourcePoints = new Stack<>();
         Stack<Point> targetPoints = new Stack<>();
-        MiscTools.loadPoints(landmarksFile.getAbsolutePath(), sourcePoints, targetPoints);
+//        MiscTools.loadPoints(landmarksFile.getAbsolutePath(), sourcePoints, targetPoints);
         Param param = new Param(mode, maxImageSubsamplingFactor, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold);
 
         int width = imagePlus.getWidth();

@@ -32,16 +32,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
 import javafx.stage.DirectoryChooser;
-import javafx.util.Callback;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.display.ImageDisplay;
@@ -106,17 +100,21 @@ public class WelcomeWorkflow extends CorrectionFlow {
         gridPane.add(imageDisplayPaneLeft, 1, 0);
         gridPane.add(imageDisplayPaneRight, 2, 0);
 
-//        gridPane.getChildren().addAll(new Node[]{imageDisplayPaneLeft, imageDisplayPaneRight});
         initListView();
         ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
         bindPaneProperty(Arrays.asList(imageDisplayPanes));
-        //Only when the user come back
-//        if (listProperty.get().size() > 0) {
-//            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, listProperty.get().get(0));
-//            applyPosition();
-//        }
+//        Only when the user come back
+        if (listProperty.get().size() > 0) {
+            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, listProperty.get().get(0))
+                    .thenRunnable(this::applyPosition)
+                    .start();
+
+        }
     }
 
+    /**
+     * Choose a directory and save the file
+     */
     @FXML
     public void addFiles() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -124,9 +122,13 @@ public class WelcomeWorkflow extends CorrectionFlow {
         List<File> list = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
         listProperty.set(list);
         listView.getItems().addAll(list);
-        workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0));
+        workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0)).start();
     }
 
+    /**
+     * Save the position whan the axis Change
+     * @param event 
+     */
     @EventHandler
     public void handleEvent(AxisPositionEvent event) {
         System.out.println(imageDisplayPaneLeft.getImageDisplay());
@@ -139,27 +141,44 @@ public class WelcomeWorkflow extends CorrectionFlow {
 
     }
 
+    /**
+     * Save the positions of the imageDisplay
+     * @param imageDisplay
+     * @param property 
+     */
     private void savePosition(ImageDisplay imageDisplay, ObjectProperty<int[]> property) {
         int[] position = new int[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
         property.set(position);
     }
 
+    /**
+     * 
+     */
     private void initListView() {
         listView.getItems().addAll(listProperty.get());
         setCellFactory(listView);
 
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> obs, File old, File newValue) -> {
-            workflowModel.openImage(imageDisplayPaneLeft, imageDisplayPaneRight, newValue);
-            if (workflowModel.getPositionLeft().length == imageDisplayPaneLeft.getImageDisplay().numDimensions()) {
-                workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneLeft.getImageDisplay());
-                workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneRight.getImageDisplay());
-            } else {
-                savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
-                savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
-            }
+            workflowModel.openImage(imageDisplayPaneLeft, imageDisplayPaneRight, newValue)
+                    .thenRunnable(() -> {
+
+                        if (workflowModel.getPositionLeft().length == imageDisplayPaneLeft.getImageDisplay().numDimensions()) {
+                            applyPosition();
+                        } else {
+                            savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
+                            savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
+                        }
+                    })
+                    .start();
 
         });
+    }
+
+    private void applyPosition() {
+        workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneLeft.getImageDisplay());
+        workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneRight.getImageDisplay());
+
     }
 
 }

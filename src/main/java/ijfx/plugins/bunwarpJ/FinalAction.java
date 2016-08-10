@@ -374,7 +374,7 @@ public class FinalAction implements Runnable
 
         final ImagePlus ip1 = new ImagePlus("Output Source-Target" + extraTitleS, fp);
         ip1.updateAndDraw();
-        ip1.show();
+//        ip1.show();
         
         outputIP[0] = ip1;
 
@@ -404,7 +404,7 @@ public class FinalAction implements Runnable
         	
         	final ImagePlus ip2 = new ImagePlus("Output Target-Source" + extraTitleT, fp2);
         	ip2.updateAndDraw();
-        	ip2.show();
+//        	ip2.show();
         	outputIP[1] = ip2;
         }
         else
