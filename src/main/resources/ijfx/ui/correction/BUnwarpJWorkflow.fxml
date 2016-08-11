@@ -14,7 +14,7 @@
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="Landmarks">
+                <Tab fx:id="landmarksTab" text="Landmarks">
                     <content>
                         <BorderPane prefHeight="200.0" prefWidth="200.0">
                             <top>
@@ -30,7 +30,7 @@
                     </content>
                 </Tab>
             
-                <Tab text="Deformation">
+                <Tab fx:id="deformationTab" text="Deformation">
                     <content>
                         <GridPane>
                             <columnConstraints>
@@ -129,7 +129,7 @@
                         </GridPane>
                     </content>
                 </Tab>
-                <Tab text="Weight">
+                <Tab fx:id="weightTab" text="Weight">
                     <content>
                         <GridPane>
                             <columnConstraints>
@@ -176,7 +176,7 @@
                         </GridPane>
                     </content>
                 </Tab>
-                <Tab text="Output">
+                <Tab fx:id="outputTab" text="Output">
                     <content>
                         <GridPane alignment="CENTER">
                             <columnConstraints>
@@ -193,7 +193,7 @@
                         </GridPane>
                     </content>
                 </Tab>
-                <Tab text="Images">
+                <Tab fx:id="imagesTab" text="Images">
                     <content>
                         <GridPane fx:id="imagesContainer" alignment="CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
                             <columnConstraints>
