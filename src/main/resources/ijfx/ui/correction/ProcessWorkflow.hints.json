@@ -1,0 +1,19 @@
+[
+    { 
+        "text":"Choose the image that contains the flatfield",
+        "target":"#processButton"
+    },
+    {
+        "text":"Cho"
+        ,"target":"#listViewItems"
+    },
+    {
+        "text":"Choose the image that contains the flatfield"
+        ,"target":"#imageDisplayPaneLeft"
+    },
+    {
+        "text":"Choose the image that contains the flatfield"
+        ,"target":"#imageDisplayPaneRight"
+    }
+  
+]

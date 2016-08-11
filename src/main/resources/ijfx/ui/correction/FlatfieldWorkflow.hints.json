@@ -1,0 +1,10 @@
+[
+    { 
+        "text":"Choose the image that contains the flatfield",
+        "target":"#flatFieldLeftButton"
+    },
+    {
+        "text":"Choose the image that contains the flatfield"
+        ,"target":"#flatFieldRightButton"
+    }
+]
