@@ -1,31 +1,47 @@
-[INFO ijfx.ui.main.ImageJFX start] You running Java 1.8.0_91  (2016-07-21 15:02:34)
-[INFO ijfx.ui.main.ImageJFX start] /home/tuananh/Projects/imagejfx/./plugins  (2016-07-21 15:02:35)
-[INFO ijfx.service.uicontext.UiContextService initialize] Importing context configuration.  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context imagej which is incompatible with : webapp, image-browser, segmentation  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context project-manager which is incompatible with : webapp, imagej, project-batch-processing  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context project-batch-processing which is incompatible with : webapp, imagej, project-manager  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context file-batch-processing which is incompatible with : webapp, imagej, project-manager, project-batch-processing  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context project-rule-list which is incompatible with : webapp, project-manager  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context project-rule-edition which is incompatible with : project-rule-list, project-manager  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context segmentation which is incompatible with : imagej, webapp  (2016-07-21 15:02:36)
-[INFO ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14] Loaded context batch which is incompatible with : imagej, segmentation, webapp  (2016-07-21 15:02:36)
-[INFO ijfx.service.watch_dir.SimpleDirectoryWatchService run] Starting file watcher service.  (2016-07-21 15:02:36)
-[WARNING ijfx.service.ui.JsonPreferenceService loadListFromJson] No such file as my_workflows_v2.json  (2016-07-21 15:02:36)
-[INFO ijfx.ui.notification.DefaultNotificationService onSocketConnected] [PushServer] Connected. Subscribing...  (2016-07-21 15:02:37)
-[INFO ijfx.ui.notification.DefaultNotificationService onWelcomeMessage] [PushServer] Subscribed  (2016-07-21 15:02:37)
-[SEVERE ijfx.service.history.HistoryService loadWorkflow] Error when loading workflow 
+août 05, 2016 4:16:43 PM ijfx.ui.main.ImageJFX start
+INFOS: You running Java 1.8.0_101
+août 05, 2016 4:17:01 PM ijfx.ui.main.ImageJFX start
+INFOS: /home/pierre/github/imagejfx/./plugins
+août 05, 2016 4:18:00 PM ijfx.service.uicontext.UiContextService initialize
+INFOS: Importing context configuration.
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context imagej which is incompatible with : webapp, image-browser, segmentation
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context project-manager which is incompatible with : webapp, imagej, project-batch-processing
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context project-batch-processing which is incompatible with : webapp, imagej, project-manager
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context file-batch-processing which is incompatible with : webapp, imagej, project-manager, project-batch-processing
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context project-rule-list which is incompatible with : webapp, project-manager
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context project-rule-edition which is incompatible with : project-rule-list, project-manager
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context segmentation which is incompatible with : imagej, webapp
+août 05, 2016 4:18:01 PM ijfx.service.uicontext.UiContextService lambda$importContextConfiguration$14
+INFOS: Loaded context batch which is incompatible with : imagej, segmentation, webapp
+août 05, 2016 4:18:01 PM ijfx.service.watch_dir.SimpleDirectoryWatchService run
+INFOS: Starting file watcher service.
+août 05, 2016 4:18:03 PM ijfx.ui.notification.DefaultNotificationService onSocketConnected
+INFOS: [PushServer] Connected. Subscribing...
+août 05, 2016 4:18:03 PM ijfx.ui.notification.DefaultNotificationService onWelcomeMessage
+INFOS: [PushServer] Subscribed
+août 05, 2016 4:18:04 PM ijfx.service.ui.JsonPreferenceService loadListFromJson
+AVERTISSEMENT: No such file as my_workflows_v2.json
+août 05, 2016 4:18:09 PM ijfx.service.history.HistoryService loadWorkflow
+GRAVE: Error when loading workflow
 com.fasterxml.jackson.core.JsonParseException: Unexpected character ('/' (code 47)): maybe a (non-standard) comment? (not recognized as one since Feature 'ALLOW_COMMENTS' not enabled for parser)
- at [Source: /home/tuananh/.imagejfx/favorites.json; line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1419)
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:508)
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:437)
+ at [Source: /home/pierre/.imagejfx/favorites.json; line: 1, column: 2]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1487)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:518)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:447)
 	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._skipComment(ReaderBasedJsonParser.java:1937)
 	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._skipWSOrEnd2(ReaderBasedJsonParser.java:1912)
 	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._skipWSOrEnd(ReaderBasedJsonParser.java:1863)
 	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:571)
-	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:3090)
-	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:3036)
-	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:2146)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:3602)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:3547)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:2578)
 	at ijfx.service.history.HistoryService.loadWorkflow(HistoryService.java:141)
 	at ijfx.service.history.HistoryService.loadFavorite(HistoryService.java:188)
 	at ijfx.service.history.HistoryService.<init>(HistoryService.java:85)
@@ -51,119 +67,197 @@ com.fasterxml.jackson.core.JsonParseException: Unexpected character ('/' (code 4
 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
 	at java.lang.Thread.run(Thread.java:745)
- (2016-07-21 15:02:37)
-[WARNING ijfx.service.history.HistoryService <init>] Error when loading favorites  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : topLeftHBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : topRightHBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : leftVBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : rightVBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : bottomLeftHBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : bottomRightHBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : topCenterHBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : bottomCenterHBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : topToolBarVBox  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton]Instance creation : 2ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton]plugin.init() : 1ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 7ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.datadisplay.table.TableDisplayToolbar] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.datadisplay.table.TableDisplayToolbar]Instance creation : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.datadisplay.table.TableDisplayToolbar]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.datadisplay.table.TableDisplayToolbar]plugin.init() : 3ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.datadisplay.table.TableDisplayToolbar] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 24ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.DebugButton] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.DebugButton]Instance creation : 5ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.DebugButton]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.DebugButton]plugin.init() : 0ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.DebugButton] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 8ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ExplorerButton] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ExplorerButton]Instance creation : 0ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ExplorerButton]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ExplorerButton]plugin.init() : 0ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ExplorerButton] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 2ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.FxStatusBarWidget] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.FxStatusBarWidget]Instance creation : 2ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.FxStatusBarWidget]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.FxStatusBarWidget]plugin.init() : 1ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.FxStatusBarWidget] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 5ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ImageJMenuBar] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ImageJMenuBar]Instance creation : 0ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ImageJMenuBar]Instance injection : 1ms  (2016-07-21 15:02:37)
-[WARNING ijfx.bridge.FxMenuCreator addSeparatorToTop] A seperator should have been inserted but was not.  (2016-07-21 15:02:37)
-[WARNING ijfx.bridge.FxMenuCreator addSeparatorToTop] A seperator should have been inserted but was not.  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ImageJMenuBar]plugin.init() : 25ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ImageJMenuBar] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 26ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ImageJToolBar] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ImageJToolBar]Instance creation : 0ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ImageJToolBar]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ImageJToolBar]plugin.init() : 12ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ImageJToolBar] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 14ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.LogPanel] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.LogPanel]Instance creation : 24ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.LogPanel]Instance injection : 0ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.LogPanel]plugin.init() : 7ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.LogPanel] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 32ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ModuleSearchField] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ModuleSearchField]Instance creation : 7ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ModuleSearchField]Instance injection : 2ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.ModuleSearchField]plugin.init() : 10ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.ModuleSearchField] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 19ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.OpenImageBar] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.OpenImageBar]Instance creation : 10ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.OpenImageBar]Instance injection : 0ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.OpenImageBar]plugin.init() : 1ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.OpenImageBar] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 12ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.SwitchContextButton] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.SwitchContextButton]Instance creation : 2ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.SwitchContextButton]Instance injection : 0ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.SwitchContextButton]plugin.init() : 1ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.SwitchContextButton] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 3ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.BatchProcessingPanel] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.BatchProcessingPanel]Instance creation : 29ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.BatchProcessingPanel]Instance injection : 1ms  (2016-07-21 15:02:37)
-[SEVERE ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [%s] Error when initializing. 
-java.lang.RuntimeException: Uncompilable source code - incompatible types: Cannot instantiate inference variables T because of an inference loop
-	at ijfx.ui.widgets.PopoverToggleButton.bind(PopoverToggleButton.java:96)
-	at ijfx.ui.widgets.PopoverToggleButton.bind(PopoverToggleButton.java:126)
-	at ijfx.ui.plugin.panel.BatchProcessingPanel.init(BatchProcessingPanel.java:183)
-	at ijfx.service.uiplugin.DefaultUiPluginService.loadWidget(DefaultUiPluginService.java:178)
-	at ijfx.service.uiplugin.DefaultUiPluginService.loadAll(DefaultUiPluginService.java:125)
-	at ijfx.ui.main.MainWindowController.init(MainWindowController.java:314)
-	at mongis.utils.CallbackTask.call(CallbackTask.java:173)
-	at javafx.concurrent.Task$TaskCallable.call(Task.java:1423)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
- (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 79ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.FavoritePanel] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.FavoritePanel]Instance creation : 0ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.FavoritePanel]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.FavoritePanel]plugin.init() : 0ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.FavoritePanel] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 2ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.LUTPanel] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.ui.plugin.panel.LUTPanel <init>] Loading FXML  (2016-07-21 15:02:37)
-[INFO ijfx.ui.plugin.panel.LUTPanel <init>] FXML loaded  (2016-07-21 15:02:37)
-[INFO ijfx.ui.plugin.panel.LUTPanel <init>] Adding listeners  (2016-07-21 15:02:37)
-[SEVERE ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [%s] Error when initializing. 
-java.lang.RuntimeException: Uncompilable source code - incompatible types: Cannot instantiate inference variables T because of an inference loop
-	at ijfx.ui.widgets.PopoverToggleButton.bind(PopoverToggleButton.java:96)
-	at ijfx.ui.widgets.PopoverToggleButton.bind(PopoverToggleButton.java:126)
-	at ijfx.ui.plugin.panel.LUTPanel.<init>(LUTPanel.java:224)
+
+août 05, 2016 4:18:09 PM ijfx.service.history.HistoryService <init>
+AVERTISSEMENT: Error when loading favorites
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : topLeftHBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : topRightHBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : leftVBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : rightVBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : bottomLeftHBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : bottomRightHBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : topCenterHBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : bottomCenterHBox
+août 05, 2016 4:18:09 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : topToolBarVBox
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.ExplainMeSegmentationButton] Initializing...
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton]Instance creation : 16ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton]Instance injection : 2ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.ExplainMeSegmentationButton]plugin.init() : 2ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.ExplainMeSegmentationButton] Initializing...
+août 05, 2016 4:18:09 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 40ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.datadisplay.table.TableDisplayToolbar] Initializing...
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.datadisplay.table.TableDisplayToolbar]Instance creation : 2ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.datadisplay.table.TableDisplayToolbar]Instance injection : 3ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.datadisplay.table.TableDisplayToolbar]plugin.init() : 14ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.datadisplay.table.TableDisplayToolbar] Initializing...
+août 05, 2016 4:18:09 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 212ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.DebugButton] Initializing...
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.DebugButton]Instance creation : 45ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.DebugButton]Instance injection : 7ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.DebugButton]plugin.init() : 2ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.DebugButton] Initializing...
+août 05, 2016 4:18:09 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 60ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ExplorerButton] Initializing...
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ExplorerButton]Instance creation : 1ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ExplorerButton]Instance injection : 2ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ExplorerButton]plugin.init() : 1ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ExplorerButton] Initializing...
+août 05, 2016 4:18:09 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 13ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.FxStatusBarWidget] Initializing...
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.FxStatusBarWidget]Instance creation : 6ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.FxStatusBarWidget]Instance injection : 4ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.FxStatusBarWidget]plugin.init() : 6ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.FxStatusBarWidget] Initializing...
+août 05, 2016 4:18:09 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 19ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ImageJMenuBar] Initializing...
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ImageJMenuBar]Instance creation : 2ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ImageJMenuBar]Instance injection : 2ms
+août 05, 2016 4:18:09 PM ijfx.bridge.FxMenuCreator addSeparatorToTop
+AVERTISSEMENT: A seperator should have been inserted but was not.
+août 05, 2016 4:18:09 PM ijfx.bridge.FxMenuCreator addSeparatorToTop
+AVERTISSEMENT: A seperator should have been inserted but was not.
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ImageJMenuBar]plugin.init() : 97ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ImageJMenuBar] Initializing...
+août 05, 2016 4:18:09 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 105ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ImageJToolBar] Initializing...
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ImageJToolBar]Instance creation : 1ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ImageJToolBar]Instance injection : 1ms
+août 05, 2016 4:18:09 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ImageJToolBar]plugin.init() : 44ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ImageJToolBar] Initializing...
+août 05, 2016 4:18:09 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 56ms
+août 05, 2016 4:18:09 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.LogPanel] Initializing...
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.LogPanel]Instance creation : 142ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.LogPanel]Instance injection : 1ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.LogPanel]plugin.init() : 43ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.LogPanel] Initializing...
+août 05, 2016 4:18:10 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 189ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ModuleSearchField] Initializing...
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ModuleSearchField]Instance creation : 41ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ModuleSearchField]Instance injection : 19ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.ModuleSearchField]plugin.init() : 41ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.ModuleSearchField] Initializing...
+août 05, 2016 4:18:10 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 103ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.OpenImageBar] Initializing...
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.OpenImageBar]Instance creation : 43ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.OpenImageBar]Instance injection : 3ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.OpenImageBar]plugin.init() : 1ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.OpenImageBar] Initializing...
+août 05, 2016 4:18:10 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 51ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.SwitchContextButton] Initializing...
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.SwitchContextButton]Instance creation : 4ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.SwitchContextButton]Instance injection : 1ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.SwitchContextButton]plugin.init() : 8ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.SwitchContextButton] Initializing...
+août 05, 2016 4:18:10 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 19ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.BatchProcessingPanel] Initializing...
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.BatchProcessingPanel]Instance creation : 107ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.BatchProcessingPanel]Instance injection : 2ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.BatchProcessingPanel]plugin.init() : 344ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.BatchProcessingPanel] Initializing...
+août 05, 2016 4:18:10 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 457ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.FavoritePanel] Initializing...
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.FavoritePanel]Instance creation : 2ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.FavoritePanel]Instance injection : 1ms
+août 05, 2016 4:18:10 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.FavoritePanel]plugin.init() : 2ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.FavoritePanel] Initializing...
+août 05, 2016 4:18:10 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 8ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.LUTPanel] Initializing...
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+GRAVE: [%s] Error when initializing.
+java.lang.RuntimeException: ControlsFX Error: ControlsFX 8.40.10 requires at least Java Version 8 Update 40
+	at impl.org.controlsfx.version.VersionChecker.doVersionCheck(VersionChecker.java:96)
+	at org.controlsfx.control.ControlsFXControl.<init>(ControlsFXControl.java:35)
+	at org.controlsfx.control.RangeSlider.<init>(RangeSlider.java:175)
+	at org.controlsfx.control.RangeSlider.<init>(RangeSlider.java:163)
+	at ijfx.ui.plugin.panel.LUTPanel.<init>(LUTPanel.java:152)
 	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
 	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
 	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
@@ -179,228 +273,1742 @@ java.lang.RuntimeException: Uncompilable source code - incompatible types: Canno
 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
 	at java.lang.Thread.run(Thread.java:745)
- (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 21ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.OverlayPanel] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.OverlayPanel]Instance creation : 109ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.OverlayPanel]Instance injection : 1ms  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.OverlayPanel]plugin.init() : 0ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.OverlayPanel] Initializing...  (2016-07-21 15:02:37)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 112ms  (2016-07-21 15:02:37)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.SegmentationPanel] Initializing...  (2016-07-21 15:02:37)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.SegmentationPanel]Instance creation : 40ms  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.SegmentationPanel]Instance injection : 0ms  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.SegmentationPanel]plugin.init() : 37ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.SegmentationPanel] Initializing...  (2016-07-21 15:02:38)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 77ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.WorkflowEditor] Initializing...  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.WorkflowEditor]Instance creation : 15ms  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.WorkflowEditor]Instance injection : 1ms  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.plugin.panel.WorkflowEditor]plugin.init() : 1ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.plugin.panel.WorkflowEditor] Initializing...  (2016-07-21 15:02:38)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 17ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.previewToolbar.PreviewToolBar] Initializing...  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.previewToolbar.PreviewToolBar]Instance creation : 2ms  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.previewToolbar.PreviewToolBar]Instance injection : 2ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : ToolBar-Context-Dependant  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Math  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Colors  (2016-07-21 15:02:38)
-[WARNING ijfx.service.uicontext.UiContextService getUIContext] Context doesn't exist : imagej+image-open  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Stacks  (2016-07-21 15:02:38)
-[WARNING ijfx.service.uicontext.UiContextService getUIContext] Context doesn't exist : image-open  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Filters  (2016-07-21 15:02:38)
-[WARNING ijfx.service.uicontext.UiContextService getUIContext] Context doesn't exist : multi-z-img  (2016-07-21 15:02:38)
-[WARNING ijfx.service.uicontext.UiContextService getUIContext] Context doesn't exist : multi-time-img  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Noises  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Image  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Binary  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService addContextualView] Registering the contextual view : Overlay  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Starting] [ijfx.ui.previewToolbar.PreviewToolBar]plugin.init() : 347ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadWidget] [ijfx.ui.previewToolbar.PreviewToolBar] Initializing...  (2016-07-21 15:02:38)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 352ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.uiplugin.DefaultUiPluginService loadAll] 18 UiPlugins created  (2016-07-21 15:02:38)
-[INFO ijfx.service.DefaultTimer logAll] [ijfx.service.uiplugin.DefaultUiPluginService]
+
+août 05, 2016 4:18:10 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 58ms
+août 05, 2016 4:18:10 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel] Initializing...
+août 05, 2016 4:18:11 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.OverlayPanel]Instance creation : 923ms
+août 05, 2016 4:18:11 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.OverlayPanel]Instance injection : 2ms
+août 05, 2016 4:18:11 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.OverlayPanel]plugin.init() : 1ms
+août 05, 2016 4:18:11 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel] Initializing...
+août 05, 2016 4:18:11 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 930ms
+août 05, 2016 4:18:11 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.SegmentationPanel] Initializing...
+août 05, 2016 4:18:11 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.SegmentationPanel]Instance creation : 143ms
+août 05, 2016 4:18:11 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.SegmentationPanel]Instance injection : 2ms
+août 05, 2016 4:18:12 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.SegmentationPanel]plugin.init() : 239ms
+août 05, 2016 4:18:12 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.SegmentationPanel] Initializing...
+août 05, 2016 4:18:12 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 387ms
+août 05, 2016 4:18:12 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.WorkflowEditor] Initializing...
+août 05, 2016 4:18:12 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.WorkflowEditor]Instance creation : 106ms
+août 05, 2016 4:18:12 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.WorkflowEditor]Instance injection : 2ms
+août 05, 2016 4:18:12 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.plugin.panel.WorkflowEditor]plugin.init() : 3ms
+août 05, 2016 4:18:12 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.plugin.panel.WorkflowEditor] Initializing...
+août 05, 2016 4:18:12 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 117ms
+août 05, 2016 4:18:12 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.previewToolbar.PreviewToolBar] Initializing...
+août 05, 2016 4:18:12 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.previewToolbar.PreviewToolBar]Instance creation : 15ms
+août 05, 2016 4:18:12 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.previewToolbar.PreviewToolBar]Instance injection : 3ms
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : ToolBar-Context-Dependant
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Math
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Colors
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService getUIContext
+AVERTISSEMENT: Context doesn't exist : imagej+image-open
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Stacks
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService getUIContext
+AVERTISSEMENT: Context doesn't exist : image-open
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Filters
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService getUIContext
+AVERTISSEMENT: Context doesn't exist : multi-z-img
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService getUIContext
+AVERTISSEMENT: Context doesn't exist : multi-time-img
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Noises
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Image
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Binary
+août 05, 2016 4:18:12 PM ijfx.service.uicontext.UiContextService addContextualView
+INFOS: Registering the contextual view : Overlay
+août 05, 2016 4:18:14 PM mercury.core.MercuryTimer log
+INFOS: [Starting] [ijfx.ui.previewToolbar.PreviewToolBar]plugin.init() : 2221ms
+août 05, 2016 4:18:14 PM ijfx.service.uiplugin.DefaultUiPluginService loadWidget
+INFOS: [ijfx.ui.previewToolbar.PreviewToolBar] Initializing...
+août 05, 2016 4:18:14 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService] Widget loading : 2242ms
+août 05, 2016 4:18:14 PM ijfx.service.uiplugin.DefaultUiPluginService loadAll
+INFOS: 18 UiPlugins created
+août 05, 2016 4:18:14 PM ijfx.service.DefaultTimer logAll
+INFOS: [ijfx.service.uiplugin.DefaultUiPluginService]
 +--------------
                         Action |     Mean | Std. Dev |        N
 +--------------
-                Widget loading |     45ms |     83ms |       18
-  (2016-07-21 15:02:38)
-[INFO ijfx.ui.main.MainWindowController finishInitialization] finishing initialization...  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService enter] Tries to enter : debug  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context debug  (2016-07-21 15:02:38)
-[WARNING ijfx.service.uicontext.UiContextService getUIContext] Context doesn't exist : debug  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context debug  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService update] Updating...  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService update] Actual context : debug   (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=debug-button, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [topRightHBox] Must show 1 items :   (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : debug-button  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=switch-context-button, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [topLeftHBox] Must show 1 items :   (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : switch-context-button  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topLeftHBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topRightHBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.ui.activity.DefaultActivityService getActivity] Loading activity : ijfx.bridge.ImageJContainer  (2016-07-21 15:02:38)
-[INFO ijfx.ui.activity.DefaultActivityService getActivity] Activity loaded  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService enter] Tries to enter : imagej  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context imagej  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context imagej  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService update] Updating...  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService update] Actual context : debug imagej   (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=log-panel, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=open-image-button, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=fx-status-bar, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [bottomLeftHBox] Must show 1 items :   (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : fx-status-bar  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [bottomLeftHBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=module-search, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=switch-context-button, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget PaneIconCellPreview[id=Delete all, styleClass=image-icon-item pane-icon-cell] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=favoritePanel, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [bottomCenterHBox] Must show 1 items :   (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=debug-button, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : favoritePanel  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [topRightHBox] Must show 2 items :   (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : debug-button  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : module-search  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topRightHBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=explorer-button, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [bottomCenterHBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [topLeftHBox] Must show 4 items :   (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=workflowEditor, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : log-panel  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [rightVBox] Must show 1 items :   (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : open-image-button  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : workflowEditor  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : explorer-button  (2016-07-21 15:02:38)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=imagej-menu-bar, visible=false, enabled=true] added to the toShow list.  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : switch-context-button  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [rightVBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] [topCenterHBox] Must show 1 items :   (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topLeftHBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1] Must show : imagej-menu-bar  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topCenterHBox] Start disapearce !  (2016-07-21 15:02:38)
-[INFO ijfx.ui.main.MainWindowController onActivityChanged] Activity changed : 
-	context = org.scijava.Context@51b8bdb3
-	consumed = false  (2016-07-21 15:02:38)
-[INFO ijfx.ui.activity.DefaultActivityService setCurrentActivity] Event published  (2016-07-21 15:02:38)
-[INFO ijfx.ui.main.MainWindowController finishInitialization] Start over  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Browser view] Time to fetch controllers : 99ms  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Browser view] Time to fetch controllers : 102ms  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Browser view] Adding all the controllers : 9ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/1edc4e83-f305-358c-9472-2f2877d2078d.png  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/f4345e5f-36f7-38ea-96a4-f570ae8a14a9.png  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/79de0ac2-282a-37c2-aa8e-10f0f5a22397.png  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/3c89b8ed-fdb1-31b4-9e46-dff76bbf1af1.png  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/0073225a-17af-3c1e-9e33-48a75f717383.png  (2016-07-21 15:02:38)
-[INFO mercury.core.MercuryTimer log] [Browser view] Updating all the controllers : 15ms  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/6b0f6a4d-bfef-3cde-a8ed-7541686a36e5.png  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/18d6a470-cebe-3a0d-9207-ebc04609f498.png  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/b284f372-a03d-3221-9929-1eec145b6a55.png  (2016-07-21 15:02:38)
-[INFO ijfx.service.thumb.ThumbService getThumb] Thumb already exists. Returning /home/tuananh/.imagejfx/thumbs/67b16f77-23f3-33c6-b4e9-50b6e13209c4.png  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@6ed28ba3  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@2e4e3c4f  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@9485d7a  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@1e7f9fb7  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@5597b28f  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@1486b082  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@169989e4  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@74f93ea7  (2016-07-21 15:02:38)
-[INFO mongis.utils.panecell.PaneIconCell setImage] Setting image : javafx.scene.image.Image@1c12f97d  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=switch-context-button, visible=false, enabled=true] to topLeftHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=debug-button, visible=false, enabled=true] to topRightHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=fx-status-bar, visible=false, enabled=true] to bottomLeftHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=debug-button, visible=true, enabled=true] to topRightHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=module-search, visible=false, enabled=true] to topRightHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=favoritePanel, visible=false, enabled=true] to bottomCenterHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=workflowEditor, visible=false, enabled=true] to rightVBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=log-panel, visible=false, enabled=true] to topLeftHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=open-image-button, visible=false, enabled=true] to topLeftHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=explorer-button, visible=false, enabled=true] to topLeftHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=switch-context-button, visible=true, enabled=true] to topLeftHBox  (2016-07-21 15:02:38)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7] Adding  [NodeContextualWidget : name=imagej-menu-bar, visible=false, enabled=true] to topCenterHBox  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget SwitchContextButton  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget DebugButton  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget FxStatusBarWidget  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget DebugButton  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget ModuleSearchField  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] ModuleSearchField had 1 hints loaded  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget FavoritePanel  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget WorkflowEditor  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] WorkflowEditor had 2 hints loaded  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget ToggleButton  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget OpenImageBar  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] OpenImageBar had 1 hints loaded  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget Button  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget SwitchContextButton  (2016-07-21 15:02:38)
-[INFO ijfx.service.ui.DefaultHintService displayHints] Trying to hint widget ImageJMenuBar  (2016-07-21 15:02:38)
-[INFO ijfx.ui.activity.DefaultActivityService getActivity] Loading activity : ijfx.ui.explorer.ExplorerActivity  (2016-07-21 15:02:42)
-[INFO ijfx.ui.activity.DefaultActivityService getActivity] Activity loaded  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService leave] Leaving context imagej  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService enter] Tries to enter : explorerActivity  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context explorerActivity  (2016-07-21 15:02:42)
-[WARNING ijfx.service.uicontext.UiContextService getUIContext] Context doesn't exist : explorerActivity  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context explorerActivity  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService update] Updating...  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService update] Actual context : debug explorerActivity   (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=workflowEditor, visible=true, enabled=true] will be hidden  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=explorer-button, visible=true, enabled=true] will be hidden  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget PaneIconCellPreview[id=Delete all, styleClass=image-icon-item pane-icon-cell] will be hidden  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=module-search, visible=true, enabled=true] will be hidden  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=favoritePanel, visible=true, enabled=true] will be hidden  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] must hide 0 items :   (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] must hide 0 items :   (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2] Must hide module-search  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2] Must hide favoritePanel  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topRightHBox] Start disapearce !  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=fx-status-bar, visible=true, enabled=true] will be hidden  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] must hide 0 items :   (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2] Must hide fx-status-bar  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] must hide 0 items :   (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2] Must hide workflowEditor  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [rightVBox] Start disapearce !  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [bottomCenterHBox] Start disapearce !  (2016-07-21 15:02:42)
-[INFO ijfx.service.uicontext.UiContextService lambda$updateController$7] Widget [NodeContextualWidget : name=imagej-menu-bar, visible=true, enabled=true] will be hidden  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] must hide 0 items :   (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2] Must hide imagej-menu-bar  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topCenterHBox] Start disapearce !  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [bottomLeftHBox] Start disapearce !  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged] must hide 0 items :   (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2] Must hide explorer-button  (2016-07-21 15:02:42)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView log] [topLeftHBox] Start disapearce !  (2016-07-21 15:02:42)
-[INFO ijfx.ui.main.MainWindowController onActivityChanged] Activity changed : 
-	context = org.scijava.Context@51b8bdb3
-	consumed = false  (2016-07-21 15:02:42)
-[INFO mercury.core.MercuryTimer log] [Browser view] Time to fetch controllers : 0ms  (2016-07-21 15:02:43)
-[INFO ijfx.ui.explorer.DefaultFolderManagerService updateExploredElements] Updating current elements  (2016-07-21 15:02:43)
-[INFO ijfx.ui.activity.DefaultActivityService setCurrentActivity] Event published  (2016-07-21 15:02:43)
-[INFO mercury.core.MercuryTimer log] [Browser view] Updating3D all the controllers : 0ms  (2016-07-21 15:02:43)
-[INFO mercury.core.MercuryTimer log] [Browser view] Time to fetch controllers : 0ms  (2016-07-21 15:02:43)
-[INFO ijfx.service.watch_dir.SimpleDirectoryWatchService register] Watching files matching [] under /usr/share/backgrounds for changes.  (2016-07-21 15:02:43)
-[INFO ijfx.service.watch_dir.SimpleDirectoryWatchService register] Watching files matching [] under /run/user/1000/gvfs/smb-share:server=129.206.99.189,share=knoplab_share/Tuan anh/Sec63cherry GFPPho8truncHDEL for changes.  (2016-07-21 15:02:43)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.ui.explorer.DefaultFolder] record fetching : 37ms  (2016-07-21 15:02:43)
-[INFO ijfx.service.DefaultTimer elapsed] [ijfx.ui.explorer.DefaultFolder] record fetching : 12ms  (2016-07-21 15:02:43)
-[INFO mercury.core.MercuryTimer log] [Browser view] Updating3D all the controllers : 0ms  (2016-07-21 15:02:43)
-[INFO ijfx.ui.explorer.DefaultFolderManagerService onFolderUpdated] Folder updated ! backgrounds  (2016-07-21 15:02:43)
-[INFO ijfx.ui.explorer.DefaultFolderManagerService onFolderUpdated] Folder updated ! Sec63cherry GFPPho8truncHDEL  (2016-07-21 15:02:43)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6] Removing  [NodeContextualWidget : name=module-search, visible=true, enabled=true]  (2016-07-21 15:02:43)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6] Removing  [NodeContextualWidget : name=workflowEditor, visible=true, enabled=true]  (2016-07-21 15:02:43)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6] Removing  [NodeContextualWidget : name=favoritePanel, visible=true, enabled=true]  (2016-07-21 15:02:43)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6] Removing  [NodeContextualWidget : name=imagej-menu-bar, visible=true, enabled=true]  (2016-07-21 15:02:43)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6] Removing  [NodeContextualWidget : name=fx-status-bar, visible=true, enabled=true]  (2016-07-21 15:02:43)
-[INFO ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6] Removing  [NodeContextualWidget : name=explorer-button, visible=true, enabled=true]  (2016-07-21 15:02:43)
-[INFO ijfx.service.log.DefaultLoggingService info] Filtering 0 items  (2016-07-21 15:02:43)
-[INFO mercury.core.MercuryTimer log] [Browser view] Time to fetch controllers : 0ms  (2016-07-21 15:02:43)
-[INFO mercury.core.MercuryTimer log] [Browser view] Updating3D all the controllers : 0ms  (2016-07-21 15:02:43)
-[INFO ijfx.ui.explorer.DefaultFolderManagerService setCurrentFolder] Setting current folder backgrounds  (2016-07-21 15:02:46)
-[INFO ijfx.service.uicontext.UiContextService enter] Tries to enter : explore-files  (2016-07-21 15:02:46)
-[INFO ijfx.service.log.DefaultLoggingService info] Filtering 15 items  (2016-07-21 15:02:46)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context explore-files  (2016-07-21 15:02:46)
-[WARNING ijfx.service.uicontext.UiContextService getUIContext] Context doesn't exist : explore-files  (2016-07-21 15:02:46)
-[INFO ijfx.service.uicontext.UiContextService enter] Entering context explore-files  (2016-07-21 15:02:46)
-[INFO ijfx.service.uicontext.UiContextService update] Updating...  (2016-07-21 15:02:46)
-[INFO ijfx.service.uicontext.UiContextService update] Actual context : debug explorerActivity explore-files   (2016-07-21 15:02:46)
-[INFO ijfx.ui.explorer.DefaultFolderManagerService updateExploredElements] Updating current elements  (2016-07-21 15:02:46)
-[INFO ijfx.ui.explorer.DefaultFolderManagerService updateExploredElements] FILE  (2016-07-21 15:02:46)
-[INFO ijfx.ui.explorer.DefaultFolderManagerService setItems] Setting 15 items  (2016-07-21 15:02:46)
-[INFO ijfx.service.log.DefaultLoggingService info] Filtering 15 items  (2016-07-21 15:02:46)
+                Widget loading |    281ms |    540ms |       18
+
+août 05, 2016 4:18:14 PM ijfx.ui.main.MainWindowController finishInitialization
+INFOS: finishing initialization...
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : debug
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context debug
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService getUIContext
+AVERTISSEMENT: Context doesn't exist : debug
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context debug
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService update
+INFOS: Updating...
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService update
+INFOS: Actual context : debug 
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=debug-button, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [topRightHBox] Must show 1 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : debug-button
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=switch-context-button, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [topRightHBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [topLeftHBox] Must show 1 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : switch-context-button
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [topLeftHBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.ui.activity.DefaultActivityService getActivity
+INFOS: Loading activity : ijfx.bridge.ImageJContainer
+août 05, 2016 4:18:14 PM ijfx.ui.activity.DefaultActivityService getActivity
+INFOS: Activity loaded
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : imagej
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context imagej
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context imagej
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService update
+INFOS: Updating...
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService update
+INFOS: Actual context : debug imagej 
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Delete all, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=workflowEditor, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [rightVBox] Must show 1 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : workflowEditor
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [rightVBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=favoritePanel, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [bottomCenterHBox] Must show 1 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : favoritePanel
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [bottomCenterHBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=imagej-menu-bar, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [topCenterHBox] Must show 1 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : imagej-menu-bar
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=log-panel, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=open-image-button, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [topCenterHBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=explorer-button, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=switch-context-button, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=debug-button, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=module-search, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [topRightHBox] Must show 2 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : debug-button
+août 05, 2016 4:18:14 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=fx-status-bar, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [topLeftHBox] Must show 4 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : module-search
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : log-panel
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [bottomLeftHBox] Must show 1 items : 
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [topRightHBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : open-image-button
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : fx-status-bar
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [bottomLeftHBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : explorer-button
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : switch-context-button
+août 05, 2016 4:18:14 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [topLeftHBox] Start disapearce !
+août 05, 2016 4:18:14 PM ijfx.ui.main.MainWindowController onActivityChanged
+INFOS: Activity changed : 
+	context = org.scijava.Context@76a085f6
+	consumed = false
+août 05, 2016 4:18:14 PM ijfx.ui.activity.DefaultActivityService setCurrentActivity
+INFOS: Event published
+août 05, 2016 4:18:14 PM ijfx.ui.main.MainWindowController finishInitialization
+INFOS: Start over
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=debug-button, visible=false, enabled=true] to topRightHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=switch-context-button, visible=false, enabled=true] to topLeftHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=workflowEditor, visible=false, enabled=true] to rightVBox
+août 05, 2016 4:18:15 PM mercury.core.MercuryTimer log
+INFOS: [Browser view] Time to fetch controllers : 300ms
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=favoritePanel, visible=false, enabled=true] to bottomCenterHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=imagej-menu-bar, visible=false, enabled=true] to topCenterHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=debug-button, visible=true, enabled=true] to topRightHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=module-search, visible=false, enabled=true] to topRightHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=fx-status-bar, visible=false, enabled=true] to bottomLeftHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=log-panel, visible=false, enabled=true] to topLeftHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=open-image-button, visible=false, enabled=true] to topLeftHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=explorer-button, visible=false, enabled=true] to topLeftHBox
+août 05, 2016 4:18:15 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=switch-context-button, visible=true, enabled=true] to topLeftHBox
+août 05, 2016 4:18:15 PM mercury.core.MercuryTimer log
+INFOS: [Browser view] Time to fetch controllers : 335ms
+août 05, 2016 4:18:15 PM mercury.core.MercuryTimer log
+INFOS: [Browser view] Adding all the controllers : 6ms
+août 05, 2016 4:18:15 PM mercury.core.MercuryTimer log
+INFOS: [Browser view] Updating all the controllers : 17ms
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget DebugButton
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget SwitchContextButton
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget WorkflowEditor
+août 05, 2016 4:18:15 PM ijfx.service.thumb.ThumbService getThumb
+INFOS: Thumb already exists. Returning /home/pierre/.imagejfx/thumbs/4f5a5801-1448-3abd-a6ae-07ead7c29e93.png
+août 05, 2016 4:18:15 PM ijfx.service.thumb.ThumbService getThumb
+INFOS: Thumb already exists. Returning /home/pierre/.imagejfx/thumbs/96934257-99a4-3d7b-9abf-8b599fa0d0be.png
+août 05, 2016 4:18:15 PM ijfx.service.thumb.ThumbService getThumb
+INFOS: Reading /home/pierre/Images/03999-DNA.ovl.json
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: WorkflowEditor had 2 hints loaded
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget FavoritePanel
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget ImageJMenuBar
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget DebugButton
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget ModuleSearchField
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: ModuleSearchField had 1 hints loaded
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget FxStatusBarWidget
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget ToggleButton
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget OpenImageBar
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: OpenImageBar had 1 hints loaded
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget Button
+août 05, 2016 4:18:15 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget SwitchContextButton
+août 05, 2016 4:18:15 PM mongis.utils.panecell.PaneIconCell setImage
+INFOS: Setting image : javafx.scene.image.Image@182022a6
+août 05, 2016 4:18:15 PM mongis.utils.panecell.PaneIconCell setImage
+INFOS: Setting image : javafx.scene.image.Image@16984b0c
+août 05, 2016 4:18:16 PM ijfx.service.thumb.ThumbService getThumb
+AVERTISSEMENT: SCIFIO Reader doesn't work with 03999-DNA.ovl.json
+août 05, 2016 4:18:17 PM ijfx.service.log.DefaultLoggingService warn
+AVERTISSEMENT: Couldn't load file /home/pierre/Images/03999-DNA.ovl.json
+java.io.IOException: io.scif.FormatException: loci.formats.UnknownFormatException: Unknown file format: /home/pierre/Images/03999-DNA.ovl.json
+	at io.scif.AbstractReader.setSource(AbstractReader.java:274)
+	at io.scif.AbstractReader.setSource(AbstractReader.java:239)
+	at ijfx.service.thumb.ThumbService.getThumb(ThumbService.java:166)
+	at ijfx.ui.plugin.panel.RecentFilePanel$FileExplorableWrapper.getImage(RecentFilePanel.java:139)
+	at ijfx.ui.plugin.panel.RecentFilePanel$FileIconCell.lambda$new$0(RecentFilePanel.java:163)
+	at mongis.utils.CallbackTask.call(CallbackTask.java:161)
+	at javafx.concurrent.Task$TaskCallable.call(Task.java:1423)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: io.scif.FormatException: loci.formats.UnknownFormatException: Unknown file format: /home/pierre/Images/03999-DNA.ovl.json
+	at io.scif.bf.BioFormatsFormat$Parser.typedParse(BioFormatsFormat.java:429)
+	at io.scif.bf.BioFormatsFormat$Parser.typedParse(BioFormatsFormat.java:406)
+	at io.scif.AbstractParser.parse(AbstractParser.java:253)
+	at io.scif.AbstractParser.parse(AbstractParser.java:336)
+	at io.scif.AbstractParser.parse(AbstractParser.java:52)
+	at io.scif.AbstractReader.setSource(AbstractReader.java:270)
+	... 10 more
+Caused by: loci.formats.UnknownFormatException: Unknown file format: /home/pierre/Images/03999-DNA.ovl.json
+	at loci.formats.ImageReader.getReader(ImageReader.java:190)
+	at loci.formats.ImageReader.setId(ImageReader.java:832)
+	at io.scif.bf.BioFormatsFormat$Parser.typedParse(BioFormatsFormat.java:424)
+	... 15 more
+
+août 05, 2016 4:18:17 PM mongis.utils.panecell.PaneIconCell setImage
+INFOS: Setting image : null
+août 05, 2016 4:18:41 PM ijfx.bridge.FxModuleSaver process
+LE PLUS PRÉCIS: ###### OpenFile #####
+inputFile = /home/pierre/Documents/for_Pierre/Image225.tif
+août 05, 2016 4:18:41 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Preprocessing : OpenFile
+août 05, 2016 4:18:41 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: org.scijava.plugins.commands.io.OpenFile
+août 05, 2016 4:18:41 PM ijfx.bridge.FxUIPreprocessor process
+GRAVE: null
+java.lang.RuntimeException: ControlsFX Error: ControlsFX 8.40.10 requires at least Java Version 8 Update 40
+	at impl.org.controlsfx.version.VersionChecker.doVersionCheck(VersionChecker.java:96)
+	at org.controlsfx.control.ControlsFXControl.<init>(ControlsFXControl.java:35)
+	at org.controlsfx.control.RangeSlider.<init>(RangeSlider.java:175)
+	at org.controlsfx.control.RangeSlider.<init>(RangeSlider.java:163)
+	at ijfx.ui.module.skin.AbstractIntervalInputSkin.<init>(AbstractIntervalInputSkin.java:47)
+	at ijfx.ui.module.skin.IntervalInputSkin.<init>(IntervalInputSkin.java:32)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at java.lang.Class.newInstance(Class.java:442)
+	at org.scijava.plugin.PluginInfo.createInstance(PluginInfo.java:304)
+	at ijfx.ui.module.DefaultInputSkinService.lambda$getSkins$0(DefaultInputSkinService.java:80)
+	at java.util.ArrayList.forEach(ArrayList.java:1249)
+	at ijfx.ui.module.DefaultInputSkinService.getSkins(DefaultInputSkinService.java:76)
+	at ijfx.ui.module.DefaultInputSkinService.canCreateSkinFor(DefaultInputSkinService.java:124)
+	at ijfx.ui.module.DefaultInputSkinService.lambda$getHandledInputs$3(DefaultInputSkinService.java:137)
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:174)
+	at java.util.HashMap$KeySpliterator.forEachRemaining(HashMap.java:1548)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:481)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:471)
+	at java.util.stream.ReduceOps$ReduceTask.doLeaf(ReduceOps.java:747)
+	at java.util.stream.ReduceOps$ReduceTask.doLeaf(ReduceOps.java:721)
+	at java.util.stream.AbstractTask.compute(AbstractTask.java:316)
+	at java.util.concurrent.CountedCompleter.exec(CountedCompleter.java:731)
+	at java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:289)
+	at java.util.concurrent.ForkJoinTask.doInvoke(ForkJoinTask.java:401)
+	at java.util.concurrent.ForkJoinTask.invoke(ForkJoinTask.java:734)
+	at java.util.stream.ReduceOps$ReduceOp.evaluateParallel(ReduceOps.java:714)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:233)
+	at java.util.stream.LongPipeline.reduce(LongPipeline.java:438)
+	at java.util.stream.LongPipeline.sum(LongPipeline.java:396)
+	at java.util.stream.ReferencePipeline.count(ReferencePipeline.java:526)
+	at ijfx.ui.module.DefaultInputSkinService.getHandledInputs(DefaultInputSkinService.java:148)
+	at ijfx.bridge.FxUIPreprocessor.process(FxUIPreprocessor.java:87)
+	at org.scijava.module.ModuleRunner.preProcess(ModuleRunner.java:104)
+	at org.scijava.module.ModuleRunner.run(ModuleRunner.java:156)
+	at org.scijava.module.ModuleRunner.call(ModuleRunner.java:126)
+	at org.scijava.module.ModuleRunner.call(ModuleRunner.java:65)
+	at org.scijava.thread.DefaultThreadService$2.call(DefaultThreadService.java:191)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+
+août 05, 2016 4:18:41 PM ijfx.service.workflow.WorkflowRecorderPreprocessor lambda$process$0
+PRÉCIS: inputFile = /home/pierre/Documents/for_Pierre/Image225.tif
+août 05, 2016 4:18:44 PM ijfx.bridge.FxUserInterfaceBridge show
+INFOS: Showing display
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context image-open
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context image-open
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context multi-z-img
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context multi-z-img
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService getUIContext
+AVERTISSEMENT: Context doesn't exist : 16-bits
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:44 PM ijfx.service.uicontext.UiContextService update
+INFOS: Updating...
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService update
+INFOS: Actual context : debug imagej image-open multi-z-img 
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Geometric Mean, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Multiply, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Harmonic Mean, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Alpha Trimmed Mean, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Gaussian, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Divide, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Merge to RGB, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Subtract, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Auto contrast, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Add, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=imagej-toolbar, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [leftVBox] Must show 1 items : 
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : imagej-toolbar
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [leftVBox] Start disapearce !
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=imagej-top-toolbar, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Translate Image, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [topToolBarVBox] Must show 1 items : 
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Rotate Image, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Rotate 90 degrees Left, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Rotate 90 degrees Right, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Image, styleClass=label]'Image' added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Duplicate Image, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Crop Image, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Threshold, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Noises, styleClass=label]'Noises' added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Binary, styleClass=label]'Binary' added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Resize Image, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : imagej-top-toolbar
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [topToolBarVBox] Start disapearce !
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Salt and Pepper, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Add noise..., styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Binarize, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Convert to Hyperstack..., styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Merge stacks into a multi-channel, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Hyperstack to Stack..., styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Delete Slices, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Stacks, styleClass=label]'Stacks' added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Reorder Data, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Filters, styleClass=label]'Filters' added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget PaneIconCellPreview[id=Extract slices, styleClass=image-icon-item pane-icon-cell] added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Colors, styleClass=label]'Colors' added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Math, styleClass=label]'Math' added to the toShow list.
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Adding slider 0,0 65535,0 
+août 05, 2016 4:18:45 PM ijfx.ui.arcmenu.ArcMenu addSlider
+INFOS: Adding slider
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Refreshing source image Image225.tif
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getScreenImage : 1ms
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getWrittableImage : 4ms
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] write to buffer : 14ms
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: FontEndTaskSubmitted
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: MenusAddedEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulesAddedEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: UiContextUpdatedEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataView updated
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewUpdatedEvent
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] canvas.repaint : 58ms
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateInfoLabel : 1ms
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateOverlays : 1ms
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleStartedEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayUpdatedEvent
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=imagej-toolbar, visible=false, enabled=true] to leftVBox
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleFinishedEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:45 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: 1 events that require image refresh
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Refreshing source image Image225.tif
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getScreenImage : 55ms
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getWrittableImage : 1ms
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.bridge.FxModuleSaver process
+LE PLUS PRÉCIS: ###### AutoContrast #####
+imageDisplay = plugin:class net.imagej.display.DefaultImageDisplay: type=interface net.imagej.display.DataView, name=Image225.tif, objects={net.imagej.display.DefaultDatasetView@6f92fc4d}channelDependant = true
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Preprocessing : AutoContrast
+août 05, 2016 4:18:45 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: ijfx.plugins.commands.AutoContrast
+août 05, 2016 4:18:45 PM ijfx.ui.module.DefaultInputSkinService lambda$getHandledInputs$3
+INFOS: [AutoContrast] imageDisplay : is resolved (true) / can create (true) / isRequired (true) / isNull (false) == Final Decision ==> false
+août 05, 2016 4:18:45 PM ijfx.ui.module.DefaultInputSkinService lambda$getHandledInputs$3
+INFOS: [AutoContrast] channelDependant : is resolved (true) / can create (true) / isRequired (true) / isNull (false) == Final Decision ==> false
+août 05, 2016 4:18:45 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Input handled by the UI : 0
+août 05, 2016 4:18:45 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Coulnd't produce interface for ijfx.plugins.commands.AutoContrast
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] write to buffer : 33ms
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=imagej-top-toolbar, visible=false, enabled=true] to topToolBarVBox
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] canvas.repaint : 113ms
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateInfoLabel : 0ms
+août 05, 2016 4:18:45 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateOverlays : 1ms
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget ImageJToolBar
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.workflow.WorkflowRecorderPreprocessor lambda$process$0
+PRÉCIS: imageDisplay = plugin:class net.imagej.display.DefaultImageDisplay: type=interface net.imagej.display.DataView, name=Image225.tif, objects={net.imagej.display.DefaultDatasetView@6f92fc4d}
+août 05, 2016 4:18:45 PM ijfx.service.workflow.WorkflowRecorderPreprocessor lambda$process$0
+PRÉCIS: channelDependant = true
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:18:45 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutingEvent
+août 05, 2016 4:18:45 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget PreviewToolBar
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataView updated
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewUpdatedEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutedEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataView updated
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewUpdatedEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayUpdatedEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleFinishedEvent
+août 05, 2016 4:18:46 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:46 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:18:46 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:46 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:46 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:46 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: 2 events that require image refresh
+août 05, 2016 4:18:46 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Refreshing source image Image225.tif
+août 05, 2016 4:18:46 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getScreenImage : 1039ms
+août 05, 2016 4:18:46 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getWrittableImage : 1ms
+août 05, 2016 4:18:46 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] write to buffer : 11ms
+août 05, 2016 4:18:46 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] canvas.repaint : 4ms
+août 05, 2016 4:18:46 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateInfoLabel : 1ms
+août 05, 2016 4:18:46 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateOverlays : 0ms
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:51 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:52 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:52 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:52 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 0, treating 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: This image contains 0 overlays
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: 0 overlay touched
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:53 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:53 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:55 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ToolChangeEvent
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:57 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:57 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:18:57 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: OverlayRestructuredEvent
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: This image contains 0 overlays
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: 0 overlay touched
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ObjectsAddedEvent
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Overlay created
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: OverlayCreatedEvent
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: LUTsChangedEvent
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewSelectedEvent
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Overlay selected event
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Channeling event
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: OverlaySelectedEvent
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Mapping event to overlay
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Mapping event to overlay
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Received 2, treating 1 overlays
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService warn
+AVERTISSEMENT: No modifier was found for this overlay PolygonOverlay
+août 05, 2016 4:19:02 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateOverlay : 16238ms
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : overlay-selected
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context overlay-selected
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService getUIContext
+AVERTISSEMENT: Context doesn't exist : overlay-selected
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context overlay-selected
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService update
+INFOS: Updating...
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService update
+INFOS: Actual context : debug imagej image-open multi-z-img overlay-selected 
+août 05, 2016 4:19:02 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel] Getting the stats : 67ms
+août 05, 2016 4:19:02 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel] Building the sumup : 6ms
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=overlayPanel, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=workflowEditor, visible=true, enabled=true] will be hidden
+août 05, 2016 4:19:02 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [rightVBox] Must show 1 items : 
+août 05, 2016 4:19:02 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : overlayPanel
+août 05, 2016 4:19:02 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: must hide 1 items : 
+août 05, 2016 4:19:02 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2
+INFOS: Must hide workflowEditor
+août 05, 2016 4:19:02 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [rightVBox] Start disapearce !
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: UiContextUpdatedEvent
+août 05, 2016 4:19:02 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel] Sort and distrubution repartition up : 136ms
+août 05, 2016 4:19:02 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayUpdatedEvent
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : overlay-selected
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : multi-z-img
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:19:02 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel] Creating charts : 21ms
+août 05, 2016 4:19:02 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel] Area Chart rendering : 8ms
+août 05, 2016 4:19:02 PM ijfx.service.DefaultTimer logAll
+INFOS: [ijfx.ui.plugin.panel.OverlayPanel]
++--------------
+                        Action |     Mean | Std. Dev |        N
++--------------
+             Getting the stats |     67ms |      0ms |        1
+            Building the sumup |      6ms |      0ms |        1
+         Sort and distrubution |    136ms |      0ms |        1
+          Area Chart rendering |      8ms |      0ms |        1
+               Creating charts |     21ms |      0ms |        1
+
+août 05, 2016 4:19:03 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6
+INFOS: Removing  [NodeContextualWidget : name=workflowEditor, visible=true, enabled=true]
+août 05, 2016 4:19:03 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=overlayPanel, visible=false, enabled=true] to rightVBox
+août 05, 2016 4:19:03 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget OverlayPanel
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleStartedEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.bridge.FxModuleSaver process
+LE PLUS PRÉCIS: ###### SegmentationTester #####
+
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Preprocessing : SegmentationTester
+août 05, 2016 4:19:11 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: ijfx.plugins.segmentation.SegmentationTester
+août 05, 2016 4:19:11 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Input handled by the UI : 0
+août 05, 2016 4:19:11 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Coulnd't produce interface for ijfx.plugins.segmentation.SegmentationTester
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutingEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutedEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleFinishedEvent
+août 05, 2016 4:19:11 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ObjectsAddedEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DatasetCreatedEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:21 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: LUTsChangedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ObjectsAddedEvent
+août 05, 2016 4:19:22 PM ijfx.bridge.FxUserInterfaceBridge show
+INFOS: Showing display
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayActivatedEvent
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context overlay-selected
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context multi-z-img
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService update
+INFOS: Updating...
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService update
+INFOS: Actual context : debug imagej image-open 
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=overlayPanel, visible=true, enabled=true] will be hidden
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget LabelCategory[id=Stacks, styleClass=label]'Stacks' will be hidden
+août 05, 2016 4:19:22 PM ijfx.service.uicontext.UiContextService lambda$updateController$7
+INFOS: Widget [NodeContextualWidget : name=workflowEditor, visible=false, enabled=true] added to the toShow list.
+août 05, 2016 4:19:22 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: [rightVBox] Must show 1 items : 
+août 05, 2016 4:19:22 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$1
+INFOS: Must show : workflowEditor
+août 05, 2016 4:19:22 PM ijfx.ui.context.animated.AnimatedPaneContextualView onContextChanged
+INFOS: must hide 1 items : 
+août 05, 2016 4:19:22 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$onContextChanged$2
+INFOS: Must hide overlayPanel
+août 05, 2016 4:19:22 PM ijfx.ui.context.animated.AnimatedPaneContextualView log
+INFOS: [rightVBox] Start disapearce !
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Adding slider 0,0 1,0 
+août 05, 2016 4:19:22 PM ijfx.ui.arcmenu.ArcMenu addSlider
+INFOS: Adding slider
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: FontEndTaskSubmitted
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: FontEndTaskSubmitted
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Refreshing source image Image225.tif-1
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: MenusAddedEvent
+août 05, 2016 4:19:22 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getScreenImage : 20192ms
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: MenusAddedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulesAddedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulesAddedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayCreatedEvent
+août 05, 2016 4:19:22 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getWrittableImage : 1ms
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleStartedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleStartedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: UiContextUpdatedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: UiContextUpdatedEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:22 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] write to buffer : 31ms
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.bridge.FxModuleSaver process
+LE PLUS PRÉCIS: ###### AutoContrast #####
+imageDisplay = plugin:class net.imagej.display.DefaultImageDisplay: type=interface net.imagej.display.DataView, name=Image225.tif-1, objects={net.imagej.display.DefaultDatasetView@be52154}channelDependant = true
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Preprocessing : AutoContrast
+août 05, 2016 4:19:23 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: ijfx.plugins.commands.AutoContrast
+août 05, 2016 4:19:23 PM ijfx.ui.module.DefaultInputSkinService lambda$getHandledInputs$3
+INFOS: [AutoContrast] imageDisplay : is resolved (true) / can create (true) / isRequired (true) / isNull (false) == Final Decision ==> false
+août 05, 2016 4:19:23 PM ijfx.ui.module.DefaultInputSkinService lambda$getHandledInputs$3
+INFOS: [AutoContrast] channelDependant : is resolved (true) / can create (true) / isRequired (true) / isNull (false) == Final Decision ==> false
+août 05, 2016 4:19:23 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Input handled by the UI : 0
+août 05, 2016 4:19:23 PM ijfx.bridge.FxUIPreprocessor process
+INFOS: Coulnd't produce interface for ijfx.plugins.commands.AutoContrast
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.workflow.WorkflowRecorderPreprocessor lambda$process$0
+PRÉCIS: imageDisplay = plugin:class net.imagej.display.DefaultImageDisplay: type=interface net.imagej.display.DataView, name=Image225.tif-1, objects={net.imagej.display.DefaultDatasetView@be52154}
+août 05, 2016 4:19:23 PM ijfx.service.workflow.WorkflowRecorderPreprocessor lambda$process$0
+PRÉCIS: channelDependant = true
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePreprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutingEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutingEvent
+août 05, 2016 4:19:23 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] canvas.repaint : 326ms
+août 05, 2016 4:19:23 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateInfoLabel : 0ms
+août 05, 2016 4:19:23 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateOverlays : 1ms
+août 05, 2016 4:19:23 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$6
+INFOS: Removing  [NodeContextualWidget : name=overlayPanel, visible=true, enabled=true]
+août 05, 2016 4:19:23 PM ijfx.ui.context.animated.AnimatedPaneContextualView lambda$updateContainer$7
+INFOS: Adding  [NodeContextualWidget : name=workflowEditor, visible=false, enabled=true] to rightVBox
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataView updated
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataView updated
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewUpdatedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewUpdatedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleExecutedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataView updated
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataView updated
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewUpdatedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DataViewUpdatedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayUpdatedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: DisplayUpdatedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModulePostprocessEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleFinishedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: ModuleFinishedEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: StatusEvent
+août 05, 2016 4:19:23 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : image-open
+août 05, 2016 4:19:23 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Tries to enter : 16-bits
+août 05, 2016 4:19:23 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:23 PM ijfx.service.uicontext.UiContextService enter
+INFOS: Entering context 16-bits
+août 05, 2016 4:19:23 PM ijfx.service.uicontext.UiContextService leave
+INFOS: Leaving context 16-bits
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: 2 events that require image refresh
+août 05, 2016 4:19:23 PM ijfx.service.log.DefaultLoggingService info
+INFOS: Refreshing source image Image225.tif-1
+août 05, 2016 4:19:23 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getScreenImage : 461ms
+août 05, 2016 4:19:23 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] getWrittableImage : 0ms
+août 05, 2016 4:19:23 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] write to buffer : 25ms
+août 05, 2016 4:19:24 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] canvas.repaint : 387ms
+août 05, 2016 4:19:24 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateInfoLabel : 1ms
+août 05, 2016 4:19:24 PM ijfx.service.DefaultTimer elapsed
+INFOS: [ijfx.ui.datadisplay.image.ImageDisplayPane] updateOverlays : 1ms
+août 05, 2016 4:19:24 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: Trying to hint widget WorkflowEditor
+août 05, 2016 4:19:24 PM ijfx.service.ui.DefaultHintService displayHints
+INFOS: WorkflowEditor had 2 hints loaded
+août 05, 2016 4:19:24 PM ijfx.service.log.DefaultLoggingService info
+INFOS: HintRequestEvent
+août 05, 2016 4:19:24 PM ijfx.service.log.DefaultLoggingService info
+INFOS: HintRequestEvent
