@@ -57,8 +57,8 @@ public class CorrectionActivity implements Activity {
             staticContext = context;
         }
         if (flow == null) {
-            flow = new Flow(WelcomeWorkflow.class)
-                    .withLink(WelcomeWorkflow.class, "nextAction", FlatfieldWorkflow.class)
+            flow = new Flow(FolderWorkflow.class)
+                    .withLink(FolderWorkflow.class, "nextAction", FlatfieldWorkflow.class)
                     .withLink(FlatfieldWorkflow.class, "nextAction", BUnwarpJWorkflow.class)
                     .withLink(BUnwarpJWorkflow.class, "nextAction", ProcessWorkflow.class)
                     .withLink(ProcessWorkflow.class, "nextAction", EndWorkflow.class)

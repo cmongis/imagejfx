@@ -57,7 +57,6 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
 
     @Parameter
     ImageDisplayService imageDisplayService;
-    
 
     @Override
     public SummaryStatistics getSummaryStatistics(Dataset dataset) {
@@ -93,19 +92,36 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
         DescriptiveStatistics summary = new DescriptiveStatistics();
         Cursor<RealType<?>> cursor = dataset.cursor();
         cursor.reset();
-        
+
         while (cursor.hasNext()) {
             cursor.fwd();
             double value = cursor.get().getRealDouble();
             summary.addValue(value);
-           
+
         }
         return summary;
     }
 
-   
+    @Override
+    public DescriptiveStatistics getPlaneDescriptiveStatistics(Dataset dataset, long[] position) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
 
+        double width = dataset.max(0) + 1;
+        double height = dataset.max(1) + 1;
 
+        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
+        randomAccess.setPosition(position);
+        for (int x = 0; x < width; x++) {
+            randomAccess.setPosition(x, 0);
+            for (int y = 0; y < height; y++) {
+                randomAccess.setPosition(y, 1);
+                stats.addValue(randomAccess.get().getRealDouble());
+            }
+        }
+        return stats;
+    }
+
+    
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition) {
         SummaryStatistics stats = new SummaryStatistics();
         if (dataset.dimensionIndex(Axes.CHANNEL) == -1) {
@@ -119,10 +135,7 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
             SamplingDefinition def = new SamplingDefinition(dataset);
 
             def.constrain(Axes.CHANNEL, new AxisSubrange(channelPosition));
-            
-            
-            
-            
+
             PositionIterator itr = new SparsePositionIterator(def);
 
             RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
@@ -138,12 +151,13 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     public <T extends RealType<T>> SummaryStatistics getSummaryStatistics(Cursor<T> cursor) {
         SummaryStatistics stats = new SummaryStatistics();
         cursor.reset();
-        while(cursor.hasNext()) {
+        while (cursor.hasNext()) {
             cursor.fwd();
             stats.addValue(cursor.get().getRealDouble());
         }
         return stats;
-        
+
     }
 
+    
 }

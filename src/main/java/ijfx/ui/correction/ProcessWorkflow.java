@@ -23,13 +23,18 @@ import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
+import ijfx.ui.main.ImageJFX;
 import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -60,11 +65,13 @@ public class ProcessWorkflow extends CorrectionFlow {
 
     @Parameter
     ImageDisplayService imageDisplayService;
+    
     @Parameter
     DatasetUtillsService datasetUtillsService;
 
     @Parameter
     LoadingScreenService loadingScreenService;
+    
     @Parameter
     Context context;
 
@@ -72,7 +79,7 @@ public class ProcessWorkflow extends CorrectionFlow {
     IOService iOService;
 
     @FXML
-    ListView<String> listView;
+    ListView<String> listViewItems;
 
     @FXML
     Button processButton;
@@ -86,6 +93,8 @@ public class ProcessWorkflow extends CorrectionFlow {
     ImageDisplayPane imageDisplayPaneLeft;
 
     ImageDisplayPane imageDisplayPaneRight;
+    
+    ExecutorService executor = ImageJFX.getThreadPool();
 
     public ProcessWorkflow() {
         CorrectionActivity.getStaticContext().inject(this);
@@ -117,28 +126,45 @@ public class ProcessWorkflow extends CorrectionFlow {
      */
     public void process() {
         List<File> files = workflowModel.getFiles();
-        listView.getItems().clear();
+        listViewItems.getItems().clear();
         workflowModel.getMapImages().clear();
+        long startTime = System.currentTimeMillis();
         files.parallelStream().forEach((File file) -> {
-            new CallbackTask<Void, Void>().run(() -> {
+            CallbackTask<Void, Void> start = new CallbackTask<Void, Void>().run(() -> {
                 try {
                     Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
                     ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
+                    
+                    //Set position, get dataset and apply flatField correction
                     workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplay);
                     Dataset targetDataset = imageDisplayService.getActiveDataset(imageDisplay);
+                    targetDataset =  workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldRight());
+//                    Future<Dataset> futureTarget = executor.submit(() ->  workflowModel.applyFlatField(targetDataset, workflowModel.getFlatfieldRight()));
+//                    
+//                    Dataset targetDatasetCorrected = futureTarget.get();
                     workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplay);
                     Dataset sourceDataset = imageDisplayService.getActiveDataset(imageDisplay);
+                    sourceDataset = workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldLeft());
+//                    Future<Dataset> futureSource = executor.submit(() -> workflowModel.applyFlatField(sourceDataset, workflowModel.getFlatfieldLeft()));
+//                    Dataset sourceDatasetCorrected = futureSource.get();
+                    
                     Dataset outputDataset = workflowModel.getTransformedImage(sourceDataset, targetDataset);
 
-                    String key = file.getAbsolutePath();
-                    workflowModel.getMapImages().put(key, outputDataset);
-                    listView.getItems().add(key);
-                } catch (IOException ex) {
+                    
+                    workflowModel.getMapImages().put(file.getAbsolutePath(), outputDataset);
+                    
+//                    listViewItems.getItems().add(key);
+                } catch (Exception ex) {
                     Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
                 }
             })
                     .submit(loadingScreenService)
+                    .thenRunnable(() -> listViewItems.getItems().add(file.getAbsolutePath()))
                     .start();
+                    start.setOnSucceeded(e -> {
+                        long time = System.currentTimeMillis() - startTime;
+                        System.out.println("ijfx.ui.correction.ProcessWorkflow.process() "+ time);
+                            });
 
         });
 
@@ -148,8 +174,8 @@ public class ProcessWorkflow extends CorrectionFlow {
      * Add the items and set the listener on change
      */
     public void bindListView() {
-        listView.getItems().addAll(workflowModel.getMapImages().keySet());
-        listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+        listViewItems.getItems().addAll(workflowModel.getMapImages().keySet());
+        listViewItems.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             createSampleImage(newValue).start();
         });
 
@@ -181,7 +207,7 @@ public class ProcessWorkflow extends CorrectionFlow {
 
             try {
                 Dataset datasetTarget = workflowModel.getMapImages().get(newValue);
-                ImageDisplay imageDisplayTarget = new DefaultImageDisplay();
+                ImageDisplay imageDisplayTarget = new SilentImageDisplay();
                 context.inject(imageDisplayTarget);
                 imageDisplayTarget.display(datasetTarget);
                 selectPosition(imageDisplayTarget, workflowModel.getPositionLeft(), workflowModel.getPositionRight(), imageDisplayPaneRight);

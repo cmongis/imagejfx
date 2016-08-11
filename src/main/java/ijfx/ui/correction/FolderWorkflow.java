@@ -49,8 +49,8 @@ import org.scijava.plugin.Parameter;
  *
  * @author Tuan anh TRINH
  */
-@ViewController(value = "WelcomeWorkflow.fxml")
-public class WelcomeWorkflow extends CorrectionFlow {
+@ViewController(value = "FolderWorkflow.fxml")
+public class FolderWorkflow extends CorrectionFlow {
 
     @Inject
     WorkflowModel workflowModel;
@@ -82,14 +82,14 @@ public class WelcomeWorkflow extends CorrectionFlow {
 
     ObjectProperty<int[]> positionRightProperty = new SimpleObjectProperty<>();
 
-    public WelcomeWorkflow() {
+    public FolderWorkflow() {
         try {
             CorrectionActivity.getStaticContext().inject(this);
             imageDisplayPaneLeft = new ImageDisplayPane(context);
             imageDisplayPaneRight = new ImageDisplayPane(context);
 
         } catch (IOException ex) {
-            Logger.getLogger(WelcomeWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FolderWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

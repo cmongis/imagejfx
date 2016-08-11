@@ -22,6 +22,7 @@ package ijfx.ui.correction;
 import ij.process.ImageProcessor;
 import ijfx.plugins.bunwarpJ.bUnwarpJ_;
 import ijfx.plugins.commands.AutoContrast;
+import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
@@ -230,6 +231,7 @@ public class WorkflowModel {
 
     /**
      * Load a table and diplay it in the TableDisplay
+     *
      * @param header
      * @param fileLabel
      * @param file
@@ -266,13 +268,14 @@ public class WorkflowModel {
         return tableDisplay;
     }
 
-
     /**
-     * Open an image in an other thread. And display the image in the different ImageDisplayPane
+     * Open an image in an other thread. And display the image in the different
+     * ImageDisplayPane
+     *
      * @param imageDisplayPane1
      * @param imageDisplayPane2
      * @param file
-     * @return 
+     * @return
      */
     public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane1, ImageDisplayPane imageDisplayPane2, File file) {
 
@@ -359,9 +362,10 @@ public class WorkflowModel {
 
     /**
      * Call the bUnwarpJ_ Command
+     *
      * @param sourceDataset
      * @param targetDataset
-     * @return 
+     * @return
      */
     public Dataset getTransformedImage(Dataset sourceDataset, Dataset targetDataset) {
         Map<String, Object> map = new HashMap<>();
@@ -388,12 +392,24 @@ public class WorkflowModel {
         return outputDataset;
     }
 
+    public Dataset applyFlatField(ImageDisplay inputImageDisplay, ImageDisplay flatFieldImageDisplay) {
+        if (flatFieldImageDisplay == null) {
+            return imageDisplayService.getActiveDataset(inputImageDisplay);
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("flatFieldImageDisplay", flatFieldImageDisplay);
+        map.put("inputImageDisplay", inputImageDisplay);
+        Module module = executeCommand(FlatFieldCorrection.class, map).orElseThrow(NullPointerException::new);
+        Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
+        return outputDataset;
+    }
+
     /**
-     * 
+     *
      * @param <C>
      * @param type
      * @param parameters
-     * @return 
+     * @return
      */
     public <C extends Command> Optional<Module> executeCommand(Class<C> type, Map<String, Object> parameters) {
         Module module = moduleService.createModule(commandService.getCommand(type));
@@ -413,16 +429,18 @@ public class WorkflowModel {
         return Optional.of(module);
     }
 
-    public void bindWelcome(WelcomeWorkflow welcomeWorkflow) {
+    public void bindWelcome(FolderWorkflow welcomeWorkflow) {
         welcomeWorkflow.listProperty.bindBidirectional(listProperty);
         welcomeWorkflow.positionLeftProperty.bindBidirectional(positionLeftProperty);
         welcomeWorkflow.positionRightProperty.bindBidirectional(positionRightProperty);
     }
 
     /**
-     * Concatenate the different Dataset and display them in the ImageDisplayPane
+     * Concatenate the different Dataset and display them in the
+     * ImageDisplayPane
+     *
      * @param datasets
-     * @param imageDisplayPane 
+     * @param imageDisplayPane
      */
     public void extractAndMerge(Dataset[] datasets, ImageDisplayPane imageDisplayPane) {
         new CallbackTask<Void, Void>().run(() -> {
@@ -467,5 +485,13 @@ public class WorkflowModel {
 
     public List<File> getFiles() {
         return listProperty.get();
+    }
+
+    public ImageDisplay getFlatfieldLeft() {
+        return flatFieldImageDisplayProperty1.get().getImageDisplay();
+    }
+
+    public ImageDisplay getFlatfieldRight() {
+        return flatFieldImageDisplayProperty2.get().getImageDisplay();
     }
 }

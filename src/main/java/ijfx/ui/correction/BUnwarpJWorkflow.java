@@ -31,9 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,18 +38,16 @@ import java.util.stream.IntStream;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.util.Callback;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.Dataset;
@@ -63,13 +58,10 @@ import net.imagej.display.OverlayService;
 import net.imagej.display.event.DataViewEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import org.scijava.Context;
-import org.scijava.command.Command;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
 import org.scijava.event.EventHandler;
 import org.scijava.io.IOService;
-import org.scijava.module.MethodCallException;
-import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 
@@ -126,6 +118,8 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
 
     public final static String[] HEADER = {"Index", "xSource", "ySource", "xTarget", "yTarget"};
 
+    @FXML
+    Tab landmarksTab, deformationTab, weightTab, outputTab, imagesTab;
     @FXML
     TableDisplayView tableDisplayView;
 
