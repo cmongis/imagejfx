@@ -19,6 +19,7 @@
  */
 package ijfx.plugins.segmentation.neural_network;
 
+import javafx.scene.Node;
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.BackpropType;
@@ -128,5 +129,10 @@ public class LSTM implements INN{
     @Override
     public INDArray output(DataSetIterator iter) {
         return net.output(iter);
+    }
+
+    @Override
+    public Node getNode() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -19,6 +19,7 @@
  */
 package ijfx.plugins.segmentation.neural_network;
 
+import javafx.scene.Node;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -73,6 +74,11 @@ public class BLSTM implements INN{
 
     @Override
     public INDArray output(DataSetIterator iter) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Node getNode() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

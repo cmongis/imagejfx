@@ -19,6 +19,7 @@
  */
 package ijfx.plugins.segmentation.neural_network;
 
+import javafx.scene.Node;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -36,6 +37,7 @@ public interface INN {
     public void train(DataSet ds);
     public INDArray output(INDArray input);
     public INDArray output(DataSetIterator iter);
+    public Node getNode();
     public void predict();
     public void save();
     public void load();
