@@ -174,8 +174,6 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
 
     @Override
     public Dataset divideActivePlaneByValue(Dataset dataset,long[] position, double value) {
-//        long[] position = new long[dataset.numDimensions()];
-//        this.getImageDisplay(dataset).localize(position);
         double width = dataset.max(0) + 1;
         double height = dataset.max(1) + 1;
 
@@ -186,10 +184,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
             for (int y = 0; y < height; y++) {
                 randomAccess.setPosition(y, 1);
                 Double d = (Double)randomAccess.get().getRealDouble() / value;
-//                System.out.println(d);
-//randomAccess.get().div(randomAccess.get().createVariable());
                 randomAccess.get().setReal(d);
-//                randomAccess.get().set
             }
         }
         return dataset;

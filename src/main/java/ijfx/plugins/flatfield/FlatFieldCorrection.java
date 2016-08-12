@@ -84,9 +84,6 @@ public class FlatFieldCorrection extends ContextCommand {
 
     @Override
     public void run() {
-//        ImageDisplay flatFieldImageDisplay = imageDisplayService.get
-
-//        flatFieldDataset = datasetUtillsService.extractPlane(flatFieldImageDisplay);//datasetUtillsService.getImageDisplay(flatFieldDataset));//convertTo32(inputImageDisplay);;
         long[] position = new long[inputImageDisplay.numDimensions()];
         inputImageDisplay.localize(position);
         long[] positionFlatField = new long[flatFieldImageDisplay.numDimensions()];
@@ -96,10 +93,8 @@ public class FlatFieldCorrection extends ContextCommand {
         Dataset flatFieldDataset = imageDisplayService.getActiveDataset(flatFieldImageDisplay);
         Dataset flatFieldDataset32 = convertTo32(flatFieldDataset);
         median = ijfxStatisticService.getPlaneDescriptiveStatistics(dataset32, position).getPercentile(50);
-//        median = 1723.0;
         Dataset datasetDividedByValue = datasetUtillsService.divideActivePlaneByValue(dataset32, position, median);;
-        outputDataset = datasetDividedByValue;
-//        outputDataset = datasetUtillsService.divideActivePlaneByActivePlane(datasetDividedByValue, position, flatFieldDataset32, positionFlatField);
+        outputDataset = datasetUtillsService.divideActivePlaneByActivePlane(datasetDividedByValue, position, flatFieldDataset32, positionFlatField);
     }
 
     public boolean isCreateNewImage() {
