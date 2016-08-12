@@ -52,13 +52,13 @@ public class SimpleCommandTester implements Command{
     OverlayService overlayService;
     
     @Parameter
-    SegmentationService segmentationService;
+    MLSegmentationService segmentationService;
     
     @Override
     public void run() {
 //        segmentationService.generateTestSet();
 //        System.out.println("Test set generated");
-        segmentationService.saveModel();
+//        segmentationService.saveModel();
     }
     
 }

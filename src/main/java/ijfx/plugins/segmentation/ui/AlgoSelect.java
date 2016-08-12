@@ -17,29 +17,38 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.segmentation.neural_network;
+package ijfx.plugins.segmentation.ui;
 
+import static com.squareup.okhttp.internal.Internal.logger;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.Node;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import javafx.scene.layout.BorderPane;
+import mongis.utils.FXUtilities;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public interface INN {
-    public MultiLayerNetwork getNN();
-    public DataSetIterator getDataSetIterator();
-    public MultiLayerConfiguration configure();
-    public void train(DataSet ds);
-    public INDArray output(INDArray input);
-    public INDArray output(DataSetIterator iter);
-    public Node getNode();
-    public void predict();
-    public void save();
-    public void load();
-    public void clear();
+public class AlgoSelect extends AbstractStepUi{
+    
+    public AlgoSelect(){
+        super("2. Pick an algorithm");
+        try {
+            FXUtilities.injectFXML(this);
+            logger.info("FXML injected");
+        }
+        catch (IOException ex) {
+            Logger.getLogger(AlgoSelect.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    @Override
+    public void init() {
+        
+        super.initCalled = true;
+    }
+    
+    
 }

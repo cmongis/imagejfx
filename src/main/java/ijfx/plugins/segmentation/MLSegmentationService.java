@@ -60,7 +60,7 @@ import org.scijava.ui.UIService;
  * @author Pierre BONNEAU
  */
 @Plugin(type = Service.class)
-public class SegmentationService extends AbstractService implements ImageJService{
+public class MLSegmentationService extends AbstractService implements ImageJService{
 
     private final double COLOR = 1.0;
 
@@ -194,15 +194,28 @@ public class SegmentationService extends AbstractService implements ImageJServic
         return this.membraneWidth;
     }
     
+    public Integer membraneWidth(){
+        return membraneWidth.getValue();
+    }
+    
+    public Property<Integer> searchRadiuProperty(){
+        return this.searchRadius;
+    }
+    
+    public Integer searchRadius(){
+        return searchRadius.getValue();
+    }
+    
     public List<ProfilesSet> getTrainingSet(){
         return this.trainingData;
     }
     
     public INN buildNN(NNType nnType){
-        INN nn = null;
+        INN nn;
         switch (nnType){
             case LSTM : nn = new LSTM(); break;
             case BLSTM : nn = new LSTM(); break;
+            default:throw new AssertionError(nnType.name());
         }
         return nn;
     }
@@ -312,12 +325,18 @@ public class SegmentationService extends AbstractService implements ImageJServic
         catch(IOException ioe){
         }
     }
+    public void clearData(){
+        testData.clear();
+        trainingData.clear();
+        confirmationSet.clear();
+        imgDatasets.clear();
+    }
     
     public void clearAll(){
-        testData = null;
-        trainingData = null;
-        confirmationSet = null;
-        imgDatasets = null;
-        net = null;
+        testData.clear();
+        trainingData.clear();
+        confirmationSet.clear();
+        imgDatasets.clear();
+        net.clear();
     }
 }

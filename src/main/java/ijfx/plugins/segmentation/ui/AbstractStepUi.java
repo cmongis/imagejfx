@@ -17,29 +17,37 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.segmentation.neural_network;
+package ijfx.plugins.segmentation.ui;
 
 import javafx.scene.Node;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import javafx.scene.layout.BorderPane;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public interface INN {
-    public MultiLayerNetwork getNN();
-    public DataSetIterator getDataSetIterator();
-    public MultiLayerConfiguration configure();
-    public void train(DataSet ds);
-    public INDArray output(INDArray input);
-    public INDArray output(DataSetIterator iter);
-    public Node getNode();
-    public void predict();
-    public void save();
-    public void load();
-    public void clear();
+public abstract class AbstractStepUi  extends BorderPane implements StepUi{
+    
+    protected final String STEP_TITLE;
+    protected boolean initCalled;
+    
+    public AbstractStepUi(String title){
+        STEP_TITLE = new String(title);
+        initCalled = false;
+    }
+
+    @Override
+    public String getTitle() {
+        return this.STEP_TITLE;
+    }
+
+    @Override
+    public Node getNode() {
+        return this;
+    }
+    
+    @Override
+    public boolean isInitCalled(){
+        return initCalled;
+    }
 }

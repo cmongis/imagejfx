@@ -1,3 +1,7 @@
+package ijfx.plugins.segmentation.ui;
+
+import javafx.scene.Node;
+
 /*
     This file is part of ImageJ FX.
 
@@ -17,29 +21,13 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.segmentation.neural_network;
-
-import javafx.scene.Node;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-
 /**
  *
  * @author Pierre BONNEAU
  */
-public interface INN {
-    public MultiLayerNetwork getNN();
-    public DataSetIterator getDataSetIterator();
-    public MultiLayerConfiguration configure();
-    public void train(DataSet ds);
-    public INDArray output(INDArray input);
-    public INDArray output(DataSetIterator iter);
+public interface StepUi {
+    public String getTitle();
     public Node getNode();
-    public void predict();
-    public void save();
-    public void load();
-    public void clear();
+    public void init();
+    public boolean isInitCalled();
 }

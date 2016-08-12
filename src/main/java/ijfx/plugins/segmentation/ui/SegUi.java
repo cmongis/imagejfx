@@ -17,15 +17,17 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.segmentation;
+package ijfx.plugins.segmentation.ui;
 
+import static com.squareup.okhttp.internal.Internal.logger;
+import ijfx.plugins.segmentation.ProfilesSet;
+import ijfx.plugins.segmentation.MLSegmentationService;
 import ijfx.plugins.segmentation.neural_network.NNType;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -33,16 +35,17 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author Pierre BONNEAU
  */
-public class SegmentationUI extends TabPane{
+public class SegUi extends TabPane{
     
     @Parameter
-    SegmentationService segmentationService;
+    MLSegmentationService segmentationService;
     
     // TAB 1
 
@@ -65,16 +68,24 @@ public class SegmentationUI extends TabPane{
     
     // TAB 3
     
-    public SegmentationUI(){
+    public SegUi(){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("SegmentationUI.fxml"));
-            loader.setRoot(this);
-            loader.setController(this);
-            loader.load();
+            FXUtilities.injectFXML(this);
+            logger.info("FXML injected");
         }
         catch (IOException ex) {
-            Logger.getLogger(SegmentationUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SegUi.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+//        try {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("SegmentationUI.fxml"));
+//            loader.setRoot(this);
+//            loader.setController(this);
+//            loader.load();
+//        }
+//        catch (IOException ex) {
+//            Logger.getLogger(SegUi.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         
         trainingDataBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onTrainingDataBtnClicked);
         trainNetBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onTrainBtnClicked);

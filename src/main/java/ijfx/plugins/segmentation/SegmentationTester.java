@@ -19,6 +19,8 @@
  */
 package ijfx.plugins.segmentation;
 
+import ijfx.plugins.segmentation.ui.MLSegmentationUi;
+import ijfx.plugins.segmentation.ui.SegUi;
 import ijfx.ui.main.ImageJFX;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -54,13 +56,17 @@ public class SegmentationTester implements Command{
 
             Stage stage = new Stage(StageStyle.UTILITY);
             
-            SegmentationUI segmentationUI = new SegmentationUI();
+            MLSegmentationUi segmentationUI = new MLSegmentationUi();
             
             context.inject(segmentationUI);
-
-            segmentationUI.init();
             
             Scene scene = new Scene(segmentationUI);
+
+//            SegUi segUi = new SegUi();
+//            
+//            context.inject(segUi);
+//            
+//            Scene scene = new Scene(segUi);
 
             String style = ImageJFX.class.getResource("flatterfx.css").toExternalForm();
             

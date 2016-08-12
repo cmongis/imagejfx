@@ -32,7 +32,7 @@ import org.scijava.plugin.Plugin;
 public class ProfilesCommandTester implements Command{
     
     @Parameter
-    SegmentationService segmentationService;
+    MLSegmentationService segmentationService;
     
     @Override
     public void run() {
