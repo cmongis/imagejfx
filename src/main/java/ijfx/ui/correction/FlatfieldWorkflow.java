@@ -28,6 +28,7 @@ import io.datafx.controller.ViewController;
 import io.datafx.controller.flow.action.ActionMethod;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
@@ -101,6 +102,8 @@ public class FlatfieldWorkflow extends CorrectionFlow {
         gridPane.add(flatFieldProperty1.get(), 0, 1);
         gridPane.add(flatFieldProperty2.get(), 1, 1);
 
+        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{flatFieldProperty1.get(), flatFieldProperty2.get()};
+        bindPaneProperty(Arrays.asList(imageDisplayPanes));
         flatFieldLeftButton.setOnAction(e -> openImage(flatFieldProperty1.get()));
         flatFieldRightButton.setOnAction(e -> openImage(flatFieldProperty2.get()));
     }
@@ -108,14 +111,7 @@ public class FlatfieldWorkflow extends CorrectionFlow {
     protected void openImage(ImageDisplayPane imageDisplayPane) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
-
-        try {
-            Dataset flatFieldDataset = imagePlaneService.openVirtualDataset(file);
-            ImageDisplay imageDisplay = displayDataset(flatFieldDataset);
-            imageDisplayPane.display(imageDisplay);
-        } catch (IOException ex) {
-            Logger.getLogger(FlatfieldWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        workflowModel.openImage(imageDisplayPane, file).start();
     }
 
     protected ImageDisplay displayDataset(Dataset flatFieldDataset) {
