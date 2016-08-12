@@ -30,6 +30,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 
@@ -55,7 +56,7 @@ public class DataGen extends AbstractStepUi{
     Button seedingBtn;
     
     @FXML
-    TextField feedbackData;
+    Text feedbackData;
     
     @FXML
     Button clearDataBtn;
@@ -82,6 +83,7 @@ public class DataGen extends AbstractStepUi{
         seedingBtn.disableProperty().bind(trainingRadio.selectedProperty());
         
         generateBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::generate);
+        clearDataBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onClearDataClicked);
     }
     
     public void generate(MouseEvent e){
@@ -102,15 +104,12 @@ public class DataGen extends AbstractStepUi{
     public void onClearDataClicked(MouseEvent me){
         if(!initCalled)
             init();
-        mLSegmentationService.clearData();
+//        mLSegmentationService.clearData();
     }
 
     @Override
     public void init() {
-        widthField.textProperty().setValue(mLSegmentationService.membraneWidth().toString());
-        
-        clearDataBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onClearDataClicked);
-        
+        widthField.textProperty().setValue(mLSegmentationService.membraneWidth().toString());        
         super.initCalled = true;
     }
 }

@@ -190,24 +190,8 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
         }
     }
     
-    public Property<Integer> membraneWidthProperty(){
-        return this.membraneWidth;
-    }
-    
-    public Integer membraneWidth(){
-        return membraneWidth.getValue();
-    }
-    
-    public Property<Integer> searchRadiuProperty(){
-        return this.searchRadius;
-    }
-    
-    public Integer searchRadius(){
-        return searchRadius.getValue();
-    }
-    
-    public List<ProfilesSet> getTrainingSet(){
-        return this.trainingData;
+    public void initModel(){
+        setModel(buildNN(NNType.LSTM));
     }
     
     public INN buildNN(NNType nnType){
@@ -224,9 +208,7 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
         return this.nnType;
     }
     
-    public void train(){
-        this.net = buildNN(nnType().getValue());
-        
+    public void train(){        
         DataSetIterator iter = new ProfileIterator(trainingData, confirmationSet, imgDatasets, true);
         int iEpoch = 0;
         int nEpochs = 100;
@@ -325,6 +307,7 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
         catch(IOException ioe){
         }
     }
+    
     public void clearData(){
         testData.clear();
         trainingData.clear();
@@ -338,5 +321,37 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
         confirmationSet.clear();
         imgDatasets.clear();
         net.clear();
+    }
+       
+    public Property<Integer> membraneWidthProperty(){
+        return this.membraneWidth;
+    }
+    
+    public Integer membraneWidth(){
+        return membraneWidth.getValue();
+    }
+    
+    public Property<Integer> searchRadiuProperty(){
+        return this.searchRadius;
+    }
+    
+    public Integer searchRadius(){
+        return searchRadius.getValue();
+    }
+    
+    public List<ProfilesSet> getTrainingSet(){
+        return this.trainingData;
+    }
+    
+    public List<ProfilesSet> getTestSet(){
+        return this.testData;
+    }
+    
+    public INN getModel(){
+        return this.net;
+    }
+    
+    public void setModel(INN net){
+        this.net = net;
     }
 }

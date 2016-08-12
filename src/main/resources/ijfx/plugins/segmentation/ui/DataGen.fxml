@@ -42,13 +42,13 @@
    </padding>
    <bottom>
       <VBox prefHeight="64.0" prefWidth="504.0" spacing="10.0" BorderPane.alignment="CENTER">
-         <children>
-            <Text fx:id="feedbackData" strokeType="OUTSIDE" strokeWidth="0.0" text="Feedback" />
-            <Button fx:id="clearDataBtn" mnemonicParsing="false" text="Clear Data" />
-         </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
+         <children>
+            <Text fx:id="feedbackData" strokeType="OUTSIDE" strokeWidth="0.0" text="Feedback" />
+            <Button fx:id="clearDataBtn" mnemonicParsing="false" text="Clear data" />
+         </children>
       </VBox>
    </bottom>
 </fx:root>
