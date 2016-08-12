@@ -293,6 +293,21 @@ public class WorkflowModel {
         return task;
     }
 
+    public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane, File file) {
+
+        CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
+            try {
+                Dataset dataset;
+                dataset = (Dataset) iOService.open(file.getAbsolutePath());
+                displayDataset(dataset, imageDisplayPane);
+            } catch (IOException ex) {
+                Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        })
+                .submit(loadingScreenService);
+        return task;
+    }
+
     /**
      *
      * @param dataset

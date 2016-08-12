@@ -137,23 +137,16 @@ public class ProcessWorkflow extends CorrectionFlow {
                     
                     //Set position, get dataset and apply flatField correction
                     workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplay);
-                    Dataset targetDataset = imageDisplayService.getActiveDataset(imageDisplay);
-                    targetDataset =  workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldRight());
-//                    Future<Dataset> futureTarget = executor.submit(() ->  workflowModel.applyFlatField(targetDataset, workflowModel.getFlatfieldRight()));
-//                    
-//                    Dataset targetDatasetCorrected = futureTarget.get();
-                    workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplay);
-                    Dataset sourceDataset = imageDisplayService.getActiveDataset(imageDisplay);
-                    sourceDataset = workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldLeft());
-//                    Future<Dataset> futureSource = executor.submit(() -> workflowModel.applyFlatField(sourceDataset, workflowModel.getFlatfieldLeft()));
-//                    Dataset sourceDatasetCorrected = futureSource.get();
+                    Dataset targetDatasetCorrected =  workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldRight());
                     
-                    Dataset outputDataset = workflowModel.getTransformedImage(sourceDataset, targetDataset);
+                    workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplay);
+                    Dataset sourceDatasetCorrected = workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldLeft());
+                    
+                    Dataset outputDataset = workflowModel.getTransformedImage(sourceDatasetCorrected, targetDatasetCorrected);
 
                     
                     workflowModel.getMapImages().put(file.getAbsolutePath(), outputDataset);
                     
-//                    listViewItems.getItems().add(key);
                 } catch (Exception ex) {
                     Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
                 }

@@ -121,6 +121,7 @@ public class FolderWorkflow extends CorrectionFlow {
         File file = directoryChooser.showDialog(null);
         List<File> list = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
         listProperty.set(list);
+        listView.getItems().clear();
         listView.getItems().addAll(list);
         workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0)).start();
     }
@@ -156,6 +157,7 @@ public class FolderWorkflow extends CorrectionFlow {
      * 
      */
     private void initListView() {
+        
         listView.getItems().addAll(listProperty.get());
         setCellFactory(listView);
 
