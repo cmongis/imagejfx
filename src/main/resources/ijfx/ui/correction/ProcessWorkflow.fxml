@@ -24,8 +24,10 @@
          <children>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                    <Button fx:id="processButton" mnemonicParsing="false" text="Process" />
+                    <Button fx:id="processButton" disable="true" mnemonicParsing="false" text="Process" />
                   <ListView fx:id="listViewItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                  <Button fx:id="directoryButton" mnemonicParsing="false" onAction="#saveDirectory" text="Choose a directory" />
+                  <Label fx:id="directoryLabel" />
                </children>
             </VBox>
          </children>

@@ -32,6 +32,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.plugins.commands.typechange.TypeChanger;
 import net.imagej.types.DataTypeService;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
@@ -106,8 +107,12 @@ public class FlatFieldCorrection extends ContextCommand {
     }
 
     public Dataset convertTo32(Dataset dataset) {
+        RealType<?> firstElement = dataset.firstElement();
+        String typeFirstElement = dataTypeService.getTypeByAttributes(firstElement.getBitsPerPixel(), true, false, !dataset.isInteger(), dataset.isSigned()).longName();
+
         String type = dataTypeService.getTypeByAttributes(32, true, false, true, true).longName();
 
+        if (typeFirstElement.equals(type)) return dataset;
         Map<String, Object> map = new HashMap<>();
 
         map.put("data", dataset);

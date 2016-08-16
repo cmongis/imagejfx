@@ -78,9 +78,9 @@ public class FolderWorkflow extends CorrectionFlow {
 
     ObjectProperty<List<File>> listProperty = new SimpleObjectProperty<>();
 
-    ObjectProperty<int[]> positionLeftProperty = new SimpleObjectProperty<>();
+    ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>();
 
-    ObjectProperty<int[]> positionRightProperty = new SimpleObjectProperty<>();
+    ObjectProperty<long[]> positionRightProperty = new SimpleObjectProperty<>();
 
     public FolderWorkflow() {
         try {
@@ -147,8 +147,8 @@ public class FolderWorkflow extends CorrectionFlow {
      * @param imageDisplay
      * @param property 
      */
-    private void savePosition(ImageDisplay imageDisplay, ObjectProperty<int[]> property) {
-        int[] position = new int[imageDisplay.numDimensions()];
+    private void savePosition(ImageDisplay imageDisplay, ObjectProperty<long[]> property) {
+        long[] position = new long[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
         property.set(position);
     }

@@ -20,24 +20,28 @@
 package ijfx.ui.correction;
 
 import ij.process.ImageProcessor;
-import ijfx.plugins.bunwarpJ.bUnwarpJ_;
+import ijfx.plugins.adapter.IJ1Service;
+import ijfx.plugins.bunwarpJ.ChromaticCorrection;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
+import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.main.ImageJFX;
 import io.datafx.controller.injection.scopes.ApplicationScoped;
+import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -57,6 +61,7 @@ import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 import mongis.utils.CallbackTask;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
 import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
@@ -65,9 +70,6 @@ import net.imagej.table.DefaultResultsTable;
 import net.imagej.table.DefaultTableDisplay;
 import net.imagej.table.ResultsTable;
 import net.imagej.table.TableDisplay;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang.StringUtils;
 import org.scijava.Context;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
@@ -89,7 +91,13 @@ public class WorkflowModel {
 
     protected ObjectProperty<ImageDisplayPane> flatFieldImageDisplayProperty2;
 
-    protected Map<String, Dataset> mapImages;
+    protected Map<File, File> mapImages;
+
+    @Parameter
+    IJ1Service iJ1Service;
+
+    @Parameter
+    DatasetService datasetService;
 
     @Parameter
     IOService iOService;
@@ -109,6 +117,9 @@ public class WorkflowModel {
     @Parameter
     LoadingScreenService loadingScreenService;
 
+    static String[] CHOICES_DEFORMATION = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
+
+    static String[] CHOICES_MODE = {"Fast", "Accurate", "Mono"};
     private StringProperty min_scale_deformation_choice = new SimpleStringProperty("Very Fine");
 
     /**
@@ -174,16 +185,13 @@ public class WorkflowModel {
 
     ImageProcessor targetMskIP = null;
     ImageProcessor sourceMskIP = null;
-    int max_scale_deformation;
-    int min_scale_deformation;
-    int mode;
 
     @Parameter
     Context context;
 
     private ObjectProperty<List<File>> listProperty = new SimpleObjectProperty<>(new ArrayList<File>());
-    protected ObjectProperty<int[]> positionLeftProperty = new SimpleObjectProperty<>(new int[]{-1});
-    protected ObjectProperty<int[]> positionRightProperty = new SimpleObjectProperty<>(new int[]{-1});
+    protected ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>(new long[]{-1});
+    protected ObjectProperty<long[]> positionRightProperty = new SimpleObjectProperty<>(new long[]{-1});
 
     protected final static Logger LOGGER = ImageJFX.getLogger();
 
@@ -241,27 +249,22 @@ public class WorkflowModel {
      */
     public TableDisplay loadTable(String[] header, Label fileLabel, File file) throws FileNotFoundException, IOException {
         Reader in;
-        List<double[]> points = new ArrayList<>();
+//        List<double[]> points = new ArrayList<>();
         landmarksFile.set(file);
         fileLabel.setText(landmarksFile.getName());
-        in = new FileReader(landmarksFile.get().getAbsolutePath());
-        Iterable<CSVRecord> records = CSVFormat.EXCEL.withHeader(header).parse(in);
-        for (CSVRecord record : records) {
-            double[] sourceArray = new double[header.length];
-            if (!StringUtils.isNumeric(record.get(header[0]))) {
-                continue;
-            }
-            points.add(sourceArray);
-            for (int i = 0; i < header.length; i++) {
-                sourceArray[i] = Double.valueOf(record.get(header[i]));
-            }
-        }
-        ResultsTable resultsTable = new DefaultResultsTable(header.length, points.size());
+        Stack<Point> sourcePoints = new Stack<>();
+        Stack<Point> targetPoints = new Stack<>();
+        bunwarpj.MiscTools.loadPoints(file.getAbsolutePath(), sourcePoints, targetPoints);
+        ResultsTable resultsTable = new DefaultResultsTable(header.length, sourcePoints.size());
         for (int col = 0; col < header.length; col++) {
             resultsTable.setColumnHeader(col, header[col]);
-            for (int row = 0; row < points.size(); row++) {
-                resultsTable.setValue(col, row, points.get(row)[col]);
-            }
+        }
+        for (int row = 0; row < sourcePoints.size(); row++) {
+            resultsTable.setValue(0, row, row);
+            resultsTable.setValue(1, row, sourcePoints.get(0).x);
+            resultsTable.setValue(2, row, sourcePoints.get(0).y);
+            resultsTable.setValue(3, row, targetPoints.get(0).x);
+            resultsTable.setValue(4, row, targetPoints.get(0).y);
         }
         TableDisplay tableDisplay = new DefaultTableDisplay();
         tableDisplay.add(resultsTable);
@@ -379,30 +382,27 @@ public class WorkflowModel {
      * Call the bUnwarpJ_ Command
      *
      * @param sourceDataset
+     * @param sourcePosition
      * @param targetDataset
+     * @param targetPosition
      * @return
      */
-    public Dataset getTransformedImage(Dataset sourceDataset, Dataset targetDataset) {
+    public Dataset applyTransformation(Dataset sourceDataset, long[] sourcePosition, Dataset targetDataset, long[] targetPosition, bunwarpj.Transformation transformation) {
+        int max_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(max_scale_deformation_choice.get());
+        int min_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(min_scale_deformation_choice.get());
+        int mode = Arrays.asList(CHOICES_MODE).indexOf(modeChoice.get());
         Map<String, Object> map = new HashMap<>();
         map.put("sourceDataset", sourceDataset);
-        map.put("targetDataset", targetDataset);
-        map.put("min_scale_deformation", min_scale_deformation_choice.get());
-        map.put("max_scale_deformation", max_scale_deformation_choice.get());
-        map.put("modeChoice", modeChoice.get());
-        map.put("maxImageSubsamplingFactor", maxImageSubsamplingFactor.get());
-        map.put("divWeight", divWeight.get());
-        map.put("curlWeight", curlWeight.get());
-        map.put("landmarkWeight", landmarkWeight.get());
-        map.put("imageWeight", imageWeight.get());
-        map.put("consistencyWeight", consistencyWeight.get());
-        map.put("richOutput", richOutput.get());
-        map.put("saveTransformation", saveTransformation.get());
-        map.put("min_scale_image", min_scale_image.get());
-        map.put("stopThreshold", stopThreshold.get());
-//        map.put("img_subsamp_fact", img_subsamp_fact.get());
+        map.put("transformation", transformation);
+        bunwarpj.Param parameter = new bunwarpj.Param(mode, maxImageSubsamplingFactor.get(), min_scale_deformation, max_scale_deformation, divWeight.get(), curlWeight.get(), landmarkWeight.get(), imageWeight.get(), consistencyWeight.get(), stopThreshold.get());
+        map.put("parameter", parameter);
+        map.put("sourcePosition", sourcePosition);
+        map.put("targetPosition", targetPosition);
+
         map.put("landmarksFile", landmarksFile.get());
 
-        Module module = executeCommand(bUnwarpJ_.class, map).orElseThrow(NullPointerException::new);
+        Module module = executeCommand(ChromaticCorrection.class, map).orElseThrow(NullPointerException::new);
+
         Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
         return outputDataset;
     }
@@ -477,16 +477,16 @@ public class WorkflowModel {
 
     }
 
-    public void setPosition(int[] position, ImageDisplay imageDisplay) {
+    public void setPosition(long[] position, ImageDisplay imageDisplay) {
         imageDisplay.setPosition(position);
         imageDisplay.update();
     }
 
-    public int[] getPositionLeft() {
+    public long[] getPositionLeft() {
         return positionLeftProperty.get();
     }
 
-    public int[] getPositionRight() {
+    public long[] getPositionRight() {
         return positionRightProperty.get();
     }
 
@@ -494,7 +494,7 @@ public class WorkflowModel {
         return landmarksFile.get();
     }
 
-    public Map<String, Dataset> getMapImages() {
+    public Map<File, File> getMapImages() {
         return mapImages;
     }
 
@@ -509,4 +509,60 @@ public class WorkflowModel {
     public ImageDisplay getFlatfieldRight() {
         return flatFieldImageDisplayProperty2.get().getImageDisplay();
     }
+
+    public void transformeImages(List<File> files, String destinationPath) {
+
+        bunwarpj.Transformation transformation = getTransformation(files.get(0));
+        files.parallelStream().forEach((File file) -> {
+            CallbackTask<Void, Void> start = new CallbackTask<Void, Void>().run(() -> {
+                transformeImage(file, destinationPath, transformation);
+            })
+                    .submit(loadingScreenService)
+                    .start();
+
+        });
+    }
+
+    public void transformeImage(File file, String destinationPath, bunwarpj.Transformation transformation) {
+        try {
+            Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
+            ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
+
+            //Set position, get dataset and apply flatField correction
+            setPosition(getPositionRight(), imageDisplay);
+            Dataset targetDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldRight());
+
+            setPosition(getPositionLeft(), imageDisplay);
+            Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
+            Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
+            StringBuilder path = new StringBuilder(destinationPath);
+            path.append("/").append(file.getName());
+            iOService.save(outputDataset, path.toString());
+            mapImages.put(file, new File(path.toString()));
+
+        } catch (Exception ex) {
+            Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public bunwarpj.Transformation getTransformation(File file) {
+        bunwarpj.Transformation transformation = null;
+        try {
+            Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
+            Stack<Point> sourcePoints = new Stack<>();
+            Stack<Point> targetPoints = new Stack<>();
+            bunwarpj.MiscTools.loadPoints(landmarksFile.get().getAbsolutePath(), sourcePoints, targetPoints);
+            int max_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(max_scale_deformation_choice.get());
+            int min_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(min_scale_deformation_choice.get());
+            int mode = Arrays.asList(CHOICES_MODE).indexOf(modeChoice.get());
+            bunwarpj.Param parameter = new bunwarpj.Param(mode, maxImageSubsamplingFactor.get(), min_scale_deformation, max_scale_deformation, divWeight.get(), curlWeight.get(), landmarkWeight.get(), imageWeight.get(), consistencyWeight.get(), stopThreshold.get());
+
+            transformation = bunwarpj.bUnwarpJ_.computeTransformationBatch((int) inputDataset.dimension(0), (int) inputDataset.dimension(1), (int) inputDataset.dimension(0), (int) inputDataset.dimension(1), sourcePoints, targetPoints, parameter);
+        } catch (IOException ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return transformation;
+
+    }
+
 }

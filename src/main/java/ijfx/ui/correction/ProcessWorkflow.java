@@ -34,13 +34,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.DirectoryChooser;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import mongis.utils.CallbackTask;
@@ -50,6 +53,7 @@ import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
+import org.scijava.display.DisplayService;
 import org.scijava.io.IOService;
 import org.scijava.plugin.Parameter;
 
@@ -64,14 +68,16 @@ public class ProcessWorkflow extends CorrectionFlow {
     WorkflowModel workflowModel;
 
     @Parameter
+    DisplayService displayService;
+    @Parameter
     ImageDisplayService imageDisplayService;
-    
+
     @Parameter
     DatasetUtillsService datasetUtillsService;
 
     @Parameter
     LoadingScreenService loadingScreenService;
-    
+
     @Parameter
     Context context;
 
@@ -79,7 +85,7 @@ public class ProcessWorkflow extends CorrectionFlow {
     IOService iOService;
 
     @FXML
-    ListView<String> listViewItems;
+    ListView<File> listViewItems;
 
     @FXML
     Button processButton;
@@ -90,10 +96,18 @@ public class ProcessWorkflow extends CorrectionFlow {
     @FXML
     GridPane gridPane;
 
+    @FXML
+    Button directoryButton;
+    
+    @FXML
+    Label directoryLabel;
+    
+    private File directory;
+
     ImageDisplayPane imageDisplayPaneLeft;
 
     ImageDisplayPane imageDisplayPaneRight;
-    
+
     ExecutorService executor = ImageJFX.getThreadPool();
 
     public ProcessWorkflow() {
@@ -111,6 +125,7 @@ public class ProcessWorkflow extends CorrectionFlow {
     @PostConstruct
     public void init() {
         bindListView();
+        setCellFactory(listViewItems);
         gridPane.add(imageDisplayPaneLeft, 1, 0);
         gridPane.add(imageDisplayPaneRight, 2, 0);
         ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
@@ -120,7 +135,6 @@ public class ProcessWorkflow extends CorrectionFlow {
 
     }
 
-
     /**
      * Compute the dataset
      */
@@ -128,38 +142,9 @@ public class ProcessWorkflow extends CorrectionFlow {
         List<File> files = workflowModel.getFiles();
         listViewItems.getItems().clear();
         workflowModel.getMapImages().clear();
-        long startTime = System.currentTimeMillis();
-        files.parallelStream().forEach((File file) -> {
-            CallbackTask<Void, Void> start = new CallbackTask<Void, Void>().run(() -> {
-                try {
-                    Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
-                    ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
-                    
-                    //Set position, get dataset and apply flatField correction
-                    workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplay);
-                    Dataset targetDatasetCorrected =  workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldRight());
-                    
-                    workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplay);
-                    Dataset sourceDatasetCorrected = workflowModel.applyFlatField(imageDisplay, workflowModel.getFlatfieldLeft());
-                    
-                    Dataset outputDataset = workflowModel.getTransformedImage(sourceDatasetCorrected, targetDatasetCorrected);
-
-                    
-                    workflowModel.getMapImages().put(file.getAbsolutePath(), outputDataset);
-                    
-                } catch (Exception ex) {
-                    Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            })
-                    .submit(loadingScreenService)
-                    .thenRunnable(() -> listViewItems.getItems().add(file.getAbsolutePath()))
-                    .start();
-                    start.setOnSucceeded(e -> {
-                        long time = System.currentTimeMillis() - startTime;
-                        System.out.println("ijfx.ui.correction.ProcessWorkflow.process() "+ time);
-                            });
-
-        });
+        System.gc();
+        workflowModel.transformeImages(files, directory.getAbsolutePath());
+        listViewItems.getItems().addAll(files);
 
     }
 
@@ -168,44 +153,46 @@ public class ProcessWorkflow extends CorrectionFlow {
      */
     public void bindListView() {
         listViewItems.getItems().addAll(workflowModel.getMapImages().keySet());
-        listViewItems.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+        listViewItems.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
             createSampleImage(newValue).start();
         });
 
     }
-/**
- * 
- * @param imageDisplay
- * @param firstPosition
- * @param secondPosition
- * @param imageDisplayPane 
- */
-    public void selectPosition(ImageDisplay imageDisplay, int[] firstPosition, int[] secondPosition, ImageDisplayPane imageDisplayPane) {
+
+    /**
+     *
+     * @param imageDisplay
+     * @param firstPosition
+     * @param secondPosition
+     * @param imageDisplayPane
+     */
+    public void selectPosition(ImageDisplay imageDisplay, long[] firstPosition, long[] secondPosition, ImageDisplayPane imageDisplayPane) {
         workflowModel.setPosition(firstPosition, imageDisplay);
         imageDisplayService.getActiveDatasetView(imageDisplay).setColorMode(ColorMode.COLOR);
         Dataset datasetFirstSlide = datasetUtillsService.extractPlane(imageDisplay);
         workflowModel.setPosition(secondPosition, imageDisplay);
-        Dataset datasetSecondSlide = datasetUtillsService.extractPlane(imageDisplay);
+        Dataset datasetSecondSlide =  datasetUtillsService.extractPlane(imageDisplay);
         workflowModel.extractAndMerge(new Dataset[]{datasetFirstSlide, datasetSecondSlide}, imageDisplayPane);
     }
 
-    
     /**
      * Extract the plane at the different positions and concatenate the Dataset
+     *
      * @param newValue
-     * @return 
+     * @return
      */
-    private CallbackTask<Void, Void> createSampleImage(String newValue) {
+    private CallbackTask<Void, Void> createSampleImage(File newValue) {
         return new CallbackTask<Void, Void>().run(() -> {
 
             try {
-                Dataset datasetTarget = workflowModel.getMapImages().get(newValue);
+                File fileTarget = workflowModel.getMapImages().get(newValue);
+                Dataset datasetTarget = (Dataset) iOService.open(fileTarget.getAbsolutePath());
                 ImageDisplay imageDisplayTarget = new SilentImageDisplay();
                 context.inject(imageDisplayTarget);
                 imageDisplayTarget.display(datasetTarget);
                 selectPosition(imageDisplayTarget, workflowModel.getPositionLeft(), workflowModel.getPositionRight(), imageDisplayPaneRight);
 
-                Dataset datasetSource = (Dataset) iOService.open(newValue);
+                Dataset datasetSource = (Dataset) iOService.open(newValue.getAbsolutePath());
                 ImageDisplay imageDisplaySource = new DefaultImageDisplay();
                 context.inject(imageDisplaySource);
                 imageDisplaySource.display(datasetSource);
@@ -216,6 +203,17 @@ public class ProcessWorkflow extends CorrectionFlow {
             }
         })
                 .submit(loadingScreenService);
+    }
+
+    @FXML
+    public void saveDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File file = directoryChooser.showDialog(null);
+        directory = file;
+        directoryLabel.setText(directory.getAbsolutePath());
+        processButton.setDisable(false);
+        
+        
     }
 
 }

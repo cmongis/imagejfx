@@ -19,6 +19,10 @@
  */
 package ijfx.plugins.bunwarpJ;
 
+import bunwarpj.MainDialog;
+import bunwarpj.MiscTools;
+import bunwarpj.Param;
+import bunwarpj.Transformation;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.Opener;
@@ -217,7 +221,7 @@ public class Pip2 implements Command {
         Param param = new Param(mode, maxImageSubsamplingFactor, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold);
 
         //Calcul transformation which have to be applied after
-        Transformation transformation = bUnwarpJ_.computeTransformationBatch(targetImp, sourceImp, targetMskIP, sourceMskIP, sourcePoints, targetPoints, param);
+        Transformation transformation =null;// bUnwarpJ_.computeTransformationBatch(targetImp, sourceImp, targetMskIP, sourceMskIP, sourcePoints, targetPoints, param);;
         //transformation.saveDirectTransformation("/home/tuananh/Desktop/trans_direct2.txt");
         //Apply transformation
         loadImagePlus().parallelStream().forEach((imagePlus) -> {
@@ -276,8 +280,8 @@ public class Pip2 implements Command {
     private ImagePlus getFeedback(Transformation transformation) {
         ImagePlus deformation = new ImagePlus();
         ImageStack imageStack = new ImageStack(sourceImp.getWidth(), sourceImp.getHeight());
-        transformation.computeDeformationVectors(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
-        transformation.computeDeformationGrid(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
+//        transformation.computeDeformationVectors(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
+//        transformation.computeDeformationGrid(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY(), imageStack, richOutput);
         deformation.setStack(imageStack);
         return deformation;
     }
@@ -329,11 +333,11 @@ public class Pip2 implements Command {
         ImagePlus[] imArray = new ImagePlus[2];
         imArray[0] = imagePlus;
         imArray[1] = imagePlus;
-        final MainDialog dialog = new MainDialog(imArray, mode,
+        final MainDialog dialog = new MainDialog(null,imArray, mode,
                 this.maxImageSubsamplingFactor, this.min_scale_deformation,
                 this.max_scale_deformation, this.divWeight, this.curlWeight,
                 this.landmarkWeight, this.imageWeight, this.consistencyWeight,
-                this.stopThreshold, false, this.saveTransformation, "");
+                this.stopThreshold, false, this.saveTransformation);
 
         dialog.applyTransformationToSource(transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
         imagePlus.setTitle(transformedTitle(imagePlus));
