@@ -27,24 +27,26 @@ import java.util.List;
  *
  * @author cyril
  */
-public interface FolderManagerService extends IjfxService{
-    
+public interface FolderManagerService extends IjfxService {
+
     public Folder addFolder(File file);
-    
+
     public List<Folder> getFolderList();
-    
+
     public Folder getCurrentFolder();
-    
+
     public void setCurrentFolder(Folder folder);
-    
-    
+
     public void setExplorationMode(ExplorationMode mode);
-    
+
     public ExplorationMode getCurrentExplorationMode();
-    
+
     public void completeStatistics();
-    
+
     public void removeFolder(Folder folder);
-    
+
     public Folder getFolderContainingFile(File f);
+
+    public final static String FOLDER_PREFERENCE_FILE = "folder_db.json";
+
 }
