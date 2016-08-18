@@ -58,4 +58,6 @@ public interface ImageRecordService extends IjfxService{
  
     public void forceSave();
     
+     public final static String JSON_FILE = "image_record.json";
+    
 }

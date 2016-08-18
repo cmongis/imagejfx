@@ -85,7 +85,6 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
 
     private static String FILE_ADDED = "%s images where analyzed.";
 
-    private static String JSON_FILE = "image_record.json";
 
     PublishSubject<ImageRecord> saveQueue = PublishSubject.create();
     
