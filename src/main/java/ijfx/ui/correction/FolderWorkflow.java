@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
@@ -97,6 +98,7 @@ public class FolderWorkflow extends CorrectionFlow {
     @PostConstruct
     public void init() {
         workflowModel.bindWelcome(this);
+
         gridPane.add(imageDisplayPaneLeft, 1, 0);
         gridPane.add(imageDisplayPaneRight, 2, 0);
 
@@ -123,12 +125,23 @@ public class FolderWorkflow extends CorrectionFlow {
         listProperty.set(list);
         listView.getItems().clear();
         listView.getItems().addAll(list);
-        workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0)).start();
+        try {
+            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0)).start().get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(FolderWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (workflowModel.getPositionLeft().length > 0) {
+            applyPosition();
+        } else {
+            savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
+            savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
+        }
     }
 
     /**
      * Save the position whan the axis Change
-     * @param event 
+     *
+     * @param event
      */
     @EventHandler
     public void handleEvent(AxisPositionEvent event) {
@@ -144,8 +157,9 @@ public class FolderWorkflow extends CorrectionFlow {
 
     /**
      * Save the positions of the imageDisplay
+     *
      * @param imageDisplay
-     * @param property 
+     * @param property
      */
     private void savePosition(ImageDisplay imageDisplay, ObjectProperty<long[]> property) {
         long[] position = new long[imageDisplay.numDimensions()];
@@ -154,10 +168,10 @@ public class FolderWorkflow extends CorrectionFlow {
     }
 
     /**
-     * 
+     *
      */
     private void initListView() {
-        
+
         listView.getItems().addAll(listProperty.get());
         setCellFactory(listView);
 
