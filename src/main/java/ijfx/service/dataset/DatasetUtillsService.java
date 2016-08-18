@@ -38,4 +38,7 @@ public interface DatasetUtillsService extends ImageJService{
     
     public Dataset divideDatasetByValue(Dataset dataset, double value);
     
+    public Dataset divideActivePlaneByValue(Dataset dataset,long[] position, double value);
+    
+    public Dataset divideActivePlaneByActivePlane(Dataset dataset,long[] position, Dataset datasetValue, long [] positionValue);
 }

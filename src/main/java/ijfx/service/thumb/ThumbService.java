@@ -112,10 +112,10 @@ public class ThumbService extends AbstractService implements ImageJService {
 
         try {
 
-            RandomAccessibleInterval openVirtualPlane = imagePlaneService.openVirtualPlane(file, nonSpacialPosition);
-            int sub = (int) openVirtualPlane.dimension(0) / width;
+            RandomAccessibleInterval interval = imagePlaneService.openVirtualPlane(file, nonSpacialPosition);
+            int sub = (int) interval.dimension(0) / width;
             sub = sub <= 2 ? 1 : sub - 1;
-            SubsampleIntervalView subsample = Views.subsample(openVirtualPlane, sub);
+            SubsampleIntervalView subsample = Views.subsample(interval, sub);
             Image image = previewService.datasetToImage(subsample);
 
             BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
@@ -129,6 +129,16 @@ public class ThumbService extends AbstractService implements ImageJService {
             return null;
         }
 
+    }
+    
+    public Image getThumb(RandomAccessibleInterval interval, int width, int height) {
+        
+        
+            int sub = (int) interval.dimension(0) / width;
+            sub = sub <= 2 ? 1 : sub - 1;
+            SubsampleIntervalView subsample = Views.subsample(interval, sub);
+            Image image = previewService.datasetToImage(subsample);
+            return image;
     }
 
     public Image getThumb(File file, Integer planeIndex, int width, int height) throws IOException {

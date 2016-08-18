@@ -184,7 +184,7 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
 
         // changing the title of the workflwo panel
         titleLabel.setText("Batch processing");
-        titleLabel.getStyleClass().add("toolbar");
+      
 
         // creating a SaveOption element
         saveOption = new DefaultSaveOptions();

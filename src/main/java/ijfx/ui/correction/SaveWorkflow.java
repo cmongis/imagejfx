@@ -20,35 +20,12 @@
 package ijfx.ui.correction;
 
 import io.datafx.controller.ViewController;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 /**
  *
  * @author Tuan anh TRINH
  */
+@ViewController(value = "SaveWorkflow.fxml")
+public class SaveWorkflow extends CorrectionFlow {
 
-@ViewController(value = "WelcomeWorkflow.fxml")
-public class WelcomeWorkflow extends AbstractCorrectionActivity{
-
-    @Inject
-    WorkflowModel workflowModel;
-
-
-
-    public WelcomeWorkflow() {
-        CorrectionActivity.getStaticContext().inject(this);
-
-    }
-
-//    
-    @PostConstruct
-    public void init() {
-
-    }
-
-//    @ActionMethod("nextAction")
-//    public void onAction() {
-//        System.out.println("ijfx.ui.correction.WelcomeWorkflow.onAction()");
-//    }
 }

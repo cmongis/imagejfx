@@ -20,35 +20,72 @@
 package ijfx.ui.correction;
 
 import ijfx.service.ImagePlaneService;
+import ijfx.service.batch.BatchService;
+import ijfx.service.dataset.DatasetUtillsService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
+import ijfx.ui.datadisplay.image.ImageWindowEventBus;
+import ijfx.ui.datadisplay.table.TableDisplayView;
 import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.event.ActionEvent;
+import java.util.stream.IntStream;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.GridPane;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.Dataset;
-import net.imagej.display.DefaultImageDisplay;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
+import net.imagej.display.OverlayService;
+import net.imagej.display.event.DataViewEvent;
+import net.imagej.display.event.LUTsChangedEvent;
 import org.scijava.Context;
-import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
+import org.scijava.display.DisplayService;
+import org.scijava.event.EventHandler;
+import org.scijava.io.IOService;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  *
  * @author Tuan anh TRINH
  */
 @ViewController(value = "BUnwarpJWorkflow.fxml")
-public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
+public class BUnwarpJWorkflow extends CorrectionFlow {
+
+    @Parameter
+    IOService iOService;
+
+    @Parameter
+    DatasetUtillsService datasetUtillsService;
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
+
+    @Parameter
+    CommandService commandService;
+
+    @Parameter
+    DisplayService displayService;
 
     @Inject
     WorkflowModel workflowModel;
@@ -59,74 +96,179 @@ public class BUnwarpJWorkflow extends AbstractCorrectionActivity {
     @Parameter
     ImagePlaneService imagePlaneService;
 
-    protected ImageDisplayPane imageDisplayPaneLeft;
+    @Parameter
+    BatchService batchService;
 
-    protected ImageDisplayPane imageDisplayPaneRight;
+    @Parameter
+    ModuleService moduleService;
 
-    protected ImageDisplayPane imageDisplayPaneBottom;
+    @Parameter
+    OverlayService overlayService;
+
+    @Parameter
+    LoadingScreenService loadingScreenService;
+
+    ImageDisplayPane imageDisplayPaneTopLeft;
+
+    ImageDisplayPane imageDisplayPaneTopRight;
+
+    ImageDisplayPane imageDisplayPaneBottomLeft;
+
+    ObjectProperty<File> landmarksFile = new SimpleObjectProperty<>(new File(""));
+
+    public final static String[] HEADER = {"Index", "xSource", "ySource", "xTarget", "yTarget"};
 
     @FXML
-    BorderPane imagesContainer;
+    Tab landmarksTab, deformationTab, weightTab, outputTab, imagesTab;
+    @FXML
+    TableDisplayView tableDisplayView;
 
     @FXML
-    Button leftButton;
+    GridPane imagesContainer;
 
     @FXML
-    Button rightButton;
+    Button loadPointsButton;
 
     @FXML
-    Button bottomButton;
+    BorderPane borderPaneTableView;
+
+    @FXML
+    Label fileLabel;
+
+    @FXML
+    TextField stopThresholdTextField;
+
+    @FXML
+    TextField divWeightTextField;
+
+    @FXML
+    TextField curlWeightTextField;
+
+    @FXML
+    TextField landmarkWeightTextField;
+
+    @FXML
+    TextField imageWeightTextField;
+
+    @FXML
+    TextField consistencyWeightTextField;
+
+    @FXML
+    CheckBox richOutput;
+
+    @FXML
+    CheckBox saveTransformation;
+
+    @FXML
+    ComboBox modeChoiceComboBox, min_scale_deformation_choiceComboBox, max_scale_deformation_choiceComboBox, img_subsamp_factComboBox;
+
+    @FXML
+    Button mergeButton;
+
+    @FXML
+    ListView<File> listView;
+
+    private final ImageWindowEventBus bus = new ImageWindowEventBus();
 
     public BUnwarpJWorkflow() {
         CorrectionActivity.getStaticContext().inject(this);
-
+//        initImageDisplayPane();
     }
 
     @PostConstruct
     public void init() {
         try {
-            imageDisplayPaneBottom = new ImageDisplayPane(context);
-            imageDisplayPaneLeft = new ImageDisplayPane(context);
-            imageDisplayPaneRight = new ImageDisplayPane(context);
-
-            imageDisplayPaneRight.getCanvas().getCamera().addListener((e) -> imageDisplayPaneLeft.getCanvas().repaint());
+            imageDisplayPaneTopLeft = new ImageDisplayPane(context);
+            imageDisplayPaneBottomLeft = new ImageDisplayPane(context);
+            imageDisplayPaneTopRight = new ImageDisplayPane(context);
         } catch (IOException ex) {
             Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }
-        rightButton.setOnAction(e -> {
-            imagesContainer.setRight(imageDisplayPaneRight);
-            openImage(imageDisplayPaneRight);
+        workflowModel.setContext(context);
+        workflowModel.bindBunwarpJ(this);
+        imagesContainer.add(imageDisplayPaneTopLeft, 0, 0);
+        imagesContainer.add(imageDisplayPaneBottomLeft, 0, 1);
+        imagesContainer.add(imageDisplayPaneTopRight, 1, 0);
+        loadPointsButton.setOnAction(e -> {
+            try {
+                tableDisplayView.display(workflowModel.loadTable(HEADER, fileLabel));
+            } catch (IOException ex) {
+                Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         });
-        leftButton.setOnAction(e -> {
-            imagesContainer.setLeft(imageDisplayPaneLeft);
-            openImage(imageDisplayPaneLeft);
+
+        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneTopLeft, imageDisplayPaneTopRight, imageDisplayPaneBottomLeft};
+        bindPaneProperty(Arrays.asList(imageDisplayPanes));
+
+//Try to get the last one!
+        bus.getStream(DataViewEvent.class)
+                //                .filter(bus::doesDisplayRequireRefresh)
+                .buffer(1000 / 15, TimeUnit.MILLISECONDS)
+                .filter(list -> !list.isEmpty())
+                //                .first()
+                //                .replay(1)
+                //                .doOnTerminate(() -> System.out.println("ijfx.ui.correction.BUnwarpJWorkflow.init()"))
+                .subscribe(onCompleted -> {
+                    Dataset[] datasets = new Dataset[2];
+                    ImageDisplay imageDisplayLeft = imageDisplayPaneTopLeft.getImageDisplay();
+                    datasets[0] = datasetUtillsService.extractPlane(imageDisplayLeft);
+
+                    ImageDisplay imageDisplayRight = imageDisplayPaneTopRight.getImageDisplay();
+                    datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
+                    workflowModel.extractAndMerge(datasets, imageDisplayPaneBottomLeft);
+                });
+
+        setCellFactory(listView);
+        listView.getItems().addAll(workflowModel.getFiles());
+        listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
+            workflowModel.openImage(this.imageDisplayPaneTopRight, this.imageDisplayPaneTopLeft, newValue)
+                    .thenRunnable(() -> {
+                        workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeft.getImageDisplay());
+                        workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRight.getImageDisplay());
+                    })
+                    .start();
+
         });
-        bottomButton.setOnAction(e -> {
-            imagesContainer.setBottom(imageDisplayPaneBottom);
-            openImage(imageDisplayPaneBottom);
-        });
-
-    }
-
-    protected ImageDisplay displayDataset(Dataset dataset, ImageDisplayPane imageDisplayPane) {
-        ImageDisplay imageDisplay = new DefaultImageDisplay();
-        context.inject(imageDisplay);
-        imageDisplay.display(dataset);
-        imageDisplayPane.display(imageDisplay);
-        return imageDisplay;
-    }
-
-    protected ImageDisplay openImage(ImageDisplayPane imageDisplayPane) {
-        FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(null);
-
-        Dataset flatFieldDataset = null;
-        try {
-            flatFieldDataset = imagePlaneService.openVirtualDataset(file);
-        } catch (IOException ex) {
-            Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+        if (workflowModel.getLandMarksFile() != null) {
+            try {
+                tableDisplayView.display(workflowModel.loadTable(HEADER, fileLabel, workflowModel.getLandMarksFile()));
+            } catch (IOException ex) {
+                Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        return displayDataset(flatFieldDataset, imageDisplayPane);
+    }
+
+    @EventHandler
+    public void handleEvent(DataViewEvent event) {
+        //To be changed
+        if (imageDisplayPaneTopLeft.getImageDisplay() != null && imageDisplayPaneTopRight.getImageDisplay() != null) {
+            if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
+                bus.channel(event);
+            }
+
+        }
 
     }
+
+    @EventHandler
+    public void handleEvent(LUTsChangedEvent event) {
+//        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
+//            bus.channel(event);
+//        }
+
+    }
+
+    public void copyLUT(List<ImageDisplay> list, Dataset output) {
+
+        if (list.stream().allMatch(imageDisplay -> imageDisplayService.getActiveDatasetView(imageDisplay).getColorTables().isEmpty())) {
+            return;
+        }
+        IntStream.range(0, imageDisplayService.getActiveDatasetView(imageDisplayPaneBottomLeft.getImageDisplay()).getColorTables().size() + 1).forEach(i -> {
+            DatasetView datasetView = imageDisplayService.getActiveDatasetView(list.get(i));
+            imageDisplayService.getActiveDatasetView(imageDisplayPaneBottomLeft.getImageDisplay()).setColorTable(datasetView.getColorTables().get(0), i);
+        });
+
+    }
+
 }

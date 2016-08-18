@@ -1,0 +1,22 @@
+[
+    { 
+        "text":"Choose the image that contains the flatfield",
+        "target":"#landmarksTab"
+    },
+    {
+        "text":"Choose the image that contains the flatfield"
+        ,"target":"#deformationTab"
+    },
+    {
+        "text":"Choose the image that contains the flatfield"
+        ,"target":"#weightTab"
+    },
+    {
+        "text":"Choose the image that contains the flatfield"
+        ,"target":"#outputTab"
+    },
+    {
+        "text":"Choose the image that contains the flatfield"
+        ,"target":"#imagesTab"
+    }
+]

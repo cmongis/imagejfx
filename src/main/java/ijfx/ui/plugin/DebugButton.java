@@ -23,11 +23,13 @@ package ijfx.ui.plugin;
 import ijfx.ui.UiPlugin;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.core.imagedb.ImageRecordService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.notification.NotificationService;
 import ijfx.service.ui.AppService;
 import ijfx.service.ui.HintService;
+import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.uicontext.UiContextService;
 import java.io.File;
 import javafx.event.ActionEvent;
@@ -41,6 +43,8 @@ import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.FileBatchProcessorPanel;
+import ijfx.ui.explorer.DefaultFolderManagerService;
+import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.PerformanceActivity;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,7 +66,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
 
     @Parameter
     private UiContextService contextService;
-    
+
     @Parameter
     private NotificationService notificationService;
 
@@ -78,6 +82,9 @@ public class DebugButton extends MenuButton implements UiPlugin {
     @Parameter
     private ActivityService activityService;
 
+    @Parameter
+    private JsonPreferenceService jsonService;
+
     Menu reloadMenu = new Menu("Reload UiPlugin");
     Menu activityMenu = new Menu("Show activity");
 
@@ -88,11 +95,12 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Reload Debug Button", event -> uiPluginService.reload(DebugButton.class));
         addItem("Reload App Browser", event -> appService.reloadCurrentView());
         addItem("Test hints", this::testHints);
-        addItem("Switch context",event->setContext());
-        addItem("Open performance monitor",this::openPerformanceMonitor);
-        addItem("Open module browser",this::openWebApp);
+        addItem("Switch context", event -> setContext());
+        addItem("Open performance monitor", this::openPerformanceMonitor);
+        addItem("Open module browser", this::openWebApp);
+        addItem("Reset Explorer Data", this::resetExplorerData);
         getItems().add(reloadMenu);
-        addEventHandler(MouseEvent.MOUSE_ENTERED,this::updateReloadMenu);
+        addEventHandler(MouseEvent.MOUSE_ENTERED, this::updateReloadMenu);
         System.out.println("Added");
     }
 
@@ -144,11 +152,11 @@ public class DebugButton extends MenuButton implements UiPlugin {
         UiPlugin ui = (UiPlugin) mi.getUserData();
         uiPluginService.reload(ui.getClass());
     }
-    
+
     private void openPerformanceMonitor(ActionEvent event) {
         activityService.openByType(PerformanceActivity.class);
     }
-    
+
     private void openWebApp(ActionEvent event) {
         appService.showApp("modules");
     }
@@ -171,10 +179,14 @@ public class DebugButton extends MenuButton implements UiPlugin {
             reloadMenu.getItems().addAll(items);
         }
     }
-    
+
     private void setContext() {
         contextService.enter("segmentation");
         contextService.update();
+    }
+
+    private void resetExplorerData(Object e) {
+        jsonService.resetConfig(FolderManagerService.FOLDER_PREFERENCE_FILE, ImageRecordService.JSON_FILE);
     }
 
 }

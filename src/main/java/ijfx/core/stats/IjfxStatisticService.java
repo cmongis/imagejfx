@@ -37,6 +37,7 @@ public interface IjfxStatisticService extends IjfxService{
     public SummaryStatistics getSummaryStatistics(Dataset dataset);
     public <T extends RealType<T>> SummaryStatistics getSummaryStatistics(Cursor<T> rai);
     public DescriptiveStatistics getDatasetDescriptiveStatistics(Dataset dataset);
+    public DescriptiveStatistics getPlaneDescriptiveStatistics(Dataset dataset, long[]position);
     public SummaryStatistics getStatistics(File file);
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition);
     

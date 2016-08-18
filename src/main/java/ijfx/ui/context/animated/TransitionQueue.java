@@ -43,7 +43,12 @@ public class TransitionQueue {
         final EventHandler handler = transition.getOnFinished();
         transition.setOnFinished(event -> {
             if (handler != null) {
+                try {
+                    
                 handler.handle(event);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
             playNext();

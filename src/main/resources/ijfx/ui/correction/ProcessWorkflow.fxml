@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <bottom>
+        <fx:include source="./ActionBar.fxml" />
+    </bottom>
+   <center>
+      <GridPane fx:id="gridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="200.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                    <Button fx:id="processButton" disable="true" mnemonicParsing="false" text="Process" />
+                  <ListView fx:id="listViewItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                  <Button fx:id="directoryButton" mnemonicParsing="false" onAction="#saveDirectory" text="Choose a directory" />
+                  <Label fx:id="directoryLabel" />
+               </children>
+            </VBox>
+         </children>
+      </GridPane>
+   </center>
+   
+</BorderPane>

@@ -53,48 +53,54 @@ public class ImagesToStack extends ContextCommand {
     @Parameter
     AxisType axisType;
 
-    @Parameter
-    String title;
+    @Parameter(required = false)
+    String title = "title";
 
     @Override
     public void run() {
         initOutput();
         for (int i = 0; i < datasetArray.length; i++) {
             addPlane(outputDataset, datasetArray[i], axisType, i);
+            copyColorTable(datasetArray[i], outputDataset, 0);
         }
     }
 
     public <T extends RealType<T>> void initOutput() {
         int size = datasetArray.length;
         Dataset firstElement = datasetArray[0];
-        
-        long[] dims = new long[firstElement.numDimensions()+1];
+
+        long[] dims = new long[firstElement.numDimensions() + 1];
         firstElement.dimensions(dims);
-        
+
         int axisTypeIndex = 2;
         dims[axisTypeIndex] = size;
-        
+
         AxisType[] axisTypesArray = new AxisType[3];
         IntStream.range(0, firstElement.numDimensions())
                 .forEach(i -> axisTypesArray[i] = firstElement.axis(i).type());
         axisTypesArray[2] = axisType;
-        outputDataset = datasetService.create(dims, title, axisTypesArray, firstElement.getValidBits(), firstElement.isSigned(), false);
+        outputDataset = datasetService.create(dims, title, axisTypesArray, firstElement.getValidBits(), firstElement.isSigned(), !firstElement.isInteger());
+        outputDataset.initializeColorTables(firstElement.getColorTableCount());
         outputDataset.setName(title);
     }
-    
-    private void addPlane(Dataset datasetOutput, Dataset input, AxisType axisType, int i){
-        RandomAccess <? extends RealType>randomAccessOutput = datasetOutput.randomAccess();
-        Cursor <? extends RealType>cursorInput = input.cursor();
+
+    private void addPlane(Dataset datasetOutput, Dataset input, AxisType axisType, int i) {
+        RandomAccess<? extends RealType> randomAccessOutput = datasetOutput.randomAccess();
+        Cursor<? extends RealType> cursorInput = input.cursor();
         long[] positionOutput = new long[datasetOutput.numDimensions()];
         while (cursorInput.hasNext()) {
             cursorInput.next();
             cursorInput.localize(positionOutput);
             IntStream.range(0, input.numDimensions())
-                    .forEach(j ->randomAccessOutput.setPosition(cursorInput.getIntPosition(j), j));
+                    .forEach(j -> randomAccessOutput.setPosition(cursorInput.getIntPosition(j), j));
             randomAccessOutput.setPosition(i, 2);
             randomAccessOutput.get().setReal(cursorInput.get().getRealFloat());
-            
+
         }
+    }
+    
+    private void copyColorTable(Dataset input, Dataset output, int cpt){
+        output.setColorTable(input.getColorTable(cpt), cpt);
     }
 
 }

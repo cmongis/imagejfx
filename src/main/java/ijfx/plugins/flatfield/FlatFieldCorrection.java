@@ -19,29 +19,24 @@
 package ijfx.plugins.flatfield;
 
 import ijfx.core.stats.IjfxStatisticService;
-import ijfx.core.utils.DatasetUtils;
 import ijfx.plugins.convertype.TypeChangerIJFX;
 import ijfx.service.dataset.DatasetUtillsService;
-import ijfx.service.sampler.DatasetSamplerService;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
-import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.plugins.commands.assign.DivideDataValuesBy;
+import net.imagej.plugins.commands.typechange.TypeChanger;
 import net.imagej.types.DataTypeService;
-import net.imglib2.Cursor;
-import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
+import org.scijava.command.ContextCommand;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
@@ -53,7 +48,7 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class, menuPath = "Process > Correction > FlatField Correction")
-public class FlatFieldCorrection implements Command {
+public class FlatFieldCorrection extends ContextCommand {
 
     @Parameter
     CommandService commandService;
@@ -75,29 +70,32 @@ public class FlatFieldCorrection implements Command {
 
     @Parameter
     ImageDisplay flatFieldImageDisplay;
+//    Dataset flatFieldDataset;
 
     @Parameter
-    Dataset flatFieldDataset;
-
-    @Parameter
-    Dataset inputDataset;
+    ImageDisplay inputImageDisplay;
 
     @Parameter(type = ItemIO.OUTPUT)
     Dataset outputDataset;
 
     @Parameter
-    boolean createNewImage = true;
+    boolean createNewImage = false;
 
-    private double median = 0.0;
+    private double median = 1.0;
 
     @Override
     public void run() {
-        flatFieldDataset = datasetUtillsService.extractPlane(flatFieldImageDisplay);//datasetUtillsService.getImageDisplay(flatFieldDataset));//convertTo32(inputDataset);;
-        inputDataset = convertTo32(inputDataset);
-        flatFieldDataset = convertTo32(flatFieldDataset);
-        median = ijfxStatisticService.getDatasetDescriptiveStatistics(inputDataset).getPercentile(50);
-        inputDataset = datasetUtillsService.divideDatasetByValue(inputDataset, median);
-        outputDataset = datasetUtillsService.divideDatasetByDataset(inputDataset, flatFieldDataset);
+        long[] position = new long[inputImageDisplay.numDimensions()];
+        inputImageDisplay.localize(position);
+        long[] positionFlatField = new long[flatFieldImageDisplay.numDimensions()];
+        flatFieldImageDisplay.localize(positionFlatField);
+        Dataset dataset = imageDisplayService.getActiveDataset(inputImageDisplay);
+        Dataset dataset32 = convertTo32(dataset);
+        Dataset flatFieldDataset = imageDisplayService.getActiveDataset(flatFieldImageDisplay);
+        Dataset flatFieldDataset32 = convertTo32(flatFieldDataset);
+        median = ijfxStatisticService.getPlaneDescriptiveStatistics(dataset32, position).getPercentile(50);
+        Dataset datasetDividedByValue = datasetUtillsService.divideActivePlaneByValue(dataset32, position, median);;
+        outputDataset = datasetUtillsService.divideActivePlaneByActivePlane(datasetDividedByValue, position, flatFieldDataset32, positionFlatField);
     }
 
     public boolean isCreateNewImage() {
@@ -108,31 +106,21 @@ public class FlatFieldCorrection implements Command {
         this.createNewImage = createNewImage;
     }
 
-    public <T> Dataset convertTo32(Dataset dataset) {
+    public Dataset convertTo32(Dataset dataset) {
+        RealType<?> firstElement = dataset.firstElement();
+        String typeFirstElement = dataTypeService.getTypeByAttributes(firstElement.getBitsPerPixel(), true, false, !dataset.isInteger(), dataset.isSigned()).longName();
+
         String type = dataTypeService.getTypeByAttributes(32, true, false, true, true).longName();
-        Module module = moduleService.createModule(commandService.getCommand(TypeChangerIJFX.class));
-        try {
-            module.initialize();
-        } catch (MethodCallException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        module.setInput("data", dataset);
-        module.setResolved("data", true);
-        module.setInput("typeName", type);
-        module.setResolved("typeName", true);
-        module.setInput("combineChannels", false);
-        module.setResolved("combineChannels", true);
 
-        Future run = moduleService.run(module, false);
+        if (typeFirstElement.equals(type)) return dataset;
+        Map<String, Object> map = new HashMap<>();
 
-        try {
-            run.get();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        Dataset data = (Dataset) module.getOutput("data");
+        map.put("data", dataset);
+        map.put("typeName", type);
+        map.put("combineChannels", false);
+
+        Module executeCommand = executeCommand(TypeChangerIJFX.class, map);
+        Dataset data = (Dataset) executeCommand.getOutput("data");
         return data;
     }
 
