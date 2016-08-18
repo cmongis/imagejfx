@@ -52,6 +52,7 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class)
 public class ChromaticCorrection implements Command {
 
+    
     @Parameter
     ModuleService moduleService;
 
@@ -112,7 +113,7 @@ public class ChromaticCorrection implements Command {
             map3.put("transformation", transformation);
             promise = executeCommand(BunwarpJFX.class, map3).orElseThrow(NullPointerException::new);
             Dataset correctedSourceDataset = (Dataset) promise.getOutput("outputDataset");
-
+            
             // Replace the corrected slice in the sourceDataset
               Map<String, Object> map4 = new HashMap<>();
             map4.put("stack", this.sourceDataset);

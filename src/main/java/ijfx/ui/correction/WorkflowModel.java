@@ -389,6 +389,7 @@ public class WorkflowModel {
      * @return
      */
     public Dataset applyTransformation(Dataset sourceDataset, long[] sourcePosition, Dataset targetDataset, long[] targetPosition, bunwarpj.Transformation transformation) {
+        System.gc();
         int max_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(max_scale_deformation_choice.get());
         int min_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(min_scale_deformation_choice.get());
         int mode = Arrays.asList(CHOICES_MODE).indexOf(modeChoice.get());
@@ -404,7 +405,7 @@ public class WorkflowModel {
 
         Module module = executeCommand(ChromaticCorrection.class, map).orElseThrow(NullPointerException::new);
 
-        Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
+        Dataset outputDataset = (Dataset) module.getOutput("outputDataset");;
         return outputDataset;
     }
 
@@ -516,11 +517,11 @@ public class WorkflowModel {
 
             try {
                 bunwarpj.Transformation transformation = getTransformation(files.get(0));
-                files.parallelStream().forEach((File file) -> {
-                    new CallbackTask<Void, Void>().run(() -> {
+                files.stream().forEach((File file) -> {
+//                    new CallbackTask<Void, Void>().run(() -> {
                         transformeImage(file, destinationPath, transformation);
-                    })
-                            .start();
+//                    })
+//                            .start();
 
                 });
             } catch (InterruptedException | ExecutionException ex) {
@@ -533,7 +534,7 @@ public class WorkflowModel {
     }
 
     public void transformeImage(File file, String destinationPath, bunwarpj.Transformation transformation) {
-        new CallbackTask<Void, Void>().run(() -> {
+//        new CallbackTask<Void, Void>().run(() -> {
             try {
                 Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
                 ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
@@ -549,14 +550,15 @@ public class WorkflowModel {
                 path.append("/").append(file.getName());
                 iOService.save(outputDataset, path.toString());
                 mapImages.put(file, new File(path.toString()));
+                imageDisplay.close();
                 Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, "Save " + path.toString());
 
             } catch (Exception ex) {
                 Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
             }
-        })
-                .submit(loadingScreenService)
-                .start();
+//        })
+//                .submit(loadingScreenService)
+//                .start();
     }
 
     public Transformation getTransformation(File file) throws InterruptedException, ExecutionException {
