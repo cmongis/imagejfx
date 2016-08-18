@@ -70,7 +70,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     DisplayService displayService;
 
     @Override
-    public Dataset extractPlane(ImageDisplay imageDisplay) {
+    public Dataset extractPlane(ImageDisplay imageDisplay) throws NullPointerException {
         CalibratedAxis[] calibratedAxises = new CalibratedAxis[imageDisplay.numDimensions()];
         int[] position = new int[imageDisplay.numDimensions()];
         imageDisplay.localize(position);

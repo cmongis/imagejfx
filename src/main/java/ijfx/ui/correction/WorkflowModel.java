@@ -19,6 +19,7 @@
  */
 package ijfx.ui.correction;
 
+import bunwarpj.Transformation;
 import ij.process.ImageProcessor;
 import ijfx.plugins.adapter.IJ1Service;
 import ijfx.plugins.bunwarpJ.ChromaticCorrection;
@@ -190,8 +191,8 @@ public class WorkflowModel {
     Context context;
 
     private ObjectProperty<List<File>> listProperty = new SimpleObjectProperty<>(new ArrayList<File>());
-    protected ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>(new long[]{-1});
-    protected ObjectProperty<long[]> positionRightProperty = new SimpleObjectProperty<>(new long[]{-1});
+    protected ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>(new long[]{});
+    protected ObjectProperty<long[]> positionRightProperty = new SimpleObjectProperty<>(new long[]{});
 
     protected final static Logger LOGGER = ImageJFX.getLogger();
 
@@ -511,42 +512,54 @@ public class WorkflowModel {
     }
 
     public void transformeImages(List<File> files, String destinationPath) {
+        new CallbackTask<Void, Void>().run(() -> {
 
-        bunwarpj.Transformation transformation = getTransformation(files.get(0));
-        files.parallelStream().forEach((File file) -> {
-            CallbackTask<Void, Void> start = new CallbackTask<Void, Void>().run(() -> {
-                transformeImage(file, destinationPath, transformation);
-            })
-                    .submit(loadingScreenService)
-                    .start();
+            try {
+                bunwarpj.Transformation transformation = getTransformation(files.get(0));
+                files.parallelStream().forEach((File file) -> {
+                    new CallbackTask<Void, Void>().run(() -> {
+                        transformeImage(file, destinationPath, transformation);
+                    })
+                            .start();
 
-        });
+                });
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        })
+                .submit(loadingScreenService)
+                .start();
+
     }
 
     public void transformeImage(File file, String destinationPath, bunwarpj.Transformation transformation) {
-        try {
-            Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
-            ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
+        new CallbackTask<Void, Void>().run(() -> {
+            try {
+                Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
+                ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
 
-            //Set position, get dataset and apply flatField correction
-            setPosition(getPositionRight(), imageDisplay);
-            Dataset targetDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldRight());
+                //Set position, get dataset and apply flatField correction
+                setPosition(getPositionRight(), imageDisplay);
+                Dataset targetDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldRight());
 
-            setPosition(getPositionLeft(), imageDisplay);
-            Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
-            Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
-            StringBuilder path = new StringBuilder(destinationPath);
-            path.append("/").append(file.getName());
-            iOService.save(outputDataset, path.toString());
-            mapImages.put(file, new File(path.toString()));
+                setPosition(getPositionLeft(), imageDisplay);
+                Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
+                Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
+                StringBuilder path = new StringBuilder(destinationPath);
+                path.append("/").append(file.getName());
+                iOService.save(outputDataset, path.toString());
+                mapImages.put(file, new File(path.toString()));
+                Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, "Save " + path.toString());
 
-        } catch (Exception ex) {
-            Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            } catch (Exception ex) {
+                Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        })
+                .submit(loadingScreenService)
+                .start();
     }
 
-    public bunwarpj.Transformation getTransformation(File file) {
-        bunwarpj.Transformation transformation = null;
+    public Transformation getTransformation(File file) throws InterruptedException, ExecutionException {
         try {
             Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
             Stack<Point> sourcePoints = new Stack<>();
@@ -557,11 +570,12 @@ public class WorkflowModel {
             int mode = Arrays.asList(CHOICES_MODE).indexOf(modeChoice.get());
             bunwarpj.Param parameter = new bunwarpj.Param(mode, maxImageSubsamplingFactor.get(), min_scale_deformation, max_scale_deformation, divWeight.get(), curlWeight.get(), landmarkWeight.get(), imageWeight.get(), consistencyWeight.get(), stopThreshold.get());
 
-            transformation = bunwarpj.bUnwarpJ_.computeTransformationBatch((int) inputDataset.dimension(0), (int) inputDataset.dimension(1), (int) inputDataset.dimension(0), (int) inputDataset.dimension(1), sourcePoints, targetPoints, parameter);
+            return bunwarpj.bUnwarpJ_.computeTransformationBatch((int) inputDataset.dimension(0), (int) inputDataset.dimension(1), (int) inputDataset.dimension(0), (int) inputDataset.dimension(1), sourcePoints, targetPoints, parameter);
         } catch (IOException ex) {
             Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return transformation;
+        return null;
+//        return callbackTask.get();
 
     }
 
