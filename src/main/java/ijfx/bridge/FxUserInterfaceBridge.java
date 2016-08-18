@@ -20,6 +20,7 @@
  */
 package ijfx.bridge;
 
+import ijfx.core.stats.IjfxStatisticService;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.service.batch.BatchService;
 import ijfx.service.ui.CommandRunner;
@@ -35,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
+import mongis.utils.CallbackTask;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -51,6 +53,7 @@ import org.scijava.ui.UIService;
 import org.scijava.ui.UserInterface;
 import org.scijava.ui.viewer.DisplayWindow;
 import mongis.utils.FXUtilities;
+import net.imagej.Dataset;
 import org.scijava.display.TextDisplay;
 
 /**
@@ -196,8 +199,18 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
             
             ImageDisplay imgDisplay = (ImageDisplay) dspl;
             
+            Dataset dataset = imageDisplayService.getActiveDataset(imgDisplay);
             
+            new CallbackTask()
+                    .setName("Enhancing contrast...")
+                    
+                    .run(()->AutoContrast.run(getContext().getService(IjfxStatisticService.class), imgDisplay, dataset, true))
+                    .submit(loadingScreenService)
+                    .setInitialProgress(0.8)
+                    .start();
+            ;
             
+       
             // we always assume that an image is displayed so we create an image window
             // in the image container (singleton pattern)
             final DefaultImageWindow imageWindow = new DefaultImageWindow(dspl.getContext());
@@ -220,7 +233,10 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
                 
             });
             
-            new CommandRunner(getContext()).run("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay,"channelDependant",true);
+            
+            
+            
+            //new CommandRunner(getContext()).run("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay,"channelDependant",true);
             
         } else if (dspl instanceof TableDisplay) {
             
