@@ -29,13 +29,14 @@ import ijfx.ui.activity.ActivityService;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import mongis.utils.AsyncCallable;
 import net.imagej.Dataset;
-import org.apache.commons.lang3.ArrayUtils;
+import net.imagej.DefaultDataset;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.UIService;
@@ -138,7 +139,7 @@ public class PlaneMetaDataSetWrapper implements Explorable{
             }
         }
         
-        /*
+        
         @Override
         public Dataset getDataset() {
 
@@ -154,16 +155,18 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                     location = DimensionUtils.readLongArray(nonPlanarPosition.getStringValue());
                     long[] dimLengths = DimensionUtils.readLongArray(m.get(MetaData.DIMENSION_LENGHS).getStringValue());
                     
-                    
-                    return imagePlaneService.extractPlane(getFile(), location,dimLengths);
+                    //Dataset virtualDataset = imagePlaneService.openVirtualDataset(getFile());
+                    return imagePlaneService.extractPlane(getFile(), location);
+                    //return imagePlaneService.extractPlane(file, location)
+                    //return imagePlaneService.isolatePlane(imagePlaneService.openVirtualDataset(getFile()), location);
                 }
 
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 ImageJFX.getLogger().log(Level.SEVERE, null, ex);
             }
             return null;
         }
-         */
+         /*
         @Override
         public Dataset getDataset() {
             try {
@@ -180,7 +183,7 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                 ImageJFX.getLogger().log(Level.SEVERE, null, io);
                 return null;
             }
-        }
+        }*/
 
     }
 
