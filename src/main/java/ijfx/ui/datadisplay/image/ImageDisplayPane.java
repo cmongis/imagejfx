@@ -21,7 +21,6 @@ package ijfx.ui.datadisplay.image;
 
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
-import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
@@ -31,9 +30,9 @@ import ijfx.ui.canvas.utils.ViewPort;
 import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
 import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.FxToolService;
-import ijfx.ui.tool.ToolChangeEvent;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -45,6 +44,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
@@ -54,10 +55,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -120,7 +119,7 @@ public class ImageDisplayPane extends AnchorPane {
     private OverlayDisplayService overlayDisplayService;
 
     @Parameter
-    private DefaultLoggingService logService;
+    private Logger logService = ImageJFX.getLogger();
 
     @Parameter
     private OverlaySelectionService overlaySelectionService;
@@ -318,7 +317,7 @@ public class ImageDisplayPane extends AnchorPane {
             }
             OverlayDrawer drawer = getDrawer(overlay);
             if (drawer == null) {
-                logService.warn("No drawer found for %s", overlay.getClass().getSimpleName());
+                logService.warning(String.format("No drawer found for %s", overlay.getClass().getSimpleName()));
             };
             Node node = drawer.update(overlay, canvas.getCamera());
             node.setMouseTransparent(true);
@@ -339,7 +338,7 @@ public class ImageDisplayPane extends AnchorPane {
             t.elapsed("updateOverlay");
 
         } catch (NullPointerException e) {
-            logService.warn("Couldn't draw overlay. Probably because of a lack of Drawer", e);
+            logService.log(Level.WARNING,"Couldn't draw overlay. Probably because of a lack of Drawer",e);
         }
     }
 
@@ -389,7 +388,7 @@ public class ImageDisplayPane extends AnchorPane {
 
             OverlayModifier modifier = getModifier(overlay);
             if (modifier == null) {
-                logService.warn("No modifier was found for this overlay " + overlay.getClass().getSimpleName());
+                logService.warning("No modifier was found for this overlay " + overlay.getClass().getSimpleName());
                 return;
             }
             List<MoveablePoint> modifiers = modifier.getModifiers(canvas.getCamera(), overlay);
@@ -414,7 +413,7 @@ public class ImageDisplayPane extends AnchorPane {
         setTitle(imageDisplay.getName());
         //   System.out.println(getDatasetview().getPlanePosition().numDimensions());
 
-        logService.setLevel(LogService.INFO);
+       
 
         if (arcMenu != null) {
             anchorPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, arcMenu::show);
@@ -543,7 +542,7 @@ public class ImageDisplayPane extends AnchorPane {
     @EventHandler
     protected void onOverlaySelectedEvent(OverlaySelectedEvent event) {
         logService.info("Overlay selected event");
-        bus.channel(event);
+        if(getOverlays().contains(event.getOverlay()))bus.channel(event);
     }
 
     @EventHandler
@@ -677,7 +676,7 @@ public class ImageDisplayPane extends AnchorPane {
         if (overlays == null) {
             return new ArrayList<Overlay>();
         }
-        return overlayService.getOverlays(imageDisplay);
+        return overlays;
     }
 
     public Overlay getSelectedOverlay() {
