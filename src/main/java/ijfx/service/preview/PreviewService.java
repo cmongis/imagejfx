@@ -240,8 +240,8 @@ public class PreviewService extends AbstractService implements ImageJService {
 
         //Sometimes activePosition is invalid
         try {
-            view.getData().setChannelMaximum(0, activeDataview.getChannelMax(activePosition.getIntPosition(0)));
-            view.getData().setChannelMinimum(0, activeDataview.getChannelMin(activePosition.getIntPosition(0)));
+            view.getData().setChannelMaximum(0, activeDataview.getChannelMax(0));
+            view.getData().setChannelMinimum(0, activeDataview.getChannelMin(0));
 
             //view.setPosition(activePosition);
             view.setColorMode(activeDataview.getColorMode());
@@ -362,7 +362,7 @@ public class PreviewService extends AbstractService implements ImageJService {
 //        activePosition.localize(dimension);
 
         //Set LUT
-        if (input.getData().getImgPlus().getCompositeChannelCount() == 1) {
+        if (colorTables.size()>1) {
             output.setColorTable(colorTables.get(activePosition.getIntPosition(0)), 0);
         } else {
             output.setColorTable(colorTables.get(0), 0);
