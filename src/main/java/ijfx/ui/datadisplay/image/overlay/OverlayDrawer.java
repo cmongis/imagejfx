@@ -71,6 +71,21 @@ public interface OverlayDrawer<T extends Overlay> extends ClassHandler<Overlay> 
         
     }
     
+    
+    public static Rectangle2D getOverlayBounds(Overlay overlay) {
+         double x1 = overlay.getRegionOfInterest().realMin(0);
+        double y1 = overlay.getRegionOfInterest().realMin(1);
+        double x2 = overlay.getRegionOfInterest().realMax(0);
+        double y2 = overlay.getRegionOfInterest().realMax(1);
+        
+        //System.out.println(String.format("(%.0f,%.0f), (%.0f,%.0f)", x1, y1, x2, y2));
+        Rectangle2D r = new Rectangle2D(x1, y1, x2 - x1, y2 - y1);
+        return r;
+    }
+    
+    public default boolean isOverlayOnViewPort(Overlay overlay, ViewPort viewport) {
+        return viewport.getSeenRectangle().contains(getOverlayBounds(overlay));
+    }
 
     public static void color(Overlay overlay, Shape shape) {
         ColorRGB fillColor = overlay.getFillColor();
