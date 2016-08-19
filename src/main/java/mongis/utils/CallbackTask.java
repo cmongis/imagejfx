@@ -84,6 +84,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     
     double total = 1.0;
     double progress = 0;
+    
     public CallbackTask() {
         super();
     }
@@ -326,6 +327,10 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         setProgress(progress, total);
     }
     
+    public CallbackTask<INPUT,OUTPUT> setInitialProgress(double p) {
+        setProgress(progress);
+        return this;
+    }
     
     
 }

@@ -219,7 +219,7 @@ public class FXUtilities {
 
         URL css
                 = rootController.getClass().getResource(rootController.getClass().getSimpleName() + ".css");
-        
+
         try {
             if (css != null) {
 
@@ -244,25 +244,24 @@ public class FXUtilities {
                 root.getScene().getStylesheets().add(css.toExternalForm());
             }
         } catch (Exception e) {
-            Logger.getGlobal().warning("No CSS found for "+rootController.getClass().getSimpleName());
+            Logger.getGlobal().warning("No CSS found for " + rootController.getClass().getSimpleName());
         }
 
     }
 
     public static void injectFXMLSafe(final Object controller) throws IOException {
         try {
-        runAndWait(() -> {
-            try {
-                injectFXML(controller);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        }
-        catch(Exception e) {
+            runAndWait(() -> {
+                try {
+                    injectFXML(controller);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (Exception e) {
             Logger.getGlobal().log(Level.WARNING, "Couldn't load CSS", e);
         }
-        
+
     }
 
     public static String javaClassToName(String className) {
@@ -388,11 +387,9 @@ public class FXUtilities {
         };
 
         try {
-            if(Platform.isFxApplicationThread()) {
+            if (Platform.isFxApplicationThread()) {
                 task.run();
-            }
-            
-            else {
+            } else {
                 runAndWait(task);
             }
 
@@ -402,6 +399,16 @@ public class FXUtilities {
         }
         return null;
 
+    }
+
+    public static File saveFileSync(String title, String defaultFolder, String extensionTitle, String... extensions) {
+        FileChooser fileChooser = new FileChooser();
+        File file = null;
+        fileChooser.setTitle(title);
+        if(defaultFolder != null) fileChooser.setInitialDirectory(new File(defaultFolder));
+        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter(extensionTitle, extensions));
+        file = fileChooser.showSaveDialog(null);
+        return file;
     }
 
     public static File saveFile(String title, String defaultFolder, String extensionTitle, String... extensions) {
