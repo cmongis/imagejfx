@@ -71,7 +71,9 @@ public interface MetaData {
     public final static int TYPE_DOUBLE = 2;
     public final static int TYPE_NOT_SET = -1;
     public final static int TYPE_UNKNOWN = 3;
-    public final static int TYPE_NUMBER = 3;
+    public final static int TYPE_NUMBER = 4;
+    
+    
     public int getType();
 
     public int getOrigin();
