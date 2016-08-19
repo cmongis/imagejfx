@@ -228,8 +228,8 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
     @Override
     public <T extends RealType<T>> IntervalView<T> planeView(Dataset source, long[] position) {
-        if (position.length == 0) {
-            return (IntervalView<T>) Views.offset(source, 0, 0);
+        if (position.length == 2) {
+            return (IntervalView<T>) Views.translate(source, 0,0);
         }
         IntervalView<T> hyperSlice = (IntervalView<T>) Views.hyperSlice(source, 2, position[0]);
         for (int d = 1; d != position.length; d++) {
