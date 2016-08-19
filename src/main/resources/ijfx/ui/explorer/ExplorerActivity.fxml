@@ -37,9 +37,21 @@
                         <FontAwesomeIconView glyphName="BAR_CHART" />
                      </graphic>
                      <HBox.margin>
-                        <Insets right="20.0" />
+                        <Insets />
                      </HBox.margin>
                   </Button>
+                  <MenuButton mnemonicParsing="false" styleClass="normal" text="More">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#exportToCSV" text="Export displayed item to CSV" />
+                      <MenuItem mnemonicParsing="false" text="Propositions are welcomed" />
+                    </items>
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="PLUS_SQUARE" />
+                     </graphic>
+                  </MenuButton>
                   <Button fx:id="selectAllButton" mnemonicParsing="false" onAction="#selectAll" styleClass="success" text="Select all">
                      <graphic>
                         <FontAwesomeIconView glyphName="CHECK" />
@@ -54,6 +66,9 @@
                      <graphic>
                         <FontAwesomeIconView glyphName="GEARS" />
                      </graphic>
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
                   </Button>
                </children>
                <styleClass>
