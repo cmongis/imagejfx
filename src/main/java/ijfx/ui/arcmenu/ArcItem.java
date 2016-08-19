@@ -642,11 +642,11 @@ public class ArcItem<T> extends Control {
      *
      */
     public void rebuildTickHashMap() {
-
+        tickHashMap = new HashMap<>();
         if (getSkin() == null) {
             return;
         }
-        tickHashMap = new HashMap<>();
+        
 
         for (double i = sliderMinValue.get(); i <= sliderMaxValue.get(); i += sliderTick.get()) {
 
