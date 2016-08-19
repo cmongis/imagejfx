@@ -19,13 +19,11 @@
  */
 package ijfx.service.cluster;
 
-import ijfx.core.listenableSystem.MetaDataSetUtils;
+import ijfx.core.metadata.MetaDataSetUtils;
 import ijfx.ui.explorer.Explorable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.imagej.ImageJService;

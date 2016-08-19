@@ -41,10 +41,10 @@ public interface WorkflowStep {
 
     public Map<String, Object> getParameters();
 
-    public void setParameterType(String parameter, StepParameterType type);
+    //public void setParameterType(String parameter, StepParameterType type);
 
-    public StepParameterType getParameterType(String parameter);
+    //public StepParameterType getParameterType(String parameter);
 
-    public Map<String, StepParameterType> getParameterTypes();
+   // public Map<String, StepParameterType> getParameterTypes();
 
 }

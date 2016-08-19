@@ -102,6 +102,8 @@ import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
+import org.scijava.Context;
+import org.scijava.plugin.PluginService;
 
 /**
  * FXML Controller class

@@ -19,10 +19,10 @@
  */
 package ijfx.ui.batch;
 
-import ijfx.core.listenableSystem.MetaDataSetUtils;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetUtils;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

@@ -51,7 +51,7 @@ public class WorkflowStepSerializer extends JsonSerializer<DefaultWorkflowStep> 
         jg.writeStringField(JsonFieldName.ID, workflowStep.getId());
         jg.writeStringField(JsonFieldName.CLASS, workflowStep.getClass().getName());
         jg.writeObjectField(JsonFieldName.parameters, workflowStep.getParameters());
-        jg.writeObjectField(JsonFieldName.parameterTypes, workflowStep.getParameterTypes());
+        //jg.writeObjectField(JsonFieldName.parameterTypes, workflowStep.getParameterTypes());
 
     }
 

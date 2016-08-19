@@ -55,7 +55,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         super();
         context.inject(this);
         setContentPane(init());
-
+          
         for (EventType<? extends MouseEvent> t : new EventType[]{MouseEvent.MOUSE_CLICKED, MouseEvent.DRAG_DETECTED, MouseEvent.MOUSE_PRESSED}) {
             addEventHandler(t, this::putInFront);
             getContentPane().addEventHandler(t, this::putInFront);

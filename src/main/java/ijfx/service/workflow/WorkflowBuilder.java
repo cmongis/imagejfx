@@ -76,6 +76,21 @@ public class WorkflowBuilder {
     }
    
     
+    public WorkflowBuilder addStep(Class<?> moduleClass,Object... params) {
+        
+        
+        
+        DefaultWorkflowStep step = new DefaultWorkflowStep(moduleClass.getName());
+        for(int i = 0; i!= params.length;i+=2) {
+            step.setParameter(params[i].toString(), params[i+1]);
+        }
+        
+        steps.add(step);
+        
+        return this;
+        
+    }
+    
     public WorkflowBuilder then(Consumer<BatchSingleInput> consumer) {
         
         remapInputs(builder->builder.onFinished(consumer));
@@ -100,6 +115,11 @@ public class WorkflowBuilder {
     }
     
     
+    public Workflow getWorkflow(String name) {
+        DefaultWorkflow workflow =  new DefaultWorkflow(steps);
+        workflow.setName("No name");
+        return workflow;
+    }
     
     public Task<Boolean> start()  {
         

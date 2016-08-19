@@ -81,6 +81,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.display.event.DataViewUpdatedEvent;
+import net.imagej.display.event.LUTsChangedEvent;
 import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
@@ -729,6 +730,14 @@ public class ImageDisplayPane extends AnchorPane {
         //Platform.runLater(() -> deleteOverlay(event.getObject()));
     }
 
+    @EventHandler
+    protected void onLUTsChangedEvent(LUTsChangedEvent event) {
+        logService.info("LUT changed");
+        if(event.getView() == getDatasetview()) {
+            getImageDisplay().update();
+        }
+    }
+    
     @EventHandler
     protected void onAnyEvent(SciJavaEvent event) {
         logService.info(event.getClass().getSimpleName());

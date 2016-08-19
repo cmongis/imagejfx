@@ -47,28 +47,22 @@ import org.scijava.plugin.Parameter;
  */
 public class DefaultWorkflowStep implements WorkflowStep {
 
-    @JsonProperty(value = JsonFieldName.ID)
     protected String id;
 
     @JsonIgnore
     protected Module module;
 
-    @JsonProperty(value = JsonFieldName.CLASS)
+    @JsonIgnore
     protected String className;
 
-    @JsonProperty(value = JsonFieldName.parameterTypes)
-    Map<String, StepParameterType> parameterType = new HashMap<>();
-
     @JsonIgnore
-    Map<String, Object> parameters = new HashMap<>();
+    protected Map<String, Object> parameters = new HashMap<>();
 
-    @JsonIgnore
     @Parameter
-    CommandService commandService;
+    protected CommandService commandService;
 
-    @JsonIgnore
     @Parameter
-    ModuleService moduleSerivce;
+    protected ModuleService moduleSerivce;
 
     public static Class[] SAVED_TYPES = new Class[]{
         double.class,
@@ -83,8 +77,7 @@ public class DefaultWorkflowStep implements WorkflowStep {
         String.class,
         File.class,
         ColorTable8.class,
-        LongInterval.class
-        ,ThresholdMethod.class
+        LongInterval.class, ThresholdMethod.class
     };
 
     public DefaultWorkflowStep() {
@@ -124,12 +117,14 @@ public class DefaultWorkflowStep implements WorkflowStep {
 
     public DefaultWorkflowStep createModule(CommandService commandService, ModuleService moduleService) {
         CommandInfo infos = commandService.getCommand(getClassName());
-        if(infos != null)
-        module = moduleService.createModule(infos);
+        if (infos != null) {
+            module = moduleService.createModule(infos);
+        }
         return this;
     }
 
     @Override
+    @JsonIgnore
     public Module getModule() {
 
         if (module == null && commandService != null && moduleSerivce != null) {
@@ -140,11 +135,12 @@ public class DefaultWorkflowStep implements WorkflowStep {
     }
 
     @Override
-    @JsonGetter
+    @JsonGetter("parameters")
     public Map<String, Object> getParameters() {
         return parameters;
     }
 
+    /*
     @Override
     public void setParameterType(String parameter, StepParameterType type) {
         parameterType.put(parameter, type);
@@ -156,9 +152,9 @@ public class DefaultWorkflowStep implements WorkflowStep {
             parameterType.put(parameter, WorkflowStep.DEFAULT_PARAMETER_TYPE);
         }
         return parameterType.get(parameter);
-    }
-
+    }*/
     @Override
+    @JsonSetter("id")
     public void setId(String id) {
         this.id = id;
     }
@@ -168,7 +164,7 @@ public class DefaultWorkflowStep implements WorkflowStep {
         className = module.getInfo().getDelegateClassName();
     }
 
-    @JsonSetter
+    @JsonSetter("parameters")
     public void setParameters(Map<String, Object> parameters) {
 
         parameters.forEach((key, value) -> {
@@ -176,7 +172,7 @@ public class DefaultWorkflowStep implements WorkflowStep {
                 return;
             }
             if (ArrayUtils.contains(SAVED_TYPES, value.getClass())) {
-               
+
                 if (value instanceof String && value.toString().startsWith(FileSerializer.FILE_PREFIX)) {
                     this.parameters.put(key, FileDeserializer.deserialize(value.toString()));
                 } else {
@@ -188,11 +184,11 @@ public class DefaultWorkflowStep implements WorkflowStep {
         //this.parameters = parameters;
     }
 
+    /*
     @Override
     public Map<String, StepParameterType> getParameterTypes() {
         return parameterType;
-    }
-
+    }*/
     @JsonGetter(value = JsonFieldName.CLASS)
     public String getClassName() {
         if (className == null && module != null) {
@@ -206,11 +202,13 @@ public class DefaultWorkflowStep implements WorkflowStep {
         this.className = className;
     }
 
+    @JsonSetter(value = "parameters")
     public void setParameter(String alpha, Object object) {
         getParameters().put(alpha, object);
 
     }
 
+    @JsonGetter(value = "parameters")
     public Object getParameter(String alpha) {
         return getParameters().get(alpha);
     }
