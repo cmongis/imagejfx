@@ -20,8 +20,11 @@
 package mongis.utils;
 
 import com.google.common.io.Resources;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  *
@@ -39,6 +42,11 @@ public class TextFileUtils {
     public static String readFileFromJar(String url, Class<?> clazz) throws IOException {
         System.out.println(url);
         return Resources.toString(clazz.getResource(url), Charset.forName("UTF-8"));
+    }
+    
+    public static void writeTextFile(File file,String text) throws IOException {
+        System.out.println(text);
+        Files.write(Paths.get(file.getAbsolutePath()), text.getBytes());
     }
     
     /*
