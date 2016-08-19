@@ -25,6 +25,7 @@ import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
 
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
@@ -195,6 +196,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
                     if (overlayJsonFile.exists()) {
                         //getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
                     }
+                    record.getMetaDataSet().setType(MetaDataSetType.FILE);
                     return record;
                 })
                 .map(record -> {
@@ -238,6 +240,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
             }
 
             planes = mList.stream()
+                    .map(m->{ m.setType(MetaDataSetType.PLANE); return m;})
                     .map(m -> new PlaneMetaDataSetWrapper(context, m))
                     .collect(Collectors.toList());
 

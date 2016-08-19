@@ -95,6 +95,7 @@ public class WorkflowPanel extends GridPane {
 
             context.inject(this);
            init();
+            setId("workflow-panel");
 
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Couldn't initiate the WorkflowPanel", ex);

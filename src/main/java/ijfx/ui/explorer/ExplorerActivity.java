@@ -21,7 +21,10 @@ package ijfx.ui.explorer;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.core.metadata.MetaDataOwner;
+import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetUtils;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.activity.Activity;
@@ -34,6 +37,7 @@ import ijfx.ui.explorer.event.FolderUpdatedEvent;
 import ijfx.ui.filter.DefaultMetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataOwnerFilter;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.SideMenuBinding;
 import ijfx.ui.utils.CollectionUtils;
 import ijfx.ui.utils.DragPanel;
@@ -77,12 +81,15 @@ import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
+import mongis.utils.TextFileUtils;
 import org.reactfx.EventStreams;
 import org.scijava.app.StatusService;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -145,6 +152,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @Parameter
     private UiContextService uiContextService;
 
+    @Parameter
+    private UIService uiService;
+    
     private ExplorerView view;
 
     private List<Runnable> folderUpdateHandler = new ArrayList<>();
@@ -520,6 +530,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         uiContextService.update();
 
     }
+    
+    
 
     @FXML
     public void onProcessButtonPressed() {
@@ -549,6 +561,30 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         System.out.println("TODO");
     }
 
+    @FXML
+    public void exportToCSV() {
+        
+        List<MetaDataSet> mList = explorerService.getItems().stream()
+                .map(e->e.getMetaDataSet())
+                .collect(Collectors.toList());
+        
+        String csvFile = MetaDataSetUtils.exportToCSV(mList, ",", true, MetaDataKeyPriority.getPriority(mList.get(0)));
+                
+        
+        File saveFile = FXUtilities.saveFileSync("Export to CSV", null, "CSV", ".csv");
+        if(saveFile != null) {
+            try {
+                TextFileUtils.writeTextFile(saveFile, csvFile);
+                
+                uiService.showDialog("CSV File successfully saved");
+            } catch (IOException ex) {
+               ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+               uiService.showDialog("Error when saving CSV File", DialogPrompt.MessageType.ERROR_MESSAGE);
+            }
+        }
+        
+    }
+    
     private void onFolderListEmptyPropertyChange(Observable obs, Boolean oldV, Boolean isEmpty) {
         if (isEmpty) {
             dragPanel.setLabel(NO_FOLDER_TEXT)

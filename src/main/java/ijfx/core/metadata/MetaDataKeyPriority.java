@@ -17,36 +17,25 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
-
-import ijfx.service.IjfxService;
-import java.io.File;
-import java.util.List;
+package ijfx.core.metadata;
 
 /**
  *
  * @author cyril
  */
-public interface FolderManagerService extends IjfxService {
+public class MetaDataKeyPriority {
 
-    public Folder addFolder(File file);
-
-    public List<Folder> getFolderList();
-
-    public Folder getCurrentFolder();
-
-    public void setCurrentFolder(Folder folder);
-
-    public void setExplorationMode(ExplorationMode mode);
-
-    public ExplorationMode getCurrentExplorationMode();
-
-    public void completeStatistics();
-
-    public void removeFolder(Folder folder);
-
-    public Folder getFolderContainingFile(File f);
-
-    public final static String FOLDER_PREFERENCE_FILE = "folder_db.json";
-
+    public static final String[] FILE = {MetaData.FILE_NAME, MetaData.WIDTH, MetaData.HEIGHT, MetaData.BITS_PER_PIXEL, MetaData.SLICE_NUMBER, MetaData.SERIE_COUNT, MetaData.SLICE_NUMBER, MetaData.ZSTACK_NUMBER, MetaData.CHANNEL_COUNT, MetaData.TIME_COUNT};
+    public static final String[] PLANE = {MetaData.FILE_NAME, MetaData.PLANE_INDEX, MetaData.CHANNEL, MetaData.TIME, MetaData.Z_POSITION};
+    
+    public static String[] getPriority(MetaDataSet m) {
+        
+        if(m.getType() == MetaDataSetType.PLANE || m.getType() == MetaDataSetType.OBJECT) return PLANE;
+        else {
+            return FILE;
+        }
+    }
+    
+    
+    
 }

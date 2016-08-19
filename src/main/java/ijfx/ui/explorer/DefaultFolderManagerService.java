@@ -90,7 +90,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     @Parameter
     NotificationService notificationService;
     
-    private static String FOLDER_PREFERENCE_FILE = "folder_db.json";
+   
 
     Logger logger = ImageJFX.getLogger();
 

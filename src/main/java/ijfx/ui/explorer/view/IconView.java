@@ -125,7 +125,7 @@ public class IconView extends ScrollPane implements ExplorerView {
 
     @Override
     public Node getIcon() {
-        return new FontAwesomeIconView(FontAwesomeIcon.CUBES);
+        return new FontAwesomeIconView(FontAwesomeIcon.PICTURE_ALT);
     }
 
     @Override

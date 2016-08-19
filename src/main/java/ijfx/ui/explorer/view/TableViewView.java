@@ -22,6 +22,7 @@ package ijfx.ui.explorer.view;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorationMode;
@@ -66,9 +67,7 @@ public class TableViewView implements ExplorerView{
     
     List<? extends Explorable> currentItems;
     
-    private static final String[] FILE_PRIORITY = { MetaData.FILE_NAME, MetaData.WIDTH, MetaData.HEIGHT,MetaData.BITS_PER_PIXEL,MetaData.SLICE_NUMBER , MetaData.SERIE_COUNT, MetaData.SLICE_NUMBER, MetaData.ZSTACK_NUMBER, MetaData.CHANNEL_COUNT, MetaData.TIME_COUNT};
     
-    private static final String[] PLANE_PRIORITY = {MetaData.FILE_NAME, MetaData.PLANE_INDEX, MetaData.CHANNEL, MetaData.TIME, MetaData.Z_POSITION};
     
     public TableViewView() {
         System.out.println("Listening now");
@@ -76,7 +75,7 @@ public class TableViewView implements ExplorerView{
        tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
        tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
        tableView.setRowFactory(this::createRow);
-       
+        
     }
 
     
@@ -188,9 +187,9 @@ public class TableViewView implements ExplorerView{
     
     private String[] getPriority() {
         if(explorerService == null || folderService.getCurrentExplorationMode() == ExplorationMode.FILE) {
-            return FILE_PRIORITY;
+            return MetaDataKeyPriority.FILE;
         }
-        else return PLANE_PRIORITY;
+        else return MetaDataKeyPriority.PLANE;
     }
     
 }

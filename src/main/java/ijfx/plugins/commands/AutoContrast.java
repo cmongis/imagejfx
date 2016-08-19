@@ -62,6 +62,12 @@ public class AutoContrast extends ContextCommand {
 
         dataset = imageDisplayService.getActiveDataset(imageDisplay);
 
+        
+        
+        run(statsService,imageDisplay,dataset,channelDependant);
+        
+        /*
+        
         boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
 
         
@@ -76,11 +82,42 @@ public class AutoContrast extends ContextCommand {
                 SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
                 setMinMax(stats, 0);
 
-            }
+            }*/
     }
     
     
-    private void setMinMax(SummaryStatistics stats,int channel) {
+    public static void run(IjfxStatisticService statsService,ImageDisplay imageDisplay, Dataset dataset, boolean channelDependant) {
+        
+        
+        
+        boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
+
+        
+
+            if (multiChannel && channelDependant == true) {
+                for (int i = 0; i <= dataset.max(dataset.dimensionIndex(Axes.CHANNEL)); i++) {
+                    SummaryStatistics stats = statsService.getChannelStatistics(dataset, i);
+                    setMinMax(imageDisplay,dataset,stats, i);
+                }
+            }
+            else {
+                SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
+                setMinMax(imageDisplay,dataset,stats, 0);
+
+            }
+        /*
+        System.out.println(stats);
+         dataset.setChannelMinimum(channel, stats.getMin());
+         dataset.setChannelMaximum(channel, stats.getMax());
+         DatasetView view = (DatasetView)imageDisplay.getActiveView();
+         view.setChannelRange(channel, stats.getMin(), stats.getMax());
+         view.getProjector().map();
+         view.update();*/
+        
+    }
+    
+    
+    private static void setMinMax(ImageDisplay imageDisplay,Dataset dataset,SummaryStatistics stats,int channel) {
         System.out.println(stats);
          dataset.setChannelMinimum(channel, stats.getMin());
          dataset.setChannelMaximum(channel, stats.getMax());

@@ -19,9 +19,11 @@
  */
 package ijfx.ui.context;
 
+import ijfx.service.uicontext.UiContextService;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import org.scijava.Context;
 import org.scijava.event.EventHandler;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -33,12 +35,20 @@ public class UiContextProperty extends ReadOnlyBooleanPropertyBase{
     
     final String name;
     
+    @Parameter
+    UiContextService contextService;
+    
+    boolean isInCurrentContext = false;
+    
     public UiContextProperty(Context context, String name) {
         this.name = name;
         context.inject(this);
+        
+        isInCurrentContext = contextService.isCurrent(name);
+        
     }
 
-    boolean isInCurrentContext = false;
+    
     
     @Override
     public Object getBean() {

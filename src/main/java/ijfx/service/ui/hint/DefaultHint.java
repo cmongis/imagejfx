@@ -20,6 +20,7 @@
 package ijfx.service.ui.hint;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.UUID;
 
 /**
  *
@@ -53,6 +54,9 @@ public class DefaultHint implements Hint{
     
     
     public String getId() {
+        if(id == null) {
+            id = UUID.nameUUIDFromBytes(getText().getBytes()).toString();
+        }
         return id;
     }
 
@@ -96,8 +100,12 @@ public class DefaultHint implements Hint{
     
     @Override
     public boolean equals(Object o) {
+        
+        if(o == null) return false;
+        
         if(Hint.class.isAssignableFrom(o.getClass())) {
             Hint h = (Hint)o;
+            
             return h.getId().equals(getId());
         }
         else return false;

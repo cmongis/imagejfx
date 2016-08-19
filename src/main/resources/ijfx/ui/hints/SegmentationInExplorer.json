@@ -1,0 +1,26 @@
+[
+    {
+        "target":""
+        ,"text":"This screen allows you to segment objects from multiple file at once."
+    }
+    
+    
+    ,{
+        "target":"#explorerActivity"
+        ,"text":"Select the files or plane you want segment using the explorer."
+    }
+    ,{
+        "target":"#workflow-panel"
+        ,"text":"This panel defines the segmentation workflow."
+    },{
+        "target":"#workflow-panel"
+        ,"text":"The workflow here should produce a binary image which will be then transform into individual object."
+        
+    }
+    ,{
+        "target":"#workflow-panel"
+        ,"text":"Each detected object will be measured accross dimension. It mean a same shape will be reused for each plane of the image."
+    }
+    
+    
+]

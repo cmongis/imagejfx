@@ -280,11 +280,12 @@ public class PreviewService extends AbstractService implements ImageJService {
         return datasetToImage(dataset, new ColorTable8());
     }
     
-    public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable, double min, double max) {
+    
+     public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable, double min, double max, WritableImage image) {
 
-        int width = (int) dataset.dimension(0);
-        int height = (int) dataset.dimension(1);
-        WritableImage image = new WritableImage(width, height);
+        //int width = (int) dataset.dimension(0);
+        //int height = (int) dataset.dimension(1);
+        //WritableImage image = new WritableImage(width, height);
         RealLUTConverter<T> converter = new RealLUTConverter<T>(min, max, colorTable);
         ARGBType argb = new ARGBType();
         RandomAccess<T> ra = dataset.randomAccess();
@@ -296,6 +297,32 @@ public class PreviewService extends AbstractService implements ImageJService {
                 image.getPixelWriter().setArgb(x, y, argb.get());
             }
         }
+        return image;
+    }
+    
+    
+    
+    public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable, double min, double max) {
+
+        int width = (int) dataset.dimension(0);
+        int height = (int) dataset.dimension(1);
+        WritableImage image = new WritableImage(width, height);
+        
+        /*
+        RealLUTConverter<T> converter = new RealLUTConverter<T>(min, max, colorTable);
+        ARGBType argb = new ARGBType();
+        RandomAccess<T> ra = dataset.randomAccess();
+        for (int x = 0; x != width; x++) {
+            for (int y = 0; y != height; y++) {
+                ra.setPosition(x, 0);
+                ra.setPosition(y, 1);
+                converter.convert(ra.get(), argb);
+                image.getPixelWriter().setArgb(x, y, argb.get());
+            }
+        }*/
+        
+        datasetToImage(dataset, colorTable, min, max,image);
+        
         return image;
     }
 

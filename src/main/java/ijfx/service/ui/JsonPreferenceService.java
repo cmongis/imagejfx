@@ -138,7 +138,24 @@ public class JsonPreferenceService extends AbstractService implements ImageJServ
         }
     }
     
-    
+    public boolean resetConfig(String... filenames) {
+        
+        boolean flag = false;
+        
+        for(String filename : filenames) {
+            File f = new File(configDirectory,addExtension(filename));
+            
+            if(f.delete()) {
+                logger.log(Level.INFO,"Info file deleted : {0}",f.getName());
+            }
+            else {
+                logger.log(Level.WARNING, "Couldn't delete {0}", f.getName());
+            }
+        }
+        
+        return flag;
+        
+    }
     
     
 }

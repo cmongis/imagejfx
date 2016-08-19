@@ -36,6 +36,10 @@ import java.util.Map;
  * @author Cyril MONGIS, 2015
  */
 public class MetaDataSet extends HashMap<String, MetaData> {
+    
+    
+    private MetaDataSetType type = MetaDataSetType.UNKNOWN;
+    
     public MetaData put(MetaData data) {
         String key = MetaDataFactory.createKey(data.getName());
         if(containsKey(data.getName())) {
@@ -85,6 +89,14 @@ public class MetaDataSet extends HashMap<String, MetaData> {
         }
         return false;
     }
+
+    public MetaDataSetType getType() {
+        return type;
+    }
    
+    public void setType(MetaDataSetType type) {
+        this.type = type;
+    }
+    
     
 }

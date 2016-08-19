@@ -44,8 +44,15 @@ public class BatchInputBuilder {
 
     private static String suffixSeparator = "_";
     
+    
+    
     public BatchInputBuilder(Context context) {
         this.context = context;
+    }
+    
+    public BatchInputBuilder wrap(BatchSingleInput input) {
+        this.input = input;
+        return this;
     }
     
     public void tryInject(Object object) {

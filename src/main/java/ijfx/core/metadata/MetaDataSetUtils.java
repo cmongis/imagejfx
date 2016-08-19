@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.core.listenableSystem;
+package ijfx.core.metadata;
 
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataKeyPrioritizer;
@@ -55,10 +55,10 @@ public class MetaDataSetUtils {
         return result;
     }
      
-     public String exportToCSV(List<MetaDataSet> mList, String separator,boolean includeHheader,String[] priority) {
+     public static String exportToCSV(List<MetaDataSet> mList, String separator,boolean includeHheader,String[] priority) {
          
          // getting all the possible keys of the list of metadataset
-         Collection<String> keys = getAllPossibleKeys(mList);
+         Collection<String> keys = getAllPossibleKeys(mList).stream().filter(MetaData::canDisplay).collect(Collectors.toList());
          
          if(priority == null) {
              priority = new String[0];

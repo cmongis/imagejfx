@@ -189,8 +189,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             // adding the vbox class to the vbox;
             // associating min and max value to properties
-            minValue = rangeSlider.lowValueProperty();
-            maxValue = rangeSlider.highValueProperty();
+            rangeSlider.lowValueProperty().bindBidirectional(minValue);
+            rangeSlider.highValueProperty().bindBidirectional(maxValue);
 
             // taking care of the range slider configuration
             rangeSlider.setShowTickLabels(true);
@@ -208,14 +208,16 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             // Adding listeners
             logger.info("Adding listeners");
 
-            rangeSlider.highValueChangingProperty().addListener(event -> onHighValueChanging());
-            rangeSlider.lowValueChangingProperty().addListener(event -> onLowValueChanging());
+            maxValue.addListener(this::onHighValueChanging);
+            minValue.addListener(this::onLowValueChanging);
             
             
             NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
             
             Bindings.bindBidirectional(minTextField.textProperty(), minValue, converter);
             Bindings.bindBidirectional(maxTextField.textProperty(),maxValue,converter);
+            
+            
             minTextField.addEventHandler(KeyEvent.KEY_TYPED,this::updateModelRangeFromView);
             maxTextField.addEventHandler(KeyEvent.KEY_TYPED,this::updateModelRangeFromView);
             // setting some insets... should be done int the FXML
@@ -291,26 +293,30 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         updateModelRangeFromView();
     }
     
-    public void updateModelRangeFromView() {
+    private void updateModelRangeFromView() {
         //System.out.println(minValue);
         //System.out.println(maxValue);
-        if (rangeSlider.isLowValueChanging() || rangeSlider.isHighValueChanging()) {
-            return;
-        }
-        threadService.queue(() -> {
+      // //if (rangeSlider.isLowValueChanging() || rangeSlider.isHighValueChanging()) {
+           // return;
+       // }
+       logger.info("updating model from view");
+        System.out.println("updating");
+       
 
-            displayRangeServ.updateCurrentDisplayRange(minValue.doubleValue(), maxValue.doubleValue());
-        });
+        displayRangeServ.updateCurrentDisplayRange(minValue.doubleValue(), maxValue.doubleValue());
+        System.out.println("updating");
 
-        updateLabel();
+       // updateLabel();
 
     }
 
     public void updateViewRangeFromModel() {
-
+        logger.info("Updating view range from model");
         double min = displayRangeServ.getCurrentViewMinimum();
         double max = displayRangeServ.getCurrentViewMaximum();
 
+        if(rangeSlider.getMin() == min && rangeSlider.getMax() == max) return;
+        
         rangeSlider.setMin(displayRangeServ.getCurrentDatasetMinimum() * .1);
         rangeSlider.setMax(displayRangeServ.getCurrentDatasetMaximum() * 1.1);
 
@@ -334,7 +340,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     @EventHandler
     public void handleEvent(DisplayActivatedEvent event) {
+        
         if(event.getDisplay() instanceof ImageDisplay == false) return;
+        if(getCurrentDatasetView() == null) return;
         updateViewRangeFromModel();
         updateLabel();
         mergedViewToggleButton.selectedProperty().setValue(getCurrentDatasetView().getColorMode() == ColorMode.COMPOSITE);
@@ -346,6 +354,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             return;
         }
         updateLabel();
+        System.out.println("updated");
         updateViewRangeFromModel();
 
     }
@@ -354,13 +363,13 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return imageDisplayService.getActiveDatasetView();
     }
 
-    private void onHighValueChanging() {
+    private void onHighValueChanging(Object notUsed) {
         //System.out.println("state changed !");
         updateModelRangeFromView();
         updateLabel();
     }
 
-    private void onLowValueChanging() {
+    private void onLowValueChanging(Object notUsed) {
         //System.out.println("state changed");
         updateModelRangeFromView();
         updateLabel();

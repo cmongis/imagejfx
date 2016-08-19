@@ -66,7 +66,7 @@ public class FreeHandTool extends AbstractPathTool {
 
         double[] xList = FxPath.xList(points);
         double[] yList = FxPath.yList(points);
-
+        System.out.println(getCanvas());
         getCanvas().repaint();
         getCanvas().getGraphicsContext2D().setStroke(OverlayDrawer.toFxColor(overlayOptionsService.colorProperty().getValue()));
         getCanvas().getGraphicsContext2D().setLineWidth(overlayOptionsService.widthProperty().getValue());

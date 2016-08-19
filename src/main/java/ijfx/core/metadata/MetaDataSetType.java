@@ -17,36 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
-
-import ijfx.service.IjfxService;
-import java.io.File;
-import java.util.List;
+package ijfx.core.metadata;
 
 /**
  *
  * @author cyril
  */
-public interface FolderManagerService extends IjfxService {
-
-    public Folder addFolder(File file);
-
-    public List<Folder> getFolderList();
-
-    public Folder getCurrentFolder();
-
-    public void setCurrentFolder(Folder folder);
-
-    public void setExplorationMode(ExplorationMode mode);
-
-    public ExplorationMode getCurrentExplorationMode();
-
-    public void completeStatistics();
-
-    public void removeFolder(Folder folder);
-
-    public Folder getFolderContainingFile(File f);
-
-    public final static String FOLDER_PREFERENCE_FILE = "folder_db.json";
-
+public enum MetaDataSetType {
+        UNKNOWN
+        ,FILE
+        ,PLANE
+        ,OBJECT
 }
