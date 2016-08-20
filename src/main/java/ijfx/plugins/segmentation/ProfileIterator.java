@@ -88,7 +88,8 @@ public class ProfileIterator implements DataSetIterator{
             currDatasetIdx++;
         }
             
-        List<double[]> intensities = profiles.getPointsAsIntensities(imgDatasets.get(num), startIdx, endIdx);
+//        List<double[]> intensities = profiles.getPointsAsIntensities(imgDatasets.get(num), startIdx, endIdx);
+        List<double[]> intensities = profiles.getPointsAsDeltaIntensities(imgDatasets.get(num), startIdx, endIdx);
         
         profileLength = profiles.getMaxLenght();
         

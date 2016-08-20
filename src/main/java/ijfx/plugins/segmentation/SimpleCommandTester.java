@@ -56,9 +56,7 @@ public class SimpleCommandTester implements Command{
     
     @Override
     public void run() {
-//        segmentationService.generateTestSet();
-//        System.out.println("Test set generated");
-//        segmentationService.saveModel();
+        segmentationService.train();
     }
     
 }

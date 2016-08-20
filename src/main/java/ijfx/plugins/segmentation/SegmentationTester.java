@@ -59,6 +59,7 @@ public class SegmentationTester implements Command{
             MLSegmentationUi segmentationUI = new MLSegmentationUi();
             
             context.inject(segmentationUI);
+            segmentationUI.init();
             
             Scene scene = new Scene(segmentationUI);
 

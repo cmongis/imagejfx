@@ -20,6 +20,7 @@
 package ijfx.plugins.segmentation;
 
 import ijfx.plugins.segmentation.search_area.MidPointCircle;
+import ijfx.plugins.segmentation.search_area.SquareFrame;
 import ijfx.plugins.segmentation.search_area.SearchArea;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
@@ -125,6 +126,42 @@ public class DefaultProfilesSet implements ProfilesSet{
                 double pixelValue = randomAccess.get().getRealDouble();
 
                 intensities[p] = pixelValue;
+            }
+            values.add(intensities);
+        }
+        return values;
+    }
+    
+    @Override
+    public List<double[]> getPointsAsDeltaIntensities(Dataset ds, int startIdx, int endIdx) {
+        
+        List<double[]> values = new ArrayList<>();
+        boolean isFirst = true;
+        double prev = 0;
+        for(int i = startIdx; i < endIdx; i++){
+            List<int[]> points = profiles.get(i);
+            // We pad the shorter series so all of them are the same lenght.
+            double[] intensities = new double[maxLenght];
+            
+            Arrays.fill(intensities, 0.0);
+            
+            RandomAccess<RealType<?>> randomAccess = ds.randomAccess();
+        
+            for(int p = 0; p < points.size(); p++){
+            
+                randomAccess.setPosition(points.get(p)[0], 0);
+                randomAccess.setPosition(points.get(p)[1], 1);
+            
+                if(isFirst){
+                    prev = randomAccess.get().getRealDouble();
+                    isFirst = false;
+                }
+                
+                double pixelValue = randomAccess.get().getRealDouble();
+                
+                double delta = pixelValue - prev;
+                
+                intensities[p] = delta;
             }
             values.add(intensities);
         }
