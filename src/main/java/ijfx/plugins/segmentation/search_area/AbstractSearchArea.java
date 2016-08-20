@@ -79,7 +79,7 @@ public abstract class AbstractSearchArea implements SearchArea{
         for(int i = 0; i< points.size(); i++){
             ra.setPosition((int)points.get(i).getX(), 0);
             ra.setPosition((int)points.get(i).getY(), 1);
-            ra.get().setReal(2300.0);
+            ra.get().setReal(2000.0);
         }
     }
     
@@ -91,7 +91,7 @@ public abstract class AbstractSearchArea implements SearchArea{
             for(int j = 0; j < line.size(); j++){
                 ra.setPosition(line.get(j)[0],0);
                 ra.setPosition(line.get(j)[1], 1);
-                ra.get().setReal(2300.0);
+                ra.get().setReal(2000.0);
             }
         }        
     }

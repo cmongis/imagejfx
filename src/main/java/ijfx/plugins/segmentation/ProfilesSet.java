@@ -28,12 +28,9 @@ import net.imagej.Dataset;
  */
 public interface ProfilesSet {
     public List<List<int[]>> getProfiles();
-    
     public int size();
-    
     public List<double[]> getPointsAsIntensities(Dataset ds, int startIdx, int endIdx);
-    
+    public List<double[]> getPointsAsDeltaIntensities(Dataset ds, int startIdx, int endIdx);    
     public int getMaxLenght();
-    
     public List<int[]> getMasks();
 }

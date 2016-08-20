@@ -22,6 +22,7 @@ package ijfx.plugins.segmentation.search_area;
 import ijfx.plugins.segmentation.search_area.MidPointCircle;
 import ijfx.plugins.segmentation.search_area.SquareFrame;
 import ijfx.plugins.segmentation.search_area.SearchArea;
+import ijfx.service.ImagePlaneService;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplay;
@@ -29,6 +30,7 @@ import net.imagej.display.ImageDisplayService;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -45,33 +47,38 @@ public class SearchAreaCommandTester implements Command{
     @Parameter
     DatasetService datasetService;
     
+    @Parameter
+    UIService uis;
+    
+    @Parameter
+    ImagePlaneService imagePlaneService;
+    
     @Override
     public void run() {
         ImageDisplay display = imageDisplayService.getActiveImageDisplay();
         Dataset ds = datasetService.getDatasets(display).get(0);
-        int cX = 150;
-        int cY = 150;
+        Dataset ds2 = imagePlaneService.createEmptyPlaneDataset(ds);
+        
+        int cX = 200;
+        int cY = 200;
         int r = 145;
         
-        int cX2 = 80;
-        int cY2 = 80;
+        int cX2 = 400;
+        int cY2 = 300;
         int r2 = 30;
 
         SearchArea area1 = new MidPointCircle(cX,cY,r);
-        area1.drawArea(ds);
+        area1.drawArea(ds2);
+        area1.setAllPossibleSegments();
+        area1.drawProfiles(ds2);
+        
         
         SearchArea area2= new SquareFrame(cX2, cY2, r2);
-//        area2.drawArea(ds);
+        area2.drawArea(ds2);
+        area2.setAllPossibleSegments();
+        area2.drawProfiles(ds2);
         
-        ds.update();        
-        
-        area1.setAllPossibleSegments();
-//        area2.setAllPossibleSegments();
-        
-        area1.drawProfiles(ds);
-//        area2.drawProfiles(ds);
-        
-        ds.update();
+        uis.show(ds2);
     }
     
 }
