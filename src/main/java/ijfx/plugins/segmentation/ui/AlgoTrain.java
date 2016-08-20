@@ -23,8 +23,9 @@ import static com.squareup.okhttp.internal.Internal.logger;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.Node;
-import javafx.scene.layout.BorderPane;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import mongis.utils.FXUtilities;
 
 /**
@@ -33,8 +34,11 @@ import mongis.utils.FXUtilities;
  */
 public class AlgoTrain extends AbstractStepUi{
 
+    @FXML
+    Button trainBtn;
+    
     public AlgoTrain(){
-        super("3. Train the algorithm");
+        super("3. Train the algorithm", SegmentationStep.ALGO_TRAIN);
         
         try {
             FXUtilities.injectFXML(this);
@@ -43,6 +47,8 @@ public class AlgoTrain extends AbstractStepUi{
         catch (IOException ex) {
             Logger.getLogger(AlgoTrain.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        trainBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onTrainBtnClicked);
     }
     
     @Override
@@ -50,5 +56,8 @@ public class AlgoTrain extends AbstractStepUi{
         
         super.initCalled = true;
     }
-    
+
+    public void onTrainBtnClicked(MouseEvent e){
+        mLSegmentationService.train();
+    }
 }

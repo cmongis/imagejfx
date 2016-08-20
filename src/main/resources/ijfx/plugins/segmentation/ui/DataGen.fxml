@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="354.0" prefWidth="514.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="354.0" prefWidth="514.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
@@ -23,7 +23,7 @@
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
                   <Button fx:id="seedingBtn" mnemonicParsing="false" text="Seeding" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="x seeds detected" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
@@ -46,7 +46,7 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
          <children>
-            <Text fx:id="feedbackData" strokeType="OUTSIDE" strokeWidth="0.0" text="Feedback" />
+            <Text fx:id="feedbackData" strokeType="OUTSIDE" strokeWidth="0.0" />
             <Button fx:id="clearDataBtn" mnemonicParsing="false" text="Clear data" />
          </children>
       </VBox>

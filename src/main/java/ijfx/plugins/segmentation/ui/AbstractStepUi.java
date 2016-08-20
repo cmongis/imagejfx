@@ -19,8 +19,10 @@
  */
 package ijfx.plugins.segmentation.ui;
 
+import ijfx.plugins.segmentation.MLSegmentationService;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -29,11 +31,18 @@ import javafx.scene.layout.BorderPane;
 public abstract class AbstractStepUi  extends BorderPane implements StepUi{
     
     protected final String STEP_TITLE;
+    protected SegmentationStep stepType;
     protected boolean initCalled;
+    protected boolean injected;
     
-    public AbstractStepUi(String title){
+    @Parameter
+    MLSegmentationService mLSegmentationService;
+    
+    public AbstractStepUi(String title, SegmentationStep type){
         STEP_TITLE = new String(title);
+        stepType = type;
         initCalled = false;
+        injected = false;
     }
 
     @Override
@@ -47,7 +56,18 @@ public abstract class AbstractStepUi  extends BorderPane implements StepUi{
     }
     
     @Override
+    public SegmentationStep getType(){
+        return this.stepType;
+    }
+    
+    
+    @Override
     public boolean isInitCalled(){
         return initCalled;
+    }
+    
+    @Override
+    public boolean isInjected(){
+        return injected;
     }
 }

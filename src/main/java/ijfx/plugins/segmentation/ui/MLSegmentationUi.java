@@ -43,8 +43,9 @@ import org.scijava.plugin.Parameter;
  */
 public class MLSegmentationUi extends BorderPane{
     
-    private Property<SegmentationStep> step;
-    private StepUi stepUi;
+    private StepUi[] steps;
+    private Property<StepUi> currStepUiProperty;
+    private boolean initCalled = false;
     
     @Parameter
     Context context;
@@ -71,46 +72,61 @@ public class MLSegmentationUi extends BorderPane{
         nextBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onNextBtnClicked);
         prevBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onPrevBtnClicked);
         
-        step = new SimpleObjectProperty<>(SegmentationStep.DATA_GEN);
-        stepUi = new DataGen();
+        steps = new StepUi[4];
+        steps[0] = new DataGen();
+        steps[1] = new AlgoSelect();
+        steps[2] = new AlgoTrain();
+        steps[3] = new Segment();
+        
+        currStepUiProperty = new SimpleObjectProperty<>(steps[0]);
         
         nextBtn.setVisible(false);
         
-        ObjectBinding<Boolean> obinding = Bindings.createObjectBinding(this::isNotFirstStep, stepProperty());
+        ObjectBinding<Boolean> obinding = Bindings.createObjectBinding(this::isNotFirstStep, stepUiProperty());
         prevBtn.visibleProperty().bind(obinding);
         
-        ObjectBinding<Boolean> obinding2 = Bindings.createObjectBinding(this::isNotLastStep, stepProperty());
+        ObjectBinding<Boolean> obinding2 = Bindings.createObjectBinding(this::isNotLastStep, stepUiProperty());
         nextBtn.visibleProperty().bind(obinding2);
         
-        step.addListener(this::onStepChanged);
+        title.textProperty().setValue(getStepUi().getTitle());
         
-        title.textProperty().setValue(getStepController().getTitle());
+        stepUiProperty().addListener(this::onStepChanged);
         
-        this.setCenter(getStepController().getNode());
+        this.setCenter(getStepUi().getNode());
     }
     
     public void onNextBtnClicked(MouseEvent me){
         switch(getStep()){
-            case DATA_GEN: stepProperty().setValue(SegmentationStep.ALGO_SELECT); break;
-            case ALGO_SELECT: stepProperty().setValue(SegmentationStep.ALGO_TRAIN); break;
-            case ALGO_TRAIN: stepProperty().setValue(SegmentationStep.SEGMENT); break;
+            case DATA_GEN: 
+                if(steps[1].equals(null)) steps[1] = new AlgoSelect();
+                stepUiProperty().setValue(steps[1]); break;
+            case ALGO_SELECT:
+                if(steps[2].equals(null)) steps[2] = new AlgoTrain();
+                stepUiProperty().setValue(steps[2]); break;
+            case ALGO_TRAIN:
+                if(steps[3].equals(null)) steps[3] = new Segment();
+                stepUiProperty().setValue(steps[3]); break;
             default: throw new AssertionError(getStep().name());
         }
+        if(!getStepUi().isInjected())
+            context.inject(getStepUi());
+        if(!getStepUi().isInitCalled())
+            getStepUi().init();
+        
     }
     
     public void onPrevBtnClicked(MouseEvent me){
         switch(getStep()){
-            case ALGO_SELECT: stepProperty().setValue(SegmentationStep.DATA_GEN); break;
-            case ALGO_TRAIN: stepProperty().setValue(SegmentationStep.ALGO_SELECT); break;
-            case SEGMENT: stepProperty().setValue(SegmentationStep.ALGO_TRAIN); break;
+            case ALGO_SELECT: stepUiProperty().setValue(steps[0]); break;
+            case ALGO_TRAIN: stepUiProperty().setValue(steps[1]); break;
+            case SEGMENT: stepUiProperty().setValue(steps[2]); break;
             default: throw new AssertionError(getStep().name());
         }
     }
     
     public void onStepChanged(Observable obs){
-        updateStepController();
-        this.setCenter(getStepController().getNode());
-        title.textProperty().setValue(getStepController().getTitle());
+        this.setCenter(getStepUi().getNode());
+        title.textProperty().setValue(getStepUi().getTitle());
     }
     
     public boolean isNotFirstStep(){
@@ -122,33 +138,31 @@ public class MLSegmentationUi extends BorderPane{
     }
     
     public void setStepController(StepUi stepUi){
-        this.stepUi = stepUi;
         context.inject(stepUi);
         stepUi.init();
+        this.currStepUiProperty.setValue(stepUi);
     }
     
-    public StepUi getStepController(){
-        return stepUi;
+    public Property<StepUi> stepUiProperty(){
+        return currStepUiProperty;
     }
     
-    public void updateStepController(){
-        switch(getStep()){
-            case DATA_GEN: stepUi = new DataGen(); break;
-            case ALGO_SELECT: stepUi = new AlgoSelect(); break;
-            case ALGO_TRAIN: stepUi = new AlgoTrain(); break;
-            case SEGMENT: stepUi = new Segment(); break;
-            default:throw new AssertionError(getStep().name());
-        }
-        context.inject(stepUi);
-        stepUi.init();
-    }
-    
-    public Property<SegmentationStep> stepProperty(){
-        return step;
+    public StepUi getStepUi(){
+        return currStepUiProperty.getValue();
     }
     
     public SegmentationStep getStep(){
-        return step.getValue();
+        return currStepUiProperty.getValue().getType();
+    }
+    
+    public void init(){
+        context.inject(getStepUi());
+        getStepUi().init();
+        initCalled = true;
+    }
+    
+    public boolean isInitCalled(){
+        return initCalled;
     }
 }
             

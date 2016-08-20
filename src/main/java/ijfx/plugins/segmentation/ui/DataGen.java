@@ -40,9 +40,6 @@ import org.scijava.plugin.Parameter;
  */
 public class DataGen extends AbstractStepUi{
     
-    @Parameter
-    MLSegmentationService mLSegmentationService;
-    
     @FXML
     RadioButton trainingRadio;
     
@@ -65,7 +62,7 @@ public class DataGen extends AbstractStepUi{
     Button generateBtn;
     
     public DataGen(){
-        super("1. Extract data from images");
+        super("1. Extract data from images", SegmentationStep.DATA_GEN);
         
         try {
             FXUtilities.injectFXML(this);
@@ -98,13 +95,17 @@ public class DataGen extends AbstractStepUi{
             catch(NumberFormatException nfe){
                 Logger.getLogger(DataGen.class.getName()).log(Level.SEVERE, null, nfe);
             }
+            mLSegmentationService.generateTrainingSet();
+        }
+        else{
+            mLSegmentationService.generateTestSet();
         }
     }
     
     public void onClearDataClicked(MouseEvent me){
         if(!initCalled)
             init();
-//        mLSegmentationService.clearData();
+        mLSegmentationService.clearData();
     }
 
     @Override

@@ -20,10 +20,15 @@
 package ijfx.plugins.segmentation.ui;
 
 import static com.squareup.okhttp.internal.Internal.logger;
+import ijfx.plugins.segmentation.MLSegmentationService;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import mongis.utils.FXUtilities;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -31,8 +36,14 @@ import mongis.utils.FXUtilities;
  */
 public class Segment extends AbstractStepUi{
     
+    @FXML
+    Button segmentBtn;
+    
+    @FXML
+    Button dummyBtn;
+    
     public Segment(){
-        super("4. Start segmentation");
+        super("4. Start segmentation", SegmentationStep.SEGMENT);
         
         try {
             FXUtilities.injectFXML(this);
@@ -41,12 +52,23 @@ public class Segment extends AbstractStepUi{
         catch (IOException ex) {
             Logger.getLogger(Segment.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        segmentBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onSegmentBtnClicked);
+        dummyBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onDummyBtnClicked);
     }
 
     @Override
     public void init() {
         
         super.initCalled = true;
+    }
+    
+    public void onSegmentBtnClicked(MouseEvent e){
+        mLSegmentationService.segment();
+    }
+    
+    public void onDummyBtnClicked(MouseEvent e){
+        mLSegmentationService.dummySegmentation();
     }
     
 }

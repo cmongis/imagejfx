@@ -24,17 +24,17 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.plugins.segmentation.MLSegmentationService;
 import ijfx.plugins.segmentation.neural_network.NNType;
+import ijfx.ui.messageBox.DefaultMessageBox;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import mongis.utils.FXUtilities;
@@ -48,11 +48,11 @@ public class AlgoSelect extends AbstractStepUi{
     
     private Text folderIcon;
     
-    @Parameter
-    MLSegmentationService mLSegmentationService;
-    
     @FXML
     ChoiceBox algoChoiceBox;
+    
+    @FXML
+    VBox initVbox;
     
     @FXML
     Button initBtn;
@@ -61,7 +61,7 @@ public class AlgoSelect extends AbstractStepUi{
     Button loadModelBtn;
     
     public AlgoSelect(){
-        super("2. Pick an algorithm");
+        super("2. Pick an algorithm", SegmentationStep.ALGO_SELECT);
         try {
             FXUtilities.injectFXML(this);
             logger.info("FXML injected");
@@ -73,6 +73,7 @@ public class AlgoSelect extends AbstractStepUi{
         algoChoiceBox.getItems().setAll(NNType.values());
         algoChoiceBox.valueProperty().addListener(this::updateNNType);
         
+        initVbox.getChildren().add(new DefaultMessageBox());
         initBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onInitModelClicked);
         
         folderIcon = GlyphsDude.createIcon(FontAwesomeIcon.FOLDER_OPEN, "15");

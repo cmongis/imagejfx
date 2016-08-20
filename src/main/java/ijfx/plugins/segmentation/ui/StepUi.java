@@ -28,6 +28,8 @@ import javafx.scene.Node;
 public interface StepUi {
     public String getTitle();
     public Node getNode();
+    public SegmentationStep getType();
     public void init();
     public boolean isInitCalled();
+    public boolean isInjected();
 }
