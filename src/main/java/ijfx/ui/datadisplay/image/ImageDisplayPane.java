@@ -734,7 +734,8 @@ public class ImageDisplayPane extends AnchorPane {
     protected void onLUTsChangedEvent(LUTsChangedEvent event) {
         logService.info("LUT changed");
         if(event.getView() == getDatasetview()) {
-            getImageDisplay().update();
+            logService.info("Updating dataset");
+            getDataset().update();
         }
     }
     
