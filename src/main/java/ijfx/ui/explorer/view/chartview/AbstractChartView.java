@@ -57,13 +57,13 @@ public abstract class AbstractChartView extends AnchorPane {
 
     @Parameter
     ExplorerService explorerService;
-    
+
     @Parameter
     HintService hintService;
 
     @FXML
     Button snapshotButton;
-    
+
     @FXML
     protected ScatterChart<Number, Number> scatterChart;
 
@@ -134,8 +134,9 @@ public abstract class AbstractChartView extends AnchorPane {
         ImageView imageView = new ImageView(image);
         snapshotButton.setGraphic(imageView);
     }
-    
-//    @FXML
-    protected abstract void help();
 
+    @FXML
+    protected void help() {
+        hintService.displayHints(this.getClass(), true);
+    }
 }

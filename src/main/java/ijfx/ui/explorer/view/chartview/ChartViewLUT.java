@@ -259,9 +259,4 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
         return lutViewChanger;
     }
 
-    @Override
-    @FXML
-    protected void help() {
-        hintService.displayHints(this.getClass(), true);
-    }
 }
