@@ -69,7 +69,7 @@ public class ImagesToStack extends ContextCommand {
         int size = datasetArray.length;
         Dataset firstElement = datasetArray[0];
 
-        long[] dims = new long[firstElement.numDimensions() + 1];
+        long[] dims = new long[3];
         firstElement.dimensions(dims);
 
         int axisTypeIndex = 2;

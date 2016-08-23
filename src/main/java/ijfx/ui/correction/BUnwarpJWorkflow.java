@@ -204,7 +204,7 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
 //Try to get the last one!
         bus.getStream(DataViewEvent.class)
                 //                .filter(bus::doesDisplayRequireRefresh)
-                .buffer(1000 / 15, TimeUnit.MILLISECONDS)
+                .buffer(5000 / 15, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
                 //                .first()
                 //                .replay(1)
@@ -218,6 +218,7 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
                     datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
                     workflowModel.extractAndMerge(datasets, imageDisplayPaneBottomLeft);
                 });
+        
 
         setCellFactory(listView);
         listView.getItems().addAll(workflowModel.getFiles());
