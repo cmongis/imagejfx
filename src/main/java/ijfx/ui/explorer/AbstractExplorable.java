@@ -19,11 +19,13 @@
  */
 package ijfx.ui.explorer;
 
+import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.ui.main.ImageJFX;
+import java.io.File;
+import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.image.Image;
-import net.imagej.Dataset;
 
 /**
  *
@@ -31,10 +33,11 @@ import net.imagej.Dataset;
  */
 public abstract class AbstractExplorable implements Explorable{
     
-    BooleanProperty selectedProperty = new SimpleBooleanProperty();
+    private final BooleanProperty selectedProperty = new SimpleBooleanProperty();
 
-    MetaDataSet metadataSet = new MetaDataSet();
+    private final MetaDataSet metadataSet = new MetaDataSet();
     
+    protected static final Logger logger = ImageJFX.getLogger();
    
 
     @Override
@@ -47,6 +50,9 @@ public abstract class AbstractExplorable implements Explorable{
         return metadataSet;
     }
 
+    protected File getFile()  {
+        return new File(getMetaDataSet().get(MetaData.ABSOLUTE_PATH).getStringValue());
+    }
   
     
 }
