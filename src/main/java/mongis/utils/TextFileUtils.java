@@ -20,35 +20,47 @@
 package mongis.utils;
 
 import com.google.common.io.Resources;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  *
  * @author cyril
  */
 public class TextFileUtils {
+
     public static String readFileFromJar(String url) throws IOException {
         return Resources.toString(TextFileUtils.class.getResource(url), Charset.forName("UTF-8"));
     }
-    
+
     public static String readFileFromJar(Class<?> clazz, String url) throws IOException {
         return readFileFromJar(url, clazz);
     }
-    
+
     public static String readFileFromJar(String url, Class<?> clazz) throws IOException {
         System.out.println(url);
         return Resources.toString(clazz.getResource(url), Charset.forName("UTF-8"));
     }
-    
-    public static void writeTextFile(File file,String text) throws IOException {
+
+    public static void writeTextFile(File file, String text) throws IOException {
         System.out.println(text);
-        Files.write(Paths.get(file.getAbsolutePath()), text.getBytes());
+        //Files.write(Paths.get(file.getAbsolutePath()), text.getBytes());
+
+        Writer out = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(file), "UTF8"));
+
+       out.append(text);
+
+        out.flush();
+        out.close();
+
     }
-    
+
     /*
     public static String readFileFromJar(Object parent, String url) throws IOException {
         return Resources.toString(parent.getClass().getResource(url), Charset.forName("UTF-8"));
