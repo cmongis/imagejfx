@@ -541,6 +541,16 @@
                 "context": "binary"
 
             }
+            ,{
+                "type":"Command"
+                ,"label":"Invert"
+                ,"action":"net.imagej.plugins.commands.assign.InvertDataValues"
+                ,"icon":"preview"
+                ,"context":"binary"
+                ,"parameters":{
+                    "allPlanes":false
+                }
+            }
         ]
     }
     ,{
