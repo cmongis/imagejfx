@@ -23,13 +23,8 @@ package ijfx.bridge;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.module.InputDialog;
 import ijfx.ui.module.InputSkinPluginService;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import mongis.utils.CallbackTask;
-import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 
 import org.scijava.Context;
@@ -94,7 +89,7 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
                 logger.info("Coulnd't produce interface for " + module.getDelegateObject().getClass().getName());
                 return;
             }
-
+            
             /*
             // if it's a legacy command, it's also ignore
             if (LegacyCommand.class.isAssignableFrom(module.getDelegateObject().getClass())) {
