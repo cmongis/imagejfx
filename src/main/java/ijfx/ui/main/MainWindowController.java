@@ -31,6 +31,7 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.ui.FontEndTaskSubmitted;
 import ijfx.service.ui.HintService;
+import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.ui.hint.DefaultHint;
 import ijfx.service.ui.hint.Hint;
 import ijfx.service.ui.hint.HintRequestEvent;
@@ -94,6 +95,10 @@ import ijfx.ui.context.animated.Animations;
 import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -102,7 +107,8 @@ import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
-import org.scijava.Context;
+import mongis.utils.TextFileUtils;
+import org.scijava.plugin.PluginInfo;
 import org.scijava.plugin.PluginService;
 
 /**
@@ -201,6 +207,13 @@ public class MainWindowController extends AnchorPane {
     @Parameter
     ActivityService activityService;
 
+    @Parameter
+    JsonPreferenceService jsonPrefSrv;
+
+    @Parameter
+            PluginService pluginSrv;
+    
+    
     LoadingPopup loadingPopup = new LoadingPopup(ImageJFX.PRIMARY_STAGE);
 
     Queue<Hint> hintQueue = new LinkedList<>();
@@ -308,9 +321,21 @@ public class MainWindowController extends AnchorPane {
         handler.setStatus("Initializing ImageJ....");
         handler.setProgress(1, 3);
         imageJ = new ImageJ();
+
+        
+        
+        
+
+        
+        
+        // service.removePlugin(service.getPlugin(Binarize.class));
         handler.setProgress(2, 3);
         handler.setStatus("ImageJ initialized.");
         imageJ.getContext().inject(this);
+        
+       
+        removeBlacklisted();
+        
         registerWidgetControllers();
         handler.setProgress(3, 3);
         uiPluginService.loadAll(handler).forEach(this::installPlugin);
@@ -852,6 +877,27 @@ public class MainWindowController extends AnchorPane {
 
             hideSideMenu();
         }
+    }
+    
+    
+    
+    public void removeBlacklisted() {
+        
+        
+        try {
+            String blacklistRaw = TextFileUtils.readFileFromJar("/blacklist.txt");
+             Stream
+                    .of(blacklistRaw.split("\n"))
+                    .map(pluginSrv::getPluginsOfClass)
+                    .map(info->(PluginInfo<?>)info)
+                    .forEach(pluginSrv::removePlugin);
+                    
+        } catch (Exception ex) {
+            logger.log(Level.WARNING,"Error when blacklisting plugings",ex);
+           
+        }
+        
+        
     }
 
 }
