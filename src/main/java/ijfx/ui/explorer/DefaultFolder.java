@@ -336,6 +336,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
         
         getObjectList().addAll(objects.stream()
         .map(o->new SegmentedObjectExplorerWrapper(o))
+        .map(o->{context.inject(o); return o;})
         .collect(Collectors.toList()));
         
 
