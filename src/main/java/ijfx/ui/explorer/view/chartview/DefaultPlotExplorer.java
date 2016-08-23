@@ -21,12 +21,15 @@ package ijfx.ui.explorer.view.chartview;
 
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.ImageViewBuilder;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.CallbackTask;
 import org.controlsfx.control.PopOver;
@@ -95,9 +98,12 @@ public class DefaultPlotExplorer implements PlotExplorer {
         });
         this.data.setNode(togglePlot);
         setPopOver(this.data.getNode());
-        this.data.getNode().setOnMouseClicked(e -> {
-            if (togglePlot.isSelected()) {
-                actionPopOver();
+        this.data.getNode().addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    actionPopOver();
+                }
             }
         });
 
