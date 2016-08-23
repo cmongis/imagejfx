@@ -140,7 +140,7 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         return priority.toArray(new String[priority.size()]);
     }
     
-    public Set<String> applyPriority(Set<String> strings) {
+    private Set<String> applyPriority(Set<String> strings) {
         return strings
                 .stream()
                 .sorted(this::comparePriority)
