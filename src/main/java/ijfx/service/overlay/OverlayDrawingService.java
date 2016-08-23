@@ -86,7 +86,7 @@ public class OverlayDrawingService extends AbstractService implements ImageJServ
          long width = maxX-minX;
          long height = maxY-minY;
          
-        Dataset overlayDataset = imagePlaneService.createEmptyPlaneDataset(source,width,height);
+        Dataset overlayDataset = imagePlaneService.createEmptyPlaneDataset(source,width+1,height+1);
         
         FILLER.draw(o, new RandomAccessCopier(imagePlaneService.planeView(source, nonSpacialPosition).randomAccess(), overlayDataset.randomAccess(), -minX, -minY));
         
