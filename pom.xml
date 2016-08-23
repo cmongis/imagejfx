@@ -67,7 +67,7 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej-plugins-commands</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
         </dependency>
         
         
@@ -235,7 +235,7 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej-legacy</artifactId>
-            <version>0.21.0</version>
+            <version>0.22.0</version>
             <classifier>tests</classifier>
         </dependency>
         
