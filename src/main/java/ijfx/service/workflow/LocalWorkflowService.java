@@ -54,7 +54,7 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String JSON_FILE = "my_workflows_v2.json";
+    private static final String JSON_FILE = "my_workflows_v3.json";
     
     
     Logger logger = ImageJFX.getLogger();
