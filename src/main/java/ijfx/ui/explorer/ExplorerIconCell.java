@@ -78,7 +78,7 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
     @Override
     public void onSimpleClick() {
         super.onSimpleClick();
-        explorerService.selectItem((Explorable)getItem());
+        explorerService.toggleSelection((Explorable)getItem());
         //getItem().selectedProperty().setValue(!getItem().selectedProperty().getValue());
     }
     

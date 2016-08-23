@@ -217,4 +217,9 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         
     }
 
+    @Override
+    public void toggleSelection(Explorable explorable) {
+        explorable.selectedProperty().setValue(!explorable.selectedProperty().getValue());
+    }
+
 }
