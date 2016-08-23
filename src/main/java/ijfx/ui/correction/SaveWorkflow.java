@@ -17,28 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.dataset;
+package ijfx.ui.correction;
 
-import net.imagej.Dataset;
-import net.imagej.ImageJService;
-import net.imagej.display.ImageDisplay;
-import net.imglib2.type.numeric.RealType;
+import io.datafx.controller.ViewController;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface DatasetUtillsService extends ImageJService{
-    
-    public Dataset extractPlane(ImageDisplay imageDisplay);
-    
-    public ImageDisplay getImageDisplay(Dataset dataset);
-    
-    public  < T extends RealType< T>> Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator);
-    
-    public Dataset divideDatasetByValue(Dataset dataset, double value);
-    
-    public Dataset divideActivePlaneByValue(Dataset dataset,long[] position, double value);
-    
-    public Dataset divideActivePlaneByActivePlane(Dataset dataset,long[] position, Dataset datasetValue, long [] positionValue);
+@ViewController(value = "SaveWorkflow.fxml")
+public class SaveWorkflow extends CorrectionFlow {
+
 }

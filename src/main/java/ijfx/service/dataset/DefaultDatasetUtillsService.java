@@ -70,7 +70,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     DisplayService displayService;
 
     @Override
-    public Dataset extractPlane(ImageDisplay imageDisplay) {
+    public Dataset extractPlane(ImageDisplay imageDisplay) throws NullPointerException {
         CalibratedAxis[] calibratedAxises = new CalibratedAxis[imageDisplay.numDimensions()];
         int[] position = new int[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
@@ -170,6 +170,60 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
             Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
         }
         return module;
+    }
+
+    @Override
+    public Dataset divideActivePlaneByValue(Dataset dataset,long[] position, double value) {
+        double width = dataset.max(0) + 1;
+        double height = dataset.max(1) + 1;
+
+        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
+        randomAccess.setPosition(position);
+        for (int x = 0; x < width; x++) {
+            randomAccess.setPosition(x, 0);
+            for (int y = 0; y < height; y++) {
+                randomAccess.setPosition(y, 1);
+                Double d = (Double)randomAccess.get().getRealDouble() / value;
+                randomAccess.get().setReal(d);
+            }
+        }
+        return dataset;
+    }
+
+    @Override
+    public Dataset divideActivePlaneByActivePlane(Dataset dataset,long[] position, Dataset datasetValue, long [] positionValue) {
+//        long[] position = new long[dataset.numDimensions()];
+//        this.getImageDisplay(dataset).localize(position);
+        double width = dataset.max(0) + 1;
+        double height = dataset.max(1) + 1;
+
+//        long[] positionValue = new long[datasetValue.numDimensions()];
+//        this.getImageDisplay(dataset).localize(positionValue);
+        double widthValue = datasetValue.max(0) + 1;
+        double heightValue = datasetValue.max(1) + 1;
+
+        if (width != widthValue || height != heightValue) {
+            throw new IllegalArgumentException("The sizes have to be the same");
+        }
+        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
+        RandomAccess<RealType<?>> randomAccessValue = datasetValue.randomAccess();
+
+        randomAccess.setPosition(position);
+        randomAccessValue.setPosition(positionValue);
+        for (int x = 0; x < width; x++) {
+            randomAccess.setPosition(x, 0);
+            randomAccessValue.setPosition(x, 0);
+            for (int y = 0; y < height; y++) {
+                randomAccess.setPosition(y, 1);
+                randomAccessValue.setPosition(y, 1);
+//                System.out.println("ijfx.service.dataset.DefaultDatasetUtillsService.divideActivePlaneByActivePlane()");
+//                System.out.println(randomAccess.get().getRealDouble());
+                Double d = randomAccess.get().getRealDouble() / randomAccessValue.get().getRealDouble();
+                randomAccess.get().setReal(d);
+//                System.out.println(randomAccess.get().getRealDouble());
+            }
+        }
+        return dataset;
     }
 
 }

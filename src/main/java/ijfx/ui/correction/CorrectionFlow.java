@@ -19,6 +19,7 @@
  */
 package ijfx.ui.correction;
 
+import ijfx.service.ui.HintService;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.flow.action.ActionMethod;
@@ -39,8 +40,9 @@ import org.scijava.plugin.Parameter;
  */
 public class CorrectionFlow {
 
-//    @Parameter
-//    Context context;
+    @Parameter
+    HintService hintService;
+    
     @Parameter
     ActivityService activityService;
 
@@ -56,8 +58,8 @@ public class CorrectionFlow {
     protected Button nextButton;
 
     @FXML
-    @ActionTrigger("reset")
-    protected Button resetButton;
+    @ActionTrigger("explainMe")
+    protected Button explainMeButton;
 
     @FXML
     @ActionTrigger("finishAction")
@@ -73,14 +75,14 @@ public class CorrectionFlow {
             first.getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPane.getCanvas().getCamera().yProperty());
         });
     }
-
-    @ActionMethod("reset")
-    public void reset() {
-        CorrectionActivity correctionActivity = (CorrectionActivity) activityService.getActivity(CorrectionActivity.class);
-        System.out.println("ijfx.ui.correction.CorrectionFlow.reset()");
-//        CorrectionActivity correctionActivity = objectService.getObjects(CorrectionActivity.class).get(0);
-        correctionActivity.reset();
-    }
+//
+//    @ActionMethod("reset")
+//    public void reset() {
+//        CorrectionActivity correctionActivity = (CorrectionActivity) activityService.getActivity(CorrectionActivity.class);
+//        System.out.println("ijfx.ui.correction.CorrectionFlow.reset()");
+////        CorrectionActivity correctionActivity = objectService.getObjects(CorrectionActivity.class).get(0);
+//        correctionActivity.reset();
+//    }
 
     public void setCellFactory(ListView<File> listView) {
         listView.setCellFactory((ListView<File> param) -> {
@@ -96,6 +98,11 @@ public class CorrectionFlow {
             };
             return cell;
         });
+    }
+    
+      @ActionMethod("explainMe")
+    protected void help() {
+        hintService.displayHints(this.getClass(), true);
     }
 
 }

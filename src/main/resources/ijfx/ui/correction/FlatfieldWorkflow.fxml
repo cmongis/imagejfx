@@ -26,8 +26,8 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Button fx:id="folderButton1" mnemonicParsing="false" text="Choose Folder" />
-            <Button fx:id="folderButton2" mnemonicParsing="false" text="Button" GridPane.columnIndex="1" />
+            <Button fx:id="flatFieldLeftButton" mnemonicParsing="false" text="Choose flatfield" />
+            <Button fx:id="flatFieldRightButton" mnemonicParsing="false" text="Choose flatfield" GridPane.columnIndex="1" />
          </children>
       </GridPane>
    </center>

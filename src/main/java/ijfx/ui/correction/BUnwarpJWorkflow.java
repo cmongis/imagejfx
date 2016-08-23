@@ -31,9 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,12 +43,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.util.Callback;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.Dataset;
@@ -62,13 +58,10 @@ import net.imagej.display.OverlayService;
 import net.imagej.display.event.DataViewEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import org.scijava.Context;
-import org.scijava.command.Command;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
 import org.scijava.event.EventHandler;
 import org.scijava.io.IOService;
-import org.scijava.module.MethodCallException;
-import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 
@@ -125,6 +118,8 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
 
     public final static String[] HEADER = {"Index", "xSource", "ySource", "xTarget", "yTarget"};
 
+    @FXML
+    Tab landmarksTab, deformationTab, weightTab, outputTab, imagesTab;
     @FXML
     TableDisplayView tableDisplayView;
 
@@ -227,9 +222,12 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
         setCellFactory(listView);
         listView.getItems().addAll(workflowModel.getFiles());
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
-            workflowModel.openImage(this.imageDisplayPaneTopRight, this.imageDisplayPaneTopLeft, newValue);
-            workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeft.getImageDisplay());
-            workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRight.getImageDisplay());
+            workflowModel.openImage(this.imageDisplayPaneTopRight, this.imageDisplayPaneTopLeft, newValue)
+                    .thenRunnable(() -> {
+                        workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeft.getImageDisplay());
+                        workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRight.getImageDisplay());
+                    })
+                    .start();
 
         });
         if (workflowModel.getLandMarksFile() != null) {
@@ -243,17 +241,21 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
 
     @EventHandler
     public void handleEvent(DataViewEvent event) {
-        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
-            bus.channel(event);
+        //To be changed
+        if (imageDisplayPaneTopLeft.getImageDisplay() != null && imageDisplayPaneTopRight.getImageDisplay() != null) {
+            if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
+                bus.channel(event);
+            }
+
         }
 
     }
 
     @EventHandler
     public void handleEvent(LUTsChangedEvent event) {
-        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
-            bus.channel(event);
-        }
+//        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
+//            bus.channel(event);
+//        }
 
     }
 

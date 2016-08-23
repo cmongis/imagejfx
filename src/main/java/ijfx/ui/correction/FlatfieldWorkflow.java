@@ -25,15 +25,14 @@ import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
+import io.datafx.controller.flow.action.ActionMethod;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
@@ -41,19 +40,18 @@ import javafx.stage.FileChooser;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import net.imagej.Dataset;
-import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
-import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  *
  * @author Tuan anh TRINH
+ *
+ * Allow the users to choose the different flatfield
  */
 @ViewController(value = "FlatfieldWorkflow.fxml")
 public class FlatfieldWorkflow extends CorrectionFlow {
@@ -62,14 +60,14 @@ public class FlatfieldWorkflow extends CorrectionFlow {
     WorkflowModel workflowModel;
 
     @FXML
-    Button folderButton1;
-    
+    Button flatFieldLeftButton;
+
     @FXML
-    Button folderButton2;
+    Button flatFieldRightButton;
 
     @FXML
     GridPane gridPane;
-    
+
     @Parameter
     ImageLoaderService imageLoaderService;
 
@@ -84,6 +82,7 @@ public class FlatfieldWorkflow extends CorrectionFlow {
 
     @Parameter
     ImagePlaneService imagePlaneService;
+    
     protected ObjectProperty<ImageDisplayPane> flatFieldProperty1 = new SimpleObjectProperty<>();
     protected ObjectProperty<ImageDisplayPane> flatFieldProperty2 = new SimpleObjectProperty<>();
 
@@ -100,25 +99,19 @@ public class FlatfieldWorkflow extends CorrectionFlow {
     @PostConstruct
     public void init() {
         workflowModel.bindFlatfield(this);
-        gridPane.add(flatFieldProperty1.get(),0,1);
-                gridPane.add(flatFieldProperty2.get(),1,1);
+        gridPane.add(flatFieldProperty1.get(), 0, 1);
+        gridPane.add(flatFieldProperty2.get(), 1, 1);
 
-//        borderPane.setRight(flatFieldProperty2.get());
-        folderButton1.setOnAction(e-> openImage(flatFieldProperty1.get()));
-        folderButton2.setOnAction(e-> openImage(flatFieldProperty2.get()));
+        ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{flatFieldProperty1.get(), flatFieldProperty2.get()};
+        bindPaneProperty(Arrays.asList(imageDisplayPanes));
+        flatFieldLeftButton.setOnAction(e -> openImage(flatFieldProperty1.get()));
+        flatFieldRightButton.setOnAction(e -> openImage(flatFieldProperty2.get()));
     }
 
     protected void openImage(ImageDisplayPane imageDisplayPane) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
-
-        try {
-            Dataset flatFieldDataset = imagePlaneService.openVirtualDataset(file);
-            ImageDisplay imageDisplay = displayDataset(flatFieldDataset);
-            imageDisplayPane.display(imageDisplay);
-           } catch (IOException ex) {
-            Logger.getLogger(FlatfieldWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        workflowModel.openImage(imageDisplayPane, file).start();
     }
 
     protected ImageDisplay displayDataset(Dataset flatFieldDataset) {
@@ -126,5 +119,7 @@ public class FlatfieldWorkflow extends CorrectionFlow {
         imageDisplay.display(flatFieldDataset);
         return imageDisplay;
     }
+    
+  
 
 }

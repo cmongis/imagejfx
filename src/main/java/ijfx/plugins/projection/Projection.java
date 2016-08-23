@@ -63,16 +63,16 @@ public class Projection implements Command {
 
     @Override
     public void run() {
-        AxisType[] axisType = new AxisType[dataset.numDimensions()];
-        CalibratedAxis[] axeArray = new CalibratedAxis[dataset.numDimensions()];
+        AxisType[] axisType = new AxisType[dataset.numDimensions()-1];
+        CalibratedAxis[] axeArray = new CalibratedAxis[dataset.numDimensions()-1];
         dataset.axes(axeArray);
         long[] dims = new long[axeArray.length];
-        for (int i = 0; i < dims.length; i++) {
+        for (int i = 0; i < dataset.numDimensions(); i++) {
+            if (i == dataset.dimensionIndex(axisTypeParameter)) {
+                continue;
+            }
             axisType[i] = axeArray[i].type();
             dims[i] = toIntExact(dataset.max(i) + 1);
-            if (i == dataset.dimensionIndex(axisTypeParameter)) {
-                dims[i] = 1;
-            }
         }
         datasetOutput = datasetService.create(dims, dataset.getName(), axisType, dataset.getValidBits(), dataset.isSigned(), false);
 

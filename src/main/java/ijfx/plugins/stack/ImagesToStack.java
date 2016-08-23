@@ -79,7 +79,7 @@ public class ImagesToStack extends ContextCommand {
         IntStream.range(0, firstElement.numDimensions())
                 .forEach(i -> axisTypesArray[i] = firstElement.axis(i).type());
         axisTypesArray[2] = axisType;
-        outputDataset = datasetService.create(dims, title, axisTypesArray, firstElement.getValidBits(), firstElement.isSigned(), false);
+        outputDataset = datasetService.create(dims, title, axisTypesArray, firstElement.getValidBits(), firstElement.isSigned(), !firstElement.isInteger());
         outputDataset.initializeColorTables(firstElement.getColorTableCount());
         outputDataset.setName(title);
     }
