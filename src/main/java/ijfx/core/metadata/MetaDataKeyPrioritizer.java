@@ -19,7 +19,9 @@
  */
 package ijfx.core.metadata;
 
+import com.google.common.collect.Sets;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -29,11 +31,16 @@ import java.util.Set;
  */
 public class MetaDataKeyPrioritizer implements Comparator<String> {
 
-    final Set<String> priority;
+    final String[] priority;
 
-    public MetaDataKeyPrioritizer(Set<String> priority) {
+    public MetaDataKeyPrioritizer(String[] priority) {
         this.priority = priority;
     }
+    
+    /*
+    public MetaDataKeyPrioritizer(Set<String> priority) {
+        this.priority = priority;
+    }*/
 
     @Override
     public int compare(String s1, String s2) {
@@ -46,7 +53,7 @@ public class MetaDataKeyPrioritizer implements Comparator<String> {
         return 100 * (is2 - is1) + c;
     }
 
-    public int priorityIndex(Set<String> set, String element) {
+    private int priorityIndex(String[] set, String element) {
         int i = 0;
         for (String s : set) {
             if (s.equals(element)) {
