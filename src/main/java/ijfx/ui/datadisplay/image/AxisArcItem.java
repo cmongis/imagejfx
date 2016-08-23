@@ -133,11 +133,13 @@ public class AxisArcItem extends ArcItem<Double> {
         return FontAwesomeIcon.QUESTION;
     }
 
-    public void updateAxis(double newValue) {
+    private void updateAxis(double newValue) {
        // logger.info(String.format("Updating axis %s (%d - %d) : %.3f",axis.type().toString(),display.min(id),display.max(id),newValue));
-        display.setPosition(Math.round(newValue), axis.type());
+        
        
-        display.update();
+       ImageJFX.getThreadPool().execute(()->display.setPosition(Math.round(newValue), axis.type()));
+       
+        //ImageJFX.getThreadPool().execute(display::update);
     }
 
 }

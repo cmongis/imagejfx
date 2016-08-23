@@ -38,6 +38,7 @@ import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,7 +76,6 @@ import mongis.utils.FXUtilities;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
-import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -95,6 +95,7 @@ import org.scijava.Context;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
+import org.scijava.event.EventService;
 import org.scijava.event.SciJavaEvent;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
@@ -153,6 +154,9 @@ public class ImageDisplayPane extends AnchorPane {
     @Parameter
     private ImagePlaneService imagePlaneService;
 
+    @Parameter
+    private EventService eventService;
+
     Logger logger = ImageJFX.getLogger();
 
     private FxTool currentTool;
@@ -182,6 +186,8 @@ public class ImageDisplayPane extends AnchorPane {
 
     private int refreshDelay = 100; // in milliseconds
 
+    private AxisConfiguration axisConfig;
+
     public ImageDisplayPane(Context context) throws IOException {
 
         FXUtilities.injectFXML(this);
@@ -205,7 +211,7 @@ public class ImageDisplayPane extends AnchorPane {
 
         stackPane.widthProperty().addListener(this::onWidthChanged);
         stackPane.heightProperty().addListener(this::onHeightChanged);
-        canvas.heightProperty().bind(stackPane.heightProperty());
+        //canvas.heightProperty().bind(stackPane.heightProperty());
         this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
             if (e.getButton() == MouseButton.PRIMARY && this.getImageDisplay() != null) {
@@ -382,10 +388,11 @@ public class ImageDisplayPane extends AnchorPane {
         canvas.repaint();
         // t.elapsed("canvas.repaint");
         updateInfoLabel();
-        // t.elapsed("updateInfoLabel");
-        // updateOverlays();
-        // t.elapsed("updateOverlays");
 
+        if (getAxisConfiguration().equals(getDataset()) == false) {
+            axisConfig = new AxisConfiguration(getDataset());
+            build();
+        }
     }
 
     private void updateOverlays(List<Overlay> overlays) {
@@ -520,10 +527,11 @@ public class ImageDisplayPane extends AnchorPane {
 
     /*
     
-     Arc Menu building
+        Arc Menu building
     
      */
     public void build() {
+
         setTitle(imageDisplay.getName());
         System.out.println(getDatasetview().getPlanePosition().numDimensions());
 
@@ -719,26 +727,18 @@ public class ImageDisplayPane extends AnchorPane {
         bus.channel(event);
         setEdited(null);
 
-        /*
-        // removing the associated node
-        anchorPane.getChildren()
-                .stream()
-                .filter(node->node.getUserData() == event.getObject())
-                .forEach(node->Platform.runLater(()->anchorPane.getChildren().remove(node)));
-         */
-        //updateOverlays();
-        //Platform.runLater(() -> deleteOverlay(event.getObject()));
     }
 
     @EventHandler
     protected void onLUTsChangedEvent(LUTsChangedEvent event) {
         logService.info("LUT changed");
-        if(event.getView() == getDatasetview()) {
+        if (event.getView() == getDatasetview()) {
             logService.info("Updating dataset");
-            getDataset().update();
+            ImageJFX.getThreadPool().execute(getDataset()::update);
+            // getDatasetview().getProjector().map();
         }
     }
-    
+
     @EventHandler
     protected void onAnyEvent(SciJavaEvent event) {
         logService.info(event.getClass().getSimpleName());
@@ -784,19 +784,6 @@ public class ImageDisplayPane extends AnchorPane {
         } else {
             return drawer.isOnOverlay(overlay, canvas.getCamera(), x, y);
         }
-        /*
-        return drawer.isOnOverlay(overlay,canvas.getCamera(),x,y);
-        
-        double x1 = overlay.getRegionOfInterest().realMin(0);
-        double y1 = overlay.getRegionOfInterest().realMin(1);
-        double x2 = overlay.getRegionOfInterest().realMax(0);
-        double y2 = overlay.getRegionOfInterest().realMax(1);
-        
-        //System.out.println(String.format("(%.0f,%.0f), (%.0f,%.0f)", x1, y1, x2, y2));
-        Rectangle2D r = new Rectangle2D(x1, y1, x2 - x1, y2 - y1);
-        //System.out.println(String.format("contains  (%.0f,%.0f) ? : %b",x,y,r.contains(x,y)));
-        return (r.contains(x, y));
-         */
     }
 
     /*
@@ -939,6 +926,57 @@ public class ImageDisplayPane extends AnchorPane {
             });
         }
 
+    }
+
+    public AxisConfiguration getAxisConfiguration() {
+        if (axisConfig == null) {
+            axisConfig = new AxisConfiguration(getDataset());
+        }
+        return axisConfig;
+    }
+
+    private class AxisConfiguration {
+
+        private CalibratedAxis[] axes;
+
+        public AxisConfiguration(Dataset dataset) {
+
+            axes = new CalibratedAxis[dataset.numDimensions()];
+            dataset.axes(axes);
+
+        }
+
+        public int numAxis() {
+            return axes.length;
+        }
+
+        public CalibratedAxis[] axes() {
+            return axes;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object == null) {
+                return false;
+            }
+            if (object instanceof Dataset) {
+                return equals(new AxisConfiguration((Dataset) object));
+            }
+            if (object instanceof AxisConfiguration == false) {
+                return false;
+            }
+            AxisConfiguration other = (AxisConfiguration) object;
+            if (other.numAxis() != numAxis()) {
+                return false;
+            }
+            return Arrays.equals(axes, other.axes());
+
+        }
+
+    }
+
+    public void dispose() {
+        
     }
 
 }
