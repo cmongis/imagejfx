@@ -22,15 +22,17 @@ package ijfx.service.workflow;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.plugins.LongInterval;
 import ijfx.service.workflow.json.FileDeserializer;
 import ijfx.service.workflow.json.FileSerializer;
 import ijfx.service.workflow.json.JsonFieldName;
+import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imagej.ImageJ;
 import net.imagej.threshold.ThresholdMethod;
 import net.imglib2.display.ColorTable8;
@@ -64,6 +66,8 @@ public class DefaultWorkflowStep implements WorkflowStep {
     @Parameter
     protected ModuleService moduleSerivce;
 
+    Logger logger = ImageJFX.getLogger();
+    
     public static Class[] SAVED_TYPES = new Class[]{
         double.class,
         int.class,
@@ -119,6 +123,11 @@ public class DefaultWorkflowStep implements WorkflowStep {
         CommandInfo infos = commandService.getCommand(getClassName());
         if (infos != null) {
             module = moduleService.createModule(infos);
+            try {
+                module.initialize();
+            } catch (Exception ex) {
+               logger.log(Level.WARNING,"Error when initializing module...",ex);
+            }
         }
         return this;
     }
