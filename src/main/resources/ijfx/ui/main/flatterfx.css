@@ -254,15 +254,15 @@
 .toggle-group {
 
 }
-.toggle-group .toggle-button{
+.toggle-group .toggle-button, .toggle-group .button, .toggle-group .menu-button {
     -fx-background-radius: 0.0 0 0 0.0;
 
 }
 
-.toggle-group .toggle-button.first {
+.toggle-group .toggle-button.first, .toggle-group .button.first {
     -fx-background-radius: 2.0 0 0 2.0;
 }
-.toggle-group .toggle-button.last {
+.toggle-group .toggle-button.last, .toggle-group .button.last, .toggle-group .menu-button.last{
     -fx-background-radius: 0.0 2.0 2.0 0.0;
 }
 .toggle-group .toggle-button:hover {
@@ -476,7 +476,7 @@
     -fx-pref-width:0;
     -fx-padding:0;
     -fx-effect:0;
-    -fx-
+    
     -fx-disable:0;
 }
 #open-button{
