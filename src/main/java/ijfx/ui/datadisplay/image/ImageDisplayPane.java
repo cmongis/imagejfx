@@ -351,7 +351,7 @@ public class ImageDisplayPane extends AnchorPane {
 
     }
 
-    private void useImageJRender() {
+    synchronized private  void useImageJRender() {
 
         Timer t = timerService.getTimer(this.getClass());
         t.start();

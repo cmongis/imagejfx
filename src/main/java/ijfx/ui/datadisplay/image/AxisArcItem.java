@@ -137,9 +137,9 @@ public class AxisArcItem extends ArcItem<Double> {
        // logger.info(String.format("Updating axis %s (%d - %d) : %.3f",axis.type().toString(),display.min(id),display.max(id),newValue));
         
        
-       ImageJFX.getThreadPool().execute(()->display.setPosition(Math.round(newValue), axis.type()));
+       display.setPosition(Math.round(newValue), axis.type());
        
-        //ImageJFX.getThreadPool().execute(display::update);
+        ImageJFX.getThreadPool().execute(display::update);
     }
 
 }
