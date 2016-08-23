@@ -32,6 +32,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
+@Deprecated
 public class ThresholdMethodSerializer<T extends ThresholdMethod> extends JsonSerializer<T>{
 
     public  ThresholdMethodSerializer(Context c) {
@@ -44,5 +45,6 @@ public class ThresholdMethodSerializer<T extends ThresholdMethod> extends JsonSe
         jg.writeObject(name);
         
     }
+    
     
 }

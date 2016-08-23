@@ -28,6 +28,7 @@ import org.scijava.Context;
  *
  * @author cyril
  */
+@Deprecated
 public class ThresholdMethodModule extends SimpleModule{
     
     Context context;
