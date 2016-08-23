@@ -47,6 +47,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -282,7 +283,12 @@ public class WorkflowModel {
      * @return
      */
     public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane1, ImageDisplayPane imageDisplayPane2, File file) {
-
+        try {
+            imageDisplayPane1.getImageDisplay().close();
+            imageDisplayPane2.getImageDisplay().close();
+        } catch (NullPointerException ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
             try {
                 Dataset dataset;
@@ -298,7 +304,11 @@ public class WorkflowModel {
     }
 
     public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane, File file) {
-
+        try {
+            imageDisplayPane.getImageDisplay().close();
+        } catch (NullPointerException ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
             try {
                 Dataset dataset;
@@ -320,19 +330,16 @@ public class WorkflowModel {
      */
     public ImageDisplay displayDataset(Dataset dataset, ImageDisplayPane imageDisplayPane) {
         try {
-            imageDisplayPane.getImageDisplay().clear();
-        } catch (Exception e) {
-            e.printStackTrace();
+            imageDisplayPane.getImageDisplay().close();
+        } catch (Exception ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        ImageDisplay imageDisplay = new DefaultImageDisplay();
-        context.inject(imageDisplay);
-        imageDisplay.display(dataset);
+        ImageDisplay imageDisplay = (ImageDisplay) displayService.createDisplayQuietly(dataset);
         try {
             commandService.run(AutoContrast.class, true, "imageDisplay", imageDisplay, "channelDependant", true).get();
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         imageDisplayPane.display(imageDisplay);
         return imageDisplay;
     }
@@ -519,7 +526,7 @@ public class WorkflowModel {
                 bunwarpj.Transformation transformation = getTransformation(files.get(0));
                 files.stream().forEach((File file) -> {
 //                    new CallbackTask<Void, Void>().run(() -> {
-                        transformeImage(file, destinationPath, transformation);
+                    transformeImage(file, destinationPath, transformation);
 //                    })
 //                            .start();
 
@@ -535,27 +542,27 @@ public class WorkflowModel {
 
     public void transformeImage(File file, String destinationPath, bunwarpj.Transformation transformation) {
 //        new CallbackTask<Void, Void>().run(() -> {
-            try {
-                Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
-                ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
+        try {
+            Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
+            ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
 
-                //Set position, get dataset and apply flatField correction
-                setPosition(getPositionRight(), imageDisplay);
-                Dataset targetDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldRight());
+            //Set position, get dataset and apply flatField correction
+            setPosition(getPositionRight(), imageDisplay);
+            Dataset targetDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldRight());
 
-                setPosition(getPositionLeft(), imageDisplay);
-                Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
-                Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
-                StringBuilder path = new StringBuilder(destinationPath);
-                path.append("/").append(file.getName());
-                iOService.save(outputDataset, path.toString());
-                mapImages.put(file, new File(path.toString()));
-                imageDisplay.close();
-                Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, "Save " + path.toString());
+            setPosition(getPositionLeft(), imageDisplay);
+            Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
+            Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
+            StringBuilder path = new StringBuilder(destinationPath);
+            path.append("/").append(file.getName());
+            iOService.save(outputDataset, path.toString());
+            mapImages.put(file, new File(path.toString()));
+            imageDisplay.close();
+            Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, "Save " + path.toString());
 
-            } catch (Exception ex) {
-                Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        } catch (Exception ex) {
+            Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
+        }
 //        })
 //                .submit(loadingScreenService)
 //                .start();
