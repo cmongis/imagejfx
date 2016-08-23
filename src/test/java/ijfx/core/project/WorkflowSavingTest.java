@@ -19,21 +19,71 @@
  */
 package ijfx.core.project;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ijfx.plugins.DefaultInterval;
 import ijfx.plugins.LongInterval;
+import ijfx.plugins.commands.ExtractSlices;
+import ijfx.plugins.projection.MedianProjection;
+import ijfx.plugins.projection.Projection;
+import ijfx.service.batch.BatchService;
+import ijfx.service.workflow.Workflow;
+import ijfx.service.workflow.WorkflowBuilder;
+import ijfx.service.workflow.WorkflowIOService;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import net.imagej.plugins.commands.imglib.GaussianBlur;
+import net.imagej.threshold.ThresholdService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
 
 /**
  *
  * @author cyril
  */
-public class SerializationTest {
+public class WorkflowSavingTest extends BaseImageJTest {
+
+    @Parameter
+    Context context;
+
+    @Parameter
+    WorkflowIOService workflowIOService;
+
+    @Override
+    protected Class[] getService() {
+        return new Class[]{
+            ThresholdService.class, WorkflowIOService.class, BatchService.class,};
+    }
+
+    @Test
+    public void testloadsave() {
+
+        File testFile = new File("workflow_test.json");
+
+        Workflow workflow = new WorkflowBuilder(context)
+                .addStep(ExtractSlices.class, "interval", new DefaultInterval(20, 70))
+                .addStep(GaussianBlur.class, "sigma", 3.0)
+                .addStep(Projection.class, "projectMethod", new MedianProjection())
+                //.addStep(GaussianBlur.class,"sigma",3.0)
+                .getWorkflow("Test workflow");
+
+        workflowIOService.saveWorkflow(workflow, testFile);
+
+        Workflow w = workflowIOService.loadWorkflow(testFile);
+
+        // Asserting the size
+        Assert.assertEquals(workflow.getStepList().size(), w.getStepList().size());
+
+        // Asserting the workflows
+        Assert.assertEquals(
+                getWorkflowParam(workflow, 1, "sigma").getClass().getName(),
+                getWorkflowParam(w, 1, "sigma").getClass().getName()
+        );
+
+    }
     
     public static ObjectMapper objectMapper = new ObjectMapper();
     
@@ -53,6 +103,12 @@ public class SerializationTest {
         Assert.assertTrue(LongInterval.class.isAssignableFrom(loaded.get("int").getClass()));
         
     }
+
+    private Object getWorkflowParam(Workflow w, int step, String paramKey) {
+        return w.getStepList().get(step).getParameters().get(paramKey);
+    }
     
+    
+
     
 }

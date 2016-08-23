@@ -21,37 +21,30 @@ package ijfx.ui.explorer;
 
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataSetType;
+import ijfx.core.metadata.MetaDataSetUtils;
 import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.PolygonOverlayStatistics;
 import ijfx.ui.main.ImageJFX;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.IntStream;
-import javafx.application.Platform;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
-import mongis.utils.CallbackTask;
 
 import net.imagej.Dataset;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
-import net.imglib2.roi.PolygonRegionOfInterest;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import ijfx.service.overlay.OverlayShapeStatistics;
+import ijfx.service.preview.PreviewService;
+import java.io.IOException;
 import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.type.numeric.RealType;
 
 /**
  *
@@ -78,9 +71,15 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
 
     @Parameter
     private ImageDisplayService imageDisplayService;
-    
+
     @Parameter
     private ImagePlaneService imagePlaneService;
+
+    @Parameter
+    private OverlayDrawingService overlayDrawingService;
+
+    @Parameter
+    private PreviewService previewService;
     
     public OverlayExplorableWrapper(Context context, File source, Overlay overlay) {
 
@@ -110,6 +109,8 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
         } else {
             this.statistics = null;
         }
+
+        getMetaDataSet().setType(MetaDataSetType.OBJECT);
     }
 
     @Override
@@ -127,86 +128,100 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
         return "";
     }
 
+    /**
+     * @Override public Image getImage() {
+     *
+     * if (overlay instanceof PolygonOverlay) { PolygonOverlay po =
+     * (PolygonOverlay) overlay;
+     *
+     * PolygonRegionOfInterest roi = po.getRegionOfInterest(); Polygon pol = new
+     * Polygon();
+     *
+     * for (int i = 0; i != roi.getVertexCount(); i++) { pol.addPoint(new
+     * Double(roi.getVertex(i).getDoublePosition(0)).intValue(), new
+     * Double(roi.getVertex(i).getDoublePosition(1)).intValue()); }
+     *
+     * Rectangle bounds = pol.getBounds();
+     *
+     * //for(int i = 0;i!=) int border = 10;
+     *
+     * Canvas canvas = new Canvas(bounds.getWidth() + border * 2,
+     * bounds.getHeight() + border * 2); GraphicsContext graphicsContext2D =
+     * canvas.getGraphicsContext2D();
+     *
+     * final double xBounds = bounds.getX(); final double yBounds =
+     * bounds.getY(); System.out.println(bounds); double[] xpoints =
+     * IntStream.of(pol.xpoints).mapToDouble(x -> x - xBounds +
+     * border).toArray(); double[] ypoints =
+     * IntStream.of(pol.ypoints).mapToDouble(y -> y - yBounds +
+     * border).toArray();
+     *
+     * graphicsContext2D.setFill(Color.TRANSPARENT); graphicsContext2D.fill();
+     * graphicsContext2D.setFill(Color.WHITE);
+     *
+     * graphicsContext2D.fillPolygon(xpoints, ypoints, xpoints.length);
+     *
+     * final WritableImage image = new WritableImage((int) canvas.getWidth(),
+     * (int) canvas.getHeight()); final SnapshotParameters params = new
+     * SnapshotParameters();
+     *
+     * params.setFill(Color.TRANSPARENT); CallbackTask run = new CallbackTask()
+     * .run(() -> canvas.snapshot(params, image));
+     *
+     * Platform.runLater(run);
+     *
+     * try { run.get(); } catch (InterruptedException ex) {
+     * Logger.getLogger(OverlayExplorableWrapper.class.getName()).log(Level.SEVERE,
+     * null, ex); } catch (ExecutionException ex) {
+     * Logger.getLogger(OverlayExplorableWrapper.class.getName()).log(Level.SEVERE,
+     * null, ex); }
+     *
+     * return image;
+     *
+     * }
+     *
+     * return null;
+    }
+     */
     @Override
-    public Image getImage() {
-
-        if (overlay instanceof PolygonOverlay) {
-            PolygonOverlay po = (PolygonOverlay) overlay;
-
-            PolygonRegionOfInterest roi = po.getRegionOfInterest();
-            Polygon pol = new Polygon();
-
-            for (int i = 0; i != roi.getVertexCount(); i++) {
-                pol.addPoint(new Double(roi.getVertex(i).getDoublePosition(0)).intValue(), new Double(roi.getVertex(i).getDoublePosition(1)).intValue());
-            }
-
-            Rectangle bounds = pol.getBounds();
-
-            //for(int i = 0;i!=)
-            int border = 10;
-
-            Canvas canvas = new Canvas(bounds.getWidth() + border * 2, bounds.getHeight() + border * 2);
-            GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
-
-            final double xBounds = bounds.getX();
-            final double yBounds = bounds.getY();
-            System.out.println(bounds);
-            double[] xpoints = IntStream.of(pol.xpoints).mapToDouble(x -> x - xBounds + border).toArray();
-            double[] ypoints = IntStream.of(pol.ypoints).mapToDouble(y -> y - yBounds + border).toArray();
-
-            graphicsContext2D.setFill(Color.TRANSPARENT);
-            graphicsContext2D.fill();
-            graphicsContext2D.setFill(Color.WHITE);
-
-            graphicsContext2D.fillPolygon(xpoints, ypoints, xpoints.length);
-
-            final WritableImage image = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
-            final SnapshotParameters params = new SnapshotParameters();
-
-            params.setFill(Color.TRANSPARENT);
-            CallbackTask run = new CallbackTask()
-                    .run(() -> canvas.snapshot(params, image));
-
-            Platform.runLater(run);
-
-            try {
-                run.get();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(OverlayExplorableWrapper.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ExecutionException ex) {
-                Logger.getLogger(OverlayExplorableWrapper.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+    public  Image getImage() {
+        try {
+            long[] nonPlanarPosition = MetaDataSetUtils.getNonPlanarPosition(getMetaDataSet());
+            Dataset dataset = imagePlaneService.openVirtualDataset(getSource());
+            Dataset extractedObject = overlayDrawingService.extractObject(overlay, dataset, nonPlanarPosition);
+            
+            Image image = previewService.datasetToImage((RandomAccessibleInterval<? extends RealType>) extractedObject);
             return image;
-
+            
+            
+            
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, "Error when accessing file " + source.getAbsolutePath(), ioe);
+            return null;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when getting image for " + getTitle(), e);
+            return null;
         }
 
-        return null;
     }
 
     @Override
     public void open() {
-        
-        
-        
-        
+
         long[] position = DimensionUtils.readLongArray(getMetaDataSet().get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue());
         try {
-        
-        Dataset dataset = imagePlaneService.extractPlane(source, position);
-        
-        DefaultImageDisplay imageDisplay = new DefaultImageDisplay();
-        imageDisplay.display(dataset);
-        imageDisplay.display(overlay);
-        
-        
-        
-        //overlayDrawingService.extractObject(overlay, source, position);
+
+            Dataset dataset = imagePlaneService.extractPlane(source, position);
+
+            DefaultImageDisplay imageDisplay = new DefaultImageDisplay();
+            imageDisplay.display(dataset);
+            imageDisplay.display(overlay);
+
+            //overlayDrawingService.extractObject(overlay, source, position);
+        } catch (Exception e) {
+
         }
-        catch(Exception e) {
-            
-        }
-        
+
     }
 
     @Override

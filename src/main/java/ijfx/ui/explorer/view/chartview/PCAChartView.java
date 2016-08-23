@@ -19,10 +19,9 @@
  */
 package ijfx.ui.explorer.view.chartview;
 
-import ijfx.ui.explorer.view.chartview.AbstractChartView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.core.listenableSystem.MetaDataSetUtils;
+import ijfx.core.metadata.MetaDataSetUtils;
 import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.DefaultObjectClusterable;
 import ijfx.service.cluster.ObjectClusterable;

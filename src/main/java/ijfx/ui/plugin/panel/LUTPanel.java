@@ -408,6 +408,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             if (getCurrentDatasetView().getColorMode() != booleanToColorMode(mergedViewToggleButton.isSelected())) {
                 getCurrentDatasetView().setColorMode(mergedViewToggleButton.isSelected() ? ColorMode.COMPOSITE : ColorMode.COLOR);
             }
+           
         }
 
     }

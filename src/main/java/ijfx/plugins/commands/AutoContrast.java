@@ -37,7 +37,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Command.class,menuPath = "Image > Adjust > Auto-Contrast+")
+@Plugin(type = Command.class, menuPath = "Image > Adjust > Auto-Contrast+")
 public class AutoContrast extends ContextCommand {
 
     @Parameter
@@ -54,18 +54,16 @@ public class AutoContrast extends ContextCommand {
 
     @Parameter
     EventService eventService;
-    
+
     Dataset dataset;
-    
+
     @Override
     public void run() {
 
         dataset = imageDisplayService.getActiveDataset(imageDisplay);
 
-        
-        
-        run(statsService,imageDisplay,dataset,channelDependant);
-        
+        run(statsService, imageDisplay, dataset, channelDependant);
+
         /*
         
         boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
@@ -84,27 +82,21 @@ public class AutoContrast extends ContextCommand {
 
             }*/
     }
-    
-    
-    public static void run(IjfxStatisticService statsService,ImageDisplay imageDisplay, Dataset dataset, boolean channelDependant) {
-        
-        
-        
+
+    public static void run(IjfxStatisticService statsService, ImageDisplay imageDisplay, Dataset dataset, boolean channelDependant) {
+
         boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
 
-        
-
-            if (multiChannel && channelDependant == true) {
-                for (int i = 0; i <= dataset.max(dataset.dimensionIndex(Axes.CHANNEL)); i++) {
-                    SummaryStatistics stats = statsService.getChannelStatistics(dataset, i);
-                    setMinMax(imageDisplay,dataset,stats, i);
-                }
+        if (multiChannel && channelDependant == true) {
+            for (int i = 0; i <= dataset.max(dataset.dimensionIndex(Axes.CHANNEL)); i++) {
+                SummaryStatistics stats = statsService.getChannelStatistics(dataset, i);
+                setMinMax(imageDisplay, dataset, stats, i);
             }
-            else {
-                SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
-                setMinMax(imageDisplay,dataset,stats, 0);
+        } else {
+            SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
+            setMinMax(imageDisplay, dataset, stats, 0);
 
-            }
+        }
         /*
         System.out.println(stats);
          dataset.setChannelMinimum(channel, stats.getMin());
@@ -113,20 +105,25 @@ public class AutoContrast extends ContextCommand {
          view.setChannelRange(channel, stats.getMin(), stats.getMax());
          view.getProjector().map();
          view.update();*/
-        
+
     }
-    
-    
-    private static void setMinMax(ImageDisplay imageDisplay,Dataset dataset,SummaryStatistics stats,int channel) {
+
+    private static void setMinMax(ImageDisplay imageDisplay, Dataset dataset, SummaryStatistics stats, int channel) {
         System.out.println(stats);
-         dataset.setChannelMinimum(channel, stats.getMin());
-         dataset.setChannelMaximum(channel, stats.getMax());
-         DatasetView view = (DatasetView)imageDisplay.getActiveView();
-         view.setChannelRange(channel, stats.getMin(), stats.getMax());
-         view.getProjector().map();
-         view.update();
-         //eventService.publish(new DatasetUpdatedEvent(dataset, true));
-         //imageDisplay.update();
+        if (dataset != null) {
+            dataset.setChannelMinimum(channel, stats.getMin());
+             dataset.setChannelMaximum(channel, stats.getMax());
+        }
+       
+           
+ if (imageDisplay != null) {
+            DatasetView view = (DatasetView) imageDisplay.getActiveView();
+            view.setChannelRange(channel, stats.getMin(), stats.getMax());
+            view.getProjector().map();
+            view.update();
+        }
+        //eventService.publish(new DatasetUpdatedEvent(dataset, true));
+        //imageDisplay.update();
     }
 
 }

@@ -21,25 +21,20 @@ package ijfx.ui.explorer.view;
 
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetUtils;
+import ijfx.service.ImagePlaneService;
 import ijfx.service.batch.SegmentedObject;
+import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.preview.PreviewService;
 import ijfx.ui.explorer.AbstractExplorable;
-import ijfx.ui.main.ImageJFX;
-import java.awt.Polygon;
-import java.awt.Rectangle;
+import java.io.IOException;
 import java.util.logging.Level;
-import java.util.stream.IntStream;
-import javafx.application.Platform;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
-import mongis.utils.CallbackTask;
 import net.imagej.Dataset;
-import net.imagej.overlay.Overlay;
-import net.imagej.overlay.PolygonOverlay;
-import net.imglib2.roi.PolygonRegionOfInterest;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.display.ColorTable8;
+import net.imglib2.type.numeric.RealType;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -49,6 +44,16 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
 
     private final SegmentedObject object;
 
+    @Parameter
+    ImagePlaneService imagePlaneService;
+    
+    @Parameter
+    OverlayDrawingService overlayDrawingService;
+    
+    @Parameter
+    PreviewService previewService;
+    
+    
     public SegmentedObjectExplorerWrapper(SegmentedObject object) {
         this.object = object;
     }
@@ -68,6 +73,31 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
         return "";
     }
 
+    
+    
+    
+     @Override
+    public  Image getImage() {
+        try {
+            long[] nonPlanarPosition = MetaDataSetUtils.getNonPlanarPosition(getMetaDataSet());
+            Dataset dataset = imagePlaneService.openVirtualDataset(getFile());
+            Dataset extractedObject = overlayDrawingService.extractObject(object.getOverlay(), dataset, nonPlanarPosition);
+            double min = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MIN).getDoubleValue();
+             double max = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MAX).getDoubleValue();
+            Image image = previewService.datasetToImage((RandomAccessibleInterval<? extends RealType>) extractedObject,new ColorTable8(),min,max);
+            return image;
+            
+            
+            
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, "Error when accessing file " + getFile().getAbsolutePath(), ioe);
+            return null;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when getting image for " + getTitle(), e);
+            return null;
+        }
+    }
+    /*
     @Override
     public Image getImage() {
 
@@ -124,7 +154,7 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
         } else {
             return null;
         }
-    }
+    }**/
 
     @Override
     public void open() throws Exception {

@@ -86,12 +86,12 @@ public class OpenImageBar extends HBox implements UiPlugin {
     public OpenImageBar() {
         super();
 
-        setSpacing(ImageJFX.MARGIN);
-
+        //setSpacing(ImageJFX.MARGIN);
+        getStyleClass().add("toggle-group");
         previousButton = GlyphsDude
                 .createIconButton(FontAwesomeIcon.ARROW_CIRCLE_LEFT);
         previousButton.setTooltip(new Tooltip(PREVIOUS_BUTTON_TXT));
-        previousButton.getStyleClass().add("icon");
+        previousButton.getStyleClass().addAll("icon","first");
         previousButton.setOnAction(event -> activityService.back());
         
         
@@ -101,7 +101,7 @@ public class OpenImageBar extends HBox implements UiPlugin {
         addAction("Explore folder",FontAwesomeIcon.COMPASS,this::explorerFolder);
         openButton.setTooltip(new Tooltip(OPEN_BUTTON_TXT));
         //openButton.setText(" ");
-        openButton.getStyleClass().add("icon");
+        openButton.getStyleClass().addAll("icon","last");
         openButton.setId("open-button");
        
         openButton.setPopupSide(Side.BOTTOM);

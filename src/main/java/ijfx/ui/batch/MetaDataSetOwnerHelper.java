@@ -19,10 +19,10 @@
  */
 package ijfx.ui.batch;
 
-import ijfx.core.listenableSystem.MetaDataSetUtils;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetUtils;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -140,7 +140,7 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         return priority.toArray(new String[priority.size()]);
     }
     
-    public Set<String> applyPriority(Set<String> strings) {
+    private Set<String> applyPriority(Set<String> strings) {
         return strings
                 .stream()
                 .sorted(this::comparePriority)
