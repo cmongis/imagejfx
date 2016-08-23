@@ -24,6 +24,7 @@ import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.sampler.PositionIterator;
 import ijfx.service.sampler.SamplingDefinition;
 import ijfx.service.sampler.SparsePositionIterator;
+import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -135,7 +136,8 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
     }
 
     public int getCurrentChannelId() {
-        return imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
+        int channelId = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
+        return channelId;
 
     }
 
@@ -144,10 +146,13 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
         imageDisplayService.getActiveDataset().setChannelMinimum(getCurrentChannelId(), min);
         imageDisplayService.getActiveDatasetView().setChannelRange(getCurrentChannelId(), min, max);
         //imageDisplayService.getActiveDatasetView().setChannelRanges(minValue.doubleValue(), maxValue.doubleValue());
-        imageDisplayService.getActiveDatasetView().getProjector().map();
-        // imageDisplayService.getActiveDatasetView().update();
 
-        eventService.publishLater(new DisplayUpdatedEvent(displayService.getActiveDisplay(), DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
+        ImageJFX.getThreadPool().execute(() -> {
+            imageDisplayService.getActiveDatasetView().getProjector().map();
+            // imageDisplayService.getActiveDatasetView().update();
+            eventService.publishLater(new DisplayUpdatedEvent(displayService.getActiveDisplay(), DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
+        });
+
     }
 
     public void autoRange() {
