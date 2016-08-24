@@ -1,0 +1,159 @@
+/*
+    This file is part of ImageJ FX.
+
+    ImageJ FX is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    ImageJ FX is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ImageJ FX.  If not, see <http://www.gnu.org/licenses/>. 
+    
+     Copyright 2015,2016 Cyril MONGIS, Michael Knop
+	
+ */
+package ijfx.service.overlay;
+
+import com.google.common.collect.Lists;
+import ijfx.bridge.ImageJContainer;
+import ijfx.service.IjfxService;
+import ijfx.ui.activity.ActivityService;
+import ijfx.ui.main.ImageJFX;
+import io.scif.services.DatasetIOService;
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
+import net.imagej.display.OverlayService;
+import net.imagej.display.OverlayView;
+import net.imagej.event.OverlayCreatedEvent;
+import net.imagej.overlay.Overlay;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.plugins.commands.io.OpenFile;
+import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
+
+/**
+ *
+ * @author cyril
+ */
+@Plugin(type=Service.class)
+public class OverlayUtilsService extends AbstractService implements IjfxService {
+    
+    @Parameter
+    CommandService commandService;
+    
+    @Parameter
+    DatasetIOService datasetIoService;
+    
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
+    @Parameter
+    OverlayService overlayService;
+    
+    @Parameter
+    EventService eventService;
+    
+    @Parameter
+    OverlaySelectionService overlaySelectionSrv;
+    
+    @Parameter
+    ActivityService activityService;
+    
+    Logger logger = ImageJFX.getLogger();
+    
+    public void openOverlay(File file, Overlay selected) {
+        
+       
+        ImageDisplay display;
+        
+       
+        display = findDisplay(file);
+        
+        //if we couldn't find the display, we open the image
+        if(display == null) {
+            
+            Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile",file);
+            
+            try {
+                run.get();
+                
+                display = findDisplay(file);
+                
+                
+                
+            } catch(Exception e) {
+                logger.log(Level.SEVERE,"Couldn't open "+file.getAbsolutePath(),e);
+                return;
+            }
+        }
+        
+        // now we check that it's still not null so we can
+        if(display != null) {
+            if(findOverlay(selected, display) ==null) {
+                display.display(selected);
+            }
+            else {
+                overlaySelectionSrv.selectOnlyOneOverlay(display, selected);
+            }
+            
+            activityService.openByType(ImageJContainer.class);
+            
+        }
+        else {
+            logger.severe("Couldn't find open file nor overlay");
+            
+        }
+    }
+    
+    public Overlay findOverlay(Overlay overlay, ImageDisplay imageDisplay) {
+        return imageDisplay
+                .stream()
+                .filter(dataview->dataview instanceof OverlayView)
+                .map(overlayView->(Overlay)overlayView.getData())
+                .filter(o->o==overlay)
+                .findFirst()
+                .orElse(null);
+    }
+    
+    public void addOverlay(ImageDisplay imageDisplay, List<Overlay> overlays) {
+        
+        
+        imageDisplay.addAll(overlays.stream().map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
+        imageDisplay.update();
+        overlays.stream().map(o -> new OverlayCreatedEvent(o)).forEach(eventService::publish);
+        
+    }
+    
+    public void addOverlay(ImageDisplay imageDisplay, Overlay[] overlayArray) {
+        addOverlay(imageDisplay,Lists.newArrayList(overlayArray));
+    }
+    
+    private ImageDisplay findDisplay(File file){
+        
+        
+        
+        return imageDisplayService.getImageDisplays().stream()
+                .filter(display->imageDisplayService.getActiveDataset(display).getSource().equals(file.getAbsolutePath()))
+                .findFirst()
+                .orElse(null);
+        
+        
+    }
+    
+    
+}
