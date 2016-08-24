@@ -19,6 +19,7 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
@@ -157,6 +158,9 @@ public class ImageDisplayPane extends AnchorPane {
     @Parameter
     private EventService eventService;
 
+    @Parameter
+    private IjfxStatisticService statsService;
+
     Logger logger = ImageJFX.getLogger();
 
     private FxTool currentTool;
@@ -232,10 +236,15 @@ public class ImageDisplayPane extends AnchorPane {
 
     public void display(ImageDisplay display) {
         imageDisplay = (ImageDisplay) display;
+
+        
+
         build();
         setCurrentTool(toolService.getCurrentTool());
         initEventBuffering();
         canvas.setImageDisplay(imageDisplay);
+       
+                    
     }
 
     public DatasetView getDatasetview() {
@@ -351,7 +360,7 @@ public class ImageDisplayPane extends AnchorPane {
 
     }
 
-    synchronized private  void useImageJRender() {
+    synchronized private void useImageJRender() {
 
         Timer t = timerService.getTimer(this.getClass());
         t.start();
@@ -976,7 +985,7 @@ public class ImageDisplayPane extends AnchorPane {
     }
 
     public void dispose() {
-        
+
     }
 
 }
