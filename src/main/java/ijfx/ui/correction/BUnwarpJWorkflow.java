@@ -27,14 +27,20 @@ import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.datadisplay.image.ImageWindowEventBus;
 import ijfx.ui.datadisplay.table.TableDisplayView;
 import io.datafx.controller.ViewController;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -56,7 +62,10 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.display.event.DataViewEvent;
+import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.display.event.LUTsChangedEvent;
+import net.imagej.overlay.Overlay;
+import net.imagej.overlay.PointOverlay;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
@@ -168,6 +177,9 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
     @FXML
     ListView<File> listView;
 
+    Stack<Point> sourcePoints;
+    Stack<Point> targetPoints;
+
     private final ImageWindowEventBus bus = new ImageWindowEventBus();
 
     public BUnwarpJWorkflow() {
@@ -202,7 +214,7 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
         bindPaneProperty(Arrays.asList(imageDisplayPanes));
 
 //Try to get the last one!
-        bus.getStream(DataViewEvent.class)
+        bus.getStream(DataViewUpdatedEvent.class)
                 //                .filter(bus::doesDisplayRequireRefresh)
                 .buffer(5000 / 15, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
@@ -218,7 +230,6 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
                     datasets[1] = datasetUtillsService.extractPlane(imageDisplayRight);
                     workflowModel.extractAndMerge(datasets, imageDisplayPaneBottomLeft);
                 });
-        
 
         setCellFactory(listView);
         listView.getItems().addAll(workflowModel.getFiles());
@@ -227,6 +238,8 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
                     .thenRunnable(() -> {
                         workflowModel.setPosition(workflowModel.getPositionLeft(), imageDisplayPaneTopLeft.getImageDisplay());
                         workflowModel.setPosition(workflowModel.getPositionRight(), imageDisplayPaneTopRight.getImageDisplay());
+                        imageDisplayPaneTopRight.getImageDisplay().display(new PointOverlay(context, new double[]{10.0, 10.0}));
+//                        loadPointOverlays();
                     })
                     .start();
 
@@ -270,6 +283,24 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
             imageDisplayService.getActiveDatasetView(imageDisplayPaneBottomLeft.getImageDisplay()).setColorTable(datasetView.getColorTables().get(0), i);
         });
 
+    }
+
+    public void loadPointOverlays() {
+        File file = workflowModel.getLandMarksFile();
+        if (file != null) {
+            if (sourcePoints == null && targetPoints == null) {
+                sourcePoints = new Stack<>();
+                targetPoints = new Stack<>();
+                bunwarpj.MiscTools.loadPoints(file.getAbsolutePath(), sourcePoints, targetPoints);
+            }
+            List<Overlay> sourceList = sourcePoints.stream().map(e -> new PointOverlay(context, new double[]{e.x, e.y})).collect(Collectors.toList());
+            List<Overlay> targetList = targetPoints.stream().map(e -> new PointOverlay(context, new double[]{e.x, e.y})).collect(Collectors.toList());
+            imageDisplayPaneTopLeft.getImageDisplay().addAll(sourceList.stream().map(e -> imageDisplayService.createDataView(e)).collect(Collectors.toList()));
+//            imageDisplayPaneTopLeft.getImageDisplay().update();
+
+            imageDisplayPaneTopRight.getImageDisplay().addAll(targetList.stream().map(e -> imageDisplayService.createDataView(e)).collect(Collectors.toList()));
+//            imageDisplayPaneTopRight.getImageDisplay().update();
+        }
     }
 
 }

@@ -26,6 +26,8 @@ import ijfx.plugins.bunwarpJ.ChromaticCorrection;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
@@ -44,7 +46,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -118,6 +123,9 @@ public class WorkflowModel {
 
     @Parameter
     LoadingScreenService loadingScreenService;
+
+    @Parameter
+    TimerService timerService;
 
     static String[] CHOICES_DEFORMATION = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
 
@@ -520,17 +528,23 @@ public class WorkflowModel {
     }
 
     public void transformeImages(List<File> files, String destinationPath) {
+        long startTime = System.currentTimeMillis();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         new CallbackTask<Void, Void>().run(() -> {
 
             try {
                 bunwarpj.Transformation transformation = getTransformation(files.get(0));
                 files.stream().forEach((File file) -> {
 //                    new CallbackTask<Void, Void>().run(() -> {
-                    transformeImage(file, destinationPath, transformation);
+                    executorService.submit(() -> transformeImage(file, destinationPath, transformation));
 //                    })
 //                            .start();
-
+//                    transformeImage(file, destinationPath, transformation);
                 });
+
+                executorService.shutdown();
+                executorService.awaitTermination(1, TimeUnit.HOURS); // or longer.    
+                System.out.println("Fin Workflow " + String.valueOf(System.currentTimeMillis() - startTime));
             } catch (InterruptedException | ExecutionException ex) {
                 Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
             }
