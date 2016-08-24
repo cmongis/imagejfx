@@ -56,10 +56,10 @@ public class IconView extends ScrollPane implements ExplorerView {
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(tilePane);
 
     @Parameter
-    ExplorerService explorerService;
+    private ExplorerService explorerService;
     
     @Parameter
-    Context context;
+    private Context context;
     
     public IconView() {
         setContent(tilePane);

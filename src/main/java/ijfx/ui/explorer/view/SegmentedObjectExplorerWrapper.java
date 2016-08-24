@@ -50,21 +50,21 @@ import org.scijava.plugin.Parameter;
 public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
 
     private final SegmentedObject object;
+     
+    @Parameter
+    private ImagePlaneService imagePlaneService;
 
     @Parameter
-    ImagePlaneService imagePlaneService;
+    private OverlayDrawingService overlayDrawingService;
 
     @Parameter
-    OverlayDrawingService overlayDrawingService;
+    private PreviewService previewService;
 
     @Parameter
-    PreviewService previewService;
+    private OverlayUtilsService overlayUtilsService;
 
     @Parameter
-    OverlayUtilsService overlayUtilsService;
-
-    @Parameter
-    LoadingScreenService loadingScreenService;
+    private LoadingScreenService loadingScreenService;
 
     public SegmentedObjectExplorerWrapper(SegmentedObject object) {
         this.object = object;
