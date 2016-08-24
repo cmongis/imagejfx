@@ -289,11 +289,16 @@ public class PreviewService extends AbstractService implements ImageJService {
         RealLUTConverter<T> converter = new RealLUTConverter<T>(min, max, colorTable);
         ARGBType argb = new ARGBType();
         RandomAccess<T> ra = dataset.randomAccess();
+        
+        int width = (int)dataset.dimension(0);
+        int height = (int)dataset.dimension(1);
+        
         for (int x = 0; x != width; x++) {
             for (int y = 0; y != height; y++) {
                 ra.setPosition(x, 0);
                 ra.setPosition(y, 1);
                 converter.convert(ra.get(), argb);
+                
                 image.getPixelWriter().setArgb(x, y, argb.get());
             }
         }
