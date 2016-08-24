@@ -20,10 +20,18 @@
  */
 package ijfx.service.overlay;
 
-import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
+import ijfx.ui.main.ImageJFX;
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
 import net.imagej.ImageJService;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 
 import net.imagej.overlay.Overlay;
 import net.imglib2.Cursor;
@@ -39,8 +47,11 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.RandomAccessibleOnRealRandomAccessible;
 import net.imglib2.view.Views;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.plugins.commands.io.OpenFile;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 
@@ -57,7 +68,9 @@ public class OverlayDrawingService extends AbstractService implements ImageJServ
 
     
     @Parameter
-    ImagePlaneService imagePlaneService;
+    private ImagePlaneService imagePlaneService;
+    
+    private Logger logger = ImageJFX.getLogger();
     
     public void drawOverlay(Overlay o, Drawer drawer, PixelDrawer tool) {
         drawer.draw(o, tool);
