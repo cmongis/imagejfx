@@ -201,14 +201,7 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
             
             Dataset dataset = imageDisplayService.getActiveDataset(imgDisplay);
             
-            new CallbackTask()
-                    .setName("Enhancing contrast...")
-                    
-                    .run(()->AutoContrast.run(getContext().getService(IjfxStatisticService.class), imgDisplay, dataset, true))
-                    .submit(loadingScreenService)
-                    .setInitialProgress(0.8)
-                    .start();
-            ;
+           
             
        
             // we always assume that an image is displayed so we create an image window
@@ -225,6 +218,14 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
                 // getting the @ImageWindowContainer unique instance
                 ImageWindowContainer.getInstance().getChildren().add(imageWindow);
 
+                 new CallbackTask()
+                    .setName("Enhancing contrast...")
+                    
+                    .run(()->AutoContrast.run(getContext().getService(IjfxStatisticService.class), imgDisplay, dataset, true))
+                    .submit(loadingScreenService)
+                    .setInitialProgress(0.8)
+                    .start();
+            ;
               
                 
                 //loadingScreenService.frontEndTask("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay);
