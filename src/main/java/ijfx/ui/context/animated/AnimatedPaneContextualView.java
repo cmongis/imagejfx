@@ -274,13 +274,13 @@ public class AnimatedPaneContextualView extends HashMap<String, NodeContextualWi
        sequence.setOnFinished(event->{
                 toShow.forEach(ctxWidget -> {
                     
-                    System.out.println("Animation finished");
+                  
                     
                     Node node = (Node)ctxWidget.getObject();
                     node.fireEvent(new UiContextEvent(UiContextEvent.NODE_DISPLAYED));
                    
                     if(onUiPluginDisplayed != null) {
-                        System.out.println("handling "+ctxWidget);
+                        
                         onUiPluginDisplayed.handle(ctxWidget);
                     }
                 });

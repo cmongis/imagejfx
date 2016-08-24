@@ -97,15 +97,7 @@ public class AutoContrast extends ContextCommand {
             setMinMax(imageDisplay, dataset, stats, 0);
 
         }
-        /*
-        System.out.println(stats);
-         dataset.setChannelMinimum(channel, stats.getMin());
-         dataset.setChannelMaximum(channel, stats.getMax());
-         DatasetView view = (DatasetView)imageDisplay.getActiveView();
-         view.setChannelRange(channel, stats.getMin(), stats.getMax());
-         view.getProjector().map();
-         view.update();*/
-
+       
     }
 
     private static void setMinMax(ImageDisplay imageDisplay, Dataset dataset, SummaryStatistics stats, int channel) {
@@ -121,9 +113,7 @@ public class AutoContrast extends ContextCommand {
             view.setChannelRange(channel, stats.getMin(), stats.getMax());
             view.getProjector().map();
             view.update();
-        }
-        //eventService.publish(new DatasetUpdatedEvent(dataset, true));
-        //imageDisplay.update();
+        }  
     }
 
 }

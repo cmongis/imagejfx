@@ -194,10 +194,6 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCellPreview paneIconCellPreview = (PaneIconCellPreview) e;
-
-            //paneIconCellPreview
-            //Has to use forceUpdateImage
-            //paneIconCellPreview.updateImageAsync(paneIconCellPreview.getItem());
             paneIconCellPreview.forceImageUpdate();
             paneIconCellPreview.setSubtitleVisible(false);
         });
@@ -242,7 +238,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
                 new CallbackTask<>()
                         .run(() -> {
-                            logger.info(String.format("Running action : %s",paneIconCellPreview.getItem()));
+                            logger.info(String.format("Running action : %s", paneIconCellPreview.getItem()));
 
                             CommandInfo commandInfo = commandService.getCommand(paneIconCellPreview.getItem().getAction());
                             commandService.run(commandInfo, true);
