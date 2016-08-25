@@ -619,7 +619,7 @@
                 ,
                 "label": "Save table as CSV"
                 ,
-                "action": "ijfx.ui.plugins.commands.table.SaveAsCsv"
+                "action": "ijfx.ui.plugins.commands..SaveAsCsv"
                 ,
                 "icon": "SAVE"
                 ,
