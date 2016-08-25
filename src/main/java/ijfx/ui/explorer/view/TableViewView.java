@@ -21,7 +21,6 @@ package ijfx.ui.explorer.view;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
@@ -47,67 +46,59 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ExplorerView.class,priority=0.9)
-public class TableViewView implements ExplorerView{
+@Plugin(type = ExplorerView.class, priority = 0.9)
+public class TableViewView implements ExplorerView {
 
     TableView<Explorable> tableView = new TableView<>();
-    
+
     MetaDataSetOwnerHelper<Explorable> helper = new MetaDataSetOwnerHelper(tableView);
-    
+
     @Parameter
     EventService eventService;
-    
+
     @Parameter
     ExplorerService explorerService;
-    
-   
-    
+
     @Parameter
-            FolderManagerService folderService;
-    
+    FolderManagerService folderService;
+
     List<? extends Explorable> currentItems;
-    
-    
-    
+
     public TableViewView() {
-      
-       tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-       tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
-       tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
-       tableView.setRowFactory(this::createRow);
-        
+
+        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
+        tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
+        tableView.setRowFactory(this::createRow);
+
     }
 
-    
-    
     @Override
     public Node getNode() {
         return tableView;
-    } 
+    }
 
     @Override
     public void setItem(List<? extends Explorable> items) {
-        
-        ImageJFX.getLogger().info(String.format("Setting %d items",items.size()));
-        
-        if(getPriority().length != helper.getPriority().length) {
+
+        ImageJFX.getLogger().info(String.format("Setting %d items", items.size()));
+
+        if (getPriority().length != helper.getPriority().length) {
             helper.setPriority(getPriority());
         }
-        
+
         helper.setColumnsFromItems(items);
         helper.setItem(items);
         currentItems = items;
-        
-        
+
         List<? extends Explorable> selected = items
                 .stream()
-                .filter(item->item.selectedProperty().getValue())
+                .filter(item -> item.selectedProperty().getValue())
                 .collect(Collectors.toList());
-        
+
         setSelectedItem(selected);
-        
+
         //tableView.getSelectionModel().getSelectedItems().addAll(selected);
-        
     }
 
     @Override
@@ -116,7 +107,7 @@ public class TableViewView implements ExplorerView{
                 .getSelectionModel()
                 .getSelectedItems()
                 .stream()
-                .map(i->(Explorable)i)
+                .map(i -> (Explorable) i)
                 .collect(Collectors.toList());
     }
 
@@ -129,67 +120,68 @@ public class TableViewView implements ExplorerView{
     public void setSelectedItem(List<? extends Explorable> items) {
         items.forEach(tableView.getSelectionModel()::select);
     }
-    
+
     private void onListChange(ListChangeListener.Change<? extends Explorable> changes) {
-        
-        while(changes.next()) {
-           
+
+        while (changes.next()) {
+
             changes.getAddedSubList()
                     .stream()
-                    .map(owner->(Explorable)owner)
-                    .forEach(explo->explo.selectedProperty().setValue(true));
-            
+                    .map(owner -> (Explorable) owner)
+                    .forEach(explo -> explo.selectedProperty().setValue(true));
+
             changes.getRemoved()
                     .stream()
-                    .map(owner->(Explorable)owner)
-                    .forEach(explo->explo.selectedProperty().setValue(false));
-            
-            
-            
+                    .map(owner -> (Explorable) owner)
+                    .forEach(explo -> explo.selectedProperty().setValue(false));
+
         }
     }
-    
+
     private void onSelectedItemChanged(Observable obs, Explorable oldValue, Explorable newValue) {
-        currentItems.forEach(item->{
+        currentItems.forEach(item -> {
             item.selectedProperty().setValue(tableView.getSelectionModel().getSelectedItems().contains(item));
         });
-        
-        if(eventService != null) {
+
+        if (eventService != null) {
             eventService.publish(new ExplorerSelectionChangedEvent().setObject(explorerService.getSelectedItems()));
         }
-        
+
     }
-    
+
     private TableRow<Explorable> createRow(TableView<Explorable> explorable) {
-        
+
         TableRow<Explorable> row = new TableRow<>();
-        row.setOnMouseClicked(event->{
-            if(event.getClickCount() == 2 && row.isEmpty() == false) {
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && row.isEmpty() == false) {
                 Explorable e = row.getItem();
                 explorerService.open(e);
             }
         });
-        
+
         return row;
     }
-   
-    
+
     private void select(Explorable owner) {
-        if(owner==null)return;
-        ((Explorable)owner).selectedProperty().setValue(true);
-    }
-    
-    private void unselect(Explorable owner) {
-        if(owner == null) return;
-        ((Explorable)owner).selectedProperty().setValue(false);
-    }
-    
-    
-    private String[] getPriority() {
-        if(explorerService == null || folderService.getCurrentExplorationMode() == ExplorationMode.FILE) {
-            return MetaDataKeyPriority.FILE;
+        if (owner == null) {
+            return;
         }
-        else return MetaDataKeyPriority.PLANE;
+        ((Explorable) owner).selectedProperty().setValue(true);
     }
-    
+
+    private void unselect(Explorable owner) {
+        if (owner == null) {
+            return;
+        }
+        ((Explorable) owner).selectedProperty().setValue(false);
+    }
+
+    private String[] getPriority() {
+        if (explorerService == null || folderService.getCurrentExplorationMode() == ExplorationMode.FILE) {
+            return MetaDataKeyPriority.FILE;
+        } else {
+            return MetaDataKeyPriority.PLANE;
+        }
+    }
+
 }
