@@ -117,7 +117,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
 
     public CallbackTask<INPUT, OUTPUT> run(Runnable runnable) {
         if (runnable == null) {
-            System.out.println("Cannot run null :-S");
+            logger.warning("Setting null as runnable");
             return this;
         }
         this.runnable = runnable;

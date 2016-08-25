@@ -85,7 +85,7 @@ public class TaskList2 {
         while (change.next()) {            
            
         }
-        System.out.println(running.size());
+        
          if (running.size() > 0) {
                 foreground.setValue(running.get(0));
             } else {

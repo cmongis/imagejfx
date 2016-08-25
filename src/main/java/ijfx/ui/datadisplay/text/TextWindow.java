@@ -87,7 +87,7 @@ public class TextWindow extends Window {
     @EventHandler
     protected void onActiveDisplayChanged(DisplayActivatedEvent event) {
         if (event.getDisplay() == textDisplay) {
-            System.out.println("I'm activated !" + textDisplay.getName());
+      
             setFocused(true);
         } else {
             setFocused(false);

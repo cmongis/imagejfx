@@ -189,7 +189,7 @@ public class HistoryService extends AbstractService implements ImageJService{
     }
 
     public void repeatAll() {
-        System.out.println("repeating all...");
+        
         new Thread(() -> workflowService.executeWorkflow(new DefaultWorkflow(stepList))).start();
     }
     

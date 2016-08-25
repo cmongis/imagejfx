@@ -36,7 +36,7 @@ public class BinarizePreprocessor implements BatchPrepreprocessorPlugin {
     @Override
     public void process(BatchSingleInput input, Module module, Map<String, Object> parameters) {
         if (module.getDelegateObject().getClass() == Binarize.class) {
-            System.out.println("Found the module !");
+            
             parameters.forEach((key,value)->{
                 System.out.printf("%s = %s\n",key,value);
             });

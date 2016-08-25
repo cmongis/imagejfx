@@ -221,7 +221,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
                     TogglePlot t = (TogglePlot) e.getNode();
                     t.setStyle("-fx-background-color: rgb(" + red + "," + green + "," + blue + ")");
                     t.setOriginStyle(t.getStyle());
-                    System.out.println(t.getStyle());
+                   
 
                 });
     }

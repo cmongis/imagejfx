@@ -89,7 +89,7 @@ public class DefaultPlotExplorer implements PlotExplorer {
         togglePlot.selectedProperty().bindBidirectional(this.explorable.selectedProperty());
         togglePlot.selectedProperty().addListener((obs, old, n) -> {
             String style;
-            System.out.println(togglePlot.getStyle());
+            
             style = (n) ? TogglePlot.DEFAULT_COLOR : togglePlot.getOriginStyle();
             togglePlot.setStyle(style);
         });

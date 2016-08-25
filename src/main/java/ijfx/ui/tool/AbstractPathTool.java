@@ -132,7 +132,7 @@ public abstract class AbstractPathTool implements FxTool {
     }
     public void onMouseDragged(MouseEvent event) {
         canvas = (FxImageCanvas)event.getTarget();
-        System.out.println(canvas);
+   
         elongPath(event);
         event.consume();
         duringDrawing(currentPath);

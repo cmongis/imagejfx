@@ -38,107 +38,93 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public class MoveablePoint extends Rectangle{
-    
-    
+public class MoveablePoint extends Rectangle {
+
     ViewPort viewport;
-    
+
     private Property<Point2D> positionOnScreen = new SimpleObjectProperty<>();
     private Property<Point2D> positionOnImage = new SimpleObjectProperty<>();
-    
-    
+
     public MoveablePoint() {
         super();
-        
-        
+
         setFill(Color.YELLOW);
-        
-        translateXProperty().bind(Bindings.createDoubleBinding(this::calculateTranslateX,widthProperty()));
+
+        translateXProperty().bind(Bindings.createDoubleBinding(this::calculateTranslateX, widthProperty()));
         translateYProperty().bind(Bindings.createDoubleBinding(this::calculateTranslateY, heightProperty()));
         setWidth(9);
         setHeight(9);
-        
+
         setOnMouseDragged(this::onMouseDragged);
         positionOnScreen.addListener(this::onPositionOnScreenChange);
     }
-    
+
     public MoveablePoint(ViewPort camera) {
         this();
         this.viewport = camera;
         camera.addListener(this::onCameraChange);
     }
-    
+
     public void onCameraChange(CanvasCamera camera) {
-        
-  
-        
+
         Rectangle2D r = camera.getSeenRectangle();
-        
-        
+
         Point2D newPosition = camera.getPositionOnCamera(getPositionOnImage());
-       
+
         setVisible(camera.isVisibleOnCamera(newPosition));
-        
-        
-        if(isVisible()) {
-             setX(newPosition.getX());
-             setY(newPosition.getY());
+
+        if (isVisible()) {
+            setX(newPosition.getX());
+            setY(newPosition.getY());
         }
-        
+
     }
-    
+
     public Point2D getPositionOnImage() {
-       
+
         return positionOnImage.getValue();
     }
-    
+
     // place the points without alerting the listeners
     public void placeOnScreen(Point2D positionOnScreen) {
         setX(positionOnScreen.getX());
         setY(positionOnScreen.getY());
     }
-    
+
     // set the position on the screen without alerting the
     // the observers
     public void setPositionSilently(Point2D positionOnScreen) {
         placeOnScreen(positionOnScreen);
     }
-    
+
     public void onPositionOnScreenChange(Observable value, Point2D oldValue, Point2D newValue) {
-        if(viewport != null) positionOnImage.setValue(viewport.getPositionOnImage(positionOnScreen.getValue()));
-       
-         System.out.println(String.format("Point (%.0f x %.0f)",getX(),getY()));
+        if (viewport != null) {
+            positionOnImage.setValue(viewport.getPositionOnImage(positionOnScreen.getValue()));
+        }
+
     }
-    
+
     public Double calculateTranslateX() {
-        return  -getWidth()/2;
+        return -getWidth() / 2;
     }
-    
+
     public Double calculateTranslateY() {
-        return -getHeight()/2;
+        return -getHeight() / 2;
     }
-    
+
     private void onMouseDragged(MouseEvent event) {
         setX(event.getX());
         setY(event.getY());
-        
-        positionOnScreen.setValue(new Point2D(getX(),getY()));
-        
+        positionOnScreen.setValue(new Point2D(getX(), getY()));
         event.consume();
-         
-         System.out.println(positionOnImage.getValue());
     }
-    
-   
+
     public Property<Point2D> positionOnScreenProperty() {
         return positionOnScreen;
     }
+
     public Property<Point2D> positionOnImageProperty() {
         return positionOnImage;
     }
-    
-    
-    
-    
-    
+
 }

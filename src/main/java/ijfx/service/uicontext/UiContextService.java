@@ -214,10 +214,10 @@ public class UiContextService extends AbstractService implements UiContextManage
             //logger.info("Should "+widget+" be shown :"+shouldShow);
             if (shouldShow && widget.isHidden()) {
                 toShow.add(widget);
-                logger.info("Widget " + widget + " added to the toShow list.");
+                logger.info("Adding widget :  " + widget);
             } else if (shouldHide && !widget.isHidden()) {
                 toHide.add(widget);
-                logger.info("Widget " + widget + " will be hidden");
+                logger.info("Hidding widget " + widget);
             }
 
         });

@@ -43,14 +43,12 @@ public class TextFileUtils {
     }
 
     public static String readFileFromJar(String url, Class<?> clazz) throws IOException {
-        System.out.println(url);
+        
         return Resources.toString(clazz.getResource(url), Charset.forName("UTF-8"));
     }
 
     public static void writeTextFile(File file, String text) throws IOException {
-        System.out.println(text);
-        //Files.write(Paths.get(file.getAbsolutePath()), text.getBytes());
-
+       
         Writer out = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(file), "UTF8"));
 
@@ -60,9 +58,4 @@ public class TextFileUtils {
         out.close();
 
     }
-
-    /*
-    public static String readFileFromJar(Object parent, String url) throws IOException {
-        return Resources.toString(parent.getClass().getResource(url), Charset.forName("UTF-8"));
-    }*/
 }

@@ -109,9 +109,7 @@ public class RectangleRepresentation extends OverlayRepresentationBase<Rectangle
         b.setX(width*zoomProperty().getValue());
         b.setY(height*zoomProperty().getValue());
         
-        
-        
-        System.out.println("final coordinates : ");
+
         
     }
     

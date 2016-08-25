@@ -207,7 +207,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
                 .collect(Collectors
                         .toList());
 
-        System.out.println(String.format("%d records fetched", records.size()));
+        logger.info(String.format("%d records fetched", records.size()));
         imageRecordService.forceSave();
         return explorables;
     }
@@ -233,7 +233,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
 
         if (planes == null) {
 
-            System.out.println("Fetching planes !");
+            logger.info("Fetching planes !");
             List<MetaDataSet> mList = new ArrayList<>(getFileList().size() * 3);
             for (Explorable e : getFileList()) {
                 mList.addAll(metadataExtractionService.extractPlaneMetaData(e.getMetaDataSet()));
@@ -245,7 +245,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
                     .collect(Collectors.toList());
 
         }
-        System.out.println(String.format("%d planes fetched", planes.size()));
+        logger.info(String.format("%d planes fetched", planes.size()));
         return planes;
     }
 
@@ -267,7 +267,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
         }
 
         try {
-            System.out.println("Listening to " + getPath());
+            logger.info("Listening to " + getPath());
             dirWatchService.register(this, getPath());
             registered = true;
         } catch (IOException ex) {
@@ -284,7 +284,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
 
         if (file.getName().endsWith(OverlayIOService.OVERLAY_FILE_EXTENSION)) {
             File imageFile = overlayIOService.getImageFileFromOverlayFile(file);
-            System.out.println(imageFile.getAbsolutePath());
+            
             getObjectList().addAll(loadOverlay(imageFile, file));
         }
 
@@ -303,7 +303,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
                 .filter(expl -> expl.isValid())
                 .collect(Collectors.toList());
 
-        System.out.println("Overlay collecté : " + collect.size());
+        logger.info("Collected overlays : " + collect.size());
         return collect;
 
     }
@@ -316,7 +316,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
     @EventHandler
     public void onObjectSegmented(ObjectSegmentedEvent event) {
         if(event.getFile().getAbsolutePath().indexOf(file.getAbsolutePath()) == 0) {
-            System.out.println("Adding objects");
+            logger.info("Adding objects");
             getObjectList().addAll(event
                     .getObject()
                     .stream()

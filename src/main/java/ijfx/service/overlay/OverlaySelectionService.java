@@ -58,8 +58,7 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
 
     public void selectOnlyOneOverlay(ImageDisplay imageDisplay, Overlay overlay) {
 
-        //System.out.println(overlay);
-        System.out.println("Calling me softly");
+       
         getOverlayViews(imageDisplay)
                 .stream()
                 .forEach(view -> {
@@ -71,21 +70,6 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
                     }
                 }
                 );
-        /*
-        for (DataView view : imageDisplay) {
-            if (view instanceof OverlayView) {
-                OverlayView overlayView = (OverlayView) view;
-                
-                boolean before = overlayView.isSelected();
-                 overlayView.setSelected(overlay == overlayView.getData());
-                boolean after = overlayView.isSelected();
-                
-                if(before != after) {
-                    eventService.publish(new OverlaySelectedEvent(imageDisplay,overlay));
-                }
-                //eventService.publish(new OverlaySelectedEvent(imageDisplay, overlay));
-            }
-        }*/
         logger.info("Selecting only " + overlay);
 
     }

@@ -82,7 +82,7 @@ public class TableWindow extends Window {
         @EventHandler
     protected void onActiveDisplayChanged(DisplayActivatedEvent event) {
         if (event.getDisplay() == tableDisplay) {
-            System.out.println("I'm activated !" + tableDisplay.getName());
+           
             setFocused(true);
         } else {
             setFocused(false);

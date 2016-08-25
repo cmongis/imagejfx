@@ -542,7 +542,7 @@ public class ImageDisplayPane extends AnchorPane {
     public void build() {
 
         setTitle(imageDisplay.getName());
-        System.out.println(getDatasetview().getPlanePosition().numDimensions());
+ 
 
         if (arcMenu != null) {
             anchorPane.removeEventHandler(MouseEvent.MOUSE_PRESSED, myHandler);
@@ -869,10 +869,7 @@ public class ImageDisplayPane extends AnchorPane {
         List<Overlay> touchedOverlay = overlayService.getOverlays(imageDisplay).stream()
                 .filter(o -> isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o))
                 .collect(Collectors.toList());
-
-        touchedOverlay.forEach(o -> {
-            System.out.println("Overlay : " + o);
-        });
+ 
 
         wasOverlaySelected = touchedOverlay.size() > 0;
         logService.info(String.format("%d overlay touched", touchedOverlay.size()));

@@ -55,7 +55,7 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
        
     
         
-        System.out.println("I'm doing something !");
+   
         GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
         graphicsContext2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
          for(double x = r.getMinX();x!=r.getMaxX();x++) {

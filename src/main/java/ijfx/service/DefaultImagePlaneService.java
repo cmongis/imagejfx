@@ -221,7 +221,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         RandomAccess<T> randomAccess = (RandomAccess<T>) target.randomAccess();
         while (cursor.hasNext()) {
             cursor.fwd();
-            System.out.println(cursor.get());
+            
             
             randomAccess.setPosition(cursor);
             randomAccess.get().set(cursor.get());

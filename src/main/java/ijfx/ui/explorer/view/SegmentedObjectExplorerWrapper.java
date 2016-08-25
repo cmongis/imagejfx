@@ -135,64 +135,7 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
         return output;
     }
 
-    /*
-    @Override
-    public Image getImage() {
-
-        Overlay overlay = object.getOverlay();
-
-        if (overlay instanceof PolygonOverlay) {
-            PolygonOverlay po = (PolygonOverlay) overlay;
-
-            PolygonRegionOfInterest roi = po.getRegionOfInterest();
-            Polygon pol = new Polygon();
-
-            for (int i = 0; i != roi.getVertexCount(); i++) {
-                pol.addPoint(new Double(roi.getVertex(i).getDoublePosition(0)).intValue(), new Double(roi.getVertex(i).getDoublePosition(1)).intValue());
-            }
-
-            Rectangle bounds = pol.getBounds();
-
-            //for(int i = 0;i!=)
-            int border = 10;
-
-            Canvas canvas = new Canvas(bounds.getWidth() + border * 2, bounds.getHeight() + border * 2);
-            GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
-
-            final double xBounds = bounds.getX();
-            final double yBounds = bounds.getY();
-            System.out.println(bounds);
-            double[] xpoints = IntStream.of(pol.xpoints).mapToDouble(x -> x - xBounds + border).toArray();
-            double[] ypoints = IntStream.of(pol.ypoints).mapToDouble(y -> y - yBounds + border).toArray();
-
-            graphicsContext2D.setFill(Color.TRANSPARENT);
-            graphicsContext2D.fill();
-            graphicsContext2D.setFill(Color.WHITE);
-
-            graphicsContext2D.fillPolygon(xpoints, ypoints, xpoints.length);
-
-            final WritableImage image = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
-            final SnapshotParameters params = new SnapshotParameters();
-
-            params.setFill(Color.TRANSPARENT);
-            CallbackTask run = new CallbackTask()
-                    .run(() -> canvas.snapshot(params, image));
-
-            Platform.runLater(run);
-
-            try {
-                run.get();
-            } catch (Exception ex) {
-                ImageJFX.getLogger().log(Level.SEVERE, null, ex);
-                return null;
-            }
-
-            return image;
-
-        } else {
-            return null;
-        }
-    }**/
+   
     @Override
     public void open() throws Exception {
         new CallbackTask<File, Void>()

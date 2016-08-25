@@ -91,9 +91,7 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
         
         
         Point2D onScreen = viewport.getPositionOnCamera(PointOverlayHelper.getOverlayPosition(overlay));
-        System.out.println("OnScreen");
-        System.out.println(onScreen);
-        
+    
         double x = onScreen.getX();
         double y = onScreen.getY();
         r.setVisible(true);

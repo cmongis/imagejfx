@@ -195,15 +195,13 @@ public class GridIconView extends AnchorPane implements ExplorerView {
     }
 
     public void onMouseClick(MouseEvent event) {
-        System.out.println(event);
+     
         if (event.getTarget() == vBox) {
             cellPaneCtrl.getItems().forEach(item -> item.selectedProperty().setValue(false));
         }
     }
 
     public void onMouseDrag(DragEvent event) {
-        System.out.println(event);
-
     }
 
     @Override

@@ -70,7 +70,7 @@ public class TableViewView implements ExplorerView{
     
     
     public TableViewView() {
-        System.out.println("Listening now");
+      
        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
        tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
        tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);

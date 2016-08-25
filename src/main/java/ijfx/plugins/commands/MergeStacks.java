@@ -110,7 +110,7 @@ public class MergeStacks extends ContextCommand {
 
     private boolean checkAxis(Dataset[] datasets) {
         // check if all the datasets have 3 dimensions, not more, not less
-        System.out.println("hello");
+        
         return datasets.length == Stream.of(datasets).filter(d -> d.numDimensions() <= 3).count();
     }
 

@@ -151,7 +151,7 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                     return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
                 } else {
                     long[] location;
-                    System.out.println(m);
+                   
                     location = DimensionUtils.readLongArray(nonPlanarPosition.getStringValue());
                     long[] dimLengths = DimensionUtils.readLongArray(m.get(MetaData.DIMENSION_LENGHS).getStringValue());
                     
@@ -165,25 +165,6 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                 ImageJFX.getLogger().log(Level.SEVERE, null, ex);
             }
             return null;
-        }
-         /*
-        @Override
-        public Dataset getDataset() {
-            try {
-                if (m.containsKey(MetaData.PLANE_INDEX) == false) {
-                    return datasetIoService.open(m.get(MetaData.ABSOLUTE_PATH).getStringValue());
-                } else {
-                    long[] position = DimensionUtils.readLongArray(m.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue());
-                    
-                    System.out.println(ArrayUtils.toString(position));
-                    
-                    return imagePlaneService.extractPlane(getFile(),position);
-                }
-            } catch (Exception io) {
-                ImageJFX.getLogger().log(Level.SEVERE, null, io);
-                return null;
-            }
-        }*/
-
+        }        
     }
 

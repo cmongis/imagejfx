@@ -101,13 +101,14 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
             return this;
         }
 
-        System.out.println("Creating toolbar");
+        
         createToolBar();
 
         return this;
     }
 
     private void createToolBar() {
+        logger.info("Creating ImageJFX Toolbar");
         Pane fakeToolBar;
         fakeToolBar = new HBox();
         PaneContextualView paneContextualView = new PaneContextualView(contextService, fakeToolBar, "ToolBar-Context-Dependant");

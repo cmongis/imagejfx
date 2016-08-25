@@ -120,7 +120,7 @@ public class IconView extends ScrollPane implements ExplorerView {
     }
     
     public void onMouseDrag(DragEvent event) {
-        System.out.println(event);
+        
         
     }
 

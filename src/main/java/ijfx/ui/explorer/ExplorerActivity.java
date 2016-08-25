@@ -172,6 +172,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     private final String EMPTY_FOLDER_TEXT = "Empty";
     private final FontAwesomeIcon EMPTY_FOLDER_ICON = FontAwesomeIcon.FROWN_ALT;
 
+    Logger logger = ImageJFX.getLogger();
+    
     public ExplorerActivity() {
         try {
             FXUtilities.injectFXML(this);
@@ -333,7 +335,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @EventHandler
     public void onFolderUpdated(FolderUpdatedEvent event) {
-        System.out.println("Folder updated !");
+        logger.info("Folder updated !");
         folderUpdateHandler.forEach(handler -> handler.run());
     }
 
@@ -443,8 +445,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     private void onFilterChanged(Observable obs, Predicate<MetaDataOwner> oldValue, Predicate<MetaDataOwner> newValue) {
-        System.out.println(currentFilters.stream().filter(f -> f.predicateProperty().getValue() != null).count());
-
+      
         Predicate<MetaDataOwner> predicate = e -> true;
 
         List<Predicate<MetaDataOwner>> predicateList = currentFilters
@@ -558,7 +559,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
     public void explainMe() {
-        System.out.println("TODO");
+        uiService.showDialog("Function not implemented yet.");
     }
 
     @FXML
@@ -650,9 +651,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @EventHandler
     protected void onExplorerServiceSelectionChanged(ExplorerSelectionChangedEvent event) {
         if (event.getObject().size() == 0) {
-            System.out.println("nothing to select ?");
+            logger.info("Nothing to selected");
         } else {
-            System.out.println("there is " + event.getObject().size());
+           logger.info("Selected objects :  " + event.getObject().size());
         }
     }
 
@@ -681,7 +682,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     private static boolean shouldHideText(ButtonBase node) {
-        System.out.println("they are calling me");
+       
         return node.getWidth() < 40;
     }
 
