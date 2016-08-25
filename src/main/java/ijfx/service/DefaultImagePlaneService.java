@@ -21,6 +21,7 @@ package ijfx.service;
 
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.utils.DimensionUtils;
+import ijfx.ui.main.ImageJFX;
 import io.scif.Metadata;
 import io.scif.MetadataLevel;
 import io.scif.config.SCIFIOConfig;
@@ -64,6 +65,8 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     @Parameter
     TimerService timerService;
 
+    Logger logger  = ImageJFX.getLogger();
+    
     public Dataset extractPlane(MetaDataSet set) {
         return null;
     }
@@ -228,7 +231,19 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
     @Override
     public <T extends RealType<T>> IntervalView<T> planeView(Dataset source, long[] position) {
-        if (position.length <= 2) {
+        
+        int srcNumDimension = source.numDimensions();
+        
+        if(position.length + 2 < srcNumDimension) {
+            if(logger != null) logger.warning("position incompatible with source. Correcting.");
+            
+            long[] correctedPosition = new long[srcNumDimension-2];
+            System.arraycopy(position,0 , correctedPosition, 0,position.length);
+            position = correctedPosition;
+            
+        }
+        
+        if (position.length <= 0) {
             return (IntervalView<T>) Views.translate(source, 0,0);
         }
         IntervalView<T> hyperSlice = (IntervalView<T>) Views.hyperSlice(source, 2, position[0]);

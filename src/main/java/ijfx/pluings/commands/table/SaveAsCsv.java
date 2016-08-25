@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.datadisplay.table;
+package ijfx.pluings.commands.table;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -47,7 +47,7 @@ import org.scijava.ui.UIService;
  */
 @Plugin(type = Command.class, menuPath = "Plugins > Table >  Save as CSV", attrs = {
     @Attr(name = "no-legacy")})
-public class SaveCSV implements Command {
+public class SaveAsCsv implements Command {
 
     @Parameter
     UIService uIService;
@@ -108,7 +108,7 @@ public class SaveCSV implements Command {
                 csvFilePrinter.close();
 
             } catch (IOException ex) {
-                Logger.getLogger(SaveCSV.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SaveAsCsv.class.getName()).log(Level.SEVERE, null, ex);
 
             }
 

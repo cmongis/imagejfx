@@ -29,6 +29,7 @@ import ijfx.ui.context.ContextualWidget;
 import ijfx.ui.context.PaneContextualView;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -46,13 +47,15 @@ import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.UIService;
 
 /**
  *
  * @author Tuan anh TRINH
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "imagej-top-toolbar", context = "imagej+image-open", order = 13.0, localization = Localization.TOP_TOOLBAR)
+@UiConfiguration(id = "imagej-top-toolbar", context = "imagej+image-open segment+image-open imagej+table-open imagej+image-open", order = 13.0, localization = Localization.TOP_TOOLBAR)
 public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -67,6 +70,9 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     PluginService pluginService;
     @Parameter
     UiContextService contextService;
+
+    @Parameter
+    UIService uiService;
 
     @Parameter
     TimerService stopWatchService;
@@ -110,10 +116,15 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         //fakeToolBar.setPadding(new Insets(10, 10,10,10));
         this.setTop(fakeToolBar);
         jsonReader = new JsonReader();
-        jsonReader.read("/ijfx/ui/menutoolbar/toolbarSettings.json");
+        try {
+            jsonReader.read("/ijfx/ui/menutoolbar/toolbarSettings.json");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error when creating the toolbar",e);
+            uiService.showDialog("Error when creating the ImageJFX Toolbar !!!", DialogPrompt.MessageType.ERROR_MESSAGE);
+        }
         jsonReader.separate();
         popOver = new PopOver();
-        popOver.setMinHeight(200);
+        popOver.setMinHeight(250);
         generateItems(jsonReader, paneContextualView);
         created = true;
     }
@@ -147,6 +158,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.minWidthProperty().bind(this.getScene().widthProperty());
         popOver.setWidth(this.getScene().widthProperty().getValue());
         popOver.maxWidthProperty().bind(this.getScene().widthProperty());
+
         pane.setMinWidth(popOver.minWidthProperty().getValue());
         pane.setMaxWidth(popOver.minWidthProperty().getValue());
 
@@ -157,7 +169,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.setAutoHide(true);
         popOver.setOpacity(1.0);
         popOver.setArrowSize(0);
-        popOver.setMinHeight(200);
+        popOver.setMinHeight(250);
         int anchorX = (int) (this.localToScreen(this.getBoundsInParent()).getMinX() + 1);
         int anchorY = (int) (this.localToScreen(this.getTop().getBoundsInParent()).getMaxY() - 1);
         popOver.show(owner);

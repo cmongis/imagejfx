@@ -526,7 +526,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     protected void onPreviewMaskButtonClicked(ActionEvent event) {
         Dataset exampleDataset;
 
-        exampleDataset = getExampleDataset();
+        exampleDataset = getExampleDataset().duplicate();
         imagePreview.refresh(exampleDataset, workflowPanel.stepListProperty());
 
         previewPopOver.setAutoHide(true);
