@@ -136,8 +136,8 @@ public class RecentFilePanel extends BorderPane{
             }
             else {
                 try {
-                    return thumbService.getThumb(file, 0,150, 150);
-                } catch (IOException ex) {
+                    return thumbService.getThumb(file, new long[0],100, 100);
+                } catch (Exception ex) {
                     logService.warn(ex,"Couldn't load file %s",file.getAbsolutePath());
                 }
             }
