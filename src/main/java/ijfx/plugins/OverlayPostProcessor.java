@@ -48,7 +48,7 @@ public class OverlayPostProcessor extends AbstractPostprocessorPlugin implements
     @Override
     public void process(Module module) {
 
-        System.out.println("Processing :" + module.getClass().getSimpleName());
+       
 
         // getting the single output
         ModuleItem<Overlay[]> singleOutput = moduleService.getSingleOutput(module, Overlay[].class);
@@ -68,7 +68,7 @@ public class OverlayPostProcessor extends AbstractPostprocessorPlugin implements
         
         // aborting if no singleinput is a list of overlay
         if (singleOutput == null || display == null) {
-            System.out.println("Aborting post processing");
+          
             return;
         }
        

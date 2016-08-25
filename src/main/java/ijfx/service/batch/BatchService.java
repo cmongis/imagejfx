@@ -181,15 +181,21 @@ public class BatchService extends AbstractService implements ImageJService {
                 progress.setStatus(String.format("Processing %s with %s", input.getName(), step.getModule().getInfo().getTitle()));
 
                 progress.setProgress(count++, totalOps);
-
+               
                 final Module module = moduleService.createModule(step.getModule().getInfo());
-                getContext().inject(module.getDelegateObject());
+                try {
+                    getContext().inject(module.getDelegateObject());
+                }
+                catch(Exception e) {
+                    logger.warning("Context already injected in module ?");
+                }
                 logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
                 if (!executeModule(input, module, step.getParameters())) {
 
                     progress.setStatus("Error :-(");
                     progress.setProgress(0, 1);
                     success = false;
+                    logger.info("Error when executing module : "+module.getInfo().getName());
                     break;
                 };
 
@@ -206,7 +212,7 @@ public class BatchService extends AbstractService implements ImageJService {
         }
 
         if (success) {
-
+            logger.info("Batch processing completed");
             progress.setStatus("Batch processing completed.");
             progress.setProgress(1.0);
 

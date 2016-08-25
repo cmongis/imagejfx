@@ -60,7 +60,7 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
     public void createNode() {
         
         Polyline polyLine = new Polyline();
-     
+        
         Group group = new Group();
         Line vertical = new Line(radius/2,0,radius/2,radius);
         Line horizontal = new Line(0,radius/2,radius,radius/2);
@@ -85,6 +85,8 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
         if(r == null) {
             createNode();
         }
+        
+        
         
         
         

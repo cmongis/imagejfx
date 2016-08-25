@@ -38,6 +38,11 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
 import ijfx.ui.UiConfiguration;
+import java.util.List;
+import org.scijava.event.EventHandler;
+import org.scijava.menu.ShadowMenu;
+import org.scijava.menu.event.MenusAddedEvent;
+import org.scijava.menu.event.MenusRemovedEvent;
 
 /**
  *
@@ -86,7 +91,7 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
         FxMenuCreator creator = new FxMenuCreator();
         context.inject(creator);
         menuService.createMenus(creator, this);
-
+        
         
         
         //if(true) return this;
@@ -115,6 +120,22 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
 
     }
 
+    @EventHandler
+    private void onMenusAddedEvent(MenusAddedEvent event) {
+        List<ShadowMenu> items = event.getItems();
+        ShadowMenu get = items.get(0);
+        get.getName();
+    }
+    
+    @EventHandler
+    private void onMenusRemovedEvent(MenusRemovedEvent event) {
+        List<ShadowMenu> items = event.getItems();
+        ShadowMenu get = items.get(0);
+        get.getName();
+    }
+    
+    
+    
     public Menu getParentMenu(String path) {
         String[] folders = path.split("/");
 

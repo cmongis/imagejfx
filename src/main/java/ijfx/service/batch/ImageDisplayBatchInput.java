@@ -56,8 +56,6 @@ public class ImageDisplayBatchInput implements BatchSingleInput{
     
     public ImageDisplayBatchInput(ImageDisplay inputDisplay, boolean useCurrentPlane) {
         
-        
-        System.out.println("Starting creating batch input");
         //injecting the context
         inputDisplay.getContext().inject(this);
         
@@ -74,13 +72,8 @@ public class ImageDisplayBatchInput implements BatchSingleInput{
         
         // creating a new dataset from this position
         dataset = imagePlaneService.isolatePlane(imageDisplayService.getActiveDataset(inputDisplay), position);
-
         this.source = dataset.getSource();
-        
         this.imageDisplay.display(dataset);
-        
-        //view = imageDisplayService.getActiveDatasetView(imageDisplay);
-        System.out.println("BatchInput created");
     }
     
     
@@ -100,13 +93,12 @@ public class ImageDisplayBatchInput implements BatchSingleInput{
 
     @Override
     public void setDataset(Dataset dataset) {
-        System.out.println("Setting dataset for the "+ i++);
         this.dataset = dataset;
     }
 
     @Override
     public void setDisplay(ImageDisplay display) {
-        System.out.println("Setting dataset for the "+ i++);
+  
         imageDisplay = display;
     }
 

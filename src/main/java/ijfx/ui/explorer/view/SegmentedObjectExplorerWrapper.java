@@ -25,11 +25,18 @@ import ijfx.core.metadata.MetaDataSetUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.OverlayDrawingService;
+import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.preview.PreviewService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.AbstractExplorable;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import mongis.utils.CallbackTask;
 import net.imagej.Dataset;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.display.ColorTable8;
@@ -43,17 +50,22 @@ import org.scijava.plugin.Parameter;
 public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
 
     private final SegmentedObject object;
+     
+    @Parameter
+    private ImagePlaneService imagePlaneService;
 
     @Parameter
-    ImagePlaneService imagePlaneService;
-    
+    private OverlayDrawingService overlayDrawingService;
+
     @Parameter
-    OverlayDrawingService overlayDrawingService;
-    
+    private PreviewService previewService;
+
     @Parameter
-    PreviewService previewService;
-    
-    
+    private OverlayUtilsService overlayUtilsService;
+
+    @Parameter
+    private LoadingScreenService loadingScreenService;
+
     public SegmentedObjectExplorerWrapper(SegmentedObject object) {
         this.object = object;
     }
@@ -73,22 +85,20 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
         return "";
     }
 
-    
-    
-    
-     @Override
-    public  Image getImage() {
+    @Override
+    public Image getImage() {
         try {
             long[] nonPlanarPosition = MetaDataSetUtils.getNonPlanarPosition(getMetaDataSet());
             Dataset dataset = imagePlaneService.openVirtualDataset(getFile());
             Dataset extractedObject = overlayDrawingService.extractObject(object.getOverlay(), dataset, nonPlanarPosition);
             double min = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MIN).getDoubleValue();
-             double max = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MAX).getDoubleValue();
-            Image image = previewService.datasetToImage((RandomAccessibleInterval<? extends RealType>) extractedObject,new ColorTable8(),min,max);
-            return image;
-            
-            
-            
+            double max = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MAX).getDoubleValue();
+            Image image = previewService.datasetToImage((RandomAccessibleInterval<? extends RealType>) extractedObject, new ColorTable8(), min, max);
+
+            int sampleFactor = new Double(100 * 100 / image.getWidth() / image.getHeight()).intValue();
+
+            return resample(image, sampleFactor);
+
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, "Error when accessing file " + getFile().getAbsolutePath(), ioe);
             return null;
@@ -97,6 +107,34 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
             return null;
         }
     }
+
+    private Image resample(Image input, int scaleFactor) {
+        final int W = (int) input.getWidth();
+        final int H = (int) input.getHeight();
+        final int S = scaleFactor;
+
+        WritableImage output = new WritableImage(
+                W * S,
+                H * S
+        );
+
+        PixelReader reader = input.getPixelReader();
+        PixelWriter writer = output.getPixelWriter();
+
+        for (int y = 0; y < H; y++) {
+            for (int x = 0; x < W; x++) {
+                final int argb = reader.getArgb(x, y);
+                for (int dy = 0; dy < S; dy++) {
+                    for (int dx = 0; dx < S; dx++) {
+                        writer.setArgb(x * S + dx, y * S + dy, argb);
+                    }
+                }
+            }
+        }
+
+        return output;
+    }
+
     /*
     @Override
     public Image getImage() {
@@ -155,9 +193,18 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
             return null;
         }
     }**/
-
     @Override
     public void open() throws Exception {
+        new CallbackTask<File, Void>()
+                .setInput(getFile())
+                .run(f -> {
+                    overlayUtilsService.openOverlay(f, object.getOverlay());
+                    return null;
+                })
+                .submit(loadingScreenService)
+                .setName("Opening file and object...")
+                .setInitialProgress(0.5)
+                .start();
     }
 
     @Override

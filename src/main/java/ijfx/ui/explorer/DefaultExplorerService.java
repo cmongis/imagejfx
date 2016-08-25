@@ -24,11 +24,14 @@ import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.event.DisplayedListChanged;
 import ijfx.ui.explorer.event.ExploredListChanged;
+import ijfx.ui.main.ImageJFX;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
@@ -61,14 +64,16 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     LoadingScreenService loadingScreenService;
 
     @Parameter
-            DefaultLoggingService loggerService;
-    
+    DefaultLoggingService loggerService;
+
     Predicate<MetaDataOwner> lastFilter;
     Predicate<MetaDataOwner> optionalFilter;
 
     private final IntegerProperty selected = new SimpleIntegerProperty(0);
 
     EventStream<Integer> selectEvents = EventStreams.changesOf((ObservableValue) selected);
+
+    Logger logger = ImageJFX.getLogger();
 
     @Override
     public void initialize() {
@@ -98,7 +103,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
 
     @Override
     public void applyFilter(Predicate<MetaDataOwner> predicate) {
-        
+
         new CallbackTask<Predicate<MetaDataOwner>, List<Explorable>>(predicate)
                 .run(this::filter)
                 .then(this::setFilteredItems)
@@ -107,7 +112,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     }
 
     protected List<Explorable> filter(Predicate<MetaDataOwner> predicate) {
-        loggerService.info("Filtering %d items",getItems().size());
+        loggerService.info("Filtering %d items", getItems().size());
         if (predicate == null && optionalFilter == null) {
             return getItems();
         } else if (predicate == null && optionalFilter != null) {
@@ -116,7 +121,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
             predicate = predicate.and(optionalFilter);
         }
         List<Explorable> collect = getItems().parallelStream().filter(predicate).collect(Collectors.toList());
-        loggerService.info("Only %d items were kept",collect.size());
+        loggerService.info("Only %d items were kept", collect.size());
         return collect;
     }
 
@@ -168,7 +173,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         Collections.sort(keyList);
         return keyList;
     }
-    
+
     private void listenToExplorableSelection(Explorable expl) {
         expl.selectedProperty().addListener(this::onExplorableSelected);
     }
@@ -193,7 +198,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
                     try {
                         progress.setProgress(1, 5);
                         explorable.open();
-                        progress.setProgress(1,1);
+                        progress.setProgress(1, 1);
                         return true;
                     } catch (Exception e) {
                         return false;
@@ -201,7 +206,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
                 })
                 .then(success -> {
                     if (success) {
-                        
+
                     }
                 })
                 .submit(loadingScreenService)
@@ -211,15 +216,17 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
 
     @Override
     public void openSelection() {
-        
+
         getSelectedItems().forEach(this::open);
-       
-        
+
     }
 
     @Override
     public void toggleSelection(Explorable explorable) {
-        explorable.selectedProperty().setValue(!explorable.selectedProperty().getValue());
+
+        boolean value = explorable.selectedProperty().getValue();
+        logger.log(Level.INFO, String.format("Toggling selection for {0} from {1} to {2}", explorable.getTitle(), value, !value));
+        explorable.selectedProperty().setValue(!value);
     }
 
 }

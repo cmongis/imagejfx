@@ -82,14 +82,13 @@ public class ContextualPaneIconWrapper  implements ContextualWidget, ContextualP
 
     @Override
     public void show() {
-        System.out.println("Showing " + node.getId());
+
         parentPane.getChildren().add(node);
         node.setVisible(true);
     }
 
     @Override
     public void hide() {
-        System.out.println("Hiding " + node.getId());
         parentPane.getChildren().remove(node);
     }
 

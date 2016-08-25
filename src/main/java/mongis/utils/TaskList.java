@@ -66,7 +66,7 @@ public class TaskList  {
     }
 
     public void submitTask(Task task) {
-        System.out.println("Is task running ? " + task.isRunning());
+       
         if (task.isRunning()) {
             runningList.add(task);
 
@@ -86,7 +86,7 @@ public class TaskList  {
     private void onOngoingListChange(ListChangeListener.Change<? extends Task> change) {
         while (change.next()) {
             
-            System.out.println("Added " + runningList.size());
+            
             change.getAddedSubList().forEach(this::listenForStop);
             change.getRemoved().forEach(this::stopListening);
             if (runningList.size() > 1) {
@@ -98,13 +98,13 @@ public class TaskList  {
     }
 
     private void listenForStart(Task task) {
-        System.out.println("Listening for start : " + task.toString());
+       
         task.addEventHandler(WorkerStateEvent.WORKER_STATE_RUNNING, this::onTaskStart);
     }
 
     private void onTaskStart(Event event) {
         Task task = (Task) event.getSource();
-        System.out.println("Task has started : " + task);
+        
         runningList.add(task);
     }
 
@@ -115,12 +115,12 @@ public class TaskList  {
     private void onStop(Event event) {
 
         Task task = (Task) event.getSource();
-        System.out.println("Task has stop : " + task.toString());
+        
         runningList.remove(task);
     }
 
     private void stopListening(Task task) {
-        System.out.println("We stop listeneing for :" + task.toString());
+        
         task.removeEventHandler(WorkerStateEvent.ANY, this::onStop);
         task.removeEventHandler(WorkerStateEvent.WORKER_STATE_RUNNING, this::onTaskStart);
     }

@@ -46,6 +46,7 @@ import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +93,7 @@ import org.scijava.Context;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
 
 /**
@@ -169,6 +171,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @Parameter
     SegmentationService segmentationService;
 
+    Logger logger = ImageJFX.getLogger();
+    
     TaskButtonBinding taskButtonBinding;
 
     WorkflowPanel workflowPanel;
@@ -270,18 +274,19 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     protected Boolean runTestProcessing(ProgressHandler handler, ImageDisplay imageDisplay) {
 
-        System.out.println("Executing");
+        logger.info("Executing segmentation test processing");
 
         if (handler == null) {
             handler = new SilentProgressHandler();
         }
-
+        
         // generating the batch service input from an image display
         BatchSingleInput input;
         ImageDisplay inputDisplay;
 
         if (isExplorer()) {
             Explorable explorable;
+            logger.info("isExplorer = true");
             if (explorerService.getSelectedItems().size() > 0) {
                 explorable = explorerService.getSelectedItems().get(0);
             } else {
@@ -298,11 +303,12 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             uiService.show(inputDisplay);
 
         } else {
+            logger.info("isExplorer = false");
             input = new ImageDisplayBatchInput(imageDisplayService.getActiveImageDisplay(), true);
             inputDisplay = imageDisplayService.getActiveImageDisplay();
         }
 
-        System.out.println("Executing");
+       logger.info("Executing segmentation workflow");
 
         // applying the workflow
         boolean batchResult = batchService.applyWorkflow(handler, input, new DefaultWorkflow(workflowPanel.stepListProperty()));
@@ -495,21 +501,32 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     }
 
+    protected Dataset getExampleDataset() {
+        
+        if(isExplorer()) {
+        
+        if(explorerService.getItems().size() == 0) {
+            uiService.showDialog("No item selected or displayed.", DialogPrompt.MessageType.ERROR_MESSAGE);
+            return null;
+        }
+        else if(explorerService.getSelectedItems().size() == 0) {
+            return explorerService.getItems().get(0).getDataset();
+        }
+        else {
+            return explorerService.getSelectedItems().get(0).getDataset();
+        }
+        }
+        else {
+            return imageDisplayService.getActiveDataset();
+        }
+        
+    }
+    
+    
     protected void onPreviewMaskButtonClicked(ActionEvent event) {
         Dataset exampleDataset;
 
-        if (isExplorer()) {
-
-            if (explorerService.getItems().size() == 0) {
-                uiService.showDialog("There is no object to show.");
-                return;
-            }
-
-            Explorable explorable = explorerService.getSelectedItems().size() > 0 ? explorerService.getSelectedItems().get(0) : explorerService.getItems().get(0);
-            exampleDataset = explorable.getDataset();
-        } else {
-            exampleDataset = imageDisplayService.getActiveDataset();
-        }
+        exampleDataset = getExampleDataset();
         imagePreview.refresh(exampleDataset, workflowPanel.stepListProperty());
 
         previewPopOver.setAutoHide(true);

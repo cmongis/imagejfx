@@ -56,10 +56,10 @@ public class IconView extends ScrollPane implements ExplorerView {
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(tilePane);
 
     @Parameter
-    ExplorerService explorerService;
+    private ExplorerService explorerService;
     
     @Parameter
-    Context context;
+    private Context context;
     
     public IconView() {
         setContent(tilePane);
@@ -111,11 +111,12 @@ public class IconView extends ScrollPane implements ExplorerView {
     }
 
     
-    public void onMouseClick(MouseEvent event){
-        System.out.println(event);
+    private void onMouseClick(MouseEvent event){
+        
         if(event.getTarget() == tilePane) {
             cellPaneCtrl.getItems().forEach(item->item.selectedProperty().setValue(false));
         }
+        
     }
     
     public void onMouseDrag(DragEvent event) {
