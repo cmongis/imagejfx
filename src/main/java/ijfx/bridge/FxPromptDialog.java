@@ -20,11 +20,11 @@
  */
 package ijfx.bridge;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.main.ImageJFX;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.util.Callback;
@@ -39,13 +39,17 @@ import mongis.utils.FXUtilities;
  */
 public class FxPromptDialog extends Dialog<Result> implements DialogPrompt {
 
+    
+    
+    
     public FxPromptDialog(String message, String title, DialogPrompt.MessageType mt, DialogPrompt.OptionType ot) {
 
         super();
 
         setTitle(title);
         setContentText(message);
-
+        
+        getDialogPane().getStylesheets().add(ImageJFX.getStylesheet());
         switch (ot) {
             case YES_NO_OPTION:
                 addButton(ButtonType.YES);
@@ -114,6 +118,16 @@ public class FxPromptDialog extends Dialog<Result> implements DialogPrompt {
         }
 
         return result;
+    }
+    
+    
+    
+    
+    
+    public void setMessageType(DialogPrompt.MessageType mt) {
+        if(mt == DialogPrompt.MessageType.ERROR_MESSAGE) {
+            setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
+        }
     }
 
 }

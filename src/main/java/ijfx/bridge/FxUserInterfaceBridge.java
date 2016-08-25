@@ -78,10 +78,10 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Parameter
     private BatchService batchService;
-    
-   @Parameter
-   private LoadingScreenService loadingScreenService;
-    
+
+    @Parameter
+    private LoadingScreenService loadingScreenService;
+
     private static final Logger logger = ImageJFX.getLogger();
 
     private boolean injection = false;
@@ -126,9 +126,9 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
         try {
             FXUtilities.runAndWait(() -> lastDialog = new FxPromptDialog(string, string1, mt, ot));
         } catch (InterruptedException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         } catch (ExecutionException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         }
 
         return lastDialog;
@@ -136,37 +136,31 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Override
     public File chooseFile(File file, String string) {
-        
-        logger.info("Choosing file..." + (file != null ? file.getAbsolutePath() : "(no file)") + " " +string);
-        
+
+        logger.info("Choosing file..." + (file != null ? file.getAbsolutePath() : "(no file)") + " " + string);
+
         // starting a file chooser
         final FileChooser chooser = new FileChooser();
-        
+
         if (file != null && file.isDirectory()) {
             chooser.setInitialDirectory(file);
         }
 
-        
-
         //runs the open file dialog and wait for it
         try {
             FXUtilities.runAndWait(() -> {
-                
-                
-                
-                
-                if(string != null && string.toLowerCase().contains("save")) {
-                
+
+                if (string != null && string.toLowerCase().contains("save")) {
+
                     lastOpenedFile = chooser.showSaveDialog(null);
-                }
-                else {
+                } else {
                     lastOpenedFile = chooser.showOpenDialog(null);
                 }
 
             });
         } catch (Exception ex) {
-            logger.log(Level.SEVERE,"Error when choosing file",ex);
-        } 
+            logger.log(Level.SEVERE, "Error when choosing file", ex);
+        }
 
         return lastOpenedFile;
     }
@@ -188,79 +182,54 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Override
     public void show(final Display<?> dspl) {
-        
-       
-        
+
         logger.info("Showing display");
-        
+
         if (dspl instanceof ImageDisplay) {
-            
+
             displayService.setActiveDisplay(dspl);
-            
+
             ImageDisplay imgDisplay = (ImageDisplay) dspl;
-            
+
             Dataset dataset = imageDisplayService.getActiveDataset(imgDisplay);
-            
-           
-            
-       
+
             // we always assume that an image is displayed so we create an image window
             // in the image container (singleton pattern)
             final DefaultImageWindow imageWindow = new DefaultImageWindow(dspl.getContext());
-            
-            imageWindow.show((ImageDisplay)imgDisplay);
 
-            
-            
-            
+            imageWindow.show((ImageDisplay) imgDisplay);
+
             Platform.runLater(() -> {
                 // creating the @ImageWindow 
                 // getting the @ImageWindowContainer unique instance
                 ImageWindowContainer.getInstance().getChildren().add(imageWindow);
 
-                 new CallbackTask()
-                    .setName("Enhancing contrast...")
-                    
-                    .run(()->AutoContrast.run(getContext().getService(IjfxStatisticService.class), imgDisplay, dataset, true))
-                    .submit(loadingScreenService)
-                    .setInitialProgress(0.8)
-                    .start();
-            ;
-              
-                
-                //loadingScreenService.frontEndTask("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay);
-                
-                
-                
-            });
-            
-            
-            
-            
-            //new CommandRunner(getContext()).run("Enhancing visual...",AutoContrast.class,"imageDisplay",imgDisplay,"channelDependant",true);
-            
-        } else if (dspl instanceof TableDisplay) {
-            
-            TableDisplayWindow window = new TableDisplayWindow(getContext());
-            
-            
-            
-            Platform.runLater(() -> {
-                
-                ImageWindowContainer.getInstance().getChildren().add(window);
-                window.show((TableDisplay)dspl);
+                new CallbackTask()
+                        .setName("Enhancing contrast...")
+                        .run(() -> AutoContrast.run(getContext().getService(IjfxStatisticService.class), imgDisplay, dataset, true))
+                        .submit(loadingScreenService)
+                        .setInitialProgress(0.8)
+                        .start();
+                ;
             });
 
-        } 
-        else if (dspl instanceof TextDisplay) {
+        } else if (dspl instanceof TableDisplay) {
+
+            TableDisplayWindow window = new TableDisplayWindow(getContext());
+
+            Platform.runLater(() -> {
+
+                ImageWindowContainer.getInstance().getChildren().add(window);
+                window.show((TableDisplay) dspl);
+            });
+
+        } else if (dspl instanceof TextDisplay) {
             Platform.runLater(() -> {
 
                 ImageWindowContainer.getInstance().getChildren().add(new TextWindow((TextDisplay) dspl));
             });
 
-        }
-        
-        else {
+        } else {
             logger.warning("Cannot show display type :" + dspl.getClass().getSimpleName());
         }
     }
