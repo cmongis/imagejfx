@@ -7,7 +7,6 @@
         "icon": "CALCULATOR"
         ,
         "items": [
-            
             {
                 "type": "Command"
                 ,
@@ -20,8 +19,7 @@
                 "context": "image-open"
 
             },
-            
-             {
+            {
                 "type": "Command"
                 ,
                 "label": "Subtract"
@@ -33,7 +31,6 @@
                 "context": "image-open"
 
             },
-            
             {
                 "type": "Command"
                 ,
@@ -46,7 +43,6 @@
                 "context": "image-open"
 
             },
-            
             {
                 "type": "Command"
                 ,
@@ -59,9 +55,9 @@
                 "context": "image-open"
 
             }
-            
-            
-           
+
+
+
         ]
     },
     {
@@ -71,7 +67,7 @@
         ,
         "icon": "PAINT_BRUSH"
         ,
-        "items": [     
+        "items": [
             {
                 "type": "Command"
                 ,
@@ -106,27 +102,35 @@
                 "icon": "USERS"
                 ,
                 "context": "multi-channel-img"
-            },{
-                "type":"Command"
-                ,"label":"Stacks to multi-channel"
-                ,"action":"ijfx.plugins.commands.MergeStacks"
-                ,"icon":"USERS"
-                ,"context":"multi-channel-img"
-            },{
-                "type":"Command"
-                ,"label":"Isolate Channel"
-                ,"action":"ijfx.plugins.commands.IsolateChannel"
-                ,"icon":"USER"
-                ,"context":"multi-channel-img"
+            }, {
+                "type": "Command"
+                ,
+                "label": "Stacks to multi-channel"
+                ,
+                "action": "ijfx.plugins.commands.MergeStacks"
+                ,
+                "icon": "USERS"
+                ,
+                "context": "multi-channel-img"
+            }, {
+                "type": "Command"
+                ,
+                "label": "Isolate Channel"
+                ,
+                "action": "ijfx.plugins.commands.IsolateChannel"
+                ,
+                "icon": "USER"
+                ,
+                "context": "multi-channel-img"
             }
-            
-            
+
+
         ]
     }
     , {
         "name": "Stacks"
         ,
-        "context": "multi-z-img multi-time-img"
+        "context": "imagej+multi-z-img imagej+multi-time-img"
         ,
         "icon": "STACK_OVERFLOW"
         ,
@@ -141,15 +145,19 @@
                 "icon": "UPLOAD"
                 ,
                 "context": "image-open"
-                
+
             }
-            
-            ,{
-                "type":"Command"
-                ,"label":"Delete Slices"
-                ,"action":"ijfx.plugins.commands.RemoveSlice"
-                ,"icon":"ERASER"
-                ,"context":"image-open"
+
+            , {
+                "type": "Command"
+                ,
+                "label": "Delete Slices"
+                ,
+                "action": "ijfx.plugins.commands.RemoveSlice"
+                ,
+                "icon": "ERASER"
+                ,
+                "context": "image-open"
             }
             , {
                 "type": "Command"
@@ -162,34 +170,46 @@
                 ,
                 "context": "image-open"
             }
-            ,{
-                "type":"Command"
-                ,"label":"Convert to Hyperstack..."
-                ,"action":"ijfx.plugins.stackconverter.StackToHS"
-                ,"icon":"STACK_OVERFLOW"
-                ,"context":"image-open"
+            , {
+                "type": "Command"
+                ,
+                "label": "Convert to Hyperstack..."
+                ,
+                "action": "ijfx.plugins.stackconverter.StackToHS"
+                ,
+                "icon": "STACK_OVERFLOW"
+                ,
+                "context": "image-open"
             }
-            ,{
-                "type":"Command"
-                ,"label":"Hyperstack to Stack..."
-                ,"action":"ijfx.plugins.stackconverter.HyperstackToStack"
-                ,"icon":"STACK_OVERFLOW"
-                ,"context":"image-open"
+            , {
+                "type": "Command"
+                ,
+                "label": "Hyperstack to Stack..."
+                ,
+                "action": "ijfx.plugins.stackconverter.HyperstackToStack"
+                ,
+                "icon": "STACK_OVERFLOW"
+                ,
+                "context": "image-open"
             }
-            ,{
-                "type":"Command"
-                ,"label":"Merge stacks into a multi-channel"
-                ,"action":"ijfx.plugins.command.MergeStacks"
-                ,"icon":"USERS"
-                ,"context":"image-open"
+            , {
+                "type": "Command"
+                ,
+                "label": "Merge stacks into a multi-channel"
+                ,
+                "action": "ijfx.plugins.command.MergeStacks"
+                ,
+                "icon": "USERS"
+                ,
+                "context": "image-open"
             }
-            
+
         ]
     },
     {
         "name": "Filters"
         ,
-        "context": "image-open"
+        "context": "imagej+image-open"
         ,
         "icon": "BULLSEYE"
         ,
@@ -212,8 +232,6 @@
 
                 }
             },
-            
-            
             {
                 "type": "Command"
                 ,
@@ -275,7 +293,7 @@
     {
         "name": "Noises"
         ,
-        "context": "image-open"
+        "context": "imagej+image-open"
         ,
         "icon": "BITCOIN"
         ,
@@ -320,7 +338,7 @@
     {
         "name": "Image"
         ,
-        "context": "image-open"
+        "context": "imagej+image-open"
         ,
         "icon": "FILE_IMAGE_ALT"
         ,
@@ -464,7 +482,7 @@
     {
         "name": "Binary"
         ,
-        "context": "image-open"
+        "context": "imagej+image-open"
         ,
         "icon": "BARCODE"
         ,
@@ -539,36 +557,75 @@
                 "icon": "preview"
                 ,
                 "context": "binary"
-
             }
-            ,{
-                "type":"Command"
-                ,"label":"Invert"
-                ,"action":"net.imagej.plugins.commands.assign.InvertDataValues"
-                ,"icon":"preview"
-                ,"context":"binary"
-                ,"parameters":{
-                    "allPlanes":false
+            , {
+                "type": "Command"
+                ,
+                "label": "Invert"
+                ,
+                "action": "net.imagej.plugins.commands.assign.InvertDataValues"
+                ,
+                "icon": "preview"
+                ,
+                "context": "binary"
+                ,
+                "parameters": {
+                    "allPlanes": false
                 }
             }
         ]
     }
-    ,{
-        "name":"Overlay"
-        ,"context":"segmentation+image-open"
-        ,"icon":"BARCODE"
-        ,"items":[
+    , {
+        "name": "Overlay"
+        ,
+        "context": "segmentation+image-open imagej+overlay-selected"
+        ,
+        "icon": "BARCODE"
+        ,
+        "items": [
             {
-                "type":"Command"
-                ,"label":"Delete all"
-                ,"action":"ijfx.plugins.commands.RemoveAllOverlayls"
-                ,"icon":"REMOVE"
-                ,"context":"imagej"
+                "type": "Command"
+                ,
+                "label": "Remove selected"
+                ,
+                "action": "ijfx.plugins.commands.removeAllOverlays"
+                ,
+                "context": "overlay-selected"
+            }
+            , {
+                "type": "Command"
+                ,
+                "label": "Delete all"
+                ,
+                "action": "ijfx.plugins.commands.RemoveAllOverlays"
+                ,
+                "icon": "REMOVE"
+                ,
+                "context": "image-open"
+            }
+
+        ]
+    }
+    , {
+        "name": "Table"
+        ,
+        "context": "table-open table-open"
+        ,
+        "icon": "TABLE"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Save table as CSV"
+                ,
+                "action": "ijfx.ui.plugins.commands.table.SaveAsCsv"
+                ,
+                "icon": "SAVE"
+                ,
+                "context": "table-open"
             }
         ]
     }
-
-
-
 
 ]
