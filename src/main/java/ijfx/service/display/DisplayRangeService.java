@@ -34,6 +34,7 @@ import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.measure.StatisticsService;
@@ -116,6 +117,14 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
         return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMax();
     }
 
+    public double getChannelMinimum(ImageDisplay display, int channel) {
+        return imageDisplayService.getActiveDatasetView(display).getChannelMin(channel);
+    }
+    
+    public double getChannelMaximum(ImageDisplay display, int channel) {
+        return imageDisplayService.getActiveDatasetView(display).getChannelMax(channel);
+    }
+    
     public double getCurrentViewMinimum() {
         return imageDisplayService.getActiveDatasetView().getChannelMin(getCurrentChannelId());
     }
@@ -141,6 +150,20 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
 
     }
 
+    public void updateDisplayRange(ImageDisplay imageDisplay,int channel,double min, double max) {
+        
+        Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
+        DatasetView datasetView = imageDisplayService.getActiveDatasetView(imageDisplay);
+        dataset.setChannelMinimum(channel, min);
+        dataset.setChannelMaximum(channel, max);
+        datasetView.setChannelRange(channel, min, max);
+        
+        
+        imageDisplayService.getActiveDatasetView().getProjector().map();
+        eventService.publishLater(new DisplayUpdatedEvent(imageDisplay, DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
+    }
+    
+    
     public void updateCurrentDisplayRange(double min, double max) {
         imageDisplayService.getActiveDataset().setChannelMaximum(getCurrentChannelId(), max);
         imageDisplayService.getActiveDataset().setChannelMinimum(getCurrentChannelId(), min);
