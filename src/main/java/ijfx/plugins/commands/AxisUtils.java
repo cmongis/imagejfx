@@ -69,7 +69,7 @@ public class AxisUtils {
 
     public static long getAxisMax(Dataset dataset, AxisType axisType) {
         int d = dataset.dimensionIndex(axisType);
-
+        if(d == -1) return 0;
         return dataset.max(d);
     }
 
