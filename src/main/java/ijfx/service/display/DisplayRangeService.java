@@ -159,7 +159,7 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
         datasetView.setChannelRange(channel, min, max);
         
         
-        imageDisplayService.getActiveDatasetView().getProjector().map();
+       datasetView.getProjector().map();
         eventService.publishLater(new DisplayUpdatedEvent(imageDisplay, DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
     }
     
