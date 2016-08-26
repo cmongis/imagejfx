@@ -161,7 +161,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
                     .setName("Getting file list...")
                     .run(this::fetchFiles)
                     .then(result -> {
-                        files = result;
+                       
                         eventService.publish(new FolderUpdatedEvent().setObject(this));
                     })
                     .setIn(currentTaskProperty())
@@ -173,6 +173,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
         listenToDirectoryChange();
         return files;
     }
+    
 
     private List<Explorable> fetchFiles(ProgressHandler progress, Void v) {
 
@@ -189,20 +190,19 @@ public class DefaultFolder implements Folder, FileChangeListener {
         
         List<Explorable> explorables = records
                 .stream()
+                .parallel()
                 .map(record -> {
                     
+                    /*
                     File overlayJsonFile = overlayIOService.getOverlayFileFromImageFile(record.getFile());
                     finalProgress.increment(0.5);
                     if (overlayJsonFile.exists()) {
                         //getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
                     }
                     record.getMetaDataSet().setType(MetaDataSetType.FILE);
-                    return record;
-                })
-                .map(record -> {
-                    finalProgress.increment(0.5);
-                    return new ImageRecordIconizer(context, record);
-
+                    return record;*/
+                    finalProgress.increment(1);
+                    return addFile(record);
                 })
                 .collect(Collectors
                         .toList());
@@ -210,6 +210,28 @@ public class DefaultFolder implements Folder, FileChangeListener {
         logger.info(String.format("%d records fetched", records.size()));
         imageRecordService.forceSave();
         return explorables;
+    }
+    
+    private Explorable addFile(File file) {
+        return addFile(imageRecordService.getRecord(file));
+    }
+    
+    private Explorable addFile(ImageRecord record) {
+        
+        record.getMetaDataSet().setType(MetaDataSetType.FILE);
+        Explorable fileExplorable = new ImageRecordIconizer(context, record);
+        
+        List<Explorable> planeExplorableList = metadataExtractionService.extractPlaneMetaData(fileExplorable.getMetaDataSet())
+                .stream()
+                .map(m -> new PlaneMetaDataSetWrapper(context, m))
+                .collect(Collectors.toList());
+        
+        
+        files.add(fileExplorable);
+        if(planes == null) planes = new ArrayList<>();
+        planes.addAll(planeExplorableList);
+        
+        return fileExplorable;
     }
 
     @JsonSetter("path")
@@ -231,6 +253,8 @@ public class DefaultFolder implements Folder, FileChangeListener {
     @Override
     public List<Explorable> getPlaneList() {
 
+        
+        /*
         if (planes == null) {
 
             logger.info("Fetching planes !");
@@ -244,8 +268,8 @@ public class DefaultFolder implements Folder, FileChangeListener {
                     .map(m -> new PlaneMetaDataSetWrapper(context, m))
                     .collect(Collectors.toList());
 
-        }
-        logger.info(String.format("%d planes fetched", planes.size()));
+        }*/
+        
         return planes;
     }
 
@@ -281,12 +305,19 @@ public class DefaultFolder implements Folder, FileChangeListener {
         logger.info("File added " + filePath);
 
         File file = new File(getDirectory(), filePath);
-
+        
+        addFile(file);
+        notifyFolderChange();
         if (file.getName().endsWith(OverlayIOService.OVERLAY_FILE_EXTENSION)) {
             File imageFile = overlayIOService.getImageFileFromOverlayFile(file);
             
             getObjectList().addAll(loadOverlay(imageFile, file));
         }
+        
+       
+        
+        
+        
 
     }
 
@@ -348,6 +379,10 @@ public class DefaultFolder implements Folder, FileChangeListener {
     
     public boolean isFilePartOf(File f) {
         return f.getAbsolutePath().startsWith(file.getAbsolutePath());
+    }
+    
+    private void notifyFolderChange() {
+        eventService.publishLater(new FolderUpdatedEvent().setObject(this));
     }
     
 }

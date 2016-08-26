@@ -175,6 +175,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     }
 
     private void listenToExplorableSelection(Explorable expl) {
+        if(expl != null)
         expl.selectedProperty().addListener(this::onExplorableSelected);
     }
 

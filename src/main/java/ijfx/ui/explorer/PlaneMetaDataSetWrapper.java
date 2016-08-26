@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.bridge.ImageJContainer;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.thumb.ThumbService;
@@ -69,6 +70,7 @@ public class PlaneMetaDataSetWrapper implements Explorable{
         public PlaneMetaDataSetWrapper(Context context, MetaDataSet m) {
             context.inject(this);
             this.m = m;
+            m.setType(MetaDataSetType.PLANE);
         }
 
         @Override
