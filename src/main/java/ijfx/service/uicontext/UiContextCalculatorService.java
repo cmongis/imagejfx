@@ -54,6 +54,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public final static String CTX_RGB_IMAGE = "rgb-img";
     public final static String CTX_MULTI_Z_IMAGE = "multi-z-img";
     public final static String CTX_MULTI_CHANNEL_IMG = "multi-channel-img";
+    public final static String CTX_MULTI_N_IMG = "multi-n-img";
     public final static String CTX_MULTI_TIME_IMG = "multi-time-img";
     public final static String CTX_TABLE_DISPLAY = "table-open";
     public final static String CTX_IMAGE_DISPLAY = "image-open";
@@ -82,7 +83,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
             if (overlaySelectionService == null) {
                 overlayService.getContext().inject(this);
             }
-            ImageDisplay imageDisplay;
+            ImageDisplay imageDisplay = null;
 
             contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
             contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()));
@@ -91,18 +92,20 @@ public class UiContextCalculatorService extends AbstractService implements Image
             if (display instanceof ImageDisplay) {
                 imageDisplay = (ImageDisplay) display;
 
-                contextService.toggleContext(CTX_OVERLAY_SELECTED, display != null && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
+                contextService.toggleContext(CTX_OVERLAY_SELECTED, imageDisplay != null && overlaySelectionService.getSelectedOverlays(imageDisplay).size() > 0);
 
-                contextService.toggleContext(CTX_MULTI_Z_IMAGE, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.Z));
+                contextService.toggleContext(CTX_MULTI_Z_IMAGE, imageDisplay != null && AxisUtils.hasAxisType(imageDisplay, Axes.Z));
 
-                contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.CHANNEL));
+                contextService.toggleContext(CTX_MULTI_CHANNEL_IMG, imageDisplay != null && AxisUtils.hasAxisType(imageDisplay, Axes.CHANNEL));
 
-                contextService.toggleContext(CTX_MULTI_TIME_IMG, display != null && AxisUtils.hasAxisType(imageDisplay, Axes.TIME));
+                contextService.toggleContext(CTX_MULTI_TIME_IMG, imageDisplay != null && AxisUtils.hasAxisType(imageDisplay, Axes.TIME));
 
-                contextService.toggleContext(CTX_RGB_IMAGE, display != null && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
+                contextService.toggleContext(CTX_RGB_IMAGE, imageDisplay != null && imageDisplayService.getActiveDataset(imageDisplay).isRGBMerged());
 
-                contextService.toggleContext(CTX_IMAGE_BINARY, display != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
+                contextService.toggleContext(CTX_IMAGE_BINARY, imageDisplay != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
 
+                contextService.toggleContext(CTX_MULTI_N_IMG, imageDisplay != null && imageDisplay.numDimensions() > 2);
+                
                 Dataset dataset = null;
                 if (display != null) {
                     dataset = (Dataset) imageDisplay.getActiveView().getData();
@@ -161,14 +164,6 @@ public class UiContextCalculatorService extends AbstractService implements Image
             determineContext(null);
         }
 
-        /*
-        
-        displayService.getDisplays().stream().forEach((display) -> {
-            if (display != event.getObject()) {
-                determineContext(display);
-            }
-        });*/
-        //contextService.update();
     }
 
 }
