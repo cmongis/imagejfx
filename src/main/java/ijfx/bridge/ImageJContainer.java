@@ -20,6 +20,7 @@
  */
 package ijfx.bridge;
 
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.context.animated.AnimatedPaneContextualView;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
 import ijfx.service.uicontext.UiContextService;
@@ -46,6 +47,7 @@ import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.plugin.panel.RecentFilePanel;
+import static java.security.AccessController.getContext;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
@@ -93,6 +95,9 @@ public class ImageJContainer extends BorderPane implements Activity {
     
     @Parameter
     FolderManagerService folderManagerService;
+    
+    @Parameter
+    LoadingScreenService loadingScreenService;
     
     private static final String DRAG_OVER_CSS_STYLE = "dragover";
 
@@ -185,7 +190,13 @@ public class ImageJContainer extends BorderPane implements Activity {
             success = true;
             String filePath = null;
             for (File file : db.getFiles()) {
-                openFile(file);
+                new CallbackTask<File,Void>()
+                        .setInput(file)
+                        .consume(this::openFile)
+                        .setInitialProgress(0.5)
+                        .setName(String.format("Opening %s...",file.getName()))
+                        .submit(loadingScreenService)
+                        .start();
             }
         }
         event.setDropCompleted(success);
