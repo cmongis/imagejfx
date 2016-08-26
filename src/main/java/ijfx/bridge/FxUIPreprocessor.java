@@ -68,8 +68,6 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
     @Parameter
     InputSkinPluginService inputSkinPluginService;
 
-    //@Parameter
-    // LegacyService legacyService;
     @Override
     public void process(Module module) {
 
@@ -90,48 +88,16 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
                 return;
             }
             
-            /*
-            // if it's a legacy command, it's also ignore
-            if (LegacyCommand.class.isAssignableFrom(module.getDelegateObject().getClass())) {
-                return;
-            }*/
-            // task displaying the generator
-            // the generator is executed in the FXUIThread
-            /*
-            Task<Boolean> displayDialogTask = new Task<Boolean>() {
-
-                @Override
-                protected Boolean call() throws Exception {
-                    InputDialog generator = new InputDialog(module, context);
-                    if (InteractiveCommand.class.isAssignableFrom(module.getClass())) {
-                        generator.show();
-
-                    } else {
-                        generator.showAndWait();
-                    }
-                    return true;
-                }
-            };*/
             FXUtilities.runAndWait(() -> {
                 InputDialog dialog = new InputDialog(module, context);
 
                 if (InteractiveCommand.class.isAssignableFrom(module.getClass())) {
                     dialog.show();
-
                 } else {
                     dialog.showAndWait();
-                    //FXUtilities.runAndWait(dialog::showAndWait);
-
                 }
 
             });
-
-            // the dialog is started in a FX Thread
-            //recorder.process(module);
-            // } catch (InterruptedException ex) {
-            //   ImageJFX.getLogger().log(Level.SEVERE,null,ex);
-            // } catch (ExecutionException ex) {
-            //    ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
         } catch (Exception ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
