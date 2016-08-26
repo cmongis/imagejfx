@@ -18,7 +18,7 @@
    <top>
         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
             <children>
-                <Label text="Welcome">
+                <Label graphicTextGap="15.0" text="Please choose a folder and select the different positions">
                     <StackPane.margin>
                         <Insets bottom="32.0" left="32.0" right="32.0" top="32.0" />
                     </StackPane.margin>

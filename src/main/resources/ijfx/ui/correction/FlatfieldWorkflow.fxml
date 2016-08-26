@@ -26,8 +26,8 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Button fx:id="flatFieldLeftButton" mnemonicParsing="false" text="Choose flatfield" />
-            <Button fx:id="flatFieldRightButton" mnemonicParsing="false" text="Choose flatfield" GridPane.columnIndex="1" />
+            <Button fx:id="flatFieldLeftButton" mnemonicParsing="false" text="Choose flatfield for the source image" />
+            <Button fx:id="flatFieldRightButton" mnemonicParsing="false" text="Choose flatfield for the target image" GridPane.columnIndex="1" />
          </children>
       </GridPane>
    </center>

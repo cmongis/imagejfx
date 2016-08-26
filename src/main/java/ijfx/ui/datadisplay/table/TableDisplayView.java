@@ -47,7 +47,6 @@ import mongis.utils.FXUtilities;
  *
  * @author Cyril MONGIS, 2015
  */
-
 public class TableDisplayView extends BorderPane {
 
     @FXML
@@ -59,7 +58,6 @@ public class TableDisplayView extends BorderPane {
 
     final Logger logger = ImageJFX.getLogger();
 
-   
     public TableDisplayView() {
 
         logger.info("Injecting FXML");
@@ -78,11 +76,11 @@ public class TableDisplayView extends BorderPane {
 
     public TableDisplayView(TableDisplay tableDisplay) {
         this();
-       display(tableDisplay);
+        display(tableDisplay);
     }
-    
+
     public void display(TableDisplay display) {
-         this.tableDisplay = display;
+        this.tableDisplay = display;
         ImageJFX.getThreadPool().submit(this::renderTable);
         logger.info("table rendered");
     }
@@ -90,7 +88,10 @@ public class TableDisplayView extends BorderPane {
     public void renderTable() {
         final Table table = tableDisplay.get(0);
         model.display(table);
+    }
 
+    public TableDisplay getTableDisplay() {
+        return tableDisplay;
     }
 
     public class FlexibleColumnModel {
@@ -124,9 +125,7 @@ public class TableDisplayView extends BorderPane {
                     TableColumn column = (TableColumn) tableView.getColumns().get(i);
                     column.setText(table.get(i).getHeader());
                 }
-                
-                
-                
+
             });
 
         }

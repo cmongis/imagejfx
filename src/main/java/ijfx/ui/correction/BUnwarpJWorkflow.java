@@ -163,16 +163,7 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
     TextField consistencyWeightTextField;
 
     @FXML
-    CheckBox richOutput;
-
-    @FXML
-    CheckBox saveTransformation;
-
-    @FXML
     ComboBox modeChoiceComboBox, min_scale_deformation_choiceComboBox, max_scale_deformation_choiceComboBox, img_subsamp_factComboBox;
-
-    @FXML
-    Button mergeButton;
 
     @FXML
     ListView<File> listView;
@@ -204,6 +195,7 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
         loadPointsButton.setOnAction(e -> {
             try {
                 tableDisplayView.display(workflowModel.loadTable(HEADER, fileLabel));
+                nextButton.setDisable(false);
             } catch (IOException ex) {
                 Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -247,6 +239,8 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
         if (workflowModel.getLandMarksFile() != null) {
             try {
                 tableDisplayView.display(workflowModel.loadTable(HEADER, fileLabel, workflowModel.getLandMarksFile()));
+                nextButton.setDisable(false);
+
             } catch (IOException ex) {
                 Logger.getLogger(BUnwarpJWorkflow.class.getName()).log(Level.SEVERE, null, ex);
             }

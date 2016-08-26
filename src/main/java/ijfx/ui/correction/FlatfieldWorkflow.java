@@ -25,10 +25,10 @@ import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.ViewController;
-import io.datafx.controller.flow.action.ActionMethod;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
@@ -82,7 +82,7 @@ public class FlatfieldWorkflow extends CorrectionFlow {
 
     @Parameter
     ImagePlaneService imagePlaneService;
-    
+
     protected ObjectProperty<ImageDisplayPane> flatFieldProperty1 = new SimpleObjectProperty<>();
     protected ObjectProperty<ImageDisplayPane> flatFieldProperty2 = new SimpleObjectProperty<>();
 
@@ -106,12 +106,21 @@ public class FlatfieldWorkflow extends CorrectionFlow {
         bindPaneProperty(Arrays.asList(imageDisplayPanes));
         flatFieldLeftButton.setOnAction(e -> openImage(flatFieldProperty1.get()));
         flatFieldRightButton.setOnAction(e -> openImage(flatFieldProperty2.get()));
+        if (flatFieldProperty1.get().getImageDisplay() != null && flatFieldProperty2.get().getImageDisplay() != null) {
+            nextButton.setDisable(false);
+        }
     }
 
     protected void openImage(ImageDisplayPane imageDisplayPane) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
-        workflowModel.openImage(imageDisplayPane, file).start();
+        workflowModel.openImage(imageDisplayPane, file).thenRunnable(() -> {
+            if (flatFieldProperty1.get().getImageDisplay() != null && flatFieldProperty2.get().getImageDisplay() != null) {
+                nextButton.setDisable(false);
+            }
+
+        }).start();
+
     }
 
     protected ImageDisplay displayDataset(Dataset flatFieldDataset) {
@@ -119,7 +128,5 @@ public class FlatfieldWorkflow extends CorrectionFlow {
         imageDisplay.display(flatFieldDataset);
         return imageDisplay;
     }
-    
-  
 
 }

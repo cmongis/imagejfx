@@ -12,7 +12,7 @@
     <children>
       <Label text="Label" />
         <Button fx:id="backButton" mnemonicParsing="false" text="Back" />
-        <Button fx:id="nextButton" mnemonicParsing="false" text="Next" />
+        <Button fx:id="nextButton" disable="true" mnemonicParsing="false" text="Next" />
         <Button fx:id="finishButton" mnemonicParsing="false" text="Finish" />
         <Button fx:id="explainMeButton" mnemonicParsing="false" text="Explain me" />
       <Label text="Label" />

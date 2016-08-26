@@ -23,6 +23,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ExplorableClustererService;
 import ijfx.service.ui.FxImageService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
@@ -46,6 +47,7 @@ import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.paint.Color;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.lut.LUTService;
 import net.imagej.ops.Initializable;
@@ -67,6 +69,9 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     private static final Color[] COLORS1 = new Color[]{Color.BLACK, Color.RED};
 
     private static final Color[] COLORS2 = new Color[]{Color.BLACK, Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE};
+
+    @Parameter
+    LoadingScreenService loadingScreenService;
 
     @Parameter
     ExplorableClustererService explorableClustererService;
@@ -101,6 +106,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     List<ComboBox<String>> comboBoxList;
     double min = 0;
     double max = 0;
+    private boolean firstAction = true;
 
     public ChartViewLUT() {
         super();
@@ -126,12 +132,13 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     }
 
-   
-
     @Override
     public Node getNode() {
-         addColorTable(Arrays.asList(COLORS1), "En rouge et noir");
-        addColorTable(Arrays.asList(COLORS2), "Rainbow");
+        if (firstAction == true) {
+            addColorTable(Arrays.asList(COLORS1), "En rouge et noir");
+            addColorTable(Arrays.asList(COLORS2), "Rainbow");
+            firstAction = false;
+        }
         return this;
     }
 
@@ -152,9 +159,9 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
             String s = c.getSelectionModel().getSelectedItem();
             c.getItems().clear();
             c.getItems().addAll(metadatas);
-            if (metadatas.contains(s)) {
-                c.getSelectionModel().select(s);
-            }
+//            if (metadatas.contains(s)) {
+//                c.getSelectionModel().select(s);
+//            }
 
         });
 
@@ -180,8 +187,8 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     @Override
     public void computeItems() {
-
         scatterChart.getData().clear();
+
         addDataToChart(currentItems, Arrays.asList(metadatas));
         applyColorTable(lutViewChanger.getColorTable());
         bindLegend();
@@ -215,7 +222,9 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     public void onComboBoxChanged(Observable observable, LUTView oldValue, LUTView newValue) {
         lutViewChanger = (LutViewChanger) newValue;
-        applyColorTable(lutViewChanger.getColorTable());
+        new CallbackTask<Void, Void>().run(() -> applyColorTable(lutViewChanger.getColorTable()))
+                .submit(loadingScreenService)
+                .start();
     }
 
     public void applyColorTable(ColorTable colorTable) {
@@ -234,7 +243,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
                     TogglePlot t = (TogglePlot) e.getNode();
                     t.setStyle("-fx-background-color: rgb(" + red + "," + green + "," + blue + ")");
                     t.setOriginStyle(t.getStyle());
-                    System.out.println(t.getStyle());
+//                    System.out.println(t.getStyle());
 
                 });
     }
@@ -276,7 +285,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     private void addColorTable(List<Color> colors, String name) {
         List<Color> generateInterpolatedColor = ColorGenerator.generateInterpolatedColor(colors, 256);
         ColorTable colorTable = LUTCreator.colorsToColorTable(generateInterpolatedColor);
-        lutViewChanger = new LutViewChanger(name, colorTable, generateInterpolatedColor);
+        lutViewChanger = new LutViewChanger(name, colorTable, colors);
         addLUTToComboBox(lutViewChanger);
     }
 

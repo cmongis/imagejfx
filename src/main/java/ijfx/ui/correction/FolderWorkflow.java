@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -112,6 +113,10 @@ public class FolderWorkflow extends CorrectionFlow {
                     .start();
 
         }
+        if (listView.getItems().size() > 0) {
+            nextButton.setDisable(false);
+        }
+
     }
 
     /**
@@ -123,19 +128,24 @@ public class FolderWorkflow extends CorrectionFlow {
         File file = directoryChooser.showDialog(null);
         List<File> list = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
         listProperty.set(list);
-        listView.getItems().clear();
-        listView.getItems().addAll(list);
-        try {
-            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0)).start().get();
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(FolderWorkflow.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (workflowModel.getPositionLeft().length > 0) {
-            applyPosition();
-        } else {
-            savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
-            savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
-        }
+
+        workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0))
+                .thenRunnable(() -> {
+                    listView.getItems().clear();
+                    listView.setItems(null);
+
+                    listView.setItems(FXCollections.observableArrayList(list));
+                    if (workflowModel.getPositionLeft().length > 0) {
+                        applyPosition();
+                    } else {
+                        savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
+                        savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
+                    }
+                    if (list.size() > 0) {
+                        nextButton.setDisable(false);
+                    }
+
+                }).start();
     }
 
     /**
