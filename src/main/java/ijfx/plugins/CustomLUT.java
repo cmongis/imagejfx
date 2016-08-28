@@ -69,7 +69,7 @@ public class CustomLUT implements Command {
     LUTService lUTService;
 
     @Parameter(type = ItemIO.BOTH)
-    Dataset dataset;
+    DatasetView datasetView;
 
     @Override
     public void run() {
@@ -84,12 +84,12 @@ public class CustomLUT implements Command {
     }
 
     public void applyLUT(ColorTable table) {
+//        displayService.get
+//        DatasetView datasetView = imageDisplayService.getActiveDatasetView();
         HashMap<String, Object> params = new HashMap<>();
         params.put("colorTable", table);
         int channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
         channel = channel == -1 ? 0 : channel;
-        commandService.run(ApplyLUT.class, true, "input",imageDisplayService.getActiveDataset(),"colorTable",table,"channelId",channel);
-
-        //lutService.applyLUT(table, displayService.getActiveDisplay(ImageDisplay.class));
+        datasetView.setColorTable(table, channel);
     }
 }
