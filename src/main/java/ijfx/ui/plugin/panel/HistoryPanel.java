@@ -55,7 +55,7 @@ import mongis.utils.FXUtilities;
  */
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "workflowEditor", localization = Localization.RIGHT, context = "imagej -overlay-selected", order = 2)
-public class WorkflowEditor extends TitledPane implements UiPlugin {
+public class HistoryPanel extends TitledPane implements UiPlugin {
 
     @FXML
     ListView<WorkflowStep> listView;
@@ -79,7 +79,7 @@ public class WorkflowEditor extends TitledPane implements UiPlugin {
     private final static String LOAD_WORKFLOW = "Load workflow";
     private final static String ERROR_MESSAGE = "Error when reading the workflow.";
 
-    public WorkflowEditor() throws IOException {
+    public HistoryPanel() throws IOException {
         super();
 
         FXUtilities.injectFXML(this);

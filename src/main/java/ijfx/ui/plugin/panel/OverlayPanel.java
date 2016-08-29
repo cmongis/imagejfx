@@ -24,6 +24,7 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.ui.main.Localization;
 import ijfx.service.overlay.OverlaySelectionService;
@@ -49,10 +50,10 @@ import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
-import ijfx.ui.main.ImageJFX;
+import ijfx.ui.datadisplay.object.DefaultObjectDisplay;
+import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javafx.animation.RotateTransition;
@@ -60,7 +61,6 @@ import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.LineChart;
@@ -82,6 +82,7 @@ import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
+import org.scijava.display.Display;
 import org.scijava.display.event.DisplayActivatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -103,8 +104,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @Parameter
     OverlayStatService statsService;
 
-    @Parameter
-    MeasurementService mSrv;
+
 
     @Parameter
     DatasetService datasetService;
@@ -118,6 +118,9 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @Parameter
     TimerService timerService;
 
+    @Parameter
+    ijfx.service.ui.MeasurementService measurementSrv;
+    
     @Parameter
     Context context;
 
@@ -150,6 +153,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @FXML
     TitledPane chartTitledPane;
 
+   
+    
     PopOver optionsPane;
 
     OverlayOptions overlayOptions;
@@ -236,25 +241,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
             return;
         }
 
-        /*
-        // task calculating the stats in a new thread
-        Task<HashMap<String, Double>> task = new Task<HashMap<String, Double>>() {
-            @Override
-            protected HashMap<String, Double> call() throws Exception {
-                return statsService.getStatisticsAsMap(event.getDisplay(), event.getOverlay());
-            }
-
-            @Override
-            protected void succeeded() {
-                super.succeeded();
-
-                tableView.getItems().clear();
-                this.getValue().forEach((key, value) -> {
-                    entries.add(new MyEntry(key, value));
-                });
-
-            }
-        };*/
+        
+        
         overlayProperty.setValue(event.getOverlay());
         Platform.runLater(() -> updateChart(event.getOverlay()));
         updateTable();
@@ -431,7 +419,18 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         });
 
     }
+    
+    @FXML
+    public void measure() {
+        
+        
+       measurementSrv.measureSelectedOverlay();
+        
+        
+    }
 
+
+    
     @Override
     public Node getUiElement() {
         return this;

@@ -22,6 +22,9 @@ package ijfx.ui.plugin.panel;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.bridge.ImageJContainer;
+import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataKeyPrioritizer;
+import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.plugins.commands.Binarize;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.batch.BatchService;
@@ -32,6 +35,7 @@ import ijfx.service.batch.SegmentedObject;
 import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.ui.MeasurementService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.WorkflowBuilder;
@@ -54,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -85,6 +90,7 @@ import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.display.OverlayView;
 import net.imagej.event.OverlayCreatedEvent;
+
 import net.imagej.overlay.Overlay;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
 import net.imagej.table.DefaultGenericTable;
@@ -95,6 +101,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
+import static org.scijava.util.Colors.map;
 
 /**
  *
@@ -168,11 +175,18 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     @Parameter
     ActivityService activityService;
 
+    
+    
+    
     @Parameter
     SegmentationService segmentationService;
 
-    Logger logger = ImageJFX.getLogger();
+    @Parameter
+    MeasurementService measureService;
     
+    
+    Logger logger = ImageJFX.getLogger();
+
     TaskButtonBinding taskButtonBinding;
 
     WorkflowPanel workflowPanel;
@@ -279,7 +293,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         if (handler == null) {
             handler = new SilentProgressHandler();
         }
-        
+
         // generating the batch service input from an image display
         BatchSingleInput input;
         ImageDisplay inputDisplay;
@@ -308,7 +322,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             inputDisplay = imageDisplayService.getActiveImageDisplay();
         }
 
-       logger.info("Executing segmentation workflow");
+        logger.info("Executing segmentation workflow");
 
         // applying the workflow
         boolean batchResult = batchService.applyWorkflow(handler, input, new DefaultWorkflow(workflowPanel.stepListProperty()));
@@ -329,18 +343,29 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         Overlay[] overlay = BinaryToOverlay.transform(context, input.getDataset(), whiteObjectCheckbox.isSelected());
         // giving a random color to each overlay
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
-
-        inputDisplay
+        
+        List<Overlay> toRemove = inputDisplay
                 .stream()
                 .filter(o -> o instanceof OverlayView)
                 .map(o -> (OverlayView) o)
                 .map(o -> o.getData())
-                .forEach(o -> overlayService.removeOverlay(inputDisplay, o));
-
+                .collect(Collectors.toList());
+        
+        for(Overlay o : toRemove) overlayService.removeOverlay(inputDisplay, o);
+        /*        
+        .forEach(o -> {
+                    try {
+                        overlayService.removeOverlay(inputDisplay, o);
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Error when removing overlay", e);
+                    }
+                });*/
+        
         // deleting the overlay owned previously by the input
         inputDisplay.addAll(Stream.of(overlay).map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
-        inputDisplay.update();
+
         Stream.of(overlay).map(o -> new OverlayCreatedEvent(o)).forEach(eventService::publish);
+        inputDisplay.update();
         //overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
         // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();
@@ -352,25 +377,42 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         //inputDisplay.update();
         handler.setStatus("Gathering statistics...");
 
+        logger.info("Gathering statistics");
+
         handler.setProgress(-1);
         // gathering statistics about the object from the input display
-        List<HashMap<String, Double>> map = Arrays.stream(overlay)
+        //List<Map<String, Object>> map;
+        
+        measureService.measureAllOverlay(inputDisplay);
+        
+        /*
+        map = Arrays.stream(overlay)
+                .filter(o -> o != null)
                 .map(o -> {
                     try {
 
-                        return overlayStatsService.getStatisticsAsMap(inputDisplay, o);
+                        Map<String, Object> stats = new HashMap<>();
+                        overlayStatsService
+                                .getStatisticsAsMap(inputDisplay, o)
+                                .forEach((key, value) -> stats.put(key, value));
+                        stats.put(MetaData.NAME, o.getName());
+                        return stats;
                     } catch (Exception e) {
                         return null;
                     }
                 })
-                .filter(o -> o != null)
                 .collect(Collectors.toList());
-
+        logger.info(String.format("Collected %d rows", map.size()));
         DefaultGenericTable resultTable = new DefaultGenericTable();
         if (map.size() > 0) {
             int headerNumber = map.get(0).keySet().size() + 1;
 
-            String[] headers = map.get(0).keySet().toArray(new String[headerNumber]);
+            String[] headers = map
+                    .get(0)
+                    .keySet()
+                    .stream()
+                    .sorted(new MetaDataKeyPrioritizer(MetaDataKeyPriority.OBJECT))
+                    .toArray(size -> new String[size]);
             resultTable.insertColumns(0, headers);
 
             for (int rowNumber = 0; rowNumber != map.size(); rowNumber++) {
@@ -378,18 +420,19 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
                 final int finalRowNumber = rowNumber;
                 resultTable.insertRow(finalRowNumber);
                 map.get(rowNumber).forEach((key, value) -> {
-                    System.out.println(String.format("Setting the value %s to %.3f (%d)", key, value, finalRowNumber));
+                    System.out.println(String.format("Setting the value %s to %s (%s)", key, value, finalRowNumber));
 
                     resultTable.set(key, finalRowNumber, value);
                 });
             }
 
         }
+        */
 
         if (isExplorer()) {
             activityService.openByType(ImageJContainer.class);
         }
-        uiService.show(resultTable);
+       
         uiService.show(outputDisplay);
 
     }
@@ -502,27 +545,23 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
     }
 
     protected Dataset getExampleDataset() {
-        
-        if(isExplorer()) {
-        
-        if(explorerService.getItems().size() == 0) {
-            uiService.showDialog("No item selected or displayed.", DialogPrompt.MessageType.ERROR_MESSAGE);
-            return null;
-        }
-        else if(explorerService.getSelectedItems().size() == 0) {
-            return explorerService.getItems().get(0).getDataset();
-        }
-        else {
-            return explorerService.getSelectedItems().get(0).getDataset();
-        }
-        }
-        else {
+
+        if (isExplorer()) {
+
+            if (explorerService.getItems().size() == 0) {
+                uiService.showDialog("No item selected or displayed.", DialogPrompt.MessageType.ERROR_MESSAGE);
+                return null;
+            } else if (explorerService.getSelectedItems().size() == 0) {
+                return explorerService.getItems().get(0).getDataset();
+            } else {
+                return explorerService.getSelectedItems().get(0).getDataset();
+            }
+        } else {
             return imageDisplayService.getActiveDataset();
         }
-        
+
     }
-    
-    
+
     protected void onPreviewMaskButtonClicked(ActionEvent event) {
         Dataset exampleDataset;
 
