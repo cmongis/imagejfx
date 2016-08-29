@@ -51,7 +51,6 @@ public class TogglePlot extends ToggleButton {
         this.selectedProperty().addListener((obs, old, n) -> {
             togglePlot.selectedProperty().setValue(n);
             this.setStyle(togglePlot.getStyle());
-            System.out.println("rer"+togglePlot.getStyle());
         });
     }
 

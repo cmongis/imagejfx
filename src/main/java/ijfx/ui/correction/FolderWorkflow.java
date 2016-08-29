@@ -127,14 +127,9 @@ public class FolderWorkflow extends CorrectionFlow {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File file = directoryChooser.showDialog(null);
         List<File> list = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
-        listProperty.set(list);
 
         workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0))
                 .thenRunnable(() -> {
-                    listView.getItems().clear();
-                    listView.setItems(null);
-
-                    listView.setItems(FXCollections.observableArrayList(list));
                     if (workflowModel.getPositionLeft().length > 0) {
                         applyPosition();
                     } else {
@@ -146,6 +141,12 @@ public class FolderWorkflow extends CorrectionFlow {
                     }
 
                 }).start();
+        listProperty.set(list);
+        listView.getItems().clear();
+        listView.setItems(null);
+//        lis
+
+        listView.setItems(FXCollections.observableArrayList(list));
     }
 
     /**

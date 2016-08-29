@@ -45,13 +45,19 @@
                             <children>
                                 <HBox alignment="CENTER" spacing="10.0">
                                     <children>
-                                        <Label text="Stop threshold" />
+                                        <Label text="Stop threshold">
+                                 <tooltip>
+                                    <Tooltip text="The stop threshold is used by the algorithm to stop the optimization process at each multiresolution level when the error relative change is not larger than this threshold." />
+                                 </tooltip></Label>
                                         <TextField fx:id="stopThresholdTextField" prefWidth="50.0" text="0" />
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
                                     <children>
-                                        <Label text="Algorithm mode" />
+                                        <Label text="Algorithm mode">
+                                 <tooltip>
+                                    <Tooltip text=" The registration mode &quot;Mono&quot; makes the program to perform only unidirectional registration, i.e. from source to target. The two registration modes &quot;Accurate&quot; and &quot;Fast&quot; involve performing bidirectional registration and affect the stopping criteria internally used by the program. " />
+                                 </tooltip></Label>
                                         <ComboBox fx:id="modeChoiceComboBox" prefWidth="150.0">
                                             <items>
                                                 <FXCollections fx:factory="observableArrayList">
@@ -68,7 +74,10 @@
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="1">
                                     <children>
-                                        <Label text="Maximum scale deformation" />
+                                        <Label text="Maximum scale deformation">
+                                 <tooltip>
+                                    <Tooltip text="&quot;Very coarse&quot; corresponds to 4 splines (one in each corner of the image). As you increase the deformation level, the number of splines is doubled in each direction (horizontal and vertical)." />
+                                 </tooltip></Label>
                                         <ComboBox fx:id="max_scale_deformation_choiceComboBox" prefWidth="150.0">
                                             <items>
                                                 <FXCollections fx:factory="observableArrayList">
@@ -87,7 +96,10 @@
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                     <children>
-                                        <Label text="Minimum scale deformation" />
+                                        <Label text="Minimum scale deformation">
+                                 <tooltip>
+                                    <Tooltip text="&quot;Very coarse&quot; corresponds to 4 splines (one in each corner of the image). As you increase the deformation level, the number of splines is doubled in each direction (horizontal and vertical)." />
+                                 </tooltip></Label>
                                         <ComboBox fx:id="min_scale_deformation_choiceComboBox" prefWidth="150.0">
                                             <items>
                                                 <FXCollections fx:factory="observableArrayList">
@@ -105,7 +117,10 @@
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="2">
                                     <children>
-                                        <Label text="img_subsamp_fact" />
+                                        <Label text="Image subsampling parameter">
+                                 <tooltip>
+                                    <Tooltip text="the image dimensions can be reduced by a factor of 2**0 = 1 to 2**7 = 128. This is very useful when registering large images." />
+                                 </tooltip></Label>
                                         <ComboBox fx:id="img_subsamp_factComboBox" prefWidth="150.0">
                                             <items>
                                                 <FXCollections fx:factory="observableArrayList">
@@ -144,31 +159,46 @@
                             <children>
                                 <HBox alignment="CENTER" spacing="10.0">
                                     <children>
-                                        <Label text="Divergence weight" />
+                                        <Label text="Divergence weight">
+                                 <tooltip>
+                                    <Tooltip text="The divergence and curl weights regularize the deformation by penalizing the divergence and curl of the deformation vector field." />
+                                 </tooltip></Label>
                                         <TextField fx:id="divWeightTextField" prefWidth="50.0" text="0" />
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
                                     <children>
-                                        <Label text="Curl Weight" />
+                                        <Label text="Curl Weight">
+                                 <tooltip>
+                                    <Tooltip text="The divergence and curl weights regularize the deformation by penalizing the divergence and curl of the deformation vector field." />
+                                 </tooltip></Label>
                                         <TextField fx:id="curlWeightTextField" prefWidth="50.0" text="0" />
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="1">
                                     <children>
-                                        <Label text="Landmark weight" />
+                                        <Label text="Landmark weight">
+                                 <tooltip>
+                                    <Tooltip text="It forces the deformations to fit the landmark points on both images. Set it to 1.0 unless you're not using landmarks." />
+                                 </tooltip></Label>
                                         <TextField fx:id="landmarkWeightTextField" prefWidth="50.0" text="1.0" />
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                     <children>
-                                        <Label text="Image weight" />
+                                        <Label text="Image weight">
+                                 <tooltip>
+                                    <Tooltip text="This is the weight to control the pixel values differences. Set it to 1.0 unless you want to do for instance landmark-only registration." />
+                                 </tooltip></Label>
                                         <TextField fx:id="imageWeightTextField" prefWidth="50.0" text="0.0" />
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER" spacing="10.0" GridPane.rowIndex="2">
                                     <children>
-                                        <Label text="Consistency weight" />
+                                        <Label text="Consistency weight">
+                                 <tooltip>
+                                    <Tooltip text="It forces the resulting deformations to be one (source to target) as close as possible to the inverse of the other one (target to source). Values between 10.0 and 30.0 usually work fine. It is only taken into account for registration modes &quot;Fast&quot; or &quot;Accurate&quot;." />
+                                 </tooltip></Label>
                                         <TextField fx:id="consistencyWeightTextField" prefWidth="50.0" text="10" />
                                     </children>
                                 </HBox>
@@ -188,7 +218,10 @@
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
-                        <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <tooltip>
+                              <Tooltip anchorX="0.0" anchorY="0.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Select an image" x="0.0" y="0.0" />
+                           </tooltip></ListView>
                             </children>
                         </GridPane>
                     </content>

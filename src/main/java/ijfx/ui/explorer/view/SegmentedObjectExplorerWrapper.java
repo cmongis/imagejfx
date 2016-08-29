@@ -94,7 +94,7 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
             double min = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MIN).getDoubleValue();
             double max = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MAX).getDoubleValue();
             Image image = previewService.datasetToImage((RandomAccessibleInterval<? extends RealType>) extractedObject, new ColorTable8(), min, max);
-            Double sampleFactor = 100 * 100 / image.getWidth() / image.getHeight();
+            Double sampleFactor = 400 * 400 / image.getWidth() / image.getHeight();
             sampleFactor = sampleFactor > 1 ? 1 : sampleFactor;
             return resample(image, sampleFactor);
 

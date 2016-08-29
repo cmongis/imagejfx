@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -188,10 +189,12 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     @Override
     public void computeItems() {
         scatterChart.getData().clear();
+        if (!Arrays.asList(metadatas).contains(null)) {
 
-        addDataToChart(currentItems, Arrays.asList(metadatas));
-        applyColorTable(lutViewChanger.getColorTable());
-        bindLegend();
+            addDataToChart(currentItems, Arrays.asList(metadatas));
+            applyColorTable(lutViewChanger.getColorTable());
+        }
+//        bindLegend();
 
     }
 
@@ -230,7 +233,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     public void applyColorTable(ColorTable colorTable) {
         setMinMax(metadatas[2]);
         RealLUTConverter<T> realLUTConverter = new RealLUTConverter<>(min, max, colorTable);
-        scatterChart.getData().get(0).getData().stream()
+        scatterChart.getData().get(0).getData().parallelStream()
                 .forEach((Data e) -> {
                     double extraValue = (double) e.getExtraValue();
                     ARGBType argbType = new ARGBType();

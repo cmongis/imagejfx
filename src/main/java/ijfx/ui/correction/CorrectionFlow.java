@@ -39,39 +39,39 @@ import org.scijava.plugin.Parameter;
  * @author Tuan anh TRINH
  */
 public class CorrectionFlow {
-
+    
     @Parameter
     HintService hintService;
     
     @Parameter
     ActivityService activityService;
-
+    
     @FXML
     BorderPane borderPane;
-
+    
     @FXML
     @BackAction
     protected Button backButton;
-
+    
     @FXML
     @ActionTrigger("nextAction")
     protected Button nextButton;
-
+    
     @FXML
     @ActionTrigger("explainMe")
     protected Button explainMeButton;
-
+    
     @FXML
     @ActionTrigger("finishAction")
     protected Button finishButton;
-
+    
     public void bindPaneProperty(List<ImageDisplayPane> imageDisplayPanes) {
         imageDisplayPanes.stream().filter(e -> e != imageDisplayPanes.get(0)).forEach(imageDisplayPane -> {
             ImageDisplayPane first = imageDisplayPanes.get(0);
             first.getCanvas().getCamera().zoomProperty().bindBidirectional(imageDisplayPane.getCanvas().getCamera().zoomProperty());
-
+            
             first.getCanvas().getCamera().xProperty().bindBidirectional(imageDisplayPane.getCanvas().getCamera().xProperty());
-
+            
             first.getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPane.getCanvas().getCamera().yProperty());
         });
     }
@@ -92,17 +92,19 @@ public class CorrectionFlow {
                     super.updateItem(file, b);
                     if (file != null) {
                         setText(file.getName());
+                    } else {
+                        setText("");
                     }
                 }
-
+                
             };
             return cell;
         });
     }
     
-      @ActionMethod("explainMe")
+    @ActionMethod("explainMe")
     protected void help() {
         hintService.displayHints(this.getClass(), true);
     }
-
+    
 }
