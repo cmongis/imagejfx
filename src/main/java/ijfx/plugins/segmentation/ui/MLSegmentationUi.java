@@ -108,8 +108,10 @@ public class MLSegmentationUi extends BorderPane{
                 stepUiProperty().setValue(steps[3]); break;
             default: throw new AssertionError(getStep().name());
         }
-        if(!getStepUi().isInjected())
+        if(!getStepUi().isInjected()){
             context.inject(getStepUi());
+            getStepUi().setInjected(true);
+        }
         if(!getStepUi().isInitCalled())
             getStepUi().init();
         

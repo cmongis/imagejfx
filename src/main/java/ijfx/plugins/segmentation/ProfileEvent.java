@@ -1,7 +1,3 @@
-package ijfx.plugins.segmentation.ui;
-
-import javafx.scene.Node;
-
 /*
     This file is part of ImageJ FX.
 
@@ -21,17 +17,27 @@ import javafx.scene.Node;
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
+package ijfx.plugins.segmentation;
+
+import org.scijava.event.SciJavaEvent;
+
 /**
  *
  * @author Pierre BONNEAU
  */
-public interface StepUi {
-    public String getTitle();
-    public Node getNode();
-    public SegmentationStep getType();
-    public void init();
-    public boolean isInitCalled();
-    public boolean isInjected();
-    public void setInitCalled(boolean called);
-    public void setInjected(boolean injected);
+public class ProfileEvent extends SciJavaEvent{
+    private final ProfileType type;
+    private final int numProfiles;
+    
+    public ProfileEvent(ProfileType type, int num){
+        this.type = type;
+        this.numProfiles = num;
+    }
+    
+    public ProfileType getType(){
+        return this.type;
+    }
+     public int getNum(){
+         return this.numProfiles;
+     }
 }

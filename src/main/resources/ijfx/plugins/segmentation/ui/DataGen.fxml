@@ -19,18 +19,38 @@
                   <TextField fx:id="widthField" prefHeight="25.0" prefWidth="149.0" promptText="membrane width" />
                </children>
             </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Label text="Dataset size :" />
+                  <Text fx:id="numTrainingData" strokeType="OUTSIDE" strokeWidth="0.0" />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </HBox>
             <RadioButton fx:id="testRadio" mnemonicParsing="false" text="Test Data" />
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
                   <Button fx:id="seedingBtn" mnemonicParsing="false" text="Seeding" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" />
                </children>
             </HBox>
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Label text="Dataset size :" />
+                  <Text fx:id="numTestData" strokeType="OUTSIDE" strokeWidth="0.0" />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </HBox>
+            <VBox fx:id="feedbackBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                <children>
                   <Button fx:id="generateBtn" mnemonicParsing="false" text="Generate" />
                </children>
-            </HBox>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </VBox>
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -46,7 +66,6 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
          <children>
-            <Text fx:id="feedbackData" strokeType="OUTSIDE" strokeWidth="0.0" />
             <Button fx:id="clearDataBtn" mnemonicParsing="false" text="Clear data" />
          </children>
       </VBox>

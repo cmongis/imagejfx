@@ -27,6 +27,7 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayShapeStatistics;
 import ijfx.service.overlay.OverlayStatService;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,24 +35,33 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
+
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
+
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
+import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PointOverlay;
+
 import net.imglib2.RandomAccess;
 import net.imglib2.type.numeric.RealType;
+
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.util.ModelSerializer;
+
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
+
 import org.scijava.Context;
 import org.scijava.ItemIO;
 import org.scijava.event.EventService;
@@ -76,9 +86,9 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
     private Property<Integer> membraneWidth = new SimpleObjectProperty<>(0);
     private Property<Integer> searchRadius = new SimpleObjectProperty<>(40);
     
-    private List<ProfilesSet> testData;
-    private List<ProfilesSet> trainingData;
-    private List<List<int[]>> confirmationSet;
+    private List<ProfilesSet> testData = new ArrayList<>();
+    private List<ProfilesSet> trainingData = new ArrayList<>();
+    private List<List<int[]>> confirmationSet = new ArrayList<>();
     private List<Dataset> imgDatasets;
     
     private INN net;
@@ -117,9 +127,6 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
      */
     public void generateTrainingSet(){
         
-        trainingData = new ArrayList<>();
-        confirmationSet = new ArrayList<>();
-        
         double maxDiameter = 0.0;
         
         List<ImageDisplay> displays = imageDisplayService.getImageDisplays();
@@ -132,6 +139,7 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
             overlaySet.add(overlayService.getOverlays(id));
         });
         
+        int numProfiles = 0;
         for(int ds = 0; ds < imgDatasets.size(); ds++){
             
             labeledDs.add(imagePlaneService.createEmptyPlaneDataset(imgDatasets.get(ds)));
@@ -151,8 +159,10 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
 //            uis.show(labeledDs.get(ds));
             ProfilesSet profiles = new DefaultProfilesSet(centers, (int)maxDiameter, context);
             generateConfirmationSet(profiles, labeledDs.get(ds));
+            numProfiles += profiles.size();
             trainingData.add(profiles);
         }
+        eventService.publish(new ProfileEvent(ProfileType.TRAIN, numProfiles));
     }
     
     /**
@@ -200,7 +210,6 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
     }
     
     public void generateTestSet(){
-        testData = new ArrayList<>();
         
         List<ImageDisplay> displays = imageDisplayService.getImageDisplays();
         imgDatasets = new ArrayList<>(displays.size());
@@ -213,14 +222,16 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
         });
         
         List<List<Point2D>> seeds = seeding();
-        
+        int numProfiles = 0;
         for(int ds = 0; ds < imgDatasets.size(); ds++){
             
             List<Point2D> centers = seeds.get(ds);
 
             ProfilesSet profiles = new DefaultProfilesSet(centers, searchRadius.getValue(), context);
+            numProfiles += profiles.size();
             testData.add(profiles);
         }
+        eventService.publish(new ProfileEvent(ProfileType.TEST, numProfiles));
     }
     
     public void initModel(){
@@ -355,7 +366,14 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
             }
             Overlay[] overlays = BinaryToOverlay.transform(context, currDataset, true);
 //            List<Overlay> overlayList = Arrays.asList(BinaryToOverlay.transform(context, currDataset, true));
-            uis.show(predictDataset.get(ds));
+            overlayStatService.setRandomColor(Arrays.asList(overlays));
+            ImageDisplay display = new DefaultImageDisplay();
+            context.inject(display);
+            display.display(currDataset);
+            for(Overlay o : overlays){
+                display.display(o);
+            }
+            uis.show(display);
         }
     }
     
@@ -428,5 +446,13 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
     
     public void setModel(INN net){
         this.net = net;
+    }
+    
+    public Integer datasetSize(List<ProfilesSet> dataset){
+        int size = 0;
+        for(ProfilesSet p: dataset){
+            size += p.size();
+        }
+        return size;
     }
 }

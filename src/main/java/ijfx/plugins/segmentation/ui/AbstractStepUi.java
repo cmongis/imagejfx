@@ -70,4 +70,14 @@ public abstract class AbstractStepUi  extends BorderPane implements StepUi{
     public boolean isInjected(){
         return injected;
     }
+    
+    @Override
+    public void setInitCalled(boolean called){
+        initCalled = called;
+    }
+    
+    @Override
+    public void setInjected(boolean injected){
+        this.injected = injected;
+    }
 }

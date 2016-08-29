@@ -21,6 +21,11 @@ package ijfx.plugins.segmentation.ui;
 
 import static com.squareup.okhttp.internal.Internal.logger;
 import ijfx.plugins.segmentation.MLSegmentationService;
+import ijfx.plugins.segmentation.ProfileEvent;
+import ijfx.ui.messageBox.DefaultMessage;
+import ijfx.ui.messageBox.DefaultMessageBox;
+import ijfx.ui.messageBox.MessageBox;
+import ijfx.ui.messageBox.MessageType;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,8 +35,10 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import mongis.utils.FXUtilities;
+import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -50,16 +57,24 @@ public class DataGen extends AbstractStepUi{
     TextField widthField;
     
     @FXML
+    Text numTrainingData;
+    
+    @FXML
     Button seedingBtn;
     
     @FXML
-    Text feedbackData;
+    Text numTestData;
     
     @FXML
     Button clearDataBtn;
     
     @FXML
     Button generateBtn;
+    
+    @FXML
+    VBox feedbackBox;
+    
+    MessageBox msgBox;
     
     public DataGen(){
         super("1. Extract data from images", SegmentationStep.DATA_GEN);
@@ -78,6 +93,9 @@ public class DataGen extends AbstractStepUi{
         widthField.disableProperty().bind(testRadio.selectedProperty());
         trainingRadio.selectedProperty().setValue(Boolean.TRUE);
         seedingBtn.disableProperty().bind(trainingRadio.selectedProperty());
+        
+        msgBox = new DefaultMessageBox();
+        feedbackBox.getChildren().add(msgBox.getContent());
         
         generateBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::generate);
         clearDataBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onClearDataClicked);
@@ -103,9 +121,28 @@ public class DataGen extends AbstractStepUi{
     }
     
     public void onClearDataClicked(MouseEvent me){
+        msgBox.messageProperty().setValue(null);
         if(!initCalled)
             init();
         mLSegmentationService.clearData();
+    }
+    
+    @EventHandler
+    public void onProfileEvent(ProfileEvent event){
+        switch(event.getType()){
+            case TRAIN :
+                msgBox.messageProperty().setValue(null);
+                msgBox.messageProperty().setValue(new DefaultMessage("INFO : "+event.getNum()+" profiles have been added to the training set", MessageType.SUCCESS));
+//                numTrainingData.textProperty().setValue(mLSegmentationService.datasetSize(mLSegmentationService.getTrainingSet()).toString());
+                break;
+            case TEST :
+                msgBox.messageProperty().setValue(null);
+                msgBox.messageProperty().setValue(new DefaultMessage("INFO : "+event.getNum()+" profiles have been added to the training set", MessageType.SUCCESS));
+//                numTestData.textProperty().setValue(mLSegmentationService.datasetSize(mLSegmentationService.getTestSet()).toString());
+                break;
+            default: throw new AssertionError(event.getType().name());
+        }
+            
     }
 
     @Override
@@ -113,4 +150,8 @@ public class DataGen extends AbstractStepUi{
         widthField.textProperty().setValue(mLSegmentationService.membraneWidth().toString());        
         super.initCalled = true;
     }
+    
+    public int datasetSize(){
+        return 0;
+    }    
 }
