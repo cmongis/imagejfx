@@ -255,7 +255,7 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
     public void train(){        
         DataSetIterator iter = new ProfileIterator(trainingData, confirmationSet, imgDatasets, true);
         int iEpoch = 0;
-        int nEpochs = 50;
+        int nEpochs = 300;
         
         while(iEpoch < nEpochs){
             System.out.printf("EPOCH %d\n",iEpoch);
@@ -335,12 +335,46 @@ public class MLSegmentationService extends AbstractService implements ImageJServ
     
     public void segment(){
         
+        List<Dataset> predictDataset = new ArrayList<>(imgDatasets.size());
+        
+        INDArray predict = classify();
+        int currIdx = 0;
+        
+        for(int ds = 0; ds < imgDatasets.size(); ds++){
+            List<List<int[]>> profilesSet = testData.get(ds).getProfiles();
+            
+            predictDataset.add(imagePlaneService.createEmptyPlaneDataset(imgDatasets.get(ds)));
+            
+            Dataset currDataset = predictDataset.get(ds);
+            
+            RandomAccess<RealType<?>> randomAccess = currDataset.randomAccess();
+                    
+            for(List<int[]> p : profilesSet){
+                for(int i = 0; i < p.size(); i++){
+                    randomAccess.setPosition(p.get(i)[0], 0);
+                    randomAccess.setPosition(p.get(i)[1], 1);
+                    
+                    double value = predict.getRow(currIdx).getDouble(i);
+                    if(value != 0)
+                        randomAccess.get().setReal(value);
+                }
+            }
+            Overlay[] overlays = BinaryToOverlay.transform(context, currDataset, true);
+//            List<Overlay> overlayList = Arrays.asList(BinaryToOverlay.transform(context, currDataset, true));
+            overlayStatService.setRandomColor(Arrays.asList(overlays));
+            ImageDisplay display = new DefaultImageDisplay();
+            context.inject(display);
+            display.display(currDataset);
+            for(Overlay o : overlays){
+                display.display(o);
+            }
+            uis.show(display);
+        }
     }
     
     public void dummySegmentation(){
         
         List<Dataset> predictDataset = new ArrayList<>(imgDatasets.size());
-        List<List<Overlay>> overlaySet = new ArrayList<>();
         
         INDArray predict = dummyClassification();
         int currIdx = 0;

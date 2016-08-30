@@ -49,7 +49,7 @@ public class LSTM implements INN{
         net = new MultiLayerNetwork(conf);
         net.init();
 //        net.setListeners(new HistogramIterationListener(1));
-//        net.setListeners(new ScoreIterationListener(1));
+        net.setListeners(new ScoreIterationListener(1));
         //Print the  number of parameters in the network (and for each layer)
         Layer[] layers = net.getLayers();
         int totalNumParams = 0;
@@ -71,7 +71,7 @@ public class LSTM implements INN{
         
         //TEMPORARY CONFIGURATION VALUE
         int input = 1;
-        int lstmLayerSize = 10;
+        int lstmLayerSize = 25;
         int output = 1;
         
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -86,7 +86,7 @@ public class LSTM implements INN{
                 .list()
                         .layer(0, new GravesLSTM.Builder().nIn(input).nOut(lstmLayerSize)
 					.activation("tanh").build())
-			.layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.XENT).activation("softmax")
+			.layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.XENT).activation("sigmoid")
 					.nIn(lstmLayerSize).nOut(output).build())
                 .backpropType(BackpropType.Standard)
                 .pretrain(false)
