@@ -34,6 +34,7 @@ import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.main.ImageJFX;
 import io.datafx.controller.injection.scopes.ApplicationScoped;
+import io.scif.FormatException;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -548,7 +549,6 @@ public class WorkflowModel {
             }
         })
                 .submit(loadingScreenService);
-                
 
     }
 
@@ -565,9 +565,16 @@ public class WorkflowModel {
             setPosition(getPositionLeft(), imageDisplay);
             Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
             Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
-            StringBuilder path = new StringBuilder(destinationPath);
-            path.append("/").append(file.getName());
-            iOService.save(outputDataset, path.toString());
+            StringBuilder path = null;
+//            try {
+//                path = new StringBuilder(destinationPath);
+//                path.append("/").append(file.getName());
+//                iOService.save(outputDataset, path.toString());
+//            } catch (Exception e) {
+                path = new StringBuilder(destinationPath);
+                path.append("/").append(file.getName().substring(0, file.getName().lastIndexOf('.'))).append(".tiff");
+                iOService.save(outputDataset, path.toString());
+//            }
             mapImages.put(file, new File(path.toString()));
             imageDisplay.close();
             Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, "Save " + path.toString());

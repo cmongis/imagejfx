@@ -233,7 +233,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     public void applyColorTable(ColorTable colorTable) {
         setMinMax(metadatas[2]);
         RealLUTConverter<T> realLUTConverter = new RealLUTConverter<>(min, max, colorTable);
-        scatterChart.getData().get(0).getData().parallelStream()
+        scatterChart.getData().get(0).getData().stream()
                 .forEach((Data e) -> {
                     double extraValue = (double) e.getExtraValue();
                     ARGBType argbType = new ARGBType();
