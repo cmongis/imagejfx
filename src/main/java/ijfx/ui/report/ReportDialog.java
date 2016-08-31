@@ -59,6 +59,7 @@ public class ReportDialog extends Dialog<Boolean>{
           
             if(result == null) {
                 setResult(false);
+                return null;
             }
             
         
