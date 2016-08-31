@@ -85,14 +85,7 @@ public class AxisTypeInputSkin extends AbstractInputSkinPlugin<AxisType> {
     public List<AxisType> getAxisList() {
         if (axisTypeList == null) {
             axisTypeList = new ArrayList();
-//            Dataset dataset = imageDisplayService.getActiveDataset();
-//            CalibratedAxis[] calibratedAxis = new CalibratedAxis[dataset.numDimensions()];
-//            dataset.axes(calibratedAxis);
-//            for (CalibratedAxis ca : calibratedAxis) {
-//                if (ca.type() != Axes.X && ca.type() != Axes.Y) {
-//                    axisTypeList.add(ca.type());
-//                }
-//            }
+
 
             Field[] fields = Axes.class.getFields();
             for (Field f : fields) {
@@ -113,8 +106,8 @@ public class AxisTypeInputSkin extends AbstractInputSkinPlugin<AxisType> {
 
     @Override
     public void init(Input<AxisType> input) {
-        System.out.println("Initiliazing");
         axisTypeComboBox.getItems().addAll(getAxisList());
+        axisTypeComboBox.getSelectionModel().select(input.getDefaultValue());
         axisTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> axisTypeProperty.setValue(newValue));
     }
 }
