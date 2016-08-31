@@ -29,6 +29,7 @@ import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.context.animated.Animations;
 import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
 import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
@@ -237,14 +238,11 @@ public class ImageDisplayPane extends AnchorPane {
     public void display(ImageDisplay display) {
         imageDisplay = (ImageDisplay) display;
 
-        
-
         build();
         setCurrentTool(toolService.getCurrentTool());
         initEventBuffering();
         canvas.setImageDisplay(imageDisplay);
-       
-                    
+
     }
 
     public DatasetView getDatasetview() {
@@ -460,6 +458,7 @@ public class ImageDisplayPane extends AnchorPane {
                     Shape shape = (Shape) node;
                     if (overlaySelectionService.isSelected(imageDisplay, overlay)) {
                         shape.setFill(shape.getStroke());
+                        Animations.QUICK_EXPAND.configure(node, 200).play();
                     } else {
                         shape.setFill(Color.TRANSPARENT);
                     }
@@ -542,7 +541,6 @@ public class ImageDisplayPane extends AnchorPane {
     public void build() {
 
         setTitle(imageDisplay.getName());
- 
 
         if (arcMenu != null) {
             anchorPane.removeEventHandler(MouseEvent.MOUSE_PRESSED, myHandler);
@@ -869,7 +867,6 @@ public class ImageDisplayPane extends AnchorPane {
         List<Overlay> touchedOverlay = overlayService.getOverlays(imageDisplay).stream()
                 .filter(o -> isOnOverlay(positionOnImage.getX(), positionOnImage.getY(), o))
                 .collect(Collectors.toList());
- 
 
         wasOverlaySelected = touchedOverlay.size() > 0;
         logService.info(String.format("%d overlay touched", touchedOverlay.size()));
