@@ -33,39 +33,39 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Command.class,menuPath = "Image > Adjust > Simple Threshold...")
-public class SimpleThreshold extends ContextCommand{
+@Plugin(type = Command.class, menuPath = "Image > Adjust > Simple Threshold...")
+public class SimpleThreshold extends ContextCommand {
 
     @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
-    
-    @Parameter(label="Threshold at")
+
+    @Parameter(label = "Threshold at")
     double value;
-    
-    @Parameter(label="Cut values above ?")
+
+    @Parameter(label = "Cut values above ?")
     boolean upperCut = false;
-    
+
     @Override
     public void run() {
-        threshold(dataset); 
+        if (isCanceled()) {
+            return;
+        }
+        threshold(dataset);
     }
-    
+
     public <T extends RealType<T>> void threshold(Dataset dataset) {
         RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
-       
+
         Cursor<T> cursor = (Cursor<T>) dataset.<T>getImgPlus().cursor();
         cursor.reset();
-        while(cursor.hasNext()) {
+        while (cursor.hasNext()) {
             cursor.fwd();
-            if(!upperCut && cursor.get().getRealDouble() < value) {
+            if (!upperCut && cursor.get().getRealDouble() < value) {
                 cursor.get().setReal(0);
-            }
-            else {
-                if(upperCut && cursor.get().getRealDouble() > value) {
-                    cursor.get().setReal(0);
-                }
+            } else if (upperCut && cursor.get().getRealDouble() > value) {
+                cursor.get().setReal(0);
             }
         }
     }
-    
+
 }
