@@ -40,7 +40,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type=Command.class,menuPath = "Plugins > Test > Wrapping",label="Wrapping")
+@Deprecated
 public class WrapUnWrapTest implements Command{
 
     @Parameter(type=ItemIO.INPUT)
