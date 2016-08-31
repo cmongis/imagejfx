@@ -130,11 +130,22 @@
     , {
         "name": "Stacks"
         ,
-        "context": "imagej+multi-z-img imagej+multi-time-img"
+        "context": "imagej+multi-n-img"
         ,
         "icon": "STACK_OVERFLOW"
         ,
         "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Project"
+                ,
+                "action": "ijfx.plugins.projection.Projection"
+                ,
+                "icon": "ARROW_DOWN"
+                ,
+                "context": "multi-n-img"
+            },
             {
                 "type": "Command"
                 ,
@@ -144,7 +155,7 @@
                 ,
                 "icon": "UPLOAD"
                 ,
-                "context": "image-open"
+                "context": "multi-z-img multi-time-img"
 
             }
 
@@ -157,7 +168,7 @@
                 ,
                 "icon": "ERASER"
                 ,
-                "context": "image-open"
+                "context": "multi-z-img multi-time-img"
             }
             , {
                 "type": "Command"
@@ -179,7 +190,7 @@
                 ,
                 "icon": "STACK_OVERFLOW"
                 ,
-                "context": "image-open"
+                "context": "multi-z-img multi-time-img"
             }
             , {
                 "type": "Command"
@@ -190,7 +201,7 @@
                 ,
                 "icon": "STACK_OVERFLOW"
                 ,
-                "context": "image-open"
+                "context": "multi-n-img"
             }
             , {
                 "type": "Command"
@@ -201,7 +212,7 @@
                 ,
                 "icon": "USERS"
                 ,
-                "context": "image-open"
+                "context": "multi-n-img"
             }
 
         ]
@@ -619,11 +630,66 @@
                 ,
                 "label": "Save table as CSV"
                 ,
-                "action": "ijfx.ui.plugins.commands..SaveAsCsv"
+                "action": "ijfx.ui.plugins.commands.SaveAsCsv"
                 ,
                 "icon": "SAVE"
                 ,
                 "context": "table-open"
+            }
+        ]
+    }
+    , {
+        "name": "Measures"
+        ,
+        "context": "image-open"
+        ,
+        "icon": "CUTLERY"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Measure all objects"
+                ,
+                "action": "ijfx.plugins.commands.measures.MeasureAllOverlays"
+                ,
+                "icon": "OBJECT_UNGROUP"
+                ,
+                "context": "image-open"
+            }
+            , {
+                "type": "ServiceCall"
+                ,
+                "label": "Measure selected"
+                ,
+                "action": "ijfx.plugins.commands.measures.MeasureSelectedOverlay"
+                ,
+                "icon": "PLUS_SQUARE_O"
+                ,
+                "context": "image-open+overlay-selected"
+            }
+        ]
+
+
+    }
+    , {
+        "name": "Save"
+        ,
+        "context": "measure-open"
+        ,
+        "icon": "SAVE"
+        ,
+        "items": [
+            {
+                "type": "Command"
+                ,
+                "label": "Save as CSV"
+                ,
+                "action": "ijfx.ui.plugins.commands.measures.SaveAsCsv"
+                ,
+                "icon": "TABLE"
+                ,
+                "context": "measure-open"
             }
         ]
     }
