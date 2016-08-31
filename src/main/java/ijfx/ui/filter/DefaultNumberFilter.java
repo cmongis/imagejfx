@@ -68,7 +68,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
 
     ObjectProperty<Predicate<Double>> predicateProperty = new SimpleObjectProperty<>();
 
-    IntegerProperty maxBinProperty = new SimpleIntegerProperty(30);
+    IntegerProperty maxBinProperty = new SimpleIntegerProperty(60);
     
     Collection< ? extends Number> possibleValues;
 
