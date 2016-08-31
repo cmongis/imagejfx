@@ -92,7 +92,7 @@ import org.scijava.event.EventService;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "overlayPanel", localization = Localization.RIGHT, context = "imagej+image-open+overlay-selected")
+@UiConfiguration(id = "overlayPanel", localization = Localization.RIGHT, context = "imagej+image-open+overlay-selected segmentation+overlay-selected")
 public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @Parameter
