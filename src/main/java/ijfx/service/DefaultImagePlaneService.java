@@ -65,16 +65,15 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     @Parameter
     TimerService timerService;
 
-    Logger logger  = ImageJFX.getLogger();
-    
+    Logger logger = ImageJFX.getLogger();
+
     public Dataset extractPlane(MetaDataSet set) {
         return null;
     }
 
     @Override
     public Dataset openVirtualDataset(File file) throws IOException {
-        
-        
+
         Timer timer = timerService.getTimer(this.getClass());
         SCIFIOConfig config = new SCIFIOConfig();
         config.imgOpenerSetComputeMinMax(false);
@@ -93,7 +92,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
         Dataset virtual = openVirtualDataset(file);
         // creating an empty dataset for the copied plane
-       
+
         return isolatePlane(virtual, DimensionUtils.nonPlanarToPlanar(nonPlanarPosition));
 
     }
@@ -167,7 +166,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
     @Override
     public <T extends RealType<T>> Dataset isolatePlane(Dataset dataset, long[] position) {
-        
+
         Timer t = timerService.getTimer(this.getClass());
         t.start();
         Dataset emptyDataset = createEmptyPlaneDataset(dataset);
@@ -195,11 +194,6 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         return emptyDataset;
     }
 
-    
-    
-    
-    
-    
     public <T extends RealType<T>> void copy(Dataset source, Dataset target, long[] nonSpacialPosition) {
 
         Cursor<T> cursor;
@@ -221,8 +215,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         RandomAccess<T> randomAccess = (RandomAccess<T>) target.randomAccess();
         while (cursor.hasNext()) {
             cursor.fwd();
-            
-            
+
             randomAccess.setPosition(cursor);
             randomAccess.get().set(cursor.get());
         }
@@ -231,22 +224,27 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
     @Override
     public <T extends RealType<T>> IntervalView<T> planeView(Dataset source, long[] position) {
-        
+
         int srcNumDimension = source.numDimensions();
-        
-        if(position.length + 2 < srcNumDimension) {
-            if(logger != null) logger.warning("position incompatible with source. Correcting.");
-            
-            long[] correctedPosition = new long[srcNumDimension-2];
-            System.arraycopy(position,0 , correctedPosition, 0,position.length);
+
+        if (position.length + 2 < srcNumDimension) {
+            if (logger != null) {
+                logger.warning("position incompatible with source. Correcting.");
+            }
+
+            long[] correctedPosition = new long[srcNumDimension - 2];
+            System.arraycopy(position, 0, correctedPosition, 0, position.length);
             position = correctedPosition;
-            
+
         }
-        
+
         if (position.length <= 0) {
-            return (IntervalView<T>) Views.translate(source, 0,0);
+            return (IntervalView<T>) Views.translate(source, 0, 0);
         }
         IntervalView<T> hyperSlice = (IntervalView<T>) Views.hyperSlice(source, 2, position[0]);
+        if (position.length == 1) {
+            return hyperSlice;
+        }
         for (int d = 1; d != position.length; d++) {
             hyperSlice = Views.hyperSlice(hyperSlice, 2, position[d]);
         }
@@ -258,7 +256,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
         Dataset dataset = openVirtualDataset(file);
         return planeView(dataset, nonSpacialPosition);
-    
+
     }
 
     private class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
