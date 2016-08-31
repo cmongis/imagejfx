@@ -27,11 +27,14 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -65,6 +68,8 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
 
     ObjectProperty<Predicate<Double>> predicateProperty = new SimpleObjectProperty<>();
 
+    IntegerProperty maxBinProperty = new SimpleIntegerProperty(30);
+    
     Collection< ? extends Number> possibleValues;
 
     @FXML
@@ -78,19 +83,16 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
 
     @FXML
     BorderPane borderPane;
-    
+
     @FXML
     TextField highTextField;
-    
+
     @FXML
     TextField lowTextField;
-    
+
     @FXML
     Label valueCountLabel;
-    
-    
-    
-    
+
     public DefaultNumberFilter() {
         try {
             FXUtilities.injectFXML(this);
@@ -100,34 +102,41 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
 //            areaChart.setCategoryGap(0);
             rangeSlider.setShowTickLabels(true);
             areaChart.setOnMouseClicked(event -> update());
-            
+
             rangeSlider.lowValueChangingProperty().addListener(this::onLowHighValueChanged);
             rangeSlider.highValueChangingProperty().addListener(this::onLowHighValueChanged);
-            
+
             rangeSlider.lowValueProperty().addListener(this::onLowHighValueChanged);
             rangeSlider.highValueProperty().addListener(this::onLowHighValueChanged);
-            
-             categoryAxis.upperBoundProperty().bind(rangeSlider.maxProperty());
-             categoryAxis.lowerBoundProperty().bind(rangeSlider.minProperty());
-             categoryAxis.minorTickCountProperty().bind(rangeSlider.minorTickCountProperty());
-             categoryAxis.tickUnitProperty().bind(rangeSlider.majorTickUnitProperty());
+
+            categoryAxis.upperBoundProperty().bind(rangeSlider.maxProperty());
+            categoryAxis.lowerBoundProperty().bind(rangeSlider.minProperty());
+            categoryAxis.minorTickCountProperty().bind(rangeSlider.minorTickCountProperty());
+            categoryAxis.tickUnitProperty().bind(rangeSlider.majorTickUnitProperty());
             NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
-            
+
             Bindings.bindBidirectional(lowTextField.textProperty(), rangeSlider.lowValueProperty(), converter);
             Bindings.bindBidirectional(highTextField.textProperty(), rangeSlider.highValueProperty(), converter);
-            
+
             lowTextField.addEventFilter(KeyEvent.KEY_RELEASED, this::updatePredicate);
-            highTextField.addEventHandler(KeyEvent.KEY_PRESSED,this::updatePredicate);
-            
-            
+            highTextField.addEventHandler(KeyEvent.KEY_PRESSED, this::updatePredicate);
+
             rangeSlider.getStyleClass().add("range-slider");
-            
-            
+
         } catch (IOException ex) {
             Logger.getLogger(DefaultNumberFilter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    
+    public IntegerProperty maxBinProperty() {
+        return maxBinProperty;
+    }
+    
+    public void setMaximumBin(Integer maxBin) {
+        maxBinProperty.setValue(maxBin);
+    }
+    
     @Override
     public Node getContent() {
         return this;
@@ -148,7 +157,10 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
     public void setAllPossibleValue(Collection<? extends Number> values) {
         possibleValues = values;
 
-        updateChart();
+        new CallbackTask()
+                .run(this::updateChart)
+                .start();
+                //updateChart();
 
     }
 
@@ -157,8 +169,6 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         return predicateProperty;
     }
 
-
-
     public void update() {
         updateChart();
 
@@ -166,25 +176,29 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
 
     public void updateChart() {
 
-        double min; // minimum value
-        double max; // maximum value
+        final double min; // minimum value
+        final double max; // maximum value
         double range; // max - min
-        double binSize;
-        int binNumber = 30;
+        final double binSize;
+        int maximumBinNumber = 30;
+        int finalBinNumber;
+
         int differentValuesCount = possibleValues
-                
                 .stream()
-                .filter(n->Double.isFinite(n.doubleValue()))
+                .filter(n -> Double.isFinite(n.doubleValue()))
                 .collect(Collectors.toSet()).size();
-        if (differentValuesCount < binNumber) {
-            binNumber = differentValuesCount;
+        if (differentValuesCount < maximumBinNumber) {
+            finalBinNumber = differentValuesCount;
+        }
+        else {
+            finalBinNumber = maximumBinNumber;
         }
 
-        EmpiricalDistribution distribution = new EmpiricalDistribution(binNumber);
+        EmpiricalDistribution distribution = new EmpiricalDistribution(finalBinNumber);
 
         Double[] values = possibleValues
-                .stream()
-                .filter(n->Double.isFinite(n.doubleValue()))
+                .parallelStream()
+                .filter(n -> Double.isFinite(n.doubleValue()))
                 .map(v -> v.doubleValue())
                 .sorted()
                 //.toArray();
@@ -194,9 +208,9 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         min = values[0];
         max = values[values.length - 1];
         range = max - min;
-        binSize = range / (binNumber - 1);
+        binSize = range / (finalBinNumber - 1);
 
-        System.out.println(String.format("min = %.0f, max = %.0f, range = %.0f, bin size = %.0f, bin number = %d", min, max, range, binSize, binNumber));
+        System.out.println(String.format("min = %.0f, max = %.0f, range = %.0f, bin size = %.0f, bin number = %d", min, max, range, binSize, finalBinNumber));
 
         XYChart.Series<Double, Double> serie = new XYChart.Series<>();
         ArrayList<Data<Double, Double>> data = new ArrayList<>();
@@ -208,15 +222,15 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
             k += binSize;
         }
 
-        serie.getData().addAll(data);
-        areaChart.getData().clear();
+        Platform.runLater(() -> {
 
-       
-        areaChart.getData().add(serie);
-        
-        
-        updateSlider(min, max, binNumber);
+            serie.getData().addAll(data);
+            areaChart.getData().clear();
 
+            areaChart.getData().add(serie);
+
+            updateSlider(min, max, finalBinNumber);
+        });
     }
 
     public void updateSlider(double min, double max, int bins) {
@@ -225,16 +239,16 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         double range = Math.abs(max - min);
         double majorTick = range / bins;
         int minorTick = 1;
-        if(range < 5) {
-            
+        if (range < 5) {
+
             majorTick = 0.5;
         }
-        
-        if(range <= 1) {
+
+        if (range <= 1) {
             majorTick = 0.1;
             minorTick = 10;
         }
-        
+
         rangeSlider.setMin(min);
         rangeSlider.setMax(max);
         rangeSlider.setLowValue(min);
@@ -244,18 +258,16 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         rangeSlider.setMinorTickCount(minorTick);
         rangeSlider.setLabelFormatter(new Converter());
         rangeSlider.setSnapToTicks(true);
-        
-       
-        
+
     }
 
     private class Converter extends StringConverter<Number> {
 
         @Override
         public String toString(Number object) {
-            
-            if(object.doubleValue() <= 1.0) {
-                return String.format("%.1f",object.doubleValue());
+
+            if (object.doubleValue() <= 1.0) {
+                return String.format("%.1f", object.doubleValue());
             }
             return "" + object.doubleValue();
         }
@@ -270,19 +282,20 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
     private void onLowHighValueChanged(Observable value, Boolean oldValue, Boolean newValue) {
 
         System.out.println("changing predicate !");
-        
+
         // if it's currently changing we don't want to update the predicate
-        if(newValue) return;
-        
+        if (newValue) {
+            return;
+        }
+
         updatePredicate(null);
-       
 
     }
-    
+
     private void updatePredicate(Event event) {
-         final double min = minProperty().getValue();
+        final double min = minProperty().getValue();
         final double max = maxProperty().getValue();
-        System.out.printf("Min : %.3f, Max : %.3f\n",min,max);
+        System.out.printf("Min : %.3f, Max : %.3f\n", min, max);
         // no predicate is necessary if there the range is full
         if (min == rangeSlider.getMin() && max == rangeSlider.getMax()) {
 
@@ -309,31 +322,31 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         }
 
     }
-    
+
     // when the low and high of the range change, we count the number of elements
     // inside the range
     private void onLowHighValueChanged(Observable obs, Number oldValue, Number newValue) {
-        new CallbackTask<Collection<? extends Number>,Long>()
+        new CallbackTask<Collection<? extends Number>, Long>()
                 .setInput(possibleValues)
                 .run(this::countElementsInRange)
                 .then(this::updateCountLabel)
-                .start();        
+                .start();
     }
-    
+
     // 
     private Long countElementsInRange(Collection<? extends Number> possibleValues) {
         return possibleValues
                 .parallelStream()
-                .filter(n-> n.doubleValue() >= rangeSlider.getLowValue() && n.doubleValue() <= rangeSlider.getHighValue())
+                .filter(n -> n.doubleValue() >= rangeSlider.getLowValue() && n.doubleValue() <= rangeSlider.getHighValue())
                 .count();
     }
+
     private void updateCountLabel(long count) {
-        if(count == possibleValues.size()) {
+        if (count == possibleValues.size()) {
             valueCountLabel.setText("All elements selected.");
-            
-        }
-        else {
-            valueCountLabel.setText(String.format("%d elements (%.0f%%)",count,1.0 * count / possibleValues.size()*100));
+
+        } else {
+            valueCountLabel.setText(String.format("%d elements (%.0f%%)", count, 1.0 * count / possibleValues.size() * 100));
         }
     }
 
