@@ -52,6 +52,7 @@ public class ThreadSafeTimerWrapper implements Timer{
     @Override
     public void start() {
         last = System.currentTimeMillis();
+        
     }
 
     @Override
@@ -69,8 +70,10 @@ public class ThreadSafeTimerWrapper implements Timer{
     }
 
     @Override
-    public long elapsed(String id) {
-        return timer.elapsed(id);
+    public long elapsed(String text) {
+       long elapsed = measure(text);
+        timer.logger.info(String.format("[%s] %s : %dms",text,text,elapsed));
+        return elapsed;
     }
 
     @Override
