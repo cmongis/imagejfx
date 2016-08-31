@@ -20,8 +20,17 @@
  */
 package ijfx.ui.plugin.panel;
 
-import ijfx.plugins.commands.ApplyLUT;
+import com.google.common.collect.Lists;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.core.stats.IjfxStatisticService;
+import ijfx.core.utils.DimensionUtils;
 import ijfx.plugins.commands.AutoContrast;
+import ijfx.plugins.commands.SimpleThreshold;
+import ijfx.service.ImagePlaneService;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
+import ijfx.service.batch.SegmentationService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.plugin.LUTComboBox;
@@ -29,6 +38,8 @@ import ijfx.ui.plugin.LUTView;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.ui.FxImageService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.uicontext.UiContextService;
+import ijfx.service.workflow.WorkflowBuilder;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -71,20 +82,28 @@ import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
 import ijfx.ui.widgets.PopoverToggleButton;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.event.Event;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.util.StringConverter;
+import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.NumberStringConverter;
+import mongis.utils.SmartNumberStringConverter;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
+import net.imagej.overlay.Overlay;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.IntervalView;
 
 import org.scijava.module.ModuleService;
 
@@ -138,6 +157,24 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @Parameter
     LoadingScreenService loadingService;
 
+    @Parameter
+    IjfxStatisticService statsService;
+
+    @Parameter
+    ImagePlaneService imagePlaneSrv;
+
+    @Parameter
+    TimerService timerService;
+
+    @Parameter
+    ModuleService moduleService;
+
+    @Parameter
+    SegmentationService segmentationService;
+
+    @Parameter
+    UiContextService uiContextService;
+
     Node lutPanelCtrl;
 
     @FXML
@@ -145,9 +182,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     @FXML
     ToggleButton minMaxButton;
-
-    @Parameter
-    ModuleService moduleService;
 
     RangeSlider rangeSlider = new RangeSlider();
 
@@ -158,6 +192,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     private ImageDisplayProperty currentImageDisplayProperty;
 
+    Button thresholdButton = new Button("Threshold using min-value.", new FontAwesomeIconView(FontAwesomeIcon.EYE));
+    Button thresholdMoreButton = new Button("Advanced thresholding");
     // PopOver popOver;
     Logger logger = ImageJFX.getLogger();
 
@@ -171,9 +207,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     protected DoubleProperty minValue = new SimpleDoubleProperty(0);
     protected DoubleProperty maxValue = new SimpleDoubleProperty(255);
 
-    
-    
-    
+    StringConverter stringConverter;
+
     public LUTPanel() {
 
         logger.info("Loading FXML");
@@ -197,6 +232,18 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             rangeSlider.setPrefWidth(255);
             minMaxButton.setPrefWidth(200);
 
+            // threshold button
+            thresholdButton.setMaxWidth(Double.POSITIVE_INFINITY);
+            thresholdButton.setOnAction(this::thresholdAndSegment);
+            gridPane.add(thresholdButton, 0, 2, 2, 1);
+
+            // advanced threshold button
+            thresholdMoreButton.setMaxWidth(Double.POSITIVE_INFINITY);
+            thresholdMoreButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
+            thresholdMoreButton.setOnAction(this::onAdvancedThresholdButtonClicked);
+            gridPane.add(thresholdMoreButton, 0, 3, 2, 1);
+
+            // adding other stuffs
             gridPane.add(new Label("Min : "), 0, 0);
             gridPane.add(new Label("Max : "), 0, 1);
             gridPane.add(minTextField, 1, 0);
@@ -210,20 +257,16 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             maxValue.addListener(this::onHighValueChanging);
             minValue.addListener(this::onLowValueChanging);
-            
-            
-            NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
-            
-            Bindings.bindBidirectional(minTextField.textProperty(), minValue, converter);
-            Bindings.bindBidirectional(maxTextField.textProperty(),maxValue,converter);
-            
-            
-            minTextField.addEventHandler(KeyEvent.KEY_TYPED,this::updateModelRangeFromView);
-            maxTextField.addEventHandler(KeyEvent.KEY_TYPED,this::updateModelRangeFromView);
+
+            //NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
+            minTextField.addEventHandler(KeyEvent.KEY_TYPED, this::updateModelRangeFromView);
+            maxTextField.addEventHandler(KeyEvent.KEY_TYPED, this::updateModelRangeFromView);
             // setting some insets... should be done int the FXML
             vboxp.setPadding(new Insets(15));
 
             PopoverToggleButton.bind(minMaxButton, vboxp, PopOver.ArrowLocation.RIGHT_TOP);
+
+            minMaxButton.addEventHandler(ActionEvent.ACTION, event -> updateHistogramAsync());
 
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -285,29 +328,38 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         mergedViewToggleButton.selectedProperty().addListener(this::onMergedViewToggleButtonChanged);
 
+        
+        // binding the min and max textfield so it can display float precision depending on the image
+        SmartNumberStringConverter smartNumberStringConverter = new SmartNumberStringConverter();
+        smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentImageDisplayProperty, minValue));
+
+        Bindings.bindBidirectional(minTextField.textProperty(), minValue, smartNumberStringConverter);
+        Bindings.bindBidirectional(maxTextField.textProperty(), maxValue, smartNumberStringConverter);
+
         return this;
     }
 
-    
     public void updateModelRangeFromView(Event event) {
         updateModelRangeFromView();
     }
-    
+
     private void updateModelRangeFromView() {
         //System.out.println(minValue);
         //System.out.println(maxValue);
-      // //if (rangeSlider.isLowValueChanging() || rangeSlider.isHighValueChanging()) {
-           // return;
-       // }
-       logger.info("updating model from view");
+        // //if (rangeSlider.isLowValueChanging() || rangeSlider.isHighValueChanging()) {
+        // return;
+        // }
+        logger.info("updating model from view");
         System.out.println("updating");
-       
 
         displayRangeServ.updateCurrentDisplayRange(minValue.doubleValue(), maxValue.doubleValue());
         System.out.println("updating");
 
-       // updateLabel();
+        // updateLabel();
+    }
 
+    private boolean isFloat() {
+        return !imageDisplayService.getActiveDataset(currentImageDisplayProperty.getValue()).isInteger();
     }
 
     public void updateViewRangeFromModel() {
@@ -315,12 +367,21 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         double min = displayRangeServ.getCurrentViewMinimum();
         double max = displayRangeServ.getCurrentViewMaximum();
 
-        if(rangeSlider.getMin() == min && rangeSlider.getMax() == max) return;
-        
+        double range = max - min;
+
+        if (rangeSlider.getMin() == min && rangeSlider.getMax() == max) {
+            return;
+        }
+        if (range < 10 && isFloat()) {
+
+            rangeSlider.setMajorTickUnit(0.1);
+            rangeSlider.setMinorTickCount(10);
+        } else {
+            rangeSlider.setMajorTickUnit(displayRangeServ.getCurrentDatasetMaximum() - displayRangeServ.getCurrentDatasetMinimum());
+        }
         rangeSlider.setMin(displayRangeServ.getCurrentDatasetMinimum() * .1);
         rangeSlider.setMax(displayRangeServ.getCurrentDatasetMaximum() * 1.1);
 
-        rangeSlider.setMajorTickUnit(displayRangeServ.getCurrentDatasetMaximum() - displayRangeServ.getCurrentDatasetMinimum());
         minValue.set(min);
         maxValue.set(max);
 
@@ -340,9 +401,13 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     @EventHandler
     public void handleEvent(DisplayActivatedEvent event) {
-        
-        if(event.getDisplay() instanceof ImageDisplay == false) return;
-        if(getCurrentDatasetView() == null) return;
+
+        if (event.getDisplay() instanceof ImageDisplay == false) {
+            return;
+        }
+        if (getCurrentDatasetView() == null) {
+            return;
+        }
         updateViewRangeFromModel();
         updateLabel();
         mergedViewToggleButton.selectedProperty().setValue(getCurrentDatasetView().getColorMode() == ColorMode.COMPOSITE);
@@ -364,7 +429,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     private void onHighValueChanging(Object notUsed) {
-        //System.out.println("state changed !");
+        System.out.println("state changed !" + minValue.getValue());
         updateModelRangeFromView();
         updateLabel();
     }
@@ -379,9 +444,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     private void autoRange(ActionEvent event) {
 
         Task task
-                = new CallbackTask<DatasetView,DatasetView>()
+                = new CallbackTask<DatasetView, DatasetView>()
                 .setName("Auto-contrast...")
-                 .setInput(getCurrentDatasetView())
+                .setInput(getCurrentDatasetView())
                 .run(this::autoContrast)
                 .then(o -> {
                     updateViewRangeFromModel();
@@ -395,7 +460,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     private DatasetView autoContrast(DatasetView view) {
         try {
-            commandService.run(AutoContrast.class, true, "imageDisplay",view,"channelDependant",true).get();
+            commandService.run(AutoContrast.class, true, "imageDisplay", view, "channelDependant", true).get();
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(LUTPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -441,6 +506,60 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         // currentImageDisplayProperty.getValue().update();
         // event.consume();
 
+    }
+
+    private void updateHistogramAsync() {
+        new CallbackTask<ImageDisplay, List<Number>>()
+                .setInput(imageDisplayService.getActiveImageDisplay())
+                .run(this::updateHistogram)
+                //.then(numberFilter::setAllPossibleValue)
+                .start();
+    }
+
+    private <T extends RealType<T>> List<Number> updateHistogram(ImageDisplay display) {
+
+        Timer t = timerService.getTimer(this.getClass().getSimpleName());
+
+        System.out.println("updating !");
+
+        t.start();
+        long[] position = new long[display.numDimensions()];
+        display.localize(position);
+        position = DimensionUtils.planarToNonPlanar(position);
+        IntervalView<T> planeView = imagePlaneSrv.planeView(imageDisplayService.getActiveDataset(), position);
+
+        t.elapsed("Isolation");
+        Double[] values = statsService.getValues(planeView);
+        t.elapsed("Value retrieving");
+        return Lists.newArrayList(values);
+    }
+
+    private void thresholdAndSegment(ActionEvent event) {
+
+        new WorkflowBuilder(context)
+                .addInput(imageDisplayService.getActiveImageDisplay())
+                .addStep(SimpleThreshold.class, "value", minValue.doubleValue())
+                .thenUseDataset(this::segment)
+                .start();
+
+    }
+
+    private void onAdvancedThresholdButtonClicked(ActionEvent event) {
+        uiContextService.enter("segment segmentation");
+        uiContextService.update();
+    }
+
+    private void segment(Dataset dataset) {
+
+        new CallbackTask<Dataset, List<Overlay>>()
+                .setInput(dataset)
+                .setInitialProgress(50)
+                .setName("Detecting objects")
+                .submit(loadingService)
+                .run(d -> {
+                    return segmentationService.segmentAndAddToDisplay(dataset, imageDisplayService.getActiveImageDisplay(), true);
+                })
+                .start();
     }
 
 }
