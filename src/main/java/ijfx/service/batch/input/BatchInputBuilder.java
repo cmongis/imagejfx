@@ -125,8 +125,8 @@ public class BatchInputBuilder {
    }
    public BatchInputBuilder saveNextToSourceWithPrefix(String suffix, String extension) {
        if(extension.startsWith(".") == false) extension = new StringBuilder().append(".").append(extension).toString();
-       File f = NamingUtils.replaceWithExtension(new File(input.getSourceFile()),suffixSeparator+suffix+extension);
-       input = new SaveToFileWrapper(context,input,f);
+       File f = NamingUtils.replaceWithExtension(new File(input.getSourceFile()),extension);
+       input = new SaveToFileWrapper(context,input,f,suffix);
                return this;
    }
     public BatchSingleInput getInput() {
