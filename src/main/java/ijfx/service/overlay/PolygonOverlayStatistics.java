@@ -95,7 +95,7 @@ public class PolygonOverlayStatistics extends AbstractOverlayShapeStatistics{
     
     
     public java.awt.Polygon getShape(Overlay overlay){
-        
+            
         PolygonRegionOfInterest roi = (PolygonRegionOfInterest) overlay.getRegionOfInterest();
         
         int npoints = roi.getVertexCount();
