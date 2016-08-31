@@ -19,6 +19,7 @@
  */
 package ijfx.service.batch;
 
+import com.google.common.collect.Lists;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
@@ -27,12 +28,15 @@ import ijfx.core.utils.DimensionUtils;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.IjfxService;
 import ijfx.service.ImagePlaneService;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.service.batch.SegmentationService.Output;
 import ijfx.service.batch.SegmentationService.Source;
 import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.service.overlay.OverlayStatService;
+import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.IjfxEvent;
@@ -44,11 +48,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.scene.image.Image;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import net.imagej.Dataset;
+import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.overlay.Overlay;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
@@ -92,6 +99,12 @@ public class SegmentationService extends AbstractService implements IjfxService 
 
     @Parameter
     ImageRecordService imageRecordService;
+    
+    @Parameter
+    OverlayUtilsService overlayUtilsService;
+    
+    @Parameter
+    TimerService timerService;
     
     public enum Source {
         EXPLORER_SELECTED, EXPLORER_ALL, IMAGEJ
@@ -207,17 +220,49 @@ public class SegmentationService extends AbstractService implements IjfxService 
     @Parameter
     LoadingScreenService loadingService;
 
+    
+    public List<Overlay> segmentAndAddToDisplay(Dataset mask, ImageDisplay inputDisplay, boolean objectsAreWhite) {
+        
+        Timer timer = timerService.getTimer(getClass());
+        
+          timer.start();
+        overlayUtilsService.removeAllOverlay(inputDisplay);
+        timer.elapsed("remove all overlay");
+      
+        Overlay[] overlay = BinaryToOverlay.transform(getContext(), mask, objectsAreWhite);
+        timer.elapsed("BinaryToOverlay.transform(...)");
+        // giving a random color to each overlay
+        overlayStatsService.setRandomColor(Arrays.asList(overlay));
+        timer.elapsed("overlayStatsSrv.setRandomColor(overlays)");
+        // deleting the overlay owned previously by the input
+        inputDisplay.addAll(Stream.of(overlay).parallel().map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
+        timer.elapsed("inputDisplay.addAll()");
+        Stream.of(overlay).parallel().map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
+        timer.elapsed("inputDisplay.update()");
+        
+        
+        
+        return Lists.newArrayList(overlay);
+    }
+    
     public List<SegmentedObject> measure(List<Overlay> overlays, MetaDataSet planeMetaData, Dataset dataset) {
         // reading the planar position
         final long[] position = DimensionUtils.nonPlanarToPlanar(DimensionUtils.readLongArray(planeMetaData.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue()));
-
-        return overlays
+        
+        Timer globalTimer = timerService.getTimer(getClass());
+        
+        globalTimer.start();
+        List<SegmentedObject> segmentedObjectList = overlays
                 .stream()
                 .map(overlay -> {
                     try {
-                    DefaultSegmentedObject segmentedObject = new DefaultSegmentedObject(overlay, overlayStatsService.getStatistics(overlay, dataset, position));
-                    segmentedObject.getMetaDataSet().merge(planeMetaData);
-                    return segmentedObject;
+                        Timer timer = timerService.getTimer(this.getClass());
+                        timer.start();
+                        DefaultSegmentedObject segmentedObject = new DefaultSegmentedObject(overlay, overlayStatsService.getStatistics(overlay, dataset, position));
+                        timer.elapsed("new SegmentedObject()");
+                        segmentedObject.getMetaDataSet().merge(planeMetaData);
+                        timer.elapsed("segmentedObject.merge()");
+                        return segmentedObject;
                     }
                     catch(Exception e) {
                         loggerService.warn(e);
@@ -226,7 +271,9 @@ public class SegmentationService extends AbstractService implements IjfxService 
                 })
                 .filter(o->o!=null)
                 .collect(Collectors.toList());
-
+        
+        globalTimer.elapsed("measure(List<Overlay>)");
+        return segmentedObjectList;
     }
 
     public List<SegmentedObject> measure(ProgressHandler handler, List<Overlay> overlays, File file) {
