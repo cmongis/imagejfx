@@ -74,6 +74,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         setMovable(true);
         setPrefSize(500, 500);
         
+        
     }
 
     abstract protected void display(T display);
@@ -84,9 +85,11 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         return display;
     }
 
-    public void show(T display) {
+    public AbstractDisplayWindow<T> show(T display) {
         this.display = display;
+     
         display(display);
+        return this;
     }
 
     protected void onWindowClosed(ActionEvent event) {
