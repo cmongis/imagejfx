@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import javafx.concurrent.Task;
 import mongis.utils.CallbackTask;
 import net.imagej.Dataset;
+import net.imagej.display.ImageDisplay;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 
@@ -74,6 +75,11 @@ public class WorkflowBuilder {
         inputs.add(new BatchInputBuilder(context).from(exp));
         return this;
     }
+    
+    public WorkflowBuilder addInput(ImageDisplay imageDisplay) {
+        inputs.add(new BatchInputBuilder(context).from(imageDisplay));
+        return this;
+    }
    
     
     public WorkflowBuilder addStep(Class<?> moduleClass,Object... params) {
@@ -81,6 +87,9 @@ public class WorkflowBuilder {
         
         
         DefaultWorkflowStep step = new DefaultWorkflowStep(moduleClass.getName());
+        
+        context.inject(step);
+        
         for(int i = 0; i!= params.length;i+=2) {
             step.setParameter(params[i].toString(), params[i+1]);
         }
@@ -95,6 +104,17 @@ public class WorkflowBuilder {
         
         remapInputs(builder->builder.onFinished(consumer));
         return this;
+    }
+    
+    public WorkflowBuilder thenUseDataset(Consumer<Dataset> consumer) {
+        then(batchInput->consumer.accept(batchInput.getDataset()));
+        return this;
+    }
+    
+    public <OUTPUT> CallbackTask<BatchSingleInput,OUTPUT> thenMapToTask(Class<? extends OUTPUT> output) {
+        CallbackTask<BatchSingleInput,OUTPUT> task = new CallbackTask<>();
+        then(task);
+        return task;
     }
     
     protected void remapInputs(Function<? super BatchInputBuilder,? extends BatchInputBuilder> remapper) {
