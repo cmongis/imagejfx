@@ -139,6 +139,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     public Dataset createEmptyPlaneDataset(Dataset input) {
         AxisType[] axisTypeList = new AxisType[2];
 
+
         long width = input.dimension(0);
         long height = input.dimension(1);
         long[] dims = new long[]{width, height};
