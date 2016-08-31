@@ -89,7 +89,7 @@ public class TableViewView implements ExplorerView {
 
         ImageJFX.getLogger().info(String.format("Setting %d items", items.size()));
 
-        priority = MetaDataKeyPriority.getPriority(items.get(0).getMetaDataSet());
+        if(items.size() >0)priority = MetaDataKeyPriority.getPriority(items.get(0).getMetaDataSet());
         helper.setPriority(priority);
         helper.setColumnsFromItems(items);
         helper.setItem(items);
