@@ -19,7 +19,10 @@
  */
 package ijfx.service.batch;
 
+import ijfx.core.metadata.GenericMetaData;
+import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.PixelStatistics;
 import ijfx.service.overlay.PixelStatisticsBase;
@@ -50,11 +53,12 @@ public class DefaultSegmentedObject implements SegmentedObject {
     
     
     public DefaultSegmentedObject() {
-        
+        set.setType(MetaDataSetType.OBJECT);
     }
 
     public void setOverlay(Overlay overlay) {
         this.overlay = overlay;
+        set.putGeneric(MetaData.NAME, overlay.getName());
     }
     
     public void setMetaDataSet(MetaDataSet set) {
@@ -64,6 +68,7 @@ public class DefaultSegmentedObject implements SegmentedObject {
     public DefaultSegmentedObject(Overlay overlay, OverlayStatistics overlayStatistics) {
         overlay.getContext().inject(this);
         setOverlay(overlay);
+        
         set.merge(overlayStatsService.getStatisticsAsMap(overlayStatistics));
         
     }
