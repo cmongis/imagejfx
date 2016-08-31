@@ -22,7 +22,7 @@ package mongis.utils;
 import ijfx.ui.main.ImageJFX;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.FutureTask;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,59 +32,57 @@ import javafx.concurrent.Task;
 import javafx.util.Callback;
 
 /**
- * The callback task allows you to easily run a method/lambda in a new thread and use the result
- * in the FX Application Thread.
- * 
+ * The callback task allows you to easily run a method/lambda in a new thread
+ * and use the result in the FX Application Thread.
+ *
  * E.g.
- * 
- * Let say I want to process a list and transform it into a node that I will later add
- * to my view.
- * 
- * 
+ *
+ * Let say I want to process a list and transform it into a node that I will
+ * later add to my view.
+ *
+ *
  * HBox hbox = ...
- * 
+ *
  * List<String> myList = ...
- * 
- * new CallbackTask<List<String>>,List<Node>>()
- *  .setInput(myList)
- *  .run(list->list
- *      .stream()
- *      .map(str->new Label(str))
- *      .collect(Collectors.toList()))
- *  .then(hbox::addAll); // equivalent of .then(list->hbox.addAll(list));
- *  .start();
- * 
- * 
- * 
- * 
+ *
+ * new CallbackTask<List<String>>,List<Node>>() .setInput(myList)
+ * .run(list->list .stream() .map(str->new Label(str))
+ * .collect(Collectors.toList())) .then(hbox::addAll); // equivalent of
+ * .then(list->hbox.addAll(list)); .start();
+ *
+ *
+ *
+ *
  * @author cyril
  */
 public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler, Consumer<INPUT> {
 
-    INPUT input;
+    private INPUT input;
 
-    Callable<INPUT> inputGetter;
-    
-    Callback<INPUT, OUTPUT> callback;
-    LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
-    Callback<ProgressHandler, OUTPUT> longCallable;
+    private Callable<INPUT> inputGetter;
 
-    Consumer<Throwable> errorHandler;
-    Throwable error;
+    private Callback<INPUT, OUTPUT> callback;
+    private LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
+    private Callback<ProgressHandler, OUTPUT> longCallable;
 
-    Runnable runnable;
+    private Consumer<Throwable> errorHandler = e -> logger.log(Level.SEVERE, null, e);
+    private Throwable error;
 
-    ExecutorService executor = ImageJFX.getThreadPool();
+    private Runnable runnable;
 
-    Consumer<OUTPUT> successHandler;
-    
-    
-    
+    private ExecutorService executor = ImageJFX.getThreadPool();
+
+    private Consumer<OUTPUT> successHandler;
+
+    private Consumer<INPUT> consumer;
+
+    private BiConsumer<ProgressHandler, INPUT> longConsumer;
+
     private final static Logger logger = Logger.getLogger(CallbackTask.class.getName());
-    
+
     double total = 1.0;
     double progress = 0;
-    
+
     public CallbackTask() {
         super();
     }
@@ -99,12 +97,12 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         this.callback = callback;
     }
 
-    public CallbackTask<INPUT,OUTPUT> setInput(Callable<INPUT> inputGetter) {
+    public CallbackTask<INPUT, OUTPUT> setInput(Callable<INPUT> inputGetter) {
         this.inputGetter = inputGetter;
         return this;
     }
-    
-    public CallbackTask<INPUT,OUTPUT> setName(String name) {
+
+    public CallbackTask<INPUT, OUTPUT> setName(String name) {
         updateTitle(name);
         updateMessage(name);
         return this;
@@ -121,6 +119,16 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
             return this;
         }
         this.runnable = runnable;
+        return this;
+    }
+
+    public CallbackTask<INPUT, OUTPUT> consume(Consumer<INPUT> consumer) {
+        this.consumer = consumer;
+        return this;
+    }
+
+    public CallbackTask<INPUT, OUTPUT> conusmer(BiConsumer<ProgressHandler, INPUT> biConsumer) {
+        this.longConsumer = biConsumer;
         return this;
     }
 
@@ -141,58 +149,82 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
             return null;
         }
 
-        if(inputGetter != null) try {
-            input = inputGetter.call();
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+        if (inputGetter != null) {
+            try {
+                input = inputGetter.call();
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
         }
-        
-        if (longCallback != null) {
-            OUTPUT output = longCallback.handle(this, input);
 
-            if (isCancelled()) {
-                return null;
-            } else {
-                return output;
-            }
+        try {
+            if (longCallback != null) {
+                OUTPUT output = longCallback.handle(this, input);
 
-        } // now if we should execute a callback
-        else if (callback != null) {
-            // executing and betting the output
-            OUTPUT output = callback.call(input);
-            // if the task has been cancelled during execution,
-            // we cancel the output and return null
-            if (isCancelled()) {
-                return null;
-            } else {
-                return output;
-            }
-        } else if (longCallable != null) {
-            if (isCancelled()) {
-                return null;
-            } else {
-                OUTPUT output = longCallable.call(this);
                 if (isCancelled()) {
                     return null;
                 } else {
                     return output;
                 }
-            }
-        } // now if we have a runnable as part of the task
-        else if (runnable != null) {
-            runnable.run();
-            // same if it was cancelled during the problem
 
-        } else {
-            return null;
+            } // now if we should execute a callback
+            else if (callback != null) {
+                // executing and betting the output
+                OUTPUT output = callback.call(input);
+                // if the task has been cancelled during execution,
+                // we cancel the output and return null
+                if (isCancelled()) {
+                    return null;
+                } else {
+                    return output;
+                }
+            } else if (longCallable != null) {
+                if (isCancelled()) {
+                    return null;
+                } else {
+                    OUTPUT output = longCallable.call(this);
+                    if (isCancelled()) {
+                        return null;
+                    } else {
+                        return output;
+                    }
+                }
+            } else if (consumer != null) {
+                if (isCancelled()) {
+                    return null;
+                } else {
+                    consumer.accept(input);
+                    return null;
+                }
+            } else if (longConsumer != null) {
+                if (isCancelled()) {
+                    return null;
+                } else {
+                    longConsumer.accept(this, input);
+                    return null;
+                }
+            } // now if we have a runnable as part of the task
+            else if (runnable != null) {
+                runnable.run();
+                // same if it was cancelled during the problem
+
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+
+            Logger.getLogger(CallbackTask.class.getSimpleName()).log(Level.SEVERE, "Error when executing callback task ", e);
+            throw e;
         }
         return null;
     }
-    
+
     @Override
     protected void failed() {
         super.failed();
-        if(errorHandler != null) errorHandler.accept(getException());
+        if (errorHandler != null) {
+            errorHandler.accept(getException());
+        }
     }
 
     public CallbackTask<INPUT, OUTPUT> setInput(INPUT input) {
@@ -220,38 +252,37 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-  
     @Override
     public void succeeded() {
         logger.info("succeeded");
-        if(successHandler != null)
-         successHandler.accept(getValue());
+        if (successHandler != null) {
+            successHandler.accept(getValue());
+        }
         super.succeeded();
-       
+
     }
-    
+
     @Override
     public void cancelled() {
         logger.info("cancelled...");
         super.cancelled();
     }
-    
 
     public CallbackTask<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
         successHandler = consumer;
         return this;
     }
-    
-    public CallbackTask<INPUT,OUTPUT> thenRunnable(Runnable runnable) {
-        return then(item->runnable.run());
+
+    public CallbackTask<INPUT, OUTPUT> thenRunnable(Runnable runnable) {
+        return then(item -> runnable.run());
     }
-    
-    public <NEXTOUTPUT> CallbackTask<OUTPUT,NEXTOUTPUT> thenTask(Callback<OUTPUT,NEXTOUTPUT> callback) {
-        CallbackTask<OUTPUT,NEXTOUTPUT> task = new CallbackTask<OUTPUT,NEXTOUTPUT>()
+
+    public <NEXTOUTPUT> CallbackTask<OUTPUT, NEXTOUTPUT> thenTask(Callback<OUTPUT, NEXTOUTPUT> callback) {
+        CallbackTask<OUTPUT, NEXTOUTPUT> task = new CallbackTask<OUTPUT, NEXTOUTPUT>()
                 .setInput(this::getValue)
                 .run(callback);
         then(task);
-        return task;       
+        return task;
     }
 
     public CallbackTask<INPUT, OUTPUT> ui() {
@@ -287,7 +318,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     @Override
     public void accept(INPUT t) {
 
-        logger.info("Consumed a new input "+t);
+        logger.info("Consumed a new input " + t);
         setInput(t);
         start();
     }
@@ -302,16 +333,16 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public CallbackTask<INPUT,OUTPUT> setIn(Property<Task> taskProperty) {
-        Platform.runLater(()->taskProperty.setValue(this));
+    public CallbackTask<INPUT, OUTPUT> setIn(Property<Task> taskProperty) {
+        Platform.runLater(() -> taskProperty.setValue(this));
         return this;
     }
-    
+
     public ExecutorService getExecutor() {
         return executor;
     }
 
-    public CallbackTask<INPUT,OUTPUT> submit(Consumer<Task> consumer) {
+    public CallbackTask<INPUT, OUTPUT> submit(Consumer<Task> consumer) {
         consumer.accept(this);
         return this;
     }
@@ -320,17 +351,16 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     public void setTotal(double total) {
         this.total = total;
     }
-    
+
     @Override
     public void increment(double d) {
-        progress+=d;
+        progress += d;
         setProgress(progress, total);
     }
-    
-    public CallbackTask<INPUT,OUTPUT> setInitialProgress(double p) {
+
+    public CallbackTask<INPUT, OUTPUT> setInitialProgress(double p) {
         setProgress(progress);
         return this;
     }
-    
-    
+
 }
