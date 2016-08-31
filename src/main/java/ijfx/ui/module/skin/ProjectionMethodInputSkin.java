@@ -50,6 +50,12 @@ public class ProjectionMethodInputSkin   extends AbstractInputSkinPlugin<Project
     @Parameter
     PluginService pluginService;
     
+    public ProjectionMethodInputSkin() {
+        super();
+        
+        projectionMethodProperty.bindBidirectional(projectionMethodComboBox.valueProperty());
+        
+    }
     
     @Override
     public Property valueProperty() {
@@ -83,9 +89,10 @@ public class ProjectionMethodInputSkin   extends AbstractInputSkinPlugin<Project
 
     @Override
     public void init(Input<ProjectionMethod> input) {
-        System.out.println("Initiliazing");
+        
         projectionMethodComboBox.getItems().addAll(getProjectionMethodList());
-        projectionMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->projectionMethodProperty.setValue(newValue));
+        projectionMethodComboBox.setValue(input.getValue());
+        //projectionMethodComboBox.getSelectionModel().selectedItemProperty().addListener((obs,oldValue,newValue)->projectionMethodProperty.setValue(newValue));
     }
     
 }
