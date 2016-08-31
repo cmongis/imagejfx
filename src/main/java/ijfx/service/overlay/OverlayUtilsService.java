@@ -162,7 +162,7 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
         
         imageDisplay.removeAll(dataviewList);
         overlays.forEach(o->eventService.publish(new OverlayDeletedEvent(o)));
-        //imageDisplay.update();
+        imageDisplay.update();
         
         
     }
