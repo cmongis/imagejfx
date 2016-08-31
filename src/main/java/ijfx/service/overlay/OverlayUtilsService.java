@@ -31,11 +31,13 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import net.imagej.display.DataView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.display.OverlayView;
 import net.imagej.event.OverlayCreatedEvent;
+import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.overlay.Overlay;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
@@ -141,6 +143,28 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
     
     public void addOverlay(ImageDisplay imageDisplay, Overlay[] overlayArray) {
         addOverlay(imageDisplay,Lists.newArrayList(overlayArray));
+    }
+    
+    public void removeAllOverlay(ImageDisplay imageDisplay) {
+        
+        removeOverlay(imageDisplay,overlayService.getOverlays(imageDisplay));
+        
+    }
+    
+    public void removeOverlay(ImageDisplay imageDisplay, List<Overlay> overlays) {
+        
+        List<DataView> dataviewList = overlays.stream()
+                .parallel()
+                .map(o->imageDisplay.stream().filter(view->view.getData() == o).findFirst().orElse(null))
+                .filter(o->o!=null)
+                .collect(Collectors.toList());
+        
+        
+        imageDisplay.removeAll(dataviewList);
+        overlays.forEach(o->eventService.publish(new OverlayDeletedEvent(o)));
+        //imageDisplay.update();
+        
+        
     }
     
     private ImageDisplay findDisplay(File file){
