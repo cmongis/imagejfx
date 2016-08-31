@@ -278,105 +278,116 @@
             <artifactId>jackson-annotations</artifactId>
             <version>2.5.1</version>
         </dependency>
+        
+        <dependency>
+            <groupId>mpicbg</groupId>
+            <artifactId>imglib</artifactId>
+            <version>2.0.0-beta6</version>
+        </dependency>
+        <dependency>
+            <groupId>mpicbg</groupId>
+            <artifactId>imglib-ij</artifactId>
+            <version>2.0.0-beta6</version>
+        </dependency>
     
-    </dependencies>
+</dependencies>
     
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
+<build>
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </resource>
             
             
             
-        </resources>
+    </resources>
         
         
-        <plugins>
+    <plugins>
             
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <!-- Configures the created archive -->
-                    <archive>
-                        <!-- Configures the content of the created manifest -->
-                        <manifest>
-                            <!-- Adds the classpath to the created manifest -->
-                            <addClasspath>true</addClasspath>
-                            <!--
-                                Specifies that all dependencies of our application are found
-                                from the lib directory.
-                            -->
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <!-- Configures the main class of the application -->
-                            <mainClass>${main-class}</mainClass>
-                        </manifest>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.5</version>
+            <configuration>
+                <!-- Configures the created archive -->
+                <archive>
+                    <!-- Configures the content of the created manifest -->
+                    <manifest>
+                        <!-- Adds the classpath to the created manifest -->
+                        <addClasspath>true</addClasspath>
+                        <!--
+                            Specifies that all dependencies of our application are found
+                            from the lib directory.
+                        -->
+                        <classpathPrefix>lib/</classpathPrefix>
+                        <!-- Configures the main class of the application -->
+                        <mainClass>${main-class}</mainClass>
+                    </manifest>
                         
-                        <manifestEntries>
-                            <SplashScreen-Image>logo.gif</SplashScreen-Image>
-                        </manifestEntries>
+                    <manifestEntries>
+                        <SplashScreen-Image>logo.gif</SplashScreen-Image>
+                    </manifestEntries>
                         
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <!-- Configures the used assembly descriptor -->
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
+                </archive>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.5.1</version>
+            <configuration>
+                <!-- Configures the used assembly descriptor -->
+                <descriptors>
+                    <descriptor>assembly.xml</descriptor>
+                </descriptors>
+            </configuration>
+        </plugin>
             
             
-        </plugins>
+    </plugins>
         
         
-    </build>
+</build>
     
-    <profiles>
-        <!--
-        The exec profile provides an easy way to execute a defined ${main-class}
-        for manual testing purposes. It is declared in a profile to avoid clashing
-        with other potential uses of exec-maven-plugin during the main build.
-        -->
-        <profile>
-            <id>exec</id>
-            <build>
-                <defaultGoal>test</defaultGoal>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.5.0</version>
-                        <configuration>
-                            <executable>java</executable>
-                            <arguments>
-                                <argument>-classpath</argument>
-                                <classpath />
-                                <argument>${main-class}</argument>
-                            </arguments>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+<profiles>
+    <!--
+    The exec profile provides an easy way to execute a defined ${main-class}
+    for manual testing purposes. It is declared in a profile to avoid clashing
+    with other potential uses of exec-maven-plugin during the main build.
+    -->
+    <profile>
+        <id>exec</id>
+        <build>
+            <defaultGoal>test</defaultGoal>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.5.0</version>
+                    <configuration>
+                        <executable>java</executable>
+                        <arguments>
+                            <argument>-classpath</argument>
+                            <classpath />
+                            <argument>${main-class}</argument>
+                        </arguments>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
 
 </project>
