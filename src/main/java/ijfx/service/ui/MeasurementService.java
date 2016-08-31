@@ -24,11 +24,11 @@ import ijfx.service.batch.DefaultSegmentedObject;
 import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlayStatService;
-import ijfx.ui.datadisplay.object.DefaultObjectDisplay;
 import ijfx.ui.datadisplay.object.DisplayedSegmentedObject;
 import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import ijfx.ui.main.ImageJFX;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import net.imagej.display.ImageDisplay;
@@ -90,6 +90,7 @@ public class MeasurementService extends AbstractService implements IjfxService {
         List<SegmentedObject> objectList = overlayServicel.getOverlays(imageDisplay)
                 .stream()
                 .map(o->measure(imageDisplay,o))
+                .filter(o->o!=null)
                 .collect(Collectors.toList());
         
         if(objectList.size() > 0) {
@@ -105,8 +106,14 @@ public class MeasurementService extends AbstractService implements IjfxService {
     }
 
     public SegmentedObject measure(ImageDisplay display, Overlay overlay) {
+        try {
         SegmentedObject object = new DefaultSegmentedObject(overlay,overlayStatsSrv.getOverlayStatistics(display, overlay));
         return new DisplayedSegmentedObject(display, object);
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE,"Error when creating SegmentedObject",e);
+            return null;
+        }
     }
     
     
