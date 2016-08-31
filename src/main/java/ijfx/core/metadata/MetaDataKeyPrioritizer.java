@@ -20,6 +20,8 @@
 package ijfx.core.metadata;
 
 import com.google.common.collect.Sets;
+import com.sun.xml.internal.ws.api.ha.StickyFeature;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +33,7 @@ import java.util.Set;
  */
 public class MetaDataKeyPrioritizer implements Comparator<String> {
 
-    final String[] priority;
+    final private String[] priority;
 
     public MetaDataKeyPrioritizer(String[] priority) {
         this.priority = priority;
@@ -62,6 +64,14 @@ public class MetaDataKeyPrioritizer implements Comparator<String> {
             i++;
         }
         return 0;
+    }
+    
+    public String[] getPriority() {
+        return priority;
+    }
+    
+    public boolean isSame(String[] newPriority) {
+        return Arrays.equals(priority, newPriority);
     }
 
 }

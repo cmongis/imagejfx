@@ -19,6 +19,8 @@
  */
 package ijfx.core.metadata;
 
+import ijfx.service.overlay.OverlayStatService;
+
 /**
  *
  * @author cyril
@@ -27,15 +29,35 @@ public class MetaDataKeyPriority {
 
     public static final String[] FILE = {MetaData.FILE_NAME, MetaData.WIDTH, MetaData.HEIGHT, MetaData.BITS_PER_PIXEL, MetaData.SLICE_NUMBER, MetaData.SERIE_COUNT, MetaData.SLICE_NUMBER, MetaData.ZSTACK_NUMBER, MetaData.CHANNEL_COUNT, MetaData.TIME_COUNT};
     public static final String[] PLANE = {MetaData.FILE_NAME, MetaData.PLANE_INDEX, MetaData.CHANNEL, MetaData.TIME, MetaData.Z_POSITION};
-    
+    public static final String[] OBJECT = {
+        MetaData.FILE_NAME,
+        MetaData.NAME,
+        MetaData.PLANE_INDEX,
+        MetaData.CHANNEL,
+        MetaData.TIME,
+        MetaData.Z_POSITION,
+        OverlayStatService.LBL_MEAN,
+        OverlayStatService.LBL_SD,
+        OverlayStatService.LBL_CIRCULARITY,
+        OverlayStatService.LBL_AREA,
+        OverlayStatService.LBL_CENTER_X,
+        OverlayStatService.LBL_CENTER_Y,};
+
     public static String[] getPriority(MetaDataSet m) {
-        
-        if(m.getType() == MetaDataSetType.PLANE || m.getType() == MetaDataSetType.OBJECT) return PLANE;
-        else {
-            return FILE;
+        if (m == null) {
+            return null;
         }
+        
+        MetaDataSetType t = m.getType();
+        
+        if(t == MetaDataSetType.PLANE) {
+            return PLANE;
+        }
+        if(t == MetaDataSetType.OBJECT) {
+            return OBJECT;
+        }
+        return FILE;
+       
     }
-    
-    
-    
+
 }
