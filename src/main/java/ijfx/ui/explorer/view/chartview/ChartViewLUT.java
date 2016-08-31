@@ -23,11 +23,13 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.cluster.ExplorableClustererService;
 import ijfx.service.ui.FxImageService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.view.GridIconView;
 import ijfx.ui.plugin.LUTComboBox;
+import ijfx.ui.plugin.LUTCreator;
 import ijfx.ui.plugin.LUTCreatorDialog;
 import ijfx.ui.plugin.LUTView;
 import ijfx.ui.plugin.LutViewChanger;
@@ -35,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -44,8 +47,11 @@ import javafx.scene.Node;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.paint.Color;
+import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.lut.LUTService;
+import net.imagej.ops.Initializable;
 import net.imglib2.converter.RealLUTConverter;
 import net.imglib2.display.ColorTable;
 import net.imglib2.type.numeric.ARGBType;
@@ -58,8 +64,15 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class,priority = 0.7)
-public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView implements ExplorerView {
+@Plugin(type = ExplorerView.class, priority = 0.7)
+public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView implements ExplorerView, Initializable {
+
+    private static final Color[] COLORS1 = new Color[]{Color.BLACK, Color.RED};
+
+    private static final Color[] COLORS2 = new Color[]{Color.BLACK, Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE};
+
+    @Parameter
+    LoadingScreenService loadingScreenService;
 
     @Parameter
     ExplorableClustererService explorableClustererService;
@@ -94,6 +107,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     List<ComboBox<String>> comboBoxList;
     double min = 0;
     double max = 0;
+    private boolean firstAction = true;
 
     public ChartViewLUT() {
         super();
@@ -116,10 +130,16 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
         scatterChart.getYAxis().labelProperty().bind(yComboBox.getSelectionModel().selectedItemProperty());
         initComboBox();
         setGraphicSnapshot();
+
     }
 
     @Override
     public Node getNode() {
+        if (firstAction == true) {
+            addColorTable(Arrays.asList(COLORS1), "En rouge et noir");
+            addColorTable(Arrays.asList(COLORS2), "Rainbow");
+            firstAction = false;
+        }
         return this;
     }
 
@@ -133,19 +153,19 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
         currentItems = items;
         List<String> metadatas = explorerService.getMetaDataKey(currentItems);
 
-        
         /**
-         * Try to keep the same metadatas 
+         * Try to keep the same metadatas
          */
         comboBoxList.stream().forEach(c -> {
             String s = c.getSelectionModel().getSelectedItem();
             c.getItems().clear();
             c.getItems().addAll(metadatas);
-            if (metadatas.contains(s)) {
-                c.getSelectionModel().select(s);
-            }
+//            if (metadatas.contains(s)) {
+//                c.getSelectionModel().select(s);
+//            }
 
         });
+
     }
 
     @Override
@@ -168,11 +188,13 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     @Override
     public void computeItems() {
-
         scatterChart.getData().clear();
-        addDataToChart(currentItems, Arrays.asList(metadatas));
-        applyColorTable(lutViewChanger.getColorTable());
-        bindLegend();
+        if (!Arrays.asList(metadatas).contains(null)) {
+
+            addDataToChart(currentItems, Arrays.asList(metadatas));
+            applyColorTable(lutViewChanger.getColorTable());
+        }
+//        bindLegend();
 
     }
 
@@ -193,6 +215,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
             computeItems();
         });
         lutComboBox.getSelectionModel().selectedItemProperty().addListener(this::onComboBoxChanged);
+
     }
 
     public void deselecItems() {
@@ -202,7 +225,9 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
 
     public void onComboBoxChanged(Observable observable, LUTView oldValue, LUTView newValue) {
         lutViewChanger = (LutViewChanger) newValue;
-        applyColorTable(lutViewChanger.getColorTable());
+        new CallbackTask<Void, Void>().run(() -> applyColorTable(lutViewChanger.getColorTable()))
+                .submit(loadingScreenService)
+                .start();
     }
 
     public void applyColorTable(ColorTable colorTable) {
@@ -240,28 +265,35 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     public void newLUT() {
         if (lutViewChanger == null) {
             lutViewChanger = new LUTCreatorDialog(new ArrayList<>()).showAndWait().orElseThrow(IllegalArgumentException::new);
-            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()+1));
+            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size() + 1));
 
         } else {
             lutViewChanger = new LUTCreatorDialog(lutViewChanger.getObservableListColors()).showAndWait().orElseThrow(IllegalArgumentException::new);
-            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size()+1));
+            lutViewChanger.setName("Lut n°" + String.valueOf(lutComboBox.getItems().size() + 1));
 
         }
         applyColorTable(lutViewChanger.getColorTable());
+        lutViewChanger.render(lutService, fxImageService);
+        lutComboBox.getItems().add(lutViewChanger);
+        lutComboBox.getSelectionModel().select(lutViewChanger);
+    }
+
+    private void addLUTToComboBox(LutViewChanger lutViewChanger) {
 //        LUTView lUTView = new LUTView("Lut " + String.valueOf(lutComboBox.getItems().size()), lutView);
         lutViewChanger.render(lutService, fxImageService);
         lutComboBox.getItems().add(lutViewChanger);
         lutComboBox.getSelectionModel().select(lutViewChanger);
+    }
 
+    private void addColorTable(List<Color> colors, String name) {
+        List<Color> generateInterpolatedColor = ColorGenerator.generateInterpolatedColor(colors, 256);
+        ColorTable colorTable = LUTCreator.colorsToColorTable(generateInterpolatedColor);
+        lutViewChanger = new LutViewChanger(name, colorTable, colors);
+        addLUTToComboBox(lutViewChanger);
     }
 
     public LUTView getLutView() {
         return lutViewChanger;
     }
 
-    @Override
-    @FXML
-    protected void help() {
-        hintService.displayHints(this.getClass(), true);
-    }
 }

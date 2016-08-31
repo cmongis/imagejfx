@@ -10,13 +10,15 @@
     {
         "text":"Choose the image that contains the flatfield"
         ,"target":"#weightTab"
-    },
-    {
-        "text":"Choose the image that contains the flatfield"
-        ,"target":"#outputTab"
-    },
-    {
-        "text":"Choose the image that contains the flatfield"
-        ,"target":"#imagesTab"
     }
+    ,{
+        "text":"Help you to see the difference between 2 slides"
+        ,"target":"#imagesTab"
+    },
+    {
+        "text":"Select the file that contains the beads positions"
+        ,"target":"#loadPointsButton"
+    }
+
+
 ]

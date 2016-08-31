@@ -1,10 +1,10 @@
 [
     { 
-        "text":"Choose the image that contains the flatfield",
+        "text":"Choose the image that contains the flatfield for the source image",
         "target":"#flatFieldLeftButton"
     },
     {
-        "text":"Choose the image that contains the flatfield"
+        "text":"Choose the image that contains the flatfield for the target image"
         ,"target":"#flatFieldRightButton"
     }
 ]

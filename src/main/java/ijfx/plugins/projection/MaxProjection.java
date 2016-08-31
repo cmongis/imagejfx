@@ -22,7 +22,9 @@ package ijfx.plugins.projection;
 import java.util.List;
 import net.imglib2.Sampler;
 import net.imglib2.type.numeric.RealType;
+import org.scijava.plugin.Plugin;
 
+@Plugin(type = ProjectionMethod.class)
 public class MaxProjection implements ProjectionMethod {
 
     private final String name = "Max";

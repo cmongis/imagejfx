@@ -19,10 +19,6 @@
  */
 package ijfx.service.overlay;
 
-import ijfx.plugins.commands.BinaryToOverlay;
-import ijfx.service.batch.BatchSingleInput;
-import ijfx.service.batch.ImageDisplayBatchInput;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,9 +38,9 @@ import org.scijava.ui.UIService;
  *
  * @author Pierre BONNEAU
  */
+@Plugin(type = Command.class, menuPath = "Analyze>Compute Overlay Statistics")
 
-@Deprecated
-public class OverlayStatCommandTester implements Command{
+public class OverlayStatCommand implements Command{
     
     @Parameter
     ImageDisplayService imageDisplayService;

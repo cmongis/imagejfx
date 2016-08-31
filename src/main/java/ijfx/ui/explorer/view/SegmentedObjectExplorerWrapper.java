@@ -50,7 +50,7 @@ import org.scijava.plugin.Parameter;
 public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
 
     private final SegmentedObject object;
-     
+
     @Parameter
     private ImagePlaneService imagePlaneService;
 
@@ -94,9 +94,8 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
             double min = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MIN).getDoubleValue();
             double max = object.getMetaDataSet().get(MetaData.STATS_PIXEL_MAX).getDoubleValue();
             Image image = previewService.datasetToImage((RandomAccessibleInterval<? extends RealType>) extractedObject, new ColorTable8(), min, max);
-
-            int sampleFactor = new Double(100 * 100 / image.getWidth() / image.getHeight()).intValue();
-
+            Double sampleFactor = 400 * 400 / image.getWidth() / image.getHeight();
+            sampleFactor = sampleFactor > 1 ? 1 : sampleFactor;
             return resample(image, sampleFactor);
 
         } catch (IOException ioe) {
@@ -108,14 +107,16 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
         }
     }
 
-    private Image resample(Image input, int scaleFactor) {
+    private Image resample(Image input, double scaleFactor) {
         final int W = (int) input.getWidth();
         final int H = (int) input.getHeight();
-        final int S = scaleFactor;
+        final double S = scaleFactor;
+        final int HSample = (int) (H * scaleFactor) + 1;
+        final int WSample = (int) (W * scaleFactor) + 1;
 
         WritableImage output = new WritableImage(
-                W * S,
-                H * S
+                WSample,
+                HSample
         );
 
         PixelReader reader = input.getPixelReader();
@@ -126,7 +127,7 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
                 final int argb = reader.getArgb(x, y);
                 for (int dy = 0; dy < S; dy++) {
                     for (int dx = 0; dx < S; dx++) {
-                        writer.setArgb(x * S + dx, y * S + dy, argb);
+                        writer.setArgb((int) (x * S) + dx, (int) (y * S) + dy, argb);
                     }
                 }
             }

@@ -77,22 +77,24 @@ public class LUTInvert implements Command {
                 .findFirst();
         ImageDisplay imageDisplay = imageDisplayOptional.get();
         dataset = imageDisplayService.getActiveDataset(imageDisplay);
-        for (int i = 0; i < dataset.getColorTableCount(); i++) {
-            ColorTable colorTable = dataset.getColorTable(i);
-            ColorTable colorTableInverted = invertColorTable(colorTable);
-            dataset.setColorTable(colorTableInverted, i);
+
+            for (int i = 0; i < dataset.getColorTableCount(); i++) {
+                ColorTable colorTable = dataset.getColorTable(i);
+                ColorTable colorTableInverted = invertColorTable(colorTable);
+                dataset.setColorTable(colorTableInverted, i);
+            }
+
+            for (int k = 0; k < imageDisplay.size(); k++) {
+                DatasetView datasetView = ((DatasetView) imageDisplay.get(k));
+                for (int j = 0; j < datasetView.getColorTables().size(); j++) {
+                    ColorTable colorTable = datasetView.getColorTables().get(j);
+                    ColorTable colorTableInverted = invertColorTable(colorTable);
+                    datasetView.setColorTable(colorTableInverted, j);
+                    datasetView.update();
+                }
+
         }
-//        for (int k = 0; k < imageDisplay.size(); k++) {
-//            DatasetView datasetView = ((DatasetView) imageDisplay.get(k));
-//            for (int j = 0; j < datasetView.getColorTables().size(); j++) {
-//                ColorTable colorTable = datasetView.getColorTables().get(j);
-//                ColorTable colorTableInverted = invertColorTable(colorTable);
-//                datasetView.setColorTable(colorTableInverted, j);
-//                datasetView.update();
-//            }
-//
-//        }
-        
+
         dataset.update();
         imageDisplay.update();
     }

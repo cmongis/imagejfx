@@ -180,10 +180,4 @@ public class PCAChartView extends AbstractChartView implements ExplorerView {
         
     }
     
-    @Override
-    @FXML
-    protected void help() {
-        hintService.displayHints(this.getClass(), true);
-    }
-    
 }

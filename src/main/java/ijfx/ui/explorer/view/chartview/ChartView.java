@@ -21,7 +21,6 @@ package ijfx.ui.explorer.view.chartview;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.service.cluster.ClustererService;
 import ijfx.service.cluster.ExplorableClustererService;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
@@ -29,29 +28,17 @@ import ijfx.ui.correction.WorkflowModel;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
-import ijfx.ui.explorer.view.FilterView;
 import ijfx.ui.explorer.view.GridIconView;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.chart.ScatterChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
@@ -192,11 +179,6 @@ public class ChartView extends AbstractChartView implements ExplorerView {
         currentItems.stream()
                 .forEach(e -> e.selectedProperty().setValue(false));
     }
-    
-    @Override
-    @FXML
-    protected void help(){
-        hintService.displayHints(ChartView.class, true);
-    }
+
 
 }

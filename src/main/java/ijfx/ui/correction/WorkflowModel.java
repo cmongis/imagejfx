@@ -19,17 +19,22 @@
  */
 package ijfx.ui.correction;
 
+import bunwarpj.Transformation;
 import ij.process.ImageProcessor;
 import ijfx.plugins.adapter.IJ1Service;
 import ijfx.plugins.bunwarpJ.ChromaticCorrection;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
+import ijfx.service.ImagePlaneService;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.main.ImageJFX;
 import io.datafx.controller.injection.scopes.ApplicationScoped;
+import io.scif.FormatException;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,9 +48,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -94,6 +103,8 @@ public class WorkflowModel {
     protected Map<File, File> mapImages;
 
     @Parameter
+    ImagePlaneService imagePlaneService;
+    @Parameter
     IJ1Service iJ1Service;
 
     @Parameter
@@ -116,6 +127,9 @@ public class WorkflowModel {
 
     @Parameter
     LoadingScreenService loadingScreenService;
+
+    @Parameter
+    TimerService timerService;
 
     static String[] CHOICES_DEFORMATION = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
 
@@ -157,14 +171,14 @@ public class WorkflowModel {
      * consistency weight
      */
     private DoubleProperty consistencyWeight = new SimpleDoubleProperty(10.0);
-    /**
-     * flag for rich output (verbose option)
-     */
-    private BooleanProperty richOutput = new SimpleBooleanProperty(false);
-    /**
-     * flag for save transformation option
-     */
-    private BooleanProperty saveTransformation = new SimpleBooleanProperty(false);
+//    /**
+//     * flag for rich output (verbose option)
+//     */
+//    private BooleanProperty richOutput = new SimpleBooleanProperty(false);
+//    /**
+//     * flag for save transformation option
+//     */
+//    private BooleanProperty saveTransformation = new SimpleBooleanProperty(false);
 
     /**
      * minimum image scale
@@ -190,8 +204,8 @@ public class WorkflowModel {
     Context context;
 
     private ObjectProperty<List<File>> listProperty = new SimpleObjectProperty<>(new ArrayList<File>());
-    protected ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>(new long[]{-1});
-    protected ObjectProperty<long[]> positionRightProperty = new SimpleObjectProperty<>(new long[]{-1});
+    protected ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>(new long[]{});
+    protected ObjectProperty<long[]> positionRightProperty = new SimpleObjectProperty<>(new long[]{});
 
     protected final static Logger LOGGER = ImageJFX.getLogger();
 
@@ -281,11 +295,16 @@ public class WorkflowModel {
      * @return
      */
     public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane1, ImageDisplayPane imageDisplayPane2, File file) {
-
+        try {
+            imageDisplayPane1.getImageDisplay().close();
+            imageDisplayPane2.getImageDisplay().close();
+        } catch (NullPointerException ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
             try {
                 Dataset dataset;
-                dataset = (Dataset) iOService.open(file.getAbsolutePath());
+                dataset = imagePlaneService.openVirtualDataset(file);
                 displayDataset(dataset, imageDisplayPane1);
                 displayDataset(dataset, imageDisplayPane2);
             } catch (IOException ex) {
@@ -297,11 +316,15 @@ public class WorkflowModel {
     }
 
     public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane, File file) {
-
+        try {
+            imageDisplayPane.getImageDisplay().close();
+        } catch (NullPointerException ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
             try {
                 Dataset dataset;
-                dataset = (Dataset) iOService.open(file.getAbsolutePath());
+                dataset = imagePlaneService.openVirtualDataset(file);
                 displayDataset(dataset, imageDisplayPane);
             } catch (IOException ex) {
                 Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
@@ -319,19 +342,16 @@ public class WorkflowModel {
      */
     public ImageDisplay displayDataset(Dataset dataset, ImageDisplayPane imageDisplayPane) {
         try {
-            imageDisplayPane.getImageDisplay().clear();
-        } catch (Exception e) {
-            e.printStackTrace();
+            imageDisplayPane.getImageDisplay().close();
+        } catch (Exception ex) {
+            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        ImageDisplay imageDisplay = new DefaultImageDisplay();
-        context.inject(imageDisplay);
-        imageDisplay.display(dataset);
+        ImageDisplay imageDisplay = (ImageDisplay) displayService.createDisplayQuietly(dataset);
         try {
             commandService.run(AutoContrast.class, true, "imageDisplay", imageDisplay, "channelDependant", true).get();
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         imageDisplayPane.display(imageDisplay);
         return imageDisplay;
     }
@@ -347,11 +367,6 @@ public class WorkflowModel {
         bUnwarpJWorkflow.imageWeightTextField.textProperty().bindBidirectional(imageWeight, new NumberStringConverter());
         bUnwarpJWorkflow.landmarkWeightTextField.textProperty().bindBidirectional(landmarkWeight, new NumberStringConverter());
         bUnwarpJWorkflow.stopThresholdTextField.textProperty().bindBidirectional(stopThreshold, new NumberStringConverter());
-
-        bUnwarpJWorkflow.richOutput.selectedProperty().bindBidirectional(richOutput);
-
-        bUnwarpJWorkflow.saveTransformation.selectedProperty().bindBidirectional(saveTransformation);
-
         bUnwarpJWorkflow.modeChoiceComboBox.valueProperty().bindBidirectional(modeChoice);
         bUnwarpJWorkflow.img_subsamp_factComboBox.valueProperty().bindBidirectional(img_subsamp_fact);
         bUnwarpJWorkflow.min_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(min_scale_deformation_choice);
@@ -388,6 +403,7 @@ public class WorkflowModel {
      * @return
      */
     public Dataset applyTransformation(Dataset sourceDataset, long[] sourcePosition, Dataset targetDataset, long[] targetPosition, bunwarpj.Transformation transformation) {
+        System.gc();
         int max_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(max_scale_deformation_choice.get());
         int min_scale_deformation = Arrays.asList(CHOICES_DEFORMATION).indexOf(min_scale_deformation_choice.get());
         int mode = Arrays.asList(CHOICES_MODE).indexOf(modeChoice.get());
@@ -403,7 +419,7 @@ public class WorkflowModel {
 
         Module module = executeCommand(ChromaticCorrection.class, map).orElseThrow(NullPointerException::new);
 
-        Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
+        Dataset outputDataset = (Dataset) module.getOutput("outputDataset");;
         return outputDataset;
     }
 
@@ -510,20 +526,34 @@ public class WorkflowModel {
         return flatFieldImageDisplayProperty2.get().getImageDisplay();
     }
 
-    public void transformeImages(List<File> files, String destinationPath) {
+    public CallbackTask<Void, Void> transformeImages(List<File> files, String destinationPath) {
+        long startTime = System.currentTimeMillis();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        return new CallbackTask<Void, Void>().run(() -> {
 
-        bunwarpj.Transformation transformation = getTransformation(files.get(0));
-        files.parallelStream().forEach((File file) -> {
-            CallbackTask<Void, Void> start = new CallbackTask<Void, Void>().run(() -> {
-                transformeImage(file, destinationPath, transformation);
-            })
-                    .submit(loadingScreenService)
-                    .start();
+            try {
+                bunwarpj.Transformation transformation = getTransformation(files.get(0));
+                files.stream().forEach((File file) -> {
+//                    new CallbackTask<Void, Void>().run(() -> {
+                    executorService.submit(() -> transformeImage(file, destinationPath, transformation));
+//                    })
+//                            .start();
+//                    transformeImage(file, destinationPath, transformation);
+                });
 
-        });
+                executorService.shutdown();
+                executorService.awaitTermination(1, TimeUnit.HOURS); // or longer.    
+                System.out.println("Fin Workflow " + String.valueOf(System.currentTimeMillis() - startTime));
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        })
+                .submit(loadingScreenService);
+
     }
 
     public void transformeImage(File file, String destinationPath, bunwarpj.Transformation transformation) {
+//        new CallbackTask<Void, Void>().run(() -> {
         try {
             Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
             ImageDisplay imageDisplay = new SilentImageDisplay(context, inputDataset);
@@ -535,18 +565,29 @@ public class WorkflowModel {
             setPosition(getPositionLeft(), imageDisplay);
             Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
             Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
-            StringBuilder path = new StringBuilder(destinationPath);
-            path.append("/").append(file.getName());
-            iOService.save(outputDataset, path.toString());
+            StringBuilder path = null;
+//            try {
+//                path = new StringBuilder(destinationPath);
+//                path.append("/").append(file.getName());
+//                iOService.save(outputDataset, path.toString());
+//            } catch (Exception e) {
+                path = new StringBuilder(destinationPath);
+                path.append("/").append(file.getName().substring(0, file.getName().lastIndexOf('.'))).append(".tiff");
+                iOService.save(outputDataset, path.toString());
+//            }
             mapImages.put(file, new File(path.toString()));
+            imageDisplay.close();
+            Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, "Save " + path.toString());
 
         } catch (Exception ex) {
             Logger.getLogger(ProcessWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        })
+//                .submit(loadingScreenService)
+//                .start();
     }
 
-    public bunwarpj.Transformation getTransformation(File file) {
-        bunwarpj.Transformation transformation = null;
+    public Transformation getTransformation(File file) throws InterruptedException, ExecutionException {
         try {
             Dataset inputDataset = (Dataset) iOService.open(file.getAbsolutePath());
             Stack<Point> sourcePoints = new Stack<>();
@@ -557,11 +598,12 @@ public class WorkflowModel {
             int mode = Arrays.asList(CHOICES_MODE).indexOf(modeChoice.get());
             bunwarpj.Param parameter = new bunwarpj.Param(mode, maxImageSubsamplingFactor.get(), min_scale_deformation, max_scale_deformation, divWeight.get(), curlWeight.get(), landmarkWeight.get(), imageWeight.get(), consistencyWeight.get(), stopThreshold.get());
 
-            transformation = bunwarpj.bUnwarpJ_.computeTransformationBatch((int) inputDataset.dimension(0), (int) inputDataset.dimension(1), (int) inputDataset.dimension(0), (int) inputDataset.dimension(1), sourcePoints, targetPoints, parameter);
+            return bunwarpj.bUnwarpJ_.computeTransformationBatch((int) inputDataset.dimension(0), (int) inputDataset.dimension(1), (int) inputDataset.dimension(0), (int) inputDataset.dimension(1), sourcePoints, targetPoints, parameter);
         } catch (IOException ex) {
             Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return transformation;
+        return null;
+//        return callbackTask.get();
 
     }
 

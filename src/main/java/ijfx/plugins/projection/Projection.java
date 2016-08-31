@@ -68,15 +68,8 @@ public class Projection extends ContextCommand {
     
     @Override
     public void run() {
-
-        if (dataset.numDimensions() <= 2) {
-
-            cancel("Projection can only be done on multidimensional datasets");
-            return;
-        }
-
-        AxisType[] axes = new AxisType[dataset.numDimensions()];
-        CalibratedAxis[] axeArray = new CalibratedAxis[dataset.numDimensions()];
+        AxisType[] axes = new AxisType[dataset.numDimensions()-1];
+        CalibratedAxis[] axeArray = new CalibratedAxis[dataset.numDimensions()-1];
         dataset.axes(axeArray);
 
         if (axisType == null) {
@@ -84,12 +77,12 @@ public class Projection extends ContextCommand {
         }
 
         long[] dims = new long[axeArray.length];
-        for (int i = 0; i < dims.length; i++) {
+        for (int i = 0; i < dataset.numDimensions(); i++) {
+            if (i == dataset.dimensionIndex(axisType)) {
+                continue;
+            }
             axes[i] = axeArray[i].type();
             dims[i] = toIntExact(dataset.max(i) + 1);
-            if (i == dataset.dimensionIndex(this.axisType)) {
-                dims[i] = 1;
-            }
         }
         datasetOutput = datasetService.create(dims, dataset.getName(), axes, dataset.getValidBits(), dataset.isSigned(), !dataset.isInteger());
 

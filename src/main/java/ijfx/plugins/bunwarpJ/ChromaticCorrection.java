@@ -52,6 +52,7 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class)
 public class ChromaticCorrection implements Command {
 
+    
     @Parameter
     ModuleService moduleService;
 
@@ -95,30 +96,30 @@ public class ChromaticCorrection implements Command {
             map.put("inputDataset", this.sourceDataset);
             map.put("position", sourcePosition);
             promise = executeCommand(ExtractSliceCommand.class, map).orElseThrow(NullPointerException::new);
-            Dataset sourceDataset = (Dataset) promise.getOutput("outputDataset");
+            Dataset smallSourceDataset = (Dataset) promise.getOutput("outputDataset");
 
             Map<String, Object> map2 = new HashMap<>();
-            map.put("inputDataset", this.sourceDataset);
-            map.put("position", targetPosition);
+            map2.put("inputDataset", this.sourceDataset);
+            map2.put("position", targetPosition);
             promise = executeCommand(ExtractSliceCommand.class, map2).orElseThrow(NullPointerException::new);
             Dataset targetDataset = (Dataset) promise.getOutput("outputDataset");
 
             // Perform correction with bUnwarpJ
             Map<String, Object> map3 = new HashMap<>();
-            map.put("sourceDataset", sourceDataset);
-            map.put("targetDataset", targetDataset);
-            map.put("landmarksFile", landmarksFile);
-            map.put("parameter", parameter);
-            map.put("transformation", transformation);
+            map3.put("sourceDataset", smallSourceDataset);
+            map3.put("targetDataset", targetDataset);
+            map3.put("landmarksFile", landmarksFile);
+            map3.put("parameter", parameter);
+            map3.put("transformation", transformation);
             promise = executeCommand(BunwarpJFX.class, map3).orElseThrow(NullPointerException::new);
             Dataset correctedSourceDataset = (Dataset) promise.getOutput("outputDataset");
-
+            
             // Replace the corrected slice in the sourceDataset
               Map<String, Object> map4 = new HashMap<>();
-            map.put("stack", this.sourceDataset);
-            map.put("sliceDataset", correctedSourceDataset);
-            map.put("position", sourcePosition);
-            promise = executeCommand(ExtractSliceCommand.class, map4).orElseThrow(NullPointerException::new);
+            map4.put("stack", this.sourceDataset);
+            map4.put("sliceDataset", correctedSourceDataset);
+            map4.put("position", sourcePosition);
+            promise = executeCommand(ReplaceSlice.class, map4).orElseThrow(NullPointerException::new);
             outputDataset = (Dataset) promise.getOutput("outputDataset");
 
             

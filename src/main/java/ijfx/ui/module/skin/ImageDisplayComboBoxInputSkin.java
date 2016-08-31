@@ -21,14 +21,18 @@ package ijfx.ui.module.skin;
 
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
+import java.awt.Rectangle;
 import java.util.List;
-import java.util.stream.Collectors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import net.imagej.Dataset;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -40,7 +44,6 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-
 @Plugin(type = InputSkinPlugin.class)
 public class ImageDisplayComboBoxInputSkin extends AbstractInputSkinPlugin<ImageDisplay> {
 
@@ -88,8 +91,21 @@ public class ImageDisplayComboBoxInputSkin extends AbstractInputSkinPlugin<Image
         imageDisplayComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             valueProperty.setValue(newValue);
         });
+        setCellFactory(imageDisplayComboBox);
 
         //input.getValue();
+    }
+
+    public void setCellFactory(ComboBox<ImageDisplay> cmb) {
+        cmb.setCellFactory((ListView<ImageDisplay> p) -> new ListCell<ImageDisplay>() {
+            @Override
+            protected void updateItem(ImageDisplay item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    setText(item.getName());
+                }
+            }
+        });
     }
 
 }

@@ -18,7 +18,7 @@
    <top>
         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
             <children>
-                <Label text="Welcome">
+                <Label graphicTextGap="15.0" text="Please choose a folder and select the different positions">
                     <StackPane.margin>
                         <Insets bottom="32.0" left="32.0" right="32.0" top="32.0" />
                     </StackPane.margin>
@@ -32,7 +32,7 @@
    <center>
       <GridPane fx:id="gridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" prefWidth="150.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" prefWidth="300.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
@@ -40,7 +40,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <VBox>
                <children>
                   <Button fx:id="chooseFolder" mnemonicParsing="false" onAction="#addFiles" text="Choose folder..." />
                   <ListView fx:id="listView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />

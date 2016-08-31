@@ -23,6 +23,7 @@ package ijfx.ui.explorer.view.chartview;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.service.ui.HintService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.utils.FontAwesomeIconUtils;
@@ -32,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -47,6 +51,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javax.imageio.ImageIO;
+import mongis.utils.CallbackTask;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -56,14 +61,16 @@ import org.scijava.plugin.Parameter;
 public abstract class AbstractChartView extends AnchorPane {
 
     @Parameter
+    LoadingScreenService loadingScreenService;
+    @Parameter
     ExplorerService explorerService;
-    
+
     @Parameter
     HintService hintService;
 
     @FXML
     Button snapshotButton;
-    
+
     @FXML
     protected ScatterChart<Number, Number> scatterChart;
 
@@ -82,15 +89,24 @@ public abstract class AbstractChartView extends AnchorPane {
 
         XYChart.Series series = new XYChart.Series();
         List<XYChart.Data> listExplorers = new ArrayList<>();
-        list.stream()
-                .map(e -> {
-                    PlotExplorer plotExplorer = new DefaultPlotExplorer(e, metadataList.toArray(new String[0]), explorerService);
-                    return plotExplorer.getData();
-                })
-                .forEach(e -> listExplorers.add(e));
-        series.getData().addAll(listExplorers);
-        scatterChart.getData().add(series);
-        series.setName("Series n° " + scatterChart.getData().size());
+        try {
+            new CallbackTask<Void, Void>().run(() -> {
+
+                list.stream()
+                        .map(e -> {
+
+                            PlotExplorer plotExplorer = new DefaultPlotExplorer(e, metadataList.toArray(new String[0]), explorerService);
+                            return plotExplorer.getData();
+                        })
+                        .forEach(e -> listExplorers.add(e));
+
+            }).submit(loadingScreenService).start().get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(AbstractChartView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                series.getData().addAll(listExplorers);
+                scatterChart.getData().add(series);
+                series.setName("Series n° " + scatterChart.getData().size());
 
     }
 
@@ -134,8 +150,9 @@ public abstract class AbstractChartView extends AnchorPane {
         ImageView imageView = new ImageView(image);
         snapshotButton.setGraphic(imageView);
     }
-    
-//    @FXML
-    protected abstract void help();
 
+    @FXML
+    protected void help() {
+        hintService.displayHints(this.getClass(), true);
+    }
 }

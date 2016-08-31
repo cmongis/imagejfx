@@ -98,10 +98,10 @@ public class ProcessWorkflow extends CorrectionFlow {
 
     @FXML
     Button directoryButton;
-    
+
     @FXML
     Label directoryLabel;
-    
+
     private File directory;
 
     ImageDisplayPane imageDisplayPaneLeft;
@@ -143,8 +143,10 @@ public class ProcessWorkflow extends CorrectionFlow {
         listViewItems.getItems().clear();
         workflowModel.getMapImages().clear();
         System.gc();
-        workflowModel.transformeImages(files, directory.getAbsolutePath());
-        listViewItems.getItems().addAll(files);
+        workflowModel.transformeImages(files, directory.getAbsolutePath()).thenRunnable(() -> {
+            listViewItems.getItems().addAll(files);
+        })
+                .start();
 
     }
 
@@ -171,7 +173,7 @@ public class ProcessWorkflow extends CorrectionFlow {
         imageDisplayService.getActiveDatasetView(imageDisplay).setColorMode(ColorMode.COLOR);
         Dataset datasetFirstSlide = datasetUtillsService.extractPlane(imageDisplay);
         workflowModel.setPosition(secondPosition, imageDisplay);
-        Dataset datasetSecondSlide =  datasetUtillsService.extractPlane(imageDisplay);
+        Dataset datasetSecondSlide = datasetUtillsService.extractPlane(imageDisplay);
         workflowModel.extractAndMerge(new Dataset[]{datasetFirstSlide, datasetSecondSlide}, imageDisplayPane);
     }
 
@@ -212,8 +214,7 @@ public class ProcessWorkflow extends CorrectionFlow {
         directory = file;
         directoryLabel.setText(directory.getAbsolutePath());
         processButton.setDisable(false);
-        
-        
+
     }
 
 }
