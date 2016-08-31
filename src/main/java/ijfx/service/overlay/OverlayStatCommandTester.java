@@ -42,8 +42,8 @@ import org.scijava.ui.UIService;
  *
  * @author Pierre BONNEAU
  */
-@Plugin(type = Command.class, menuPath = "Analyze>Compute Statistics")
 
+@Deprecated
 public class OverlayStatCommandTester implements Command{
     
     @Parameter
