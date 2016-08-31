@@ -29,11 +29,13 @@ import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
+import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -43,8 +45,8 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class, menuPath = "Image > Stacks > Project...", attrs = {
-    @Attr(name = "no-legacy")})
-public class Projection implements Command {
+    @Attr(name = "no-legacy")}, initializer = "init")
+public class Projection extends ContextCommand {
 
     @Parameter
     DatasetService datasetService;
@@ -55,32 +57,47 @@ public class Projection implements Command {
     @Parameter(type = ItemIO.OUTPUT)
     Dataset datasetOutput;
 
-    @Parameter
-    ProjectionMethod projectionMethod;
+    @Parameter(label = "Projection method")
+    ProjectionMethod projectionMethod = new MeanProjection();
+
+    @Parameter(label = "Axe to project")
+    AxisType axisType;
 
     @Parameter
-    AxisType axisTypeParameter;
-
+    ImageDisplayService imageDisplayService;
+    
     @Override
     public void run() {
-        AxisType[] axisType = new AxisType[dataset.numDimensions()];
+
+        if (dataset.numDimensions() <= 2) {
+
+            cancel("Projection can only be done on multidimensional datasets");
+            return;
+        }
+
+        AxisType[] axes = new AxisType[dataset.numDimensions()];
         CalibratedAxis[] axeArray = new CalibratedAxis[dataset.numDimensions()];
         dataset.axes(axeArray);
+
+        if (axisType == null) {
+            axisType = dataset.axis(2).type();
+        }
+
         long[] dims = new long[axeArray.length];
         for (int i = 0; i < dims.length; i++) {
-            axisType[i] = axeArray[i].type();
+            axes[i] = axeArray[i].type();
             dims[i] = toIntExact(dataset.max(i) + 1);
-            if (i == dataset.dimensionIndex(axisTypeParameter)) {
+            if (i == dataset.dimensionIndex(this.axisType)) {
                 dims[i] = 1;
             }
         }
-        datasetOutput = datasetService.create(dims, dataset.getName(), axisType, dataset.getValidBits(), dataset.isSigned(), false);
+        datasetOutput = datasetService.create(dims, dataset.getName(), axes, dataset.getValidBits(), dataset.isSigned(), !dataset.isInteger());
 
         project(dataset, datasetOutput, projectionMethod);
     }
 
     public < T extends RealType<T>> void project(Dataset input, Dataset output, ProjectionMethod projectionMethod) {
-        int indexToModify = input.dimensionIndex(axisTypeParameter);
+        int indexToModify = input.dimensionIndex(axisType);
         Img<?> inputImg = input.getImgPlus().getImg();
         long[] dims = new long[input.numDimensions()];
         input.dimensions(dims);
@@ -89,20 +106,20 @@ public class Projection implements Command {
         RandomAccess<T> randomAccessOutput = (RandomAccess<T>) output.randomAccess();
         long[] position = new long[input.numDimensions()];
         List<T> listToProcess = new ArrayList<>();
-        
+
         //In order to avoid creation of too big array
         long[] dimensionToGenerate = Arrays.copyOfRange(dims, 2, dims.length);
-        
+
         //Set the dimension to 1 in order to reduce the size of the array
         //Cannot set to 0
-        dimensionToGenerate[indexToModify-2] = 1;
+        dimensionToGenerate[indexToModify - 2] = 1;
         NDimensionalArray nDimensionalArray = new NDimensionalArray(dimensionToGenerate);
         long[][] possibilities = nDimensionalArray.getPossibilities();
 
         for (int x = 0; x < dims[input.dimensionIndex(Axes.X)]; x++) {
             for (int y = 0; y < dims[input.dimensionIndex(Axes.Y)]; y++) {
                 for (long[] possibilitie : possibilities) {
-                    
+
                     //Go throug th dimension to project
                     for (int m = 0; m < dims[indexToModify]; m++) {
                         position[0] = x;
@@ -115,14 +132,26 @@ public class Projection implements Command {
                         listToProcess.add(randomAccess.get().copy());
                         if (m == 0) {
                             randomAccessOutput.setPosition(position);
-                        } 
-                        else if (m == dims[indexToModify] - 1) {
-                            projectionMethod.process(listToProcess,randomAccessOutput);
+                        } else if (m == dims[indexToModify] - 1) {
+                            projectionMethod.process(listToProcess, randomAccessOutput);
                             listToProcess.removeAll(listToProcess);
                         }
                     }
                 }
             }
+        }
+    }
+
+    public void init() {
+        if (axisType == null && dataset != null) {
+            if (dataset.numDimensions() > 2) {
+                axisType = dataset.axis(2).type();
+            }
+        }
+        else if( axisType == null) {
+            
+            axisType = imageDisplayService.getActiveDataset().axis(2).type();
+            
         }
     }
 }
