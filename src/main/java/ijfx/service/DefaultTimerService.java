@@ -37,7 +37,7 @@ public class DefaultTimerService extends AbstractService implements TimerService
 
     @Override
     public Timer getTimer(Class<?> clazz) {
-        return getTimer(clazz.getName());
+        return getTimer(clazz.getSimpleName());
     }
 
     @Override
