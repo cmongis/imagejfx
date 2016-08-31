@@ -19,7 +19,9 @@
  */
 package ijfx.ui.batch;
 
+import com.google.common.collect.Sets;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataKeyPrioritizer;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.metadata.MetaDataSetUtils;
@@ -47,7 +49,9 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
 
     Set<String> currentColumns = new HashSet<>();
 
-    LinkedHashSet<String> priority = new LinkedHashSet();
+    //LinkedHashSet<String> priority = new LinkedHashSet();
+    
+    MetaDataKeyPrioritizer priority = new MetaDataKeyPrioritizer(new String[0]);
     
     public MetaDataSetOwnerHelper(TableView<T> tableView) {
         this.tableView = tableView;
@@ -77,7 +81,8 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
                 .stream()
                 .map(i->i.getMetaDataSet())
                 .collect(Collectors.toList());
-        updateColumns(MetaDataSetUtils.getAllPossibleKeys(mList).stream().filter(MetaData::canDisplay).collect(Collectors.toList()));
+        
+        updateColumns(MetaDataSetUtils.getAllPossibleKeys(mList).stream().filter(MetaData::canDisplay).sorted(priority).collect(Collectors.toList()));
     }
 
     private void updateColums(String... columnList) {
@@ -85,10 +90,11 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     }
 
     private void updateColumns(List<String> columnList) {
-        columnList.sort(this::comparePriority);
+        columnList.sort(priority);
         if (Collections.disjoint(currentColumns, columnList)) {
             System.out.println("The columns are not the same, updating");
             setColumnNumber(columnList.size());
+            currentColumns = new HashSet(columnList);
             IntStream.range(0, columnList.size()).forEach(n -> {
                 tableView.getColumns().get(n).setUserData(columnList.get(n));
                 tableView.getColumns().get(n).setText(columnList.get(n));
@@ -119,43 +125,24 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         }
     }
 
-    private TableColumn<T, String> generateColumn(String key) {
-        TableColumn<T, String> column = new TableColumn<>();
+    private TableColumn<T, Object> generateColumn(String key) {
+        TableColumn<T, Object> column = new TableColumn<>();
         column.setUserData(key);
         column.setCellValueFactory(this::getCellValueFactory);
         return column;
     }
     
-    public void setPriority(Collection<String> priorityOrder) {
-        
-        priority = new LinkedHashSet(priorityOrder);
-        
-    }
     
     public void setPriority(String... keyName) {
-        setPriority(Arrays.asList(keyName));
+       // if(priority.isSame(keyName) == false) {
+            priority = new MetaDataKeyPrioritizer(keyName);
+        //}
     }
     
     public String[] getPriority() {
-        return priority.toArray(new String[priority.size()]);
-    }
-    
-    private Set<String> applyPriority(Set<String> strings) {
-        return strings
-                .stream()
-                .sorted(this::comparePriority)
-                .collect(Collectors.toSet());
+        return priority.getPriority();
     }
 
-    protected int comparePriority(String s1, String s2) {
-
-        Integer is1 = priorityIndex(priority,s1) ;
-        Integer is2 = priorityIndex(priority,s2);
-        
-        Integer c = s1.compareTo(s2);
-        
-        return 100 * (is2-is1) + c;
-    }
     
     public int priorityIndex(Set<String> set, String element) {
         int i = 0;
@@ -166,9 +153,9 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         return 0;
     }
     
-    protected ObservableValue<String> getCellValueFactory(TableColumn.CellDataFeatures<T, String> cell) {
+    protected ObservableValue<Object> getCellValueFactory(TableColumn.CellDataFeatures<T, Object> cell) {
         String key = cell.getTableColumn().getUserData().toString();
-        String value = cell.getValue().getMetaDataSet().get(key).getStringValue();
+        Object value = cell.getValue().getMetaDataSet().get(key).getValue();
         return new ReadOnlyObjectWrapper<>(value);
     }
 
