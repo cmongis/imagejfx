@@ -23,10 +23,11 @@ package ijfx.bridge;
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.service.batch.BatchService;
-import ijfx.service.ui.CommandRunner;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.DefaultImageWindow;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
+import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
+import ijfx.ui.datadisplay.object.SegmentedObjectWindow;
 import ijfx.ui.datadisplay.table.TableDisplayWindow;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.datadisplay.text.TextWindow;
@@ -229,7 +230,13 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
                 ImageWindowContainer.getInstance().getChildren().add(new TextWindow((TextDisplay) dspl));
             });
 
-        } else {
+        }
+        else if (dspl instanceof SegmentedObjectDisplay) {
+            Platform.runLater(()->{
+                ImageWindowContainer.getInstance().getChildren().add(new SegmentedObjectWindow(getContext()).show((SegmentedObjectDisplay)dspl));
+            });
+        }
+        else {
             logger.warning("Cannot show display type :" + dspl.getClass().getSimpleName());
         }
     }
