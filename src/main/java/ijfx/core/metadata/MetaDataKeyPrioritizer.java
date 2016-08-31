@@ -19,12 +19,8 @@
  */
 package ijfx.core.metadata;
 
-import com.google.common.collect.Sets;
-import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Orders metadata by priority list
