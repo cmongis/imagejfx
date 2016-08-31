@@ -108,7 +108,7 @@ import static org.scijava.util.Colors.map;
  * @author cyril
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "segmentation-panel", context = "segmentation", localization = Localization.RIGHT)
+@UiConfiguration(id = "segmentation-panel", context = "segmentation -overlay-selected", localization = Localization.RIGHT)
 public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     /*
@@ -197,6 +197,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     ReadOnlyBooleanProperty isExplorer;
 
+    ReadOnlyBooleanProperty isMultidimensional;
+    
     private static final Boolean USE_ALL_PLANE = Boolean.TRUE;
 
     PopOver previewPopOver = new PopOver();
@@ -222,6 +224,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
         isExplorer = new UiContextProperty(context, "explorerActivity");
 
+        isMultidimensional = new UiContextProperty(context, "multi-n-img");
         //startButton.visibleProperty().bind(isExplorer);
         // Bindings buttons
         new TaskButtonBinding(startButton)
@@ -232,8 +235,11 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         new TaskButtonBinding(testButton)
                 .setTaskFactory(this::createTaskButtonBinding)
                 .setBaseIcon(FontAwesomeIcon.CHECK_SQUARE)
-                .textBeforeTaskProperty().bind(Bindings.createStringBinding(this::getTestButtonText, isExplorer));
+                .textBeforeTaskProperty().bind(Bindings.createStringBinding(this::getTestButtonText, isExplorer,isMultidimensional));
 
+        testButton.visibleProperty().bind(isExplorer.or(isExplorer.not().and(isMultidimensional)));
+        
+        
         Button button = new Button("Segment more");
         button.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.COMPASS));
         button.setOnAction(this::segmentMore);
@@ -352,83 +358,31 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
                 .collect(Collectors.toList());
         
         for(Overlay o : toRemove) overlayService.removeOverlay(inputDisplay, o);
-        /*        
-        .forEach(o -> {
-                    try {
-                        overlayService.removeOverlay(inputDisplay, o);
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error when removing overlay", e);
-                    }
-                });*/
+        
         
         // deleting the overlay owned previously by the input
         inputDisplay.addAll(Stream.of(overlay).map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
 
         Stream.of(overlay).map(o -> new OverlayCreatedEvent(o)).forEach(eventService::publish);
         inputDisplay.update();
-        //overlayService.getOverlays(inputDisplay).forEach(o -> overlayService.removeOverlay(o));
+        
+        
+        
         // creating a display for the mask
         ImageDisplay outputDisplay = new DefaultImageDisplay();
         context.inject(outputDisplay);
         outputDisplay.display(input.getDataset());
 
         // adding the overlay to the input dipslay
-        //overlayService.addOverlays(inputDisplay, Arrays.asList(overlay));
-        //inputDisplay.update();
+
         handler.setStatus("Gathering statistics...");
 
         logger.info("Gathering statistics");
 
         handler.setProgress(-1);
-        // gathering statistics about the object from the input display
-        //List<Map<String, Object>> map;
-        
+       
         measureService.measureAllOverlay(inputDisplay);
         
-        /*
-        map = Arrays.stream(overlay)
-                .filter(o -> o != null)
-                .map(o -> {
-                    try {
-
-                        Map<String, Object> stats = new HashMap<>();
-                        overlayStatsService
-                                .getStatisticsAsMap(inputDisplay, o)
-                                .forEach((key, value) -> stats.put(key, value));
-                        stats.put(MetaData.NAME, o.getName());
-                        return stats;
-                    } catch (Exception e) {
-                        return null;
-                    }
-                })
-                .collect(Collectors.toList());
-        logger.info(String.format("Collected %d rows", map.size()));
-        DefaultGenericTable resultTable = new DefaultGenericTable();
-        if (map.size() > 0) {
-            int headerNumber = map.get(0).keySet().size() + 1;
-
-            String[] headers = map
-                    .get(0)
-                    .keySet()
-                    .stream()
-                    .sorted(new MetaDataKeyPrioritizer(MetaDataKeyPriority.OBJECT))
-                    .toArray(size -> new String[size]);
-            resultTable.insertColumns(0, headers);
-
-            for (int rowNumber = 0; rowNumber != map.size(); rowNumber++) {
-
-                final int finalRowNumber = rowNumber;
-                resultTable.insertRow(finalRowNumber);
-                map.get(rowNumber).forEach((key, value) -> {
-                    System.out.println(String.format("Setting the value %s to %s (%s)", key, value, finalRowNumber));
-
-                    resultTable.set(key, finalRowNumber, value);
-                });
-            }
-
-        }
-        */
-
         if (isExplorer()) {
             activityService.openByType(ImageJContainer.class);
         }
@@ -476,7 +430,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         } else {
 
             Task<Boolean> task = new WorkflowBuilder(context)
-                    .addInput(imageDisplayService.getActiveDataset())
+                    .addInput(imageDisplayService.getActiveDataset().duplicate())
                     .execute(workflowPanel.stepListProperty())
                     .then(input -> detectObjectsAndDisplay(new SilentProgressHandler(), imageDisplayService.getActiveImageDisplay(), input))
                     .start();
@@ -496,14 +450,22 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     private String getTestButtonText() {
         if (!isExplorer()) {
-            return "Test on the current plane";
+             
+                return "Segment the plane";
+            
         } else {
             return "Test on one image";
         }
     }
-
+    private boolean isMultidimensional() {
+        return isMultidimensional.getValue();
+    }
     private String getStartButtonText() {
         if (!isExplorer()) {
+            if(!isMultidimensional()) {
+                return "Segment this image";
+            }
+            else
             return "Use whole image as input";
         } else {
             return "Process all images";
