@@ -66,7 +66,8 @@ public class WorkflowSavingTest extends BaseImageJTest {
         Workflow workflow = new WorkflowBuilder(context)
                 .addStep(ExtractSlices.class, "interval", new DefaultInterval(20, 70))
                 .addStep(GaussianBlur.class, "sigma", 3.0)
-                .addStep(Projection.class, "projectMethod", new MedianProjection())
+                .addStep(Projection.class, "projectMethod", new MedianProjection(),"axisTypeParameter")
+                
                 //.addStep(GaussianBlur.class,"sigma",3.0)
                 .getWorkflow("Test workflow");
 
@@ -98,6 +99,8 @@ public class WorkflowSavingTest extends BaseImageJTest {
         hashMap.put("int",interval);
         String serialized = objectMapper.writeValueAsString(hashMap);
         System.out.println(serialized);
+        
+        
         HashMap<String,Object> loaded = objectMapper.readValue(serialized,HashMap.class);
         
         Assert.assertTrue(LongInterval.class.isAssignableFrom(loaded.get("int").getClass()));
