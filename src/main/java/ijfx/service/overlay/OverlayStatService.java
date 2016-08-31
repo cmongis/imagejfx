@@ -26,6 +26,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Callback;
 import net.imagej.Dataset;
@@ -220,22 +221,26 @@ public class OverlayStatService extends AbstractService implements ImageJService
     }
 
     public OverlayStatistics getOverlayStatistics(ImageDisplay display, Overlay overlay) {
-        return new DefaultOverlayStatistics(display, overlay);
+        try {
+            return new DefaultOverlayStatistics(display, overlay);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when creating OverlayStatisticsObject for overlay " + overlay.getName(), e);
+        }
+        return null;
     }
 
     public OverlayShapeStatistics getShapeStatistics(Overlay overlay) {
 
-        OverlayShapeStatistics overlayStatistics;
+        OverlayShapeStatistics overlayStatistics = null;
 
         if (overlay instanceof LineOverlay) {
             overlayStatistics = new LineOverlayStatistics(overlay, this.context());
         } else if (overlay instanceof RectangleOverlay) {
             overlayStatistics = new RectangleOverlayStatistics(overlay, this.context());
-        } else if(overlay instanceof PolygonOverlay){
-            overlay = cleanOverlay((PolygonOverlay)overlay);
+        } else if (overlay instanceof PolygonOverlay) {
+            overlay = cleanOverlay((PolygonOverlay) overlay);
+            overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());
         }
-         overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());
-        
 
         return overlayStatistics;
     }
@@ -319,7 +324,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
 
             overlays.get(i).setFillColor(randomColor);
             overlays.get(i).setLineColor(randomColor);
-            overlays.get(i).update();
+            //overlays.get(i);
         }
     }
 
@@ -388,24 +393,24 @@ public class OverlayStatService extends AbstractService implements ImageJService
         Callback<RealLocalizable, Point2D> converter = real -> new Point2D.Double(real.getDoublePosition(0), real.getDoublePosition(1));
 
         List<RealLocalizable> points = new ArrayList<>();
-        
+
         points.add(overlay.getRegionOfInterest().getVertex(0));
-        
-        
+
         for (int i = 1; i != npoints - 2; i++) {
 
             Point2D p1 = converter.call(roi.getVertex(i - 1));
             Point2D p2 = converter.call(roi.getVertex(i));
             Point2D p3 = converter.call(roi.getVertex(i + 1));
-            
-            if(!areColinear(p1, p2, p3))  points.add(roi.getVertex(i));
-            
+
+            if (!areColinear(p1, p2, p3)) {
+                points.add(roi.getVertex(i));
+            }
 
         }
-        
-        points.add(overlay.getRegionOfInterest().getVertex(npoints-1));
-        
-        return createPolytonOverlay(getContext(), points, p->new RealPoint(p));
+
+        points.add(overlay.getRegionOfInterest().getVertex(npoints - 1));
+
+        return createPolytonOverlay(getContext(), points, p -> new RealPoint(p));
 
         /*
         if (npoints >= 3) {
