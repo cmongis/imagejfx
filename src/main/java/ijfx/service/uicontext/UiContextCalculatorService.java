@@ -24,6 +24,7 @@ package ijfx.service.uicontext;
 import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlaySelectionEvent;
+import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import mongis.utils.RequestBuffer;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
@@ -59,7 +60,8 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public final static String CTX_TABLE_DISPLAY = "table-open";
     public final static String CTX_IMAGE_DISPLAY = "image-open";
     public final static String CTX_IMAGE_BINARY = "binary";
-
+    public final static String CTX_MEASURE_DISPLAY = "measure-open";
+    
     @Parameter
     DisplayService displayService;
 
@@ -86,8 +88,8 @@ public class UiContextCalculatorService extends AbstractService implements Image
             ImageDisplay imageDisplay = null;
 
             contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
-            contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()));
-
+            contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()) );
+            contextService.toggleContext(CTX_MEASURE_DISPLAY, display != null && SegmentedObjectDisplay.class.isAssignableFrom(display.getClass()));
             // calculation specific to iamge display
             if (display instanceof ImageDisplay) {
                 imageDisplay = (ImageDisplay) display;
@@ -125,14 +127,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
 
     @EventHandler
     public void handleEvent(DisplayUpdatedEvent event) {
-//        displayService.getDisplays().stream().forEach((display) -> {
-//            if (display != event.getDisplay()) {
-//                determineContext(display, false);
-//            }
-//        });
         determineContext(event.getDisplay());
-        // contextService.update();
-
     }
 
     @EventHandler
@@ -143,8 +138,6 @@ public class UiContextCalculatorService extends AbstractService implements Image
             }
         });
         determineContext(event.getDisplay());
-        // contextService.update();
-
     }
 
     @EventHandler
