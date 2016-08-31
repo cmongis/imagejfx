@@ -22,6 +22,7 @@ package ijfx.ui.explorer.view;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaDataKeyPriority;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorationMode;
@@ -31,6 +32,7 @@ import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
@@ -64,6 +66,8 @@ public class TableViewView implements ExplorerView {
 
     List<? extends Explorable> currentItems;
 
+    Logger logger = ImageJFX.getLogger();
+
     public TableViewView() {
 
         tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -78,15 +82,15 @@ public class TableViewView implements ExplorerView {
         return tableView;
     }
 
+    String[] priority = new String[0];
+
     @Override
     public void setItem(List<? extends Explorable> items) {
 
         ImageJFX.getLogger().info(String.format("Setting %d items", items.size()));
 
-        if (getPriority().length != helper.getPriority().length) {
-            helper.setPriority(getPriority());
-        }
-
+        priority = MetaDataKeyPriority.getPriority(items.get(0).getMetaDataSet());
+        helper.setPriority(priority);
         helper.setColumnsFromItems(items);
         helper.setItem(items);
         currentItems = items;
@@ -125,6 +129,7 @@ public class TableViewView implements ExplorerView {
 
         while (changes.next()) {
 
+            logger.info(String.format("Selection changed : %d newly selected, %d unselected", changes.getAddedSize(), changes.getRemovedSize()));
             changes.getAddedSubList()
                     .stream()
                     .map(owner -> (Explorable) owner)
@@ -176,12 +181,8 @@ public class TableViewView implements ExplorerView {
         ((Explorable) owner).selectedProperty().setValue(false);
     }
 
-    private String[] getPriority() {
-        if (explorerService == null || folderService.getCurrentExplorationMode() == ExplorationMode.FILE) {
-            return MetaDataKeyPriority.FILE;
-        } else {
-            return MetaDataKeyPriority.PLANE;
-        }
+    private String[] getPriority(MetaDataSetType t) {
+        return priority;
     }
 
 }
