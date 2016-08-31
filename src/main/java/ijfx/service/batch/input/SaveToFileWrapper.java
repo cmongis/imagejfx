@@ -20,6 +20,7 @@
 package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
+import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
@@ -62,8 +63,8 @@ public class SaveToFileWrapper extends AbstractSaverWrapper {
         
         String baseName = FilenameUtils.getBaseName(saveFile.getName());
         String ext = FilenameUtils.getExtension(saveFile.getName());
-        String finalName = new StringBuilder().append(baseName).append(suffix).append(".").append(ext).toString();
-        System.out.println(finalName);
+        String finalName = new StringBuilder().append(baseName).append("_").append(suffix).append(".").append(ext).toString();
+        
         saveTo = new File(saveFile.getParentFile(),finalName);
     }
             
@@ -71,7 +72,7 @@ public class SaveToFileWrapper extends AbstractSaverWrapper {
     @Override
     public void save() {
         try {
-            System.out.println("Saving to ..."+saveTo.getAbsolutePath());
+            ImageJFX.getLogger().info("Saving to ..."+saveTo.getAbsolutePath());
             datasetIoService.save(getWrappedObject().getDataset(), saveTo.getAbsolutePath());
         } catch (IOException ex) {
             Logger.getLogger(SaveToFileWrapper.class.getName()).log(Level.SEVERE, null, ex);
