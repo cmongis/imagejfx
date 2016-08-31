@@ -20,6 +20,7 @@
 package ijfx.ui.context;
 
 import ijfx.service.uicontext.UiContextService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import org.scijava.Context;
 import org.scijava.event.EventHandler;
@@ -68,7 +69,7 @@ public class UiContextProperty extends ReadOnlyBooleanPropertyBase{
     @EventHandler
     public void onContextUpdated(UiContextUpdatedEvent event)  {
         isInCurrentContext = event.getObject().contains(name);
-        fireValueChangedEvent();
+        Platform.runLater(this::fireValueChangedEvent);
     }
     
 }
