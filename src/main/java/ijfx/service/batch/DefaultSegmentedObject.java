@@ -66,6 +66,7 @@ public class DefaultSegmentedObject implements SegmentedObject {
     }
     
     public DefaultSegmentedObject(Overlay overlay, OverlayStatistics overlayStatistics) {
+        this();
         overlay.getContext().inject(this);
         setOverlay(overlay);
         
