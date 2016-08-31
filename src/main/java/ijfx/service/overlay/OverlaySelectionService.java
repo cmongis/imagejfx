@@ -85,6 +85,16 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
         eventService.publish(new OverlayAllSelectedEvent(imageDisplay));
     }
 
+    public void select(ImageDisplay display, List<Overlay> overlay) {
+        
+        getSelectedOverlays(display)
+                .stream()
+                .filter(o->isSelected(display, o) && overlay.contains(o) == false)
+                .forEach(o->setOverlaySelection(display, o, false));
+        
+        overlay.forEach(o->setOverlaySelection(display, o, true)); 
+    }
+    
     public void unselectedAll(ImageDisplay imageDisplay) {
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView && view.isSelected() == true) {
