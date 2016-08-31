@@ -359,6 +359,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     private boolean isFloat() {
+        if(currentImageDisplayProperty.getValue() == null) return false;
         return !imageDisplayService.getActiveDataset(currentImageDisplayProperty.getValue()).isInteger();
     }
 
