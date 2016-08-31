@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.plugins.LongInterval;
+import ijfx.plugins.projection.ProjectionMethod;
 import ijfx.service.workflow.json.FileDeserializer;
 import ijfx.service.workflow.json.FileSerializer;
 import ijfx.service.workflow.json.JsonFieldName;
@@ -33,7 +34,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import net.imagej.ImageJ;
+import net.imagej.axis.AxisType;
 import net.imagej.threshold.ThresholdMethod;
 import net.imglib2.display.ColorTable8;
 import org.apache.commons.lang3.ArrayUtils;
@@ -81,7 +84,11 @@ public class DefaultWorkflowStep implements WorkflowStep {
         String.class,
         File.class,
         ColorTable8.class,
-        LongInterval.class, ThresholdMethod.class
+        LongInterval.class,
+        ThresholdMethod.class,
+        ProjectionMethod.class,
+        AxisType.class
+        
     };
 
     public DefaultWorkflowStep() {
@@ -180,7 +187,9 @@ public class DefaultWorkflowStep implements WorkflowStep {
             if (value == null) {
                 return;
             }
-            if (ArrayUtils.contains(SAVED_TYPES, value.getClass())) {
+            
+            boolean canSave  = canSave(value);
+            if (canSave) {
 
                 if (value instanceof String && value.toString().startsWith(FileSerializer.FILE_PREFIX)) {
                     this.parameters.put(key, FileDeserializer.deserialize(value.toString()));
@@ -193,6 +202,15 @@ public class DefaultWorkflowStep implements WorkflowStep {
         //this.parameters = parameters;
     }
 
+    private boolean canSave(Object value) {
+        return Stream
+                .of(SAVED_TYPES)
+                .parallel()
+                .filter(type->type.isAssignableFrom(value.getClass()))
+                .count() > 0;
+                
+    }
+    
     /*
     @Override
     public Map<String, StepParameterType> getParameterTypes() {
