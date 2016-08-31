@@ -1,4 +1,4 @@
-/*
+ /*
     This file is part of ImageJ FX.
 
     ImageJ FX is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import ijfx.service.IjfxService;
 import java.io.File;
 import net.imagej.Dataset;
 import net.imglib2.Cursor;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -40,5 +41,5 @@ public interface IjfxStatisticService extends IjfxService{
     public DescriptiveStatistics getPlaneDescriptiveStatistics(Dataset dataset, long[]position);
     public SummaryStatistics getStatistics(File file);
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition);
-    
+    public <T extends RealType<T>> Double[] getValues(RandomAccessibleInterval<T> inteverval);
 }

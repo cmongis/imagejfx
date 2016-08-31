@@ -27,14 +27,18 @@ import ijfx.service.sampler.SparsePositionIterator;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.axis.Axes;
 import net.imagej.sampler.AxisSubrange;
 import net.imglib2.Cursor;
+import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessible;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.SubsampleIntervalView;
+import net.imglib2.view.Views;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.plugin.Parameter;
@@ -157,6 +161,24 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
         }
         return stats;
 
+    }
+    
+    @Override
+    public <T extends RealType<T>> Double[] getValues(RandomAccessibleInterval<T> interval) {
+        
+        IterableInterval<T> flatIterable = Views.flatIterable(interval);
+        
+        Double[] values = new Double[(int)(flatIterable.dimension(0)*flatIterable.dimension(1))];
+        Cursor<T> cursor = flatIterable.cursor();
+        cursor.reset();
+        int i = 0;
+        while(cursor.hasNext()) {
+            cursor.fwd();
+            values[i] = cursor.get().getRealDouble();
+            i++;
+        }
+        
+        return values;
     }
 
     
