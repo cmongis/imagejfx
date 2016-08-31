@@ -33,6 +33,7 @@ import ijfx.service.workflow.WorkflowIOService;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import net.imagej.axis.Axes;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
 import net.imagej.threshold.ThresholdService;
 import org.junit.Assert;
@@ -62,11 +63,11 @@ public class WorkflowSavingTest extends BaseImageJTest {
     public void testloadsave() {
 
         File testFile = new File("workflow_test.json");
-
+        if(testFile.exists()) testFile.delete();
         Workflow workflow = new WorkflowBuilder(context)
                 .addStep(ExtractSlices.class, "interval", new DefaultInterval(20, 70))
                 .addStep(GaussianBlur.class, "sigma", 3.0)
-                .addStep(Projection.class, "projectMethod", new MedianProjection(),"axisTypeParameter")
+                .addStep(Projection.class, "projectMethod", new MedianProjection())
                 
                 //.addStep(GaussianBlur.class,"sigma",3.0)
                 .getWorkflow("Test workflow");
@@ -75,6 +76,8 @@ public class WorkflowSavingTest extends BaseImageJTest {
 
         Workflow w = workflowIOService.loadWorkflow(testFile);
 
+        Assert.assertNotNull(w);
+        
         // Asserting the size
         Assert.assertEquals(workflow.getStepList().size(), w.getStepList().size());
 
