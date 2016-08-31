@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.chart.*?>
 <?import java.lang.*?>
@@ -24,7 +25,12 @@
                <bottom>
                   <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <items>
-                      <Button mnemonicParsing="false" onAction="#deleteOverlay" text="Delete Overlay" />
+                        <Button mnemonicParsing="false" onAction="#measure" text="Measure">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="CUTLERY" />
+                           </graphic>
+                        </Button>
+                      <Button mnemonicParsing="false" onAction="#deleteOverlay" text="Delete" />
                     </items>
                   </ToolBar>
                </bottom>
