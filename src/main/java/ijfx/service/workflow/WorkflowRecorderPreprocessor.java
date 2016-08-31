@@ -39,9 +39,8 @@ import org.scijava.plugin.Plugin;
  *
  * @author Cyril MONGIS, 2015
  */
-
-@Plugin(type = PreprocessorPlugin.class, priority = Priority.VERY_LOW_PRIORITY-10)
-public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin{
+@Plugin(type = PreprocessorPlugin.class, priority = Priority.VERY_LOW_PRIORITY - 10)
+public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin {
 
     @Parameter
     Context context;
@@ -52,38 +51,41 @@ public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin{
     @Parameter
     WorkflowService workflowService;
 
-    
     @Parameter
     BatchService batchService;
-    
-    
+
     private final Logger logger = ImageJFX.getLogger();
-    
+
     @Override
     public void process(Module module) {
 
-        
-        if(workflowService.isRunning() || batchService.isRunning()) return;
-        
-        if(CommandModule.class.isAssignableFrom(module.getClass())) {
-            if(((CommandModule)module).isCanceled()) {
+        if (workflowService.isRunning() || batchService.isRunning()) {
+            return;
+        }
+
+        if (CommandModule.class.isAssignableFrom(module.getClass())) {
+            if (((CommandModule) module).isCanceled()) {
+                logger.info("Command canceled. No recording");
                 return;
             }
         }
-        
+
         DefaultWorkflowStep step = new DefaultWorkflowStep(module);
         context.inject(step);
         step.setParameters(module.getInputs());
+        // creating a builder for logging purpose
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Recorded parameters  : ");
         module.getInputs().forEach((key, value) -> {
-            logger.fine("" + key + " = " + value);
+            builder.append("  ").append(key).append("=").append(value);
         });
 
-        
+        logger.info(builder.toString());
+
         step.setId(workflowService.generateStepName(editService.getStepList(), step));
 
         Platform.runLater(() -> editService.getStepList().add(step));
 
-       
     }
 
 }
