@@ -159,4 +159,10 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
     public MetaDataSet getMetaDataSet() {
         return object.getMetaDataSet();
     }
+
+    public SegmentedObject getObject() {
+        return object;
+    }
+    
+    
 }
