@@ -647,27 +647,43 @@
         ,
         "items": [
             {
+                "type":"Command"
+                ,"label":"Slice statistics"
+                ,"action":"ijfx.plugins.commands.measures.MeasurePlaneStatistics"
+                ,"icon":"INDENT"
+                ,"context":"image-open"
+            }
+            ,{
+                "type":"Command"
+                ,"label":"Global statistics"
+                ,"action":"ijfx.plugins.commands.measures.DatasetStatistics"
+                ,"icon":"GLOBE"
+                ,"context":"image-open"
+            }
+            
+            ,{
                 "type": "Command"
                 ,
-                "label": "Measure all objects"
+                "label": "All objects"
                 ,
                 "action": "ijfx.plugins.commands.measures.MeasureAllOverlays"
                 ,
-                "icon": "OBJECT_UNGROUP"
+                "icon": "TH"
                 ,
                 "context": "image-open"
             }
             , {
-                "type": "ServiceCall"
+                "type": "Command"
                 ,
-                "label": "Measure selected"
+                "label": "Selected object"
                 ,
                 "action": "ijfx.plugins.commands.measures.MeasureSelectedOverlay"
                 ,
-                "icon": "PLUS_SQUARE_O"
+                "icon": "SQUARE"
                 ,
                 "context": "image-open+overlay-selected"
             }
+           
         ]
 
 
