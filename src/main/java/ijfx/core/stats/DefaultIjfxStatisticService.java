@@ -19,6 +19,15 @@
  */
 package ijfx.core.stats;
 
+import static ijfx.core.metadata.MetaData.LBL_KURTOSIS;
+import static ijfx.core.metadata.MetaData.LBL_MAX;
+import static ijfx.core.metadata.MetaData.LBL_MEAN;
+import static ijfx.core.metadata.MetaData.LBL_MEDIAN;
+import static ijfx.core.metadata.MetaData.LBL_MIN;
+import static ijfx.core.metadata.MetaData.LBL_PIXEL_COUNT;
+import static ijfx.core.metadata.MetaData.LBL_SD;
+import static ijfx.core.metadata.MetaData.LBL_SKEWNESS;
+import static ijfx.core.metadata.MetaData.LBL_VARIANCE;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.service.sampler.PositionIterator;
@@ -27,7 +36,8 @@ import ijfx.service.sampler.SparsePositionIterator;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.axis.Axes;
@@ -37,9 +47,9 @@ import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.view.SubsampleIntervalView;
 import net.imglib2.view.Views;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -181,5 +191,27 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
         return values;
     }
 
+    @Override
+    public Map<String, Double> summaryStatisticsToMap(StatisticalSummary summaryStats) {
+        
+        Map<String,Double> statistics = new HashMap<>();
+         statistics.put(LBL_MEAN, summaryStats.getMean());
+        statistics.put(LBL_MIN, summaryStats.getMin());
+        statistics.put(LBL_MAX, summaryStats.getMax());
+        statistics.put(LBL_SD, summaryStats.getStandardDeviation());
+        statistics.put(LBL_VARIANCE, summaryStats.getVariance());
+        
+        statistics.put(LBL_PIXEL_COUNT, (double) summaryStats.getN());
+        return statistics;
+    }
+
+    @Override
+    public Map<String, Double> descriptiveStatisticsToMap(DescriptiveStatistics descriptiveStats) {
+        Map<String,Double> statistics = summaryStatisticsToMap(descriptiveStats);
+        statistics.put(LBL_MEDIAN, descriptiveStats.getPercentile(50));
+        statistics.put(LBL_KURTOSIS,descriptiveStats.getKurtosis());
+        statistics.put(LBL_SKEWNESS,descriptiveStats.getSkewness());
+        return statistics;
+    }
     
 }

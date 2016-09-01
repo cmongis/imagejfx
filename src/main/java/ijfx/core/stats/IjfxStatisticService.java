@@ -21,11 +21,13 @@ package ijfx.core.stats;
 
 import ijfx.service.IjfxService;
 import java.io.File;
+import java.util.Map;
 import net.imagej.Dataset;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
@@ -42,4 +44,8 @@ public interface IjfxStatisticService extends IjfxService{
     public SummaryStatistics getStatistics(File file);
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition);
     public <T extends RealType<T>> Double[] getValues(RandomAccessibleInterval<T> inteverval);
+    public Map<String,Double> summaryStatisticsToMap(StatisticalSummary stats);
+    public Map<String,Double> descriptiveStatisticsToMap(DescriptiveStatistics descriptiveStats);
+    
+    
 }
