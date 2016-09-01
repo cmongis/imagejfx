@@ -2,4 +2,7 @@ ijfx.plugins.commands.Binarize
 net.imagej.plugins.commands.display.interactive.Threshold
 net.imagej.ops.commands.threshold.GlobalThresholder
 net.imagej.ops.commands.project.ProjectCommand
-package net.imagej.plugins.commands.display.interactive;
+net.imagej.plugins.commands.display.interactive
+package net.imagej.plugins.commands.app.ImageJWebsite
+org.scijava.ui.swing.console.ShowConsole
+org.scijava.ui.swing.mdi.WindowsTileVertical
