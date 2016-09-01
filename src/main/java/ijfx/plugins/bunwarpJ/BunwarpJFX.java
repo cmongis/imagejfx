@@ -46,7 +46,6 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>BUnwarpJCommand")
 public class BunwarpJFX implements Command {
 
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};

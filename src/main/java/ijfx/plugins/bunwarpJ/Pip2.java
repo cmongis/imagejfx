@@ -63,7 +63,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Pip2")
+@Deprecated
 public class Pip2 implements Command {
 
     public static String[] modesArray = {"Fast", "Accurate", "Mono"};
