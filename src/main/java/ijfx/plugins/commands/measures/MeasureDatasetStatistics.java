@@ -19,37 +19,30 @@
  */
 package ijfx.plugins.commands.measures;
 
-import ijfx.service.overlay.OverlaySelectionService;
-import ijfx.service.ui.MeasurementService;
-import net.imagej.display.ImageDisplay;
-import org.scijava.ItemIO;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplayService;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.UIService;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath = "Analyze > Compute selected object")
-public class MeasureSelectedOverlay extends ContextCommand{
-    
-    @Parameter(type = ItemIO.BOTH)
-    ImageDisplay imageDisplay;
-    
-    @Parameter
-    OverlaySelectionService overlaySelectionService;
+@Plugin(type  = Command.class, menuPath = "Analyze > Compute dataset statistics", headless  = false)
+public class MeasureDatasetStatistics extends ContextCommand
+{
 
     @Parameter
-    MeasurementService measurementService;
+    MetaDataSetDisplayService metaDataSetSrv;
+    
+    @Parameter
+    UIService uiService;
     
     @Override
     public void run() {
-        
-        measurementService.measureSelectedOverlay();
+        uiService.showDialog("Option not supported yet.");
     }
-    
-    
     
 }

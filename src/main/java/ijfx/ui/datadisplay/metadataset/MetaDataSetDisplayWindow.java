@@ -17,39 +17,40 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.commands.measures;
+package ijfx.ui.datadisplay.metadataset;
 
-import ijfx.service.overlay.OverlaySelectionService;
-import ijfx.service.ui.MeasurementService;
-import net.imagej.display.ImageDisplay;
-import org.scijava.ItemIO;
-import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
+import ijfx.ui.datadisplay.table.AbstractDisplayWindow;
+import javafx.scene.layout.Pane;
+import org.scijava.Context;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath = "Analyze > Compute selected object")
-public class MeasureSelectedOverlay extends ContextCommand{
-    
-    @Parameter(type = ItemIO.BOTH)
-    ImageDisplay imageDisplay;
-    
-    @Parameter
-    OverlaySelectionService overlaySelectionService;
+public class MetaDataSetDisplayWindow extends AbstractDisplayWindow<MetaDataSetDisplay>{
 
-    @Parameter
-    MeasurementService measurementService;
+    MetaDataSetDisplayPane pane;
     
-    @Override
-    public void run() {
-        
-        measurementService.measureSelectedOverlay();
+    @Parameter
+    Context context;
+
+    public MetaDataSetDisplayWindow(Context context) {
+        super(context);
     }
     
-    
+    @Override
+    protected void display(MetaDataSetDisplay display) {
+        pane.display(display);
+        setTitle(display.getName());
+    }
+
+    @Override
+    protected Pane init() {
+        if(pane == null) {
+            pane = new MetaDataSetDisplayPane(context);
+        }
+        return pane;
+    }
     
 }

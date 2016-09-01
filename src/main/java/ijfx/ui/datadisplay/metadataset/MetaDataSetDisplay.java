@@ -17,33 +17,20 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.commands.measures;
+package ijfx.ui.datadisplay.metadataset;
 
-import ijfx.service.ui.MeasurementService;
-import net.imagej.display.ImageDisplay;
-import org.scijava.ItemIO;
-import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+import ijfx.core.metadata.MetaDataSet;
+import org.scijava.display.Display;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath="Analyze > Compute object statistics")
-public class MeasureAllOverlays extends ContextCommand{
-
-    @Parameter
-    MeasurementService measurementService;
+public interface MetaDataSetDisplay extends Display<MetaDataSet>{
     
-    @Parameter(type = ItemIO.BOTH)
-    ImageDisplay imageDisplay;
+    public static String PLANE_MEASURES = "Plane measure";
+    public static String DATASET_MEASURE = "Measures";
+            
     
-    @Override
-    public void run() {
-        
-        measurementService.measureAllOverlay(imageDisplay);
-    }
     
 }

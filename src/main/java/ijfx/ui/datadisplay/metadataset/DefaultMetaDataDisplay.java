@@ -17,38 +17,21 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.plugins.commands.measures;
+package ijfx.ui.datadisplay.metadataset;
 
-import ijfx.service.overlay.OverlaySelectionService;
-import ijfx.service.ui.MeasurementService;
-import net.imagej.display.ImageDisplay;
-import org.scijava.ItemIO;
-import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+import ijfx.core.metadata.MetaDataSet;
+import org.scijava.display.AbstractDisplay;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath = "Analyze > Compute selected object")
-public class MeasureSelectedOverlay extends ContextCommand{
+public class DefaultMetaDataDisplay extends AbstractDisplay<MetaDataSet> implements MetaDataSetDisplay{
     
-    @Parameter(type = ItemIO.BOTH)
-    ImageDisplay imageDisplay;
-    
-    @Parameter
-    OverlaySelectionService overlaySelectionService;
-
-    @Parameter
-    MeasurementService measurementService;
-    
-    @Override
-    public void run() {
-        
-        measurementService.measureSelectedOverlay();
+    public DefaultMetaDataDisplay(Class<MetaDataSet> type) {
+        super(type);
     }
+    
     
     
     

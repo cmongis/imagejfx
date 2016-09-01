@@ -34,8 +34,10 @@ public class MetaDataSetExplorerWrapper extends AbstractExplorable implements Ex
 
     private static Image bieber = new Image("http://www.billboard.com/files/styles/article_main_image/public/media/justin-bieber-shirtless-presents-onstage-at-fashion-rocks-2014-billboard-650.jpg");
     
+    private final MetaDataSet wrappedMetaDataSet;
+    
     public MetaDataSetExplorerWrapper(MetaDataSet metaDataSet) {
-        getMetaDataSet().merge(metaDataSet);
+        wrappedMetaDataSet = metaDataSet;
     }
 
     
@@ -69,6 +71,11 @@ public class MetaDataSetExplorerWrapper extends AbstractExplorable implements Ex
     @Override
     public Dataset getDataset() {
         return null;
+    }
+    
+    @Override
+    public MetaDataSet getMetaDataSet() {
+        return wrappedMetaDataSet;
     }
     
 }
