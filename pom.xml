@@ -23,19 +23,22 @@
             <id>imagej.releases</id>
             <url>http://maven.imagej.net/content/repositories/releases/</url>
         </repository>
+        <!--
         <repository>
             <id>imagej.snapshots</id>
             <url>http://maven.imagej.net/content/repositories/snapshots</url>
         </repository>
+        -->
         <!-- NB: for project parent -->
         <repository>
             <id>ome.releases</id>
             <url>http://maven.imagej.net/content/repositories/ome-releases/</url>
         </repository>
+        <!--
         <repository>
             <id>cfx.snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
+        </repository>-->
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
