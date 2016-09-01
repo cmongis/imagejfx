@@ -20,6 +20,7 @@
  */
 package ijfx.service.overlay;
 
+import ijfx.core.metadata.MetaData;
 import ijfx.ui.main.ImageJFX;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -85,29 +86,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
 
     final private Logger logger = ImageJFX.getLogger();
 
-    public final static String LBL_MEAN = "Mean";
-    public final static String LBL_MEDIAN = "Median";
-    public final static String LBL_AREA = "Area";
-    public final static String LBL_MAX = "Max";
-    public final static String LBL_MIN = "Min";
-    public final static String LBL_SD = "Std. Dev.";
-    public final static String LBL_VARIANCE = "Variance";
-    public final static String LBL_PIXEL_COUNT = "Pixel count";
-
-    public final static String LBL_MBR = "Minimum Bounding Rectangle";
-    public final static String LBL_CENTROID = "Center of Gravity";
-    public final static String LBL_MAX_FERET_DIAMETER = "Feret Diameter";
-    public final static String LBL_MIN_FERET_DIAMETER = "Min. Feret Diameter";
-    public final static String LBL_LONG_SIDE_MBR = "Long Side MBR";
-    public final static String LBL_SHORT_SIDE_MBR = "Short Side MBR";
-    public final static String LBL_ASPECT_RATIO = "Aspect ratio";
-    public final static String LBL_CONVEXITY = "Convexity";
-    public final static String LBL_SOLIDITY = "Solidity";
-    public final static String LBL_CIRCULARITY = "Circularity";
-    public final static String LBL_THINNES_RATIO = "Thinnes ratio";
-
-    public final static String LBL_CENTER_X = "Center X";
-    public final static String LBL_CENTER_Y = "Center Y";
 
     public Double[] getValueListFromImageDisplay(ImageDisplay imageDisplay, Overlay overlay) {
 
@@ -264,13 +242,13 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public HashMap<String, Double> getPixelStatisticsAsMap(PixelStatistics overlayStats) {
         HashMap<String, Double> statistics = new HashMap<>();
         // if(overlayStats.getPixelStatistics() != null) {
-        statistics.put(LBL_MEAN, overlayStats.getMean());
-        statistics.put(LBL_MIN, overlayStats.getMin());
-        statistics.put(LBL_MAX, overlayStats.getMax());
-        statistics.put(LBL_SD, overlayStats.getStandardDeviation());
-        statistics.put(LBL_VARIANCE, overlayStats.getVariance());
-        statistics.put(LBL_MEDIAN, overlayStats.getMedian());
-        statistics.put(LBL_PIXEL_COUNT, (double) overlayStats.getPixelCount());
+        statistics.put(MetaData.LBL_MEAN, overlayStats.getMean());
+        statistics.put(MetaData.LBL_MIN, overlayStats.getMin());
+        statistics.put(MetaData.LBL_MAX, overlayStats.getMax());
+        statistics.put(MetaData.LBL_SD, overlayStats.getStandardDeviation());
+        statistics.put(MetaData.LBL_VARIANCE, overlayStats.getVariance());
+        statistics.put(MetaData.LBL_MEDIAN, overlayStats.getMedian());
+        statistics.put(MetaData.LBL_PIXEL_COUNT, (double) overlayStats.getPixelCount());
         // }
         return statistics;
     }
@@ -283,19 +261,19 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public HashMap<String, Double> getShapeStatisticsAsMap(OverlayShapeStatistics overlayStats) {
 
         HashMap<String, Double> statistics = new HashMap<>();
-        statistics.put(LBL_AREA, overlayStats.getArea());
+        statistics.put(MetaData.LBL_AREA, overlayStats.getArea());
 
-        statistics.put(LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
-        statistics.put(LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
-        statistics.put(LBL_LONG_SIDE_MBR, overlayStats.getLongSideMBR());
-        statistics.put(LBL_SHORT_SIDE_MBR, overlayStats.getShortSideMBR());
-        statistics.put(LBL_ASPECT_RATIO, overlayStats.getAspectRatio());
-        statistics.put(LBL_CONVEXITY, overlayStats.getConvexity());
-        statistics.put(LBL_SOLIDITY, overlayStats.getSolidity());
-        statistics.put(LBL_CIRCULARITY, overlayStats.getCircularity());
-        statistics.put(LBL_THINNES_RATIO, overlayStats.getThinnesRatio());
-        statistics.put(LBL_CENTER_X, overlayStats.getCenterX());
-        statistics.put(LBL_CENTER_Y, overlayStats.getCenterY());
+        statistics.put(MetaData.LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
+        statistics.put(MetaData.LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
+        statistics.put(MetaData.LBL_LONG_SIDE_MBR, overlayStats.getLongSideMBR());
+        statistics.put(MetaData.LBL_SHORT_SIDE_MBR, overlayStats.getShortSideMBR());
+        statistics.put(MetaData.LBL_ASPECT_RATIO, overlayStats.getAspectRatio());
+        statistics.put(MetaData.LBL_CONVEXITY, overlayStats.getConvexity());
+        statistics.put(MetaData.LBL_SOLIDITY, overlayStats.getSolidity());
+        statistics.put(MetaData.LBL_CIRCULARITY, overlayStats.getCircularity());
+        statistics.put(MetaData.LBL_THINNES_RATIO, overlayStats.getThinnesRatio());
+        statistics.put(MetaData.LBL_CENTER_X, overlayStats.getCenterX());
+        statistics.put(MetaData.LBL_CENTER_Y, overlayStats.getCenterY());
 
         return statistics;
     }
