@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TabPane minHeight="200.0" minWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab fx:id="tableTab" text="Table">
+               <content>
+                  <BorderPane fx:id="tableBorderPane">
+                     <bottom>
+                        <HBox styleClass="hbox" BorderPane.alignment="CENTER">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#removeSelectedMeasures" text="Delete selected measures" />
+                              <Button mnemonicParsing="false" onAction="#removeSelectedOverlays" text="Delete selected overlay" />
+                              <Button mnemonicParsing="false" onAction="#saveAsCsv" styleClass="success" text="Save">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="SAVE" styleClass="success" />
+                                 </graphic>
+                              </Button>
+                           </children>
+                           <BorderPane.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </BorderPane.margin>
+                        </HBox>
+                     </bottom>
+                  </BorderPane>
+               </content>
+            </Tab>
+          <Tab fx:id="histogramTabPane" text="Overall histogram">
+               <content>
+                  <BorderPane>
+                     <center>
+                        <AreaChart fx:id="areaChart" createSymbols="false" BorderPane.alignment="CENTER">
+                          <xAxis>
+                            <NumberAxis fx:id="yAxis" side="BOTTOM" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" fx:id="xAxis" />
+                          </yAxis>
+                        </AreaChart>
+                     </center>
+                     <bottom>
+                        <HBox BorderPane.alignment="CENTER">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#calculateHistogram" text="Calculate">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="LINE_CHART" />
+                                 </graphic>
+                              </Button>
+                              <Button mnemonicParsing="false" text="Save as image">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="IMAGE" />
+                                 </graphic>
+                              </Button>
+                              <Button mnemonicParsing="false" text="Save as Text">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="TABLE" />
+                                 </graphic>
+                              </Button>
+                           </children>
+                           <styleClass>
+                              <String fx:value="hbox" />
+                              <String fx:value="with-padding" />
+                           </styleClass>
+                        </HBox>
+                     </bottom>
+                  </BorderPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+</fx:root>
