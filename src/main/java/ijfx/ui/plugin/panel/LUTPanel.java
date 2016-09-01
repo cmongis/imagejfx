@@ -297,11 +297,13 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     public void applyLUT(ColorTable table) {
         DatasetView datasetView = imageDisplayService.getActiveDatasetView();
+        Dataset dataset = imageDisplayService.getActiveDataset();
         HashMap<String, Object> params = new HashMap<>();
         params.put("colorTable", table);
         int channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
         channel = channel == -1 ? 0 : channel;
-        datasetView.setColorTable(table, channel);
+        dataset.setColorTable(table,channel);
+        datasetView.setColorTable(table, channel);  
     }
 
     @Override
