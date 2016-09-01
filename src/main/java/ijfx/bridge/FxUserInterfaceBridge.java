@@ -26,6 +26,8 @@ import ijfx.service.batch.BatchService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.DefaultImageWindow;
 import ijfx.ui.datadisplay.image.ImageWindowContainer;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplay;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplayWindow;
 import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import ijfx.ui.datadisplay.object.SegmentedObjectWindow;
 import ijfx.ui.datadisplay.table.TableDisplayWindow;
@@ -234,6 +236,12 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
         else if (dspl instanceof SegmentedObjectDisplay) {
             Platform.runLater(()->{
                 ImageWindowContainer.getInstance().getChildren().add(new SegmentedObjectWindow(getContext()).show((SegmentedObjectDisplay)dspl));
+            });
+        }
+        
+        else if (dspl instanceof MetaDataSetDisplay) {
+            Platform.runLater(()->{
+                ImageWindowContainer.getInstance().getChildren().add(new MetaDataSetDisplayWindow(getContext()).show((MetaDataSetDisplay)dspl));
             });
         }
         else {
