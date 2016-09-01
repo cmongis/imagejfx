@@ -4,7 +4,7 @@
         "target":"#processButton"
     },
     {
-        "text":"Cho"
+        "text":"Select an image. The source image would be displayed on the left and the transformed image on the right"
         ,"target":"#listViewItems"
     },
     {

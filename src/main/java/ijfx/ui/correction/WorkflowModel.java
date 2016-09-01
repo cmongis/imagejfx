@@ -79,6 +79,7 @@ import net.imagej.table.DefaultResultsTable;
 import net.imagej.table.DefaultTableDisplay;
 import net.imagej.table.ResultsTable;
 import net.imagej.table.TableDisplay;
+import net.imglib2.display.ColorTable;
 import org.scijava.Context;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
@@ -565,6 +566,7 @@ public class WorkflowModel {
             setPosition(getPositionLeft(), imageDisplay);
             Dataset sourceDatasetCorrected = applyFlatField(imageDisplay, getFlatfieldLeft());
             Dataset outputDataset = applyTransformation(sourceDatasetCorrected, getPositionLeft(), targetDatasetCorrected, getPositionRight(), transformation);//applyTransformation(sourceDatasetCorrected, targetDatasetCorrected, transformation);;
+            copyLUT(inputDataset, outputDataset);
             StringBuilder path = null;
 //            try {
 //                path = new StringBuilder(destinationPath);
@@ -605,6 +607,13 @@ public class WorkflowModel {
         return null;
 //        return callbackTask.get();
 
+    }
+    
+    private void copyLUT(Dataset input, Dataset output){
+        for (int i = 0 ; i < input.getColorTableCount(); i++){
+            ColorTable colorTable = input.getColorTable(i);
+            output.setColorTable(colorTable, i);
+        }
     }
 
 }

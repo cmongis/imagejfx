@@ -15,20 +15,6 @@
     <bottom>
         <fx:include source="./ActionBar.fxml" />
     </bottom>
-   <top>
-        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
-            <children>
-                <Label graphicTextGap="15.0" text="Please choose a folder and select the different positions">
-                    <StackPane.margin>
-                        <Insets bottom="32.0" left="32.0" right="32.0" top="32.0" />
-                    </StackPane.margin>
-                    <font>
-                        <Font size="24.0" />
-                    </font>
-                </Label>
-            </children>
-        </StackPane>
-   </top>
    <center>
       <GridPane fx:id="gridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -37,16 +23,26 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <VBox>
+            <VBox GridPane.rowIndex="1">
                <children>
                   <Button fx:id="chooseFolder" mnemonicParsing="false" onAction="#addFiles" text="Choose folder..." />
                   <ListView fx:id="listView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
                </children>
             </VBox>
+            <Label text="Source Image" GridPane.columnIndex="1" GridPane.vgrow="NEVER" />
+            <Label text="Target image" GridPane.columnIndex="2" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
          </children>
       </GridPane>
    </center>
+   <top>
+          <Label graphicTextGap="15.0" text="Please choose a folder and select the different positions" BorderPane.alignment="CENTER">
+              <font>
+                  <Font size="28.0" />
+              </font>
+          </Label>
+   </top>
 </BorderPane>

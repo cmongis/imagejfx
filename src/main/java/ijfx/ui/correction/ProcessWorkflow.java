@@ -28,6 +28,7 @@ import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -96,12 +97,6 @@ public class ProcessWorkflow extends CorrectionFlow {
     @FXML
     GridPane gridPane;
 
-    @FXML
-    Button directoryButton;
-
-    @FXML
-    Label directoryLabel;
-
     private File directory;
 
     ImageDisplayPane imageDisplayPaneLeft;
@@ -126,12 +121,17 @@ public class ProcessWorkflow extends CorrectionFlow {
     public void init() {
         bindListView();
         setCellFactory(listViewItems);
-        gridPane.add(imageDisplayPaneLeft, 1, 0);
-        gridPane.add(imageDisplayPaneRight, 2, 0);
+        gridPane.add(imageDisplayPaneLeft, 1, 1);
+        gridPane.add(imageDisplayPaneRight, 2, 1);
         ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
         bindPaneProperty(Arrays.asList(imageDisplayPanes));
 
-        processButton.setOnMouseClicked(e -> process());
+        processButton.setOnMouseClicked(e -> {
+            saveDirectory();
+            if (directory != null) {
+                process();
+            }
+        });
 
     }
 
@@ -144,6 +144,9 @@ public class ProcessWorkflow extends CorrectionFlow {
         workflowModel.getMapImages().clear();
         System.gc();
         workflowModel.transformeImages(files, directory.getAbsolutePath()).thenRunnable(() -> {
+            files.sort((File o1, File o2) -> {
+                return o1.getName().compareTo(o2.getName());
+            });
             listViewItems.getItems().addAll(files);
         })
                 .start();
@@ -195,7 +198,7 @@ public class ProcessWorkflow extends CorrectionFlow {
                 selectPosition(imageDisplayTarget, workflowModel.getPositionLeft(), workflowModel.getPositionRight(), imageDisplayPaneRight);
 
                 Dataset datasetSource = (Dataset) iOService.open(newValue.getAbsolutePath());
-                ImageDisplay imageDisplaySource = new DefaultImageDisplay();
+                ImageDisplay imageDisplaySource = new SilentImageDisplay();
                 context.inject(imageDisplaySource);
                 imageDisplaySource.display(datasetSource);
                 selectPosition(imageDisplaySource, workflowModel.getPositionLeft(), workflowModel.getPositionRight(), imageDisplayPaneLeft);
@@ -209,11 +212,10 @@ public class ProcessWorkflow extends CorrectionFlow {
 
     @FXML
     public void saveDirectory() {
+        directory = null;
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File file = directoryChooser.showDialog(null);
         directory = file;
-        directoryLabel.setText(directory.getAbsolutePath());
-        processButton.setDisable(false);
 
     }
 
