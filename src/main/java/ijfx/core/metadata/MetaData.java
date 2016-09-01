@@ -34,6 +34,8 @@ import java.util.Map;
  */
 public interface MetaData {
 
+    
+
     /**
      * Transforms a metaDataSet to a string to string hashMap. This method can
      * be useful if one wants to write this metaDataSet to a file in a string
@@ -136,6 +138,30 @@ public interface MetaData {
     
     public final static String STATS_PIXEL_STD_DEV = "Standard deviation";
  
+    public static final String LBL_CIRCULARITY = "Circularity";
+    public static final String LBL_MEDIAN = "Median";
+    public static final String LBL_MEAN = STATS_PIXEL_MEAN;
+    public static final String LBL_CENTER_Y = "Center Y";
+    public static final String LBL_AREA = "Area";
+    public static final String LBL_MIN = STATS_PIXEL_MIN;
+    public static final String LBL_MIN_FERET_DIAMETER = "Min. Feret Diameter";
+    public static final String LBL_VARIANCE = "Variance";
+    public static final String LBL_SOLIDITY = "Solidity";
+    public static final String LBL_CENTROID = "Center of Gravity";
+    public static final String LBL_THINNES_RATIO = "Thinnes ratio";
+    public static final String LBL_ASPECT_RATIO = "Aspect ratio";
+    public static final String LBL_LONG_SIDE_MBR = "Long Side MBR";
+    public static final String LBL_SHORT_SIDE_MBR = "Short Side MBR";
+    public static final String LBL_CENTER_X = "Center X";
+    public static final String LBL_SD = "Std. Dev.";
+    public static final String LBL_KURTOSIS = "Kurtosis";
+    public static final String LBL_SKEWNESS = "Skewness";
+    public static final String LBL_MBR = "Minimum Bounding Rectangle";
+    public static final String LBL_PIXEL_COUNT = "Pixel count";
+    public static final String LBL_MAX_FERET_DIAMETER = "Feret Diameter";
+    public static final String LBL_CONVEXITY = "Convexity";
+    public static final String LBL_MAX = STATS_PIXEL_MAX;
+    
     
     public final static String[] STATS_RELATED_METADATA = new String[] { STATS_PIXEL_MIN, STATS_PIXEL_MAX, STATS_PIXEL_MEAN, STATS_PIXEL_STD_DEV };
     

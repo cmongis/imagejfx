@@ -36,12 +36,12 @@ public class MetaDataKeyPriority {
         MetaData.CHANNEL,
         MetaData.TIME,
         MetaData.Z_POSITION,
-        OverlayStatService.LBL_MEAN,
-        OverlayStatService.LBL_SD,
-        OverlayStatService.LBL_CIRCULARITY,
-        OverlayStatService.LBL_AREA,
-        OverlayStatService.LBL_CENTER_X,
-        OverlayStatService.LBL_CENTER_Y,};
+        MetaData.LBL_MEAN,
+        MetaData.LBL_SD,
+        MetaData.LBL_CIRCULARITY,
+        MetaData.LBL_AREA,
+        MetaData.LBL_CENTER_X,
+        MetaData.LBL_CENTER_Y,};
 
     public static String[] getPriority(MetaDataSet m) {
         if (m == null) {
