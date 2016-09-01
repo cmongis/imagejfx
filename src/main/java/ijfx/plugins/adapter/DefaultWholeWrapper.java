@@ -30,7 +30,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins>DefaultWholeAdapter")
+@Deprecated
 public class DefaultWholeWrapper implements Command{
    @Parameter(type = ItemIO.BOTH)
     protected Dataset dataset;
