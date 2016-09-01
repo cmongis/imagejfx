@@ -32,7 +32,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath = "Analyze > Compute selected object")
+@Plugin(type = Command.class, menuPath = "Analyze > Measure selected object")
 public class MeasureSelectedOverlay extends ContextCommand{
     
     @Parameter(type = ItemIO.BOTH)

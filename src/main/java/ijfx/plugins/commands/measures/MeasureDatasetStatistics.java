@@ -19,7 +19,14 @@
  */
 package ijfx.plugins.commands.measures;
 
+import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
+import ijfx.core.stats.IjfxStatisticService;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplay;
 import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplayService;
+import java.util.Map;
+import net.imagej.Dataset;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
@@ -30,7 +37,7 @@ import org.scijava.ui.UIService;
  *
  * @author cyril
  */
-@Plugin(type  = Command.class, menuPath = "Analyze > Compute dataset statistics", headless  = false)
+@Plugin(type  = Command.class, menuPath = "Analyze > Compute statistics > Whole dataset", headless  = false)
 public class MeasureDatasetStatistics extends ContextCommand
 {
 
@@ -40,9 +47,31 @@ public class MeasureDatasetStatistics extends ContextCommand
     @Parameter
     UIService uiService;
     
+    @Parameter
+    Dataset dataset;
+    
+    @Parameter
+    IjfxStatisticService ijfxStatisticsSrv;
+    
+    @Parameter
+    MetaDataSetDisplayService metaDataSetDisplayService;
+    
     @Override
     public void run() {
-        uiService.showDialog("Option not supported yet.");
+      
+        
+        DescriptiveStatistics planeDescriptiveStatistics = ijfxStatisticsSrv.getDatasetDescriptiveStatistics(dataset);
+        
+        Map<String, Double> statsMap = ijfxStatisticsSrv.descriptiveStatisticsToMap(planeDescriptiveStatistics);
+        
+        MetaDataSet metaDataSet = new MetaDataSet();
+        metaDataSet.merge(statsMap);
+        metaDataSet.setType(MetaDataSetType.FILE);
+        metaDataSetDisplayService.addMetaDataSetToDisplay(metaDataSet, MetaDataSetDisplay.DATASET_MEASURE);
+        
+        
+      
+        
     }
     
 }

@@ -31,7 +31,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath="Analyze > Compute object statistics")
+@Plugin(type = Command.class, menuPath="Analyze > Measure all objects")
 public class MeasureAllOverlays extends ContextCommand{
 
     @Parameter

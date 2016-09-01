@@ -22,13 +22,12 @@ package ijfx.plugins.commands.measures;
 import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.metadata.MetaDataSetUtils;
-import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplay;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 import mongis.utils.TextFileUtils;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -43,15 +42,13 @@ import org.scijava.widget.FileWidget;
  *
  * @author cyril
  */
-@Plugin(type = Command.class)
-public class SaveAsCsv extends ContextCommand{
-
-    
-    @Parameter(label = "Save as",style = FileWidget.SAVE_STYLE)
+@Plugin(type = Command.class,label = "Save table as")
+public class SaveMetaDataSetAsCsv extends ContextCommand {
+     @Parameter(label = "File to save",style = FileWidget.SAVE_STYLE)
     File outputFile;
     
     @Parameter(type = ItemIO.BOTH)
-    SegmentedObjectDisplay objectDisplay;
+    MetaDataSetDisplay objectDisplay;
     
     @Parameter
     UIService uiService;
@@ -65,21 +62,13 @@ public class SaveAsCsv extends ContextCommand{
         }
         if(isCanceled()) return;
         
-        List<MetaDataSet> rows = objectDisplay.stream()
-                .map(o->o.getMetaDataSet())
-                .collect(Collectors.toList());
-        
-        String content = MetaDataSetUtils.exportToCSV(rows, ",", true, MetaDataKeyPriority.OBJECT);
-        
-        
+        List<MetaDataSet> rows = objectDisplay;
+        String content = MetaDataSetUtils.exportToCSV(rows, ",", true, MetaDataKeyPriority.getPriority(objectDisplay.get(0)));
         try {
             TextFileUtils.writeTextFile(outputFile, content);
         } catch (IOException ex) {
            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
            uiService.showDialog("Error when saving CSV file.", DialogPrompt.MessageType.ERROR_MESSAGE);
         }
-        
-        
     }
-    
 }

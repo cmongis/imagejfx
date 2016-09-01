@@ -19,9 +19,14 @@
  */
 package ijfx.plugins.commands.measures;
 
+import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.core.stats.IjfxStatisticService;
-import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplay;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplayService;
+import java.util.Map;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -36,7 +41,7 @@ import org.scijava.ui.UIService;
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath = "Analyze > Compute slice statistics",headless = false)
+@Plugin(type = Command.class, menuPath = "Analyze > Compute statistics > Current slice",headless = false)
 public class MeasurePlaneStatistics extends ContextCommand{
     
     @Parameter
@@ -54,16 +59,27 @@ public class MeasurePlaneStatistics extends ContextCommand{
     @Parameter
     UIService uiService;
     
+    @Parameter
+    MetaDataSetDisplayService metaDataSetDisplaySrv;
+    
     public void run() {
         
         long[] position = new long[imageDisplay.numDimensions()];
-        
-        position = DimensionUtils.planarToNonPlanar(position);
-        
         imageDisplay.localize(position);
+        //position = DimensionUtils.planarToNonPlanar(position);
+        
+        
         DescriptiveStatistics planeDescriptiveStatistics = ijfxStatisticsSrv.getPlaneDescriptiveStatistics(imageDisplaySrv.getActiveDataset(imageDisplay), position);
         
-        uiService.showDialog("Sorry, feature still to implements");
+        Map<String, Double> statsMap = ijfxStatisticsSrv.descriptiveStatisticsToMap(planeDescriptiveStatistics);
+        
+        MetaDataSet metaDataSet = new MetaDataSet();
+        metaDataSet.merge(statsMap);
+        metaDataSet.putGeneric(MetaData.NAME, imageDisplay.getName());
+        metaDataSet.setType(MetaDataSetType.PLANE);
+        metaDataSetDisplaySrv.addMetaDataSetToDisplay(metaDataSet, MetaDataSetDisplay.PLANE_MEASURES);
+        
+      
         
     }
     
