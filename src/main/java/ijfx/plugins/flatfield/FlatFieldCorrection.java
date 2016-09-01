@@ -124,22 +124,7 @@ public class FlatFieldCorrection extends ContextCommand {
         return data;
     }
 
-//    private Dataset divideDatasetByDataset(Dataset numerator, Dataset denominator) {
-//        Map<String, Object> parameters = new HashMap<>();
-//        parameters.put("input1", numerator);
-//        parameters.put("input2", denominator);
-//        parameters.put("wantDoubles", true);
-//        try {
-//            parameters.put("op", OpDivide.class.newInstance());
-//        } catch (InstantiationException ex) {
-//            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        Module module = executeCommand(ImageCalculator.class, parameters);
-//        Dataset result = (Dataset) module.getOutput("output");
-//        return result;
-//    }
+
     private <C extends Command> Module executeCommand(Class<C> type, Map<String, Object> parameters) {
         Module module = moduleService.createModule(commandService.getCommand(type));
         try {
