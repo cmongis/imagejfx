@@ -38,7 +38,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Command.class,menuPath = "Plugins > Text Overlay Drawing")
+@Deprecated
 public class ExtractOverlayTest extends ContextCommand {
 
     @Parameter
