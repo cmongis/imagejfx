@@ -100,8 +100,8 @@ public class FolderWorkflow extends CorrectionFlow {
     public void init() {
         workflowModel.bindWelcome(this);
 
-        gridPane.add(imageDisplayPaneLeft, 1, 0);
-        gridPane.add(imageDisplayPaneRight, 2, 0);
+        gridPane.add(imageDisplayPaneLeft, 1, 1);
+        gridPane.add(imageDisplayPaneRight, 2, 1);
 
         initListView();
         ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
