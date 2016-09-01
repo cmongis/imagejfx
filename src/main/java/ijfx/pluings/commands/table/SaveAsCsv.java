@@ -45,8 +45,7 @@ import org.scijava.ui.UIService;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Command.class, menuPath = "Plugins > Table >  Save as CSV", attrs = {
-    @Attr(name = "no-legacy")})
+@Deprecated
 public class SaveAsCsv implements Command {
 
     @Parameter
