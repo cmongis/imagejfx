@@ -355,25 +355,7 @@ public class MainWindowController extends AnchorPane {
         loadWidget(uiPlugin);
     }
 
-    /*
-    protected Boolean bindWidgetToController(Collection<UiPlugin> uiPluginList) {
-        logger.info("Getting widget list");
-        // uiPluginService.getUiPluginList().forEach(widgetPlugin -> {
-        for (UiPlugin uiPlugin : uiPluginList) {
-            UiConfiguration infos = uiPluginService.getInfos(uiPlugin);
-
-            if (infos == null) {
-                logger.warning("No informations for " + uiPlugin.getClass().getName());
-                return false;
-            }
-
-            uiContextService.link(infos.id(), infos.context());
-            loadWidget(uiPlugin);
-        }
-
-        logger.info("Widget laoading done.");
-        return true;
-    }*/
+  
     protected void finishInitialization(Object o) {
 
         logger.info("finishing initialization...");
@@ -888,8 +870,8 @@ public class MainWindowController extends AnchorPane {
             String blacklistRaw = TextFileUtils.readFileFromJar("/blacklist.txt");
              Stream
                     .of(blacklistRaw.split("\n"))
-                    .map(pluginSrv::getPluginsOfClass)
-                    .map(info->(PluginInfo<?>)info)
+                    .map(pluginSrv::getPlugin)
+                    //.map(info->(PluginInfo<?>)info.get)
                     .forEach(pluginSrv::removePlugin);
                     
         } catch (Exception ex) {
