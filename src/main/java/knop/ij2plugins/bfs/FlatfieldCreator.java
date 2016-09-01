@@ -17,7 +17,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Command.class, headless = true, menuPath = "KnopLab > Flatfield Creator")
+@Plugin(type = Command.class, headless = true, menuPath = "Image > Correction > Average flatfield from stack")
 public class FlatfieldCreator extends ImageJ2PluginAdapter{
      
     public static final String USE_MEAN = "Use mean";
@@ -43,16 +43,5 @@ public class FlatfieldCreator extends ImageJ2PluginAdapter{
         return new ImagePlus("",fp);
     }
     
-    
-    
-    public static void main(String... args) {
-        
-        ImagePlus ip = IJ.openImage("/Users/cyril/Copy/Projects/Netbeans/BrightfieldSegmentationImageJ2/flatfield_gfp.tif");
-        FlatfieldCreator corrector =new FlatfieldCreator();
-        ImagePlus result = corrector.run(ip);
-       
-        result.show();
-        IJ.save("/Users/cyril/Copy/Projects/Netbeans/BrightfieldSegmentationImageJ2/flatfield_gfp_result.tif");
-        
-    }
+ 
 }
