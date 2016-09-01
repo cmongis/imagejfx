@@ -20,6 +20,9 @@
 package ijfx.ui.datadisplay.metadataset;
 
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.service.IjfxService;
+import ijfx.ui.main.ImageJFX;
+import java.util.logging.Logger;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayCreatedEvent;
 import org.scijava.event.EventService;
@@ -33,52 +36,56 @@ import org.scijava.service.Service;
  * @author cyril
  */
 @Plugin(type = Service.class)
-public class MetaDataSetDisplayService extends AbstractService{
-    
+public class MetaDataSetDisplayService extends AbstractService implements IjfxService {
+
     @Parameter
     DisplayService displayService;
-    
+
     @Parameter
     EventService eventService;
-    
+
+    Logger logger = ImageJFX.getLogger();
+
     public MetaDataSetDisplay createDisplay(String name) {
-        
+
         DefaultMetaDataDisplay display = new DefaultMetaDataDisplay(MetaDataSet.class);
-        
+
         display.setName(name);
-        
+
         displayService.getDisplays().add(display);
-        
+
         eventService.publish(new DisplayCreatedEvent(display));
-        
-       return display;
-        
-        
+        getContext().inject(display);
+        return display;
+
     }
-    
+
     public MetaDataSetDisplay findDisplay(String name) {
         return displayService.getDisplaysOfType(MetaDataSetDisplay.class)
                 .stream()
-                .filter(display->name.equals(display.getName()))
+                .filter(display -> name.equals(display.getName()))
                 .findFirst()
-                .orElseGet(()->createDisplay(name));
+                .orElseGet(() -> createDisplay(name));
     }
-    
+
     public void addMetaDataset(MetaDataSet metaDataSet) {
         MetaDataSetDisplay activeDisplay = displayService.getActiveDisplay(MetaDataSetDisplay.class);
-        
-        if(activeDisplay == null) {
+
+        if (activeDisplay == null) {
             displayService.createDisplay("Measures", metaDataSet);
+            
         }
         activeDisplay = displayService.getActiveDisplay(MetaDataSetDisplay.class);
-        activeDisplay.display(this);
+        activeDisplay.add(metaDataSet);
+
         activeDisplay.update();
     }
-    
+
     public void addMetaDataSetToDisplay(MetaDataSet metaDataSet, String displayName) {
-        findDisplay(displayName).display(metaDataSet);
+        MetaDataSetDisplay display = findDisplay(displayName);
+
+        display.add(metaDataSet);
+        display.update();
     }
-    
-    
-    
+
 }

@@ -19,6 +19,7 @@
  */
 package ijfx.ui.datadisplay.metadataset;
 
+import ijfx.plugins.commands.measures.SaveMetaDataSetAsCsv;
 import ijfx.ui.datadisplay.object.*;
 import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.LoadingScreenService;
@@ -28,6 +29,7 @@ import ijfx.ui.explorer.view.TableViewView;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.utils.ChartUpdater;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -112,10 +114,11 @@ public class MetaDataSetDisplayPane extends BorderPane {
 
     public void update() {
         logger.info("Updating current display");
-        view.setItem(display
+        List<MetaDataSetExplorerWrapper> collect = display
                 .stream()
                 .map(m->new MetaDataSetExplorerWrapper(m))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+        view.setItem(collect);
         
 
     }
@@ -137,6 +140,7 @@ public class MetaDataSetDisplayPane extends BorderPane {
     
     @EventHandler
     public void onDisplayUpdated(DisplayUpdatedEvent event) {
+        logger.info("updating");
         if(event.getDisplay() == display) {
             Platform.runLater(this::update);
         }
@@ -159,8 +163,8 @@ public class MetaDataSetDisplayPane extends BorderPane {
     
     @FXML
     public void saveAsCsv() {
-        uiService.showDialog("Feature not available ... yet :-D");
+        commandService.run(SaveMetaDataSetAsCsv.class, true);
     }
     
-    
+   
 }

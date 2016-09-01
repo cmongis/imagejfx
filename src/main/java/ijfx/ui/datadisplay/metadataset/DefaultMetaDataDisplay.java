@@ -21,6 +21,9 @@ package ijfx.ui.datadisplay.metadataset;
 
 import ijfx.core.metadata.MetaDataSet;
 import org.scijava.display.AbstractDisplay;
+import org.scijava.display.event.DisplayUpdatedEvent;
+import org.scijava.event.EventService;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -28,11 +31,21 @@ import org.scijava.display.AbstractDisplay;
  */
 public class DefaultMetaDataDisplay extends AbstractDisplay<MetaDataSet> implements MetaDataSetDisplay{
     
+    @Parameter
+    EventService eventService;
+    
     public DefaultMetaDataDisplay(Class<MetaDataSet> type) {
         super(type);
     }
     
-    
+     @Override
+    public void update() {
+        if(eventService == null) {
+            super.getContext().inject(this);
+        }
+        super.update();
+        eventService.publish(new DisplayUpdatedEvent(this, DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
+    }
     
     
 }
