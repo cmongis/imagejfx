@@ -41,6 +41,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -64,6 +65,9 @@ public class MeasurementService extends AbstractService implements IjfxService {
     @Parameter
     OverlayService overlayServicel;
 
+    @Parameter
+            UIService uiService;
+    
     Logger logger = ImageJFX.getLogger();
 
     public void measureSelectedOverlay() {
@@ -93,6 +97,8 @@ public class MeasurementService extends AbstractService implements IjfxService {
                 .filter(o->o!=null)
                 .collect(Collectors.toList());
         
+        
+        
         if(objectList.size() > 0) {
             
             
@@ -100,6 +106,9 @@ public class MeasurementService extends AbstractService implements IjfxService {
             display.addAll(objectList);
             display.update();
             
+        }
+        else {
+            uiService.showDialog("There is no object to measure.");
         }
         
         
