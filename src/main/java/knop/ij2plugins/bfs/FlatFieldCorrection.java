@@ -30,16 +30,13 @@ import org.scijava.plugin.Plugin;
  *
  * @author alex
  */
-@Plugin(type = Command.class, headless = true, menuPath = "KnopLab > Flatfield Correction")
+@Deprecated
 public class FlatFieldCorrection implements Command {
 
     /*     
      Parser for command / Macro arguments.
      */
   
-
-
-
     @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
 
