@@ -50,9 +50,8 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     Set<String> currentColumns = new HashSet<>();
 
     //LinkedHashSet<String> priority = new LinkedHashSet();
-    
     MetaDataKeyPrioritizer priority = new MetaDataKeyPrioritizer(new String[0]);
-    
+
     public MetaDataSetOwnerHelper(TableView<T> tableView) {
         this.tableView = tableView;
     }
@@ -60,7 +59,7 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     public void setItem(List<? extends T> mList) {
         tableView.getItems().clear();
         tableView.getItems().addAll(mList);
-        
+
     }
 
     public Set<String> getCurrentColumns() {
@@ -79,9 +78,9 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     public void setColumnsFromItems(List<? extends T> items) {
         List<MetaDataSet> mList = items
                 .stream()
-                .map(i->i.getMetaDataSet())
+                .map(i -> i.getMetaDataSet())
                 .collect(Collectors.toList());
-        
+
         updateColumns(MetaDataSetUtils.getAllPossibleKeys(mList).stream().filter(MetaData::canDisplay).sorted(priority).collect(Collectors.toList()));
     }
 
@@ -91,7 +90,8 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
 
     private void updateColumns(List<String> columnList) {
         columnList.sort(priority);
-        if (Collections.disjoint(currentColumns, columnList)) {
+      
+        if (!columnList.equals(currentColumns)) {
             System.out.println("The columns are not the same, updating");
             setColumnNumber(columnList.size());
             currentColumns = new HashSet(columnList);
@@ -105,12 +105,12 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     private void setColumnNumber(Integer number) {
         int actualSize = tableView.getColumns().size();
         System.out.println(String.format("Changing the number of column from %d to %d", actualSize, number));
-        
-        if(number == 0) {
+
+        if (number == 0) {
             tableView.getColumns().clear();
             return;
         }
-        
+
         if (actualSize == number) {
             return;
         }
@@ -131,28 +131,28 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         column.setCellValueFactory(this::getCellValueFactory);
         return column;
     }
-    
-    
+
     public void setPriority(String... keyName) {
-       // if(priority.isSame(keyName) == false) {
-            priority = new MetaDataKeyPrioritizer(keyName);
+        // if(priority.isSame(keyName) == false) {
+        priority = new MetaDataKeyPrioritizer(keyName);
         //}
     }
-    
+
     public String[] getPriority() {
         return priority.getPriority();
     }
 
-    
     public int priorityIndex(Set<String> set, String element) {
         int i = 0;
-        for(String s : set) {
-            if(s.equals(element)) return 100-i;
+        for (String s : set) {
+            if (s.equals(element)) {
+                return 100 - i;
+            }
             i++;
         }
         return 0;
     }
-    
+
     protected ObservableValue<Object> getCellValueFactory(TableColumn.CellDataFeatures<T, Object> cell) {
         String key = cell.getTableColumn().getUserData().toString();
         Object value = cell.getValue().getMetaDataSet().get(key).getValue();
