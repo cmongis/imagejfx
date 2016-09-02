@@ -870,6 +870,7 @@ public class MainWindowController extends AnchorPane {
             String blacklistRaw = TextFileUtils.readFileFromJar("/blacklist.txt");
              Stream
                     .of(blacklistRaw.split("\n"))
+                     .filter(s->s.startsWith("#") == false)
                     .map(pluginSrv::getPlugin)
                     //.map(info->(PluginInfo<?>)info.get)
                     .forEach(pluginSrv::removePlugin);

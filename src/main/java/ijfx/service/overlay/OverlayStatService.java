@@ -261,8 +261,8 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public HashMap<String, Double> getShapeStatisticsAsMap(OverlayShapeStatistics overlayStats) {
 
         HashMap<String, Double> statistics = new HashMap<>();
+        if(overlayStats == null) return statistics;
         statistics.put(MetaData.LBL_AREA, overlayStats.getArea());
-
         statistics.put(MetaData.LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
         statistics.put(MetaData.LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
         statistics.put(MetaData.LBL_LONG_SIDE_MBR, overlayStats.getLongSideMBR());

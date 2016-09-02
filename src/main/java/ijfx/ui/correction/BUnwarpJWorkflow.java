@@ -24,7 +24,7 @@ import ijfx.service.batch.BatchService;
 import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
-import ijfx.ui.datadisplay.image.ImageWindowEventBus;
+import ijfx.ui.datadisplay.image.SciJavaEventBus;
 import ijfx.ui.datadisplay.table.TableDisplayView;
 import io.datafx.controller.ViewController;
 import java.awt.Point;
@@ -171,7 +171,7 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
     Stack<Point> sourcePoints;
     Stack<Point> targetPoints;
 
-    private final ImageWindowEventBus bus = new ImageWindowEventBus();
+    private final SciJavaEventBus bus = new SciJavaEventBus();
 
     public BUnwarpJWorkflow() {
         CorrectionActivity.getStaticContext().inject(this);

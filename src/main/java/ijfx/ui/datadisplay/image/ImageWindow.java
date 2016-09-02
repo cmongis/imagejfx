@@ -217,7 +217,7 @@ public class ImageWindow extends Window {
 
     private final Property<FxTool> currentToolProperty = new SimpleObjectProperty();
 
-    private final ImageWindowEventBus bus = new ImageWindowEventBus();
+    private final SciJavaEventBus bus = new SciJavaEventBus();
 
     public ImageWindow() {
         super();

@@ -65,7 +65,7 @@ import org.scijava.plugin.Plugin;
 	@Menu(label = MenuConstants.PROCESS_LABEL,
 		weight = MenuConstants.PROCESS_WEIGHT,
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Binary", mnemonic = 'b'), @Menu(label = "Binarize...") },
+	@Menu(label = "Binary", mnemonic = 'b'), @Menu(label = "Binarize (FX)...") },
 	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class Binarize<T extends RealType<T>> extends DynamicCommand {
 

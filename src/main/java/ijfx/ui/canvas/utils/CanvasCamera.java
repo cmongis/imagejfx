@@ -300,4 +300,24 @@ public class CanvasCamera implements ViewPort {
 
     List<Consumer<CanvasCamera>> listeners = new ArrayList<>();
 
+    @Override
+    public double getRealImageWidth() {
+        return imageSpace.getWidth();
+    }
+
+    @Override
+    public double getRealImageHeight() {
+        return imageSpace.getHeight();
+    }
+
+    @Override
+    public double getSeenImageWidth() {
+        return getEffectiveWidth();
+    }
+
+    @Override
+    public double getSeenImageHeight() {
+        return getEffectiveHeight();
+    }
+
 }

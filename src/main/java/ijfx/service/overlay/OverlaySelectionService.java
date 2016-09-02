@@ -31,6 +31,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.display.OverlayView;
+import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.overlay.Overlay;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
@@ -99,7 +100,7 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
         for (DataView view : imageDisplay) {
             if (view instanceof OverlayView && view.isSelected() == true) {
                 ((OverlayView) view).setSelected(false);
-                eventService.publish(new OverlaySelectionEvent(imageDisplay, (Overlay) view.getData()));
+                eventService.publish(new DataViewUpdatedEvent(view));
             }
         }
     }
@@ -142,7 +143,8 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
 
     public void setOverlaySelection(ImageDisplay imageDisplay, OverlayView view, boolean selected) {
         view.setSelected(selected);
-        eventService.publishLater(new OverlaySelectedEvent(imageDisplay, view.getData()));
+        eventService.publishLater(new DataViewUpdatedEvent(view));
+        //eventService.publishLater(new OverlaySelectedEvent(imageDisplay, view.getData()));
     }
 
     public void setOverlaySelection(ImageDisplay imageDisplay, Overlay selectedOverlay, boolean selected) {
@@ -155,8 +157,8 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
 
         if (overlayView != null) {
             overlayView.setSelected(selected);
-
-            eventService.publishLater(new OverlaySelectedEvent(imageDisplay, selectedOverlay));
+            eventService.publishLater(new DataViewUpdatedEvent(overlayView));
+            //eventService.publishLater(new OverlaySelectedEvent(imageDisplay, selectedOverlay));
 
         } else {
             logger.warning(("Couldn't find Overlay in this ImageDisplay"));

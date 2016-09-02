@@ -24,7 +24,6 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
-import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.ui.main.Localization;
 import ijfx.service.overlay.OverlaySelectionService;
@@ -42,7 +41,6 @@ import javafx.scene.layout.BorderPane;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
-import net.imagej.measure.MeasurementService;
 import org.scijava.display.DisplayService;
 
 import org.scijava.plugin.Parameter;
@@ -50,11 +48,12 @@ import org.scijava.plugin.Plugin;
 import mongis.utils.FXUtilities;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
-import ijfx.ui.datadisplay.object.DefaultObjectDisplay;
-import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
+import ijfx.ui.datadisplay.image.SciJavaEventBus;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
@@ -74,6 +73,8 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import mongis.utils.CallbackTask;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.OverlayView;
+import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
@@ -82,7 +83,6 @@ import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
-import org.scijava.display.Display;
 import org.scijava.display.event.DisplayActivatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
@@ -92,7 +92,7 @@ import org.scijava.event.EventService;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "overlayPanel", localization = Localization.RIGHT, context = "imagej+image-open+overlay-selected segmentation+overlay-selected")
+@UiConfiguration(id = "overlayPanel", localization = Localization.RIGHT, context = "imagej+overlay-selected segmentation+overlay-selected")
 public class OverlayPanel extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -124,6 +124,8 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @Parameter
     Context context;
 
+    
+    
     @FXML
     TableView<MyEntry> tableView;
 
@@ -153,7 +155,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     @FXML
     TitledPane chartTitledPane;
 
-   
+    SciJavaEventBus eventBus = new SciJavaEventBus();
     
     PopOver optionsPane;
 
@@ -211,6 +213,21 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         chartTitledPane.setGraphic(gearIcon);
         chartTitledPane.setContentDisplay(ContentDisplay.RIGHT);
         chartTitledPane.graphicTextGapProperty().setValue(TEXT_GAP);
+        
+        // channeling all the DataViewUpdatedEvent so it updates the
+        // current selected overlay
+        eventBus.getStream(DataViewUpdatedEvent.class)
+                .map(event->event.getView())
+                .filter(view->view instanceof OverlayView)
+                .cast(OverlayView.class)
+                .filter(view->view.isSelected())
+                .buffer(500, TimeUnit.MILLISECONDS)
+                .filter(list->list.isEmpty() == false)
+                .subscribe(list->{
+                    overlayProperty.setValue(list.get(0).getData());
+                });
+                
+                
     }
 
     ImageDisplay imageDisplay;
@@ -275,23 +292,37 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         if (event.getDisplay() instanceof ImageDisplay) {
             imageDisplay = (ImageDisplay) event.getDisplay();
         }
-        onOverlaySelectionChanged();
+       
+        if(imageDisplay !=null) {
+            List<Overlay> selectedOverlays = overlaySelectionService.getSelectedOverlays(imageDisplay);
+           if(selectedOverlays.size() > 0) {
+               overlayProperty.setValue(selectedOverlays.get(0));
+           }
+        }
     }
 
     @EventHandler
+    public void onDataViewUpdated(DataViewUpdatedEvent event) {
+        
+        eventBus.channel(event);
+        
+    }
+    
     public void onOverlayUpdated(OverlayUpdatedEvent event) {
-        System.out.println("Updating chart ?");
+       
 
         overlaySelectionService
                 .getSelectedOverlays(imageDisplay)
                 .forEach(o -> System.out.println("Selected overlay " + o.toString()));
 
         if (overlaySelectionService.getSelectedOverlays(imageDisplay).contains(event.getObject())) {
-            Platform.runLater(() -> updateChart(event.getObject()));
+            updateChart(event.getObject());
             updateTable();
         }
     }
 
+ 
+    
     private void updateChart(Overlay overlay) {
 
         boolean isLineOverlay = overlay instanceof LineOverlay;
@@ -470,9 +501,11 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     }
 
     public void onOverlaySelectionChanged(Observable obs, Overlay oldValue, Overlay newValue) {
-
-        overlayNameField.setText(newValue.getName());
-
+        Platform.runLater(()->{
+            overlayNameField.setText(newValue.getName());
+            updateChart(newValue);
+            updateTable();
+        });
     }
 
     public void onOverlayNameChanged(Observable obs, String oldText, String newText) {

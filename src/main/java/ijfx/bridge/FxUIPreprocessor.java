@@ -25,6 +25,9 @@ import ijfx.ui.module.InputDialog;
 import ijfx.ui.module.InputSkinPluginService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import mongis.utils.CallbackTask;
 import net.imagej.display.ImageDisplayService;
 
 import org.scijava.Context;
@@ -88,16 +91,33 @@ public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
                 return;
             }
             
+            
+            Task<InputDialog> task = new CallbackTask<Object, InputDialog>()
+                    .run(objectNull-> new InputDialog(module,context));
+            Platform.runLater(task);
+                    
+            
+            InputDialog dialog = task.get();
+            
+            if(module.getDelegateObject() instanceof InteractiveCommand) {
+                logger.info("Showing dialog and moving on");
+                Platform.runLater(dialog::show);
+            }
+            else {
+                logger.info("Showing dialog and wait");
+                FXUtilities.runAndWait(dialog::showAndWait);
+            }
+            /*
             FXUtilities.runAndWait(() -> {
                 InputDialog dialog = new InputDialog(module, context);
 
-                if (InteractiveCommand.class.isAssignableFrom(module.getClass())) {
+                if (InteractiveCommand.class.isAssignableFrom(module.getDelegateObject().getClass())) {
                     dialog.show();
                 } else {
                     dialog.showAndWait();
                 }
 
-            });
+            });*/
         } catch (Exception ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }

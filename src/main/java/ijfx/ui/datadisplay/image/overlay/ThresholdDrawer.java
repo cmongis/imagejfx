@@ -25,6 +25,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.ThresholdOverlay;
@@ -35,44 +36,61 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-
+@Plugin(type = OverlayDrawer.class)
 public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
 
     Canvas canvas;
 
     @Parameter
     OverlayDrawingService drawingService;
-    
+
+    WritableImage image;
+
+    int width;
+
+    int height;
+
     public Node update(ThresholdOverlay overlay, ViewPort viewport) {
 
         if (canvas == null) {
             canvas = new Canvas(viewport.getEffectiveWidth(), viewport.getEffectiveHeight());
-
+            width = new Double(viewport.getRealImageWidth()).intValue();
+            height = new Double(viewport.getRealImageHeight()).intValue();
+            image = new WritableImage(width, height);
         }
-        
+
         Rectangle2D r = viewport.getSeenRectangle();
-        
-       
-    
-        
-   
-        GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
-        graphicsContext2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-         for(double x = r.getMinX();x!=r.getMaxX();x++) {
-            for(double y = r.getMinY();y!=r.getMaxY();y++) {
-                if(overlay.getRegionOfInterest().contains(new double[]{x,y})) {
-                    graphicsContext2D.setFill(Color.RED);
-                    graphicsContext2D.fillRect(x, y, 1, 1);
-                    System.out.println(x);
+
+        long[] point = new long[2];
+        for (int x = 0; x != width; x++) {
+            for (int y = 0; y != height; y++) {
+                point[0] = x;
+                point[1] = y;
+                if (overlay.classify(point) == 0) {
+                    image.getPixelWriter().setColor(x, y, Color.CYAN);
+                } else {
+                    image.getPixelWriter().setColor(x, y, Color.TRANSPARENT);
                 }
-                else {
-                    graphicsContext2D.setFill(Color.YELLOW);
-                }
-                
             }
         }
-     
-        
+
+        overlay.getPointsWithin().cursor();
+
+        GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
+        graphicsContext2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        graphicsContext2D.setFill(Color.TRANSPARENT);
+        graphicsContext2D.fill();
+
+        double sx, sy, sw, sh;
+
+        sx = viewport.getSeenRectangle().getMinX();
+        sy = viewport.getSeenRectangle().getMinY();
+        sw = viewport.getSeenRectangle().getWidth();
+        sh = viewport.getSeenRectangle().getHeight();
+
+        graphicsContext2D.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.getWidth(), canvas.getHeight());
+
         return canvas;
 
     }
@@ -80,6 +98,11 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
     @Override
     public boolean canHandle(Overlay t) {
         return t instanceof ThresholdOverlay;
+    }
+
+    @Override
+    public boolean isOverlayOnViewPort(Overlay o, ViewPort p) {
+        return true;
     }
 
 }

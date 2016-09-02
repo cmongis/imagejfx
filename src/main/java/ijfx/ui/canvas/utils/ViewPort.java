@@ -43,6 +43,14 @@ public interface ViewPort {
 
     Rectangle2D getSeenRectangle();
 
+    double getRealImageWidth();
+    
+    double getRealImageHeight();
+    
+    double getSeenImageWidth();
+    
+    double getSeenImageHeight();
+    
     double getZoom();
 
     void setZoom(double zoom);

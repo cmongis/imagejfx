@@ -21,6 +21,8 @@ package ijfx.ui.datadisplay.image;
 
 import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.imagej.display.OverlayView;
 import net.imagej.display.event.AxisPositionEvent;
 import net.imagej.display.event.DataViewUpdatedEvent;
@@ -38,7 +40,7 @@ import rx.subjects.PublishSubject;
  *
  * @author cyril
  */
-public class ImageWindowEventBus {
+public class SciJavaEventBus {
 
     PublishSubject<SciJavaEvent> bus = PublishSubject.create();
 
@@ -54,7 +56,7 @@ public class ImageWindowEventBus {
         OverlayUpdatedEvent.class, OverlayCreatedEvent.class, OverlaySelectionEvent.class,OverlaySelectedEvent.class
     };
 
-    public ImageWindowEventBus() {
+    public SciJavaEventBus() {
 
     }
 
@@ -79,6 +81,12 @@ public class ImageWindowEventBus {
                 .filter(obj -> eventClass.isAssignableFrom(obj.getClass()))
                 .map(obj -> (T) obj);
 
+    }
+    
+    public <T extends SciJavaEvent> Observable<List<T>> getBufferedStream(final Class<T> eventClass,long delay) {
+        return getStream(eventClass)
+                .buffer(delay, TimeUnit.MILLISECONDS)
+                .filter(list->list.isEmpty() == false);
     }
 
     public void channel(SciJavaEvent event) {
