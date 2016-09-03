@@ -39,7 +39,6 @@ import javafx.scene.chart.AreaChart;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
-import org.deeplearning4j.ui.UiServer;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
 import org.scijava.display.event.DisplayUpdatedEvent;
