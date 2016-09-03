@@ -63,12 +63,11 @@ public class FxImageCanvas extends Canvas {
     protected Point2D mousePositionOnImage;
 
     // Overlay ... to be taken care of 
-    ArrayList<Overlay> overlays;
+    private ArrayList<Overlay> overlays;
 
-    // Boolean refreshLock = Boolean.TRUE;
-    Pane container;
+  
 
-    ImageDisplay imageDisplay;
+    private ImageDisplay imageDisplay;
     
     /**
      * Creates an FxImageCanvas
@@ -272,33 +271,4 @@ public class FxImageCanvas extends Canvas {
     public Point2D getCursorPositionOnImage() {
         return mousePositionOnImage;
     }
-
-    /**
-     *
-     * @return returns the list of overlay
-     */
-    public ArrayList<Overlay> getOverlays() {
-        return overlays;
-    }
-
-    /**
-     * Set the overlays
-     *
-     * @param overlays
-     */
-    public void setOverlays(ArrayList<Overlay> overlays) {
-        this.overlays = overlays;
-    }
-
-    public void setImageDisplay(ImageDisplay imageDisplay) {
-        this.imageDisplay = imageDisplay;
-    }
-
-    public ImageDisplay getImageDisplay() {
-        return imageDisplay;
-    }
-    
-    
-    
-
 }
