@@ -50,9 +50,9 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
 
     int height;
 
-    public Node update(ThresholdOverlay overlay, ViewPort viewport) {
+    public void update(ThresholdOverlay overlay, ViewPort viewport, Canvas canvas) {
 
-        if (canvas == null) {
+        if (image == null) {
             canvas = new Canvas(viewport.getEffectiveWidth(), viewport.getEffectiveHeight());
             width = new Double(viewport.getRealImageWidth()).intValue();
             height = new Double(viewport.getRealImageHeight()).intValue();
@@ -91,13 +91,10 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
 
         graphicsContext2D.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.getWidth(), canvas.getHeight());
 
-        return canvas;
-
     }
 
-    @Override
-    public boolean canHandle(Overlay t) {
-        return t instanceof ThresholdOverlay;
+    public boolean canHandle(Class<?> t) {
+        return t ==  ThresholdOverlay.class;
     }
 
     @Override

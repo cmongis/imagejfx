@@ -21,7 +21,7 @@ package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.shape.Rectangle;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.RectangleOverlay;
@@ -34,19 +34,21 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = OverlayDrawer.class)
 public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
     
-   private Rectangle rectangle;
+
     
-    @Override
-    public Node update(RectangleOverlay overlay, ViewPort viewport) {
+    RectangleOverlayHelper helper;
+    public  void update(RectangleOverlay overlay, ViewPort viewport,Canvas canvas) {
         
+        
+        /**
         if(rectangle == null) {
             rectangle = new Rectangle();
         }
         
          
       
-       
-        RectangleOverlayHelper helper = new RectangleOverlayHelper(overlay);
+      * if
+        
         Point2D a = helper.getMinEdge();
         Point2D b = helper.getMaxEdge();
         a = viewport.getPositionOnCamera(a);
@@ -61,12 +63,25 @@ public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
         rectangle.setHeight(Math.abs(a.getY() - b.getY()));
         return rectangle;
         
+        **/
+        
+        
+       helper  = new RectangleOverlayHelper(overlay);
+       Point2D a = helper.getMinEdge();
+        Point2D b = helper.getMaxEdge();
+        a = viewport.getPositionOnCamera(a);
+        b = viewport.getPositionOnCamera(b);
+        
+        
+        
+       canvas.getGraphicsContext2D().strokeRect(a.getX(), a.getX(), b.getX()-a.getX(), b.getY()-a.getY())
+               ;
+        
         
     }
 
-    @Override
-    public boolean canHandle(Overlay t) {
-        return t instanceof RectangleOverlay;
+    public boolean canHandle(Class<?> t) {
+        return t ==  RectangleOverlay.class;
     }
 
    

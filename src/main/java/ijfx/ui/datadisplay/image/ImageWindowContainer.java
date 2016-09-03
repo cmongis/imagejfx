@@ -20,9 +20,12 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import ij.gui.ImageWindow;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
+import jfxtras.scene.control.window.Window;
+
 
 /**
  *
@@ -40,8 +43,8 @@ public class ImageWindowContainer extends AnchorPane {
             while (change.next()) {
                 change.getAddedSubList()
                         .stream()
-                        .filter(node -> node instanceof ImageWindow)
-                        .map(node -> (ImageWindow) node)
+                        .filter(node -> node instanceof Window)
+                        .map(node -> (Window) node)
                         .forEach(window -> {
 
                             double move = getChildren().size() * 15;
@@ -55,10 +58,7 @@ public class ImageWindowContainer extends AnchorPane {
             }
             Node onFront = getChildren().get(getChildren().size() - 1);
 
-            if (onFront instanceof ImageWindow) {
-
-                ((ImageWindow) onFront).putInFront();
-            }
+           
         });
 
     }

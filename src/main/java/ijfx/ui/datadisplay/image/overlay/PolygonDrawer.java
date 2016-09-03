@@ -21,8 +21,10 @@ package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.roi.PolygonRegionOfInterest;
@@ -34,42 +36,63 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = OverlayDrawer.class)
 public class PolygonDrawer implements OverlayDrawer<PolygonOverlay> {
-    
+
     Polygon shape;
 
+    /**
+     * @Override public Node update(PolygonOverlay overlay, ViewPort viewport) {
+     *
+     * if (shape == null) {
+     *
+     * shape = new Polygon();
+     *
+     * }
+     * shape.getPoints().clear();
+     *
+     * PolygonRegionOfInterest roi = overlay.getRegionOfInterest();
+     *
+     * Double[] points = new Double[roi.getVertexCount() * 2]; for (int i = 0; i
+     * != roi.getVertexCount(); i++) {
+     *
+     * Point2D positionOnViewPort = new
+     * Point2D(roi.getVertex(i).getDoublePosition(0),roi.getVertex(i).getDoublePosition(1));
+     * positionOnViewPort = viewport.getPositionOnCamera(positionOnViewPort);
+     * points[i * 2] = positionOnViewPort.getX(); points[i * 2 + 1] =
+     * positionOnViewPort.getY();
+     *
+     * }
+     *
+     * shape.getPoints().addAll(points);
+     *
+     * OverlayDrawer.color(overlay, shape); return shape;
+     *
+     * }\
+     */
+    
     @Override
-    public Node update(PolygonOverlay overlay, ViewPort viewport) {
+    public void update(PolygonOverlay overlay, ViewPort viewport, Canvas canvas) {
 
-        if (shape == null) {
-
-            shape = new Polygon();
-
-        }
-        shape.getPoints().clear();
-        
+        GraphicsContext context = canvas.getGraphicsContext2D();
         PolygonRegionOfInterest roi = overlay.getRegionOfInterest();
-       
-        Double[] points = new Double[roi.getVertexCount() * 2];
+        double[] xs = new double[roi.getVertexCount()];
+        double[] ys = new double[roi.getVertexCount()];
         for (int i = 0; i != roi.getVertexCount(); i++) {
-            
-            Point2D positionOnViewPort = new Point2D(roi.getVertex(i).getDoublePosition(0),roi.getVertex(i).getDoublePosition(1));
+
+            Point2D positionOnViewPort = new Point2D(roi.getVertex(i).getDoublePosition(0), roi.getVertex(i).getDoublePosition(1));
             positionOnViewPort = viewport.getPositionOnCamera(positionOnViewPort);
-            points[i * 2] = positionOnViewPort.getX();
-            points[i * 2 + 1] = positionOnViewPort.getY();
+            
+            xs[i] = positionOnViewPort.getX();
+            ys[i] = positionOnViewPort.getY();
 
         }
-
-        shape.getPoints().addAll(points);
-        
-        OverlayDrawer.color(overlay, shape);
-        return shape;
-
+        context.setLineWidth(2.0);
+        context.strokePolygon(xs, ys, xs.length);
+        //context.setFont(new Font("Arial", 15));
+        //context.fillText("heloo", xs[0], ys[0]);
     }
 
-    @Override
-    public boolean canHandle(Overlay t) {
-        return t instanceof PolygonOverlay;
+    public boolean canHandle(Class<?> t) {
+        return t == PolygonOverlay.class;
     }
 
-   
 }

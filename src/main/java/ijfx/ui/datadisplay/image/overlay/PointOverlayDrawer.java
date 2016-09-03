@@ -26,15 +26,13 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PointOverlay;
+import net.imagej.overlay.PolygonOverlay;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -57,6 +55,26 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
     
     ViewPort viewport;
     
+    public void update(PointOverlay overlay, ViewPort viewport, Canvas canvas) {
+        
+        //Point2D onScreen = viewport.getPositionOnCamera(PointOverlayHelper.getOverlayPosition(overlay));
+        
+        //double[] xy = new double[] { onScreen.getX(), onScreen.getY() };
+        
+       for(double[] xy : overlay.getPoints()) {
+           Point2D onScreen = new Point2D(xy[0],xy[1]);
+           xy = new double[] { onScreen.getX(), onScreen.getY() };
+           
+           canvas
+                   .getGraphicsContext2D()
+                   .fillRect(xy[0]-radius, xy[1]-radius, radius*2, radius*2);
+           
+       }
+        
+        
+    }
+    
+    /**
     public void createNode() {
         
         Polyline polyLine = new Polyline();
@@ -77,6 +95,8 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
         
         r = new Rectangle(3, 3);
     }
+    
+    
     
     @Override
     public Node update(PointOverlay overlay, ViewPort viewport) {
@@ -110,11 +130,10 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
         return r;
         
         
-    }
+    }**/
 
-    @Override
-    public boolean canHandle(Overlay t) {
-        return t instanceof PointOverlay;
+    public boolean canHandle(Class<?> t) {
+        return t ==  PointOverlay.class;
     }
     
     @Override

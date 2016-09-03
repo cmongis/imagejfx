@@ -20,9 +20,11 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
+import java.awt.Graphics;
+import java.util.concurrent.Callable;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
-import javafx.scene.shape.Line;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
 import org.scijava.plugin.Plugin;
@@ -34,37 +36,59 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = OverlayDrawer.class)
 public class LineDrawer implements OverlayDrawer<LineOverlay> {
 
-    Line line;
+    //Line line;
 
     LineHelper helper;
 
     @Override
-    public boolean canHandle(Overlay t) {
-        return t instanceof LineOverlay;
+    public boolean canHandle(Class<?> t) {
+        return t == LineOverlay.class;
     }
 
     @Override
-    public Node update(LineOverlay overlay, ViewPort viewport) {
+    public void update(LineOverlay overlay, ViewPort viewport, Canvas canvas) {
 
-        if (line == null) {
-
-            line = new Line();
-
-        }
+        if(helper == null) {
         helper = new LineHelper(overlay);
+        }
+        //if (line == null) {
+
+        //    line = new Line();
+
+        //}
+        
 
         Point2D startOnScreen = viewport.getPositionOnCamera(helper.getLineStart());
         Point2D endOnScreen = viewport.getPositionOnCamera(helper.getLineEnd());
         
+        GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
+        
+        int ox = getAsInt(startOnScreen::getX);
+        int oy = getAsInt(startOnScreen::getY);
+        int dx = getAsInt(endOnScreen::getX);
+        int dy = getAsInt(endOnScreen::getY);
+        graphicsContext2D.moveTo(ox,oy);
+        graphicsContext2D.lineTo(dx, dy);
+        
+        
+        
+        /**
         line.setStartX(startOnScreen.getX());
         line.setStartY(startOnScreen.getY());
         line.setEndX(endOnScreen.getX());
         line.setEndY(endOnScreen.getY());
-        
         OverlayDrawer.color(overlay, line);
+         **/
+        //return line;
         
-        return line;
-        
+    }
+    
+    public int getAsInt(Callable<Double> d) {
+        try {
+            return new Double(d.call()).intValue();
+        } catch (Exception ex) {
+           return 0;
+        }
     }
 
 }

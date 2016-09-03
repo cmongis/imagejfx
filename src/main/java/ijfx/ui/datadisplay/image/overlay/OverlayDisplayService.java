@@ -47,10 +47,19 @@ public class OverlayDisplayService extends AbstractService implements IjfxServic
         return findPluginFor(OverlayModifier.class, overlay);
     }
 
-    public OverlayDrawer createDrawer(Overlay overlay) {
-        return findPluginFor(OverlayDrawer.class, overlay);
-    }
+    //public OverlayDrawer createDrawer(Overlay overlay) {
+      //  return findPluginFor(OverlayDrawer.class, overlay);
+    //}
 
+    public  OverlayDrawer createDrawer(Class<?> o) {
+        
+        for (OverlayDrawer drawer : pluginService.createInstancesOfType(OverlayDrawer.class)) {
+            if(drawer.canHandle(o))
+            return drawer;
+        }
+        return null;
+    }
+    
     private <T extends ClassHandler, C> T findPluginFor(Class<? extends T> handlerType, C overlay) {
 
         // if (map.containsKey(overlay) == false || map.get(overlay) == null) {

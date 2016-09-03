@@ -21,10 +21,11 @@ package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import net.imagej.overlay.Overlay;
+import org.scijava.plugin.SciJavaPlugin;
 import org.scijava.util.ColorRGB;
 
 /**
@@ -34,15 +35,15 @@ import org.scijava.util.ColorRGB;
  * 
  * @author cyril
  */
-public interface OverlayDrawer<T extends Overlay> extends ClassHandler<Overlay> {
+public interface OverlayDrawer<T extends Overlay> extends SciJavaPlugin{
     
 
     
     // returns a node updated according to the overlay parameter
     // with size and position depending on the viewport
-    public Node update(T overlay, ViewPort viewport);
+    public void update(T overlay, ViewPort viewport, Canvas canvas);
 
-   
+    public boolean canHandle(Class<?> o);
     
     public static Color toFxColor(ColorRGB color) {
         return toFxColor(color,1.0);
