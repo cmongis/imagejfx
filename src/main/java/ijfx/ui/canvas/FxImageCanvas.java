@@ -23,13 +23,13 @@ package ijfx.ui.canvas;
 import ijfx.ui.canvas.utils.CanvasCamera;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import net.imagej.display.ImageDisplay;
 import net.imagej.overlay.Overlay;
@@ -68,6 +68,9 @@ public class FxImageCanvas extends Canvas {
   
 
     private ImageDisplay imageDisplay;
+    
+    
+    private Consumer<FxImageCanvas> afterDrawing; 
     
     /**
      * Creates an FxImageCanvas
@@ -171,7 +174,9 @@ public class FxImageCanvas extends Canvas {
             // drawing the part of the image seen by the camera into
             // the canvas
             getGraphicsContext2D().drawImage(image, sx, sy, sw, sh, tx, ty, tw, th);
-
+            
+            if(afterDrawing != null) afterDrawing.accept(this);
+            
             drawBorders();
 
         }
@@ -183,7 +188,7 @@ public class FxImageCanvas extends Canvas {
      * Draw the borders when the size of the displayed image is smaller than the
      * screen
      */
-    protected void drawBorders() {
+    public void drawBorders() {
         double borderWidth = 0;
         double borderHeight = 0;
 
@@ -271,4 +276,21 @@ public class FxImageCanvas extends Canvas {
     public Point2D getCursorPositionOnImage() {
         return mousePositionOnImage;
     }
+
+    public ImageDisplay getImageDisplay() {
+        return imageDisplay;
+    }
+
+    public void setImageDisplay(ImageDisplay imageDisplay) {
+        this.imageDisplay = imageDisplay;
+    }
+
+    public void setAfterDrawing(Consumer<FxImageCanvas> afterDrawing) {
+        this.afterDrawing = afterDrawing;
+    }
+    
+    
+    
+    
+    
 }
