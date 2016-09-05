@@ -20,6 +20,7 @@
  */
 package ijfx.ui.main;
 
+import com.sun.xml.internal.bind.v2.runtime.property.ValueProperty;
 import ijfx.ui.context.animated.AnimatedPaneContextualView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -71,19 +72,13 @@ import ijfx.ui.plugin.DebugEvent;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.beans.binding.BooleanBinding;
-import javafx.event.ActionEvent;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Paint;
@@ -95,10 +90,10 @@ import ijfx.ui.context.animated.Animations;
 import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -108,7 +103,7 @@ import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
 import mongis.utils.TextFileUtils;
-import org.scijava.plugin.PluginInfo;
+import mongis.utils.TransitionBinding;
 import org.scijava.plugin.PluginService;
 
 /**
@@ -188,32 +183,31 @@ public class MainWindowController extends AnchorPane {
     protected BooleanBinding isSideMenuHidden;
 
     @Parameter
-    UiPluginService uiPluginService;
+    private UiPluginService uiPluginService;
 
-    MainWindowController thisController;
-
-    @Parameter
-    UiContextService uiContextService;
+    private MainWindowController thisController;
 
     @Parameter
-    AppService appService;
+    private UiContextService uiContextService;
 
     @Parameter
-    DefaultLoggingService logErrorService;
+    private AppService appService;
 
     @Parameter
-    HintService hintService;
+    private DefaultLoggingService logErrorService;
 
     @Parameter
-    ActivityService activityService;
+    private HintService hintService;
 
     @Parameter
-    JsonPreferenceService jsonPrefSrv;
+    private ActivityService activityService;
 
     @Parameter
-            PluginService pluginSrv;
-    
-    
+    private JsonPreferenceService jsonPrefSrv;
+
+    @Parameter
+    private PluginService pluginSrv;
+
     LoadingPopup loadingPopup = new LoadingPopup(ImageJFX.PRIMARY_STAGE);
 
     Queue<Hint> hintQueue = new LinkedList<>();
@@ -221,6 +215,8 @@ public class MainWindowController extends AnchorPane {
     TaskList2 taskList = new TaskList2();
 
     boolean isHintDisplaying = false;
+
+    BooleanProperty menuActivated = new SimpleBooleanProperty(false);
 
     private Thread memoryThread = new Thread(() -> {
 
@@ -257,14 +253,6 @@ public class MainWindowController extends AnchorPane {
 
         //loadingScreen.setDefaultPane(mainAnchorPane);
         sideMenu.setTranslateZ(0);
-
-        mainAnchorPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-
-            if (event.getButton() == MouseButton.PRIMARY && event.getSceneX() >= sideMenu.getWidth() && sideMenu.getTranslateX() > -1 * sideMenu.getWidth()) {
-                hideSideMenu();
-            }
-
-        });
 
         memoryThread.start();
 
@@ -308,7 +296,6 @@ public class MainWindowController extends AnchorPane {
                 .attachTo(this.getScene());
 
         taskList.submitTask(task);
-        hideSideMenu();
 
     }
 
@@ -322,20 +309,13 @@ public class MainWindowController extends AnchorPane {
         handler.setProgress(1, 3);
         imageJ = new ImageJ();
 
-        
-        
-        
-
-        
-        
         // service.removePlugin(service.getPlugin(Binarize.class));
         handler.setProgress(2, 3);
         handler.setStatus("ImageJ initialized.");
         imageJ.getContext().inject(this);
-        
-       
+
         removeBlacklisted();
-        
+
         registerWidgetControllers();
         handler.setProgress(3, 3);
         uiPluginService.loadAll(handler).forEach(this::installPlugin);
@@ -355,7 +335,6 @@ public class MainWindowController extends AnchorPane {
         loadWidget(uiPlugin);
     }
 
-  
     protected void finishInitialization(Object o) {
 
         logger.info("finishing initialization...");
@@ -363,7 +342,6 @@ public class MainWindowController extends AnchorPane {
         uiContextService.enter(UiContexts.list(UiContexts.DEBUG));
 
         // showing the intro app
-        //appService.showApp(WebApps.PROJECT_WIZARD);
         // updating the context
         uiContextService.update();
         activityService.openByType(ImageJContainer.class);
@@ -413,25 +391,6 @@ public class MainWindowController extends AnchorPane {
         registerPaneCtrl(topToolBarVBox)
                 .setAnimationOnShow(Animations.FADEIN)
                 .setAnimationOnHide(Animations.FADEOUT);
-    }
-
-    public void populateWidgets() {
-
-    }
-
-    public void resetWidgets() {
-        //widgetLoaderService.reload();
-    }
-
-    protected void showLoading() {
-        logger.info("Showing loading screen");
-
-        //Platform.runLater(() -> loadingScreen.showOn(mainAnchorPane));
-    }
-
-    protected void hideLoading() {
-        logger.info("Hiding logging screen");
-        //Platform.runLater(() -> loadingScreen.hideFrom(mainAnchorPane));
     }
 
     private AnimatedPaneContextualView registerPaneCtrl(Pane node) {
@@ -495,27 +454,6 @@ public class MainWindowController extends AnchorPane {
     public void handleEvent(DebugEvent event) {
 
         Platform.runLater(() -> showHelpSequence(new DefaultHint().setTarget("#debug-button").setText("This is a very long text which doesn't really matter !")));
-    }
-
-    @EventHandler
-    public void handleEvent(ToggleSideMenuEvent event) {
-
-        if (event.is(ToggleSideMenuEvent.SIDE_MENU)) {
-
-            if (sideMenu.getTranslateX() >= 0.0) {
-                hideSideMenu();
-            } else {
-                showSideMenu();
-            }
-        }
-        if (event.is(ToggleSideMenuEvent.RELOAD_SIDE_MENU)) {
-
-            Platform.runLater(() -> {
-                resetMenuAction();
-                showSideMenu();
-
-            });
-        }
     }
 
     @EventHandler
@@ -583,50 +521,11 @@ public class MainWindowController extends AnchorPane {
                     .title(notification.getTitle())
                     .text(notification.getText());
 
-            //ns.hideCloseButton();
             ns.position(Pos.TOP_RIGHT);
-            //ns.showConfirm();
-            ns.hideAfter(Duration.hours(24));
+            ns.hideAfter(Duration.seconds(120));
             ns.show();
 
         });
-    }
-
-    /**
-     *
-     * Side Menu
-     *
-     */
-    // Debugging convenient method
-    private void resetMenuAction() {
-        sideMenuMainTopVBox.getChildren().clear();
-        initMenuAction();
-    }
-
-    // animating the appearance of the Menu
-    public void showSideMenu() {
-
-        final Timeline timeline = new Timeline();
-
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), 0, Interpolator.EASE_OUT);
-        KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
-        timeline.getKeyFrames().add(kf);
-        timeline.play();
-
-        System.out.println(rightVBox.getChildren());
-
-    }
-
-    // animating the disapearance of the menu
-    @FXML
-    public void hideSideMenu() {
-        final Timeline timeline = new Timeline();
-
-        KeyValue kv = new KeyValue(sideMenu.translateXProperty(), -1 * (sideMenu.getWidth() + 20), Interpolator.EASE_IN);
-        KeyFrame kf = new KeyFrame(ImageJFX.getAnimationDuration(), kv);
-        timeline.getKeyFrames().add(kf);
-        timeline.play();
-
     }
 
     public void onUiPluginDisplaed(ContextualWidget<Node> uiPlugin) {
@@ -770,6 +669,8 @@ public class MainWindowController extends AnchorPane {
 
     }
 
+    TransitionBinding<Number> sideMenuWidthBinding = new TransitionBinding<Number>(10d, 250d);
+
     /**
      *
      * Side Menu Actions
@@ -777,30 +678,31 @@ public class MainWindowController extends AnchorPane {
      */
     public void initMenuAction() {
 
+        sideMenuWidthBinding.bind(menuActivated, sideMenu.prefWidthProperty());
+
+        sideMenu.setOnMouseEntered(event -> menuActivated.setValue(true));
+        sideMenu.setOnMouseExited(event -> menuActivated.setValue(false));
+
         addSideMenuButton("Explore", FontAwesomeIcon.COMPASS, ExplorerActivity.class);
 
         addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class);
-        addSideMenuButton("Segment", FontAwesomeIcon.EYE, null).setOnAction(event -> {
+        addSideMenuButton("Segment", FontAwesomeIcon.EYE, null).setOnMouseClicked(event -> {
             uiContextService.enter("segment", "segmentation");
             uiContextService.update();
-            hideSideMenu();
+            menuActivated.setValue(false);
 
         });
-        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, null).setOnAction(event -> {
+        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, null).setOnMouseClicked(event -> {
             uiContextService.enter("batch");
             uiContextService.update();
             if (activityService.getCurrentActivityAsClass() != ExplorerActivity.class) {
                 activityService.openByType(ExplorerActivity.class);
-                hideSideMenu();
+                menuActivated.setValue(false);
             }
         });
         addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, CorrectionActivity.class);
 
-        /*
-        
-        sideMenuMainTopVBox.getChildren().addAll(
-                new SideMenuButton("Create database", WebApps.PROJECT_WIZARD).setIcon(FontAwesomeIcon.MAGIC), new SideMenuButton("Visualize", ImageJContainer.class).setIcon(FontAwesomeIcon.PHOTO), new SideMenuButton("Batch Processing", FileBatchProcessorPanel.class).setIcon(FontAwesomeIcon.TASKS), new SideMenuButton("Personal Database", ProjectManager.class).setIcon(FontAwesomeIcon.DATABASE), new Separator(Orientation.HORIZONTAL), new SideMenuButton("Setting", "index").setIcon(FontAwesomeIcon.GEAR), new SideMenuButton("Explore", ExplorerActivity.class).setIcon(FontAwesomeIcon.COMPASS)
-        );*/
+        menuActivated.setValue(false);
     }
 
     private SideMenuButton addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass) {
@@ -812,18 +714,60 @@ public class MainWindowController extends AnchorPane {
         return sideMenuButton;
     }
 
-    private class SideMenuButton extends Button {
+    public void removeBlacklisted() {
+
+        try {
+            String blacklistRaw = TextFileUtils.readFileFromJar("/blacklist.txt");
+            Stream
+                    .of(blacklistRaw.split("\n"))
+                    .filter(s -> s.startsWith("#") == false)
+                    .map(pluginSrv::getPlugin)
+                    //.map(info->(PluginInfo<?>)info.get)
+                    .forEach(pluginSrv::removePlugin);
+
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Error when blacklisting plugings", ex);
+
+        }
+    }
+
+    private class SideMenuButton extends HBox {
 
         String appToOpen;
         Class<? extends Activity> activityClass;
 
+        Label label = new Label();
+        FontAwesomeIconView iconNode;
+        String initialText;
+
         public SideMenuButton(String name) {
 
             super();
-            setText(name);
-            setOnAction(this::onAction);
+            label.setText(name);
+            initialText = name;
+
+            setOnMouseClicked(this::onAction);
             getStyleClass().add("side-menu-button");
             setMaxWidth(Double.MAX_VALUE);
+            iconNode = new FontAwesomeIconView(FontAwesomeIcon.QUESTION);
+            iconNode.getStyleClass().add("side-menu-icon");
+
+            getChildren().addAll(iconNode, label);
+
+            new TransitionBinding<Number>(0d, 1d)
+                    .bind(sideMenuWidthBinding.stateProperty(), label.opacityProperty())
+                    .setDuration(Duration.millis(150));
+            
+            label.textProperty().bind(Bindings.createStringBinding(this::getText, menuActivated));
+            
+        }
+
+        public String getText() {
+            if (menuActivated.getValue()) {
+                return initialText;
+            } else {
+                return "";
+            }
         }
 
         public SideMenuButton(String name, String appToOpen) {
@@ -839,15 +783,13 @@ public class MainWindowController extends AnchorPane {
         }
 
         public SideMenuButton setIcon(FontAwesomeIcon icon) {
-            Node iconNode = new FontAwesomeIconView(icon); //GlyphsDude.createIcon(icon);
-            iconNode.getStyleClass().add("side-menu-icon");
-            if (icon != null) {
-                setGraphic(iconNode);
-            }
+            //GlyphsDude.createIcon(icon);
+
+            iconNode.setIcon(icon);
             return this;
         }
 
-        public void onAction(ActionEvent event) {
+        public void onAction(Event event) {
 
             if (appToOpen != null) {
 
@@ -856,31 +798,6 @@ public class MainWindowController extends AnchorPane {
             } else {
                 activityService.openByType(this.activityClass);
             }
-
-            hideSideMenu();
         }
     }
-    
-    
-    
-    public void removeBlacklisted() {
-        
-        
-        try {
-            String blacklistRaw = TextFileUtils.readFileFromJar("/blacklist.txt");
-             Stream
-                    .of(blacklistRaw.split("\n"))
-                     .filter(s->s.startsWith("#") == false)
-                    .map(pluginSrv::getPlugin)
-                    //.map(info->(PluginInfo<?>)info.get)
-                    .forEach(pluginSrv::removePlugin);
-                    
-        } catch (Exception ex) {
-            logger.log(Level.WARNING,"Error when blacklisting plugings",ex);
-           
-        }
-        
-        
-    }
-
 }
