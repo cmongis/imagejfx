@@ -20,6 +20,7 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.datadisplay.image.OverlayViewConfiguration;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
@@ -41,7 +42,7 @@ public interface OverlayDrawer<T extends Overlay> extends SciJavaPlugin{
     
     // returns a node updated according to the overlay parameter
     // with size and position depending on the viewport
-    public void update(T overlay, ViewPort viewport, Canvas canvas);
+    public void update(OverlayViewConfiguration<T> overlay, ViewPort viewport, Canvas canvas);
 
     public boolean canHandle(Class<?> o);
     

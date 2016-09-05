@@ -21,6 +21,7 @@ package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.service.overlay.OverlayDrawingService;
 import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.datadisplay.image.OverlayViewConfiguration;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -50,10 +51,11 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
 
     int height;
 
-    public void update(ThresholdOverlay overlay, ViewPort viewport, Canvas canvas) {
+    public void update(OverlayViewConfiguration<ThresholdOverlay> viewConfig, ViewPort viewport, Canvas canvas) {
 
+        ThresholdOverlay overlay = viewConfig.getOverlay();
+        
         if (image == null) {
-            canvas = new Canvas(viewport.getEffectiveWidth(), viewport.getEffectiveHeight());
             width = new Double(viewport.getRealImageWidth()).intValue();
             height = new Double(viewport.getRealImageHeight()).intValue();
             image = new WritableImage(width, height);
@@ -62,22 +64,23 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
         Rectangle2D r = viewport.getSeenRectangle();
 
         long[] point = new long[2];
+       
         for (int x = 0; x != width; x++) {
             for (int y = 0; y != height; y++) {
                 point[0] = x;
                 point[1] = y;
                 if (overlay.classify(point) == 0) {
-                    image.getPixelWriter().setColor(x, y, Color.CYAN);
+                    image.getPixelWriter().setColor(x, y, Color.RED);
                 } else {
                     image.getPixelWriter().setColor(x, y, Color.TRANSPARENT);
                 }
             }
         }
 
-        overlay.getPointsWithin().cursor();
+        
 
         GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
-        graphicsContext2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+       
 
         graphicsContext2D.setFill(Color.TRANSPARENT);
         graphicsContext2D.fill();

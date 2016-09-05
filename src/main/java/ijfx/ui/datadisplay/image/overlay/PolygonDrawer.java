@@ -20,6 +20,7 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.datadisplay.image.OverlayViewConfiguration;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -70,8 +71,10 @@ public class PolygonDrawer implements OverlayDrawer<PolygonOverlay> {
      */
     
     @Override
-    public void update(PolygonOverlay overlay, ViewPort viewport, Canvas canvas) {
+    public void update(OverlayViewConfiguration<PolygonOverlay> viewConfig, ViewPort viewport, Canvas canvas) {
 
+        PolygonOverlay overlay = viewConfig.getOverlay();
+        
         GraphicsContext context = canvas.getGraphicsContext2D();
         PolygonRegionOfInterest roi = overlay.getRegionOfInterest();
         double[] xs = new double[roi.getVertexCount()];
@@ -85,7 +88,9 @@ public class PolygonDrawer implements OverlayDrawer<PolygonOverlay> {
             ys[i] = positionOnViewPort.getY();
 
         }
-        context.setLineWidth(2.0);
+        context.setFill(viewConfig.getFillCollor());
+        context.setLineWidth(viewConfig.getStrokeWidth());
+        context.fillPolygon(xs, ys, xs.length);
         context.strokePolygon(xs, ys, xs.length);
         //context.setFont(new Font("Arial", 15));
         //context.fillText("heloo", xs[0], ys[0]);

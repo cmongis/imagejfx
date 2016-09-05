@@ -20,10 +20,9 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.datadisplay.image.OverlayViewConfiguration;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.shape.Rectangle;
-import net.imagej.overlay.Overlay;
 import net.imagej.overlay.RectangleOverlay;
 import org.scijava.plugin.Plugin;
 
@@ -32,58 +31,27 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = OverlayDrawer.class)
-public class RectangleDrawer implements OverlayDrawer<RectangleOverlay>{
-    
+public class RectangleDrawer implements OverlayDrawer<RectangleOverlay> {
 
-    
     RectangleOverlayHelper helper;
-    public  void update(RectangleOverlay overlay, ViewPort viewport,Canvas canvas) {
-        
-        
-        /**
-        if(rectangle == null) {
-            rectangle = new Rectangle();
-        }
-        
-         
-      
-      * if
-        
+
+    public void update(OverlayViewConfiguration<RectangleOverlay> viewConfig, ViewPort viewport, Canvas canvas) {
+
+        RectangleOverlay overlay = viewConfig.getOverlay();
+
+        helper = new RectangleOverlayHelper(overlay);
         Point2D a = helper.getMinEdge();
         Point2D b = helper.getMaxEdge();
         a = viewport.getPositionOnCamera(a);
         b = viewport.getPositionOnCamera(b);
-      
-        rectangle.setVisible(true);
-        rectangle.setX(a.getX());
-        rectangle.setY(a.getY());
-        
-        OverlayDrawer.color(overlay, rectangle);
-        rectangle.setWidth(Math.abs(a.getX() - b.getX()));
-        rectangle.setHeight(Math.abs(a.getY() - b.getY()));
-        return rectangle;
-        
-        **/
-        
-        
-       helper  = new RectangleOverlayHelper(overlay);
-       Point2D a = helper.getMinEdge();
-        Point2D b = helper.getMaxEdge();
-        a = viewport.getPositionOnCamera(a);
-        b = viewport.getPositionOnCamera(b);
-        
-        
-        
-       canvas.getGraphicsContext2D().strokeRect(a.getX(), a.getX(), b.getX()-a.getX(), b.getY()-a.getY())
-               ;
-        
-        
+
+        canvas.getGraphicsContext2D().fillRect(a.getX(), a.getX(), b.getX() - a.getX(), b.getY() - a.getY());
+        canvas.getGraphicsContext2D().strokeRect(a.getX(), a.getX(), b.getX() - a.getX(), b.getY() - a.getY());
+
     }
 
     public boolean canHandle(Class<?> t) {
-        return t ==  RectangleOverlay.class;
+        return t == RectangleOverlay.class;
     }
 
-   
-    
 }

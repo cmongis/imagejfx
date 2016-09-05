@@ -20,6 +20,7 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.datadisplay.image.OverlayViewConfiguration;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -30,6 +31,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import net.imagej.overlay.LineOverlay;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PointOverlay;
 import net.imagej.overlay.PolygonOverlay;
@@ -55,8 +57,10 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
     
     ViewPort viewport;
     
-    public void update(PointOverlay overlay, ViewPort viewport, Canvas canvas) {
+    public void update(OverlayViewConfiguration<PointOverlay> viewConfig, ViewPort viewport, Canvas canvas) {
         
+        
+        PointOverlay overlay = viewConfig.getOverlay();
         //Point2D onScreen = viewport.getPositionOnCamera(PointOverlayHelper.getOverlayPosition(overlay));
         
         //double[] xy = new double[] { onScreen.getX(), onScreen.getY() };

@@ -20,7 +20,7 @@
 package ijfx.ui.datadisplay.image.overlay;
 
 import ijfx.ui.canvas.utils.ViewPort;
-import java.awt.Graphics;
+import ijfx.ui.datadisplay.image.OverlayViewConfiguration;
 import java.util.concurrent.Callable;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -46,8 +46,10 @@ public class LineDrawer implements OverlayDrawer<LineOverlay> {
     }
 
     @Override
-    public void update(LineOverlay overlay, ViewPort viewport, Canvas canvas) {
+    public void update(OverlayViewConfiguration<LineOverlay> viewConfig, ViewPort viewport, Canvas canvas) {
 
+        LineOverlay overlay = viewConfig.getOverlay();
+        
         if(helper == null) {
         helper = new LineHelper(overlay);
         }
@@ -67,6 +69,9 @@ public class LineDrawer implements OverlayDrawer<LineOverlay> {
         int oy = getAsInt(startOnScreen::getY);
         int dx = getAsInt(endOnScreen::getX);
         int dy = getAsInt(endOnScreen::getY);
+        
+        graphicsContext2D.setStroke(viewConfig.getStrokeColor());
+        
         graphicsContext2D.moveTo(ox,oy);
         graphicsContext2D.lineTo(dx, dy);
         
