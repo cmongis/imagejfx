@@ -1769,37 +1769,40 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 
 #sideMenu {
-    -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.3),30,0.3,3px,3px);
+    -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.3),10,0.3,2px,2px);
 }
 
-#sideMenu:hidden {
-    -fx-effect:none;
-}
+
 
 .side-menu-button {
 
-    -fx-padding:20px;
+    
     -fx-background-color:-dark;
     -fx-background-radius:0;
     -fx-effect:none;
-
-}
-.side-menu-button{
     -fx-text-alignment:left;
     -fx-alignment:center-left;
     -fx-label-padding: 0px 0px 0px 0px;
     -fx-graphic-text-gap:20px;
-
+    -fx-padding: 0px 0px 0px 17px;
+    
 }
+.side-menu-button .label {
+    -fx-min-width:0px;
+    -fx-padding:20px 0px 20px 20px;
+}
+.side-menu-button:hover {
+    -fx-background-color:-flatter-primary;
+}
+
 .side-menu-button .content {
     -fx-margin: 0px 0px 20px 0px;
     -fx-background:red;
 }
 .side-menu-icon {
     -fx-font-size:20px;
-    -fx-padding: 0px 0px 0px 20px;
     -fx-background-color:red;
-    -fx-padding: 0px 0px 0px 20px;
+    
 }
 
 #overlayListView .list-cell:checked, #overlayListView .list-cell:armed, #overlayListView .list-cell:hover {
