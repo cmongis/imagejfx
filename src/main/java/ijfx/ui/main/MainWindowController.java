@@ -20,7 +20,6 @@
  */
 package ijfx.ui.main;
 
-import com.sun.xml.internal.bind.v2.runtime.property.ValueProperty;
 import ijfx.ui.context.animated.AnimatedPaneContextualView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
