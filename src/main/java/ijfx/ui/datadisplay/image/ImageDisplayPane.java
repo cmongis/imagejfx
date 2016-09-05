@@ -29,7 +29,6 @@ import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.canvas.utils.ViewPort;
-import ijfx.ui.context.animated.Animations;
 import ijfx.ui.datadisplay.image.overlay.DefaultOverlayViewConfiguration;
 import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
@@ -42,18 +41,18 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -66,7 +65,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
@@ -75,7 +73,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Shape;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.Dataset;
@@ -108,7 +105,6 @@ import org.scijava.event.EventService;
 import org.scijava.event.SciJavaEvent;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
-import rx.subjects.PublishSubject;
 
 /**
  * This render an ImageDisplay as a JavaFX object.
@@ -188,12 +184,7 @@ public class ImageDisplayPane extends AnchorPane {
 
     private final ExecutorService refreshQueue = Executors.newFixedThreadPool(1);
 
-   
-
-
     private final HashMap<Overlay, OverlayModifier> modifierMap = new HashMap();
-
-
 
     private final Map<Class<?>, OverlayDrawer> drawerMap = new HashMap<>();
 
@@ -271,21 +262,13 @@ public class ImageDisplayPane extends AnchorPane {
         });
     }
 
-    private void onWidthChanged(Observable obs, Number oldValue, Number newValue) {
-        
+    private void onWidthChanged(Observable obs, Number oldValue, Number newValue) {       
         canvas.setWidth(newValue.doubleValue());
-       
-        
-        
-        //updateOverlays(getOverlays());
+  
     }
 
-    private void onHeightChanged(Observable obs, Number oldValue, Number newValue) {
-        
+    private void onHeightChanged(Observable obs, Number oldValue, Number newValue) {       
         canvas.setHeight(newValue.doubleValue());
-        
-        
-        //updateOverlays(getOverlays());
     }
 
     public void display(ImageDisplay display) {
@@ -603,15 +586,17 @@ public class ImageDisplayPane extends AnchorPane {
                     logService.info(String.format("%s events that require image refresh", list.size()));
                     list.forEach(event -> System.out.println(event.getClass().getSimpleName()));
                     refreshSourceImage();
+                    
+                    
                 });
-
+       
         /**
          * bus.getStream(OverlayCreatedEvent.class)
          * .map(event->event.getObject())
          * //.filter(overlay->overlayService.getOverlays(getImageDisplay()).contains(overlay))
                 .subscribe(this::updateOverlay);
          */
-        /*
+        
         bus.getStream(DataViewUpdatedEvent.class)
                 .map(dataviewEvent -> dataviewEvent.getView())
                 .filter(dataview -> dataview instanceof OverlayView)
@@ -619,23 +604,7 @@ public class ImageDisplayPane extends AnchorPane {
                 .buffer(refreshDelay, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
                 .map(list -> new HashSet<OverlayView>(list))
-                .subscribe(set -> {
-
-                    /**
-                     * updateOverlays(set.stream().map(view->view.getData()).collect(Collectors.toList()));
-                     * set.stream() .filter(view->view.isSelected() &&
-                     * shapeMap.containsKey(view.getData())) .forEach(view->{
-                     * Platform.runLater(()->{
-                     *
-                     * Animations.QUICK_EXPAND.configure(shapeMap.get(view.getData()),
-                     * 200).play();
-                     *
-                     * });
-                            });
-                     *
-                    repaint();
-
-                });*/
+                .subscribe(this::treatOverlayViewUpdatedEvent);
 
         // stream intercepting all the event causing a overlay to be deleted
         bus.getStream(OverlayDeletedEvent.class)
@@ -643,6 +612,19 @@ public class ImageDisplayPane extends AnchorPane {
                 .buffer(refreshDelay, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
                 .subscribe(this::deleteOverlays);
+    }
+    
+    protected void treatOverlayViewUpdatedEvent(Set<OverlayView> set) {
+        Stream<OverlayView> selected = set.stream().filter(view->view.isSelected());
+                   
+                    if(selected.count() == 1) {
+                        
+                        OverlayView view = selected.findFirst().get();
+                        setEdited(view.getData());
+                    }
+                    else {
+                        setEdited(null);
+                    }
     }
 
     protected Overlay extractOverlayFromEvent(SciJavaEvent event) {
@@ -727,7 +709,7 @@ public class ImageDisplayPane extends AnchorPane {
     void onOverlayModified(OverlayUpdatedEvent event) {
         logService.info("Overlay modified");
         if (getOverlays().contains(event.getObject())) {
-            bus.channel(event);
+            Platform.runLater(canvas::repaint);
         }
     }
 

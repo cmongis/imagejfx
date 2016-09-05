@@ -19,6 +19,7 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
 import net.imagej.overlay.Overlay;
 
@@ -32,4 +33,13 @@ public interface OverlayViewConfiguration<T extends Overlay> {
     T getOverlay();
     double getStrokeWidth();
      Paint getFillCollor();
+     
+     default void configureContext(GraphicsContext context) {
+         
+         context.setStroke(getStrokeColor());
+         context.setFill(getFillCollor());
+         context.setLineWidth(getStrokeWidth());
+         
+     }
+     
 }

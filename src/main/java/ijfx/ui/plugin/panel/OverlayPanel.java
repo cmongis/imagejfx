@@ -308,14 +308,11 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         
     }
     
+    @EventHandler
     public void onOverlayUpdated(OverlayUpdatedEvent event) {
        
 
-        overlaySelectionService
-                .getSelectedOverlays(imageDisplay)
-                .forEach(o -> System.out.println("Selected overlay " + o.toString()));
-
-        if (overlaySelectionService.getSelectedOverlays(imageDisplay).contains(event.getObject())) {
+       if(event.getObject() == overlayProperty.getValue()) {
             updateChart(event.getObject());
             updateTable();
         }

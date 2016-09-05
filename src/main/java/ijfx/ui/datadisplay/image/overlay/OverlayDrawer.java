@@ -59,7 +59,7 @@ public interface OverlayDrawer<T extends Overlay> extends SciJavaPlugin{
         return new Color(red, green, blue, alpha);
     }
     
-    public default boolean isOnOverlay(Overlay overlay, ViewPort viewport, double xOnImage, double yOnImage) {
+    public default boolean isOnOverlay(T overlay, ViewPort viewport, double xOnImage, double yOnImage) {
         double x1 = overlay.getRegionOfInterest().realMin(0);
         double y1 = overlay.getRegionOfInterest().realMin(1);
         double x2 = overlay.getRegionOfInterest().realMax(0);

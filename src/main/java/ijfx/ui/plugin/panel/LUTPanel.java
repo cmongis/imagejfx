@@ -592,22 +592,39 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         }
     }
     
+    private void deleteThresholdOverlay() {
+        overlayService
+                .getOverlays(currentImageDisplayProperty.getValue())
+                .stream()
+                .filter(o->o instanceof ThresholdOverlay)
+                .map(o->(ThresholdOverlay)o)
+                .findFirst()
+                .ifPresent(ovrl->overlayService.removeOverlay(getCurrentImageDisplay(), ovrl));
+    }
     
-    private void onThresholdButtonChanged(Observable obs) {
+    private void onThresholdButtonChanged(Observable obs, Number oldValue, Number newValue) {
         
         
         if(getCurrentImageDisplay() == null) return;
         
-        if(getThresholdValue() == Double.NaN) return;
-        
+        if(Double.isNaN(newValue.doubleValue()))  {
+            deleteThresholdOverlay();
+            return;
+        }
+        Timer t = timerService.getTimer(this.getClass());
+        t.start();
         ThresholdOverlay thresholdOverlay = getThresholdOverlay();
+        t.elapsed("getting overlay");
         logger.info("Threshold value " + getThresholdValue());
+        
         thresholdOverlay.setRange(minValue.getValue(), maxValue.getValue());
         thresholdOverlay.setColorWithin(Colors.WHITE);
 			thresholdOverlay.setColorLess(Colors.BLACK);
 			thresholdOverlay.setColorGreater(Colors.BLACK);
         thresholdOverlay.update();
-        eventService.publish(new OverlayUpdatedEvent(thresholdOverlay));
+        t.elapsed("updating");
+        logger.info("update over");
+        //eventService.publish(new OverlayUpdatedEvent(thresholdOverlay));
         
         
     }

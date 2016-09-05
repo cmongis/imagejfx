@@ -50,9 +50,9 @@ public class LineDrawer implements OverlayDrawer<LineOverlay> {
 
         LineOverlay overlay = viewConfig.getOverlay();
         
-        if(helper == null) {
+        
         helper = new LineHelper(overlay);
-        }
+        
         //if (line == null) {
 
         //    line = new Line();
@@ -72,19 +72,8 @@ public class LineDrawer implements OverlayDrawer<LineOverlay> {
         
         graphicsContext2D.setStroke(viewConfig.getStrokeColor());
         
-        graphicsContext2D.moveTo(ox,oy);
-        graphicsContext2D.lineTo(dx, dy);
-        
-        
-        
-        /**
-        line.setStartX(startOnScreen.getX());
-        line.setStartY(startOnScreen.getY());
-        line.setEndX(endOnScreen.getX());
-        line.setEndY(endOnScreen.getY());
-        OverlayDrawer.color(overlay, line);
-         **/
-        //return line;
+        graphicsContext2D.strokeLine(ox, oy, dx, dy);
+      
         
     }
     

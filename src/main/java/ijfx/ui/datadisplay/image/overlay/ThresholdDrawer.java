@@ -105,4 +105,13 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
         return true;
     }
 
+    @Override
+    public boolean isOnOverlay(ThresholdOverlay overlay, ViewPort viewport, double xOnImage, double yOnImage) {
+        
+        long x = Math.round(xOnImage);
+        long y = Math.round(yOnImage);
+   
+        return overlay.classify(new long[] {x,y}) == 0;
+    }
+    
 }

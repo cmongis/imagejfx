@@ -78,70 +78,14 @@ public class PointOverlayDrawer implements OverlayDrawer<PointOverlay>{
         
     }
     
-    /**
-    public void createNode() {
-        
-        Polyline polyLine = new Polyline();
-        
-        Group group = new Group();
-        Line vertical = new Line(radius/2,0,radius/2,radius);
-        Line horizontal = new Line(0,radius/2,radius,radius/2);
-        
-        vertical.strokeWidthProperty().bind(strokeWidth);
-        horizontal.strokeWidthProperty().bind(strokeWidth);
-        
-        
-        
-        vertical.strokeProperty().bind(strokePaint);
-        horizontal.strokeProperty().bind(strokePaint);
-        
-        group.getChildren().addAll(vertical,horizontal);
-        
-        r = new Rectangle(3, 3);
-    }
     
-    
-    
-    @Override
-    public Node update(PointOverlay overlay, ViewPort viewport) {
-        
-        
-        if(r == null) {
-            createNode();
-        }
-        
-        
-        
-        
-        
-        Point2D onScreen = viewport.getPositionOnCamera(PointOverlayHelper.getOverlayPosition(overlay));
-    
-        double x = onScreen.getX();
-        double y = onScreen.getY();
-        r.setVisible(true);
-        r.setX(x-1);
-        r.setY(y-1);
-        
-        r.setWidth(3);
-        r.setHeight(3);
-        r.setFill(Color.RED);
-        r.setStrokeWidth(2.0);
-        
-       
-        
-        OverlayDrawer.color(overlay, r);
-         r.setVisible(viewport.getSeenRectangle().contains(PointOverlayHelper.getOverlayPosition(overlay)));
-        return r;
-        
-        
-    }**/
 
     public boolean canHandle(Class<?> t) {
         return t ==  PointOverlay.class;
     }
     
     @Override
-    public boolean isOnOverlay(Overlay overlay, ViewPort viewport, double xOnImage, double yOnImage) {
+    public boolean isOnOverlay(PointOverlay overlay, ViewPort viewport, double xOnImage, double yOnImage) {
         
         if(overlay instanceof PointOverlay) {
             
