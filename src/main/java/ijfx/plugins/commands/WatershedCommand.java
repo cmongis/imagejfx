@@ -26,10 +26,8 @@ import net.imglib2.algorithm.labeling.Watershed;
 import net.imglib2.labeling.Labeling;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
-import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
  *

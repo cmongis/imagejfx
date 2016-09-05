@@ -81,7 +81,6 @@ import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
 import ijfx.ui.widgets.PopoverToggleButton;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -93,19 +92,22 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
-import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.NumberStringConverter;
 import mongis.utils.SmartNumberStringConverter;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.OverlayService;
+import net.imagej.event.OverlayCreatedEvent;
+import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.ThresholdOverlay;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 
 import org.scijava.module.ModuleService;
+import org.scijava.util.Colors;
 
 /**
  *
@@ -175,6 +177,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @Parameter
     UiContextService uiContextService;
 
+    @Parameter
+            OverlayService overlayService;
+    
     Node lutPanelCtrl;
 
     @FXML
@@ -183,6 +188,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @FXML
     ToggleButton minMaxButton;
 
+    
+    
     RangeSlider rangeSlider = new RangeSlider();
 
     @FXML
@@ -192,7 +199,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     private ImageDisplayProperty currentImageDisplayProperty;
 
-    Button thresholdButton = new Button("Threshold using min-value.", new FontAwesomeIconView(FontAwesomeIcon.EYE));
+    ToggleButton thresholdButton = new ToggleButton("Threshold using min-value.", new FontAwesomeIconView(FontAwesomeIcon.EYE));
     Button thresholdMoreButton = new Button("Advanced thresholding");
     // PopOver popOver;
     Logger logger = ImageJFX.getLogger();
@@ -209,6 +216,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     StringConverter stringConverter;
 
+    DoubleProperty thresholdLevel = new SimpleDoubleProperty();
+    
     public LUTPanel() {
 
         logger.info("Loading FXML");
@@ -234,7 +243,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             // threshold button
             thresholdButton.setMaxWidth(Double.POSITIVE_INFINITY);
-            thresholdButton.setOnAction(this::thresholdAndSegment);
+            //thresholdButton.setOnAction(this::thresholdAndSegment);
             gridPane.add(thresholdButton, 0, 2, 2, 1);
 
             // advanced threshold button
@@ -338,6 +347,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         Bindings.bindBidirectional(minTextField.textProperty(), minValue, smartNumberStringConverter);
         Bindings.bindBidirectional(maxTextField.textProperty(), maxValue, smartNumberStringConverter);
 
+        
+        thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, minValue,maxValue,thresholdButton.selectedProperty()));
+        thresholdLevel.addListener(this::onThresholdButtonChanged);
         return this;
     }
 
@@ -443,6 +455,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         updateLabel();
     }
 
+  
     @FXML
     private void autoRange(ActionEvent event) {
 
@@ -564,5 +577,64 @@ public class LUTPanel extends TitledPane implements UiPlugin {
                 })
                 .start();
     }
+    
+    /*
+     * Threshold releated functions
+     * 
+     */
+      
+    private Double getThresholdValue() {
+        if(thresholdButton.isSelected()) {
+            return minValue.getValue();
+        }
+        else {
+            return Double.NaN;
+        }
+    }
+    
+    
+    private void onThresholdButtonChanged(Observable obs) {
+        
+        
+        if(getCurrentImageDisplay() == null) return;
+        
+        if(getThresholdValue() == Double.NaN) return;
+        
+        ThresholdOverlay thresholdOverlay = getThresholdOverlay();
+        logger.info("Threshold value " + getThresholdValue());
+        thresholdOverlay.setRange(minValue.getValue(), maxValue.getValue());
+        thresholdOverlay.setColorWithin(Colors.WHITE);
+			thresholdOverlay.setColorLess(Colors.BLACK);
+			thresholdOverlay.setColorGreater(Colors.BLACK);
+        thresholdOverlay.update();
+        eventService.publish(new OverlayUpdatedEvent(thresholdOverlay));
+        
+        
+    }
+    
+    private Dataset getCurrentDataset() {
+        return imageDisplayService.getActiveDataset(getCurrentImageDisplay());
+    }
+    
+    private ThresholdOverlay getThresholdOverlay() {
+       logger.info("getting the overlay;");
+        return overlayService
+                .getOverlays(currentImageDisplayProperty.getValue())
+                .stream()
+                .filter(o->o instanceof ThresholdOverlay)
+                .map(o->(ThresholdOverlay)o)
+                .findFirst()
+                .orElseGet(this::createThresholdOverlay);
+        
+    }
+    
+    private ThresholdOverlay createThresholdOverlay() {
+        logger.info("Creating an overlay");
+        ThresholdOverlay overlay = new ThresholdOverlay(context, getCurrentDataset(), minValue.getValue(), maxValue.getValue());
+        overlayService.addOverlays(getCurrentImageDisplay(), Lists.newArrayList(overlay));
+        eventService.publish(new OverlayCreatedEvent(overlay));
+        return overlay;
+    }
+    
 
 }
