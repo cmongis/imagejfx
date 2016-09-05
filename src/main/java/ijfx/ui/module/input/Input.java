@@ -50,4 +50,10 @@ public interface Input<T> {
    
     public boolean isMessage();
     
+    public String getWidgetType();
+    
+    public T getMinimumValue();
+    
+    public T getMaximumValue();
+    
 }

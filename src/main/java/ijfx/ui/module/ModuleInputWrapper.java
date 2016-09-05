@@ -115,5 +115,22 @@ public class ModuleInputWrapper<T extends Object> implements Input{
     public boolean isMessage() {
         return moduleItem.getVisibility() == ItemVisibility.MESSAGE;
     }
+
+    @Override
+    public String getWidgetType() {
+        
+        return moduleItem.getWidgetStyle();
+    }
     
+  
+
+    @Override
+    public T getMinimumValue() {
+        return moduleItem.getMinimumValue();
+    }
+
+    @Override
+    public T getMaximumValue() {
+        return moduleItem.getMaximumValue();
+    }
 }

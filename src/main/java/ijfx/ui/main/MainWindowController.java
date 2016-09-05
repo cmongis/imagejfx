@@ -703,6 +703,15 @@ public class MainWindowController extends AnchorPane {
         addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, CorrectionActivity.class);
 
         menuActivated.setValue(false);
+        
+       new TransitionBinding<Number>(0d, 1d)
+                    .bind(sideMenuWidthBinding.stateProperty(), memoryLabel.opacityProperty())
+                    .setDuration(Duration.millis(150));
+       
+       new TransitionBinding<Number>(0d, 1d)
+                    .bind(sideMenuWidthBinding.stateProperty(), memoryProgressBar.opacityProperty())
+                    .setDuration(Duration.millis(150));
+        
     }
 
     private SideMenuButton addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass) {

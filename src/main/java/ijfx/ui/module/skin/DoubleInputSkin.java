@@ -20,18 +20,20 @@
  */
 package ijfx.ui.module.skin;
 
-
-import ijfx.ui.module.input.AbstractInputSkin;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import org.scijava.plugin.Plugin;
+import org.scijava.widget.NumberWidget;
 
 /**
  *
@@ -40,36 +42,39 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = InputSkinPlugin.class)
 public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
 
-    TextField field;
+    private TextField field;
 
     EventHandler<KeyEvent> changeListener = (event) -> {
         onChange(field.getText());
     };
 
+    private Slider slider;
+
+    private Input<Double> input;
+
+    private boolean isSlider = false;
+
     public static String CLASS_INVALID = "danger";
+
+    private DoubleProperty value = new SimpleDoubleProperty();
 
     public DoubleInputSkin() {
         super();
-        
-       
-        
+
     }
-    
-    
+
     @Override
     public Node getNode() {
-
-        field.addEventHandler(KeyEvent.KEY_RELEASED, changeListener);
-
-        return field;
-
+        if (isSlider) {
+            return slider;
+        } else {
+            return field;
+        }
     }
 
     @Override
     public void dispose() {
     }
-
-    Property<Double> value = new SimpleObjectProperty<Double>();
 
     public void onChange(String newValue) {
         try {
@@ -92,10 +97,8 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
 
     @Override
     public Property<Double> valueProperty() {
-        return (ObjectProperty<Double>) value;
+        return value.asObject();
     }
-
-   
 
     @Override
     public boolean canHandle(Class<?> clazz) {
@@ -103,10 +106,42 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
     }
 
     @Override
-    public void init(Input input) {
-        
-        field = new TextField();
-        field.setText(input.getValue().toString());
+    public void init(Input<Double> input) {
+
+        this.input = input;
+
+        value.setValue(input.getValue());
+
+        if (input.getWidgetType().equals(NumberWidget.SLIDER_STYLE) || input.getWidgetType().equals(NumberWidget.SCROLL_BAR_STYLE)) {
+            isSlider = true;
+
+        } else {
+            isSlider = false;
+        }
+
+        if (isSlider) {
+            slider = new Slider();
+            slider.setShowTickLabels(true);
+            slider.setMin(input.getMinimumValue()+1);
+            slider.setMax(input.getMaximumValue());
+
+            double range = input.getMaximumValue() - input.getMinimumValue();
+            
+            if(range <= 10) {
+                slider.setMajorTickUnit(0.1);
+            }
+            else {
+                slider.setMajorTickUnit(1.0);
+            }
+            
+            value.bindBidirectional(slider.valueProperty());
+
+        } else {
+            field = new TextField();
+
+            field.setText(input.getValue().toString());
+            field.addEventHandler(KeyEvent.KEY_RELEASED, changeListener);
+        }
     }
 
 }
