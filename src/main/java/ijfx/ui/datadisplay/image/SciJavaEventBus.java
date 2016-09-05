@@ -44,35 +44,15 @@ public class SciJavaEventBus {
 
     PublishSubject<SciJavaEvent> bus = PublishSubject.create();
 
-    private Class<?>[] displayEvents = new Class<?>[]{
-        DisplayUpdatedEvent.class,
-        DatasetUpdatedEvent.class,
-        LUTsChangedEvent.class,
-        AxisPositionEvent.class,
-        DataViewUpdatedEvent.class,
-    };
+   
 
-    private Class<?>[] overlayEvents = new Class<?>[]{
-        OverlayUpdatedEvent.class, OverlayCreatedEvent.class, OverlaySelectionEvent.class,OverlaySelectedEvent.class
-    };
+    
 
     public SciJavaEventBus() {
 
     }
+    
 
-    public boolean doesDisplayRequireRefresh(SciJavaEvent event) {
-        //System.out.println("Event class : " + event.getClass());
-        return ArrayUtils.contains(displayEvents, event.getClass());
-
-    }
-
-    public boolean isOverlayEvent(SciJavaEvent event) {
-        if(event instanceof DataViewUpdatedEvent) {
-            DataViewUpdatedEvent devent = (DataViewUpdatedEvent)event;
-            return devent.getView() instanceof OverlayView;
-        }
-        return ArrayUtils.contains(overlayEvents, event.getClass());
-    }
 
     public <T extends SciJavaEvent> Observable<T> getStream(final Class<T> eventClass) {
 
