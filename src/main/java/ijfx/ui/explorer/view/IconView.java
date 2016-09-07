@@ -21,6 +21,7 @@ package ijfx.ui.explorer.view;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerIconCell;
 import ijfx.ui.explorer.ExplorerService;
@@ -61,6 +62,9 @@ public class IconView extends ScrollPane implements ExplorerView {
     @Parameter
     private Context context;
     
+    @Parameter
+    private LoadingScreenService loadingScreenService;
+    
     public IconView() {
         setContent(tilePane);
         setPrefWidth(400);
@@ -90,7 +94,7 @@ public class IconView extends ScrollPane implements ExplorerView {
 
     @Override
     public void setItem(List<? extends Explorable> items) {
-        cellPaneCtrl.update(new ArrayList<Iconazable>(items));
+        loadingScreenService.frontEndTask(cellPaneCtrl.update(new ArrayList<Iconazable>(items)),false);
         binder.update();
     }
 
