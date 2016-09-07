@@ -38,6 +38,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import mongis.utils.StringUtils;
 
 /**
  *
@@ -156,6 +157,9 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     protected ObservableValue<Object> getCellValueFactory(TableColumn.CellDataFeatures<T, Object> cell) {
         String key = cell.getTableColumn().getUserData().toString();
         Object value = cell.getValue().getMetaDataSet().get(key).getValue();
+        if(value instanceof Number) {
+            value = StringUtils.numberToString(((Number)value).doubleValue(), 3);
+        }
         return new ReadOnlyObjectWrapper<>(value);
     }
 

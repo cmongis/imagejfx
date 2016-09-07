@@ -37,6 +37,7 @@ import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
 import net.imglib2.roi.PolygonRegionOfInterest;
@@ -98,7 +99,7 @@ public class BinaryToOverlay implements Command {
 
     private <T extends RealType<T>> void perform(Dataset dataset) {
         
-        overlays = transform(context, dataset, USE_WHITE_PIXEL.equals(objectColor));
+        overlays = transform(context, (RandomAccessibleInterval<T>)dataset, USE_WHITE_PIXEL.equals(objectColor));
         
         if (overlays != null && display != null) {
             logger.info(String.format("%d overlays added to %s", overlays.length, display.toString()));
@@ -110,16 +111,18 @@ public class BinaryToOverlay implements Command {
         
     }
     
+    public static Overlay[] transform(Context context, Dataset dataset, boolean recognizeWhiteObject) {
+        return transform(context, (RandomAccessibleInterval)dataset, recognizeWhiteObject);
+    }
     
-    public static <T> Overlay[] transform(Context context, Dataset dataset,boolean recognizeWhiteObject) {
+    public static <T extends RealType<T>> Overlay[] transform(Context context, RandomAccessibleInterval<T> dataset,boolean recognizeWhiteObject) {
         // converting 
         
         int width = (int) dataset.max(0);
         int height = (int) dataset.max(1);
        
-        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
-        Cursor<T> cursor = (Cursor<T>) dataset.cursor();
-        cursor.reset();
+        RandomAccess<T> randomAccess = dataset.randomAccess();
+       
         ByteProcessor byteProcessor = new ByteProcessor(width, height);
 
         long[] position = new long[dataset.numDimensions()];

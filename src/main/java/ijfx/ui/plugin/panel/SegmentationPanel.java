@@ -22,9 +22,6 @@ package ijfx.ui.plugin.panel;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.bridge.ImageJContainer;
-import ijfx.core.metadata.MetaData;
-import ijfx.core.metadata.MetaDataKeyPrioritizer;
-import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.plugins.commands.Binarize;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.batch.BatchService;
@@ -56,9 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -93,7 +88,7 @@ import net.imagej.event.OverlayCreatedEvent;
 
 import net.imagej.overlay.Overlay;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
-import net.imagej.table.DefaultGenericTable;
+import net.imglib2.RandomAccessibleInterval;
 import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.event.EventService;
@@ -101,7 +96,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
-import static org.scijava.util.Colors.map;
 
 /**
  *
@@ -346,7 +340,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         // detecting objects
         handler.setStatus("Detecting objects...");
 
-        Overlay[] overlay = BinaryToOverlay.transform(context, input.getDataset(), whiteObjectCheckbox.isSelected());
+        Overlay[] overlay = BinaryToOverlay.transform(context, (RandomAccessibleInterval)input.getDataset(), whiteObjectCheckbox.isSelected());
         // giving a random color to each overlay
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
         

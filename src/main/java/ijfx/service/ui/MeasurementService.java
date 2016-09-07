@@ -28,6 +28,8 @@ import ijfx.ui.datadisplay.object.DisplayedSegmentedObject;
 import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import ijfx.ui.main.ImageJFX;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.ThresholdOverlay;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
@@ -63,7 +66,7 @@ public class MeasurementService extends AbstractService implements IjfxService {
     OverlayStatService overlayStatsSrv;
 
     @Parameter
-    OverlayService overlayServicel;
+    OverlayService overlayService;
 
     @Parameter
             UIService uiService;
@@ -87,16 +90,17 @@ public class MeasurementService extends AbstractService implements IjfxService {
 
     }
 
-    public void measureAllOverlay(ImageDisplay imageDisplay) {
+    public void measureOverlays(ImageDisplay imageDisplay, List<Overlay> overlayList, Predicate<SegmentedObject> filter) {
         
+        // the filter always return true if null
+        if(filter == null) filter = o->true;
         
-        
-        List<SegmentedObject> objectList = overlayServicel.getOverlays(imageDisplay)
+        List<SegmentedObject> objectList = overlayList
                 .stream()
                 .map(o->measure(imageDisplay,o))
                 .filter(o->o!=null)
+                .filter(filter)
                 .collect(Collectors.toList());
-        
         
         
         if(objectList.size() > 0) {
@@ -111,7 +115,10 @@ public class MeasurementService extends AbstractService implements IjfxService {
             uiService.showDialog("There is no object to measure.");
         }
         
-        
+    }
+    
+    public void measureAllOverlay(ImageDisplay imageDisplay) {
+        measureOverlays(imageDisplay,overlayService.getOverlays(imageDisplay),null); 
     }
 
     public SegmentedObject measure(ImageDisplay display, Overlay overlay) {
@@ -142,5 +149,12 @@ public class MeasurementService extends AbstractService implements IjfxService {
         getCurrentDisplay(object).display(object);
 
     }
-
+    public Optional<ThresholdOverlay> getThresholdOverlay(ImageDisplay imageDisplay) {
+         return overlayService
+                .getOverlays(imageDisplay)
+                .stream()
+                .filter(o->o instanceof ThresholdOverlay)
+                .map(o->(ThresholdOverlay)o)
+                .findFirst();
+    }
 }

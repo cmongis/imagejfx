@@ -22,17 +22,21 @@ package ijfx.ui.module.skin;
 
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javax.swing.text.NumberFormatter;
+import mongis.utils.StringUtils;
 import org.scijava.plugin.Plugin;
+import org.scijava.util.NumberUtils;
 import org.scijava.widget.NumberWidget;
 
 /**
@@ -51,7 +55,8 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
     private Slider slider;
 
     private Input<Double> input;
-
+    private Label sliderLabel = new Label();
+    private HBox hbox = new HBox();
     private boolean isSlider = false;
 
     public static String CLASS_INVALID = "danger";
@@ -66,7 +71,7 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
     @Override
     public Node getNode() {
         if (isSlider) {
-            return slider;
+            return hbox;
         } else {
             return field;
         }
@@ -121,7 +126,7 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
 
         if (isSlider) {
             slider = new Slider();
-            slider.setShowTickLabels(true);
+            //slider.setShowTickLabels(true);
             slider.setMin(input.getMinimumValue()+1);
             slider.setMax(input.getMaximumValue());
 
@@ -135,6 +140,15 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
             }
             
             value.bindBidirectional(slider.valueProperty());
+            
+            hbox.getChildren().addAll(sliderLabel,slider);
+            sliderLabel.setPrefWidth(60);
+            sliderLabel.setMaxWidth(60);
+            sliderLabel.getStyleClass().add("warning");
+            hbox.setSpacing(10.0);
+            
+            sliderLabel.textProperty().bind(Bindings.createStringBinding(()->StringUtils.numberToString(value.getValue(),3), value));
+            
 
         } else {
             field = new TextField();

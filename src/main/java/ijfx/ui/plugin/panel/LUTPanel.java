@@ -27,6 +27,7 @@ import ijfx.core.stats.IjfxStatisticService;
 import ijfx.core.utils.DimensionUtils;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.plugins.commands.SimpleThreshold;
+import ijfx.plugins.commands.measures.MeasureAllOverlays;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
@@ -93,6 +94,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
 import mongis.utils.SmartNumberStringConverter;
+import mongis.utils.TransitionBinding;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
@@ -100,7 +102,6 @@ import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.OverlayService;
 import net.imagej.event.OverlayCreatedEvent;
-import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.ThresholdOverlay;
 import net.imglib2.type.numeric.RealType;
@@ -214,9 +215,11 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     protected DoubleProperty minValue = new SimpleDoubleProperty(0);
     protected DoubleProperty maxValue = new SimpleDoubleProperty(255);
 
-    StringConverter stringConverter;
+    protected StringConverter stringConverter;
 
-    DoubleProperty thresholdLevel = new SimpleDoubleProperty();
+    protected DoubleProperty thresholdLevel = new SimpleDoubleProperty();
+    
+    protected Button analyseParticalButton = new Button("Analyze particles", new FontAwesomeIconView(FontAwesomeIcon.TABLE));
     
     public LUTPanel() {
 
@@ -246,11 +249,20 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             //thresholdButton.setOnAction(this::thresholdAndSegment);
             gridPane.add(thresholdButton, 0, 2, 2, 1);
 
+            // analyse particle button
+            analyseParticalButton.setMaxWidth(Double.POSITIVE_INFINITY);
+            analyseParticalButton.setOnAction(event->commandService.run(MeasureAllOverlays.class, true));
+            analyseParticalButton.setOpacity(0.0);
+            gridPane.add(analyseParticalButton, 0, 3,2,1);
+            new TransitionBinding<Number>(0,1.0)
+                    .bind(thresholdButton.selectedProperty(), analyseParticalButton.opacityProperty());
+            
+            
             // advanced threshold button
             thresholdMoreButton.setMaxWidth(Double.POSITIVE_INFINITY);
             thresholdMoreButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
             thresholdMoreButton.setOnAction(this::onAdvancedThresholdButtonClicked);
-            gridPane.add(thresholdMoreButton, 0, 3, 2, 1);
+            gridPane.add(thresholdMoreButton, 0, 4, 2, 1);
 
             // adding other stuffs
             gridPane.add(new Label("Min : "), 0, 0);

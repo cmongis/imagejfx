@@ -57,6 +57,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.overlay.Overlay;
+import net.imglib2.RandomAccessibleInterval;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -229,7 +230,7 @@ public class SegmentationService extends AbstractService implements IjfxService 
         overlayUtilsService.removeAllOverlay(inputDisplay);
         timer.elapsed("remove all overlay");
       
-        Overlay[] overlay = BinaryToOverlay.transform(getContext(), mask, objectsAreWhite);
+        Overlay[] overlay = BinaryToOverlay.transform(getContext(), (RandomAccessibleInterval)mask.getImgPlus(), objectsAreWhite);
         timer.elapsed("BinaryToOverlay.transform(...)");
         // giving a random color to each overlay
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
