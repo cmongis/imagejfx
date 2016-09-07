@@ -20,6 +20,7 @@
  */
 package ijfx.ui.main;
 
+import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -58,11 +59,10 @@ public class ImageJFX extends Application {
     public static boolean formatted = false;
 
     public static Stage PRIMARY_STAGE;
-    
+
     public static Logger getLogger() {
         if (logger == null) {
             logger = Logger.getLogger("ImageJFX");
-            
 
         }
 
@@ -74,8 +74,6 @@ public class ImageJFX extends Application {
 
     protected static String STYLESHEET_NAME = "flatterfx.css";
 
- 
-    
     public static final String CSS_DARK_FILL = "dark-fill";
     public static final String IMAGEJFX_PREF_NODE = "/imagejfx/";
     public static final String STYLESHEET_ADDR = ImageJFX.class.getResource(STYLESHEET_NAME).toExternalForm();
@@ -107,9 +105,9 @@ public class ImageJFX extends Application {
 
         Parent root;
         try {
-            
+
             PRIMARY_STAGE = primaryStage;
-            
+
             LogRecorderService.getInstance();
 
             getLogger().info("You running Java " + System.getProperty("java.version"));
@@ -117,16 +115,15 @@ public class ImageJFX extends Application {
             getLogger().info(new File("./plugins").getAbsolutePath());
             // System.setProperty("imagej.dir","/Applications/Fiji.app/");
             // System.setProperty("plugins.dir","plugins/");
-            
+
             //loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
             //root = loader.load();
-
             controller = new MainWindowController();//loader.<MainWindowController>getController();
 
             Scene scene = new Scene(controller);
-           
+
             scene.getStylesheets().add(getStylesheet());
-            
+
             // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Open+Sans");
             //scene.getStylesheets().add("http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css");
             //Font.loadFont(FontAwesomeIconView.class.getResource("fontawesome-webfont.ttf").toExternalForm().toString(), 0);
@@ -142,8 +139,14 @@ public class ImageJFX extends Application {
             primaryStage.show();
             controller.setScene(scene);
             Platform.runLater(controller::init);
+
+            SplashScreen splashScreen = SplashScreen.getSplashScreen();
+            if (splashScreen != null) {
+                splashScreen.close();
+            }
+
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,null,ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         }
 
     }
@@ -156,16 +159,15 @@ public class ImageJFX extends Application {
 
     public static File getConfigDirectory() {
         File configDirectory = new File(System.getProperty("user.home") + File.separator + IJFX_FOLDER_NAME);
-        if(configDirectory.exists() == false)
+        if (configDirectory.exists() == false) {
             configDirectory.mkdir();
-        
+        }
+
         return configDirectory;
     }
 
-    
-    
     public static String getConfigFile(String filename) {
-        return new File(getConfigDirectory(),filename).getAbsolutePath();
+        return new File(getConfigDirectory(), filename).getAbsolutePath();
     }
 
     private static ExecutorService service = Executors.newCachedThreadPool();
