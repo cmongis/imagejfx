@@ -90,6 +90,9 @@ import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
 import java.util.stream.Stream;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.Event;
@@ -252,10 +255,11 @@ public class MainWindowController extends AnchorPane {
 
         //loadingScreen.setDefaultPane(mainAnchorPane);
         sideMenu.setTranslateZ(0);
-
+        sideMenu.setTranslateX(-100);
+        sideMenu.setPrefWidth(30);
         memoryThread.start();
 
-        initMenuAction();
+        
 
         /*
             The boot sequence is the following
@@ -345,7 +349,10 @@ public class MainWindowController extends AnchorPane {
         uiContextService.update();
         activityService.openByType(ImageJContainer.class);
         // sequence over
-
+        
+        
+        initMenuAction();
+        new Timeline(new KeyFrame(Duration.millis(300),new KeyValue(sideMenu.translateXProperty(), 0.0))).play();
         logger.info("Start over");
 
     }
@@ -701,7 +708,7 @@ public class MainWindowController extends AnchorPane {
         });
         addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, CorrectionActivity.class);
 
-        menuActivated.setValue(false);
+        
         
        new TransitionBinding<Number>(0d, 1d)
                     .bind(sideMenuWidthBinding.stateProperty(), memoryLabel.opacityProperty())
@@ -711,6 +718,8 @@ public class MainWindowController extends AnchorPane {
                     .bind(sideMenuWidthBinding.stateProperty(), memoryProgressBar.opacityProperty())
                     .setDuration(Duration.millis(150));
         
+       
+       menuActivated.setValue(false);
     }
 
     private SideMenuButton addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass) {
