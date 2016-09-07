@@ -19,17 +19,15 @@
  */
 package ijfx.ui.batch;
 
-import com.google.common.collect.Sets;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataKeyPrioritizer;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.metadata.MetaDataSetUtils;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +36,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import mongis.utils.StringUtils;
 
 /**
  *
@@ -130,6 +127,7 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         TableColumn<T, Object> column = new TableColumn<>();
         column.setUserData(key);
         column.setCellValueFactory(this::getCellValueFactory);
+        
         return column;
     }
 
@@ -157,10 +155,21 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     protected ObservableValue<Object> getCellValueFactory(TableColumn.CellDataFeatures<T, Object> cell) {
         String key = cell.getTableColumn().getUserData().toString();
         Object value = cell.getValue().getMetaDataSet().get(key).getValue();
-        if(value instanceof Number) {
-            value = StringUtils.numberToString(((Number)value).doubleValue(), 3);
+        if(value instanceof Double) {
+            Double d = (Double) value;
+            value = round(d,3);
+            if(d > 10) {
+                if(value.toString().endsWith(".0")) value = d.intValue();
+            }
         }
         return new ReadOnlyObjectWrapper<>(value);
+    }
+    
+    private double round(double value, int places) {
+         BigDecimal bd = new BigDecimal(value);
+         
+    bd = bd.setScale(places, RoundingMode.HALF_UP);
+    return bd.doubleValue();
     }
 
 }
