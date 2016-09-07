@@ -291,6 +291,7 @@ public class SegmentationService extends AbstractService implements IjfxService 
                         return measure(overlays, set, dataset);
                     })
                     .flatMap(obj -> obj.stream())
+                    .filter(obj->obj!=null)
                     .collect(Collectors.toList());
 
         } catch (Exception e) {

@@ -21,6 +21,8 @@ package ijfx.ui.explorer.view.chartview;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.service.cluster.ExplorableClustererService;
 import ijfx.service.ui.FxImageService;
 import ijfx.service.ui.LoadingScreenService;
@@ -37,7 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -156,16 +157,45 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
         /**
          * Try to keep the same metadatas
          */
-        comboBoxList.stream().forEach(c -> {
-            String s = c.getSelectionModel().getSelectedItem();
-            c.getItems().clear();
-            c.getItems().addAll(metadatas);
-//            if (metadatas.contains(s)) {
-//                c.getSelectionModel().select(s);
-//            }
+        comboBoxList.stream().forEach(comboBox -> {
+            String selectedItem = comboBox.getSelectionModel().getSelectedItem();
+            comboBox.getItems().clear();
+            comboBox.getItems().addAll(metadatas);
+            
+            /*
+            if (metadatas.contains(selectedItem)) {
+                comboBox.getSelectionModel().select(selectedItem);
+            }*/
+            autoComboBox(comboBox, metadatas, selectedItem);
 
         });
 
+    }
+    
+    
+    public void autoComboBox(ComboBox combox, List<String> newMetaData, String formerSelectedItem) {
+        
+        if(formerSelectedItem == null && currentItems.size() > 0) {
+            MetaDataSetType type = currentItems.get(0).getMetaDataSet().getType();
+            combox.getSelectionModel().select(autoComboBox(combox,type));
+            return;
+        }
+        
+        if(newMetaData.contains(formerSelectedItem)) combox.getSelectionModel().select(formerSelectedItem);
+    }
+    
+    private String autoComboBox(ComboBox comboBox, MetaDataSetType type) {
+        switch(type) {
+            case OBJECT:
+                if(comboBox == xComboBox) return MetaData.LBL_CENTER_X;
+                if(comboBox == yComboBox) return MetaData.LBL_CENTER_Y;
+                if(comboBox == thirdComboBox) return MetaData.LBL_MEAN;
+            default:
+                if(comboBox == xComboBox) return MetaData.WIDTH;
+
+                
+        }
+        return null;
     }
 
     @Override
@@ -233,6 +263,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     public void applyColorTable(ColorTable colorTable) {
         setMinMax(metadatas[2]);
         RealLUTConverter<T> realLUTConverter = new RealLUTConverter<>(min, max, colorTable);
+        if(scatterChart.getData().size() == 0) return;
         scatterChart.getData().get(0).getData().stream()
                 .forEach((Data e) -> {
                     double extraValue = (double) e.getExtraValue();
@@ -252,6 +283,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
     }
 
     private void setMinMax(String newValue) {
+        if(currentItems != null && currentItems.size() > 0) {
         min = max = currentItems.get(0).getMetaDataSet().get(newValue).getDoubleValue();
         currentItems.stream()
                 .forEach(e -> {
@@ -259,6 +291,7 @@ public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView imple
                     min = min > value ? value : min;
                     max = max < value ? value : max;
                 });
+        }
     }
 
     @FXML

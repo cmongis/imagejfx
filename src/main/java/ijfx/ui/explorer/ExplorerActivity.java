@@ -419,6 +419,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         Set<String> keySet = new HashSet();
         items
                 .stream()
+                .filter(owner->owner!=null)
                 .map(owner -> owner.getMetaDataSet().keySet())
                 .forEach(keys -> keySet.addAll(keys));
 

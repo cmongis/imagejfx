@@ -20,7 +20,9 @@
 package mongis.utils;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.util.converter.NumberStringConverter;
 
 /**
@@ -32,10 +34,12 @@ public class SmartNumberStringConverter extends NumberStringConverter{
     
    private final BooleanProperty floatingPoint = new SimpleBooleanProperty();
    
+   private final IntegerProperty floatingPointNumber = new SimpleIntegerProperty(2);
+   
    @Override
    public Number fromString(String str) {
        if(floatingPoint.getValue()) {
-           return new Float(str);
+           return new Double(str);
        }
        else {
            return new Integer(str);
@@ -44,8 +48,8 @@ public class SmartNumberStringConverter extends NumberStringConverter{
    
    @Override
    public String toString(Number number) {
-       if(floatingPoint.getValue()) {
-           return Float.toString(number.floatValue());
+       if(floatingPoint.getValue() && floatingPointNumber.getValue() != 0) {
+           return StringUtils.numberToString(number.doubleValue(), floatingPointNumber.getValue());
        }
        else {
            return Integer.toString(number.intValue());
@@ -64,5 +68,8 @@ public class SmartNumberStringConverter extends NumberStringConverter{
         return floatingPoint;
     }
    
+    public IntegerProperty floatingPointNumberProperty() {
+        return floatingPointNumber;
+    }
     
 }

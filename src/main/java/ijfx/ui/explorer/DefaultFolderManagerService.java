@@ -187,7 +187,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
             return;
         } else {
 
-            if (null != mode) {
+            if (mode != null) {
                 switch (mode) {
                     case FILE:
                         task.run(currentFolder::getFileList);
@@ -195,17 +195,17 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
                     case PLANE:
                         task.run(currentFolder::getPlaneList);
                         break;
-                    default:
+                    case OBJECT:
                         task.run(currentFolder::getObjectList);
-                        break;
+                   
                 }
             }
             task.then(this::setItems);
             task.start();
             loadingScreenService.frontEndTask(task, false);
         }
-        
-        logger.info("Exploration mode changed : " + mode != null ? mode.toString() : null);
+        if(mode != null)
+        logger.info("Exploration mode changed : " + mode.toString());
     }
     private void setItems(List<Explorable> items) {
         

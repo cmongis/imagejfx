@@ -75,6 +75,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
+import mongis.utils.FakeTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import mongis.utils.TaskButtonBinding;
@@ -422,7 +423,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             return task;
 
         } else {
-
+            segmentMore(null);
+            return new FakeTask<>(1000);
+            /*
             Task<Boolean> task = new WorkflowBuilder(context)
                     .addInput(imageDisplayService.getActiveDataset().duplicate())
                     .execute(workflowPanel.stepListProperty())
@@ -432,7 +435,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             loadingScreenService.frontEndTask(
                     task, true);
 
-            return task;
+            return task;*/
 
         }
 

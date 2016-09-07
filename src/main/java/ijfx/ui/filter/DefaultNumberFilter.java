@@ -20,7 +20,6 @@
 package ijfx.ui.filter;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -49,9 +48,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
+import mongis.utils.SmartNumberStringConverter;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.EmpiricalDistribution;
@@ -69,7 +68,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
     ObjectProperty<Predicate<Double>> predicateProperty = new SimpleObjectProperty<>();
 
     IntegerProperty maxBinProperty = new SimpleIntegerProperty(60);
-    
+
     Collection< ? extends Number> possibleValues;
 
     @FXML
@@ -93,6 +92,8 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
     @FXML
     Label valueCountLabel;
 
+    SmartNumberStringConverter converter = new SmartNumberStringConverter();
+
     public DefaultNumberFilter() {
         try {
             FXUtilities.injectFXML(this);
@@ -113,7 +114,8 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
             categoryAxis.lowerBoundProperty().bind(rangeSlider.minProperty());
             categoryAxis.minorTickCountProperty().bind(rangeSlider.minorTickCountProperty());
             categoryAxis.tickUnitProperty().bind(rangeSlider.majorTickUnitProperty());
-            NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
+            converter.setFloatingPoint(true);
+            converter.floatingPointNumberProperty().bind(Bindings.createIntegerBinding(this::getDisplayedFloatingPoint, rangeSlider.minProperty(),rangeSlider.maxProperty()));
 
             Bindings.bindBidirectional(lowTextField.textProperty(), rangeSlider.lowValueProperty(), converter);
             Bindings.bindBidirectional(highTextField.textProperty(), rangeSlider.highValueProperty(), converter);
@@ -128,15 +130,25 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         }
     }
 
-    
+    public Integer getDisplayedFloatingPoint() {
+        double range = rangeSlider.getMax() - rangeSlider.getMin();
+        if (range >= 5) {
+            return 0;
+        } else if (range > 1 && range < 5) {
+            return 1;
+        } else {
+            return 3;
+        }
+    }
+
     public IntegerProperty maxBinProperty() {
         return maxBinProperty;
     }
-    
+
     public void setMaximumBin(Integer maxBin) {
         maxBinProperty.setValue(maxBin);
     }
-    
+
     @Override
     public Node getContent() {
         return this;
@@ -160,7 +172,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
         new CallbackTask()
                 .run(this::updateChart)
                 .start();
-                //updateChart();
+        //updateChart();
 
     }
 
@@ -189,8 +201,7 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
                 .collect(Collectors.toSet()).size();
         if (differentValuesCount < maximumBinNumber) {
             finalBinNumber = differentValuesCount;
-        }
-        else {
+        } else {
             finalBinNumber = maximumBinNumber;
         }
 

@@ -161,7 +161,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
                     .setName("Getting file list...")
                     .run(this::fetchFiles)
                     .then(result -> {
-                       
+                        files = result;
                         eventService.publish(new FolderUpdatedEvent().setObject(this));
                     })
                     .setIn(currentTaskProperty())
@@ -193,14 +193,6 @@ public class DefaultFolder implements Folder, FileChangeListener {
                 .parallel()
                 .map(record -> {
                     
-                    /*
-                    File overlayJsonFile = overlayIOService.getOverlayFileFromImageFile(record.getFile());
-                    finalProgress.increment(0.5);
-                    if (overlayJsonFile.exists()) {
-                        //getObjectList().addAll(loadOverlay(record.getFile(), overlayJsonFile));
-                    }
-                    record.getMetaDataSet().setType(MetaDataSetType.FILE);
-                    return record;*/
                     finalProgress.increment(1);
                     return addFile(record);
                 })

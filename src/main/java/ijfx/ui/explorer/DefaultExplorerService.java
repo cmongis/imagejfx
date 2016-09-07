@@ -180,6 +180,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     }
 
     private void stopListeningToExplorable(Explorable expl) {
+        if(expl != null)
         expl.selectedProperty().removeListener(this::onExplorableSelected);
     }
 
