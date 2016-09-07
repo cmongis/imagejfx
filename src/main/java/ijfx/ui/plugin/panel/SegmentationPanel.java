@@ -423,9 +423,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             return task;
 
         } else {
-            segmentMore(null);
-            return new FakeTask<>(1000);
-            /*
+            
             Task<Boolean> task = new WorkflowBuilder(context)
                     .addInput(imageDisplayService.getActiveDataset().duplicate())
                     .execute(workflowPanel.stepListProperty())
@@ -435,7 +433,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             loadingScreenService.frontEndTask(
                     task, true);
 
-            return task;*/
+            return task;
 
         }
 
@@ -479,7 +477,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         uiContextService.update();
     }
 
-    public void segmentMore(ActionEvent event) {
+    private void segmentMore(ActionEvent event) {
 
         ImageDisplay activeImageDisplay = imageDisplayService.getActiveImageDisplay();
 

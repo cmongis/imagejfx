@@ -45,8 +45,10 @@ public class CanvasCamera implements ViewPort {
 
     final DoubleProperty zoomProperty = new SimpleDoubleProperty(1.0);
 
-    Rectangle2D imageSpace;
+    private Rectangle2D imageSpace;
 
+    private Rectangle2D seenRectangle;
+    
     public CanvasCamera() {
         zoomProperty.addListener(e -> fireValueChangedEvent());
         xCenterProperty.addListener(e -> fireValueChangedEvent());
@@ -130,6 +132,7 @@ public class CanvasCamera implements ViewPort {
     public void zoomIn() {
         double value = zoomProperty.get();
         zoomProperty.set(value *= 1.1);
+        seenRectangle = null;
         fireValueChangedEvent();
         // System.out.println(zoom);
     }
@@ -137,6 +140,7 @@ public class CanvasCamera implements ViewPort {
     public void zoomOut() {
         double value = zoomProperty.get();
         zoomProperty.set(value *= 0.9);
+        seenRectangle = null;
         fireValueChangedEvent();
     }
 
@@ -174,6 +178,7 @@ public class CanvasCamera implements ViewPort {
             newX = getCameraLeftLimit() + 1;
         }
         setX(newX);
+        seenRectangle = null;
         fireValueChangedEvent();
         return this;
     }
@@ -189,6 +194,7 @@ public class CanvasCamera implements ViewPort {
         }
 
         setY(newY);
+        seenRectangle = null;
         fireValueChangedEvent();
         return this;
     }
@@ -201,12 +207,16 @@ public class CanvasCamera implements ViewPort {
     @Override
     public Rectangle2D getSeenRectangle() {
 
+        if(seenRectangle == null) {
+        
         double rx = getX() - getEffectiveWidth() / 2;
         double ry = getY() - getEffectiveHeight() / 2;
 
         double rwidth = getEffectiveWidth();
         double rheight = getEffectiveHeight();
-        return new Rectangle2D(rx, ry, rwidth, rheight);
+        seenRectangle = new Rectangle2D(rx, ry, rwidth, rheight);
+        }
+        return seenRectangle;
     }
 
     public CanvasCamera accordToSpace(Rectangle2D space) {
@@ -261,6 +271,14 @@ public class CanvasCamera implements ViewPort {
         // double y = (point.getY() - getY()) * zoom + (height/2);
         return new Point2D(x, y);
 
+    }
+    
+    @Override
+    public void localizeOnCamera(double[] position) {
+        if(position.length < 2) throw new IllegalArgumentException("The position array is too small. Array size of 2 required");
+        Rectangle2D r = getSeenRectangle();
+        position[0] = (position[0] - r.getMinX()) * zoomProperty.get();
+        position[1] = (position[1] - r.getMinY()) * zoomProperty.get();
     }
 
     public boolean isVisibleOnCamera(Point2D p) {

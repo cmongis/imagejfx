@@ -38,6 +38,8 @@ public interface ViewPort {
     double getEffectiveWidth();
 
     Point2D getPositionOnCamera(Point2D point);
+    
+    void localizeOnCamera(double[] position);
 
     Point2D getPositionOnImage(Point2D point);
 
