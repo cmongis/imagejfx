@@ -456,7 +456,7 @@ public class ImageDisplayPane extends AnchorPane {
 
         
         Timer t1 = timerService.getTimer(this.getClass());
-        Timer t2 = timerService.getTimer(this.getClass());
+        
         
         t1.start();
        

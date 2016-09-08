@@ -362,6 +362,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         
         thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, minValue,maxValue,thresholdButton.selectedProperty()));
         thresholdLevel.addListener(this::onThresholdButtonChanged);
+        
+        
+        
         return this;
     }
 
@@ -437,6 +440,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         }
         updateViewRangeFromModel();
         updateLabel();
+        thresholdButton.setSelected(false);
         mergedViewToggleButton.selectedProperty().setValue(getCurrentDatasetView().getColorMode() == ColorMode.COMPOSITE);
     }
 
@@ -501,7 +505,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             if (getCurrentDatasetView().getColorMode() != booleanToColorMode(mergedViewToggleButton.isSelected())) {
                 getCurrentDatasetView().setColorMode(mergedViewToggleButton.isSelected() ? ColorMode.COMPOSITE : ColorMode.COLOR);
             }
-            getCurrentDatasetView().getProjector().map();
+      
         }
 
     }
