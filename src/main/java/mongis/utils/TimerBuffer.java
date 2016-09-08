@@ -17,44 +17,49 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.canvas.utils;
+package mongis.utils;
 
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.function.Consumer;
-import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
 
 /**
  *
  * @author cyril
  */
-public interface ViewPort {
-
-    void addListener(Consumer<CanvasCamera> listener);
-
-    // height of the part extracted from the picture after taking account the zoom effect
-    double getEffectiveHeight();
-
-    // width of the part extracted from the picture after taking account the zoom effect
-    double getEffectiveWidth();
-
-    Point2D getPositionOnCamera(Point2D point);
+public class TimerBuffer<T> {
     
-    void localizeOnCamera(double[] position);
-
-    Point2D getPositionOnImage(Point2D point);
-
-    Rectangle2D getSeenRectangle();
-
-    double getRealImageWidth();
+    private long millis = 50;
     
-    double getRealImageHeight();
+    List<T> queue = new ArrayList<>();
     
-    double getSeenImageWidth();
+    Timer timer = new Timer();
+    Boolean set = Boolean.FALSE;
+    Consumer<List<T>> consumer;
     
-    double getSeenImageHeight();
+    public void add(T t) {
+        queue.add(t);
+        if(!set) {
+            setTimer();
+        }
+    }
     
-    double getZoom();
-
-    void setZoom(double zoom);
+    public void setTimer() {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                consume();
+            }
+        }, millis);
+    }
     
+    public synchronized void consume() {
+        synchronized(queue) {
+            consumer.accept(new ArrayList(queue));
+            queue.clear();
+        }
+    }
 }

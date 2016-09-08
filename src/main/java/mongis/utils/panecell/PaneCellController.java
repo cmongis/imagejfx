@@ -93,9 +93,9 @@ public class PaneCellController<T extends Object> {
      *
      * @param items List of items coming from the model
      */
-    public synchronized void update(List<T> items) {
+    public synchronized Task update(List<T> items) {
 
-        Task task = new CallbackTask<Integer, List<PaneCell<T>>>()
+        return new CallbackTask<Integer, List<PaneCell<T>>>()
                 .setInput(items.size())
                 .setName("Loading...")
                 .run(this::retrieve)
@@ -103,24 +103,29 @@ public class PaneCellController<T extends Object> {
                     MercuryTimer timer = new MercuryTimer("Browser view");
                     timer.start();
                     pane.getChildren().clear();
-                    pane.getChildren().addAll(getContent(controllers));
-                    timer.elapsed("Adding all the controllers");
-                    for (int i = 0; i != items.size(); i++) {
-                        controllers.get(i).setItem(items.get(i));
+                    int pace = 10;
+                    for (int i = 0; i + pace != items.size(); i += pace) {
+                        if (i + pace > items.size()) {
+                            pace = items.size() - i;
+                        }
+                        pane.getChildren().addAll(getContent(controllers.subList(i,i+pace)));
+                        for (int j = i; j != i + pace; j++) {
+                            controllers.get(j).setItem(items.get(j));
+                        }
                     }
+
+                    //pane.getChildren().addAll(getContent(controllers));
+                    timer.elapsed("Adding all the controllers");
+                    //for (int i = 0; i != items.size(); i++) {
+                    //  controllers.get(i).setItem(items.get(i));
+                    //}
                     timer.elapsed("Updating all the controllers");
 
                 })
                 .start();
-        if(pane != null) {
-        new LoadingPopup()
-                .bindTask(task)
-                .showOnScene(pane.getScene())
-                .setCanCancel(false)
-                .closeOnFinished()
                 
-                ;
-        }
+   
+        
     }
 
     public synchronized void update3DList(List<List<List<T>>> items, int size, List<String> metaDatas) {
@@ -172,97 +177,6 @@ public class PaneCellController<T extends Object> {
         return cachedControllerList.subList(0, number);
     }
 
-    /*
-    public synchronized void update(List<T> items) {
-
-        try {
-
-            int layoutObjectCount = itemControllerList.size();
-            int itemCount = items.size();
-
-            MercuryTimer timer = new MercuryTimer("Browser view");
-
-            logger.info(String.format("%d items to show against %s controllers ", itemCount, itemControllerList.size()));
-
-            // if there is more controllers than items
-            if (itemCount < layoutObjectCount) {
-
-                // we create an list to contain all controllers that have to be removed
-                List<PaneCell<T>> toRemove = new ArrayList<>(layoutObjectCount - itemCount); // creating the missing controller the new objects
-
-                // putting the excess of controllers in a blacklis
-                for (int i = itemCount; i < layoutObjectCount; i++) {
-
-                    // System.out.println("Removing :" +i);
-                    toRemove.add(itemControllerList.get(i));
-
-                }
-
-                // adding these controllers to the cache
-                cachedControllerList.addAll(toRemove);
-
-                logger.info(String.format("Deleting %d controllers", toRemove.size()));
-
-                // removing from the list
-                itemControllerList.removeAll(toRemove);
-
-                pane.getChildren().removeAll(getContent(toRemove));
-
-                cachedControllerList.stream().forEach(item -> item.setItem(null));
-
-                logger.info(String.format("%d controllers left.", itemControllerList.size()));
-            }
-
-            timer.elapsed("controller deleting");
-
-            // if there is more items than controllers
-            if (layoutObjectCount < itemCount) {
-
-                //creating a list that should contain the controllers to add
-                List<PaneCell<T>> toAdd = new ArrayList<>(itemCount - layoutObjectCount);
-
-                // adding extra controllers
-                for (int i = layoutObjectCount; i < itemCount; i++) {
-
-                    PaneCell itemController;
-
-                    // if there is no more controllers in the cache
-                    if (cachedControllerList.size() == 0) {
-
-                        fillCache(itemCount - i);
-                    }
-                    // we pop the first
-                    itemController = cachedControllerList.pop();
-
-                    itemController.setItem(items.get(i));
-
-                    //adding the controller to the add list
-                    toAdd.add(itemController);
-                }
-                timer.elapsed("controller fetching");
-                // adding all the controllers
-                itemControllerList.addAll(toAdd);
-                pane.getChildren().addAll(getContent(toAdd));
-                timer.elapsed("controller adding");
-            }
-
-            // updating the controllers with the new data
-            for (int i = 0; i < itemCount; i++) {
-
-                if (i >= itemControllerList.size()) {
-                    break;
-                }
-                itemControllerList.get(i).setItem(items.get(i));
-            }
-
-            timer.elapsed("controller update");
-            
-            
-            currentItems = items;
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Couln't update the controllers", e);
-        }
-    }*/
     // get the list of cells
     protected Collection<Node> getContent(Collection<PaneCell<T>> cellList) {
         return cellList.stream().map(PaneCell::getContent).collect(Collectors.toList());

@@ -28,6 +28,7 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
+import net.imglib2.RealLocalizable;
 import net.imglib2.roi.PolygonRegionOfInterest;
 import org.scijava.plugin.Plugin;
 
@@ -79,14 +80,13 @@ public class PolygonDrawer implements OverlayDrawer<PolygonOverlay> {
         PolygonRegionOfInterest roi = overlay.getRegionOfInterest();
         double[] xs = new double[roi.getVertexCount()];
         double[] ys = new double[roi.getVertexCount()];
+        double[] position = new double[2];
         for (int i = 0; i != roi.getVertexCount(); i++) {
-
-            Point2D positionOnViewPort = new Point2D(roi.getVertex(i).getDoublePosition(0), roi.getVertex(i).getDoublePosition(1));
-            positionOnViewPort = viewport.getPositionOnCamera(positionOnViewPort);
-            
-            xs[i] = positionOnViewPort.getX();
-            ys[i] = positionOnViewPort.getY();
-
+            RealLocalizable vertex = roi.getVertex(i);
+            vertex.localize(position);
+            viewport.localizeOnCamera(position);
+            xs[i] = position[0];
+            ys[i] = position[1];
         }
         context.setFill(viewConfig.getFillCollor());
         context.setLineWidth(viewConfig.getStrokeWidth());
