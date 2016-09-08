@@ -449,7 +449,7 @@ public class ImageDisplayPane extends AnchorPane {
         Timer t2 = timerService.getTimer(this.getClass());
         
         t1.start();
-        t2.start();
+       
         List<OverlayView> overlays = imageDisplay
                 .stream()
                 .parallel()
@@ -460,18 +460,13 @@ public class ImageDisplayPane extends AnchorPane {
         canvas.getGraphicsContext2D().setFill(Color.RED);
         canvas.getGraphicsContext2D().setStroke(Color.RED);
         logger.info("Redrawing overlays");
+        
         for (OverlayView view : overlays) {
             Overlay overlay = view.getData();
-            t2.start();
-            OverlayDrawer drawer = getDrawer(overlay);
-            
+             OverlayDrawer drawer = getDrawer(overlay);   
             if (drawer.isOverlayOnViewPort(overlay, canvas.getCamera())) {
-                t2.start();
                 drawer.update(new DefaultOverlayViewConfiguration(view, overlay), canvas.getCamera(), canvas);
-                t2.elapsed("drawing an overlay");
             }
-            
-
         }
         
         t1.elapsed("Drawing all overlay");

@@ -22,6 +22,7 @@ package ijfx.service;
 import ijfx.ui.main.ImageJFX;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
@@ -35,7 +36,7 @@ public class ThreadSafeTimerWrapper implements Timer{
     long start;
     long last;
     
-    private static final Executor executor = ImageJFX.getThreadPool();
+    private static final Executor executor = Executors.newFixedThreadPool(2);
     
     public ThreadSafeTimerWrapper(DefaultTimer timer) {
         this.timer = timer;
