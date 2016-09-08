@@ -101,18 +101,20 @@ public class AutoContrast extends ContextCommand {
     }
 
     private static void setMinMax(ImageDisplay imageDisplay, Dataset dataset, SummaryStatistics stats, int channel) {
-        System.out.println(stats);
+       
         if (dataset != null) {
             dataset.setChannelMinimum(channel, stats.getMin());
              dataset.setChannelMaximum(channel, stats.getMax());
+             dataset.update();
         }
        
            
  if (imageDisplay != null) {
             DatasetView view = (DatasetView) imageDisplay.getActiveView();
             view.setChannelRange(channel, stats.getMin(), stats.getMax());
-            view.getProjector().map();
+            
             view.update();
+            view.getProjector().map();
         }  
     }
 

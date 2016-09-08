@@ -20,12 +20,14 @@
 package ijfx.ui.datadisplay.image;
 
 import ijfx.core.stats.IjfxStatisticService;
+import ijfx.plugins.commands.AutoContrast;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.canvas.utils.ViewPort;
@@ -94,6 +96,8 @@ import net.imagej.overlay.Overlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.converter.RealLUTConverter;
 import net.imglib2.display.ColorTable;
+import net.imglib2.display.screenimage.awt.ARGBScreenImage;
+import net.imglib2.img.array.ArrayCursor;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
@@ -192,6 +196,8 @@ public class ImageDisplayPane extends AnchorPane {
 
     private final SciJavaEventBus bus = new SciJavaEventBus();
 
+    @Parameter
+    LoadingScreenService loadingScreenService;
     
      private Class<?>[] displayEvents = new Class<?>[]{
         DisplayUpdatedEvent.class,
@@ -228,7 +234,7 @@ public class ImageDisplayPane extends AnchorPane {
     
     private final StringProperty titleProperty = new SimpleStringProperty();
 
-    private int refreshDelay = 50; // in milliseconds
+    private int refreshDelay = 30; // in milliseconds
 
     private AxisConfiguration axisConfig;
 
@@ -250,8 +256,11 @@ public class ImageDisplayPane extends AnchorPane {
 
         canvas.getCamera().addListener(this::onViewPortChange);
 
-        stackPane.widthProperty().addListener(this::onWidthChanged);
-        stackPane.heightProperty().addListener(this::onHeightChanged);
+        //stackPane.widthProperty().addListener(this::onWidthChanged);
+        //stackPane.heightProperty().addListener(this::onHeightChanged);
+        
+        canvas.widthProperty().bind(stackPane.widthProperty());
+        canvas.heightProperty().bind(stackPane.heightProperty());
         
         //canvas.heightProperty().bind(stackPane.heightProperty());
         this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
@@ -264,6 +273,7 @@ public class ImageDisplayPane extends AnchorPane {
 
     private void onWidthChanged(Observable obs, Number oldValue, Number newValue) {       
         canvas.setWidth(newValue.doubleValue());
+        if(oldValue.doubleValue() == 0.0) canvas.scaleToFit();
   
     }
 
@@ -278,7 +288,17 @@ public class ImageDisplayPane extends AnchorPane {
         setCurrentTool(toolService.getCurrentTool());
         initEventBuffering();
         canvas.setImageDisplay(imageDisplay);
-
+        
+         new CallbackTask()
+                        .setName("Enhancing contrast...")
+                        .run(() -> AutoContrast.run(statsService, imageDisplay, getDataset(), true))
+                        .submit(loadingScreenService)
+                        .setInitialProgress(0.8)
+                        .start();
+        
+        
+        
+        
     }
 
     public DatasetView getDatasetview() {
@@ -332,18 +352,17 @@ public class ImageDisplayPane extends AnchorPane {
 
     public void refreshSourceImage() {
 
-        //refreshQueue.execute(
+        
         new CallbackTask<Void, Void>()
                 .run(this::transformImage)
                 .then(this::updateImageAndOverlays)
                 .start();
-        //);
 
     }
 
     private void transformImage() {
 
-        useImageJRender();
+        useIjfxRender();
 
     }
 
@@ -355,41 +374,27 @@ public class ImageDisplayPane extends AnchorPane {
 
         WritableImage image = getWrittableImage();
 
-        t.elapsed("getWrittableImage");
-        long[] position = new long[imageDisplay.numDimensions()];
-
-        imageDisplay.localize(position);
-        RandomAccess<T> ra;
-        if (position.length == 2) {
-            ra = (RandomAccess<T>) getDataset().randomAccess();
-        } else {
-            ra = (RandomAccess<T>) imagePlaneService.planeView(getDataset(), position).randomAccess();
-        }
-
-        int channel = imageDisplay.getIntPosition(Axes.CHANNEL);
-        ColorTable colorTable = dataset.getColorTable(channel);
+       
 
         DatasetView view = imageDisplayService.getActiveDatasetView(imageDisplay);
-
-        double min = view.getChannelMin(channel);
-        double max = view.getChannelMax(channel);
-
-        int width = (int) dataset.dimension(0);
-        int height = (int) dataset.dimension(1);
-
-        RealLUTConverter<T> converter = new RealLUTConverter<T>(min, max, colorTable);
-        ARGBType argb = new ARGBType();
-        // RandomAccess<T> ra = dataset.randomAccess();
-
-        for (int x = 0; x != width; x++) {
-            for (int y = 0; y != height; y++) {
-                ra.setPosition(x, 0);
-                ra.setPosition(y, 1);
-                converter.convert(ra.get(), argb);
-                image.getPixelWriter().setArgb(x, y, argb.get());
-            }
+        
+        ARGBScreenImage screenImage = view.getScreenImage();
+        
+        
+        ArrayCursor<ARGBType> cursor = screenImage.cursor();
+        
+        long[] position = new long[2];
+        
+        cursor.reset();
+        while(cursor.hasNext()) {
+            cursor.fwd();
+            cursor.localize(position);
+            image.getPixelWriter().setArgb((int)position[0],(int)position[1],cursor.get().get());
         }
-
+        
+        
+       
+        
         t.elapsed("pixel transformation");
 
     }
@@ -402,7 +407,12 @@ public class ImageDisplayPane extends AnchorPane {
         logService.info("Refreshing source image " + imageDisplay.getName());
         t.elapsed("in between");
         //Retrieving buffered image from the dataset view
-        BufferedImage bf = getDatasetview().getScreenImage().image();
+        
+        DatasetView datasetView = getDatasetview();
+        
+        ARGBScreenImage screenImage = datasetView.getScreenImage();
+        
+        BufferedImage bf = screenImage.image();
 
         t.elapsed("getScreenImage");
 

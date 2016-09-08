@@ -72,7 +72,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         getStyleClass().add(WINDOW_CLASS_NAME);
         setTitleBarStyleClass(TITLE_CLASS_NAME);
         setMovable(true);
-        setPrefSize(500, 500);
+       
         
         
     }
@@ -89,6 +89,8 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         this.display = display;
      
         display(display);
+         setPrefWidth(500);
+        setPrefHeight(500);
         return this;
     }
 

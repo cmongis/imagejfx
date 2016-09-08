@@ -206,14 +206,6 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
                 // creating the @ImageWindow 
                 // getting the @ImageWindowContainer unique instance
                 ImageWindowContainer.getInstance().getChildren().add(imageWindow);
-
-                new CallbackTask()
-                        .setName("Enhancing contrast...")
-                        .run(() -> AutoContrast.run(getContext().getService(IjfxStatisticService.class), imgDisplay, dataset, true))
-                        .submit(loadingScreenService)
-                        .setInitialProgress(0.8)
-                        .start();
-                ;
             });
 
         } else if (dspl instanceof TableDisplay) {

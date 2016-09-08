@@ -80,26 +80,17 @@ public class FxImageCanvas extends Canvas {
 
         // add width and height listenr that will repain the
         // canvas when this one is resized
-        widthProperty().addListener((obj, old, nw) -> {
-            camera.setWidth(nw.doubleValue());
-            // System.out.println("width is changing : " + nw);
-            if (old.doubleValue() != nw.doubleValue()) {
-                repaint();
-            }
-
-        });
-        heightProperty().addListener((obj, old, nw) -> {
-            camera.setHeight(nw.doubleValue());
-            if (old.doubleValue() != nw.doubleValue()) {
-                repaint();
-            }
-        });
+        camera.widthProperty().bind(widthProperty());
+        camera.heightProperty().bind(heightProperty());
 
         // add the different mouse listener (only the zoom)
         addMouseListeners();
 
     }
 
+
+    
+    
     /**
      *
      * @return the image currently displayed
@@ -289,7 +280,13 @@ public class FxImageCanvas extends Canvas {
         this.afterDrawing = afterDrawing;
     }
     
-    
+    public void scaleToFit() {
+        
+        
+        double zoom = image.getWidth() / getWidth();
+        getCamera().setZoom(zoom);
+        
+    }
     
     
     
