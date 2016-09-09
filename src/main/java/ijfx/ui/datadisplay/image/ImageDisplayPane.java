@@ -234,7 +234,7 @@ public class ImageDisplayPane extends AnchorPane {
     
     private final StringProperty titleProperty = new SimpleStringProperty();
 
-    private int refreshDelay = 30; // in milliseconds
+    private int refreshDelay = 1000/24; // in milliseconds
 
     private AxisConfiguration axisConfig;
 
