@@ -51,7 +51,7 @@ import org.scijava.widget.FileWidget;
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath = "Image > Capture to PNG...")
+@Plugin(type = Command.class, menuPath = "Edit > Copy to PNG...")
 public class ExportToPNG extends ContextCommand {
 
     @Parameter(label = "save", style = FileWidget.SAVE_STYLE, type = ItemIO.INPUT)

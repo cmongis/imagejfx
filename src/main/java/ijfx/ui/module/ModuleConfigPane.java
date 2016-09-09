@@ -263,7 +263,7 @@ public class ModuleConfigPane extends BorderPane {
 
                     // the control is created
                     inputControl = new InputControl(inputSkinPluginService, input);
-
+                    
                     // setting the value to the control
                     inputControl.setValue(input.getValue());
 

@@ -445,9 +445,9 @@ public class ImageDisplayPane extends AnchorPane {
         repaint();
         // t.elapsed("canvas.repaint");
         updateInfoLabel();
-
-        if (getAxisConfiguration().equals(getDataset()) == false) {
-            axisConfig = new AxisConfiguration(getDataset());
+        
+        if (getAxisConfiguration().equals(imageDisplay) == false) {
+            axisConfig = new AxisConfiguration(imageDisplay);
             build();
         }
     }
@@ -752,7 +752,13 @@ public class ImageDisplayPane extends AnchorPane {
         setEdited(null);
 
     }
-
+    
+    @EventHandler
+    public void onDatasetUpdated(DatasetUpdatedEvent event) {
+        if(event.getObject() == getDataset()) {
+            Platform.runLater(this::build);
+        }
+    }
     @EventHandler
     protected void onLUTsChangedEvent(LUTsChangedEvent event) {
         logService.info("LUT changed");
@@ -952,7 +958,7 @@ public class ImageDisplayPane extends AnchorPane {
 
     public AxisConfiguration getAxisConfiguration() {
         if (axisConfig == null) {
-            axisConfig = new AxisConfiguration(getDataset());
+            axisConfig = new AxisConfiguration(imageDisplay);
         }
         return axisConfig;
     }
@@ -961,7 +967,7 @@ public class ImageDisplayPane extends AnchorPane {
 
         private CalibratedAxis[] axes;
 
-        public AxisConfiguration(Dataset dataset) {
+        public AxisConfiguration(ImageDisplay dataset) {
 
             axes = new CalibratedAxis[dataset.numDimensions()];
             dataset.axes(axes);
@@ -981,8 +987,8 @@ public class ImageDisplayPane extends AnchorPane {
             if (object == null) {
                 return false;
             }
-            if (object instanceof Dataset) {
-                return equals(new AxisConfiguration((Dataset) object));
+            if (object instanceof ImageDisplay) {
+                return equals(new AxisConfiguration((ImageDisplay) object));
             }
             if (object instanceof AxisConfiguration == false) {
                 return false;

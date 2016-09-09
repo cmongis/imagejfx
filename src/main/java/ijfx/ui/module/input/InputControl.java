@@ -89,11 +89,19 @@ public class InputControl<T extends Object> extends Control {
         setSkin(skin);
        
         
-        chosenValueProperty().bindBidirectional(skin.valueProperty());
-        chosenValueProperty().addListener(this::onValueChanged);
+      
         
         skin.getNode().getStyleClass().add(INPUT_CSS_CLASS);
-        chosenValueProperty().setValue((T)input.getDefaultValue());
+        Object value = input.getValue();
+        Object defaultValue = input.getValue();
+        if(value == null && defaultValue != null) {
+            chosenValueProperty().setValue((T)defaultValue);
+        }
+        else {
+            chosenValueProperty().setValue((T)value);
+        }
+        chosenValueProperty().bindBidirectional(skin.valueProperty());
+        chosenValueProperty().addListener(this::onValueChanged);
     }
     
     @Override
