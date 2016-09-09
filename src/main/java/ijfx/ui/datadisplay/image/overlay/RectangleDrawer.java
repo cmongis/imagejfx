@@ -55,10 +55,11 @@ public class RectangleDrawer implements OverlayDrawer<RectangleOverlay> {
         double h = b.getY() - a.getY();
         
         //viewConfig.configureContext(context2d);
-        context2d.setFill(Color.YELLOW.deriveColor(1.0, 1.0, 1.0, 0.5));
+        context2d.setFill(Color.YELLOW.deriveColor(1.0, 1.0, 1.0, 0.2));
         context2d.setStroke(Color.YELLOW);
+        context2d.setLineWidth(1.0);
         context2d.fillRect(x, y, w, h);
-        context2d.rect(x, y, w, h);
+        context2d.strokeRect(x, y, w, h);
 
     }
 

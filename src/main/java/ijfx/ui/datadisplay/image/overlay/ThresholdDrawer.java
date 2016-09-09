@@ -62,8 +62,8 @@ public class ThresholdDrawer implements OverlayDrawer<ThresholdOverlay> {
         }
 
         Rectangle2D r = viewport.getSeenRectangle();
-
-        long[] point = new long[2];
+        
+        long[] point = new long[overlay.numDimensions()];
        
         for (int x = 0; x != width; x++) {
             for (int y = 0; y != height; y++) {

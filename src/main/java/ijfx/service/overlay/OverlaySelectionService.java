@@ -120,6 +120,14 @@ public class OverlaySelectionService extends AbstractService implements ImageJSe
                 .collect(Collectors.toList());
 
     }
+    
+    public Overlay getSelectedOverlay(ImageDisplay imageDisplay) {
+        List<Overlay> selectedOverlays = getSelectedOverlays(imageDisplay);
+        if(selectedOverlays.size() == 0) return null;
+        else {
+            return selectedOverlays.get(0);
+        }
+    }
 
     public boolean isMultipleSelection(ImageDisplay imageDisplay) {
 

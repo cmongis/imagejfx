@@ -20,8 +20,7 @@
 package ijfx.plugins.bunwarpJ;
 
 import bunwarpj.Transformation;
-import ij.ImagePlus;
-import ijfx.ui.correction.WorkflowModel;
+import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.util.HashMap;
@@ -30,12 +29,10 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
-import net.imglib2.img.Img;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.ItemIO;
+import org.scijava.app.StatusService;
 import org.scijava.command.Command;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
@@ -86,23 +83,30 @@ public class ChromaticCorrection implements Command {
     @Parameter
     CommandService commandService;
 
+    @Parameter
+    StatusService uiService;
+    
     @Override
-    public void run() {
+    public void run(){
 
-            Module promise;
-
+         
+        try {
             //Extract Slice
             Map<String, Object> map = new HashMap<>();
             map.put("inputDataset", this.sourceDataset);
             map.put("position", sourcePosition);
-            promise = executeCommand(ExtractSliceCommand.class, map).orElseThrow(NullPointerException::new);
-            Dataset smallSourceDataset = (Dataset) promise.getOutput("outputDataset");
-
+            Future<CommandModule> run = commandService.run( ExtractSliceCommand.class,true,map); //executeCommand(ExtractSliceCommand.class, map).orElseThrow(NullPointerException::new);
+           
+            Dataset smallSourceDataset = (Dataset) run.get().getOutput("outputDataset");//(Dataset) promise.getOutput("outputDataset");
+            
+            //uiService.set
+            
             Map<String, Object> map2 = new HashMap<>();
             map2.put("inputDataset", this.sourceDataset);
             map2.put("position", targetPosition);
-            promise = executeCommand(ExtractSliceCommand.class, map2).orElseThrow(NullPointerException::new);
-            Dataset targetDataset = (Dataset) promise.getOutput("outputDataset");
+           // promise = executeCommand(ExtractSliceCommand.class, map2).orElseThrow(NullPointerException::new);
+            Dataset targetDataset = (Dataset)commandService.run(ExtractSliceCommand.class, true, map2).get().getOutput("outputDataset");
+//(Dataset) promise.getOutput("outputDataset");
 
             // Perform correction with bUnwarpJ
             Map<String, Object> map3 = new HashMap<>();
@@ -111,18 +115,22 @@ public class ChromaticCorrection implements Command {
             map3.put("landmarksFile", landmarksFile);
             map3.put("parameter", parameter);
             map3.put("transformation", transformation);
-            promise = executeCommand(BunwarpJFX.class, map3).orElseThrow(NullPointerException::new);
-            Dataset correctedSourceDataset = (Dataset) promise.getOutput("outputDataset");
-            
-            // Replace the corrected slice in the sourceDataset
+            //promise = executeCommand(BunwarpJFX.class, map3).orElseThrow(NullPointerException::new);
+            Dataset correctedSourceDataset = (Dataset) commandService.run(BunwarpJFX.class, true, map3).get().getOutput("outputDataset");//(Dataset) promise.getOutput("outputDataset");
+                       // Replace the corrected slice in the sourceDataset
               Map<String, Object> map4 = new HashMap<>();
             map4.put("stack", this.sourceDataset);
             map4.put("sliceDataset", correctedSourceDataset);
             map4.put("position", sourcePosition);
-            promise = executeCommand(ReplaceSlice.class, map4).orElseThrow(NullPointerException::new);
-            outputDataset = (Dataset) promise.getOutput("outputDataset");
-
             
+            //promise = executeCommand(ReplaceSlice.class, map4).orElseThrow(NullPointerException::new);
+            outputDataset = (Dataset) commandService.run(ReplaceSlice.class,true,map4).get().getOutput("outputDataset");
+                   // (Dataset) promise.getOutput("outputDataset");
+
+        }
+        catch(InterruptedException | ExecutionException e) {
+            
+        }
             
        
     }
@@ -140,7 +148,7 @@ public class ChromaticCorrection implements Command {
 
             run.get();
         } catch (MethodCallException | InterruptedException | ExecutionException ex) {
-            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
         return Optional.of(module);
     }

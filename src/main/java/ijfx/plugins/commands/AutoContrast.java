@@ -64,27 +64,15 @@ public class AutoContrast extends ContextCommand {
 
         run(statsService, imageDisplay, dataset, channelDependant);
 
-        /*
-        
-        boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
-
-        
-
-            if (multiChannel && channelDependant == true) {
-                for (int i = 0; i <= dataset.max(dataset.dimensionIndex(Axes.CHANNEL)); i++) {
-                    SummaryStatistics stats = statsService.getChannelStatistics(dataset, i);
-                    setMinMax(stats, i);
-                }
-            }
-            else {
-                SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
-                setMinMax(stats, 0);
-
-            }*/
+       
     }
 
     public static void run(IjfxStatisticService statsService, ImageDisplay imageDisplay, Dataset dataset, boolean channelDependant) {
 
+        
+        if(dataset.isRGBMerged()) {
+            return;
+        }
         boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
 
         if (multiChannel && channelDependant == true) {

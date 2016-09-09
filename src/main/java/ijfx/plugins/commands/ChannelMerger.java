@@ -274,16 +274,16 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
             // i don't know if it's necessary
             //inputRandomAccess.setPosition(position);
             t = inputCursor.get();
-
+            
             int channel = inputCursor.getIntPosition(channelAxisIndex);
 
             double d = t.getRealDouble();
 
             // get the color associated to the the pixel depending on which channel it comes from
             converters.get(channel).convert(t, color);
-
+            
             // set the output cur
-            if (channelAxisIndex != -1) {
+            if (channelAxisIndex == -1) {
                 position[channelAxisIndex] = 0;
             }
             outputCursor.setPosition(position);
