@@ -29,4 +29,22 @@ public interface OverlayStatistics {
     Overlay getOverlay();
     OverlayShapeStatistics getShapeStatistics();
     PixelStatistics getPixelStatistics();
+    
+    
+    public static OverlayStatistics EMPTY = new OverlayStatistics() {
+        @Override
+        public Overlay getOverlay() {
+            return null;
+        }
+
+        @Override
+        public OverlayShapeStatistics getShapeStatistics() {
+            return OverlayShapeStatistics.EMPTY;
+        }
+
+        @Override
+        public PixelStatistics getPixelStatistics() {
+            return PixelStatistics.EMPTY;
+        }
+    };
 }

@@ -204,7 +204,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error when creating OverlayStatisticsObject for overlay " + overlay.getName(), e);
         }
-        return null;
+        return OverlayStatistics.EMPTY;
     }
 
     public OverlayShapeStatistics getShapeStatistics(Overlay overlay) {
@@ -219,7 +219,10 @@ public class OverlayStatService extends AbstractService implements ImageJService
             overlay = cleanOverlay((PolygonOverlay) overlay);
             overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());
         }
-
+        else {
+            overlayStatistics = OverlayShapeStatistics.EMPTY;
+        }
+        
         return overlayStatistics;
     }
 

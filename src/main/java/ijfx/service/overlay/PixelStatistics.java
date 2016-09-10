@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 @JsonDeserialize(as=PixelStatisticsBase.class)
 public interface PixelStatistics {
-
+    
     double getMean();
     double getMax();
     double getMin();
@@ -35,5 +35,43 @@ public interface PixelStatistics {
     double getVariance();
     double getMedian();
     long getPixelCount();
+    
+    
+    PixelStatistics EMPTY = new PixelStatistics() {
+        @Override
+        public double getMean() {
+             return Double.NaN;
+        }
+
+        @Override
+        public double getMax() {
+             return Double.NaN;
+        }
+
+        @Override
+        public double getMin() {
+             return Double.NaN;
+        }
+
+        @Override
+        public double getStandardDeviation() {
+             return Double.NaN;
+        }
+
+        @Override
+        public double getVariance() {
+             return Double.NaN;
+        }
+
+        @Override
+        public double getMedian() {
+             return Double.NaN;
+        }
+
+        @Override
+        public long getPixelCount() {
+             return 0;
+        }
+    };
     
 }

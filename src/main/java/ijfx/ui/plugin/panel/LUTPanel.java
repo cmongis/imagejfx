@@ -25,6 +25,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.core.utils.DimensionUtils;
+import ijfx.plugins.commands.ApplyLUT;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.plugins.commands.SimpleThreshold;
 import ijfx.plugins.commands.measures.MeasureAllOverlays;
@@ -317,6 +318,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     public void applyLUT(ColorTable table) {
+        
+        
+        /**
         DatasetView datasetView = imageDisplayService.getActiveDatasetView();
         Dataset dataset = imageDisplayService.getActiveDataset();
         HashMap<String, Object> params = new HashMap<>();
@@ -324,7 +328,10 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         int channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
         channel = channel == -1 ? 0 : channel;
         dataset.setColorTable(table,channel);
-        datasetView.setColorTable(table, channel);  
+        datasetView.setColorTable(table, channel);  */
+        
+        commandService.run(ApplyLUT.class,true,"channelId",displayRangeServ.getCurrentChannelId(),"colorTable",table);
+        
     }
 
     @Override

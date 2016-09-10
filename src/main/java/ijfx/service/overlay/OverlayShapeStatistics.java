@@ -27,29 +27,118 @@ import net.imagej.overlay.Overlay;
  *
  * @author cyril
  */
-
 public interface OverlayShapeStatistics {
-    
-    
-    
-    Overlay getOverlay();    
+
+    Overlay getOverlay();
+
     double getCenterX();
+
     double getCenterY();
+
     double getArea();
+
     Polygon getMinimumBoundingRectangle();
+
     Point2D getCenterOfGravity();
+
     double getFeretDiameter();
+
     double getMinFeretDiameter();
 //    double getOrientationMajorAxis();
 //    double getOrientationMinorAxis();
+
     double getLongSideMBR();
+
     double getShortSideMBR();
+
     double getAspectRatio();
+
     double getConvexity();
+
     double getSolidity();
+
     double getCircularity();
+
     double getThinnesRatio();
-    
+
     @Override
     String toString();
+    
+    public static OverlayShapeStatistics EMPTY = new OverlayShapeStatistics() {
+        @Override
+        public Overlay getOverlay() {
+            return null;
+        }
+
+        @Override
+        public double getCenterX() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getCenterY() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getArea() {
+            return Double.NaN;
+        }
+
+        @Override
+        public Polygon getMinimumBoundingRectangle() {
+            return new Polygon();
+        }
+
+        @Override
+        public Point2D getCenterOfGravity() {
+            return new Point2D(Double.NaN, Double.NaN);
+        }
+
+        @Override
+        public double getFeretDiameter() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getMinFeretDiameter() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getLongSideMBR() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getShortSideMBR() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getAspectRatio() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getConvexity() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getSolidity() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getCircularity() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getThinnesRatio() {
+            return Double.NaN;
+        }
+    };
+    
 }

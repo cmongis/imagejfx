@@ -165,6 +165,7 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
     
     
     public void updateCurrentDisplayRange(double min, double max) {
+        if(Double.isNaN(min ) || Double.isNaN(max)) return;
         imageDisplayService.getActiveDataset().setChannelMaximum(getCurrentChannelId(), max);
         imageDisplayService.getActiveDataset().setChannelMinimum(getCurrentChannelId(), min);
         imageDisplayService.getActiveDatasetView().setChannelRange(getCurrentChannelId(), min, max);
