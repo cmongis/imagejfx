@@ -27,8 +27,27 @@ import ijfx.service.overlay.OverlayStatService;
  */
 public class MetaDataKeyPriority {
 
-    public static final String[] FILE = {MetaData.FILE_NAME, MetaData.WIDTH, MetaData.HEIGHT, MetaData.BITS_PER_PIXEL, MetaData.SLICE_NUMBER, MetaData.SERIE_COUNT, MetaData.SLICE_NUMBER, MetaData.ZSTACK_NUMBER, MetaData.CHANNEL_COUNT, MetaData.TIME_COUNT};
-    public static final String[] PLANE = {MetaData.FILE_NAME, MetaData.PLANE_INDEX, MetaData.CHANNEL, MetaData.TIME, MetaData.Z_POSITION};
+    public static final String[] FILE = {
+        MetaData.FILE_NAME,
+        MetaData.WIDTH,
+        MetaData.HEIGHT,
+        MetaData.BITS_PER_PIXEL,
+        MetaData.SLICE_NUMBER,
+        MetaData.SERIE_COUNT,
+        MetaData.SLICE_NUMBER,
+        MetaData.ZSTACK_NUMBER,
+        MetaData.CHANNEL_COUNT,
+        MetaData.TIME_COUNT,
+        MetaData.LBL_MEAN,
+        MetaData.LBL_MIN,
+        MetaData.LBL_MAX};
+    public static final String[] PLANE = {
+        MetaData.FILE_NAME,
+        MetaData.PLANE_INDEX,
+        MetaData.CHANNEL,
+        MetaData.TIME,
+        MetaData.Z_POSITION
+    };
     public static final String[] OBJECT = {
         MetaData.FILE_NAME,
         MetaData.NAME,
@@ -41,7 +60,8 @@ public class MetaDataKeyPriority {
         MetaData.LBL_CIRCULARITY,
         MetaData.LBL_AREA,
         MetaData.LBL_CENTER_X,
-        MetaData.LBL_CENTER_Y,};
+        MetaData.LBL_CENTER_Y,
+    };
 
     public static String[] getPriority(MetaDataSet m) {
         if (m == null) {
