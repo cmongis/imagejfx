@@ -143,6 +143,7 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
         ImageRecord imageRecord;
         if (getRecordMap().containsKey(file) == false) {
             imageRecord = new DefaultImageRecord(file, metadataExtractorService.extractMetaData(file));
+            if(imageRecord.getMetaDataSet().size() == 0) throw new IllegalArgumentException("Error when reading file metadata : "+file.getName());
             addRecord(imageRecord);
         } else {
             imageRecord = getRecordMap().get(file);
@@ -151,57 +152,6 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
         return imageRecord;
     }
     
-    
-    /*
-    private void analyseQueue() {
-
-        ArrayList<File> fileAdded = new ArrayList<>();
-        IOFileFilter ioFileFilter = imageLoaderService.getIOFileFilter();
-
-        while (fileQueue.size() > 0) {
-
-            File f = fileQueue.poll();
-
-            logger.info(String.format("IO filter result : %s : %s", f.getName(), ioFileFilter.accept(f, f.getName())));
-
-            if (isPresent(f)) {
-                logger.info(String.format("%s is already present.", f.getName()));
-            }
-            if (f.isDirectory()) {
-
-                for (File child : f.listFiles()) {
-                    logger.info("Checking child " + child.getName());
-                    if (ioFileFilter.accept(child, child.getName())) {
-                        fileQueue.add(child);
-                        // logger.info("Adding child to the queue : "+child.getName());
-                    }
-                }
-            } else if (isPresent(f) == false && ioFileFilter.accept(f, f.getName())) {
-
-                logger.info("Reading metadata of " + f.getName());
-
-                MercuryTimer mercuryTimer = new MercuryTimer("Metadata reading");
-                try {
-                    MetaDataSet metadataSet = metadataExtractorService.extractMetaData(f);
-
-                    addRecord(f, metadataSet);
-                    mercuryTimer.elapsed("Metadata reading");
-                    fileAdded.add(f);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Couldn't read metadata for file " + f.getName(), e);
-                }
-            }
-
-            //logger.info(String.format(" %d files left in the queue",fileAdded.size()));
-        }
-
-        if (fileAdded.size() > 0) {
-            notificationService.publish(new DefaultNotification("Auto indexation", String.format(FILE_ADDED, fileAdded.size())));
-            save();
-        }
-    }*/
-
- 
 
     private void save() {
         jsonPreferenceService.savePreference(getRecords(), JSON_FILE);
@@ -231,19 +181,7 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
                 })
                 .collect(Collectors.toList());
 
-        /*
-        for(File f : files) {
-            if(isPresent(f)) {
-                records.add(getRecordMap().get(f));
-            }
-            else {
-                MetaDataSet m = metadataExtractorService.extractMetaData(f);
-                addRecord(f, m);
-                records.add(recordMap.get(f));
-            }
-            statusService.showProgress(count++, total);
-        }*/
-        // return records;
+      
     }
 
     public void forceSave() {
