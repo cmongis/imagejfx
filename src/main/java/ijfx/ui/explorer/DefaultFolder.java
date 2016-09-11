@@ -244,24 +244,6 @@ public class DefaultFolder implements Folder, FileChangeListener {
 
     @Override
     public List<Explorable> getPlaneList() {
-
-        
-        /*
-        if (planes == null) {
-
-            logger.info("Fetching planes !");
-            List<MetaDataSet> mList = new ArrayList<>(getFileList().size() * 3);
-            for (Explorable e : getFileList()) {
-                mList.addAll(metadataExtractionService.extractPlaneMetaData(e.getMetaDataSet()));
-            }
-
-            planes = mList.stream()
-                    .map(m->{ m.setType(MetaDataSetType.PLANE); return m;})
-                    .map(m -> new PlaneMetaDataSetWrapper(context, m))
-                    .collect(Collectors.toList());
-
-        }*/
-        
         return planes;
     }
 
@@ -376,5 +358,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
     private void notifyFolderChange() {
         eventService.publishLater(new FolderUpdatedEvent().setObject(this));
     }
+    
+
     
 }

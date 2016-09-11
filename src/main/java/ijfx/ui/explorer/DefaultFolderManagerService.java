@@ -21,6 +21,7 @@ package ijfx.ui.explorer;
 
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.ui.LoadingScreenService;
@@ -222,7 +223,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         for (Explorable e : explorableList) {
             if (!e.getMetaDataSet().containsKey(MetaData.STATS_PIXEL_MIN)) {
                 progress.setProgress(i,elements);
-                if (e instanceof ImageRecordIconizer) {
+                if (e.getMetaDataSet().getType() == MetaDataSetType.FILE) {
                     ImageRecordIconizer iconizer = (ImageRecordIconizer) e;
                     SummaryStatistics stats = statsService.getStatistics(iconizer.getImageRecord().getFile());
                     iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
@@ -231,7 +232,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
                     iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
                     elementAnalyzedCount++;
                 }
-                if(e instanceof PlaneMetaDataSetWrapper) {
+                if(e.getMetaDataSet().getType() == MetaDataSetType.PLANE) {
                     SummaryStatistics stats = statsService.getSummaryStatistics(e.getDataset());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
                     e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
@@ -277,6 +278,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     
     private void onStatisticComputingEnded(Integer computedImages) {
         notificationService.publish(new DefaultNotification("Statistic Computation", String.format("%d images where computed.",computedImages)));
+        eventService.publish(new FolderUpdatedEvent().setObject(getCurrentFolder()));
     }
     
     public void removeFolder(Folder folder) {
