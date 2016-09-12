@@ -123,8 +123,8 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         }
     }
 
-    private TableColumn<T, Object> generateColumn(String key) {
-        TableColumn<T, Object> column = new TableColumn<>();
+    private TableColumn<T, MetaData> generateColumn(String key) {
+        TableColumn<T, MetaData> column = new TableColumn<>();
         column.setUserData(key);
         column.setCellValueFactory(this::getCellValueFactory);
         
@@ -152,16 +152,10 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         return 0;
     }
 
-    protected ObservableValue<Object> getCellValueFactory(TableColumn.CellDataFeatures<T, Object> cell) {
+    protected ObservableValue<MetaData> getCellValueFactory(TableColumn.CellDataFeatures<T, MetaData> cell) {
         String key = cell.getTableColumn().getUserData().toString();
-        Object value = cell.getValue().getMetaDataSet().get(key).getValue();
-        if(value instanceof Double) {
-            Double d = (Double) value;
-            value = round(d,3);
-            if(d > 10) {
-                if(value.toString().endsWith(".0")) value = d.intValue();
-            }
-        }
+        MetaData value = cell.getValue().getMetaDataSet().get(key);
+        
         return new ReadOnlyObjectWrapper<>(value);
     }
     

@@ -24,13 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author cyril
  */
-public class TimerBuffer<T> {
+public class TimedBuffer<T> {
     
     private long millis = 50;
     
@@ -40,11 +43,19 @@ public class TimerBuffer<T> {
     Boolean set = Boolean.FALSE;
     Consumer<List<T>> consumer;
     
+    public TimedBuffer<T> setAction(Consumer<List<T>> consumer) {
+        this.consumer = consumer;
+        return this;
+    }
+    
     public void add(T t) {
-        queue.add(t);
+        synchronized(queue) {
+            queue.add(t);
+        }
         if(!set) {
             setTimer();
         }
+        
     }
     
     public void setTimer() {
@@ -54,12 +65,50 @@ public class TimerBuffer<T> {
                 consume();
             }
         }, millis);
+        set = true;
     }
     
     public synchronized void consume() {
+        List<T> toTreat;
         synchronized(queue) {
-            consumer.accept(new ArrayList(queue));
+            toTreat  = new ArrayList<>(queue);
             queue.clear();
+            set = false;
+            
         }
+        consumer.accept(toTreat);
+    }
+    
+    
+    
+    public static void main(String... args) {
+        
+       TimedBuffer<Boolean> buffer =  new TimedBuffer<>();
+      
+       buffer.setAction(list->System.out.println("Treating a list of " +list.size()));
+      
+       
+       
+       BiConsumer<Integer,Integer> pulse = (count,delay)->{
+       
+           for(int i = 0;i!=count;i++) {
+               buffer.add(Boolean.TRUE);
+               try {
+                   Thread.sleep(delay);
+               } catch (InterruptedException ex) {
+                   Logger.getLogger(TimedBuffer.class.getName()).log(Level.SEVERE, null, ex);
+               }
+           }
+       
+       };
+       
+       long start = System.currentTimeMillis();
+       
+       pulse.accept(100,1);
+       
+        System.out.println("process time = "+(System.currentTimeMillis() - start));
+       
+       
+        
     }
 }

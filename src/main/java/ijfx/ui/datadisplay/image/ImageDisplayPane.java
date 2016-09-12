@@ -41,6 +41,7 @@ import ijfx.ui.tool.FxToolService;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,6 +71,8 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.PixelFormat;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -397,21 +400,26 @@ public class ImageDisplayPane extends AnchorPane {
         
         ARGBScreenImage screenImage = view.getScreenImage();
         
+        t.elapsed("getting screen image");
         
         ArrayCursor<ARGBType> cursor = screenImage.cursor();
         
         long[] position = new long[2];
+        PixelWriter writer = image.getPixelWriter();
+        int[] pixels = screenImage.getData();
+        int width = new Double(image.getWidth()).intValue();
+        int height = new Double(image.getHeight()).intValue();
+        //writer.setPixels(0, 0, image.getWidth(), image.getHeight(), PixelFormat.getIntArgbInstance(),pixels, 0, image.getWidth());
+        writer.setPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), pixels, 0, width);
         
+        /*
         cursor.reset();
+        
         while(cursor.hasNext()) {
             cursor.fwd();
             cursor.localize(position);
-            image.getPixelWriter().setArgb((int)position[0],(int)position[1],cursor.get().get());
-        }
-        
-        
-       
-        
+            writer.setArgb((int)position[0],(int)position[1],cursor.get().get());
+        }*/
         t.elapsed("pixel transformation");
 
     }

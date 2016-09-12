@@ -26,6 +26,7 @@ import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import mongis.utils.RequestBuffer;
+import mongis.utils.TimedBuffer;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.axis.Axes;
@@ -79,8 +80,10 @@ public class UiContextCalculatorService extends AbstractService implements Image
 
     private final RequestBuffer requestBuffer = new RequestBuffer(2);
 
+    TimedBuffer<Runnable> requestBuffer2 = new TimedBuffer<Runnable>().setAction(list->list.get(list.size()-1).run());
+    
     public void determineContext(Display display) {
-        requestBuffer.queue(() -> {
+        requestBuffer2.add(() -> {
 
             if (overlaySelectionService == null) {
                 overlayService.getContext().inject(this);
@@ -143,7 +146,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
     @EventHandler
     public void handleEvent(OverlaySelectionEvent event) {
         determineContext(event.getDisplay());
-        contextService.update();
+        
 
     }
 

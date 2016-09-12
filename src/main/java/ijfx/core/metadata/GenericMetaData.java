@@ -19,9 +19,13 @@
  */
 package ijfx.core.metadata;
 
+import static ijfx.core.metadata.MetaData.TYPE_DOUBLE;
+import static ijfx.core.metadata.MetaData.TYPE_INTEGER;
+import static ijfx.core.metadata.MetaData.TYPE_NUMBER;
 import java.text.DecimalFormat;
 import java.util.Objects;
 import javax.jws.HandlerChain;
+import mongis.utils.StringUtils;
 
 /**
  *
@@ -113,6 +117,14 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
     @Override
     public int compareTo(Object o) {
         try {
+            
+            if(o instanceof MetaData) {
+                MetaData m = (MetaData)o;
+                if(getType() == TYPE_NUMBER) {
+                    return Double.compare(number, m.getDoubleValue());
+                }
+                return str().compareTo(m.str());
+            }
             return number == null ? string.compareTo((String) o) : number.compareTo((Double) o);
         } catch (Exception e) {
             return 0;
@@ -124,9 +136,7 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
         return new DecimalFormat("#.####").format(d);
     }
     
-    public String toString() {
-        return String.format("[MetaData Type = %s] %s = %s",(getType() == MetaData.TYPE_STRING ? "String" : "Number"),getName(),getStringValue());
-    }
+    
     
     @Override
     public boolean equals(Object o) {
@@ -151,6 +161,18 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
         hash = 53 * hash + Objects.hashCode(this.number);
         hash = 53 * hash + Objects.hashCode(this.string);
         return hash;
+    }
+    
+     public  String toString() {
+        
+        final int type = getType();
+        
+        if(type == TYPE_DOUBLE || type == TYPE_NUMBER ||type == TYPE_INTEGER) {
+            return StringUtils.numberToString(getDoubleValue(), 3);
+        }
+        return getValue().toString();
+        
+        
     }
 
 }

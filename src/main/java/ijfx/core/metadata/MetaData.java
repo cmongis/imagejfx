@@ -22,6 +22,7 @@ package ijfx.core.metadata;
 
 import java.util.HashMap;
 import java.util.Map;
+import mongis.utils.StringUtils;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -182,5 +183,10 @@ public interface MetaData {
         return canDisplay(m.getName());
     }
     
+    public default String str() {
+        return String.format("[MetaData Type = %s] %s = %s",(getType() == MetaData.TYPE_STRING ? "String" : "Number"),getName(),getStringValue());
+    }
+    
+   
     // addedd an other useful comment
 }
