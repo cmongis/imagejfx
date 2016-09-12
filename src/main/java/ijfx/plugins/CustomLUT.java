@@ -46,6 +46,7 @@ import org.scijava.plugin.Plugin;
 /**
  *
  * @author Tuan anh TRINH
+ * Allow the user to choose a range of color
  */
 @Plugin(type = Command.class, menuPath = "Image>Color>Custom LUT")
 public class CustomLUT implements Command {
@@ -73,7 +74,6 @@ public class CustomLUT implements Command {
 
     @Override
     public void run() {
-//         LutViewChanger lutViewChanger = new LUTCreatorDialog(new ArrayList<>());
         Platform.runLater(() -> {
 
             LutViewChanger lutViewChanger = new LUTCreatorDialog(new ArrayList<>()).showAndWait().orElseThrow(IllegalArgumentException::new);
@@ -84,10 +84,6 @@ public class CustomLUT implements Command {
     }
 
     public void applyLUT(ColorTable table) {
-//        displayService.get
-//        DatasetView datasetView = imageDisplayService.getActiveDatasetView();
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("colorTable", table);
         int channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
         channel = channel == -1 ? 0 : channel;
         datasetView.setColorTable(table, channel);

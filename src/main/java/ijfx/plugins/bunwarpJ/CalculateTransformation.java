@@ -33,6 +33,8 @@ import org.scijava.plugin.Plugin;
 /**
  *
  * @author Tuan anh TRINH
+ * 
+ * Compute an elastic transformation using bunwarpj
  */
 @Plugin(type = Command.class)
 

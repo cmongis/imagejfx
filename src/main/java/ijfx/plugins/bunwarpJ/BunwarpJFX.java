@@ -95,76 +95,62 @@ public class BunwarpJFX implements Command {
     /**
      * minimum scale deformation
      */
-//    @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine"})
     private String min_scale_deformation_choice;
 
     /**
      * maximum scale deformation
      */
-//    @Parameter(choices = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"})
     private String max_scale_deformation_choice;
 
     /**
      * algorithm mode (fast, accurate or mono)
      */
-//    @Parameter(choices = {"Fast", "Accurate", "Mono"})
     private String modeChoice = "Mono";
     /**
      * image subsampling factor at the highest pyramid level
      */
-//    @Parameter
     private int maxImageSubsamplingFactor = 0;
 
     // Transformation parameters
     /**
      * divergence weight
      */
-//    @Parameter
     private double divWeight = 0;
     /**
      * curl weight
      */
-//    @Parameter
     private double curlWeight = 0;
     /**
      * landmarks weight
      */
-//    @Parameter
     private double landmarkWeight = 1.0;
     /**
      * image similarity weight
      */
-//    @Parameter
     private double imageWeight = 0.0;
     /**
      * consistency weight
      */
-//    @Parameter
     private double consistencyWeight = 10;
     /**
      * flag for rich output (verbose option)
      */
-//    @Parameter
-//    private boolean richOutput = false;
     /**
      * flag for save transformation option
      */
-//    @Parameter
     private boolean saveTransformation = false;
 
     /**
      * minimum image scale
      */
-//    @Parameter
     private int min_scale_image = 0;
     /**
      * stopping threshold
      */
-//    @Parameter
+
     private static double stopThreshold = 1e-2;
 
-//    @Parameter(choices = {"0", "1", "2", "3", "4", "5", "6", "7"})
-//    String img_subsamp_fact;
+
     @Parameter(label = "Landmarks File", required = false)
     File landmarksFile = null;
 
@@ -203,73 +189,16 @@ public class BunwarpJFX implements Command {
         Runtime.getRuntime().gc();
         this.sourceImp = iJ1Service.getInput(sourceDataset).duplicate();
         this.targetImp = iJ1Service.getInput(targetDataset);
-//        sourceImp.setPosition(0, 0, 0);
         Stack<Point> sourcePoints = new Stack<>();
         Stack<Point> targetPoints = new Stack<>();
-//        bunwarpj.Param parameter = new bunwarpj.Param(mode, maxImageSubsamplingFactor, min_scale_deformation, max_scale_deformation, divWeight, curlWeight, landmarkWeight, imageWeight, consistencyWeight, stopThreshold);
-//        sourceImp.setProcessor(sourceImp.getProcessor().convertToFloat());
-//        targetImp.setProcessor(targetImp.getProcessor().convertToFloat());
 
-//        sourceImp = convertToGray32(sourceImp);
-//        targetImp = convertToGray32(targetImp);
         if (transformation == null) {
             bunwarpj.MiscTools.loadPoints(landmarksFile.getAbsolutePath(), sourcePoints, targetPoints);
             transformation = bunwarpj.bUnwarpJ_.computeTransformationBatch(sourceImp.getWidth(), sourceImp.getHeight(), targetImp.getWidth(), targetImp.getHeight(), sourcePoints, targetPoints, parameter);
         }
         bunwarpj.MiscTools.applyTransformationToSourceMT(sourceImp, targetImp, transformation.getIntervals(), transformation.getDirectDeformationCoefficientsX(), transformation.getDirectDeformationCoefficientsY());
         Img img = ImagePlusAdapter.wrapImgPlus(sourceImp);
-        outputDataset = datasetService.create(img);//        init();
-//        if (landmarksFile != null) {
-//            pathFile = landmarksFile.getAbsolutePath();
-//        }
-//
-//        // Collect input values
-//        // Source and target image plus
-//        this.sourceImp = iJ1Service.getInput(sourceDataset);
-//        this.targetImp = iJ1Service.getInput(targetDataset);
-//        final ImagePlus[] imageList = new ImagePlus[]{sourceImp, targetImp};
-//
-//        final MainDialog dialog = new MainDialog(imageList, Arrays.asList(modesArray).indexOf(modeChoice),
-//                maxImageSubsamplingFactor, Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation),
-//                Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation), divWeight, curlWeight,
-//                landmarkWeight, imageWeight, consistencyWeight,
-//                stopThreshold, richOutput, saveTransformation, pathFile
-//        );
-//
-//        int outputLevel = 1;
-//
-//        boolean showMarquardtOptim = false;
-//
-//        if (richOutput) {
-//            outputLevel++;
-//            showMarquardtOptim = true;
-//        }
-//
-//        FinalAction finalAction
-//                = new FinalAction(dialog);
-//
-//        finalAction.setup(sourceImp, targetImp,
-//                dialog.getSource(), dialog.getTarget(), dialog.getSourcePh(), dialog.getTargetPh(),
-//                dialog.getSourceMsk(), dialog.getTargetMsk(),
-//                dialog.getSourceAffineMatrix(), dialog.getTargetAffineMatrix(),
-//                Arrays.asList(sMinScaleDeformationChoices).indexOf(min_scale_deformation), Arrays.asList(sMaxScaleDeformationChoices).indexOf(max_scale_deformation),
-//                min_scale_image, divWeight, curlWeight, landmarkWeight, imageWeight,
-//                consistencyWeight, stopThreshold, outputLevel, showMarquardtOptim, Arrays.asList(modesArray).indexOf(modeChoice));
-//
-//        dialog.setFinalActionLaunched(true);
-//        dialog.setToolbarAllUp();
-//        dialog.repaintToolbar();
-//
-//        // Throw final action thread
-//        Thread fa = finalAction.getThread();
-//        fa.start();
-//        try {
-//            // We join the thread to the main plugin thread
-//            fa.join();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        transformation = finalAction.getWarp();
+        outputDataset = datasetService.create(img);
 
     }
 

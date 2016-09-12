@@ -39,7 +39,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Invert ColorTable values.
+ * Invert ColorTable values in the Datasets and DatasetView.
  *
  * @author Tuan anh TRINH
  */
