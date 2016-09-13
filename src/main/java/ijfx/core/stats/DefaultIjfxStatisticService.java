@@ -30,9 +30,7 @@ import static ijfx.core.metadata.MetaData.LBL_SKEWNESS;
 import static ijfx.core.metadata.MetaData.LBL_VARIANCE;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
-import ijfx.service.sampler.PositionIterator;
 import ijfx.service.sampler.SamplingDefinition;
-import ijfx.service.sampler.SparsePositionIterator;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +45,7 @@ import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
@@ -72,6 +71,8 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     @Parameter
     ImageDisplayService imageDisplayService;
 
+    
+    
     @Override
     public SummaryStatistics getSummaryStatistics(Dataset dataset) {
         SummaryStatistics summary = new SummaryStatistics();
@@ -138,6 +139,9 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition) {
         SummaryStatistics stats = new SummaryStatistics();
+        
+        Timer timer = timerService.getTimer(this.getClass());
+        
         if (dataset.dimensionIndex(Axes.CHANNEL) == -1) {
             Cursor<RealType<?>> cursor = dataset.cursor();
             cursor.reset();
@@ -146,17 +150,19 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
                 stats.addValue(cursor.get().getRealDouble());
             }
         } else {
-            SamplingDefinition def = new SamplingDefinition(dataset);
-
-            def.constrain(Axes.CHANNEL, new AxisSubrange(channelPosition));
-
-            PositionIterator itr = new SparsePositionIterator(def);
-
-            RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
-            while (itr.hasNext()) {
-                randomAccess.setPosition(itr.next());
-                stats.addValue(randomAccess.get().getRealDouble());
+            
+            timer.start();
+            IntervalView<RealType<?>> hyperSlice = Views.hyperSlice(dataset, dataset.dimensionIndex(Axes.CHANNEL), channelPosition);
+            timer.elapsed("hyperslice creation");
+            Cursor<RealType<?>> cursor = hyperSlice.cursor();
+            timer.elapsed("cursor creation");
+            cursor.reset();
+           
+            while(cursor.hasNext()) {
+                cursor.fwd();
+                stats.addValue(cursor.get().getRealDouble());
             }
+            
         }
         return stats;
     }
