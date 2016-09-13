@@ -156,7 +156,10 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         return metadataset;
 
     }
+    
 
+    
+    
     private ReaderFilter getReaderFilter(File file) throws FormatException, IOException {
         return scifio.initializer().initializeReader(file.getAbsolutePath(), config);
     }
@@ -211,6 +214,11 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
     @Override
     public List<MetaDataSet> extractPlaneMetaData(File file) {
         return extractPlaneMetaData(extractMetaData(file));
+    }
+
+    @Override
+    public MetaDataSet extractMetaData(Dataset dataset) {
+        return null;
     }
 
 }

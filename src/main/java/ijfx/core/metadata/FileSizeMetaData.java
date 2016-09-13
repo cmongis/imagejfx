@@ -34,7 +34,7 @@ public class FileSizeMetaData extends GenericMetaData{
     }
     
     @Override
-    public String getStringValue() {
+    public String toString() {
         return FileUtils.readableFileSize(getDoubleValue().longValue());
     }
     

@@ -23,6 +23,7 @@ import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.IjfxService;
 import java.io.File;
 import java.util.List;
+import net.imagej.Dataset;
 
 /**
  *
@@ -34,5 +35,6 @@ public interface MetaDataExtractionService extends IjfxService {
     public MetaDataSet extractMetaData(File file);
     public List<MetaDataSet> extractPlaneMetaData(MetaDataSet metadataset);
     public List<MetaDataSet> extractPlaneMetaData(File file); 
+    public MetaDataSet extractMetaData(Dataset dataset);
     
 }
