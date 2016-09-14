@@ -43,7 +43,6 @@ import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.WorkflowBuilder;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
@@ -87,17 +86,19 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
 import mongis.utils.SmartNumberStringConverter;
 import mongis.utils.TransitionBinding;
 import net.imagej.Dataset;
-import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
@@ -199,7 +200,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     private ReadOnlyBooleanProperty isMultiChannelImage;
 
-    private ImageDisplayProperty currentImageDisplayProperty;
+    private ImageDisplayProperty currentDisplay;
 
     ToggleButton thresholdButton = new ToggleButton("Threshold using min-value.", new FontAwesomeIconView(FontAwesomeIcon.EYE));
     Button thresholdMoreButton = new Button("Advanced thresholding");
@@ -221,6 +222,10 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     protected DoubleProperty thresholdLevel = new SimpleDoubleProperty();
     
     protected Button analyseParticalButton = new Button("Analyze particles", new FontAwesomeIconView(FontAwesomeIcon.TABLE));
+    
+    protected final Property<ColorMode> colorMode = new SimpleObjectProperty(ColorMode.COLOR);
+    
+    protected final BooleanProperty isComposite = new SimpleBooleanProperty();
     
     public LUTPanel() {
 
@@ -280,7 +285,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             highValue.addListener(this::onHighValueChanging);
             lowValue.addListener(this::onLowValueChanging);
 
-            //NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
+           
             minTextField.addEventHandler(KeyEvent.KEY_TYPED, this::updateModelRangeFromView);
             maxTextField.addEventHandler(KeyEvent.KEY_TYPED, this::updateModelRangeFromView);
             // setting some insets... should be done int the FXML
@@ -290,19 +295,63 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             minMaxButton.addEventHandler(ActionEvent.ACTION, event -> updateHistogramAsync());
 
+            isComposite.addListener(this::syncCompositeSettings);
+            colorMode.addListener(this::syncCompositeSettings);
+            
+            colorMode.addListener(this::onColorModeChanged);
+            
+            mergedViewToggleButton.selectedProperty().bindBidirectional(isComposite);
+            
+            
+            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        // System.out.println(label);
+    
+    }
+       @Override
+    public UiPlugin init() {
+
+        // creating the LUT Combobx
+        lutComboBox = new LUTComboBox();
+        context.inject(lutComboBox);
+        lutComboBox.init();
+        lutComboBox.setPrefWidth(200);
+        lutComboBox.setMinWidth(200);
+        buildComboBox();
+        vbox.getChildren().add(lutComboBox);
+
+        // creating a property allowing to know if the current image is multi channel
+        isMultiChannelImage = new UiContextProperty(context, "multi-channel-img");
+
+        // property representing the current image display
+        currentDisplay = new ImageDisplayProperty(context);
+
+        // binding desabling the merged view button
+        mergedViewToggleButton.disableProperty().bind(isMultiChannelImage.not());
+
+      
+        
+        // binding the min and max textfield so it can display float precision depending on the image
+        SmartNumberStringConverter smartNumberStringConverter = new SmartNumberStringConverter();
+        smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentDisplay, lowValue));
+
+        Bindings.bindBidirectional(minTextField.textProperty(), lowValue, smartNumberStringConverter);
+        Bindings.bindBidirectional(maxTextField.textProperty(), highValue, smartNumberStringConverter);
+
+        
+        thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, lowValue,highValue,thresholdButton.selectedProperty()));
+        thresholdLevel.addListener(this::onThresholdButtonChanged);
+        
+        currentDisplay.addListener(this::onDisplayChanged);
+        
+        return this;
     }
 
     public void buildComboBox() {
 
-        /*
-        lutComboBox.setOnAction(event -> {
-            applyLUT(lutComboBox.getSelectionModel().getSelectedItem().getColorTable());
-        });*/
+      
         lutComboBox.setId("lutPanel");
 
         lutComboBox.getSelectionModel().selectedItemProperty().addListener(this::onComboBoxChanged);
@@ -318,18 +367,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     public void applyLUT(ColorTable table) {
-        
-        
-        /**
-        DatasetView datasetView = imageDisplayService.getActiveDatasetView();
-        Dataset dataset = imageDisplayService.getActiveDataset();
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("colorTable", table);
-        int channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
-        channel = channel == -1 ? 0 : channel;
-        dataset.setColorTable(table,channel);
-        datasetView.setColorTable(table, channel);  */
-        
+        // applies the chosen LUT using the ImageJFX dedicated plugin
         commandService.run(ApplyLUT.class,true,"channelId",displayRangeServ.getCurrentChannelId(),"colorTable",table);
         
     }
@@ -339,41 +377,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return this;
     }
 
-    @Override
-    public UiPlugin init() {
-
-        lutComboBox = new LUTComboBox();
-        context.inject(lutComboBox);
-        lutComboBox.init();
-        lutComboBox.setPrefWidth(200);
-        lutComboBox.setMinWidth(200);
-        buildComboBox();
-        vbox.getChildren().add(lutComboBox);
-
-        isMultiChannelImage = new UiContextProperty(context, "multi-channel-img");
-
-        currentImageDisplayProperty = new ImageDisplayProperty(context);
-
-        mergedViewToggleButton.disableProperty().bind(isMultiChannelImage.not());
-
-        mergedViewToggleButton.selectedProperty().addListener(this::onMergedViewToggleButtonChanged);
-
-        
-        // binding the min and max textfield so it can display float precision depending on the image
-        SmartNumberStringConverter smartNumberStringConverter = new SmartNumberStringConverter();
-        smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentImageDisplayProperty, lowValue));
-
-        Bindings.bindBidirectional(minTextField.textProperty(), lowValue, smartNumberStringConverter);
-        Bindings.bindBidirectional(maxTextField.textProperty(), highValue, smartNumberStringConverter);
-
-        
-        thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, lowValue,highValue,thresholdButton.selectedProperty()));
-        thresholdLevel.addListener(this::onThresholdButtonChanged);
-        
-        
-        
-        return this;
-    }
+ 
 
     public void updateModelRangeFromView(Event event) {
         updateModelRangeFromView();
@@ -387,9 +391,22 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     private boolean isFloat() {
-        if(currentImageDisplayProperty.getValue() == null) return false;
-        return !imageDisplayService.getActiveDataset(currentImageDisplayProperty.getValue()).isInteger();
+        if(currentDisplay.getValue() == null) return false;
+        return !imageDisplayService.getActiveDataset(currentDisplay.getValue()).isInteger();
     }
+    
+    private void syncCompositeSettings(Observable o, Object oldValue, Object newValue) {
+        if(newValue instanceof ColorMode) {
+            isComposite.setValue(ColorModeToBoolean((ColorMode)newValue));
+        }
+        else {
+            if(newValue instanceof Boolean) {
+                colorMode.setValue(booleanToColorMode((Boolean)newValue));
+            }
+        }
+    }
+    
+    
 
     public void updateViewRangeFromModel() {
         logger.info("Updating view range from model");
@@ -443,10 +460,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         if (getCurrentDatasetView() == null) {
             return;
         }
-        updateViewRangeFromModel();
-        updateLabel();
-        thresholdButton.setSelected(false);
-        mergedViewToggleButton.selectedProperty().setValue(getCurrentDatasetView().getColorMode() == ColorMode.COMPOSITE);
+      
+        
+        
     }
 
     @EventHandler
@@ -502,23 +518,27 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return view;
     }
 
-    private void onMergedViewToggleButtonChanged(Observable obs) {
-
+    private void onColorModeChanged(Observable obs, ColorMode oldValue, ColorMode newValue) {  
         if (getCurrentImageDisplay() != null) {
-            if (getCurrentDatasetView().getColorMode() != booleanToColorMode(mergedViewToggleButton.isSelected())) {
+            if (getCurrentDatasetView().getColorMode() != newValue) {
                 getCurrentDatasetView().setColorMode(mergedViewToggleButton.isSelected() ? ColorMode.COMPOSITE : ColorMode.COLOR);
+                getCurrentImageDisplay().update();
             }
-      
         }
-
     }
 
     private ColorMode booleanToColorMode(boolean isComposite) {
         return isComposite ? ColorMode.COMPOSITE : ColorMode.COLOR;
     }
+    private Boolean ColorModeToBoolean(ColorMode colorMode) {
+        return colorMode == ColorMode.COMPOSITE;
+    }
+    private Boolean isComposite() {
+        return colorMode.getValue() == ColorMode.COMPOSITE;
+    }
 
     public ImageDisplay getCurrentImageDisplay() {
-        return currentImageDisplayProperty.getValue();
+        return currentDisplay.getValue();
     }
 
     public DatasetView getCurrentDatasetView() {
@@ -527,7 +547,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     public boolean isCurrentImageComposite() {
 
-        ImageDisplay current = currentImageDisplayProperty.getValue();
+        ImageDisplay current = currentDisplay.getValue();
         if (current == null) {
             return false;
         }
@@ -535,13 +555,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return dataset.isRGBMerged();
     }
 
-    public void toggleRGBView(MouseEvent event) {
-        //Dataset dataset = imageDisplayService.getActiveDataset(currentImageDisplayProperty.getValue());
-        //dataset.setRGBMerged(!dataset.isRGBMerged());
-        // currentImageDisplayProperty.getValue().update();
-        // event.consume();
-
-    }
+   
 
     private void updateHistogramAsync() {
         new CallbackTask<ImageDisplay, List<Number>>()
@@ -553,18 +567,17 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     private <T extends RealType<T>> List<Number> updateHistogram(ImageDisplay display) {
 
-        Timer t = timerService.getTimer(this.getClass().getSimpleName());
+        final Timer t = timerService.getTimer(this.getClass().getSimpleName());
 
-        System.out.println("updating !");
-
+    
         t.start();
         long[] position = new long[display.numDimensions()];
         display.localize(position);
         position = DimensionUtils.planarToNonPlanar(position);
-        IntervalView<T> planeView = imagePlaneSrv.planeView(imageDisplayService.getActiveDataset(), position);
+        final IntervalView<T> planeView = imagePlaneSrv.planeView(imageDisplayService.getActiveDataset(), position);
 
         t.elapsed("Isolation");
-        Double[] values = statsService.getValues(planeView);
+        final Double[] values = statsService.getValues(planeView);
         t.elapsed("Value retrieving");
         return Lists.newArrayList(values);
     }
@@ -613,12 +626,20 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     
     private void deleteThresholdOverlay() {
         overlayService
-                .getOverlays(currentImageDisplayProperty.getValue())
+                .getOverlays(currentDisplay.getValue())
                 .stream()
                 .filter(o->o instanceof ThresholdOverlay)
                 .map(o->(ThresholdOverlay)o)
                 .findFirst()
                 .ifPresent(ovrl->overlayService.removeOverlay(getCurrentImageDisplay(), ovrl));
+    }
+    
+    
+    private void onDisplayChanged(Observable obs, ImageDisplay oldValue, ImageDisplay newValue) {
+        colorMode.setValue(imageDisplayService.getActiveDatasetView(newValue).getColorMode());
+        updateViewRangeFromModel();
+        updateLabel();
+        thresholdButton.setSelected(false);
     }
     
     private void onThresholdButtonChanged(Observable obs, Number oldValue, Number newValue) {
@@ -655,7 +676,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     private ThresholdOverlay getThresholdOverlay() {
        logger.info("getting the overlay;");
         return overlayService
-                .getOverlays(currentImageDisplayProperty.getValue())
+                .getOverlays(currentDisplay.getValue())
                 .stream()
                 .filter(o->o instanceof ThresholdOverlay)
                 .map(o->(ThresholdOverlay)o)
