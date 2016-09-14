@@ -175,7 +175,6 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
 
     public BUnwarpJWorkflow() {
         CorrectionActivity.getStaticContext().inject(this);
-//        initImageDisplayPane();
     }
 
     @PostConstruct
@@ -261,9 +260,6 @@ public class BUnwarpJWorkflow extends CorrectionFlow {
 
     @EventHandler
     public void handleEvent(LUTsChangedEvent event) {
-//        if (imageDisplayPaneTopLeft.getImageDisplay().contains(event.getView()) || imageDisplayPaneTopRight.getImageDisplay().contains(event.getView())) {
-//            bus.channel(event);
-//        }
 
     }
 
