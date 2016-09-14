@@ -51,10 +51,12 @@ public class TimedBuffer<T> {
     public void add(T t) {
         synchronized(queue) {
             queue.add(t);
-        }
-        if(!set) {
+            
+            if(!set) {
             setTimer();
+            }
         }
+        
         
     }
     

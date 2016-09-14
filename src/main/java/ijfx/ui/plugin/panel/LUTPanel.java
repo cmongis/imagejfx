@@ -213,8 +213,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     public static final String LUT_COMBOBOX_CSS_ID = "lut-panel-lut-combobox";
 
-    protected DoubleProperty minValue = new SimpleDoubleProperty(0);
-    protected DoubleProperty maxValue = new SimpleDoubleProperty(255);
+    protected DoubleProperty lowValue = new SimpleDoubleProperty(0);
+    protected DoubleProperty highValue = new SimpleDoubleProperty(255);
 
     protected StringConverter stringConverter;
 
@@ -237,8 +237,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             // adding the vbox class to the vbox;
             // associating min and max value to properties
-            rangeSlider.lowValueProperty().bindBidirectional(minValue);
-            rangeSlider.highValueProperty().bindBidirectional(maxValue);
+            rangeSlider.lowValueProperty().bindBidirectional(lowValue);
+            rangeSlider.highValueProperty().bindBidirectional(highValue);
 
             // taking care of the range slider configuration
             rangeSlider.setShowTickLabels(true);
@@ -277,8 +277,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             // Adding listeners
             logger.info("Adding listeners");
 
-            maxValue.addListener(this::onHighValueChanging);
-            minValue.addListener(this::onLowValueChanging);
+            highValue.addListener(this::onHighValueChanging);
+            lowValue.addListener(this::onLowValueChanging);
 
             //NumberStringConverter converter = new NumberStringConverter(NumberFormat.getIntegerInstance());
             minTextField.addEventHandler(KeyEvent.KEY_TYPED, this::updateModelRangeFromView);
@@ -361,13 +361,13 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         
         // binding the min and max textfield so it can display float precision depending on the image
         SmartNumberStringConverter smartNumberStringConverter = new SmartNumberStringConverter();
-        smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentImageDisplayProperty, minValue));
+        smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentImageDisplayProperty, lowValue));
 
-        Bindings.bindBidirectional(minTextField.textProperty(), minValue, smartNumberStringConverter);
-        Bindings.bindBidirectional(maxTextField.textProperty(), maxValue, smartNumberStringConverter);
+        Bindings.bindBidirectional(minTextField.textProperty(), lowValue, smartNumberStringConverter);
+        Bindings.bindBidirectional(maxTextField.textProperty(), highValue, smartNumberStringConverter);
 
         
-        thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, minValue,maxValue,thresholdButton.selectedProperty()));
+        thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, lowValue,highValue,thresholdButton.selectedProperty()));
         thresholdLevel.addListener(this::onThresholdButtonChanged);
         
         
@@ -380,18 +380,10 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     private void updateModelRangeFromView() {
-        //System.out.println(minValue);
-        //System.out.println(maxValue);
-        // //if (rangeSlider.isLowValueChanging() || rangeSlider.isHighValueChanging()) {
-        // return;
-        // }
+       
         logger.info("updating model from view");
-        System.out.println("updating");
-
-        displayRangeServ.updateCurrentDisplayRange(minValue.doubleValue(), maxValue.doubleValue());
-        System.out.println("updating");
-
-        // updateLabel();
+        
+        displayRangeServ.updateCurrentDisplayRange(lowValue.doubleValue(), highValue.doubleValue());
     }
 
     private boolean isFloat() {
@@ -401,14 +393,19 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     public void updateViewRangeFromModel() {
         logger.info("Updating view range from model");
-        double min = displayRangeServ.getCurrentViewMinimum();
-        double max = displayRangeServ.getCurrentViewMaximum();
+        double low = displayRangeServ.getCurrentViewMinimum();
+        double high = displayRangeServ.getCurrentViewMaximum();
 
-        double range = max - min;
+        double range = high - low;
 
-        if (rangeSlider.getMin() == min && rangeSlider.getMax() == max) {
-            return;
+        if (rangeSlider.getMin() != low) {
+             lowValue.setValue(low);
         }
+        if(rangeSlider.getMax() != high) {
+            highValue.setValue(high);
+        }
+        
+        
         if (range < 10 && isFloat()) {
 
             rangeSlider.setMajorTickUnit(0.1);
@@ -416,11 +413,12 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         } else {
             rangeSlider.setMajorTickUnit(displayRangeServ.getCurrentDatasetMaximum() - displayRangeServ.getCurrentDatasetMinimum());
         }
+        
+        
+        
         rangeSlider.setMin(displayRangeServ.getCurrentDatasetMinimum() * .1);
         rangeSlider.setMax(displayRangeServ.getCurrentDatasetMaximum() * 1.1);
 
-        minValue.set(min);
-        maxValue.set(max);
 
         updateLabel();
 
@@ -457,7 +455,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             return;
         }
         updateLabel();
-        System.out.println("updated");
+      
         updateViewRangeFromModel();
 
     }
@@ -467,7 +465,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     private void onHighValueChanging(Object notUsed) {
-        System.out.println("state changed !" + minValue.getValue());
+       
         updateModelRangeFromView();
         updateLabel();
     }
@@ -493,8 +491,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
                 }).start();
 
         loadingService.frontEndTask(task);
-        // displayRangeServ.autoRange();
-
     }
 
     private DatasetView autoContrast(DatasetView view) {
@@ -577,7 +573,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         new WorkflowBuilder(context)
                 .addInput(imageDisplayService.getActiveImageDisplay())
-                .addStep(SimpleThreshold.class, "value", minValue.doubleValue())
+                .addStep(SimpleThreshold.class, "value", lowValue.doubleValue())
                 .thenUseDataset(this::segment)
                 .start();
 
@@ -608,7 +604,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
       
     private Double getThresholdValue() {
         if(thresholdButton.isSelected()) {
-            return minValue.getValue();
+            return lowValue.getValue();
         }
         else {
             return Double.NaN;
@@ -640,7 +636,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         t.elapsed("getting overlay");
         logger.info("Threshold value " + getThresholdValue());
         
-        thresholdOverlay.setRange(minValue.getValue(), maxValue.getValue());
+        thresholdOverlay.setRange(lowValue.getValue(), highValue.getValue());
         thresholdOverlay.setColorWithin(Colors.WHITE);
 			thresholdOverlay.setColorLess(Colors.BLACK);
 			thresholdOverlay.setColorGreater(Colors.BLACK);
@@ -670,7 +666,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     
     private ThresholdOverlay createThresholdOverlay() {
         logger.info("Creating an overlay");
-        ThresholdOverlay overlay = new ThresholdOverlay(context, getCurrentDataset(), minValue.getValue(), maxValue.getValue());
+        ThresholdOverlay overlay = new ThresholdOverlay(context, getCurrentDataset(), lowValue.getValue(), highValue.getValue());
         overlayService.addOverlays(getCurrentImageDisplay(), Lists.newArrayList(overlay));
         eventService.publish(new OverlayCreatedEvent(overlay));
         return overlay;
