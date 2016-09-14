@@ -50,6 +50,9 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     //LinkedHashSet<String> priority = new LinkedHashSet();
     MetaDataKeyPrioritizer priority = new MetaDataKeyPrioritizer(new String[0]);
 
+    
+   
+    
     public MetaDataSetOwnerHelper(TableView<T> tableView) {
         this.tableView = tableView;
     }
@@ -82,11 +85,11 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         updateColumns(MetaDataSetUtils.getAllPossibleKeys(mList).stream().filter(MetaData::canDisplay).sorted(priority).collect(Collectors.toList()));
     }
 
-    private void updateColums(String... columnList) {
+    protected void updateColums(String... columnList) {
         updateColumns(Arrays.asList(columnList));
     }
 
-    private void updateColumns(List<String> columnList) {
+    protected void updateColumns(List<String> columnList) {
         columnList.sort(priority);
       
         if (!columnList.equals(currentColumns)) {
@@ -123,7 +126,7 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
         }
     }
 
-    private TableColumn<T, MetaData> generateColumn(String key) {
+    protected TableColumn<T, MetaData> generateColumn(String key) {
         TableColumn<T, MetaData> column = new TableColumn<>();
         column.setUserData(key);
         column.setCellValueFactory(this::getCellValueFactory);
@@ -166,4 +169,6 @@ public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
     return bd.doubleValue();
     }
 
+    
+   
 }
