@@ -63,9 +63,11 @@ import org.scijava.ui.UIService;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class,priority = 0.6)
+@Plugin(type = ExplorerView.class,priority = 0.6,name = "Icons")
 public class GridIconView extends AnchorPane implements ExplorerView {
 
+    
+    
     @Parameter
     UIService uIService;
 

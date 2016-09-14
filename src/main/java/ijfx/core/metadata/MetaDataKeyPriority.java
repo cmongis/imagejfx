@@ -46,7 +46,9 @@ public class MetaDataKeyPriority {
         MetaData.PLANE_INDEX,
         MetaData.CHANNEL,
         MetaData.TIME,
-        MetaData.Z_POSITION
+        MetaData.Z_POSITION,
+         MetaData.BITS_PER_PIXEL,
+            
     };
     public static final String[] OBJECT = {
         MetaData.FILE_NAME,

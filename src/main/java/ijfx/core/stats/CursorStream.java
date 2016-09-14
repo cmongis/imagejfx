@@ -17,28 +17,22 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.explorer;
+package ijfx.core.stats;
 
-import java.util.List;
-import javafx.scene.Node;
-import org.scijava.plugin.SciJavaPlugin;
+import java.util.stream.Stream;
+import static javafx.scene.input.KeyCode.T;
+import net.imglib2.Cursor;
 
 /**
  *
  * @author cyril
  */
-public interface ExplorerView extends SciJavaPlugin {
+public class CursorStream{
     
-
-    
-    public Node getNode();
-    
-    public Node getIcon();
-    
-    public void setItem(List<? extends Explorable> items);
-     
-    public List<? extends Explorable> getSelectedItems();
-    
-    public void setSelectedItem(List<? extends Explorable> items);
+    public  static <T> Stream<T> of(Cursor<T> cursor) {
+        Stream.Builder<T> builder = Stream.builder();
+        cursor.forEachRemaining(t->builder.accept(t));
+        return builder.build();
+    }
     
 }

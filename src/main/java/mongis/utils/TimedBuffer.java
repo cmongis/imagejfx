@@ -61,6 +61,8 @@ public class TimedBuffer<T> {
     }
     
     public void setTimer() {
+        if(timer !=null) timer.cancel();
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {

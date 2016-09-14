@@ -88,7 +88,9 @@ public class TableViewView implements ExplorerView {
     public void setItem(List<? extends Explorable> items) {
 
         ImageJFX.getLogger().info(String.format("Setting %d items", items.size()));
-
+        
+        if(items == currentItems) return;
+        
         if(items.size() >0)priority = MetaDataKeyPriority.getPriority(items.get(0).getMetaDataSet());
         helper.setPriority(priority);
         helper.setColumnsFromItems(items);
