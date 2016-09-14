@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
@@ -21,11 +21,11 @@
                   <String fx:value="warning" />
                </styleClass>
             </Label>
-            <Button fx:id="markButton" mnemonicParsing="false" onAction="#markSelection" text="Mark">
+            <Button fx:id="markButton" mnemonicParsing="false" onAction="#markSelection" styleClass="success" text="Mark">
                <graphic>
                   <FontAwesomeIconView glyphName="CHECK_SQUARE" />
                </graphic></Button>
-            <Button fx:id="unmarkButton" mnemonicParsing="false" onAction="#unmarkSelection" text="Unmarked all">
+            <Button fx:id="unmarkButton" mnemonicParsing="false" onAction="#unmarkSelection" styleClass="warning" text="Unmarked all">
                <graphic>
                   <FontAwesomeIconView glyphName="REMOVE" />
                </graphic>
