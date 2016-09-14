@@ -39,6 +39,10 @@ import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
 import ijfx.ui.UiConfiguration;
 import java.util.List;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.input.MouseEvent;
+import mongis.utils.TransitionBinding;
 import org.scijava.event.EventHandler;
 import org.scijava.menu.ShadowMenu;
 import org.scijava.menu.event.MenusAddedEvent;
@@ -85,6 +89,7 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
 
     public static final String CSS_IJ1_CMD = "ij1-command";
     
+    BooleanProperty isHover = new SimpleBooleanProperty();
     
     @Override
     public UiPlugin init() {
@@ -93,29 +98,13 @@ public class ImageJMenuBar extends MenuBar implements UiPlugin {
         menuService.createMenus(creator, this);
         
         
+        addEventHandler(MouseEvent.MOUSE_ENTERED,event->isHover.setValue(true));
+        addEventHandler(MouseEvent.MOUSE_EXITED,event->isHover.setValue(false));
         
-        //if(true) return this;
+        new TransitionBinding<Double>(0.5, 1.0)
+                .bind(isHover,opacityProperty().asObject());
         
-        /*
-        ij1PluginService.getCommandListFromMenu().forEach(command -> {
-
-            try {
-                Menu menu = getParentMenu(command.getPath());
-                if (menu.getItems().stream().filter(item -> command.getLabel().equals(item.getText())).count() > 0) {
-                    return;
-                }
-                
-                MenuItem item = new MenuItem(command.getLabel());
-                item.setOnAction(event -> {
-                    ij1PluginService.executeCommand(command);
-                });
-                item.getStyleClass().add(CSS_IJ1_CMD);
-                menu.getItems().add(item);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        */
+      
         return this;
 
     }
