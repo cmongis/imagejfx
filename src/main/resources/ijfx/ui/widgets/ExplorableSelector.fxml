@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+   <bottom>
+      <HBox spacing="20.0" styleClass="hbox" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="markedLabel" text="Label">
+               <styleClass>
+                  <String fx:value="h4" />
+                  <String fx:value="warning" />
+               </styleClass>
+            </Label>
+            <Button fx:id="markButton" mnemonicParsing="false" onAction="#markSelection" text="Mark">
+               <graphic>
+                  <FontAwesomeIconView glyphName="CHECK_SQUARE" />
+               </graphic></Button>
+            <Button fx:id="unmarkButton" mnemonicParsing="false" onAction="#unmarkSelection" text="Unmarked all">
+               <graphic>
+                  <FontAwesomeIconView glyphName="REMOVE" />
+               </graphic>
+            </Button>
+         </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
+      </HBox>
+   </bottom>
+   <top>
+      <TextField fx:id="filterTextField" promptText="filter..." BorderPane.alignment="CENTER" />
+   </top>
+</fx:root>
