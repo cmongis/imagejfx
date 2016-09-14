@@ -20,19 +20,12 @@
 package ijfx.ui.utils;
 
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectPropertyBase;
-import javafx.beans.property.SimpleBooleanProperty;
-import net.imagej.Dataset;
-import net.imagej.display.ColorMode;
-import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
 import org.scijava.display.Display;
 import org.scijava.display.event.DisplayActivatedEvent;
-import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 
@@ -53,8 +46,6 @@ public class ImageDisplayProperty extends ReadOnlyObjectPropertyBase<ImageDispla
         context.inject(this);
         current = imageDisplayService.getActiveImageDisplay();
         fireValueChangedEvent();
-
-     
     }
 
     @Override
