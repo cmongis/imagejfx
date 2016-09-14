@@ -30,7 +30,6 @@ import static ijfx.core.metadata.MetaData.LBL_SKEWNESS;
 import static ijfx.core.metadata.MetaData.LBL_VARIANCE;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
-import ijfx.service.sampler.SamplingDefinition;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,6 @@ import java.util.Map;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.axis.Axes;
-import net.imagej.sampler.AxisSubrange;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -71,8 +69,6 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     @Parameter
     ImageDisplayService imageDisplayService;
 
-    
-    
     @Override
     public SummaryStatistics getSummaryStatistics(Dataset dataset) {
         SummaryStatistics summary = new SummaryStatistics();
@@ -136,88 +132,82 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
         return stats;
     }
 
-    
+    @Override
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition) {
-        SummaryStatistics stats = new SummaryStatistics();
-        
-        Timer timer = timerService.getTimer(this.getClass());
-        
+        final SummaryStatistics stats = new SummaryStatistics();
+
+        final Timer timer = timerService.getTimer(this.getClass());
+
+        final Cursor<RealType<?>> cursor;
+
         if (dataset.dimensionIndex(Axes.CHANNEL) == -1) {
-            Cursor<RealType<?>> cursor = dataset.cursor();
+            cursor = dataset.cursor();
             cursor.reset();
             while (cursor.hasNext()) {
                 cursor.fwd();
                 stats.addValue(cursor.get().getRealDouble());
             }
         } else {
-            
             timer.start();
-            IntervalView<RealType<?>> hyperSlice = Views.hyperSlice(dataset, dataset.dimensionIndex(Axes.CHANNEL), channelPosition);
-            timer.elapsed("hyperslice creation");
-            Cursor<RealType<?>> cursor = hyperSlice.cursor();
-            timer.elapsed("cursor creation");
+            final IntervalView<RealType<?>> hyperSlice = Views.hyperSlice(dataset, dataset.dimensionIndex(Axes.CHANNEL), channelPosition);
+            cursor = hyperSlice.cursor();
             cursor.reset();
-           
-            while(cursor.hasNext()) {
+            while (cursor.hasNext()) {
                 cursor.fwd();
                 stats.addValue(cursor.get().getRealDouble());
             }
-            
         }
         return stats;
     }
 
     @Override
     public <T extends RealType<T>> SummaryStatistics getSummaryStatistics(Cursor<T> cursor) {
-        SummaryStatistics stats = new SummaryStatistics();
+        final SummaryStatistics stats = new SummaryStatistics();
         cursor.reset();
         while (cursor.hasNext()) {
             cursor.fwd();
             stats.addValue(cursor.get().getRealDouble());
         }
         return stats;
-
     }
-    
+
     @Override
     public <T extends RealType<T>> Double[] getValues(RandomAccessibleInterval<T> interval) {
-        
-        IterableInterval<T> flatIterable = Views.flatIterable(interval);
-        
-        Double[] values = new Double[(int)(flatIterable.dimension(0)*flatIterable.dimension(1))];
-        Cursor<T> cursor = flatIterable.cursor();
+
+        final IterableInterval<T> flatIterable = Views.flatIterable(interval);
+
+        final Double[] values = new Double[(int) (flatIterable.dimension(0) * flatIterable.dimension(1))];
+        final Cursor<T> cursor = flatIterable.cursor();
         cursor.reset();
         int i = 0;
-        while(cursor.hasNext()) {
+        while (cursor.hasNext()) {
             cursor.fwd();
             values[i] = cursor.get().getRealDouble();
             i++;
         }
-        
         return values;
     }
 
     @Override
     public Map<String, Double> summaryStatisticsToMap(StatisticalSummary summaryStats) {
-        
-        Map<String,Double> statistics = new HashMap<>();
-         statistics.put(LBL_MEAN, summaryStats.getMean());
+
+        Map<String, Double> statistics = new HashMap<>();
+        statistics.put(LBL_MEAN, summaryStats.getMean());
         statistics.put(LBL_MIN, summaryStats.getMin());
         statistics.put(LBL_MAX, summaryStats.getMax());
         statistics.put(LBL_SD, summaryStats.getStandardDeviation());
         statistics.put(LBL_VARIANCE, summaryStats.getVariance());
-        
         statistics.put(LBL_PIXEL_COUNT, (double) summaryStats.getN());
         return statistics;
     }
 
     @Override
     public Map<String, Double> descriptiveStatisticsToMap(DescriptiveStatistics descriptiveStats) {
-        Map<String,Double> statistics = summaryStatisticsToMap(descriptiveStats);
+        Map<String, Double> statistics = summaryStatisticsToMap(descriptiveStats);
         statistics.put(LBL_MEDIAN, descriptiveStats.getPercentile(50));
-        statistics.put(LBL_KURTOSIS,descriptiveStats.getKurtosis());
-        statistics.put(LBL_SKEWNESS,descriptiveStats.getSkewness());
+        statistics.put(LBL_KURTOSIS, descriptiveStats.getKurtosis());
+        statistics.put(LBL_SKEWNESS, descriptiveStats.getSkewness());
         return statistics;
     }
-    
+
 }
