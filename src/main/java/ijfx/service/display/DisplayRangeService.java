@@ -21,15 +21,13 @@
 package ijfx.service.display;
 
 import ijfx.core.stats.IjfxStatisticService;
-import ijfx.service.sampler.PositionIterator;
-import ijfx.service.sampler.SamplingDefinition;
-import ijfx.service.sampler.SparsePositionIterator;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javafx.util.Pair;
+import mongis.utils.TimedBuffer;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.axis.Axes;
@@ -38,9 +36,6 @@ import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.measure.StatisticsService;
-import net.imagej.sampler.AxisSubrange;
-import net.imglib2.RandomAccess;
-import net.imglib2.type.numeric.RealType;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayUpdatedEvent;
@@ -59,22 +54,37 @@ import org.scijava.service.Service;
 public class DisplayRangeService extends AbstractService implements ImageJService {
 
     @Parameter
-    DisplayService displayService;
+    private DisplayService displayService;
 
     @Parameter
-    ImageDisplayService imageDisplayService;
+    private ImageDisplayService imageDisplayService;
 
     @Parameter
-    EventService eventService;
+    private EventService eventService;
 
     @Parameter
-    StatisticsService statService;
+    private StatisticsService statService;
 
     @Parameter
-    IjfxStatisticService ijfxStatsService;
+    private IjfxStatisticService ijfxStatsService;
 
-    Map<String, SummaryStatistics> datasetMinMax = new HashMap<>();
+    private final Map<String, SummaryStatistics> datasetMinMax = new HashMap<>();
 
+    
+    private final TimedBuffer<Runnable> rangeUpdateQueue = new TimedBuffer<Runnable>(100);
+    
+    
+    public DisplayRangeService() {
+        super();
+        
+        rangeUpdateQueue.setAction(this::executeLast);
+        
+    }
+    
+    private void executeLast(List<Runnable> task) {
+        ImageJFX.getThreadQueue().submit(task.get(task.size()-1));
+    }
+    
     private CalibratedAxis getChannelAxis() {
 
         for (CalibratedAxis a : getAxisList()) {
@@ -103,12 +113,6 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
     }
 
     public double getCurrentDatasetMinimum() {
-
-        /*
-        return imageDisplayService
-                .getActiveDataset(displayService
-                        .getActiveDisplay(ImageDisplay.class))
-                .getChannelMinimum(getCurrentChannelId());*/
         return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMin();
     }
 
@@ -152,8 +156,8 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
 
     public void updateDisplayRange(ImageDisplay imageDisplay,int channel,double min, double max) {
         
-        Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
-        DatasetView datasetView = imageDisplayService.getActiveDatasetView(imageDisplay);
+        final Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
+        final DatasetView datasetView = imageDisplayService.getActiveDatasetView(imageDisplay);
         dataset.setChannelMinimum(channel, min);
         dataset.setChannelMaximum(channel, max);
         datasetView.setChannelRange(channel, min, max);
@@ -179,7 +183,9 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
         imageDisplayService.getActiveDataset().setChannelMinimum(getCurrentChannelId(), min);
         imageDisplayService.getActiveDatasetView().setChannelRange(getCurrentChannelId(), min, max);
       
-        ImageJFX.getThreadPool().execute(() -> {
+        
+        
+       rangeUpdateQueue.add(() -> {
             imageDisplayService.getActiveDatasetView().getProjector().map();
             eventService.publishLater(new DisplayUpdatedEvent(displayService.getActiveDisplay(), DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
         });
@@ -207,5 +213,5 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
     private String getDisplayChannelId(ImageDisplay display, int channel) {
         return UUID.nameUUIDFromBytes(new String(display.hashCode() + "" + channel).getBytes()).toString();
     }
-
+    
 }
