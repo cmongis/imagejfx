@@ -20,8 +20,8 @@
 package ijfx.ui.widgets;
 
 import static com.squareup.okhttp.internal.Internal.logger;
+import ijfx.core.metadata.MetaData;
 import ijfx.ui.batch.ExplorableTableHelper;
-import ijfx.ui.batch.FileInputModel;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
 import java.io.IOException;
@@ -42,11 +42,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
@@ -80,7 +77,7 @@ public class ExplorableSelector extends BorderPane{
     /**
      * List of selected explorable
      */
-    ListProperty<Explorable> selectedFilesListProperty;
+    ListProperty<Explorable> selectedCountProperty;
 
     /**
      * Binding representing is multiple object are selected
@@ -107,6 +104,7 @@ public class ExplorableSelector extends BorderPane{
             FXUtilities.injectFXML(this,"/ijfx/ui/widgets/ExplorableSelector.fxml");
 
             helper = new ExplorableTableHelper(tableView);
+            helper.setPriority(MetaData.NAME,MetaData.FILE_SIZE);
             tableView.setItems(filteredFiles);
 
             //markedColumn.setCellFactory(this::generateCheckBoxCell);
@@ -122,10 +120,10 @@ public class ExplorableSelector extends BorderPane{
             isFilterOn = Bindings.notEqual("", filterTextField.textProperty());
 
             // property giving access to the number of selected files inside the table view
-            selectedFilesListProperty = new SimpleListProperty<>(tableView.getSelectionModel().getSelectedItems());
+            selectedCountProperty = new SimpleListProperty<>(tableView.getSelectionModel().getSelectedItems());
 
             // true when multiple selection
-            isMultipleSelection = Bindings.greaterThan(selectedFilesListProperty.sizeProperty(), 1);
+            isMultipleSelection = Bindings.greaterThan(selectedCountProperty.sizeProperty(), 1);
 
             // creating a binding calling a method deciding for the mark name
             markButtonText = Bindings.createStringBinding(this::getMarkButtonText, isFilterOn, isMultipleSelection);
@@ -138,6 +136,9 @@ public class ExplorableSelector extends BorderPane{
             markedLabel.textProperty().bind(markLabelText);
 
             addedFiles.addListener(this::onItemsAdded);
+            
+            
+            
             
             
         } catch (IOException ex) {
@@ -229,7 +230,7 @@ public class ExplorableSelector extends BorderPane{
         updateFilter();
     }
 
-    public void updateFilter() {
+    private void updateFilter() {
         final String filterContent = filterTextField.getText().toLowerCase();
 
         // if nothing is on the filter field
@@ -255,7 +256,7 @@ public class ExplorableSelector extends BorderPane{
 
    
 
-    public void onSelected(Observable obs, Boolean oldValue, Boolean newValue) {
+    private void onSelected(Observable obs, Boolean oldValue, Boolean newValue) {
         if (oldValue == null || oldValue.equals(newValue)) {
             return;
         }
@@ -266,7 +267,6 @@ public class ExplorableSelector extends BorderPane{
     
     public void addItem(Collection<Explorable> items) {
         this.addedFiles.addAll(items);
-       
     }
 
     public void onItemsAdded(Change<? extends Explorable> change) {
@@ -285,6 +285,17 @@ public class ExplorableSelector extends BorderPane{
         }
     }
     
+    public ObservableList<Explorable> itemProperty() {
+        return addedFiles;
+    }
+    
+    public ObservableList<Explorable> getSelectedItem() {
+        return addedFiles.filtered(f->f.selectedProperty().getValue());
+    }
+    
+    public ListProperty<Explorable> selectedCountProperty() {
+        return selectedCountProperty;
+    }
     
     
 }  
