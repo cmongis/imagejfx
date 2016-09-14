@@ -35,13 +35,21 @@ import java.util.logging.Logger;
  */
 public class TimedBuffer<T> {
     
-    private long millis = 50;
+    final private long millis;
     
-    List<T> queue = new ArrayList<>();
+    private final List<T> queue = new ArrayList<>();
     
-    Timer timer = new Timer();
-    Boolean set = Boolean.FALSE;
-    Consumer<List<T>> consumer;
+    private Timer timer = new Timer();
+    private Boolean set = Boolean.FALSE;
+    private Consumer<List<T>> consumer;
+    
+    public TimedBuffer(long refreshDelay) {
+        this.millis = refreshDelay;
+    }
+    public TimedBuffer() {
+        this(50);
+    }
+    
     
     public TimedBuffer<T> setAction(Consumer<List<T>> consumer) {
         this.consumer = consumer;
