@@ -103,12 +103,19 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     }
 
     @Override
+    public void reloadCurrentActivity() {
+        activityMap.clear();
+        activityMapById.clear();
+        openByType(getCurrentActivity().getClass());
+    }
+    
+    @Override
     public Activity getActivity(Class<? extends Activity> activityClass) {
         if (activityClass == null) {
             logger.severe("Passing NULL as activity parameter !");
             return null;
         }
-        if (activityMap.containsKey(activityClass.getName()) == false) {
+        if(activityMap.containsKey(activityClass.getName()) == false) {
             try {
                 logger.info("Loading activity : " + activityClass.getName());
                 PluginInfo<SciJavaPlugin> plugin;
@@ -135,7 +142,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     public Activity getActivityByName(String activityId) {
         logger.info(activityId);
         // checking if an activity with this has already been around
-        if (activityMapById.containsKey(activityId) == false) {
+        if (false || activityMapById.containsKey(activityId) == false) {
             List<PluginInfo<Activity>> pluginsOfType = pluginService.getPluginsOfType(Activity.class);
 
             for (PluginInfo<Activity> info : pluginsOfType) {

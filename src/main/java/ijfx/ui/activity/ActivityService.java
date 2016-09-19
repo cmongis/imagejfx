@@ -56,5 +56,6 @@ public interface ActivityService extends IjfxService{
     
     public Class<?> getCurrentActivityAsClass();
     
+    public void reloadCurrentActivity();
     
 }
