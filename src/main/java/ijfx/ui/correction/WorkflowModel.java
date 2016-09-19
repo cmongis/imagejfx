@@ -21,20 +21,20 @@ package ijfx.ui.correction;
 
 import bunwarpj.Transformation;
 import ij.process.ImageProcessor;
+import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.plugins.adapter.IJ1Service;
 import ijfx.plugins.bunwarpJ.ChromaticCorrection;
 import ijfx.plugins.commands.AutoContrast;
 import ijfx.plugins.flatfield.FlatFieldCorrection;
 import ijfx.plugins.stack.ImagesToStack;
 import ijfx.service.ImagePlaneService;
-import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.widgets.FileExplorableWrapper;
 import io.datafx.controller.injection.scopes.ApplicationScoped;
-import io.scif.FormatException;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,12 +54,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
-import javafx.beans.property.BooleanProperty;
+import java.util.stream.Collectors;
+import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -69,10 +69,10 @@ import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 import mongis.utils.CallbackTask;
+import mongis.utils.ProgressHandler;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
-import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.table.DefaultResultsTable;
@@ -129,9 +129,14 @@ public class WorkflowModel {
     @Parameter
     LoadingScreenService loadingScreenService;
 
+    
+    @Parameter
+    ImageLoaderService imageLoaderService;
+    
     @Parameter
     TimerService timerService;
 
+    
     static String[] CHOICES_DEFORMATION = {"Very Coarse", "Coarse", "Fine", "Very Fine", "Super Fine"};
 
     static String[] CHOICES_MODE = {"Fast", "Accurate", "Mono"};
@@ -204,26 +209,99 @@ public class WorkflowModel {
     @Parameter
     Context context;
 
-    private ObjectProperty<List<File>> listProperty = new SimpleObjectProperty<>(new ArrayList<File>());
+   
     protected ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>(new long[]{});
     protected ObjectProperty<long[]> positionRightProperty = new SimpleObjectProperty<>(new long[]{});
 
     protected final static Logger LOGGER = ImageJFX.getLogger();
 
+    
+    
+    /*
+     *  Files related function
+     */
+    
+    private final Property<File> directoryProperty = new SimpleObjectProperty();
+    
+    private final ObjectProperty<List<FileExplorableWrapper>> fileListProperty = new SimpleObjectProperty<>();
+    
+   
+    
     public WorkflowModel() {
         LOGGER.info("Init WorkflowModel");
         CorrectionActivity.getStaticContext().inject(this);
         init();
         mapImages = new HashMap<>();
+        
+        // initializing property listeners
+        directoryProperty.addListener(this::onFolderChanged);
+        
     }
+    
+    
 
     public void init() {
 
         flatFieldImageDisplayProperty1 = initDisplayPane();
-
         flatFieldImageDisplayProperty2 = initDisplayPane();
 
     }
+    
+    public Property<List<FileExplorableWrapper>> fileListProperty() {
+       return fileListProperty;
+    }
+    
+    public Property<File> directoryProperty() {
+        return directoryProperty;
+    }
+    
+    public File getSelectedDirectory() {
+        return directoryProperty.getValue();
+    }
+    
+   public List<File> getSelectedFiles() {
+       return fileListProperty()
+               .getValue()
+               .stream()
+               .filter(f->f.selectedProperty().getValue())
+               .map(wrapper->wrapper.getFile())
+               .collect(Collectors.toList());
+   }
+    
+    public void onFolderChanged(Observable obs, File oldFile, File newFile) {
+        
+        
+        new CallbackTask<File, List<FileExplorableWrapper>>()
+                .setInput(newFile)
+                .run(this::checkFolder)
+                .then(this::onFoldedChecked)
+                .submit(loadingScreenService)
+                .start();
+        
+                
+    }
+    
+    
+    protected List<FileExplorableWrapper> checkFolder(ProgressHandler handler, File input) {
+        
+        handler.setProgress(1,3);
+        handler.setStatus(String.format("Checking folder %s",input.getName()));
+        
+        handler.setProgress(2,3);
+        
+        return imageLoaderService
+                .getAllImagesFromDirectory(input)
+                .stream()
+                .map(FileExplorableWrapper::new)
+                .collect(Collectors.toList());
+        
+    }
+    protected void onFoldedChecked(List<FileExplorableWrapper> list) {
+        fileListProperty.setValue(list);
+    }
+    
+    
+    
 
     public void setContext(Context context) {
         if (context != this.context) {
@@ -315,6 +393,8 @@ public class WorkflowModel {
                 .submit(loadingScreenService);
         return task;
     }
+    
+  
 
     public CallbackTask<Void, Void> openImage(ImageDisplayPane imageDisplayPane, File file) {
         try {
@@ -372,7 +452,6 @@ public class WorkflowModel {
         bUnwarpJWorkflow.img_subsamp_factComboBox.valueProperty().bindBidirectional(img_subsamp_fact);
         bUnwarpJWorkflow.min_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(min_scale_deformation_choice);
         bUnwarpJWorkflow.max_scale_deformation_choiceComboBox.valueProperty().bindBidirectional(max_scale_deformation_choice);
-
         bUnwarpJWorkflow.landmarksFile.bindBidirectional(landmarksFile);
     }
 
@@ -461,11 +540,7 @@ public class WorkflowModel {
         return Optional.of(module);
     }
 
-    public void bindWelcome(FolderWorkflow welcomeWorkflow) {
-        welcomeWorkflow.listProperty.bindBidirectional(listProperty);
-        welcomeWorkflow.positionLeftProperty.bindBidirectional(positionLeftProperty);
-        welcomeWorkflow.positionRightProperty.bindBidirectional(positionRightProperty);
-    }
+   
 
     /**
      * Concatenate the different Dataset and display them in the
@@ -516,8 +591,9 @@ public class WorkflowModel {
     }
 
     public List<File> getFiles() {
-        return listProperty.get();
+        return getSelectedFiles();
     }
+    
 
     public ImageDisplay getFlatfieldLeft() {
         return flatFieldImageDisplayProperty1.get().getImageDisplay();
@@ -552,6 +628,8 @@ public class WorkflowModel {
                 .submit(loadingScreenService);
 
     }
+    
+    
 
     public void transformeImage(File file, String destinationPath, bunwarpj.Transformation transformation) {
 //        new CallbackTask<Void, Void>().run(() -> {

@@ -19,14 +19,18 @@
  */
 package ijfx.ui.correction;
 
+import com.github.rjeschke.txtmark.Processor;
+import ijfx.ui.RichMessageDisplayer;
 import ijfx.ui.activity.Activity;
 import io.datafx.controller.flow.Flow;
 import io.datafx.controller.flow.FlowException;
+import java.io.IOException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.scene.web.WebView;
 import mongis.utils.CallbackTask;
 import org.reactfx.StateMachine;
 import org.scijava.Context;
@@ -37,7 +41,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = Activity.class, name = "imagej", label = "Correction")
+@Plugin(type = Activity.class, name = "correction", label = "Correction")
 public class CorrectionActivity implements Activity {
 
     @Parameter
@@ -49,6 +53,8 @@ public class CorrectionActivity implements Activity {
 
     public Flow flow;
 
+    
+    
     public CorrectionActivity() throws FlowException {
     }
 
@@ -57,7 +63,8 @@ public class CorrectionActivity implements Activity {
             staticContext = context;
         }
         if (flow == null) {
-            flow = new Flow(FolderWorkflow.class)
+            flow = new Flow(FolderSelection.class)
+                    .withLink(FolderSelection.class,"nextAction",FolderWorkflow.class)
                     .withLink(FolderWorkflow.class, "nextAction", FlatfieldWorkflow.class)
                     .withLink(FlatfieldWorkflow.class, "nextAction", BUnwarpJWorkflow.class)
                     .withLink(BUnwarpJWorkflow.class, "nextAction", ProcessWorkflow.class)
@@ -97,5 +104,8 @@ public class CorrectionActivity implements Activity {
             Logger.getLogger(CorrectionActivity.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
+    
 
 }

@@ -26,9 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -36,9 +36,12 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.event.AxisPositionEvent;
@@ -74,11 +77,13 @@ public class FolderWorkflow extends CorrectionFlow {
     @FXML
     Button chooseFolder;
 
+    @FXML
+    BorderPane borderPane;
+    
     ImageDisplayPane imageDisplayPaneLeft;
 
     ImageDisplayPane imageDisplayPaneRight;
 
-    ObjectProperty<List<File>> listProperty = new SimpleObjectProperty<>();
 
     ObjectProperty<long[]> positionLeftProperty = new SimpleObjectProperty<>();
 
@@ -98,56 +103,61 @@ public class FolderWorkflow extends CorrectionFlow {
 
     @PostConstruct
     public void init() {
-        workflowModel.bindWelcome(this);
+        
+        
+      
+        
+        // TODO : prevent direct access to the model
+        workflowModel.positionLeftProperty.bindBidirectional(positionLeftProperty);
+        workflowModel.positionRightProperty.bindBidirectional(positionRightProperty);
 
+        
+        
         gridPane.add(imageDisplayPaneLeft, 1, 1);
         gridPane.add(imageDisplayPaneRight, 2, 1);
 
         initListView();
         ImageDisplayPane[] imageDisplayPanes = new ImageDisplayPane[]{imageDisplayPaneLeft, imageDisplayPaneRight};
         bindPaneProperty(Arrays.asList(imageDisplayPanes));
+        
+        
+        
+        
 //        Only when the user come back
-        if (listProperty.get().size() > 0) {
-            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, listProperty.get().get(0))
+        if (listView.getItems().size() > 0) {
+            workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, listView.getItems().get(0))
                     .thenRunnable(this::applyPosition)
                     .start();
-
         }
+        
+        initWebView();
+        
         if (listView.getItems().size() > 0) {
             nextButton.setDisable(false);
         }
+        
+        Platform.runLater(this::initWebView);
+        
+        
 
     }
-
-    /**
-     * Choose a directory and save the file
-     */
-    @FXML
-    public void addFiles() {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File file = directoryChooser.showDialog(null);
-        List<File> list = (List<File>) imageLoaderService.getAllImagesFromDirectory(file);
-
-        workflowModel.openImage(this.imageDisplayPaneLeft, this.imageDisplayPaneRight, list.get(0))
-                .thenRunnable(() -> {
-                    if (workflowModel.getPositionLeft().length > 0) {
-                        applyPosition();
-                    } else {
-                        savePosition(imageDisplayPaneLeft.getImageDisplay(), positionLeftProperty);
-                        savePosition(imageDisplayPaneRight.getImageDisplay(), positionRightProperty);
-                    }
-                    if (list.size() > 0) {
-                        nextButton.setDisable(false);
-                    }
-
-                }).start();
-        listProperty.set(list);
-        listView.getItems().clear();
-        listView.setItems(null);
-//        lis
-
-        listView.setItems(FXCollections.observableArrayList(list));
+    
+    @PreDestroy
+    public void destroy() {
+         // binding to the model
+       
+        workflowModel.positionLeftProperty.unbindBidirectional(positionLeftProperty);
+        workflowModel.positionRightProperty.unbindBidirectional(positionRightProperty);
     }
+    
+    public void initWebView() {
+        WebView webView = new WebView();
+        borderPane.setTop(webView);
+        initWebView(webView, "FolderWorkflow.md");
+    }
+
+  
+ 
 
     /**
      * Save the position whan the axis Change
@@ -182,8 +192,11 @@ public class FolderWorkflow extends CorrectionFlow {
      *
      */
     private void initListView() {
-
-        listView.getItems().addAll(listProperty.get());
+        
+          List<File> selectedFiles = workflowModel.getSelectedFiles();
+       
+        listView.getItems().addAll(selectedFiles);
+ 
         setCellFactory(listView);
 
         listView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends File> obs, File old, File newValue) -> {

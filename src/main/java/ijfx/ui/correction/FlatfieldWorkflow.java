@@ -28,14 +28,14 @@ import io.datafx.controller.ViewController;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -68,6 +68,9 @@ public class FlatfieldWorkflow extends CorrectionFlow {
     @FXML
     GridPane gridPane;
 
+    @FXML
+    BorderPane borderPane;
+    
     @Parameter
     ImageLoaderService imageLoaderService;
 
@@ -109,8 +112,17 @@ public class FlatfieldWorkflow extends CorrectionFlow {
         if (flatFieldProperty1.get().getImageDisplay() != null && flatFieldProperty2.get().getImageDisplay() != null) {
             nextButton.setDisable(false);
         }
+        
+        Platform.runLater(this::initWebView);
+        
     }
 
+    protected void initWebView() {
+        WebView webView = new WebView();
+        borderPane.setTop(webView);
+        initWebView(webView,"FlatfieldWorkflow.md");
+    }
+    
     protected void openImage(ImageDisplayPane imageDisplayPane) {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
@@ -120,7 +132,6 @@ public class FlatfieldWorkflow extends CorrectionFlow {
             }
 
         }).start();
-
     }
 
     protected ImageDisplay displayDataset(Dataset flatFieldDataset) {

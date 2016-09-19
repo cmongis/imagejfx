@@ -19,19 +19,25 @@
  */
 package ijfx.ui.correction;
 
+import com.github.rjeschke.txtmark.Processor;
 import ijfx.service.ui.HintService;
+import ijfx.ui.RichMessageDisplayer;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.datadisplay.image.ImageDisplayPane;
 import io.datafx.controller.flow.action.ActionMethod;
 import io.datafx.controller.flow.action.ActionTrigger;
 import io.datafx.controller.flow.action.BackAction;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebView;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -75,14 +81,7 @@ public class CorrectionFlow {
             first.getCanvas().getCamera().yProperty().bindBidirectional(imageDisplayPane.getCanvas().getCamera().yProperty());
         });
     }
-//
-//    @ActionMethod("reset")
-//    public void reset() {
-//        CorrectionActivity correctionActivity = (CorrectionActivity) activityService.getActivity(CorrectionActivity.class);
-//        System.out.println("ijfx.ui.correction.CorrectionFlow.reset()");
-////        CorrectionActivity correctionActivity = objectService.getObjects(CorrectionActivity.class).get(0);
-//        correctionActivity.reset();
-//    }
+
 
     public void setCellFactory(ListView<File> listView) {
         listView.setCellFactory((ListView<File> param) -> {
@@ -107,4 +106,17 @@ public class CorrectionFlow {
         hintService.displayHints(this.getClass(), true);
     }
     
+    
+    protected RichMessageDisplayer displayer;
+    
+    public void initWebView(WebView webView,String resourceUrl) {
+        try {
+            
+            webView.setPrefHeight(150);
+            displayer = new RichMessageDisplayer(webView).addStringProcessor(Processor::process);
+            displayer.setContent(this.getClass(), resourceUrl);
+        } catch (IOException ex) {
+            Logger.getLogger(FolderSelection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
