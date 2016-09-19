@@ -20,11 +20,15 @@
 package ijfx.ui;
 
 import ijfx.ui.main.ImageJFX;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
+import mongis.utils.TextFileUtils;
 
 /**
  *
@@ -43,6 +47,13 @@ public class RichMessageDisplayer {
         this.webView = webView;
     }
 
+    
+    public void setContent(Class clazz,String path) throws IOException {
+        
+        setMessage(TextFileUtils.readFileFromJar(clazz, path));
+        
+    }
+    
     public void setMessage(String text) {
         if (webView == null) {
             return;
