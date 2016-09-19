@@ -1,6 +1,10 @@
 [
     {
+        "target":"#sideMenuMainTopVBox"
+        ,"text":"Welcome to ImageJFX !\nThis bar give you access to the different tasks possible with ImageJFX."
+    },
+    {
         "target":"#open-button"
-        ,"text":"You can open an image by using this button."
+        ,"text":"But first, open an image by using this button.\nYou can also drop a file to open it or a folder to explorer it."
     }
 ]

@@ -1,55 +1,60 @@
 {
 	"apps": [
 		{
-			"id":"documentation"
-			,"name": "Documentation",
+			"id": "documentation",
+			"name": "Documentation",
 			"description": "Display and allow service testing",
-			"version": "1.1.0"
-                        ,"url":"documentation.html"
-                        
-		}
-		,{
-			"id":"index"
-			,"name":"App Directory"
-			,"description":"Display the available apps"
-			,"version":"1.0.beta"
-		}
-		,{
-			"id":"editor"
-			,"name":"Code Editor"
-			,"description":"Edit HTML, JS and CSS files"
-			,"version":"1.0"
-		}
-		
-                ,{
-                    "id":"project-wizard"
-                    ,"name":"Project Creator"
-                    ,"description":"Create a project"
-                    ,"version":"1.0"
-                    ,"url":"project-wizard/index.html"
-                }
-                ,{
-                    "id":"hierarchy-editor"
-                    ,"name":"Project Hierarchy Editor"
-                    ,"description":"Modify the metadata hierarchy of your project."
-                    ,"url":"project-wizard/index.html#/hierarchy-editor"
-                }
-                
-                
-		,{
-			"id":"modules"
-			,"name":"ImageJ Module List"
-			,"description":"Informations about ImageJ modules"
-			,"version":"1.0"
-		
-		}
-		,{
-			"id":"context-manager"
-			,"name":"Context Manager"
-			,"description":"Allows context linking and editing"
-			,"version":"1.0"
-		}
+			"version": "1.1.0",
+			"url": "documentation.html"
 
+		}
+		, {
+			"id": "index",
+			"name": "App Directory",
+			"description": "Display the available apps",
+			"version": "1.0.beta"
+		}
+		, {
+			"id": "editor",
+			"name": "Code Editor",
+			"description": "Edit HTML, JS and CSS files",
+			"version": "1.0"
+		},
+		{
+			"id": "project-wizard",
+			"name": "Project Creator",
+			"description": "Create a project",
+			"version": "1.0",
+			"url": "project-wizard/index.html"
+                }
+                , {
+			"id": "hierarchy-editor",
+			"name": "Project Hierarchy Editor",
+			"description": "Modify the metadata hierarchy of your project.",
+			"url": "project-wizard/index.html#/hierarchy-editor"
+                }
+
+
+		, {
+			"id": "modules",
+			"name": "ImageJ Module List",
+			"description": "Informations about ImageJ modules",
+			"version": "1.0"
+
+		}
+		, {
+			"id": "context-manager",
+			"name": "Context Manager",
+			"description": "Allows context linking and editing",
+			"version": "1.0"
+		},
+		{
+			"id": "helpcenter",
+			"name": "Help Center",
+			"description": "Find articles and help there",
+			"version": "1.0"
+			,"url":"helpcenter/index.html"
+		}
 	]
 
 }
