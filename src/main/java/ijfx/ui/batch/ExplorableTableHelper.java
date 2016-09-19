@@ -78,11 +78,18 @@ public class ExplorableTableHelper extends MetaDataSetOwnerHelper<Explorable>{
         
         final int offset = getOffset();
         int actualSize = tableView.getColumns().size() - offset;
+        
+         if(actualSize < 0) {
+            tableView.getColumns().add(getCheckboxColumn());
+            actualSize = tableView.getColumns().size() - offset;
+        }
+        
          System.out.println(String.format("Changing the number of column from %d to %d", actualSize, number));
         if (number == 0) {
             tableView.getColumns().clear();
             return;
         }
+       
 
         if (actualSize == number) {
             return;
