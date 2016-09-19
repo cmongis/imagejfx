@@ -103,19 +103,6 @@ public class PaneCellController<T extends Object> {
                     MercuryTimer timer = new MercuryTimer("Browser view");
                     timer.start();
                     pane.getChildren().clear();
-                    
-                    /*
-                    int pace = 10;
-                    for (int i = 0; i + pace != items.size(); i += pace) {
-                        if (i + pace > items.size()) {
-                            pace = items.size() - i;
-                        }
-                        pane.getChildren().addAll(getContent(controllers.subList(i,i+pace)));
-                        for (int j = i; j != i + pace; j++) {
-                            controllers.get(j).setItem(items.get(j));
-                        }
-                    }**/
-
                     pane.getChildren().addAll(getContent(controllers));
                     timer.elapsed("Adding all the controllers");
                     for (int i = 0; i != items.size(); i++) {
