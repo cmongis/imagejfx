@@ -50,7 +50,7 @@ import ijfx.ui.UiConfiguration;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "module-search", context = "imagej", localization = Localization.TOP_RIGHT,order=0.5)
+@UiConfiguration(id = "module-search", context = "imagej+any-display-open", localization = Localization.TOP_RIGHT,order=0.5)
 public class ModuleSearchField extends HBox implements UiPlugin {
 
     TextField textfield = new TextField();
