@@ -26,7 +26,9 @@ import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
@@ -35,6 +37,8 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
@@ -66,21 +70,25 @@ public class ExplorableSelector extends BorderPane{
     @FXML
     Label markedLabel; // label representing the number of marked object
 
-    ObservableList<Explorable> filteredFiles = FXCollections.observableArrayList();
+    final ObservableList<Explorable> filteredFiles = FXCollections.observableArrayList();
 
-    ObservableList<Explorable> addedFiles = FXCollections.observableArrayList();
+    final ObservableList<Explorable> addedFiles = FXCollections.observableArrayList();
 
+    final ObservableList<Explorable> markedItemProperty = FXCollections.observableArrayList();
+    
+  
+    
     MetaDataSetOwnerHelper<Explorable> helper;
 
     BooleanBinding isFilterOn;
 
     /**
-     * List of selected explorable
+     * List of selected explorable in the table view
      */
     ListProperty<Explorable> selectedCountProperty;
 
     /**
-     * Binding representing is multiple object are selected
+     * Binding representing is multiple object are selected inside the table view
      */
     BooleanBinding isMultipleSelection;
 
@@ -98,6 +106,8 @@ public class ExplorableSelector extends BorderPane{
 
     private final static String MARK_LABEL_TEXT = "%d files marked for processing";
 
+    private final ExplorableListeningManager listeningManager = new ExplorableListeningManager(this::onExplorableMarked);
+    
     public ExplorableSelector() {
 
         try {
@@ -137,7 +147,7 @@ public class ExplorableSelector extends BorderPane{
 
             addedFiles.addListener(this::onItemsAdded);
             
-            
+            //new OpacityTransitionBinding(this, selectedCountProperty.emptyProperty().not());
             
             
             
@@ -176,13 +186,13 @@ public class ExplorableSelector extends BorderPane{
         } else {
             addedFiles.forEach(this::markFileForSelection);
         }
-        onSelected(null, null, null);
+
     }
 
     @FXML
     private void unmarkSelection() {
         addedFiles.forEach(fileInputModel -> fileInputModel.selectedProperty().setValue(false));
-        onSelected(null, null, null);
+        
     }
 
     @FXML
@@ -193,9 +203,7 @@ public class ExplorableSelector extends BorderPane{
     @FXML
     private void deleteAll() {
 
-        addedFiles.forEach(finput -> {
-            finput.selectedProperty().removeListener(this::onSelected);
-        });
+        
 
         addedFiles.clear();
         filteredFiles.clear();
@@ -256,16 +264,15 @@ public class ExplorableSelector extends BorderPane{
 
    
 
-    private void onSelected(Observable obs, Boolean oldValue, Boolean newValue) {
-        if (oldValue == null || oldValue.equals(newValue)) {
-            return;
-        }
-        markLabelText.invalidate();
-        markLabelText.getValue();
+   
+    
+    public void setItems(Collection<? extends Explorable> items) {
+        this.addedFiles.clear();
+        addItem(items);
     }
     
-    
-    public void addItem(Collection<Explorable> items) {
+    public void addItem(Collection<? extends Explorable> items) {
+        if(items != null)
         this.addedFiles.addAll(items);
     }
 
@@ -277,24 +284,38 @@ public class ExplorableSelector extends BorderPane{
             updateFilter();
             
             change.getAddedSubList()
-                    .forEach(expl->expl.selectedProperty().addListener(this::onSelected));
+                    .forEach(listeningManager::listen);
             
             change.getRemoved()
-                    .forEach(expl->expl.selectedProperty().removeListener(this::onSelected));
+                    .forEach(listeningManager::stopListening);
             
         }
     }
+    
+   private void onExplorableMarked(Explorable exp, Boolean newValue) {
+       if(newValue) markedItemProperty.add(exp);
+       else markedItemProperty.remove(exp);
+       
+       markLabelText.invalidate();
+        markLabelText.getValue();
+   }
     
     public ObservableList<Explorable> itemProperty() {
         return addedFiles;
     }
     
-    public ObservableList<Explorable> getSelectedItem() {
-        return addedFiles.filtered(f->f.selectedProperty().getValue());
+    
+    /**
+     * Return the list of items explicitly marked for processing (using checkboxs)
+     * @return the observable list of items which have been marked for processing
+     */
+    public ObservableList<Explorable> markedItemProperty() {
+        return markedItemProperty;
     }
     
-    public ListProperty<Explorable> selectedCountProperty() {
-        return selectedCountProperty;
+    
+    public void dispose() {
+        addedFiles.clear();
     }
     
     

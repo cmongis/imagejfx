@@ -74,5 +74,11 @@ public class FileExplorableWrapper extends AbstractExplorable{
     public Dataset getDataset() {
         return null;
     }
+
+    @Override
+    public File getFile() {
+        return file;
+    }
+    
     
 }
