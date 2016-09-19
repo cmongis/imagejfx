@@ -25,7 +25,7 @@
                <graphic>
                   <FontAwesomeIconView glyphName="CHECK_SQUARE" />
                </graphic></Button>
-            <Button fx:id="unmarkButton" mnemonicParsing="false" onAction="#unmarkSelection" styleClass="warning" text="Unmarked all">
+            <Button fx:id="unmarkButton" mnemonicParsing="false" onAction="#unmarkSelection" text="Unmarked all">
                <graphic>
                   <FontAwesomeIconView glyphName="REMOVE" />
                </graphic>
