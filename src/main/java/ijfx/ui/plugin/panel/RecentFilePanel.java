@@ -131,7 +131,7 @@ public class RecentFilePanel extends BorderPane{
 
         @Override
         public Image getImage() {
-            if(file.getName().endsWith("png") || file.getName().endsWith("g")) {
+            if(file.getName().endsWith("png") || file.getName().endsWith("jpg")) {
                 return new Image(file.getAbsolutePath());
             }
             else {

@@ -309,11 +309,19 @@ public class ImageDisplayPane extends AnchorPane {
     private WritableImage wi;
 
     private double getImageWidth() {
-        return imageDisplay.dimension(0);
+        if (imageDisplay.numDimensions() > 0) {
+            return imageDisplay.dimension(0);
+        } else {
+            return 0;
+        }
     }
 
     private double getImageHeight() {
-        return imageDisplay.dimension(1);
+        if (imageDisplay.numDimensions() > 0) {
+            return imageDisplay.dimension(1);
+        } else {
+            return 0;
+        }
     }
 
     public WritableImage getWrittableImage() {
@@ -790,16 +798,17 @@ public class ImageDisplayPane extends AnchorPane {
         int[] position = new int[imageDisplay.numDimensions()];
         imageDisplay.axes(axes);
         imageDisplay.localize(position);
-        StringBuilder stringBuilder = new StringBuilder();
-        IntStream.range(2, position.length)
-                .forEach(e -> {
-                    stringBuilder.append(axes[e].type().toString());
-                    stringBuilder.append(": ");
-                    stringBuilder.append(position[e]);
-                    stringBuilder.append("");
+        String positionStr
+                = IntStream.range(2, position.length)
+                .mapToObj(e -> {
+                    long p = position[e];
+                    long max = imageDisplay.dimension(e) - 1;
+                    String axe = axes[e].type().toString();
+                    return String.format("%s : %d / %d", axe, p, max);
 
-                });
-        infoLabel.setText(String.format("%s - %d x %d - %s", imageType, width, height, stringBuilder));
+                })
+                .collect(Collectors.joining("   -  "));
+        infoLabel.setText(String.format("%s - %d x %d - %s", imageType, width, height, positionStr));
 
     }
 

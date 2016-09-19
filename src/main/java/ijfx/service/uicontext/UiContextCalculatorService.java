@@ -62,6 +62,7 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public final static String CTX_IMAGE_DISPLAY = "image-open";
     public final static String CTX_IMAGE_BINARY = "binary";
     public final static String CTX_MEASURE_DISPLAY = "measure-open";
+    public final static String CTX_ANY_DISPLAY = "any-display-open";
     
     @Parameter
     DisplayService displayService;
@@ -93,7 +94,9 @@ public class UiContextCalculatorService extends AbstractService implements Image
             contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
             contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()) );
             contextService.toggleContext(CTX_MEASURE_DISPLAY, display != null && SegmentedObjectDisplay.class.isAssignableFrom(display.getClass()));
-            // calculation specific to iamge display
+            contextService.toggleContext(CTX_ANY_DISPLAY, displayService.getDisplays().size() > 0);
+
+// calculation specific to iamge display
             if (display instanceof ImageDisplay) {
                 imageDisplay = (ImageDisplay) display;
 

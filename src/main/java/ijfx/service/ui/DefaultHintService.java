@@ -46,7 +46,7 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class DefaultHintService extends AbstractService implements HintService {
 
-    Set<String> history;
+    Set<String> history = new HashSet();
 
     @Parameter
     JsonPreferenceService prefService;
@@ -89,7 +89,7 @@ public class DefaultHintService extends AbstractService implements HintService {
 
     @Override
     public void initialize() {
-        loadConfiguration();
+        //loadConfiguration();
     }
 
     @Override
@@ -196,7 +196,7 @@ public class DefaultHintService extends AbstractService implements HintService {
         public void setRead() {
             hint.setRead();
             history.add(hint.getId());
-            saveConfiguration();
+            //saveConfiguration();
         }
     }
 

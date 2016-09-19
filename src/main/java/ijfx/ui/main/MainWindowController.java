@@ -89,6 +89,7 @@ import ijfx.ui.context.animated.Animations;
 import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.explorer.ExplorerActivity;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -259,8 +260,6 @@ public class MainWindowController extends AnchorPane {
         sideMenu.setPrefWidth(30);
         memoryThread.start();
 
-        
-
         /*
             The boot sequence is the following
             1. start imagej
@@ -349,10 +348,9 @@ public class MainWindowController extends AnchorPane {
         uiContextService.update();
         activityService.openByType(ImageJContainer.class);
         // sequence over
-        
-        
+
         initMenuAction();
-        new Timeline(new KeyFrame(Duration.millis(300),new KeyValue(sideMenu.translateXProperty(), 0.0))).play();
+        new Timeline(new KeyFrame(Duration.millis(300), new KeyValue(sideMenu.translateXProperty(), 0.0))).play();
         logger.info("Start over");
 
     }
@@ -562,23 +560,29 @@ public class MainWindowController extends AnchorPane {
         }
 
         Node node = mainAnchorPane.getScene().lookup(hint.getTarget());
-        if (node == null) {
-            logger.warning("Couldn't find node " + hint.getTarget());
-            nextHint();
-
-            return;
-        }
 
         try {
             isHintDisplaying = true;
             double hintWidth = 200;
             double hintMargin = 20;
             double rectanglePadding = 5;
-            Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
 
+            final double sceneHeight = getScene().getHeight();
+            final double sceneWidth = getScene().getWidth();
+            final double finalX;
+            final double finalY;
+            // rectangle representing the highlighted node
+            Rectangle rectangle;
+            if (node != null) {
+                Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
+                rectangle = new Rectangle(nodeBounds.getMinX() - rectanglePadding, nodeBounds.getMinY() - rectanglePadding, nodeBounds.getWidth() + rectanglePadding * 2, nodeBounds.getHeight() + rectanglePadding * 2);
+
+            }
+            else {
+                rectangle = new Rectangle(getWidth() / 2, getHeight() / 2, 0, 0);
+            }
             Bounds rectangleBounds;
-            Rectangle rectangle = new Rectangle(nodeBounds.getMinX() - rectanglePadding, nodeBounds.getMinY() - rectanglePadding, nodeBounds.getWidth() + rectanglePadding * 2, nodeBounds.getHeight() + rectanglePadding * 2);
-            Rectangle bigOne = new Rectangle(0, 0, mainAnchorPane.getScene().getWidth(), mainAnchorPane.getScene().getHeight());
+            Rectangle bigOne = new Rectangle(0, 0, sceneWidth, sceneHeight);
 
             Shape highligther = Path.subtract(bigOne, rectangle);
             highligther.setFill(Paint.valueOf("black"));
@@ -593,24 +597,43 @@ public class MainWindowController extends AnchorPane {
             label.setPrefWidth(hintWidth);
 
             rectangleBounds = rectangle.getBoundsInLocal();
-
-            label.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
-                if (rectangleBounds.getMinX() < hintWidth + hintMargin) {
-                    return rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
-
-                } else {
-                    return rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
-                }
-            }, highligther.translateXProperty()));
-
-            label.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
-                if (rectangleBounds.getMinY() + label.getHeight() > node.getScene().getHeight()) {
-                    return rectangleBounds.getMaxY() - label.getHeight();
-                } else {
-                    return rectangleBounds.getMinY();
-                }
-            }, label.heightProperty()));
-
+            
+            // callable determining the final position of the box
+            
+            
+            // generics:
+            
+            Callable<Double> verticalCenter = ()-> (sceneWidth - rectangleBounds.getWidth()) / 2;
+            Callable<Double> horizontalCenter = ()->(sceneWidth - rectangleBounds.getHeight()) / 2;
+            
+            
+            Callable<Double> toTheLeft = ()-> rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
+            Callable<Double> toTheRight = ()-> rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
+            
+          
+            
+            Callable<Double> onTop = ()->rectangleBounds.getMaxY() - label.getHeight();
+            Callable<Double> under = ()->rectangleBounds.getMinY();
+           
+            // deciding the last position
+            
+            
+            
+            Callable<Double> xPosition = rectangleBounds.getMinX() < hintWidth + hintMargin ? toTheLeft : toTheRight;
+            Callable<Double> yPosition = rectangleBounds.getMinY() + label.getHeight() > sceneHeight ? onTop : under;
+            
+            // correcting
+            if(rectangleBounds.getWidth() > sceneWidth * 0.9) {
+                xPosition = horizontalCenter;
+                yPosition = under;
+            }
+            
+            
+            label.translateXProperty().bind(Bindings.createDoubleBinding(xPosition, highligther.translateXProperty()));
+            label.translateYProperty().bind(Bindings.createDoubleBinding(yPosition, label.heightProperty()));
+            
+            
+            
             //label.setTranslateY(nodeBounds.getMinY());
             Button gotItButton = new Button("Got it !");
 
@@ -708,18 +731,15 @@ public class MainWindowController extends AnchorPane {
         });
         addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, CorrectionActivity.class);
 
-        
-        
-       new TransitionBinding<Number>(0d, 1d)
-                    .bind(sideMenuWidthBinding.stateProperty(), memoryLabel.opacityProperty())
-                    .setDuration(Duration.millis(150));
-       
-       new TransitionBinding<Number>(0d, 1d)
-                    .bind(sideMenuWidthBinding.stateProperty(), memoryProgressBar.opacityProperty())
-                    .setDuration(Duration.millis(150));
-        
-       
-       menuActivated.setValue(false);
+        new TransitionBinding<Number>(0d, 1d)
+                .bind(sideMenuWidthBinding.stateProperty(), memoryLabel.opacityProperty())
+                .setDuration(Duration.millis(150));
+
+        new TransitionBinding<Number>(0d, 1d)
+                .bind(sideMenuWidthBinding.stateProperty(), memoryProgressBar.opacityProperty())
+                .setDuration(Duration.millis(150));
+
+        menuActivated.setValue(false);
     }
 
     private SideMenuButton addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass) {
@@ -774,9 +794,9 @@ public class MainWindowController extends AnchorPane {
             new TransitionBinding<Number>(0d, 1d)
                     .bind(sideMenuWidthBinding.stateProperty(), label.opacityProperty())
                     .setDuration(Duration.millis(150));
-            
+
             label.textProperty().bind(Bindings.createStringBinding(this::getText, menuActivated));
-            
+
         }
 
         public String getText() {

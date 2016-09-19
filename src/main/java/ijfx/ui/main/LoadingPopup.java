@@ -72,6 +72,8 @@ public class LoadingPopup extends PopupControl {
     
     private Scene lastScene;
     
+ 
+    
     public LoadingPopup() {
         super();
 
