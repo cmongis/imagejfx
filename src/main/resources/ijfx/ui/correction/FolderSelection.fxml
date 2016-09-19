@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="with-padding" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <bottom>
+      <BorderPane BorderPane.alignment="CENTER">
+         <right>
+              <fx:include source="./ActionBar.fxml" />
+         </right>
+         <left>
+            <Button fx:id="folderButton" mnemonicParsing="false" text="Button" BorderPane.alignment="CENTER" />
+         </left>
+      </BorderPane>
+   </bottom>
+</BorderPane>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -10,10 +11,22 @@
 
 <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="-1.0" prefWidth="-1.0" spacing="12.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Button fx:id="backButton" mnemonicParsing="false" text="Back" />
-        <Button fx:id="nextButton" disable="true" mnemonicParsing="false" text="Next" />
-        <Button fx:id="finishButton" mnemonicParsing="false" text="Finish" />
-        <Button fx:id="explainMeButton" mnemonicParsing="false" text="Explain me" />
+        <Button fx:id="backButton" mnemonicParsing="false" text="Back">
+         <graphic>
+            <FontAwesomeIconView glyphName="ARROW_LEFT" />
+         </graphic></Button>
+        <Button fx:id="nextButton" disable="true" mnemonicParsing="false" styleClass="warning" text="Next">
+         <graphic>
+            <FontAwesomeIconView glyphName="ARROW_RIGHT" />
+         </graphic></Button>
+        <Button fx:id="finishButton" mnemonicParsing="false" text="Start correction">
+         <graphic>
+            <FontAwesomeIconView glyphName="TASKS" />
+         </graphic></Button>
+        <Button fx:id="explainMeButton" mnemonicParsing="false" styleClass="success" text="Explain me">
+         <graphic>
+            <FontAwesomeIconView glyphName="INFO_CIRCLE" />
+         </graphic></Button>
 
     </children>
     <padding>

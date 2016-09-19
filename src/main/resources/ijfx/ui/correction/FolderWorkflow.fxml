@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="with-padding" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
         <fx:include source="./ActionBar.fxml" />
     </bottom>
@@ -27,9 +27,8 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <VBox GridPane.rowIndex="1">
+            <VBox prefWidth="150.0" GridPane.rowIndex="1">
                <children>
-                  <Button fx:id="chooseFolder" mnemonicParsing="false" onAction="#addFiles" text="Choose folder..." />
                   <ListView fx:id="listView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
                </children>
             </VBox>
@@ -38,11 +37,4 @@
          </children>
       </GridPane>
    </center>
-   <top>
-          <Label graphicTextGap="15.0" text="Please choose a folder and select the different positions" BorderPane.alignment="CENTER">
-              <font>
-                  <Font size="28.0" />
-              </font>
-          </Label>
-   </top>
 </BorderPane>
