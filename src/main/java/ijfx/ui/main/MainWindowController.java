@@ -105,7 +105,7 @@ import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
 import mongis.utils.TextFileUtils;
-import mongis.utils.TransitionBinding;
+import mongis.utils.transition.TransitionBinding;
 import org.scijava.plugin.PluginService;
 
 /**

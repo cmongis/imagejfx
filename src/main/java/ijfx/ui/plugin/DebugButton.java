@@ -94,11 +94,13 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Reload CSS", this::reloadCss);
         addItem("Reload Debug Button", event -> uiPluginService.reload(DebugButton.class));
         addItem("Reload App Browser", event -> appService.reloadCurrentView());
-        addItem("Test hints", this::testHints);
-        addItem("Switch context", event -> setContext());
+        addItem("Reload Activity",event->activityService.reloadCurrentActivity());
+        //addItem("Test hints", this::testHints);
+        //addItem("Switch context", event -> setContext());
         addItem("Open performance monitor", this::openPerformanceMonitor);
         addItem("Open module browser", this::openWebApp);
         addItem("Reset Explorer Data", this::resetExplorerData);
+       
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED, this::updateReloadMenu);
         System.out.println("Added");

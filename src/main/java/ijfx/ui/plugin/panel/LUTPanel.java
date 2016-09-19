@@ -97,7 +97,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 import mongis.utils.SmartNumberStringConverter;
-import mongis.utils.TransitionBinding;
+import mongis.utils.transition.TransitionBinding;
 import net.imagej.Dataset;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
