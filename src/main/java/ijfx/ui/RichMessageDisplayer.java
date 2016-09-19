@@ -47,7 +47,12 @@ public class RichMessageDisplayer {
         this.webView = webView;
     }
 
-    
+    /**
+     * Load the content of a file located in the jar (same as the reference class)
+     * @param Reference class which should belong to the same jar as the file
+     * @param Path relative path (to the reference) or absolute path of the loaded
+     * @throws IOException 
+     */
     public void setContent(Class clazz,String path) throws IOException {
         
         setMessage(TextFileUtils.readFileFromJar(clazz, path));
