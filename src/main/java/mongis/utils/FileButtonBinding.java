@@ -53,11 +53,17 @@ public class FileButtonBinding {
     private final ObjectProperty<File> fileProperty = new SimpleObjectProperty<>(null);
 
     private String buttonDefaultText = "Choose a directory ...";
-
-    public FileButtonBinding(Button b) {
+    
+    public FileButtonBinding(Button button) {
+        this(button,null);
+    }
+    
+    public FileButtonBinding(Button b, File defaultFile) {
         this.button = b;
 
         button.setOnAction(this::onClick);
+        
+        fileProperty.setValue(defaultFile);
         fileProperty.addListener(this::onFileChanged);
 
         onFileChanged(null, null, fileProperty.getValue());
