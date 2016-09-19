@@ -422,7 +422,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             highValue.setValue(high);
         }
         
-        
+        if(range > 0) {
         if (range < 10 && isFloat()) {
 
             rangeSlider.setMajorTickUnit(0.1);
@@ -430,7 +430,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         } else {
             rangeSlider.setMajorTickUnit(displayRangeServ.getCurrentDatasetMaximum() - displayRangeServ.getCurrentDatasetMinimum());
         }
-        
+        }
         
         
         rangeSlider.setMin(displayRangeServ.getCurrentDatasetMinimum() * .1);
