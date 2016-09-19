@@ -178,6 +178,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         popOver.setAnchorY(anchorY);
         popOver.getStyleClass().clear();
         popOver.getStyleClass().add("popoverToolBar");
+        popOver.addEventFilter(MouseEvent.MOUSE_EXITED, this::onMouseExitedPopOver);
 
     }
 
@@ -216,6 +217,10 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
         } else if (labelCategory.getPane().getChildren().isEmpty()) {
             popOver.setOpacity(0);
         }
+    }
+    
+    protected void onMouseExitedPopOver(MouseEvent event) {
+        popOver.hide();
     }
 
     /**
