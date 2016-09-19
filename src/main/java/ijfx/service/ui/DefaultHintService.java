@@ -26,6 +26,7 @@ import ijfx.service.ui.hint.HintRequestEvent;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,19 +61,16 @@ public class DefaultHintService extends AbstractService implements HintService {
     
     @Override
     public void displayHint(Hint hint, boolean force) {
-
+        
+        if(force || !wasRead(hint))
+        eventService.publishLater(new HintRequestEvent(Arrays.asList(hint)));
     }
 
     @Override
     public void displayHints(List<? extends Hint> hintList, boolean force) {
-
-        
-        
         if(force) {
             eventService.publishLater(new HintRequestEvent(hintList));
         }
-        
-        
         else {
             List<Hint> nonReadHint = new ArrayList<>();
             
@@ -85,7 +83,6 @@ public class DefaultHintService extends AbstractService implements HintService {
             
             eventService.publishLater((new HintRequestEvent(nonReadHint)));
         }
-        
     }
     
     
@@ -197,15 +194,10 @@ public class DefaultHintService extends AbstractService implements HintService {
 
         @Override
         public void setRead() {
-            
             hint.setRead();
             history.add(hint.getId());
             saveConfiguration();
-            
         }
-        
-        
-        
     }
 
 }
