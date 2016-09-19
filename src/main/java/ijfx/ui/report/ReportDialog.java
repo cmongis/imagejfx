@@ -55,24 +55,19 @@ public class ReportDialog extends Dialog<Boolean>{
     
     
     
-    public Void onSendingDone(Boolean result) {
+    private  void onSendingDone(Boolean result) {
           
-            if(result == null) {
-                setResult(false);
-                return null;
-            }
-            
-        
+
             if(result) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Report sent ! Thank you for your contribution.", ButtonType.CLOSE).show();
             }
             else {
                 new Alert(Alert.AlertType.ERROR, "Error when sending report. Perhaps our server is down\nor you are not connected to the internet.", ButtonType.CLOSE).show();
             }
-            setResult(true);
-            
+            setResult(result);
+            close();
 
-            return null;
+            
     }
     
     

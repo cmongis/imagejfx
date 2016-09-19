@@ -23,7 +23,7 @@ package ijfx.ui.report;
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
-import java.util.logging.Level;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -31,11 +31,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.util.Callback;
+import mongis.utils.CallbackTask;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
 import mongis.utils.TaskButtonBinding;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -59,10 +60,12 @@ public class ReportPanel extends GridPane {
     @Parameter
     DefaultLoggingService logService;
 
+    @Parameter
+    UIService uiService;
 
     static final Logger logger = ImageJFX.getLogger();
     
-    Callback<Boolean,Void> onReportDone;
+    Consumer<Boolean> onReportDone;
     
     public ReportPanel() {
 
@@ -74,9 +77,6 @@ public class ReportPanel extends GridPane {
             new TaskButtonBinding(sendButton)
                     .setTextWhenRunning("Sending...")
                     .setTextWhenSucceed("Sent")
-                    .setWhenSucceed(() -> {
-                        onReportDone.call(true);
-                    })
                     .setTaskFactory(this::generateTask);
 
         } catch (IOException ex) {
@@ -92,39 +92,35 @@ public class ReportPanel extends GridPane {
 
     public Task generateTask(Object obj) {
 
-        Task<Boolean> task;
-        task = new Task<Boolean>() {
-            @Override
-            protected Boolean call()  {
-               
-                try {
-                    return logService.sendMessageToDeveloper(senderTextField.getText(), descriptionTextArea.getText());
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                    return Boolean.FALSE;
-                }
-               
-                
-            }
-            ;
-        };
         
-        return task;
+        return new CallbackTask<Void,Boolean>()
+                .run(this::sendReport)
+                .then(onReportDone);
+                
+        
+        //return task;
 
     }
-
-    public Callback<Boolean, Void> getOnReportDone() {
-        return onReportDone;
+    
+    public Boolean sendReport(Object obj){
+        try {
+            return logService.sendMessageToDeveloper(senderTextField.getText(), descriptionTextArea.getText());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
-    public ReportPanel setOnReportDone(Callback<Boolean, Void> onReportDone) {
+    
+
+    public ReportPanel setOnReportDone(Consumer<Boolean> onReportDone) {
         this.onReportDone = onReportDone;
         return this;
     }
 
    @FXML
    public void cancel() {
-       this.onReportDone.call(null);
+       this.onReportDone.accept(null);
    }
     
     
