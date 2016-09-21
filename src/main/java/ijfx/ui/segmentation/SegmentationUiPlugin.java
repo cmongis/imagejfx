@@ -23,6 +23,7 @@ import ijfx.service.workflow.Workflow;
 import javafx.beans.property.Property;
 import javafx.scene.Node;
 import net.imagej.display.ImageDisplay;
+import net.imagej.ops.Initializable;
 import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
 import org.scijava.plugin.Plugin;
@@ -32,7 +33,7 @@ import org.scijava.plugin.SciJavaPlugin;
  *
  * @author cyril
  */
-public interface SegmentationUiPlugin extends SciJavaPlugin{
+public interface SegmentationUiPlugin extends SciJavaPlugin,Initializable{
     
     void setImageDisplay(ImageDisplay display);
     
