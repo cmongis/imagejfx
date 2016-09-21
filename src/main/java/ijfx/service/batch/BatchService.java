@@ -178,15 +178,17 @@ public class BatchService extends AbstractService implements ImageJService {
 
             for (WorkflowStep step : workflow.getStepList()) {
                 logger.info("Executing step : " + step.getId());
-                progress.setStatus(String.format("Processing %s with %s", input.getName(), step.getModule().getInfo().getTitle()));
-
+                try {
+                    progress.setStatus(String.format("Processing %s with %s", input.getName(), step.getModule().getInfo().getTitle()));
+                } catch (NullPointerException e) {
+                    progress.setStatus("...");
+                }
                 progress.setProgress(count++, totalOps);
-               
+
                 final Module module = moduleService.createModule(step.getModule().getInfo());
                 try {
                     getContext().inject(module.getDelegateObject());
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     logger.warning("Context already injected in module ?");
                 }
                 logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
@@ -195,7 +197,7 @@ public class BatchService extends AbstractService implements ImageJService {
                     progress.setStatus("Error :-(");
                     progress.setProgress(0, 1);
                     success = false;
-                    logger.info("Error when executing module : "+module.getInfo().getName());
+                    logger.info("Error when executing module : " + module.getInfo().getName());
                     break;
                 };
 
@@ -227,11 +229,10 @@ public class BatchService extends AbstractService implements ImageJService {
         return success;
 
     }
-
     // execute a module (with all the side parameters injected)
+
     public boolean executeModule(BatchSingleInput input, Module module, Map<String, Object> parameters) {
-       
-        
+
         logger.info("Executing module " + module.getDelegateObject().getClass().getSimpleName());
         logger.info("Injecting input");
         boolean inputInjectionSuccess = injectInput(input, module);
@@ -254,34 +255,31 @@ public class BatchService extends AbstractService implements ImageJService {
         module.getInputs().forEach((key, value) -> {
             module.setResolved(key, true);
         });
-        
+
         // calling the batch preprocessor plugins
         pluginService
                 .createInstancesOfType(BatchPrepreprocessorPlugin.class)
-                .forEach(processor->processor.process(input, module,parameters));
-        
-        
+                .forEach(processor -> processor.process(input, module, parameters));
+
         String moduleName = module.getInfo().getDelegateClassName();
         logger.info(String.format("[%s] starting module", moduleName));
 
         logger.info("Running module");
         Future<Module> run;
-  
+
         try {
             //getContext().inject(run);
             getContext().inject(module);
             module.initialize();
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             logger.info("Context already injected.");
             //   e.printStackTrace();
         }
-            run = moduleService.run(module, getPreProcessors(), getPostprocessors(), parameters);
-       // } else {
-       //     run = moduleService.run(module, process, parameters);
+        run = moduleService.run(module, getPreProcessors(), getPostprocessors(), parameters);
+        // } else {
+        //     run = moduleService.run(module, process, parameters);
 
         //}
-
         logger.info(String.format("[%s] module started", moduleName));
 
         try {
@@ -345,7 +343,7 @@ public class BatchService extends AbstractService implements ImageJService {
     public void extractOutput(BatchSingleInput input, Module module) {
         Map<String, Object> outputs = module.getOutputs();
         outputs.forEach((s, o) -> {
-            logger.info(String.format("Trying to find output from %s = %s",s,o));
+            logger.info(String.format("Trying to find output from %s = %s", s, o));
             if (Dataset.class.isAssignableFrom(o.getClass())) {
                 logger.info("Extracting Dataset !");
                 input.setDataset((Dataset) module.getOutput(s));
@@ -373,11 +371,9 @@ public class BatchService extends AbstractService implements ImageJService {
     private <T> T injectPlugin(T p) {
         try {
             getContext().inject(p);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             return p;
         }
     }
@@ -389,7 +385,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 .sequential()
                 .filter(p -> !processorBlackList.contains(p.getClass()))
                 .sequential()
-                .map(p->{
+                .map(p -> {
                     return p;
                 })
                 //.map(this::injectPlugin)
