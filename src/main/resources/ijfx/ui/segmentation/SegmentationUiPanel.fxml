@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
-
-<fx:root prefWidth="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefWidth="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <Accordion fx:id="accordion" prefHeight="250.0" BorderPane.alignment="CENTER" />
    </center>
@@ -22,7 +25,7 @@
                   <String fx:value="warning" />
                </styleClass>
             </Label>
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Analyse particle" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#analyseParticles" text="Analyse particle" />
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Segment more images" />
             <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text="More ...">
               <items>
