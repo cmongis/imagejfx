@@ -19,6 +19,7 @@
  */
 package ijfx.service.ui;
 
+import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.IjfxService;
 import ijfx.service.batch.DefaultSegmentedObject;
 import ijfx.service.batch.SegmentedObject;
@@ -27,6 +28,7 @@ import ijfx.service.overlay.OverlayStatService;
 import ijfx.ui.datadisplay.object.DisplayedSegmentedObject;
 import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import ijfx.ui.main.ImageJFX;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -36,8 +38,16 @@ import java.util.stream.Collectors;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.ThresholdOverlay;
+import net.imglib2.Cursor;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.Img;
+import net.imglib2.img.ImgFactory;
+import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.roi.BinaryMaskRegionOfInterest;
+import net.imglib2.type.logic.BitType;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
@@ -88,6 +98,50 @@ public class MeasurementService extends AbstractService implements IjfxService {
 
         measureAllOverlay(imageDisplaySrv.getActiveImageDisplay());
 
+    }
+    
+    
+    /**
+     * Take a threshold overlay and return single polygon overlays
+     * 
+     * @param thresholdOverlay
+     * @return Polygon overlays extracted with connected component algorithm
+     */
+    public List<Overlay> extractOverlays(ThresholdOverlay thresholdOverlay,  RandomAccessibleInterval interval) {
+        long width = interval.dimension(0);
+        long height = interval.dimension(1);
+        
+        Img<BitType> binaryMark = createBinaryMask(thresholdOverlay, width, height);
+        
+        
+        return Arrays.asList(BinaryToOverlay.transform(getContext(), binaryMark, true));
+    }
+    
+    public List<Overlay> extractOverlays(BinaryMaskOverlay maskOverlay) {
+        
+        BinaryMaskRegionOfInterest roi =  (BinaryMaskRegionOfInterest) maskOverlay.getRegionOfInterest();
+        
+        return Arrays.asList(BinaryToOverlay.transform(getContext(), roi.getImg(), true));
+        
+    }
+    
+    private Img<BitType> createBinaryMask(ThresholdOverlay overlay, long width, long height) {
+
+        ImgFactory<BitType> factory = new ArrayImgFactory<>();
+        long[] dim = new long[2];
+        dim[0] = width;
+        dim[1] = height;
+        Img<BitType> img = factory.create(dim, new BitType(false));
+
+        Cursor<BitType> cursor = img.cursor();
+        cursor.reset();
+        while (cursor.hasNext()) {
+            cursor.fwd();
+            cursor.localize(dim);
+            cursor.get().set(overlay.classify(dim) == 0);
+        }
+
+        return img;
     }
 
     public void measureOverlays(ImageDisplay imageDisplay, List<Overlay> overlayList, Predicate<SegmentedObject> filter) {
