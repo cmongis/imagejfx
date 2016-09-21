@@ -22,6 +22,7 @@ package mongis.utils;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
@@ -32,6 +33,20 @@ import javafx.scene.Node;
 public class BindingsUtils {
     
     
+    public static void bindNodeToClass(Node node, ObservableValue<Boolean> property,String styleClass) {
+        
+        property.addListener((obs,oldValue,newValue)-> {
+            if(newValue && node.getStyleClass().contains(styleClass) == false) {
+                node.getStyleClass().add(styleClass);
+            }
+            else if(!newValue) {
+                node.getStyleClass().remove(styleClass);
+            }
+        });
+        
+        if(property.getValue()) node.getStyleClass().add(styleClass);
+        
+    }
     
     public static void bindNodeToPseudoClass(PseudoClass pseudoClass, Node node,ReadOnlyProperty<Boolean> booleanProperty) {
         
