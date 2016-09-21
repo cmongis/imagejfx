@@ -112,6 +112,15 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
 
     }
 
+    public double getDatasetMinimum(ImageDisplay display,int channel) {
+        return getDisplayStatistics(display, channel).getMin();
+    }
+    
+    public double getDatasetMaximum(ImageDisplay display, int channel) {
+        return getDisplayStatistics(display, channel).getMax();
+    }
+    
+    
     public double getCurrentDatasetMinimum() {
         return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMin();
     }
