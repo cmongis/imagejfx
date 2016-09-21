@@ -102,7 +102,7 @@ import org.scijava.ui.UIService;
  *
  * @author cyril
  */
-@Plugin(type = UiPlugin.class)
+//@Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "segmentation-panel", context = "segmentation -overlay-selected", localization = Localization.RIGHT)
 public class SegmentationPanel extends BorderPane implements UiPlugin {
 
