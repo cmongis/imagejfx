@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox spacing="20.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox spacing="10.0">
+               <children>
+                  <Label fx:id="fixedThresholdLabel" text="Fixed :" />
+                  <VBox fx:id="sliderVBox" />
+                  <BorderPane>
+                     <left>
+                        <TextField fx:id="minValueTextField" prefWidth="50.0" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <TextField fx:id="maxValueTextField" prefWidth="50.0" BorderPane.alignment="CENTER" />
+                     </right>
+                  </BorderPane>
+               </children>
+            </VBox>
+            <VBox spacing="10.0">
+               <children>
+                  <Label fx:id="autoThresholdLabel" text="Automatic" />
+                  <ComboBox fx:id="methodComboBox" maxWidth="1.7976931348623157E308" />
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </center>
+   <top>
+      <HBox alignment="CENTER" styleClass="toggle-group" BorderPane.alignment="CENTER">
+         <children>
+            <ToggleButton fx:id="fixedThresholdButton" mnemonicParsing="false" prefWidth="100.0" styleClass="first" text="Fixed" />
+            <ToggleButton fx:id="autoThresholdButton" mnemonicParsing="false" prefWidth="100.0" styleClass="last" text="Auto" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" top="10.0" />
+         </padding>
+      </HBox>
+   </top>
+   <padding>
+      <Insets bottom="10.0" top="10.0" />
+   </padding>
+</fx:root>

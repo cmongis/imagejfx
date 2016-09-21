@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root prefWidth="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <Accordion fx:id="accordion" prefHeight="250.0" BorderPane.alignment="CENTER" />
+   </center>
+   <bottom>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Separator prefWidth="200.0" />
+            <Label maxWidth="1.7976931348623157E308" text="... and measure" textAlignment="CENTER">
+               <styleClass>
+                  <String fx:value="h4" />
+                  <String fx:value="warning" />
+               </styleClass>
+            </Label>
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Analyse particle" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Segment more images" />
+            <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text="More ...">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+              </items>
+            </MenuButton>
+         </children>
+         <styleClass>
+            <String fx:value="vbox" />
+            <String fx:value="with-top-padding" />
+         </styleClass>
+      </VBox>
+   </bottom>
+   <top>
+      <Label maxWidth="1.7976931348623157E308" text="Segment using..." textAlignment="CENTER" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="10.0" />
+         </padding>
+         <styleClass>
+            <String fx:value="h4" />
+            <String fx:value="warning" />
+         </styleClass>
+      </Label>
+   </top>
+</fx:root>
