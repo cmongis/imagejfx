@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.util.Callback;
 import net.imagej.display.DataView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -130,6 +131,26 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
                 .filter(o->o==overlay)
                 .findFirst()
                 .orElse(null);
+    }
+    
+    public <T extends Overlay> T findOverlayOfType(ImageDisplay imageDisplay, Class<T> clazz) {
+        return (T) imageDisplay.
+                stream()
+                .filter(dataview->dataview instanceof OverlayView)
+                .map(overlayView->(Overlay)overlayView.getData())
+                .filter(o->o.getClass().isAssignableFrom(clazz))
+                .findFirst()
+                .orElse(null);
+    }
+    
+    public <T extends Overlay> T findOverlayOfType(ImageDisplay imageDisplay, Class<T> clazz, Callback<ImageDisplay,T> factory) {
+        return (T) imageDisplay.
+                stream()
+                .filter(dataview->dataview instanceof OverlayView)
+                .map(overlayView->(Overlay)overlayView.getData())
+                .filter(o->o.getClass().isAssignableFrom(clazz))
+                .findFirst()
+                .orElseGet(()->factory.call(imageDisplay));
     }
     
     public void addOverlay(ImageDisplay imageDisplay, List<Overlay> overlays) {
