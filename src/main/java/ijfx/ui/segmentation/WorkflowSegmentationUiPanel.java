@@ -24,6 +24,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.plugins.commands.Binarize;
 import ijfx.service.batch.BatchService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.ui.MeasurementService;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.batch.WorkflowPanel;
@@ -41,10 +42,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
-import net.imagej.ops.Ops.Image.Invert;
-import net.imagej.ops.Ops.Morphology.Dilate;
-import net.imagej.ops.Ops.Morphology.Erode;
-import net.imagej.ops.math.UnaryRealTypeMath;
 import net.imagej.plugins.commands.assign.InvertDataValues;
 import net.imagej.plugins.commands.binary.DilateBinaryImage;
 import net.imagej.plugins.commands.binary.ErodeBinaryImage;
@@ -76,6 +73,9 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     @Parameter
     LoadingScreenService loadingService;
+    
+    @Parameter
+    MeasurementService measurementSrv;
     
     @FXML
     protected ToggleButton toggleButton;
@@ -168,5 +168,7 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
                 .start();
         loadingService.frontEndTask(task,true);
     }
+    
+
 
 }
