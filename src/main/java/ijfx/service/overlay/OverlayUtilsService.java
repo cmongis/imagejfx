@@ -143,6 +143,16 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
                 .orElse(null);
     }
     
+    public <T extends Overlay> List<T> findOverlaysOfType(ImageDisplay imageDisplay, Class<T> clazz) {
+        return  imageDisplay.
+                stream()
+                .filter(dataview->dataview instanceof OverlayView)
+                .map(overlayView->(Overlay)overlayView.getData())
+                .filter(o->o.getClass().isAssignableFrom(clazz))
+                .map(o->(T)o)
+                .collect(Collectors.toList());
+    }
+    
     public <T extends Overlay> T findOverlayOfType(ImageDisplay imageDisplay, Class<T> clazz, Callback<ImageDisplay,T> factory) {
         return (T) imageDisplay.
                 stream()
