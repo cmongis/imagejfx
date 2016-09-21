@@ -22,6 +22,7 @@ package ijfx.service;
 import java.io.File;
 import java.io.IOException;
 import net.imagej.Dataset;
+import net.imagej.display.ImageDisplay;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
@@ -35,7 +36,7 @@ public interface ImagePlaneService extends IjfxService {
     <T extends RealType<T>> Dataset extractPlane(File file, long[] nonPlanarPosition) throws IOException;
 
     Dataset extractPlane(File file, int planeIndex) throws IOException;
-
+ 
     <T extends RealType<T>> Dataset isolatePlane(Dataset dataset, long[] position);
     
     Dataset createEmptyPlaneDataset(Dataset input);
