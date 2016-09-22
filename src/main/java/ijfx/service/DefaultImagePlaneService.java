@@ -170,6 +170,11 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
         Timer t = timerService.getTimer(this.getClass());
         t.start();
+        
+        if(position.length < dataset.numDimensions()) {
+            position = DimensionUtils.nonPlanarToPlanar(position);
+        }
+        
         Dataset emptyDataset = createEmptyPlaneDataset(dataset);
 
         RandomAccess<T> randomAccessOrigin = (RandomAccess<T>) dataset.randomAccess();

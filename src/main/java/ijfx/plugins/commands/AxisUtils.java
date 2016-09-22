@@ -19,7 +19,6 @@
  */
 package ijfx.plugins.commands;
 
-import ijfx.service.uicontext.UiContextCalculatorService;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
@@ -32,6 +31,13 @@ import net.imagej.display.ImageDisplay;
  */
 public class AxisUtils {
 
+    public static CalibratedAxis[] getAxes(Dataset dataset) {
+        CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
+        dataset.axes(axes);
+        return axes;
+    }
+    
+    
     public static AxisType getSliceAxis(Dataset dataset) {
         AxisType axisType = null;
         if (hasAxisType(dataset, Axes.Z)) {

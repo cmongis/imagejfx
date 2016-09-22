@@ -20,6 +20,7 @@
 package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
+import java.util.function.Consumer;
 import net.imagej.Dataset;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
@@ -39,7 +40,7 @@ public abstract class AbstractLoaderWrapper<T> implements BatchSingleInput {
     @Parameter
     Context context;
     
-    
+    Consumer<AbstractLoaderWrapper<T>> onSave;
     
     public AbstractLoaderWrapper(T wrappedObject) {
         this.wrappedObject = wrappedObject;
@@ -81,7 +82,15 @@ public abstract class AbstractLoaderWrapper<T> implements BatchSingleInput {
 
     @Override
     public void save() {
+        if(onSave != null) {
+            onSave.accept(this);
+        }
         input.save();
+    }
+    
+    public AbstractLoaderWrapper<T> onSave(Consumer<AbstractLoaderWrapper<T>> onSave) {
+        this.onSave = onSave;
+        return this;
     }
 
     @Override
@@ -89,7 +98,7 @@ public abstract class AbstractLoaderWrapper<T> implements BatchSingleInput {
         input.dispose();
     }
 
-    protected T getWrappedValue() {
+    public T getWrappedValue() {
         return wrappedObject;
     }
     

@@ -20,9 +20,11 @@
 package ijfx.ui.segmentation;
 
 import ijfx.core.utils.DimensionUtils;
+import ijfx.plugins.commands.SimpleThreshold;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.workflow.Workflow;
+import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.Map;
@@ -73,6 +75,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.IntervalView;
 import org.apache.commons.lang3.ArrayUtils;
 import org.controlsfx.control.RangeSlider;
+import org.scijava.Context;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -132,23 +135,26 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
         SciJava classes
      */
     @Parameter
-    DisplayRangeService displayRangeService;
+    private DisplayRangeService displayRangeService;
 
     @Parameter
     private ImagePlaneService imagePlaneService;
 
     @Parameter
-    ThresholdService thresholdService;
+    private ThresholdService thresholdService;
 
     @Parameter
-    ImageDisplayService imageDisplayService;
+    private ImageDisplayService imageDisplayService;
 
     @Parameter
-    HistogramBundle histogramService;
+    private HistogramBundle histogramService;
 
     @Parameter
-    AutoscaleService autoScaleService;
+    private AutoscaleService autoScaleService;
 
+    @Parameter
+    private Context context;
+    
     ToggleGroupValue<Boolean> toggleGroupValue = new ToggleGroupValue<>();
 
     SmartNumberStringConverter converter = new SmartNumberStringConverter();
@@ -199,7 +205,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     @Override
     public Workflow getWorkflow() {
-        return null;
+        return new WorkflowBuilder(context).addStep(SimpleThreshold.class, "value",lowValue.getValue(),"makeBinary",true,"upperCut",true).getWorkflow("Simple threshold");
     }
 
     @Override

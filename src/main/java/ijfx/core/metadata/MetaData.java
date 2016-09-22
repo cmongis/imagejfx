@@ -163,6 +163,7 @@ public interface MetaData {
     public static final String LBL_CONVEXITY = "Convexity";
     public static final String LBL_MAX = STATS_PIXEL_MAX;
     
+    public static final String COUNT = "Count";
     
     public final static String[] STATS_RELATED_METADATA = new String[] { STATS_PIXEL_MIN, STATS_PIXEL_MAX, STATS_PIXEL_MEAN, STATS_PIXEL_STD_DEV };
     

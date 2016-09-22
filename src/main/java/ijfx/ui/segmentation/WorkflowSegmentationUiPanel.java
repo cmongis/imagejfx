@@ -25,6 +25,7 @@ import ijfx.plugins.commands.Binarize;
 import ijfx.service.batch.BatchService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.ui.MeasurementService;
+import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.batch.WorkflowPanel;
@@ -141,7 +142,7 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     @Override
     public Workflow getWorkflow() {
-        return null;
+        return new DefaultWorkflow(workflowPanel.stepListProperty());
     }
 
     @Override

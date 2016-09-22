@@ -129,7 +129,7 @@ public class BatchService extends AbstractService implements ImageJService {
     }
 
     // applies a workflow to a list of inputs
-    public Boolean applyWorkflow(ProgressHandler progress, List<BatchSingleInput> inputs, Workflow workflow) {
+    public Boolean applyWorkflow(ProgressHandler progress, List<? extends BatchSingleInput> inputs, Workflow workflow) {
 
         if (progress == null) {
             progress = new SilentProgressHandler();

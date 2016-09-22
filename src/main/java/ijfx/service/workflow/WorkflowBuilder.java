@@ -22,6 +22,7 @@ package ijfx.service.workflow;
 import ijfx.service.batch.BatchService;
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.input.BatchInputBuilder;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
 import java.io.File;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javafx.concurrent.Task;
 import mongis.utils.CallbackTask;
+import mongis.utils.ProgressHandler;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import org.scijava.Context;
@@ -50,6 +52,8 @@ public class WorkflowBuilder {
     @Parameter
     BatchService batchService;
     
+    @Parameter
+   LoadingScreenService loadingScreenService;
     
     List<BatchInputBuilder> inputs =new ArrayList<>();
     
@@ -57,6 +61,17 @@ public class WorkflowBuilder {
     
     public WorkflowBuilder(Context context) {
         context.inject(this);
+    }
+    
+    
+    public WorkflowBuilder addInput(Collection<? extends BatchSingleInput> inputs) {
+        inputs.forEach(this::addInput);
+        return this;
+    }
+    
+    public WorkflowBuilder addInputs(Collection<? extends Explorable> explorableList) {
+        explorableList.forEach(this::addInput);
+        return this;
     }
     
     public WorkflowBuilder addInput(BatchSingleInput input) {
@@ -133,6 +148,10 @@ public class WorkflowBuilder {
         steps.addAll(stepList);
         return this;
     }
+    public WorkflowBuilder execute(Workflow workflow) {
+        steps.addAll(workflow.getStepList());
+        return this;
+    }
     
     
     public Workflow getWorkflow(String name) {
@@ -141,16 +160,31 @@ public class WorkflowBuilder {
         return workflow;
     }
     
+    
+    private List<BatchSingleInput> getInputs() {
+        return inputs.stream().map(builder->builder.getInput()).collect(Collectors.toList());
+    }
+    
     public Task<Boolean> start()  {
         
         DefaultWorkflow workflow = new DefaultWorkflow(steps);
         
         return new CallbackTask<List<BatchSingleInput>,Boolean>()
-                .setInput(inputs.stream().map(builder->builder.getInput()).collect(Collectors.toList()))
+                .setInput(getInputs())
                 .run((progress,input)->batchService.applyWorkflow(progress, input, workflow))
                 .start();
     }
+    
+    public void startAndShow() {
+        loadingScreenService.frontEndTask(start(),true);
+    }
    
+    public boolean runSync(ProgressHandler handler) {
+        handler = ProgressHandler.check(handler);
+        
+        return batchService.applyWorkflow(handler, getInputs(), new DefaultWorkflow(steps));
+        
+    }
 }
     
     

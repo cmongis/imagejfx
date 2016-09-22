@@ -19,9 +19,16 @@
  */
 package ijfx.plugins.commands;
 
+import static javafx.scene.Cursor.cursor;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
+import net.imagej.ImgPlusService;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.img.Img;
+import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -36,8 +43,14 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class, menuPath = "Image > Adjust > Simple Threshold...")
 public class SimpleThreshold extends ContextCommand {
 
+    @Parameter
+    DatasetService datasetService;
+
     @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
+
+    @Parameter
+    ImgPlusService imgPlusService;
 
     @Parameter(label = "Threshold at")
     double value;
@@ -45,17 +58,53 @@ public class SimpleThreshold extends ContextCommand {
     @Parameter(label = "Cut values above ?")
     boolean upperCut = false;
 
+    @Parameter(label = "Make Binary")
+    boolean makeBinary = false;
+
     @Override
     public void run() {
         if (isCanceled()) {
             return;
         }
-        threshold(dataset);
+        if (makeBinary) {
+            makeBinary(dataset);
+        } else {
+            threshold(dataset);
+        }
+    }
+
+    
+    public <T extends RealType<T>> void makeBinary(Dataset dataset) {
+
+        long[] dimension = new long[dataset.numDimensions()];
+
+        dataset.dimensions(dimension);
+
+        Img<BitType> img = new ArrayImgFactory<BitType>().create(dimension, new BitType());
+
+        RandomAccess<BitType> randomAccess = img.randomAccess();
+
+        Cursor<T> cursor = (Cursor<T>) dataset.<T>getImgPlus().cursor();
+
+        cursor.reset();
+        double pixelValue;
+        while (cursor.hasNext()) {
+            cursor.fwd();
+            randomAccess.setPosition(cursor);
+            pixelValue = cursor.get().getRealDouble();
+            if (upperCut) {
+                randomAccess.get().set(value > pixelValue);
+            } else {
+                randomAccess.get().set(value < pixelValue);
+            }
+        }
+
+        dataset.setImgPlus(new ImgPlus(img, dataset));
+        dataset.rebuild();
+
     }
 
     public <T extends RealType<T>> void threshold(Dataset dataset) {
-        RandomAccess<RealType<?>> randomAccess = dataset.randomAccess();
-
         Cursor<T> cursor = (Cursor<T>) dataset.<T>getImgPlus().cursor();
         cursor.reset();
         while (cursor.hasNext()) {

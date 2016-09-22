@@ -20,6 +20,8 @@
 package ijfx.core.utils;
 
 import mongis.ndarray.NDimensionalArray;
+import net.imagej.display.ImageDisplay;
+import net.imglib2.RandomAccessibleInterval;
 
 /**
  * Set of methods easing dealing with dimension arrays in Datasets
@@ -27,6 +29,25 @@ import mongis.ndarray.NDimensionalArray;
  */
 public class DimensionUtils {
 
+    
+    public static long[] getDimension(RandomAccessibleInterval interval) {
+        
+       long[] dimension = new long[interval.numDimensions()];
+       interval.dimensions(dimension);
+       
+       return dimension;
+        
+    }
+    
+    public static long[] getDimensions(ImageDisplay imageDisplay) {
+        
+       long[] dimension = new long[imageDisplay.numDimensions()];
+       imageDisplay.dimensions(dimension);
+       
+       return dimension;
+        
+    }
+    
     /**
      * Transform a string containing a array of numbers in the form [x,y,z] into a long array
      * @param number array e.g [13,24,2,41]
@@ -85,6 +106,14 @@ public class DimensionUtils {
         return ndArray.getPossibilities();
     }
     
+    public static long[][] allPossibilities(long[] dimensions) {
+         NDimensionalArray ndArray = new NDimensionalArray(dimensions);
+        return ndArray.getPossibilities();
+    }
+   
+    public static long[][] allPossibilities(ImageDisplay imageDisplay) {
+        return allPossibilities(planarToNonPlanar(getDimensions(imageDisplay)));
+    }
    
     
     

@@ -38,10 +38,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import mongis.ndarray.NDimensionalArray;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
+import net.imagej.display.ImageDisplay;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -89,7 +91,6 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         return scifio;
     }
 
-    
     @Override
     public MetaDataSet extractMetaData(File file) {
 
@@ -102,7 +103,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             t.elapsed("Metadata parser creation");
             long serieCount, timeCount, zCount, channelCount, width, height, imageSize, bitsPerPixel;
             String dimensionOrder;
-            
+
             serieCount = metadata.getImageCount();
             width = metadata.get(0).getAxisLength(Axes.X);
             height = metadata.get(0).getAxisLength(Axes.Y);
@@ -122,29 +123,27 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             metadataset.putGeneric(MetaData.SERIE_COUNT, serieCount);
             metadataset.putGeneric(MetaData.CHANNEL_COUNT, channelCount);
             metadataset.putGeneric(MetaData.FILE_NAME, file.getName());
-            metadataset.putGeneric(MetaData.ABSOLUTE_PATH,file.getAbsolutePath());
-           
+            metadataset.putGeneric(MetaData.ABSOLUTE_PATH, file.getAbsolutePath());
+
             // creating array containing the axes and axe lengths other than x an y
-           long[] dims = new long[metadata.get(0).getAxesLengths().length - 2];
-           CalibratedAxis[] axes = new CalibratedAxis[dims.length];
-             if (dims.length > 0) {
-            System.arraycopy(metadata.get(0).getAxes().toArray(new CalibratedAxis[metadata.get(0).getAxes().size()]), 2, axes, 0, axes.length);
-            System.arraycopy(metadata.get(0).getAxesLengths(),2,dims,0,dims.length);
-            
-           
+            long[] dims = new long[metadata.get(0).getAxesLengths().length - 2];
+            CalibratedAxis[] axes = new CalibratedAxis[dims.length];
+            if (dims.length > 0) {
+                System.arraycopy(metadata.get(0).getAxes().toArray(new CalibratedAxis[metadata.get(0).getAxes().size()]), 2, axes, 0, axes.length);
+                System.arraycopy(metadata.get(0).getAxesLengths(), 2, dims, 0, dims.length);
+
                 NDimensionalArray ndarray = new NDimensionalArray(dims);
 
                 String[] dimNames = new String[dims.length];
-                
-                for(int i = 0; i!=dimNames.length;i++) {
-                    dimNames[i] = metadata.get(0).getAxis(i+2).type().getLabel();
+
+                for (int i = 0; i != dimNames.length; i++) {
+                    dimNames[i] = metadata.get(0).getAxis(i + 2).type().getLabel();
                 }
-               
 
                 metadataset.putGeneric(MetaData.DIMENSION_ORDER, String.join(",", dimNames));
                 metadataset.putGeneric(MetaData.DIMENSION_LENGHS, Arrays.toString(dims));
             }
-             
+
             return metadataset;
 
         } catch (FormatException ex) {
@@ -156,10 +155,7 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         return metadataset;
 
     }
-    
 
-    
-    
     private ReaderFilter getReaderFilter(File file) throws FormatException, IOException {
         return scifio.initializer().initializeReader(file.getAbsolutePath(), config);
     }
@@ -172,46 +168,64 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         if (dimensionLengthesString == null || dimensionLengthesString.equals("null") || dimensionLengthesString.equals("[]")) {
             planes.add(new MetaDataSet().merge(metadataset));
             return planes;
-        }
-        else {
-           
+        } else {
+
             long[] dimensionLengthes = DimensionUtils.readLongArray(metadataset.get(MetaData.DIMENSION_LENGHS).getStringValue());
-            
+
             String[] dimensionLabelArray = metadataset.get(MetaData.DIMENSION_ORDER).getStringValue().split(",");
-            
+
             NDimensionalArray array = new NDimensionalArray(dimensionLengthes);
             int planeIndex = 0;
             long[][] coordinateList = array.get(0).generateAllPossibilities();
             // generate all the possibilities
-            for(long[] coordinate : coordinateList) {
-                
+            for (long[] coordinate : coordinateList) {
+
                 MetaDataSet planeMetaDataSet = new MetaDataSet().merge(metadataset);
                 for (String statsMetaData : MetaData.STATS_RELATED_METADATA) {
                     planeMetaDataSet.remove(statsMetaData);
                 }
-                for(int d = 0; d!= coordinate.length;d++) {
+                for (int d = 0; d != coordinate.length; d++) {
                     String label = dimensionLabelArray[d];
                     long value = coordinate[d];
                     planeMetaDataSet.putGeneric(label, value);
-                    
-                } 
+
+                }
                 // putting the plane index
                 planeMetaDataSet.putGeneric(MetaData.PLANE_INDEX, planeIndex);
-                
+
                 // indicate metadata type
                 planeMetaDataSet.putGeneric(MetaData.METADATA_SET_TYPE_KEY, MetaData.METADATA_SET_TYPE_PLANE);
-                
+
                 // puting the non planar position
-                planeMetaDataSet.putGeneric(MetaData.PLANE_NON_PLANAR_POSITION,Arrays.toString(coordinate));
+                planeMetaDataSet.putGeneric(MetaData.PLANE_NON_PLANAR_POSITION, Arrays.toString(coordinate));
                 planes.add(planeMetaDataSet);
                 planeIndex++;
             }
-            
+
         }
         return planes;
 
     }
+
+    public void fillPositionMetaData(MetaDataSet set, CalibratedAxis[] axes, long[] absoluteCoordinate) {
+
+        String[] dimensionLabelArray = Stream
+                .of(axes)
+                .map(axe -> axe.type().getLabel())
+                .toArray(size -> new String[size]);
+
+        for (int d = 2; d != absoluteCoordinate.length; d++) {
+            String label = dimensionLabelArray[d];
+            long value = absoluteCoordinate[d];
+            set.putGeneric(label, value);
+
+        }   
+    }
+
+ 
+    
     @Override
+
     public List<MetaDataSet> extractPlaneMetaData(File file) {
         return extractPlaneMetaData(extractMetaData(file));
     }
@@ -219,6 +233,26 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
     @Override
     public MetaDataSet extractMetaData(Dataset dataset) {
         return null;
+    }
+
+    @Override
+    public MetaDataSet extractMetaData(ImageDisplay imageDisplay) {
+        
+        MetaDataSet set = new MetaDataSet();
+      
+        
+        long[] position = new long[imageDisplay.numDimensions()];
+        CalibratedAxis[] axes = new CalibratedAxis[imageDisplay.numDimensions()];
+        
+        imageDisplay.localize(position);
+        imageDisplay.axes(axes);
+        
+        
+        set.putGeneric(MetaData.NAME, imageDisplay.getName());
+        fillPositionMetaData(set, axes, position);
+        
+        
+        return set;
     }
 
 }

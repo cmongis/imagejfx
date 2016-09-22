@@ -19,15 +19,25 @@
  */
 package ijfx.service.ui;
 
+import ij.ImagePlus;
+import ij.blob.Blob;
+import ij.blob.ManyBlobs;
+import ij.process.ByteProcessor;
+import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataSet;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.IjfxService;
 import ijfx.service.batch.DefaultSegmentedObject;
 import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.OverlaySelectionService;
+import ijfx.service.overlay.OverlayShapeStatistics;
 import ijfx.service.overlay.OverlayStatService;
+import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplayService;
 import ijfx.ui.datadisplay.object.DisplayedSegmentedObject;
 import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import ijfx.ui.main.ImageJFX;
+import java.awt.Polygon;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -40,14 +50,20 @@ import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.ThresholdOverlay;
 import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.RealLocalizable;
+import net.imglib2.RealPoint;
 import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.roi.BinaryMaskRegionOfInterest;
+import net.imglib2.roi.PolygonRegionOfInterest;
 import net.imglib2.type.logic.BitType;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
@@ -79,9 +95,14 @@ public class MeasurementService extends AbstractService implements IjfxService {
     OverlayService overlayService;
 
     @Parameter
-            UIService uiService;
-    
+    UIService uiService;
+
+    @Parameter
+    MetaDataSetDisplayService metaDataDisplaySrv;
+
     Logger logger = ImageJFX.getLogger();
+
+    private static final String COUNT_DISPLAY_NAME = "Object count";
 
     public void measureSelectedOverlay() {
         ImageDisplay display = imageDisplaySrv.getActiveImageDisplay();
@@ -89,7 +110,7 @@ public class MeasurementService extends AbstractService implements IjfxService {
         logger.info("Measuring selected overlay");
         overlaySelectionSrv.getSelectedOverlays(display)
                 .stream()
-                .map(o -> measure(display,o))
+                .map(o -> measure(display, o))
                 .forEach(this::display);
 
     }
@@ -99,32 +120,30 @@ public class MeasurementService extends AbstractService implements IjfxService {
         measureAllOverlay(imageDisplaySrv.getActiveImageDisplay());
 
     }
-    
-    
+
     /**
      * Take a threshold overlay and return single polygon overlays
-     * 
+     *
      * @param thresholdOverlay
      * @return Polygon overlays extracted with connected component algorithm
      */
-    public List<Overlay> extractOverlays(ThresholdOverlay thresholdOverlay,  RandomAccessibleInterval interval) {
+    public List<Overlay> extractOverlays(ThresholdOverlay thresholdOverlay, RandomAccessibleInterval interval) {
         long width = interval.dimension(0);
         long height = interval.dimension(1);
-        
+
         Img<BitType> binaryMark = createBinaryMask(thresholdOverlay, width, height);
-        
-        
+
         return Arrays.asList(BinaryToOverlay.transform(getContext(), binaryMark, true));
     }
-    
+
     public List<Overlay> extractOverlays(BinaryMaskOverlay maskOverlay) {
-        
-        BinaryMaskRegionOfInterest roi =  (BinaryMaskRegionOfInterest) maskOverlay.getRegionOfInterest();
-        
+
+        BinaryMaskRegionOfInterest roi = (BinaryMaskRegionOfInterest) maskOverlay.getRegionOfInterest();
+
         return Arrays.asList(BinaryToOverlay.transform(getContext(), roi.getImg(), true));
-        
+
     }
-    
+
     private Img<BitType> createBinaryMask(ThresholdOverlay overlay, long width, long height) {
 
         ImgFactory<BitType> factory = new ArrayImgFactory<>();
@@ -145,48 +164,76 @@ public class MeasurementService extends AbstractService implements IjfxService {
     }
 
     public void measureOverlays(ImageDisplay imageDisplay, List<Overlay> overlayList, Predicate<SegmentedObject> filter) {
-        
+
         // the filter always return true if null
-        if(filter == null) filter = o->true;
-        
+        if (filter == null) {
+            filter = o -> true;
+        }
+
         List<SegmentedObject> objectList = overlayList
                 .stream()
-                .map(o->measure(imageDisplay,o))
-                .filter(o->o!=null)
+                .map(o -> measure(imageDisplay, o))
+                .filter(o -> o != null)
                 .filter(filter)
                 .collect(Collectors.toList());
-        
-        
-        if(objectList.size() > 0) {
-            
-            
-            Display display = displayService.createDisplay("Measures from "+imageDisplay.getName(),objectList.get(0));
+
+        if (objectList.size() > 0) {
+
+            Display display = displayService.createDisplay("Measures from " + imageDisplay.getName(), objectList.get(0));
             display.addAll(objectList);
             display.update();
-            
-        }
-        else {
+
+        } else {
             uiService.showDialog("There is no object to measure.");
         }
-        
+
+    }
+
+    public long countObjects(List<Overlay> overlayList, Predicate<OverlayShapeStatistics> filter) {
+
+        long count = overlayList
+                .parallelStream()
+                .map(overlayStatsSrv::getShapeStatistics)
+                .filter(o -> o != null)
+                .filter(filter)
+                .count();
+
+        return count;
+    }
+
+    public long countObjects(List<Overlay> overlayList, Predicate<OverlayShapeStatistics> filter, MetaDataSet set, boolean show) {
+
+        long count = countObjects(overlayList, filter);
+
+        set.putGeneric(MetaData.COUNT, count);
+
+        if (show) {
+            metaDataDisplaySrv.addMetaDataSetToDisplay(set, COUNT_DISPLAY_NAME);
+        }
+
+        return count;
+
     }
     
+     public long countObjects(RandomAccessibleInterval interval, Predicate<OverlayShapeStatistics> filter, MetaDataSet set, boolean show) {
+         return countObjects(transform(interval, true), filter, set, show);
+         
+     }
+
     public void measureAllOverlay(ImageDisplay imageDisplay) {
-        measureOverlays(imageDisplay,overlayService.getOverlays(imageDisplay),null); 
+        measureOverlays(imageDisplay, overlayService.getOverlays(imageDisplay), null);
     }
 
     public SegmentedObject measure(ImageDisplay display, Overlay overlay) {
         try {
-        SegmentedObject object = new DefaultSegmentedObject(overlay,overlayStatsSrv.getOverlayStatistics(display, overlay));
-        return new DisplayedSegmentedObject(display, object);
-        }
-        catch(Exception e) {
-            logger.log(Level.SEVERE,"Error when creating SegmentedObject",e);
+            SegmentedObject object = new DefaultSegmentedObject(overlay, overlayStatsSrv.getOverlayStatistics(display, overlay));
+            return new DisplayedSegmentedObject(display, object);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when creating SegmentedObject", e);
             return null;
         }
     }
-    
-    
+
     public synchronized Display getCurrentDisplay(SegmentedObject object) {
         return displayService.getDisplays()
                 .stream()
@@ -194,21 +241,99 @@ public class MeasurementService extends AbstractService implements IjfxService {
                 .findFirst()
                 .orElseGet(() -> {
                     logger.info("Creating display");
-                    return displayService.createDisplay("Measures",object);
+                    return displayService.createDisplay("Measures", object);
                 });
     }
-    
+
     public void display(SegmentedObject object) {
         logger.info("Dislaying segmented object " + object.getOverlay().getName());
         getCurrentDisplay(object).display(object);
 
     }
+
     public Optional<ThresholdOverlay> getThresholdOverlay(ImageDisplay imageDisplay) {
-         return overlayService
+        return overlayService
                 .getOverlays(imageDisplay)
                 .stream()
-                .filter(o->o instanceof ThresholdOverlay)
-                .map(o->(ThresholdOverlay)o)
+                .filter(o -> o instanceof ThresholdOverlay)
+                .map(o -> (ThresholdOverlay) o)
                 .findFirst();
     }
+
+    public <T extends RealType<T>> List<Overlay> transform(RandomAccessibleInterval<T> dataset, boolean recognizeWhiteObject) {
+        // converting 
+
+        int width = (int) dataset.max(0);
+        int height = (int) dataset.max(1);
+
+        RandomAccess<T> randomAccess = dataset.randomAccess();
+
+        ByteProcessor byteProcessor = new ByteProcessor(width, height);
+
+        long[] position = new long[dataset.numDimensions()];
+
+        for (int x = 0; x != width; x++) {
+            for (int y = 0; y != height; y++) {
+
+                position[0] = x;
+                position[1] = y;
+
+                randomAccess.setPosition(position);
+                double p = randomAccess.get().getRealDouble();
+                byteProcessor.set(x, y, (p > 0.0 ? 255 : 0));
+
+            }
+        }
+
+        ImagePlus imp = new ImagePlus("Temporary mask", byteProcessor);
+
+        ManyBlobs blobs = new ManyBlobs(imp);
+
+        // inverting if necessary because the
+        // CC algorithm recognise black objects
+        if (recognizeWhiteObject) {
+            imp.getProcessor().invert();
+        }
+        //launching the search
+        blobs.findConnectedComponents();
+
+        // creating a list
+        List<Overlay> listOverlays = new ArrayList<>(blobs.size());
+
+        int count = 1;
+
+        // converting each Blob into a PolygonOverlay
+        for (Blob b : blobs) {
+
+            PolygonOverlay po = new PolygonOverlay(getContext());
+            po.setName(String.format("%d", count++));
+
+            // we modifiy the PolygonOverlay by modifying it region of interest
+            PolygonRegionOfInterest roi = po.getRegionOfInterest();
+
+            Polygon polygon = b.getOuterContour();
+
+            if (polygon.getBounds().getWidth() <= 2 && polygon.getBounds().getHeight() <= 2) {
+
+                continue;
+            }
+
+            int pointCount = polygon.npoints;
+            //System.out.printf("Point count = %d\n",pointCount);
+            //System.out.println(polygon);
+            for (int i = 0; i != pointCount; i++) {
+                RealLocalizable localizable = new RealPoint(polygon.xpoints[i], polygon.ypoints[i]);
+
+                //System.out.println(String.format("%.0f,%.0f",localizable.getDoublePosition(0),localizable.getDoublePosition(1)));
+                roi.addVertex(i, localizable);
+
+            }
+            po.setLineWidth(2.0);
+            listOverlays.add(po);
+
+        }
+
+        return listOverlays;
+    }
+
 }

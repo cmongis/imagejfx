@@ -20,14 +20,9 @@
 package ijfx.service.batch.input;
 
 import ijfx.core.metadata.MetaData;
-import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.ui.explorer.Explorable;
-import net.imagej.Dataset;
-import net.imagej.display.DatasetView;
-import net.imagej.display.ImageDisplay;
-import org.scijava.Context;
-import org.scijava.plugin.Parameter;
+import java.util.function.Consumer;
 
 /**
  *
@@ -59,7 +54,13 @@ public class ExplorableBatchInputWrapper extends  AbstractLoaderWrapper<Explorab
                 .getStringValue();
     }
     
+    @Override
+    public void save() {
+        super.save();
+        
+    } 
     
+  
     
     
 }
