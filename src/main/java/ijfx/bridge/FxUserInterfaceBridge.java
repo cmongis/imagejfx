@@ -20,30 +20,17 @@
  */
 package ijfx.bridge;
 
-import ijfx.core.stats.IjfxStatisticService;
-import ijfx.plugins.commands.AutoContrast;
 import ijfx.service.batch.BatchService;
 import ijfx.service.ui.LoadingScreenService;
-import ijfx.ui.datadisplay.image.DefaultImageWindow;
-import ijfx.ui.datadisplay.image.ImageWindowContainer;
-import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplay;
-import ijfx.ui.datadisplay.metadataset.MetaDataSetDisplayWindow;
-import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
-import ijfx.ui.datadisplay.object.SegmentedObjectWindow;
-import ijfx.ui.datadisplay.table.TableDisplayWindow;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.datadisplay.text.TextWindow;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.stage.FileChooser;
-import mongis.utils.CallbackTask;
 import net.imagej.DatasetService;
-import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.table.TableDisplay;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
@@ -56,8 +43,6 @@ import org.scijava.ui.UIService;
 import org.scijava.ui.UserInterface;
 import org.scijava.ui.viewer.DisplayWindow;
 import mongis.utils.FXUtilities;
-import net.imagej.Dataset;
-import org.scijava.display.TextDisplay;
 
 /**
  * UI bridge between ImageJFX and ImageJ
@@ -85,6 +70,9 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     @Parameter
     private LoadingScreenService loadingScreenService;
 
+    @Parameter
+    private ActivityService activityService;
+    
     private static final Logger logger = ImageJFX.getLogger();
 
     private boolean injection = false;
@@ -187,58 +175,11 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     public void show(final Display<?> dspl) {
 
         logger.info("Showing display");
-
-        if (dspl instanceof ImageDisplay) {
-
-            displayService.setActiveDisplay(dspl);
-
-            ImageDisplay imgDisplay = (ImageDisplay) dspl;
-
-            Dataset dataset = imageDisplayService.getActiveDataset(imgDisplay);
-
-            // we always assume that an image is displayed so we create an image window
-            // in the image container (singleton pattern)
-            final DefaultImageWindow imageWindow = new DefaultImageWindow(dspl.getContext());
-
-            imageWindow.show((ImageDisplay) imgDisplay);
-
-            Platform.runLater(() -> {
-                // creating the @ImageWindow 
-                // getting the @ImageWindowContainer unique instance
-                ImageWindowContainer.getInstance().getChildren().add(imageWindow);
-            });
-
-        } else if (dspl instanceof TableDisplay) {
-
-            TableDisplayWindow window = new TableDisplayWindow(getContext());
-
-            Platform.runLater(() -> {
-
-                ImageWindowContainer.getInstance().getChildren().add(window);
-                window.show((TableDisplay) dspl);
-            });
-
-        } else if (dspl instanceof TextDisplay) {
-            Platform.runLater(() -> {
-
-                ImageWindowContainer.getInstance().getChildren().add(new TextWindow((TextDisplay) dspl));
-            });
-
-        }
-        else if (dspl instanceof SegmentedObjectDisplay) {
-            Platform.runLater(()->{
-                ImageWindowContainer.getInstance().getChildren().add(new SegmentedObjectWindow(getContext()).show((SegmentedObjectDisplay)dspl));
-            });
-        }
         
-        else if (dspl instanceof MetaDataSetDisplay) {
-            Platform.runLater(()->{
-                ImageWindowContainer.getInstance().getChildren().add(new MetaDataSetDisplayWindow(getContext()).show((MetaDataSetDisplay)dspl));
-            });
-        }
-        else {
-            logger.warning("Cannot show display type :" + dspl.getClass().getSimpleName());
-        }
+        ImageJContainer activity = activityService.getActivity(ImageJContainer.class);
+        
+        activity.display(dspl);
+        
     }
 
     @Override
