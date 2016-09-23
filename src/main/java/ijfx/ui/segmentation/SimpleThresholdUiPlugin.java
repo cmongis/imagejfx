@@ -58,7 +58,7 @@ import net.imagej.autoscale.DataRange;
 import net.imagej.display.DataView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.display.event.AxisEvent;
+import net.imagej.display.event.AxisPositionEvent;
 import net.imagej.threshold.ThresholdMethod;
 import net.imagej.threshold.ThresholdService;
 import net.imagej.widget.HistogramBundle;
@@ -154,7 +154,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     @Parameter
     private Context context;
-    
+
     ToggleGroupValue<Boolean> toggleGroupValue = new ToggleGroupValue<>();
 
     SmartNumberStringConverter converter = new SmartNumberStringConverter();
@@ -185,12 +185,13 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
         ImageDisplay old = imageDisplay;
 
         imageDisplay = display;
-
-        updatePosition(imageDisplay);
-        if (isAutothreshold()) {
-            calculateThresholdValues();
+        if (display != null) {
+            updatePosition(imageDisplay);
+            if (isAutothreshold()) {
+                calculateThresholdValues();
+            }
+            requestMaskUpdate();
         }
-        requestMaskUpdate();
     }
 
     @Override
@@ -205,7 +206,9 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     @Override
     public Workflow getWorkflow() {
-        return new WorkflowBuilder(context).addStep(SimpleThreshold.class, "value",lowValue.getValue(),"makeBinary",true,"upperCut",true).getWorkflow("Simple threshold");
+        return new WorkflowBuilder(context)
+                .addStep(SimpleThreshold.class, "value", lowValue.getValue(), "makeBinary", true, "upperCut", false)
+                .getWorkflow("Simple threshold");
     }
 
     @Override
@@ -264,7 +267,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
         //
         methodComboBox.getItems().addAll(thresholdMethods.keySet());
         methodComboBox.setValue("Default");
-        
+
         // requesting refreshing the min/max value when refreshing the method
         methodComboBox.valueProperty().addListener(this::onMethodChanged);
 
@@ -279,7 +282,9 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     }
 
     private void onAutothresholdChanged(Observable obs, Boolean oldValue, Boolean newValue) {
-        if(newValue)calculateThresholdValues();
+        if (newValue) {
+            calculateThresholdValues();
+        }
     }
 
     private void onPositionChanged(Observable obs, Double[] oldValue, Double[] position) {
@@ -291,7 +296,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
         minValue.setValue(min);
         maxValue.setValue(max);
-
+        requestMaskUpdate();
     }
 
     private void init() {
@@ -323,7 +328,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     }
 
     @EventHandler
-    public void onAxisEvent(AxisEvent event) {
+    public void onAxisEvent(AxisPositionEvent event) {
         if (event.getDisplay() == imageDisplay) {
             updatePosition(imageDisplay);
         }
@@ -370,7 +375,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     private <T extends RealType<T>> void calculateThresholdValues() {
 
         logger.info("Calculating the threshold values");
-        
+
         IntervalView<T> planeView = getAccessInterval();
 
         String methodStr = methodComboBox.getValue() == null ? "Default" : methodComboBox.getValue();
