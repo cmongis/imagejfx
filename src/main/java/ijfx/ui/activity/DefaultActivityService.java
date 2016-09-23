@@ -110,7 +110,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     }
     
     @Override
-    public Activity getActivity(Class<? extends Activity> activityClass) {
+    public <T extends Activity> T getActivity(Class<T> activityClass) {
         if (activityClass == null) {
             logger.severe("Passing NULL as activity parameter !");
             return null;
@@ -135,7 +135,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
         } else {
             System.out.println("it exists !");
         }
-        return activityMap.get(activityClass.getName());
+        return (T) activityMap.get(activityClass.getName());
     }
 
     @Override
