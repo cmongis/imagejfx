@@ -92,10 +92,10 @@ public class SimpleThreshold extends ContextCommand {
             cursor.fwd();
             randomAccess.setPosition(cursor);
             pixelValue = cursor.get().getRealDouble();
-            if (upperCut) {
-                randomAccess.get().set(value > pixelValue);
+            if (!upperCut) {
+                randomAccess.get().set(pixelValue >= value);
             } else {
-                randomAccess.get().set(value < pixelValue);
+                randomAccess.get().set(pixelValue < value);
             }
         }
 
