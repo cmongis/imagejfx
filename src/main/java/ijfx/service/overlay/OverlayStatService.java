@@ -217,7 +217,12 @@ public class OverlayStatService extends AbstractService implements ImageJService
             overlayStatistics = new RectangleOverlayStatistics(overlay, this.context());
         } else if (overlay instanceof PolygonOverlay) {
             overlay = cleanOverlay((PolygonOverlay) overlay);
+            try {
             overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());
+            }
+            catch(Exception e) {
+                overlayStatistics = OverlayShapeStatistics.EMPTY;
+            }
         }
         else {
             overlayStatistics = OverlayShapeStatistics.EMPTY;
