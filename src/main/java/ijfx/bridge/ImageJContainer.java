@@ -41,17 +41,19 @@ import org.scijava.plugin.PluginService;
 
 import mongis.utils.FXUtilities;
 import ijfx.service.uiplugin.UiPluginService;
+import ijfx.service.PluginUtilsService;
 import ijfx.ui.activity.Activity;
 import ijfx.ui.activity.ActivityService;
+import ijfx.ui.datadisplay.GenericDisplayWindow;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.plugin.panel.RecentFilePanel;
-import static java.security.AccessController.getContext;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import mongis.utils.CallbackTask;
+import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.plugins.commands.io.OpenFile;
 
@@ -99,6 +101,7 @@ public class ImageJContainer extends BorderPane implements Activity {
     @Parameter
     LoadingScreenService loadingScreenService;
     
+    
     private static final String DRAG_OVER_CSS_STYLE = "dragover";
 
     @Override
@@ -110,6 +113,9 @@ public class ImageJContainer extends BorderPane implements Activity {
     
     @Parameter
     DisplayService displayService;
+    
+    @Parameter
+    PluginUtilsService pluginUtilsService;
     
     public static final String TOP = "imagej-container-top";
 
@@ -130,6 +136,21 @@ public class ImageJContainer extends BorderPane implements Activity {
         this.setOnDragExited(this::onDragExited);
 
         
+    }
+    
+    
+    public void display(Display<?> display) {  
+        new CallbackTask<Display<?>,GenericDisplayWindow>()
+                .setInput(display)
+                .run(this::createWindow)
+                .then(ImageWindowContainer.getInstance().getChildren()::add)
+                .start();
+    }
+    
+    private GenericDisplayWindow createWindow(Display<?> display) {
+        GenericDisplayWindow genericDisplayWindow = new GenericDisplayWindow(context);
+        genericDisplayWindow.show(display);
+        return genericDisplayWindow;
     }
 
     private void updateCenter() {
