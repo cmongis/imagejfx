@@ -636,6 +636,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     
     
     private void onDisplayChanged(Observable obs, ImageDisplay oldValue, ImageDisplay newValue) {
+        if(newValue == null) return;
         colorMode.setValue(imageDisplayService.getActiveDatasetView(newValue).getColorMode());
         updateViewRangeFromModel();
         updateLabel();
