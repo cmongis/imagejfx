@@ -56,7 +56,6 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
@@ -64,6 +63,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.CallbackTask;
@@ -75,6 +75,7 @@ import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.ThresholdOverlay;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
@@ -91,7 +92,7 @@ import org.scijava.plugin.PluginService;
  * @author cyril
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "segment segmentation")
+@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "explorerActivity+segment segment+any-display-open -overlay-selected")
 public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -138,6 +139,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     Accordion accordion;
 
+    @FXML
+    private CheckBox planeSettingCheckBox;
+    
     Img<BitType> currentMask;
 
     private final Map<TitledPane, SegmentationUiPlugin> nodeMap = new HashMap<>();
@@ -152,6 +156,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             FXUtilities.injectFXML(this, "/ijfx/ui/segmentation/SegmentationUiPanel.fxml");
             setPrefWidth(200);
             accordion.expandedPaneProperty().addListener(this::onExpandedPaneChanged);
+            measureAllPlaneProperty.bind(planeSettingCheckBox.selectedProperty());
         } catch (IOException ex) {
             Logger.getLogger(SegmentationUiPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -257,7 +262,11 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     }
 
     private synchronized void updateMask(ImageDisplay imageDisplay, Img<BitType> mask) {
-
+        
+        ThresholdOverlay findOverlayOfType = overlayUtilsService.findOverlayOfType(imageDisplay, ThresholdOverlay.class);
+        
+        if(findOverlayOfType != null) overlayService.removeOverlay(findOverlayOfType);
+        
         BinaryMaskOverlay overlay = getBinaryMask(imageDisplay);
         if (overlay == null) {
             overlay = createBinaryMaskOverlay(imageDisplay, mask);
@@ -364,7 +373,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
         long[][] planes = DimensionUtils.allPossibilities(imageDisplay);
         handler.setTotal(planes.length);
-        
+        handler.setStatus("Process each plane...");
         for(long[] position : planes) {
             
             
@@ -375,19 +384,19 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             handler.increment(0.5);
             
             MetaDataSet set = new MetaDataSet();
+            set.putGeneric(MetaData.NAME,imageDisplay.getName());
             metaDataSrv.fillPositionMetaData(set,AxisUtils.getAxes(dataset),DimensionUtils.nonPlanarToPlanar(position));
             
             boolean result = new WorkflowBuilder(context)
                     .addInput(isolatedPlane)
                     .execute(getWorkflow())
-                    .thenUseDataset(mask->measurementService.countObjects(mask, getShapeFilter(),set,true))
+                    .thenUseDataset(mask->{
+                        measurementService.countObjects(mask, getShapeFilter(),set,true);
+                        
+                            })
                     .runSync(null);
             
             handler.increment(0.5);
-            
-            
-            
-            
         }
         
         
@@ -414,7 +423,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     }
 
     private boolean measureAllPlanes() {
-        if(true) return true;
         return measureAllPlaneProperty.getValue();
     }
 
