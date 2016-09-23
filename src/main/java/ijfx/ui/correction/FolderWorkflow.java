@@ -94,7 +94,7 @@ public class FolderWorkflow extends CorrectionFlow {
             CorrectionActivity.getStaticContext().inject(this);
             imageDisplayPaneLeft = new ImageDisplayPane(context);
             imageDisplayPaneRight = new ImageDisplayPane(context);
-
+            
         } catch (IOException ex) {
             Logger.getLogger(FolderWorkflow.class.getName()).log(Level.SEVERE, null, ex);
         }
