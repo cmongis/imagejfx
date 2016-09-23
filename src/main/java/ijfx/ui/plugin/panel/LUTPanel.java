@@ -573,7 +573,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         t.start();
         long[] position = new long[display.numDimensions()];
         display.localize(position);
-        position = DimensionUtils.planarToNonPlanar(position);
+        position = DimensionUtils.absoluteToPlanar(position);
         final IntervalView<T> planeView = imagePlaneSrv.planeView(imageDisplayService.getActiveDataset(), position);
 
         t.elapsed("Isolation");

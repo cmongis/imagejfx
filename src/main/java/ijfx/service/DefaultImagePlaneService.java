@@ -93,7 +93,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         Dataset virtual = openVirtualDataset(file);
         // creating an empty dataset for the copied plane
 
-        return isolatePlane(virtual, DimensionUtils.nonPlanarToPlanar(nonPlanarPosition));
+        return isolatePlane(virtual, DimensionUtils.planarToAbsolute(nonPlanarPosition));
 
     }
 
@@ -172,7 +172,7 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         t.start();
         
         if(position.length < dataset.numDimensions()) {
-            position = DimensionUtils.nonPlanarToPlanar(position);
+            position = DimensionUtils.planarToAbsolute(position);
         }
         
         Dataset emptyDataset = createEmptyPlaneDataset(dataset);

@@ -366,7 +366,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
         long[] position = new long[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
 
-        IntervalView<T> planeView = imagePlaneService.planeView(dataset, DimensionUtils.planarToNonPlanar(position));
+        IntervalView<T> planeView = imagePlaneService.planeView(dataset, DimensionUtils.absoluteToPlanar(position));
 
         return planeView;
 

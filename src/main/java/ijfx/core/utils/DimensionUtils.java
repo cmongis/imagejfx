@@ -73,35 +73,41 @@ public class DimensionUtils {
     /**
      * Transform a non planar set of dimension ([2,1,4] into a plane set of dimension [0,0,2,1,4].
      * It basically creates a new long array with 0,0 in front of.
-     * @param array
+     * @param planarPosition 
      * @return
      */
-    public static long[] nonPlanarToPlanar(long[] array) {
-      long[] result = new long[2+array.length];
+    public static long[] planarToAbsolute(long[] planarPosition) {
+      long[] result = new long[2+planarPosition.length];
       
       result[0] = 0;
       result[1] = 0;
       if(result.length == 2) return result;
-      System.arraycopy(array, 0, result, 2, array.length);
+      System.arraycopy(planarPosition, 0, result, 2, planarPosition.length);
       
       
       
       return result;
     }
     
-    public static long[] planarToNonPlanar(long[] array) {
-        if(array.length <= 2) return new long[0];
+     /**
+     * Transform an absolute position / dimension  like [0,0,2,1,4] (which includes the X/Y dimensions) into an plane position/dimension like [2,1,4]
+     * It basically takes of the two first dimension
+     * @param absolutePosition Absolute dimensions/position
+     * @return planar dimensions/position
+     */
+    public static long[] absoluteToPlanar(long[] absolutePosition) {
+        if(absolutePosition.length <= 2) return new long[0];
         else {
             
-            long[] result = new long[array.length -2];
-            System.arraycopy(array, 2, result, 0, array.length-2);
+            long[] result = new long[absolutePosition.length -2];
+            System.arraycopy(absolutePosition, 2, result, 0, absolutePosition.length-2);
             
             return result;
         }
     }
     
     public static long[][] allNonPlanarPossibilities(long[] dimensions) {
-        dimensions = planarToNonPlanar(dimensions);
+        dimensions = absoluteToPlanar(dimensions);
         NDimensionalArray ndArray = new NDimensionalArray(dimensions);
         return ndArray.getPossibilities();
     }
@@ -112,7 +118,7 @@ public class DimensionUtils {
     }
    
     public static long[][] allPossibilities(ImageDisplay imageDisplay) {
-        return allPossibilities(planarToNonPlanar(getDimensions(imageDisplay)));
+        return allPossibilities(absoluteToPlanar(getDimensions(imageDisplay)));
     }
    
     

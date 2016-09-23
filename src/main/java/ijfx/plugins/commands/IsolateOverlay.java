@@ -71,7 +71,7 @@ public class IsolateOverlay extends ContextCommand{
         
         Overlay o = overlaySelectionService.getSelectedOverlays(input).get(0);
         
-        output = overlayDrawingService.extractObject(o, source, DimensionUtils.planarToNonPlanar(position));
+        output = overlayDrawingService.extractObject(o, source, DimensionUtils.absoluteToPlanar(position));
         
         
     }

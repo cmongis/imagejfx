@@ -385,7 +385,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             
             MetaDataSet set = new MetaDataSet();
             set.putGeneric(MetaData.NAME,imageDisplay.getName());
-            metaDataSrv.fillPositionMetaData(set,AxisUtils.getAxes(dataset),DimensionUtils.nonPlanarToPlanar(position));
+            metaDataSrv.fillPositionMetaData(set,AxisUtils.getAxes(dataset),DimensionUtils.planarToAbsolute(position));
             
             boolean result = new WorkflowBuilder(context)
                     .addInput(isolatedPlane)

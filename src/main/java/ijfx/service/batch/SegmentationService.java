@@ -248,7 +248,7 @@ public class SegmentationService extends AbstractService implements IjfxService 
     
     public List<SegmentedObject> measure(List<Overlay> overlays, MetaDataSet planeMetaData, Dataset dataset) {
         // reading the planar position
-        final long[] position = DimensionUtils.nonPlanarToPlanar(DimensionUtils.readLongArray(planeMetaData.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue()));
+        final long[] position = DimensionUtils.planarToAbsolute(DimensionUtils.readLongArray(planeMetaData.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue()));
         
         Timer globalTimer = timerService.getTimer(getClass());
         
