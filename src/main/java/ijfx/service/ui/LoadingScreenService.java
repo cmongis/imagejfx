@@ -21,25 +21,22 @@
 package ijfx.service.ui;
 
 import ijfx.bridge.FxStatusBar;
-import java.util.concurrent.Future;
+import ijfx.service.IjfxService;
 import java.util.function.Consumer;
 import javafx.concurrent.Task;
-import net.imagej.ImageJService;
-import org.scijava.command.Command;
-import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
-import org.scijava.service.Service;
+import org.scijava.service.SciJavaService;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = Service.class)
-public class LoadingScreenService extends AbstractService implements ImageJService,Consumer<Task>{
+@Plugin(type = SciJavaService.class)
+public class LoadingScreenService extends AbstractService implements IjfxService,Consumer<Task>{
     
     @Parameter
     EventService eventService;
