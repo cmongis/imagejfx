@@ -20,23 +20,26 @@
 package ijfx.service;
 
 import ijfx.core.Handles;
-import ijfx.ui.datadisplay.DisplayPanePlugin;
 import ijfx.ui.main.ImageJFX;
 import java.util.logging.Level;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.plugin.PluginInfo;
 import org.scijava.plugin.PluginService;
 import org.scijava.plugin.SciJavaPlugin;
 import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = Service.class)
 public class PluginUtilsService extends AbstractService implements IjfxService {
     
     
     @Parameter
-            PluginService pluginService;
+    PluginService pluginService;
     
     
     /**
@@ -52,8 +55,7 @@ public class PluginUtilsService extends AbstractService implements IjfxService {
          return pluginService
                 .getPluginsOfType(pluginType)
                 .stream()
-                .filter(infos->infos.getPluginType().getAnnotation(Handles.class) != null)
-                .filter(infos->infos.getPluginType().getAnnotation(Handles.class).type().isAssignableFrom(handledType))
+                .filter(infos->filter(infos,handledType))
                 .findFirst()
                 .map(pluginService::createInstance)
                 .orElse(null);
@@ -62,6 +64,12 @@ public class PluginUtilsService extends AbstractService implements IjfxService {
             ImageJFX.getLogger().log(Level.SEVERE,String.format("Error when creating plugin of %s handling %s",pluginType.getSimpleName(),handledType.getSimpleName()),e);
         }
         return null;
+    }
+    
+    private <T extends SciJavaPlugin,H> boolean filter(PluginInfo<T> infos, Class<H> handledType) {
+        Handles annotation = infos.getPluginClass().getAnnotation(Handles.class);
+        
+        return annotation != null && annotation.type().isAssignableFrom(handledType);
     }
     
 }
