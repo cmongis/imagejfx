@@ -23,6 +23,8 @@ import ijfx.plugins.commands.measures.SaveMetaDataSetAsCsv;
 import ijfx.ui.datadisplay.object.*;
 import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.core.Handles;
+import ijfx.ui.datadisplay.DisplayPanePlugin;
 import ijfx.ui.explorer.MetaDataSetExplorerWrapper;
 import ijfx.ui.explorer.view.SegmentedObjectExplorerWrapper;
 import ijfx.ui.explorer.view.TableViewView;
@@ -34,10 +36,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import mongis.utils.FXUtilities;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
@@ -45,18 +50,24 @@ import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 import org.scijava.ui.UIService;
 
 /**
  *
  * @author cyril
  */
-public class MetaDataSetDisplayPane extends BorderPane {
+@Plugin(type = DisplayPanePlugin.class)
+@Handles(type=MetaDataSetDisplay.class)
+public class MetaDataSetDisplayPane extends BorderPane implements DisplayPanePlugin<MetaDataSetDisplay> {
 
     MetaDataSetDisplay display;
 
     TableViewView view = new TableViewView();
 
+    @Parameter
+    Context context;
+    
     @Parameter
     OverlayUtilsService overlayUtilsService;
 
@@ -70,7 +81,7 @@ public class MetaDataSetDisplayPane extends BorderPane {
     UIService uiService;
     
     @Parameter
-            LoadingScreenService loadingScreenService;
+    LoadingScreenService loadingScreenService;
     
     Logger logger = ImageJFX.getLogger();
 
@@ -83,17 +94,19 @@ public class MetaDataSetDisplayPane extends BorderPane {
     @FXML
     AreaChart<Double,Double> areaChart;
     
+    StringProperty titleProperty = new SimpleStringProperty();
     
     ChartUpdater chartUpdater;
     
-    public MetaDataSetDisplayPane(Context context) {
+    
+    public MetaDataSetDisplayPane() {
         try {
             logger.info("Creating display view");
             
             FXUtilities.injectFXML(this);
 
-            context.inject(view);
-            context.inject(this);
+           
+       
             tableBorderPane.setCenter(view.getNode());
             
             chartUpdater = new ChartUpdater(areaChart);
@@ -106,12 +119,14 @@ public class MetaDataSetDisplayPane extends BorderPane {
     }
 
     public void display(MetaDataSetDisplay display) {
+        
+         context.inject(view);
         this.display = display;
         update();
 
     }
 
-    public void update() {
+    public synchronized void update() {
         logger.info("Updating current display");
         List<MetaDataSetExplorerWrapper> collect = display
                 .stream()
@@ -163,6 +178,23 @@ public class MetaDataSetDisplayPane extends BorderPane {
     @FXML
     public void saveAsCsv() {
         commandService.run(SaveMetaDataSetAsCsv.class, true);
+    }
+
+
+
+    @Override
+    public void dispose() {
+        display.clear();
+    }
+
+    @Override
+    public StringProperty titleProperty() {
+        return titleProperty();
+    }
+
+    @Override
+    public Pane getPane() {
+        return this;
     }
     
    

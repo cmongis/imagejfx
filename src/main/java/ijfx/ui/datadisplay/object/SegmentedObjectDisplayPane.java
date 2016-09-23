@@ -19,12 +19,14 @@
  */
 package ijfx.ui.datadisplay.object;
 
+import ijfx.core.Handles;
 import ijfx.plugins.commands.measures.SaveAsCsv;
 import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.ui.datadisplay.DisplayPanePlugin;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.view.SegmentedObjectExplorerWrapper;
 import ijfx.ui.explorer.view.TableViewView;
@@ -38,10 +40,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.display.ImageDisplayService;
@@ -52,12 +57,15 @@ import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-public class SegmentedObjectDisplayPane extends BorderPane {
+@Plugin(type = DisplayPanePlugin.class)
+@Handles(type = SegmentedObjectDisplay.class)
+public class SegmentedObjectDisplayPane extends BorderPane implements DisplayPanePlugin<SegmentedObjectDisplay> {
 
     SegmentedObjectDisplay display;
 
@@ -96,6 +104,8 @@ public class SegmentedObjectDisplayPane extends BorderPane {
     OverlayStatService overlayStatsService;
     
     ChartUpdater chartUpdater;
+    
+    StringProperty titleProperty = new SimpleStringProperty();
     
     public SegmentedObjectDisplayPane(Context context) {
         try {
@@ -213,5 +223,21 @@ public class SegmentedObjectDisplayPane extends BorderPane {
                 .setName("Updating chart")
                 .start();
         
+    }
+
+    @Override
+    public void dispose() {
+        display.clear();
+        display.close();
+    }
+
+    @Override
+    public StringProperty titleProperty() {
+        return titleProperty();
+    }
+
+    @Override
+    public Pane getPane() {
+        return this;
     }
 }

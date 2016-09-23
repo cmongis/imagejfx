@@ -21,14 +21,17 @@ package ijfx.ui.datadisplay.metadataset;
 
 import ijfx.core.metadata.MetaDataSet;
 import org.scijava.display.AbstractDisplay;
+import org.scijava.display.Display;
 import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
+@Plugin(type = Display.class)
 public class DefaultMetaDataDisplay extends AbstractDisplay<MetaDataSet> implements MetaDataSetDisplay{
     
     @Parameter

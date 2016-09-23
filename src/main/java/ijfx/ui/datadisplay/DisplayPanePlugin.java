@@ -17,40 +17,20 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.datadisplay.metadataset;
+package ijfx.ui.datadisplay;
 
-import ijfx.ui.datadisplay.table.AbstractDisplayWindow;
+import javafx.beans.property.StringProperty;
 import javafx.scene.layout.Pane;
-import org.scijava.Context;
-import org.scijava.plugin.Parameter;
+import org.scijava.display.Display;
+import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
  * @author cyril
  */
-public class MetaDataSetDisplayWindow extends AbstractDisplayWindow<MetaDataSetDisplay>{
-
-    MetaDataSetDisplayPane pane;
-    
-    @Parameter
-    Context context;
-
-    public MetaDataSetDisplayWindow(Context context) {
-        super(context);
-    }
-    
-    @Override
-    protected void display(MetaDataSetDisplay display) {
-        pane.display(display);
-        setTitle(display.getName());
-    }
-
-    @Override
-    protected Pane init() {
-        if(pane == null) {
-            pane = new MetaDataSetDisplayPane(context);
-        }
-        return pane;
-    }
-    
+public interface DisplayPanePlugin<T extends Display> extends SciJavaPlugin {
+    void display(T display);
+    void dispose();
+    StringProperty titleProperty();
+    Pane getPane();
 }

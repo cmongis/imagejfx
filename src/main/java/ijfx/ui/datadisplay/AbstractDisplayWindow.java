@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.datadisplay.table;
+package ijfx.ui.datadisplay;
 
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -37,9 +37,9 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window {
+public abstract class AbstractDisplayWindow extends Window {
 
-    private T display;
+    private Display<?> display;
 
     @Parameter
     EventService eventService;
@@ -54,7 +54,7 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
     public AbstractDisplayWindow(Context context) {
         super();
         context.inject(this);
-        setContentPane(init());
+       
           
         for (EventType<? extends MouseEvent> t : new EventType[]{MouseEvent.MOUSE_CLICKED, MouseEvent.DRAG_DETECTED, MouseEvent.MOUSE_PRESSED}) {
             addEventHandler(t, this::putInFront);
@@ -77,19 +77,17 @@ public abstract class AbstractDisplayWindow<T extends Display<?>> extends Window
         
     }
 
-    abstract protected void display(T display);
+    abstract protected void display(Display<?> display);
 
-    abstract protected Pane init();
-
-    public T getDisplay() {
+    public Display<?> getDisplay() {
         return display;
     }
 
-    public AbstractDisplayWindow<T> show(T display) {
+    public AbstractDisplayWindow show(Display<?> display) {
         this.display = display;
      
         display(display);
-         setPrefWidth(500);
+        setPrefWidth(500);
         setPrefHeight(500);
         return this;
     }

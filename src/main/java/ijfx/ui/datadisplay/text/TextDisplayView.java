@@ -20,21 +20,29 @@
  */
 package ijfx.ui.datadisplay.text;
 
+import ijfx.core.Handles;
+import ijfx.ui.datadisplay.DisplayPanePlugin;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import mongis.utils.FXUtilities;
 import org.scijava.display.TextDisplay;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public class TextDisplayView extends BorderPane {
+@Plugin(type = DisplayPanePlugin.class)
+@Handles(type = TextDisplay.class)
+public class TextDisplayView extends BorderPane  implements DisplayPanePlugin<TextDisplay>{
 
     @FXML
     Text text;
@@ -44,6 +52,7 @@ public class TextDisplayView extends BorderPane {
 
     final Logger logger = ImageJFX.getLogger();
 
+    StringProperty titleProperty = new SimpleStringProperty();
 
     public TextDisplayView() {
     
@@ -63,7 +72,26 @@ public class TextDisplayView extends BorderPane {
 
     TextDisplayView(TextDisplay textDisplay) {
         this();
-        this.textDisplay = textDisplay;
+       
+    }
+
+    @Override
+    public void display(TextDisplay display) {
+         this.textDisplay = textDisplay;
         text.setText(this.textDisplay.get(0));
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    @Override
+    public StringProperty titleProperty() {
+        return titleProperty();
+    }
+
+    @Override
+    public Pane getPane() {
+        return this;
     }
 }

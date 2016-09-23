@@ -28,9 +28,11 @@ import ijfx.service.overlay.OverlaySelectedEvent;
 import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.core.Handles;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.canvas.utils.ViewPort;
+import ijfx.ui.datadisplay.DisplayPanePlugin;
 import ijfx.ui.datadisplay.image.overlay.DefaultOverlayViewConfiguration;
 import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
@@ -38,10 +40,10 @@ import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.FxToolService;
+import ijfx.ui.tool.ToolChangeEvent;
 import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -77,6 +79,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import mongis.utils.CallbackTask;
@@ -97,8 +100,6 @@ import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.Overlay;
 import net.imglib2.display.screenimage.awt.ARGBScreenImage;
-import net.imglib2.img.array.ArrayCursor;
-import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
 import org.scijava.Context;
@@ -109,6 +110,7 @@ import org.scijava.event.EventService;
 import org.scijava.event.SciJavaEvent;
 import org.scijava.module.Module;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  * This render an ImageDisplay as a JavaFX object.
@@ -126,7 +128,9 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public class ImageDisplayPane extends AnchorPane {
+@Plugin(type = DisplayPanePlugin.class)
+@Handles(type = ImageDisplay.class)
+public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<ImageDisplay>{
 
     @FXML
     private StackPane stackPane;
@@ -235,12 +239,11 @@ public class ImageDisplayPane extends AnchorPane {
 
     private AxisConfiguration axisConfig;
 
-    public ImageDisplayPane(Context context) throws IOException {
+    public ImageDisplayPane() throws IOException {
 
         FXUtilities.injectFXML(this);
 
-        context.inject(this);
-
+  
         canvas = new FxImageCanvas();
 
         stackPane.getChildren().add(canvas);
@@ -256,14 +259,20 @@ public class ImageDisplayPane extends AnchorPane {
         canvas.widthProperty().bind(stackPane.widthProperty());
         canvas.heightProperty().bind(stackPane.heightProperty());
 
+        /*
         this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
             if (e.getButton() == MouseButton.PRIMARY && this.getImageDisplay() != null) {
                 displayService.setActiveDisplay(this.getImageDisplay());
             }
-        });
+        });*/
     }
 
+    public ImageDisplayPane(Context context) throws IOException {
+        this();
+        context.inject(this);
+    }
+    
     public void display(ImageDisplay display) {
         imageDisplay = (ImageDisplay) display;
 
@@ -766,7 +775,15 @@ public class ImageDisplayPane extends AnchorPane {
     protected void onAnyEvent(SciJavaEvent event) {
         logService.info(event.getClass().getSimpleName());
     }
+    
+    @EventHandler
+    protected void onToolChangedEvent(ToolChangeEvent event) {
+        setCurrentTool(event.getTool());
+    }
 
+    @Override
+    public Pane getPane() { return this; }
+    
     protected OverlayDrawer getDrawer(Overlay overlay) {
         //logger.info("Searching a drawer for "+overlay.getClass().getSimpleName());
         if (drawerMap.get(overlay.getClass()) == null) {

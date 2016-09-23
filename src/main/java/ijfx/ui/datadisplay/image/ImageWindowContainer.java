@@ -46,10 +46,8 @@ public class ImageWindowContainer extends AnchorPane {
                         .filter(node -> node instanceof Window)
                         .map(node -> (Window) node)
                         .forEach(window -> {
-
                             double move = getChildren().size() * 15;
                             window.relocate(move, move);
-
                         });
             };
 

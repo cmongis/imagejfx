@@ -20,6 +20,8 @@
  */
 package ijfx.ui.datadisplay.table;
 
+import ijfx.core.Handles;
+import ijfx.ui.datadisplay.DisplayPanePlugin;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +33,8 @@ import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,16 +42,20 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import net.imagej.table.Table;
 import net.imagej.table.TableDisplay;
 import mongis.utils.FXUtilities;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public class TableDisplayView extends BorderPane {
+@Plugin(type = DisplayPanePlugin.class)
+@Handles(type = TableDisplay.class)
+public class TableDisplayView extends BorderPane implements DisplayPanePlugin<TableDisplay> {
 
     @FXML
     TableView tableView;
@@ -58,6 +66,8 @@ public class TableDisplayView extends BorderPane {
 
     final Logger logger = ImageJFX.getLogger();
 
+    StringProperty titleProperty = new SimpleStringProperty();
+    
     public TableDisplayView() {
 
         logger.info("Injecting FXML");
@@ -92,6 +102,22 @@ public class TableDisplayView extends BorderPane {
 
     public TableDisplay getTableDisplay() {
         return tableDisplay;
+    }
+
+    @Override
+    public void dispose() {
+        tableDisplay.clear();
+        tableDisplay.close();
+    }
+
+    @Override
+    public StringProperty titleProperty() {
+        return titleProperty();
+    }
+
+    @Override
+    public Pane getPane() {
+        return this;
     }
 
     public class FlexibleColumnModel {
