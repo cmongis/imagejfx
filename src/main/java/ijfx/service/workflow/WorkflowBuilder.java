@@ -44,156 +44,138 @@ import org.scijava.plugin.Parameter;
  * @author cyril
  */
 public class WorkflowBuilder {
-    
+
     @Parameter
     Context context;
-    
-    
+
     @Parameter
     BatchService batchService;
-    
+
     @Parameter
-   LoadingScreenService loadingScreenService;
-    
-    List<BatchInputBuilder> inputs =new ArrayList<>();
-    
+    LoadingScreenService loadingScreenService;
+
+    List<BatchInputBuilder> inputs = new ArrayList<>();
+
     List<WorkflowStep> steps = new ArrayList<>();
-    
+
     public WorkflowBuilder(Context context) {
         context.inject(this);
     }
-    
-    
+
     public WorkflowBuilder addInput(Collection<? extends BatchSingleInput> inputs) {
         inputs.forEach(this::addInput);
         return this;
     }
-    
+
     public WorkflowBuilder addInputs(Collection<? extends Explorable> explorableList) {
         explorableList.forEach(this::addInput);
         return this;
     }
-    
+
     public WorkflowBuilder addInput(BatchSingleInput input) {
-        
+
         inputs.add(new BatchInputBuilder(context).wrap(input));
-        
+
         return this;
     }
-    
+
     public WorkflowBuilder addInput(Dataset dataset) {
         inputs.add(new BatchInputBuilder(context).from(dataset));
         return this;
     }
-    
+
     public WorkflowBuilder addInput(Explorable exp) {
         inputs.add(new BatchInputBuilder(context).from(exp));
         return this;
     }
-    
+
     public WorkflowBuilder addInput(ImageDisplay imageDisplay) {
         inputs.add(new BatchInputBuilder(context).from(imageDisplay));
         return this;
     }
-   
-    
-    public WorkflowBuilder addStep(Class<?> moduleClass,Object... params) {
-        
-        
-        
+
+    public WorkflowBuilder addStep(Class<?> moduleClass, Object... params) {
+
         DefaultWorkflowStep step = new DefaultWorkflowStep(moduleClass.getName());
-        
+
         context.inject(step);
-        
-        for(int i = 0; i!= params.length;i+=2) {
-            step.setParameter(params[i].toString(), params[i+1]);
+
+        for (int i = 0; i != params.length; i += 2) {
+            step.setParameter(params[i].toString(), params[i + 1]);
         }
-        
+
         steps.add(step);
-        
+
         return this;
-        
+
     }
-    
+
     public WorkflowBuilder then(Consumer<BatchSingleInput> consumer) {
-        
-        remapInputs(builder->builder.onFinished(consumer));
+
+        remapInputs(builder -> builder.onFinished(consumer));
         return this;
     }
-    
+
     public WorkflowBuilder thenUseDataset(Consumer<Dataset> consumer) {
-        then(batchInput->consumer.accept(batchInput.getDataset()));
+        then(batchInput -> consumer.accept(batchInput.getDataset()));
         return this;
     }
-    
-    public <OUTPUT> CallbackTask<BatchSingleInput,OUTPUT> thenMapToTask(Class<? extends OUTPUT> output) {
-        CallbackTask<BatchSingleInput,OUTPUT> task = new CallbackTask<>();
+
+    public <OUTPUT> CallbackTask<BatchSingleInput, OUTPUT> thenMapToTask(Class<? extends OUTPUT> output) {
+        CallbackTask<BatchSingleInput, OUTPUT> task = new CallbackTask<>();
         then(task);
         return task;
     }
-    
-    protected void remapInputs(Function<? super BatchInputBuilder,? extends BatchInputBuilder> remapper) {
+
+    protected void remapInputs(Function<? super BatchInputBuilder, ? extends BatchInputBuilder> remapper) {
         inputs = inputs.stream().map(remapper).collect(Collectors.toList());
     }
-    
+
     public WorkflowBuilder saveTo(File directory) {
-        
-        remapInputs(builder->builder.saveIn(directory));
+
+        remapInputs(builder -> builder.saveIn(directory));
         return this;
-        
-        
+
     }
-    
+
     public WorkflowBuilder execute(Collection<WorkflowStep> stepList) {
         steps.addAll(stepList);
         return this;
     }
+
     public WorkflowBuilder execute(Workflow workflow) {
         steps.addAll(workflow.getStepList());
         return this;
     }
-    
-    
+
     public Workflow getWorkflow(String name) {
-        DefaultWorkflow workflow =  new DefaultWorkflow(steps);
+        DefaultWorkflow workflow = new DefaultWorkflow(steps);
         workflow.setName("No name");
         return workflow;
     }
-    
-    
+
     private List<BatchSingleInput> getInputs() {
-        return inputs.stream().map(builder->builder.getInput()).collect(Collectors.toList());
+        return inputs.stream().map(builder -> builder.getInput()).collect(Collectors.toList());
     }
-    
-    public Task<Boolean> start()  {
-        
+
+    public Task<Boolean> start() {
+
         DefaultWorkflow workflow = new DefaultWorkflow(steps);
-        
-        return new CallbackTask<List<BatchSingleInput>,Boolean>()
+
+        return new CallbackTask<List<BatchSingleInput>, Boolean>()
                 .setInput(getInputs())
-                .run((progress,input)->batchService.applyWorkflow(progress, input, workflow))
+                .run((progress, input) -> batchService.applyWorkflow(progress, input, workflow))
                 .start();
     }
-    
+
     public void startAndShow() {
-        loadingScreenService.frontEndTask(start(),true);
+        loadingScreenService.frontEndTask(start(), true);
     }
-   
+
     public boolean runSync(ProgressHandler handler) {
         handler = ProgressHandler.check(handler);
-        
+
         return batchService.applyWorkflow(handler, getInputs(), new DefaultWorkflow(steps));
-        
+
     }
 }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
