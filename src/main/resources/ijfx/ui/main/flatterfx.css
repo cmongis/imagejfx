@@ -10,6 +10,7 @@
     -bg-dark:derive(-dark,-10%);
 
     -bg-darker:derive(-dark,-20%);
+    -darker:-bg-darker;
     -bg-light:derive(-dark,20%);
 
     -txt-normal:derive(-dark,110%);
@@ -1128,7 +1129,20 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .titled-pane > .title > .arrow-button .arrow {
     -fx-background-color:-txt-highlight;
+    -fx-effect:none;
 }
+
+.segmentation-accordion .titled-pane:expanded > .title {
+    -fx-background-color:derive(-flatter-warning,-10%);
+}
+.segmentation-accordion .titled-pane > .title {
+
+    -fx-padding:10px;
+}
+.segmentation-accordion {
+    
+}
+
 
 .range-slider .thumb {
     -fx-background-color:-dark;
