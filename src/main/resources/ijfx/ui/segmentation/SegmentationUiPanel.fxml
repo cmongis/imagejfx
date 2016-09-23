@@ -18,7 +18,7 @@
 
 <fx:root prefWidth="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <Accordion fx:id="accordion" prefHeight="250.0" BorderPane.alignment="CENTER" />
+      <Accordion fx:id="accordion" prefHeight="250.0" styleClass="segmentation-accordion" BorderPane.alignment="CENTER" />
    </center>
    <bottom>
       <VBox BorderPane.alignment="CENTER">
@@ -30,7 +30,7 @@
                   <String fx:value="warning" />
                </styleClass>
             </Label>
-            <CheckBox mnemonicParsing="false" text="only this plane" />
+            <CheckBox fx:id="planeSettingCheckBox" mnemonicParsing="false" text="only this plane" />
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#analyseParticles" text="Analyse particle">
                <graphic>
                   <FontAwesomeIconView glyphName="BAR_CHART" />
