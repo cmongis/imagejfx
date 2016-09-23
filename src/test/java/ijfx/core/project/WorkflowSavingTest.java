@@ -27,13 +27,13 @@ import ijfx.plugins.commands.ExtractSlices;
 import ijfx.plugins.projection.MedianProjection;
 import ijfx.plugins.projection.Projection;
 import ijfx.service.batch.BatchService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.service.workflow.WorkflowIOService;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import net.imagej.axis.Axes;
 import net.imagej.plugins.commands.imglib.GaussianBlur;
 import net.imagej.threshold.ThresholdService;
 import org.junit.Assert;
@@ -56,7 +56,7 @@ public class WorkflowSavingTest extends BaseImageJTest {
     @Override
     protected Class[] getService() {
         return new Class[]{
-            ThresholdService.class, WorkflowIOService.class, BatchService.class,};
+            ThresholdService.class, WorkflowIOService.class, BatchService.class,LoadingScreenService.class};
     }
 
     @Test
