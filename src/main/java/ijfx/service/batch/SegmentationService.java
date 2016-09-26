@@ -39,9 +39,12 @@ import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.overlay.io.OverlayIOService;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.service.workflow.Workflow;
 import ijfx.ui.IjfxEvent;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorationMode;
 import ijfx.ui.explorer.ExplorerService;
+import ijfx.ui.explorer.FolderManagerService;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +66,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -100,13 +104,22 @@ public class SegmentationService extends AbstractService implements IjfxService 
 
     @Parameter
     ImageRecordService imageRecordService;
-    
+
     @Parameter
     OverlayUtilsService overlayUtilsService;
-    
+
     @Parameter
     TimerService timerService;
-    
+
+    @Parameter
+    BatchService batchService;
+
+    @Parameter
+    UIService uiService;
+
+    @Parameter
+    FolderManagerService folderManagerService;
+
     public enum Source {
         EXPLORER_SELECTED, EXPLORER_ALL, IMAGEJ
     }
@@ -188,7 +201,7 @@ public class SegmentationService extends AbstractService implements IjfxService 
 
     public Consumer<BatchSingleInput> addObjectToList(List<SegmentedObject> objectList) {
         return input -> {
-            Overlay[] overlay = BinaryToOverlay.transform(getContext(), input.getDataset(), false);
+            Overlay[] overlay = BinaryToOverlay.transform(getContext(), input.getDataset(), true);
             File file = new File(input.getSourceFile());
             List<SegmentedObject> measure = measure(new SilentProgressHandler(), Arrays.asList(overlay), file);
             objectList.addAll(measure);
@@ -196,7 +209,7 @@ public class SegmentationService extends AbstractService implements IjfxService 
     }
 
     public void saveOverlaysNextToSourceFile(BatchSingleInput input) {
-        Overlay[] overlay = BinaryToOverlay.transform(getContext(), input.getDataset(), false);
+        Overlay[] overlay = BinaryToOverlay.transform(getContext(), input.getDataset(), true);
 
         File file = new File(input.getSourceFile());
 
@@ -221,16 +234,15 @@ public class SegmentationService extends AbstractService implements IjfxService 
     @Parameter
     LoadingScreenService loadingService;
 
-    
     public List<Overlay> segmentAndAddToDisplay(Dataset mask, ImageDisplay inputDisplay, boolean objectsAreWhite) {
-        
+
         Timer timer = timerService.getTimer(getClass());
-        
-          timer.start();
+
+        timer.start();
         overlayUtilsService.removeAllOverlay(inputDisplay);
         timer.elapsed("remove all overlay");
-      
-        Overlay[] overlay = BinaryToOverlay.transform(getContext(), (RandomAccessibleInterval)mask.getImgPlus(), objectsAreWhite);
+
+        Overlay[] overlay = BinaryToOverlay.transform(getContext(), (RandomAccessibleInterval) mask.getImgPlus(), objectsAreWhite);
         timer.elapsed("BinaryToOverlay.transform(...)");
         // giving a random color to each overlay
         overlayStatsService.setRandomColor(Arrays.asList(overlay));
@@ -238,20 +250,18 @@ public class SegmentationService extends AbstractService implements IjfxService 
         // deleting the overlay owned previously by the input
         inputDisplay.addAll(Stream.of(overlay).parallel().map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
         timer.elapsed("inputDisplay.addAll()");
-        Stream.of(overlay).parallel().map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
+        Stream.of(overlay).parallel().map(o -> new OverlayCreatedEvent(o)).forEach(eventService::publish);
         timer.elapsed("inputDisplay.update()");
-        
-        
-        
+
         return Lists.newArrayList(overlay);
     }
-    
+
     public List<SegmentedObject> measure(List<Overlay> overlays, MetaDataSet planeMetaData, Dataset dataset) {
         // reading the planar position
         final long[] position = DimensionUtils.planarToAbsolute(DimensionUtils.readLongArray(planeMetaData.get(MetaData.PLANE_NON_PLANAR_POSITION).getStringValue()));
-        
+
         Timer globalTimer = timerService.getTimer(getClass());
-        
+
         globalTimer.start();
         List<SegmentedObject> segmentedObjectList = overlays
                 .stream()
@@ -264,15 +274,14 @@ public class SegmentationService extends AbstractService implements IjfxService 
                         segmentedObject.getMetaDataSet().merge(planeMetaData);
                         timer.elapsed("segmentedObject.merge()");
                         return segmentedObject;
-                    }
-                    catch(Exception e) {
+                    } catch (Exception e) {
                         loggerService.warn(e);
                     }
                     return null;
                 })
-                .filter(o->o!=null)
+                .filter(o -> o != null)
                 .collect(Collectors.toList());
-        
+
         globalTimer.elapsed("measure(List<Overlay>)");
         return segmentedObjectList;
     }
@@ -291,13 +300,38 @@ public class SegmentationService extends AbstractService implements IjfxService 
                         return measure(overlays, set, dataset);
                     })
                     .flatMap(obj -> obj.stream())
-                    .filter(obj->obj!=null)
+                    .filter(obj -> obj != null)
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
             loggerService.error(e);
             return new ArrayList<>();
         }
+    }
+
+    public Boolean measureFromExplorer(ProgressHandler progress, Workflow workflow) {
+
+        final List<SegmentedObject> objectFound = new ArrayList<>();
+        List<BatchSingleInput> input = explorerService.getSelectedItems()
+                .stream()
+                .map(explorable -> new BatchInputBuilder(getContext())
+                        .from(explorable)
+                        .onFinished(addObjectToList(objectFound))
+                        .getInput()
+                )
+                .collect(Collectors.toList());
+
+        boolean result = batchService.applyWorkflow(progress, input, workflow);
+        if (result == true) {
+            uiService.showDialog(String.format("%d objects where segmented", objectFound.size()), "Segmentation over");
+            folderManagerService.getCurrentFolder().addObjects(objectFound);
+            folderManagerService.setExplorationMode(ExplorationMode.OBJECT);
+            return result;
+        } else {
+            uiService.showDialog(String.format("Error when segmenting the objects"));
+            return false;
+        }
+
     }
 
 }

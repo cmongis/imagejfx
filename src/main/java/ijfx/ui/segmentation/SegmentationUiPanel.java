@@ -19,10 +19,13 @@
  */
 package ijfx.ui.segmentation;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.bridge.ImageJContainer;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.core.utils.DimensionUtils;
 import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.ImagePlaneService;
@@ -32,6 +35,8 @@ import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.batch.input.AbstractLoaderWrapper;
 import ijfx.service.batch.input.ExplorableBatchInputWrapper;
 import ijfx.service.overlay.OverlayShapeStatistics;
+import ijfx.service.overlay.OverlayStatService;
+import ijfx.service.overlay.OverlayStatistics;
 
 import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.LoadingScreenService;
@@ -49,10 +54,12 @@ import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.main.Localization;
 import ijfx.ui.utils.ImageDisplayProperty;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,7 +72,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.CallbackTask;
@@ -77,6 +85,7 @@ import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.overlay.Overlay;
+import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.ThresholdOverlay;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -90,6 +99,20 @@ import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
 
 /**
+ *
+ * Menu aimed to ease segmentation while offering segmentation options during
+ * explorer mode and normal mode.
+ *
+ * Possibilities in Image mode: - Particle analysis of the current plane -
+ * Particle analysis of the all the plane using the same mask - Particle
+ * analysis of all the plane with segmentation of each - Object counting of the
+ * current plane - Object counting of all the planes
+ *
+ * Possibilities in the Explorer Mode - Particles analysis of the selected item
+ * - Segmentation of the selected item and use it to measure all the plane of
+ * all the source - Count object of the selected items
+ *
+ *
  *
  * @author cyril
  */
@@ -138,11 +161,17 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @Parameter
     private ImageDisplayService imageDisplayService;
 
+    @Parameter
+    private OverlayStatService overlayStatService;
+
     @FXML
     Accordion accordion;
 
     @FXML
-    private CheckBox planeSettingCheckBox;
+    private SplitMenuButton analyseParticlesButton;
+
+    @FXML
+    private SplitMenuButton countObjectsButton;
 
     Img<BitType> currentMask;
 
@@ -158,13 +187,19 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private SilentImageDisplay fakeDisplay;
 
+    private static final String MEASURE_CURRENT_PLANE = "...only this plane using...";
+    private static final String ALL_PLANE_ONE_MASK = "... for all planes using this mask";
+
     public SegmentationUiPanel() {
 
         try {
             FXUtilities.injectFXML(this, "/ijfx/ui/segmentation/SegmentationUiPanel.fxml");
             setPrefWidth(200);
             accordion.expandedPaneProperty().addListener(this::onExpandedPaneChanged);
-            measureAllPlaneProperty.bind(planeSettingCheckBox.selectedProperty());
+            //measureAllPlaneProperty.bind(planeSettingCheckBox.selectedProperty());
+
+            addAction(FontAwesomeIcon.COPY, ALL_PLANE_ONE_MASK, this::analyseParticlesFromAllPlanes, analyseParticlesButton);
+
         } catch (IOException ex) {
             Logger.getLogger(SegmentationUiPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -179,6 +214,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         return isExplorerProperty.getValue();
     }
 
+    /*
+        Init functions
+     */
     @Override
     public UiPlugin init() {
 
@@ -200,18 +238,40 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         isExplorerProperty.addListener(this::onExplorerPropertyChanged);
 
+        onExplorerPropertyChanged(isExplorerProperty, Boolean.FALSE, isExplorer());
+
+        //planeSettingCheckBox.textProperty().bind(Bindings.createStringBinding(this::getCheckBoxText, planeSettingCheckBox.selectedProperty()));
         return this;
     }
 
-   
+    private void addAction(FontAwesomeIcon icon, String label, Consumer<ProgressHandler> action, SplitMenuButton menuButton) {
 
+        MenuItem item = new MenuItem(label, new FontAwesomeIconView(icon));
+        item.setOnAction(
+                event -> new CallbackTask<Void, Void>()
+                .run((progress, voiid) -> {
+                    action.accept(progress);
+                    return null;
+                })
+                .submit(loadingScreenService)
+                .start()
+        );
+
+        menuButton.getItems().add(item);
+
+    }
+
+    /*
+     *  Getters 
+     * 
+     */
     private void onExplorerPropertyChanged(Observable obs, Boolean oldValue, Boolean isExplorer) {
 
         if (isExplorer) {
             imageDisplayProperty.unbind();
             imageDisplayProperty.setValue(null);
         } else {
-            imageDisplayProperty.bind(imageDisplayProperty);
+            imageDisplayProperty.bind(imageJCurrentDisplay);
         }
 
     }
@@ -221,6 +281,11 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     }
 
     private void onExpandedPaneChanged(Observable obs, TitledPane oldPane, TitledPane newPane) {
+
+        if (newPane == null) {
+            return;
+        }
+        nodeMap.get(newPane).setImageDisplay(null);
         nodeMap.get(newPane).setImageDisplay(getCurrentImageDisplay());
     }
 
@@ -237,6 +302,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     }
 
     private ImageDisplay getCurrentImageDisplay() {
+
         return imageDisplayProperty.getValue();
     }
 
@@ -263,10 +329,10 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     }
 
     // 
-    private void onImageDisplayChanged(Observable obs, ImageDisplay oldValue, ImageDisplay newValue) {
-
+    private void onImageDisplayChanged(Observable obs) {
+        ImageDisplay display = imageDisplayProperty.getValue();
         if (getActivePlugin() != null) {
-            getActivePlugin().setImageDisplay(newValue);
+            getActivePlugin().setImageDisplay(display);
         }
 
     }
@@ -319,35 +385,110 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     public void analyseParticles() {
 
+        if (isExplorer()) {
+            new CallbackTask<Workflow, Boolean>().
+                    setInput(getWorkflow())
+                    .run(segmentationService::measureFromExplorer)
+                    .submit(loadingScreenService)
+                    .start();
+        } else {
+
+        }
+
         new CallbackTask<Object, Object>()
-                .run((progress, status) -> {
-
-                    progress.setStatus("Transforming mask...");
-                    progress.setProgress(1, 3);
-                    List<Overlay> overlays = measurementService
-                            .extractOverlays(
-                                    overlayUtilsService
-                                    .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
-                                    ));
-                    overlayUtilsService.removeAllOverlay(getCurrentImageDisplay());
-
-                    overlayUtilsService.addOverlay(getCurrentImageDisplay(), overlays);
-                    progress.setStatus("Measuring...");
-                    progress.setProgress(2, 3);
-                    measurementService.measureOverlays(getCurrentImageDisplay(), overlays, this::filterSegmentedObject);
-                    return null;
-                })
+                .run(this::analyseParticleFromCurrentPlane)
                 .submit(loadingScreenService)
                 .start();
     }
 
-    private Object analyseParticles(ProgressHandler progress, Object object) {
+    private List<? extends Overlay> getOverlays(ProgressHandler progress) {
+        // list of overlays to measure
+        List<? extends Overlay> overlays;
 
+        // first, let's check if polygon overlays have already been separated
+        overlays = overlayUtilsService.findOverlaysOfType(getCurrentImageDisplay(), PolygonOverlay.class);
+
+        // if none if found, we transformed the mask
+        if (overlays.isEmpty()) {
+            progress.setStatus("Transforming masks into ROIs...");
+
+            overlays = measurementService
+                    .extractOverlays(
+                            overlayUtilsService
+                            .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
+                            ));
+
+            // now we remove all the present overlays just in case
+            overlayUtilsService.removeAllOverlay(getCurrentImageDisplay());
+            overlayUtilsService.addOverlay(getCurrentImageDisplay(), overlays);
+        }
+
+        return overlays;
+    }
+
+    private Object analyseParticleFromCurrentPlane(ProgressHandler progress, Object object) {
+
+        progress.setStatus("Getting ROIs...");
+        progress.setProgress(1, 3);
+        List<? extends Overlay> overlays = getOverlays(progress);
+
+        progress.setStatus("Measuring...");
+        progress.setProgress(2, 3);
+        measurementService.measureOverlays(getCurrentImageDisplay(), overlays, this::filterSegmentedObject);
         return null;
     }
 
+    private void analyseParticlesFromAllPlanes(ProgressHandler progress) {
+
+        // getting the ROIs
+        progress.setStatus("Getting ROIs...");
+        progress.setProgress(1, 30);
+
+        long[][] planePossibilities = DimensionUtils.allPossibilities(getCurrentImageDisplay());
+
+        if (planePossibilities.length == 0) {
+            analyseParticleFromCurrentPlane(progress, null);
+            return;
+        }
+
+        List<? extends Overlay> overlays = getOverlays(progress);
+
+        // progress parameters
+        int total = overlays.size() * planePossibilities.length;
+        double inc = 1d / total;
+        progress.setTotal(total);
+
+        Dataset dataset = imageDisplayService.getActiveDataset();
+        List<MetaDataSet> result = new ArrayList<>();
+        
+        String displayName = getCurrentImageDisplay().getName();
+        
+        for (long[] position : planePossibilities) {
+
+            position = DimensionUtils.planarToAbsolute(position);
+
+            for (Overlay overlay : overlays) {
+                MetaDataSet set = new MetaDataSet(MetaDataSetType.OBJECT);
+                set.putGeneric(MetaData.NAME, getCurrentImageDisplay().getName());
+                metaDataSrv.fillPositionMetaData(set, AxisUtils.getAxes(dataset), position);
+                OverlayStatistics statistics = overlayStatService.getStatistics(overlay, dataset, position);
+                set.merge(overlayStatService.getStatisticsAsMap(statistics));
+                progress.increment(inc);
+
+                result.add(set);
+
+            }
+
+        }
+        
+        metaDataDisplayService.findDisplay(String.format("Measure per plane for %s",displayName)).addAll(result);
+        
+        
+
+    }
+
     @FXML
-    public void countParticles() {
+    public void countObjects() {
         new CallbackTask<Void, Void>()
                 .runLongCallable(this::countParticles)
                 .submit(loadingScreenService)
@@ -373,19 +514,17 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                     .execute(getWorkflow())
                     .startAndShow();
 
+        } else if (!measureAllPlanes()) {
+
+            MetaDataSet set = getDisplayMetaDataSet();
+            handler.setProgress(1.5, 3);
+            handler.setStatus("Transforming masks...");
+            List<Overlay> overlayList = measurementService.transform(currentMask, true);
+
+            measurementService.countObjects(overlayList, o -> true, set, true);
+
         } else {
-            if (!measureAllPlanes()) {
-
-                MetaDataSet set = getDisplayMetaDataSet();
-                handler.setProgress(1.5, 3);
-                handler.setStatus("Transforming masks...");
-                List<Overlay> overlayList = measurementService.transform(currentMask, true);
-
-                measurementService.countObjects(overlayList, o -> true, set, true);
-
-            } else {
-                countParticlesFromPlane(handler, getCurrentImageDisplay());
-            }
+            countParticlesFromPlane(handler, getCurrentImageDisplay());
         }
         return null;
 
@@ -403,7 +542,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
             handler.increment(0.5);
 
-            MetaDataSet set = new MetaDataSet();
+            MetaDataSet set = new MetaDataSet(MetaDataSetType.OBJECT);
             set.putGeneric(MetaData.NAME, imageDisplay.getName());
             metaDataSrv.fillPositionMetaData(set, AxisUtils.getAxes(dataset), DimensionUtils.planarToAbsolute(position));
 
@@ -419,6 +558,19 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             handler.increment(0.5);
         }
 
+    }
+
+    private void iterateThroughPlanes(ProgressHandler handler, ImageDisplay imageDisplay, Consumer<Dataset> consumer) {
+        Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
+        long[][] planes = DimensionUtils.allPossibilities(imageDisplay);
+        handler.setTotal(planes.length);
+        handler.setStatus("Process each plane...");
+        for (long[] position : planes) {
+            Dataset isolatedPlane = imagePlaneService.isolatePlane(dataset, position);
+            handler.increment(0.5);
+            consumer.accept(dataset);
+            handler.increment(0.5);
+        }
     }
 
     private void countParticles(AbstractLoaderWrapper<Explorable> output) {

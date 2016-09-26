@@ -38,6 +38,7 @@ public class SmartNumberStringConverter extends NumberStringConverter{
    
    @Override
    public Number fromString(String str) {
+       if(str.trim().equals("")) return Double.NaN;
        if(floatingPoint.getValue()) {
            return new Double(str);
        }

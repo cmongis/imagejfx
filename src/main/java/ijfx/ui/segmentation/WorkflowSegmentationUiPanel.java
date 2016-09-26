@@ -110,8 +110,9 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     @Override
     public void setImageDisplay(ImageDisplay display) {
+        if(display == imageDisplay) return;
         this.imageDisplay = display;
-        
+        if(this.imageDisplay == null) return;
         if(stepCount.valueProperty().get() > 0) {
             onTestClicked(null);
         }

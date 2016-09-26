@@ -26,6 +26,7 @@ import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
 import org.scijava.display.Display;
 import org.scijava.display.event.DisplayActivatedEvent;
+import org.scijava.display.event.DisplayUpdatedEvent;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 
@@ -63,17 +64,30 @@ public class ImageDisplayProperty extends ReadOnlyObjectPropertyBase<ImageDispla
         return "activeImageDisplay";
     }
 
+    private void checkNew(Display<?> display) {
+         if(display == current) return;
+        if (ImageDisplay.class.isAssignableFrom(display.getClass())) {
+            ImageDisplay imageDisplay = (ImageDisplay)display;
+            
+            current = (ImageDisplay)display;
+             Platform.runLater(this::fireValueChangedEvent);
+        } else {
+           // current = null;
+        }
+       
+    }
+    
     @EventHandler
     public void onActiveImageDisplayChanged(DisplayActivatedEvent event) {
         Display<?> display = event.getDisplay();
-        if (ImageDisplay.class.isAssignableFrom(display.getClass())) {
-            current = (ImageDisplay) display;
-            
-            
-        } else {
-            current = null;
+       checkNew(display);
+    }
+    
+    @EventHandler
+    public void onDisplayUpdated(DisplayUpdatedEvent event) {
+        if(event.getDisplay() == imageDisplayService.getActiveImageDisplay()) {
+            checkNew(event.getDisplay());
         }
-        Platform.runLater(this::fireValueChangedEvent);
     }
 
     

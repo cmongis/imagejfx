@@ -72,6 +72,9 @@ public class SegmentedObjectDisplayPane extends BorderPane implements DisplayPan
     TableViewView view = new TableViewView();
 
     @Parameter
+    Context context;
+    
+    @Parameter
     OverlaySelectionService service;
 
     @Parameter
@@ -107,16 +110,14 @@ public class SegmentedObjectDisplayPane extends BorderPane implements DisplayPan
     
     StringProperty titleProperty = new SimpleStringProperty();
     
-    public SegmentedObjectDisplayPane(Context context) {
+  
+    
+    public SegmentedObjectDisplayPane() {
         try {
             logger.info("Creating display view");
             
             FXUtilities.injectFXML(this);
-
-            context.inject(view);
-            context.inject(this);
             tableBorderPane.setCenter(view.getNode());
-            
             chartUpdater = new ChartUpdater(areaChart);
             chartUpdater.setMaximumBinNumber(200);
         }
@@ -127,6 +128,9 @@ public class SegmentedObjectDisplayPane extends BorderPane implements DisplayPan
     }
 
     public void display(SegmentedObjectDisplay display) {
+        
+        context.inject(view);
+        
         this.display = display;
         update();
 
@@ -233,7 +237,7 @@ public class SegmentedObjectDisplayPane extends BorderPane implements DisplayPan
 
     @Override
     public StringProperty titleProperty() {
-        return titleProperty();
+        return titleProperty;
     }
 
     @Override

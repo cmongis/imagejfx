@@ -15,7 +15,8 @@
          <children>
             <VBox spacing="10.0">
                <children>
-                  <Label fx:id="fixedThresholdLabel" prefHeight="0.0" text="Fixed :" />
+                   <!--
+                  <Label fx:id="fixedThresholdLabel" prefHeight="0.0" text="Fixed :" />-->
                   <VBox fx:id="sliderVBox" />
                   <BorderPane>
                      <left>
@@ -29,7 +30,7 @@
             </VBox>
             <VBox spacing="10.0">
                <children>
-                  <Label fx:id="autoThresholdLabel" prefHeight="0.0" text="Automatic" />
+                  <!--<Label fx:id="autoThresholdLabel" prefHeight="0.0" text="Automatic" />-->
                   <ComboBox fx:id="methodComboBox" maxWidth="1.7976931348623157E308" />
                </children>
             </VBox>

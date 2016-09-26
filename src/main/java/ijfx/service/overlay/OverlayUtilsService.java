@@ -163,7 +163,7 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
                 .orElseGet(()->factory.call(imageDisplay));
     }
     
-    public void addOverlay(ImageDisplay imageDisplay, List<Overlay> overlays) {
+    public void addOverlay(ImageDisplay imageDisplay, List<? extends Overlay> overlays) {
         
         
         imageDisplay.addAll(overlays.stream().map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));

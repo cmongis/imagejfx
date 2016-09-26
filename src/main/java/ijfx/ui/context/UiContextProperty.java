@@ -46,7 +46,7 @@ public class UiContextProperty extends ReadOnlyBooleanPropertyBase{
         context.inject(this);
         
         isInCurrentContext = contextService.isCurrent(name);
-        
+        Platform.runLater(this::fireValueChangedEvent);
     }
 
     

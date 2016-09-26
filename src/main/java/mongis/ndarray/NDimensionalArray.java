@@ -84,6 +84,11 @@ public class NDimensionalArray extends ArrayList<Dimension> {
         }
     
     public long[][] getPossibilities(){
+        
+        if(size() == 0) {
+            return new long[0][];
+        }
+        
             return get(0).generateAllPossibilities();
         
     }

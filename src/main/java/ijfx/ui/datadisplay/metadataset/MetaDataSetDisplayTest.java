@@ -20,10 +20,8 @@
 package ijfx.ui.datadisplay.metadataset;
 
 import ijfx.core.metadata.MetaDataSet;
-import org.scijava.display.AbstractDisplay;
-import org.scijava.display.Display;
-import org.scijava.display.event.DisplayUpdatedEvent;
-import org.scijava.event.EventService;
+import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -31,28 +29,34 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Display.class)
-public class DefaultMetaDataDisplay extends AbstractDisplay<MetaDataSet> implements MetaDataSetDisplay{
-    
+@Plugin(type = Command.class,menuPath = "Plugins > Test > MetaDataSet Display")
+public class MetaDataSetDisplayTest extends ContextCommand{
+
     @Parameter
-    EventService eventService;
+    MetaDataSetDisplayService metaDataDisplayService;
     
-    public DefaultMetaDataDisplay() {
-        this(MetaDataSet.class);
+    @Override
+    public void run() {
+        
+        doIt();
+        
     }
     
-    public DefaultMetaDataDisplay(Class<MetaDataSet> type) {
-        super(type);
-    }
     
-     @Override
-    public void update() {
-        if(eventService == null) {
-            super.getContext().inject(this);
+    public void doIt() {
+        String displayName = "Test display 2";
+        for(int i = 0; i!= 100;i++) {
+            MetaDataSet set = new MetaDataSet();
+            set.putGeneric("Name","line "+(i+1));
+            set.putGeneric("int",i);
+            set.putGeneric("double",new Double(i*1.5).doubleValue());
+            metaDataDisplayService.addMetaDataSetToDisplay(set, displayName);
+            
+            
         }
-        super.update();
-        //eventService.publish(new DisplayUpdatedEvent(this, DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
+        
+        
+        
     }
-    
     
 }

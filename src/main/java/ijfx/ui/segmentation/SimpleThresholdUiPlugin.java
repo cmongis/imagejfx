@@ -25,6 +25,7 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
+import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.Map;
@@ -105,11 +106,11 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     @FXML
     ToggleButton fixedThresholdButton;
 
-    @FXML
-    Label fixedThresholdLabel;
+    //@FXML
+    //Label fixedThresholdLabel;
 
-    @FXML
-    Label autoThresholdLabel;
+    //@FXML
+    //Label autoThresholdLabel;
 
     private ImageDisplay imageDisplay = null;
 
@@ -155,6 +156,11 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     @Parameter
     private Context context;
 
+    @Parameter
+    UiContextProperty isExplorer;
+    
+    
+   
     ToggleGroupValue<Boolean> toggleGroupValue = new ToggleGroupValue<>();
 
     SmartNumberStringConverter converter = new SmartNumberStringConverter();
@@ -182,8 +188,8 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     @Override
     public void setImageDisplay(ImageDisplay display) {
 
-        ImageDisplay old = imageDisplay;
-
+        if(display == imageDisplay) return;
+     
         imageDisplay = display;
         if (display != null) {
             updatePosition(imageDisplay);
@@ -232,16 +238,21 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
         autoThreshold.setValue(Boolean.TRUE);
 
         // disabling the rangeSlider in auto mode
-        rangeSlider.disableProperty().bind(autoThreshold);
+        rangeSlider.disableProperty().bind(autoThreshold.or(isExplorer));
 
         // binding text field to the low/high values
         Bindings.bindBidirectional(minValueTextField.textProperty(), lowValue, converter);
         Bindings.bindBidirectional(maxValueTextField.textProperty(), highValue, converter);
 
+        minValueTextField.disableProperty().bind(autoThreshold);
+        maxValueTextField.disableProperty().bind(autoThreshold);
+        
         // highlighting labels depending on the mode
-        BindingsUtils.bindNodeToClass(fixedThresholdLabel, autoThreshold.not(), "warning");
-        BindingsUtils.bindNodeToClass(autoThresholdLabel, autoThreshold, "warning");
+        //BindingsUtils.bindNodeToClass(fixedThresholdLabel, autoThreshold.not(), "warning");
+        //BindingsUtils.bindNodeToClass(autoThresholdLabel, autoThreshold, "warning");
 
+        methodComboBox.disableProperty().bind(autoThreshold.not());
+        
         // when changing the display position, the min and max values should be changed
         position.addListener(this::onPositionChanged);
 
@@ -301,6 +312,9 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     private void init() {
         if (thresholdMethods == null) {
+            
+            isExplorer = new UiContextProperty(context,"explorerActivity");
+            
             initListeners();
         }
     }
@@ -374,6 +388,9 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     private <T extends RealType<T>> void calculateThresholdValues() {
 
+        
+        if(imageDisplay == null) return;
+        
         logger.info("Calculating the threshold values");
 
         IntervalView<T> planeView = getAccessInterval();
@@ -400,6 +417,8 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     private <T extends RealType<T>> Img<BitType> generateMask(ImageDisplay imageDisplay) {
 
+        if(imageDisplay == null) return null;
+        
         logger.info("Generating mask !");
         IntervalView<T> planeView = getAccessInterval();
 

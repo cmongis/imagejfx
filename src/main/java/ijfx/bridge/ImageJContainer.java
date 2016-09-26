@@ -150,6 +150,7 @@ public class ImageJContainer extends BorderPane implements Activity {
     private GenericDisplayWindow createWindow(Display<?> display) {
         GenericDisplayWindow genericDisplayWindow = new GenericDisplayWindow(context);
         genericDisplayWindow.show(display);
+        displayService.setActiveDisplay(display);
         return genericDisplayWindow;
     }
 

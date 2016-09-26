@@ -24,6 +24,7 @@ import ijfx.ui.datadisplay.object.*;
 import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.core.Handles;
+import ijfx.core.metadata.MetaDataSet;
 import ijfx.ui.datadisplay.DisplayPanePlugin;
 import ijfx.ui.explorer.MetaDataSetExplorerWrapper;
 import ijfx.ui.explorer.view.SegmentedObjectExplorerWrapper;
@@ -31,6 +32,7 @@ import ijfx.ui.explorer.view.TableViewView;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.utils.ChartUpdater;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -128,7 +130,7 @@ public class MetaDataSetDisplayPane extends BorderPane implements DisplayPanePlu
 
     public synchronized void update() {
         logger.info("Updating current display");
-        List<MetaDataSetExplorerWrapper> collect = display
+        List<MetaDataSetExplorerWrapper> collect = new ArrayList<MetaDataSet>(display)
                 .stream()
                 .map(m->new MetaDataSetExplorerWrapper(m))
                 .collect(Collectors.toList());
@@ -189,7 +191,7 @@ public class MetaDataSetDisplayPane extends BorderPane implements DisplayPanePlu
 
     @Override
     public StringProperty titleProperty() {
-        return titleProperty();
+        return titleProperty;
     }
 
     @Override

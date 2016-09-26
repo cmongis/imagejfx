@@ -154,7 +154,7 @@
  *                                                                             *
  ******************************************************************************/
 
-.toggle-button, .button,.menu-button{
+.toggle-button, .button,.menu-button,.split-menu-button .label{
     -fx-background-color: -flatter-primary;
     -fx-background-insets:  0.0;
     -fx-background-radius: 2.0;
@@ -170,7 +170,7 @@
 
 }
 
-.button:hover, .toggle-button:hover, .combo-box:hover {
+.button:hover, .toggle-button:hover, .combo-box:hover ,.split-menu-button:hover{
     -fx-background-color:derive(-flatter-primary,5%);
 
     -fx-stroke-width:3px;
@@ -182,7 +182,8 @@
 
 .toggle-button:focused,
 .button:focused,
-.button:default:focused {
+.button:default:focused
+,.split-menu-button:focused{
     -fx-background-color: derive(-flatter-primary, 30.0%);
 
 }
@@ -196,11 +197,12 @@
 .toggle-button:armed,
 .toggle-button:selected,
 .button:armed,
-.button:default:armed {
+.button:default:armed,
+.split-menu-button:default:armed{
     -fx-background-color: derive(-flatter-primary, -10.0%);
     -fx-text-fill: -txt-highlight;
 }
-.button,.toggle-button {
+.button,.toggle-button,.split-menu-button {
     -fx-cursor:hand;
 }
 .button.danger {
@@ -250,7 +252,9 @@
 }
 .button.larger {
     -fx-padding:9px;
-
+}
+.button.smaller, .toggle-button.smaller {
+    -fx-font-size:12px;
 }
 .toggle-group {
 
@@ -270,6 +274,10 @@
     -fx-translate-x:0;
     -fx-translate-y:0;
     -fx-background-color:derive(-flatter-warning,-10%);
+}
+
+.toggle-group.vertical.smaller .toggle-button{
+   -fx-font-size:12px;
 }
 
 .toggle-group.vertical .toggle-button.first{

@@ -24,22 +24,23 @@
       <VBox BorderPane.alignment="CENTER">
          <children>
             <Separator prefWidth="200.0" />
-            <Label maxWidth="1.7976931348623157E308" text="... and measure" textAlignment="CENTER">
+            <Label maxWidth="1.7976931348623157E308" text="... and ..." textAlignment="CENTER">
                <styleClass>
                   <String fx:value="h4" />
                   <String fx:value="warning" />
                </styleClass>
             </Label>
-            <CheckBox fx:id="planeSettingCheckBox" mnemonicParsing="false" text="only this plane" />
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#analyseParticles" text="Analyse particle">
+            <SplitMenuButton fx:id="analyseParticlesButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#analyseParticles" text="Analyse particles">
                <graphic>
                   <FontAwesomeIconView glyphName="BAR_CHART" />
-               </graphic></Button>
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#countParticles" text="Count">
-               <graphic>
-                  <FontAwesomeIconView glyphName="TACHOMETER" text="" />
                </graphic>
-            </Button>
+            </SplitMenuButton>
+            <SplitMenuButton fx:id="countObjectsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#countObjects" text="Count objects">
+               <graphic>
+                  <FontAwesomeIconView glyphName="CHILD" text="" />
+               </graphic>
+            </SplitMenuButton>
+            <HBox styleClass="toggle-group" />
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#segmentMore" text="Segment more images">
                <graphic>
                   <FontAwesomeIconView glyphName="TASKS" />
@@ -61,14 +62,21 @@
       </VBox>
    </bottom>
    <top>
-      <Label maxWidth="1.7976931348623157E308" text="Segment using..." textAlignment="CENTER" BorderPane.alignment="CENTER">
-         <padding>
-            <Insets bottom="10.0" />
-         </padding>
-         <styleClass>
-            <String fx:value="h4" />
-            <String fx:value="warning" />
-         </styleClass>
-      </Label>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Label maxWidth="1.7976931348623157E308" text="Segment it using..." textAlignment="CENTER">
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding>
+               <styleClass>
+                  <String fx:value="h4" />
+                  <String fx:value="warning" />
+               </styleClass>
+            </Label>
+               </children>
+              
+            
+         
+      </VBox>
    </top>
 </fx:root>

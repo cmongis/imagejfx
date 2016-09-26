@@ -25,6 +25,7 @@ import ij.blob.ManyBlobs;
 import ij.process.ByteProcessor;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.IjfxService;
 import ijfx.service.batch.DefaultSegmentedObject;
@@ -100,6 +101,7 @@ public class MeasurementService extends AbstractService implements IjfxService {
     @Parameter
     MetaDataSetDisplayService metaDataDisplaySrv;
 
+    
     Logger logger = ImageJFX.getLogger();
 
     private static final String COUNT_DISPLAY_NAME = "Object count";
@@ -116,9 +118,7 @@ public class MeasurementService extends AbstractService implements IjfxService {
     }
 
     public void measureAllOverlay() {
-
         measureAllOverlay(imageDisplaySrv.getActiveImageDisplay());
-
     }
 
     /**
@@ -163,7 +163,7 @@ public class MeasurementService extends AbstractService implements IjfxService {
         return img;
     }
 
-    public void measureOverlays(ImageDisplay imageDisplay, List<Overlay> overlayList, Predicate<SegmentedObject> filter) {
+    public void measureOverlays(ImageDisplay imageDisplay, List<? extends Overlay> overlayList, Predicate<SegmentedObject> filter) {
 
         // the filter always return true if null
         if (filter == null) {
@@ -206,7 +206,7 @@ public class MeasurementService extends AbstractService implements IjfxService {
         long count = countObjects(overlayList, filter);
 
         set.putGeneric(MetaData.COUNT, count);
-
+        set.setType(MetaDataSetType.OBJECT);
         if (show) {
             metaDataDisplaySrv.addMetaDataSetToDisplay(set, COUNT_DISPLAY_NAME);
         }
@@ -335,5 +335,8 @@ public class MeasurementService extends AbstractService implements IjfxService {
 
         return listOverlays;
     }
+    
+    
+   
 
 }

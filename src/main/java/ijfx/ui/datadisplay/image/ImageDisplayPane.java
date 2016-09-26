@@ -275,11 +275,11 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     
     public void display(ImageDisplay display) {
         imageDisplay = (ImageDisplay) display;
-
+        canvas.setImageDisplay(imageDisplay);
         build();
         setCurrentTool(toolService.getCurrentTool());
         initEventBuffering();
-        canvas.setImageDisplay(imageDisplay);
+        
 
         new CallbackTask()
                 .setName("Enhancing contrast...")
@@ -318,16 +318,16 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     private WritableImage wi;
 
     private double getImageWidth() {
-        if (imageDisplay.numDimensions() > 0) {
-            return imageDisplay.dimension(0);
+        if (getDataset().numDimensions() >= 2) {
+            return getDataset().dimension(0);
         } else {
             return 0;
         }
     }
 
     private double getImageHeight() {
-        if (imageDisplay.numDimensions() > 0) {
-            return imageDisplay.dimension(1);
+        if (getDataset().numDimensions() >= 2) {
+            return getDataset().dimension(1);
         } else {
             return 0;
         }
@@ -387,7 +387,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         final WritableImage image = getWrittableImage();
 
         final DatasetView view = imageDisplayService.getActiveDatasetView(imageDisplay);
-
+        if(view == null) return;
         final ARGBScreenImage screenImage = view.getScreenImage();
 
         t.elapsed("getting screen image");
@@ -813,7 +813,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         long height = getDataset().dimension(1);
         CalibratedAxis[] axes = new CalibratedAxis[imageDisplay.numDimensions()];
         int[] position = new int[imageDisplay.numDimensions()];
-        imageDisplay.axes(axes);
+        getDataset().axes(axes);
         imageDisplay.localize(position);
         String positionStr
                 = IntStream.range(2, position.length)

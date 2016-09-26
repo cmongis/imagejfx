@@ -19,7 +19,7 @@
  */
 package ijfx.plugins.commands;
 
-import static javafx.scene.Cursor.cursor;
+import javafx.beans.property.BooleanProperty;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.ImgPlus;
