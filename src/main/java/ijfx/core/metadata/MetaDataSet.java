@@ -40,6 +40,15 @@ public class MetaDataSet extends HashMap<String, MetaData> {
     
     private MetaDataSetType type = MetaDataSetType.UNKNOWN;
     
+    public MetaDataSet() {
+        super();
+    }
+    
+    public MetaDataSet(MetaDataSetType type) {
+        super();
+        setType(type);
+    }
+    
     public MetaData put(MetaData data) {
         String key = MetaDataFactory.createKey(data.getName());
         if(containsKey(data.getName())) {

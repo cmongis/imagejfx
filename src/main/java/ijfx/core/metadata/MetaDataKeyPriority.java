@@ -53,10 +53,12 @@ public class MetaDataKeyPriority {
     public static final String[] OBJECT = {
         MetaData.FILE_NAME,
         MetaData.NAME,
+        
         MetaData.PLANE_INDEX,
         MetaData.CHANNEL,
         MetaData.TIME,
         MetaData.Z_POSITION,
+        MetaData.COUNT,
         MetaData.LBL_MEAN,
         MetaData.LBL_SD,
         MetaData.LBL_CIRCULARITY,
@@ -64,6 +66,8 @@ public class MetaDataKeyPriority {
         MetaData.LBL_CENTER_X,
         MetaData.LBL_CENTER_Y,
     };
+    
+    
 
     public static String[] getPriority(MetaDataSet m) {
         if (m == null) {
