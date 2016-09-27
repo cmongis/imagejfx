@@ -241,7 +241,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         // initializing a fx property
         imageDisplayProperty = new SimpleObjectProperty<>();
         imageJCurrentDisplay = new ImageDisplayProperty(context);
-
+         segmentationContext = new UiContextProperty(context, "segmentation");
+         
+         
         // when the display is changed, we want to notify only the current wrapper
         imageDisplayProperty.addListener(this::onImageDisplayChanged);
 
@@ -256,7 +258,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         isExplorerProperty.addListener(this::onExplorerPropertyChanged);
 
-        segmentationContext = new UiContextProperty(context, "segmentation");
+       
 
         segmentationContext.addListener(this::onSegmentationContextChanged);
 
