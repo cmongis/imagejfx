@@ -716,7 +716,7 @@ public class MainWindowController extends AnchorPane {
 
         addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class);
         addSideMenuButton("Segment", FontAwesomeIcon.EYE, null).setOnMouseClicked(event -> {
-            uiContextService.enter("segment", "segmentation");
+            uiContextService.enter("segmentation");
             uiContextService.update();
             menuActivated.setValue(false);
 
