@@ -124,6 +124,8 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     private final Property<Img<BitType>> maskProperty = new SimpleObjectProperty();
 
+    private final BooleanProperty activatedProperty = new SimpleBooleanProperty();
+    
     BooleanProperty autoThreshold = new SimpleBooleanProperty();
 
     RangeSlider rangeSlider = new RangeSlider();
@@ -173,12 +175,12 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
             FXUtilities.injectFXML(this, "/ijfx/ui/segmentation/SimpleThresholdUiPlugin.fxml");
 
             sliderVBox.getChildren().add(rangeSlider);
-
+            rangeSlider.setId("thresholdSlider");
             toggleGroupValue.add(fixedThresholdButton, Boolean.FALSE);
             toggleGroupValue.add(autoThresholdButton, Boolean.TRUE);
 
             autoThreshold.bindBidirectional(toggleGroupValue.valueProperty());
-
+            
         } catch (IOException ex) {
             Logger.getLogger(SimpleThresholdUiPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -329,6 +331,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     }
 
     private void onMinMaxChanged(Observable obs) {
+        if(isDisabled()) return;
         logger.info("min max request !");
         requestMaskUpdate();
     }
@@ -343,6 +346,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     @EventHandler
     public void onAxisEvent(AxisPositionEvent event) {
+        if(!isActivated()) return;
         if (event.getDisplay() == imageDisplay) {
             updatePosition(imageDisplay);
         }
@@ -458,5 +462,12 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
         }
 
     }
+
+    @Override
+    public BooleanProperty activatedProperty() {
+        return activatedProperty;
+    }
+
+   
 
 }

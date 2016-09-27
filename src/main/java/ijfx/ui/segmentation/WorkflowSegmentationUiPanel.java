@@ -32,7 +32,9 @@ import ijfx.ui.batch.WorkflowPanel;
 import ijfx.ui.widgets.PopoverToggleButton;
 import ijfx.ui.widgets.PrettyStats;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -74,10 +76,10 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     @Parameter
     LoadingScreenService loadingService;
-    
+
     @Parameter
     MeasurementService measurementSrv;
-    
+
     @FXML
     protected ToggleButton toggleButton;
 
@@ -90,6 +92,8 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
     protected Button testButton = new Button("Test", new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE_ALT));
 
     protected ImageDisplay imageDisplay;
+
+    private final BooleanProperty activatedProperty = new SimpleBooleanProperty();
 
     public WorkflowSegmentationUiPanel() {
 
@@ -110,13 +114,17 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     @Override
     public void setImageDisplay(ImageDisplay display) {
-        if(display == imageDisplay) return;
+        if (display == imageDisplay) {
+            return;
+        }
         this.imageDisplay = display;
-        if(this.imageDisplay == null) return;
-        if(stepCount.valueProperty().get() > 0) {
+        if (this.imageDisplay == null) {
+            return;
+        }
+        if (stepCount.valueProperty().get() > 0) {
             onTestClicked(null);
         }
-        
+
     }
 
     @Override
@@ -153,12 +161,10 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     private void onTestClicked(ActionEvent event) {
 
-        
-        
         Task task = new WorkflowBuilder(context)
                 .addInput(imageDisplay)
                 .execute(workflowPanel.stepListProperty())
-                .then(output->{
+                .then(output -> {
                     Dataset dataset = output.getDataset();
                     if (dataset.getType().getBitsPerPixel() == 1) {
                         maskProperty().setValue((Img<BitType>) dataset.getImgPlus().getImg());
@@ -168,9 +174,12 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
                     }
                 })
                 .start();
-        loadingService.frontEndTask(task,true);
+        loadingService.frontEndTask(task, true);
     }
-    
 
+    @Override
+    public BooleanProperty activatedProperty() {
+        return activatedProperty;
+    }
 
 }

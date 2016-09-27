@@ -20,6 +20,7 @@
 package ijfx.ui.segmentation;
 
 import ijfx.service.workflow.Workflow;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.scene.Node;
 import net.imagej.display.ImageDisplay;
@@ -42,6 +43,12 @@ public interface SegmentationUiPlugin extends SciJavaPlugin,Initializable{
     Workflow getWorkflow();
     
     Property<Img<BitType>> maskProperty();
+    
+    BooleanProperty activatedProperty();
+    
+    public default boolean isActivated() {
+        return activatedProperty().getValue();
+    }
     
     public default String getName() {
         return getClass().getAnnotation(Plugin.class).label();
