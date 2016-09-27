@@ -22,7 +22,9 @@ package ijfx.core.imagedb;
 import ijfx.core.metadata.FileSizeMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
 import ijfx.core.utils.DimensionUtils;
+import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.ui.main.ImageJFX;
@@ -232,7 +234,15 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
 
     @Override
     public MetaDataSet extractMetaData(Dataset dataset) {
-        return null;
+        
+        MetaDataSet set = new MetaDataSet(MetaDataSetType.FILE);
+        CalibratedAxis[] axes = AxisUtils.getAxes(dataset);
+        set.putGeneric(MetaData.NAME,dataset.getName());
+        for(int i = 2; i!= dataset.numDimensions();i++) {
+            set.putGeneric(axes[i].type().getLabel(),dataset.numDimensions());
+        }
+        
+        return set;
     }
 
     @Override
