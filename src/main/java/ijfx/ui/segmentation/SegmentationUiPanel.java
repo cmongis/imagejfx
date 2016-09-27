@@ -192,6 +192,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private static final String MEASURE_CURRENT_PLANE = "...only this plane using...";
     private static final String ALL_PLANE_ONE_MASK = "... for all planes using this mask";
+    private static final String SEGMENT_AND_MEASURE = "... after segmenting each planes";
 
     public SegmentationUiPanel() {
 
@@ -202,7 +203,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             //measureAllPlaneProperty.bind(planeSettingCheckBox.selectedProperty());
 
             addAction(FontAwesomeIcon.COPY, ALL_PLANE_ONE_MASK, this::analyseParticlesFromAllPlanes, analyseParticlesButton);
-
+            addAction(FontAwesomeIcon.TASKS,SEGMENT_AND_MEASURE,this::segmentAndAnalyseEachPlane,analyseParticlesButton);
         } catch (IOException ex) {
             Logger.getLogger(SegmentationUiPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -497,7 +498,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                 .map(position->new DatasetPlaneWrapper(context, dataset, position))
                 .collect(Collectors.toList());
         
-        String displayName = String.format("Measures from %d (each plane segmented)",dataset.getName());
+        String displayName = String.format("Measures from %s (each plane segmented)",dataset.getName());
         
         new WorkflowBuilder(context)
                 .addInput(collect)
@@ -507,7 +508,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                     // casting the original input/output
                     DatasetPlaneWrapper wrapper = (DatasetPlaneWrapper) output;
                     
-                    long[] position = wrapper.getPositinon();
+                    long[] position = DimensionUtils.absoluteToPlanar(wrapper.getPositinon());
                     
                     // we duplicate the output
                     Dataset mask = output.getDataset();
@@ -525,12 +526,12 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                     metaDataSrv.fillPositionMetaData(set, AxisUtils.getAxes(dataset), position);
                     
                     // getting back a list of measures;
-                    List<SegmentedObject> measures = segmentationService.measure(overlays, set, dataset);
+                    List<? extends SegmentedObject> measures = measurementService.measureOverlays(overlays, source, position);
                     
                     metaDataDisplayService.addMetaDataSetToDisplay(measures, displayName);
                 
                 })
-                .startAndShow();
+                .runSync(handler);
         
         
     }
