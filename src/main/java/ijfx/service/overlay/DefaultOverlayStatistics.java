@@ -31,8 +31,6 @@ public class DefaultOverlayStatistics implements OverlayStatistics {
 
     private final Overlay overlay;
 
-    private final ImageDisplay imageDisplay;
-
     private final OverlayShapeStatistics shapeStats;
 
     private final PixelStatistics pixelStats;
@@ -40,12 +38,25 @@ public class DefaultOverlayStatistics implements OverlayStatistics {
     @Parameter
     private OverlayStatService overlayStatsService;
 
+    public DefaultOverlayStatistics(Overlay overlay, OverlayShapeStatistics shapeStats, PixelStatistics pixelStats) {
+        this.overlay = overlay;
+        this.shapeStats = shapeStats;
+        this.pixelStats = pixelStats;
+    }
+
+    
+    
+    
+    public DefaultOverlayStatistics(Overlay overlay, OverlayStatistics stats) {
+        this.pixelStats = stats.getPixelStatistics();
+        this.shapeStats = stats.getShapeStatistics();
+        this.overlay = overlay;
+    }
     
     public DefaultOverlayStatistics(ImageDisplay imageDisplay, Overlay overlay) {
 
         imageDisplay.getContext().inject(this);
         this.overlay = overlay;
-        this.imageDisplay = imageDisplay;
         shapeStats = overlayStatsService.getShapeStatistics(overlay);
         pixelStats = new DefaultPixelStatistics(imageDisplay, overlay, imageDisplay.getContext());
 
