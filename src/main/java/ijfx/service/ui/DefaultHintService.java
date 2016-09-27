@@ -104,6 +104,8 @@ public class DefaultHintService extends AbstractService implements HintService {
 
     @Override
     public void resetConfiguration() {
+        history.clear();
+        prefService.resetConfig(CONFIGURATION_FILE);
     }
 
     @Override
@@ -161,6 +163,7 @@ public class DefaultHintService extends AbstractService implements HintService {
             history = new HashSet<>();
         }
         prefService.savePreference(history, CONFIGURATION_FILE);
+        
     }
     
     
