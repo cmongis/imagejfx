@@ -30,7 +30,6 @@ import io.scif.img.cell.SCIFIOCellImgFactory;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
