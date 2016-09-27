@@ -45,7 +45,6 @@ import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorationMode;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
-import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
@@ -75,7 +74,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
-import mongis.utils.FakeTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import mongis.utils.TaskButtonBinding;
@@ -94,7 +92,6 @@ import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
 
@@ -479,25 +476,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     private void segmentMore(ActionEvent event) {
 
-        ImageDisplay activeImageDisplay = imageDisplayService.getActiveImageDisplay();
-
-        Dataset activeDataset = imageDisplayService.getActiveDataset(activeImageDisplay);
-
-        if (activeDataset != null) {
-
-            String source = activeDataset.getSource();
-
-            Folder folderContainingFile = folderManagerService.getFolderContainingFile(new File(source));
-
-            if (folderContainingFile == null) {
-                folderContainingFile = folderManagerService.addFolder(new File(source).getParentFile());
-            }
-
-            folderManagerService.setCurrentFolder(folderContainingFile);
-        }
-        folderManagerService.setExplorationMode(ExplorationMode.FILE);
-
-        activityService.openByType(ExplorerActivity.class);
+        
 
     }
 
