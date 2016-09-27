@@ -28,11 +28,13 @@ import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.metadata.MetaDataSetType;
 import ijfx.core.utils.DimensionUtils;
 import ijfx.plugins.commands.AxisUtils;
+import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.batch.SegmentationService;
 import ijfx.service.batch.SegmentedObject;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.service.batch.input.AbstractLoaderWrapper;
+import ijfx.service.batch.input.DatasetPlaneWrapper;
 import ijfx.service.batch.input.ExplorableBatchInputWrapper;
 import ijfx.service.overlay.OverlayShapeStatistics;
 import ijfx.service.overlay.OverlayStatService;
@@ -64,6 +66,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
@@ -112,7 +115,7 @@ import org.scijava.plugin.PluginService;
  * - Segmentation of the selected item and use it to measure all the plane of
  * all the source - Count object of the selected items
  *
- *
+ * TODO: getting all the logic out of the controller
  *
  * @author cyril
  */
@@ -455,7 +458,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         // progress parameters
         int total = overlays.size() * planePossibilities.length;
-        double inc = 1d / total;
+        int i = 0;
         progress.setTotal(total);
 
         Dataset dataset = imageDisplayService.getActiveDataset();
@@ -466,14 +469,14 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         for (long[] position : planePossibilities) {
 
             position = DimensionUtils.planarToAbsolute(position);
-
+            progress.setStatus(String.format("Measuring from plane %d/%d",i++,total));
             for (Overlay overlay : overlays) {
                 MetaDataSet set = new MetaDataSet(MetaDataSetType.OBJECT);
                 set.putGeneric(MetaData.NAME, getCurrentImageDisplay().getName());
                 metaDataSrv.fillPositionMetaData(set, AxisUtils.getAxes(dataset), position);
                 OverlayStatistics statistics = overlayStatService.getStatistics(overlay, dataset, position);
                 set.merge(overlayStatService.getStatisticsAsMap(statistics));
-                progress.increment(inc);
+                progress.increment(1.0);
 
                 result.add(set);
 
@@ -482,9 +485,54 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         }
         
         metaDataDisplayService.findDisplay(String.format("Measure per plane for %s",displayName)).addAll(result);
+    }
+    
+    private void segmentAndAnalyseEachPlane(ProgressHandler handler) {
+        final Dataset dataset = imageDisplayService.getActiveDataset();
         
         
-
+        // DatasetPlaneWrapper copies the indicate position from the original dataset before
+        // the beginning of the process;
+        List<DatasetPlaneWrapper> collect = Stream.of(DimensionUtils.allPossibilities(getCurrentImageDisplay()))
+                .map(position->new DatasetPlaneWrapper(context, dataset, position))
+                .collect(Collectors.toList());
+        
+        String displayName = String.format("Measures from %d (each plane segmented)",dataset.getName());
+        
+        new WorkflowBuilder(context)
+                .addInput(collect)
+                .execute(getWorkflow())
+                .then(output->{
+                    
+                    // casting the original input/output
+                    DatasetPlaneWrapper wrapper = (DatasetPlaneWrapper) output;
+                    
+                    long[] position = wrapper.getPositinon();
+                    
+                    // we duplicate the output
+                    Dataset mask = output.getDataset();
+                    
+                    // getting the source dataset
+                    Dataset source = wrapper.getWrappedValue();
+                    
+                    // getting the list of overlays
+                    List<Overlay> overlays = Arrays.asList(BinaryToOverlay.transform(context,mask,true));
+                    
+                    // getting a global metadata set from the dataset object
+                    MetaDataSet set = metaDataSrv.extractMetaData(dataset);
+                    
+                    // filling the position informations
+                    metaDataSrv.fillPositionMetaData(set, AxisUtils.getAxes(dataset), position);
+                    
+                    // getting back a list of measures;
+                    List<SegmentedObject> measures = segmentationService.measure(overlays, set, dataset);
+                    
+                    metaDataDisplayService.addMetaDataSetToDisplay(measures, displayName);
+                
+                })
+                .startAndShow();
+        
+        
     }
 
     @FXML

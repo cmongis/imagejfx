@@ -36,8 +36,14 @@ public interface ImagePlaneService extends IjfxService {
     <T extends RealType<T>> Dataset extractPlane(File file, long[] nonPlanarPosition) throws IOException;
 
     Dataset extractPlane(File file, int planeIndex) throws IOException;
- 
-    <T extends RealType<T>> Dataset isolatePlane(Dataset dataset, long[] position);
+    /**
+     * 
+     * @param <T>
+     * @param dataset source dataset
+     * @param absolutePosition long array representing the position of the plane (2 first digits are 0,0 for X,Y) 
+     * @return the isolated dataset
+     */
+    <T extends RealType<T>> Dataset isolatePlane(Dataset dataset, long[] absolutePosition);
     
     Dataset createEmptyPlaneDataset(Dataset input);
     Dataset createEmptyPlaneDataset(Dataset input, long with, long height);

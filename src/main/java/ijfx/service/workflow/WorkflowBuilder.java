@@ -83,6 +83,11 @@ public class WorkflowBuilder {
         inputs.add(new BatchInputBuilder(context).from(dataset));
         return this;
     }
+    
+    public WorkflowBuilder addInput(Dataset dataset, long[] planePosition) {
+        inputs.add(new BatchInputBuilder(context).from(dataset,planePosition));
+        return this;
+    }
 
     public WorkflowBuilder addInput(Explorable exp) {
         inputs.add(new BatchInputBuilder(context).from(exp));

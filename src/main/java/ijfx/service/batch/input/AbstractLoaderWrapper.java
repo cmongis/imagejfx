@@ -33,14 +33,14 @@ import org.scijava.plugin.Parameter;
  */
 public abstract class AbstractLoaderWrapper<T> implements BatchSingleInput {
 
-    final T wrappedObject;
+    final protected T wrappedObject;
 
-    final NaiveBatchInput input = new NaiveBatchInput();
+    final protected NaiveBatchInput input = new NaiveBatchInput();
     
     @Parameter
-    Context context;
+    private Context context;
     
-    Consumer<AbstractLoaderWrapper<T>> onSave;
+    protected Consumer<AbstractLoaderWrapper<T>> onSave;
     
     public AbstractLoaderWrapper(T wrappedObject) {
         this.wrappedObject = wrappedObject;

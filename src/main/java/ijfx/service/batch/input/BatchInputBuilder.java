@@ -79,6 +79,11 @@ public class BatchInputBuilder {
         input = naiveInput;
         return this;
     }
+    
+    public BatchInputBuilder from(Dataset dataset, long[] planePosition) {
+        input = new DatasetPlaneWrapper(context, dataset, planePosition);
+        return this;
+    }
 
     public BatchInputBuilder from(Explorable holder) {
         input = new ExplorableBatchInputWrapper(holder);

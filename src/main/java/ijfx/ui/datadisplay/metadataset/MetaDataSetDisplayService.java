@@ -19,10 +19,13 @@
  */
 package ijfx.ui.datadisplay.metadataset;
 
+import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.service.IjfxService;
 import ijfx.ui.main.ImageJFX;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayCreatedEvent;
 import org.scijava.event.EventService;
@@ -88,4 +91,16 @@ public class MetaDataSetDisplayService extends AbstractService implements IjfxSe
         display.update();
     }
 
+    public void addMetaDataSetToDisplay(List<? extends MetaDataOwner> owners, String displayName) {
+        
+        MetaDataSetDisplay display = findDisplay(displayName);
+        
+        List<MetaDataSet> setList = owners.stream().map(owner->owner.getMetaDataSet()).collect(Collectors.toList());
+        
+        display.addAll(setList);
+        
+        display.update();
+        
+    }
+    
 }
