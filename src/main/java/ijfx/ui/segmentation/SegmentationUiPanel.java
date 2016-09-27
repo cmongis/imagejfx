@@ -41,6 +41,7 @@ import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.OverlayStatistics;
 
 import ijfx.service.overlay.OverlayUtilsService;
+import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.ui.MeasurementService;
 import ijfx.service.workflow.DefaultWorkflow;
@@ -167,6 +168,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @Parameter
     private OverlayStatService overlayStatService;
 
+    @Parameter
+    private HintService hintService;
+
     @FXML
     Accordion accordion;
 
@@ -203,7 +207,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             //measureAllPlaneProperty.bind(planeSettingCheckBox.selectedProperty());
 
             addAction(FontAwesomeIcon.COPY, ALL_PLANE_ONE_MASK, this::analyseParticlesFromAllPlanes, analyseParticlesButton);
-            addAction(FontAwesomeIcon.TASKS,SEGMENT_AND_MEASURE,this::segmentAndAnalyseEachPlane,analyseParticlesButton);
+            addAction(FontAwesomeIcon.TASKS, SEGMENT_AND_MEASURE, this::segmentAndAnalyseEachPlane, analyseParticlesButton);
         } catch (IOException ex) {
             Logger.getLogger(SegmentationUiPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -269,42 +273,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
      *  Getters 
      * 
      */
-    private void onExplorerPropertyChanged(Observable obs, Boolean oldValue, Boolean isExplorer) {
-
-        if (isExplorer) {
-            imageDisplayProperty.unbind();
-            imageDisplayProperty.setValue(null);
-        } else {
-            imageDisplayProperty.bind(imageJCurrentDisplay);
-        }
-
-    }
-
-    private SegmentationUiPlugin getActivePlugin() {
-        return nodeMap.get(getExpandedPane());
-    }
-
-    private void onExpandedPaneChanged(Observable obs, TitledPane oldPane, TitledPane newPane) {
-
-        if (newPane == null) {
-            return;
-        }
-        nodeMap.get(newPane).setImageDisplay(null);
-        nodeMap.get(newPane).setImageDisplay(getCurrentImageDisplay());
-    }
-
-    private void onMaskChanged(Observable obs, Img<BitType> oldMask, Img<BitType> newMask) {
-
-        if (newMask != null && getCurrentImageDisplay() != null) {
-
-            new CallbackTask()
-                    .run(() -> updateMask(getCurrentImageDisplay(), newMask))
-                    .start();
-
-        }
-
-    }
-
     private ImageDisplay getCurrentImageDisplay() {
 
         return imageDisplayProperty.getValue();
@@ -332,13 +300,44 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         return accordion.getExpandedPane();
     }
 
-    // 
-    private void onImageDisplayChanged(Observable obs) {
-        ImageDisplay display = imageDisplayProperty.getValue();
-        if (getActivePlugin() != null) {
-            getActivePlugin().setImageDisplay(display);
+    private void onExplorerPropertyChanged(Observable obs, Boolean oldValue, Boolean isExplorer) {
+
+        if (isExplorer) {
+            imageDisplayProperty.unbind();
+            imageDisplayProperty.setValue(null);
+        } else {
+            imageDisplayProperty.bind(imageJCurrentDisplay);
         }
 
+    }
+
+    private SegmentationUiPlugin getActivePlugin() {
+        return nodeMap.get(getExpandedPane());
+    }
+
+    private List<? extends Overlay> getOverlays(ProgressHandler progress) {
+        // list of overlays to measure
+        List<? extends Overlay> overlays;
+
+        // first, let's check if polygon overlays have already been separated
+        overlays = overlayUtilsService.findOverlaysOfType(getCurrentImageDisplay(), PolygonOverlay.class);
+
+        // if none if found, we transformed the mask
+        if (overlays.isEmpty()) {
+            progress.setStatus("Transforming masks into ROIs...");
+
+            overlays = measurementService
+                    .extractOverlays(
+                            overlayUtilsService
+                            .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
+                            ));
+
+            // now we remove all the present overlays just in case
+            overlayUtilsService.removeAllOverlay(getCurrentImageDisplay());
+            overlayUtilsService.addOverlay(getCurrentImageDisplay(), overlays);
+        }
+
+        return overlays;
     }
 
     private BinaryMaskOverlay getBinaryMask(ImageDisplay imageDisplay) {
@@ -354,6 +353,49 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         return overlay;
 
     }
+    
+       private Predicate<OverlayShapeStatistics> getShapeFilter() {
+        return o -> true;
+    }
+
+
+    /*
+        EVENT HANDLERS
+     */
+    private void onExpandedPaneChanged(Observable obs, TitledPane oldPane, TitledPane newPane) {
+
+        if (newPane == null) {
+            return;
+        }
+        nodeMap.get(newPane).setImageDisplay(null);
+        nodeMap.get(newPane).setImageDisplay(getCurrentImageDisplay());
+    }
+
+    private void onMaskChanged(Observable obs, Img<BitType> oldMask, Img<BitType> newMask) {
+
+        if (newMask != null && getCurrentImageDisplay() != null) {
+
+            new CallbackTask()
+                    .run(() -> updateMask(getCurrentImageDisplay(), newMask))
+                    .start();
+
+        }
+
+    }
+
+    // 
+    private void onImageDisplayChanged(Observable obs) {
+        ImageDisplay display = imageDisplayProperty.getValue();
+        if (getActivePlugin() != null) {
+            getActivePlugin().setImageDisplay(display);
+        }
+
+    }
+    
+    
+    /*
+        PROCESSES
+    */
 
     private synchronized void updateMask(ImageDisplay imageDisplay, Img<BitType> mask) {
 
@@ -405,31 +447,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                 .start();
     }
 
-    private List<? extends Overlay> getOverlays(ProgressHandler progress) {
-        // list of overlays to measure
-        List<? extends Overlay> overlays;
-
-        // first, let's check if polygon overlays have already been separated
-        overlays = overlayUtilsService.findOverlaysOfType(getCurrentImageDisplay(), PolygonOverlay.class);
-
-        // if none if found, we transformed the mask
-        if (overlays.isEmpty()) {
-            progress.setStatus("Transforming masks into ROIs...");
-
-            overlays = measurementService
-                    .extractOverlays(
-                            overlayUtilsService
-                            .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
-                            ));
-
-            // now we remove all the present overlays just in case
-            overlayUtilsService.removeAllOverlay(getCurrentImageDisplay());
-            overlayUtilsService.addOverlay(getCurrentImageDisplay(), overlays);
-        }
-
-        return overlays;
-    }
-
     private Object analyseParticleFromCurrentPlane(ProgressHandler progress, Object object) {
 
         progress.setStatus("Getting ROIs...");
@@ -464,13 +481,13 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         Dataset dataset = imageDisplayService.getActiveDataset();
         List<MetaDataSet> result = new ArrayList<>();
-        
+
         String displayName = getCurrentImageDisplay().getName();
-        
+
         for (long[] position : planePossibilities) {
 
             position = DimensionUtils.planarToAbsolute(position);
-            progress.setStatus(String.format("Measuring from plane %d/%d",i++,total));
+            progress.setStatus(String.format("Measuring from plane %d/%d", i++, total));
             for (Overlay overlay : overlays) {
                 MetaDataSet set = new MetaDataSet(MetaDataSetType.OBJECT);
                 set.putGeneric(MetaData.NAME, getCurrentImageDisplay().getName());
@@ -484,56 +501,54 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             }
 
         }
-        
-        metaDataDisplayService.findDisplay(String.format("Measure per plane for %s",displayName)).addAll(result);
+
+        metaDataDisplayService.findDisplay(String.format("Measure per plane for %s", displayName)).addAll(result);
     }
-    
+
     private void segmentAndAnalyseEachPlane(ProgressHandler handler) {
         final Dataset dataset = imageDisplayService.getActiveDataset();
-        
-        
+
         // DatasetPlaneWrapper copies the indicate position from the original dataset before
         // the beginning of the process;
         List<DatasetPlaneWrapper> collect = Stream.of(DimensionUtils.allPossibilities(getCurrentImageDisplay()))
-                .map(position->new DatasetPlaneWrapper(context, dataset, position))
+                .map(position -> new DatasetPlaneWrapper(context, dataset, position))
                 .collect(Collectors.toList());
-        
-        String displayName = String.format("Measures from %s (each plane segmented)",dataset.getName());
-        
+
+        String displayName = String.format("Measures from %s (each plane segmented)", dataset.getName());
+
         new WorkflowBuilder(context)
                 .addInput(collect)
                 .execute(getWorkflow())
-                .then(output->{
-                    
+                .then(output -> {
+
                     // casting the original input/output
                     DatasetPlaneWrapper wrapper = (DatasetPlaneWrapper) output;
-                    
+
                     long[] position = DimensionUtils.absoluteToPlanar(wrapper.getPositinon());
-                    
+
                     // we duplicate the output
                     Dataset mask = output.getDataset();
-                    
+
                     // getting the source dataset
                     Dataset source = wrapper.getWrappedValue();
-                    
+
                     // getting the list of overlays
-                    List<Overlay> overlays = Arrays.asList(BinaryToOverlay.transform(context,mask,true));
-                    
+                    List<Overlay> overlays = Arrays.asList(BinaryToOverlay.transform(context, mask, true));
+
                     // getting a global metadata set from the dataset object
                     MetaDataSet set = metaDataSrv.extractMetaData(dataset);
-                    
+
                     // filling the position informations
                     metaDataSrv.fillPositionMetaData(set, AxisUtils.getAxes(dataset), position);
-                    
+
                     // getting back a list of measures;
                     List<? extends SegmentedObject> measures = measurementService.measureOverlays(overlays, source, position);
-                    
+
                     metaDataDisplayService.addMetaDataSetToDisplay(measures, displayName);
-                
+
                 })
                 .runSync(handler);
-        
-        
+
     }
 
     @FXML
@@ -632,10 +647,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     }
 
-    private Predicate<OverlayShapeStatistics> getShapeFilter() {
-        return o -> true;
-    }
-
+ 
     private boolean measureAllPlanes() {
         return measureAllPlaneProperty.getValue();
     }
