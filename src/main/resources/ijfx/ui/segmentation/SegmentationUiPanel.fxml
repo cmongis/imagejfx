@@ -45,15 +45,6 @@
                <graphic>
                   <FontAwesomeIconView glyphName="TASKS" />
                </graphic></Button>
-            <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="normal" text="More ..." textAlignment="CENTER">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Suggest new action" />
-                <MenuItem mnemonicParsing="false" text="... using the report button" />
-              </items>
-               <graphic>
-                  <FontAwesomeIconView glyphName="PLUS" />
-               </graphic>
-            </MenuButton>
          </children>
          <styleClass>
             <String fx:value="vbox" />
