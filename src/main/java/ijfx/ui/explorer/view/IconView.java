@@ -47,7 +47,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = ExplorerView.class,priority = 0.8)
+@Plugin(type = ExplorerView.class,priority = 0.8,label="Preview")
 public class IconView extends ScrollPane implements ExplorerView {
 
     private final TilePane tilePane = new TilePane();

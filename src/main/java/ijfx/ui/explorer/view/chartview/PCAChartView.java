@@ -52,7 +52,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class,priority = 0.4)
+@Plugin(type = ExplorerView.class,priority = 0.4,label="PCA (exp)")
 public class PCAChartView extends AbstractChartView implements ExplorerView {
     
     @FXML

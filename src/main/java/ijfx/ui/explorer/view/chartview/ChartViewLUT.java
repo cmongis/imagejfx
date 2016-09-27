@@ -65,7 +65,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class, priority = 0.7)
+@Plugin(type = ExplorerView.class, priority = 0.7,label="Plot data")
 public class ChartViewLUT<T extends RealType<T>> extends AbstractChartView implements ExplorerView, Initializable {
 
     private static final Color[] COLORS1 = new Color[]{Color.BLACK, Color.RED};

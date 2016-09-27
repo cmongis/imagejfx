@@ -48,7 +48,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class,priority=0.5)
+@Plugin(type = ExplorerView.class,priority=0.5,label="XMean (exp)")
 public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Parameter
