@@ -21,6 +21,7 @@
 package ijfx.service.overlay;
 
 import ijfx.core.metadata.MetaData;
+import ijfx.core.utils.DimensionUtils;
 import ijfx.ui.main.ImageJFX;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -44,6 +45,7 @@ import net.imagej.overlay.PolygonOverlay;
 import net.imagej.overlay.RectangleOverlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessible;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
@@ -85,7 +87,6 @@ public class OverlayStatService extends AbstractService implements ImageJService
     private OverlayDrawingService overlayDrawingService;
 
     final private Logger logger = ImageJFX.getLogger();
-
 
     public Double[] getValueListFromImageDisplay(ImageDisplay imageDisplay, Overlay overlay) {
 
@@ -207,6 +208,19 @@ public class OverlayStatService extends AbstractService implements ImageJService
         return OverlayStatistics.EMPTY;
     }
 
+    public <T extends RealType<T>> OverlayStatistics getOverlayStatistics(RandomAccessibleInterval<T> rai, Overlay overlay) {
+
+        return new DefaultOverlayStatistics(overlay, getShapeStatistics(overlay),getPixelStatistics(overlay, rai));
+        
+    }
+
+    public <T extends RealType<T>> PixelStatistics getPixelStatistics(Overlay overlay, RandomAccessibleInterval<T> rai) {
+        RandomAccess<T> randomAccess = rai.randomAccess();
+        PixelMeasurer<T> measurer = new PixelMeasurer<>(randomAccess);
+        overlayDrawingService.drawOverlay(overlay, OverlayDrawingService.FILLER, measurer);
+        return new PixelStatisticsBase(new DescriptiveStatistics(ArrayUtils.toPrimitive(measurer.getValuesAsArray()))); 
+    }
+
     public OverlayShapeStatistics getShapeStatistics(Overlay overlay) {
 
         OverlayShapeStatistics overlayStatistics = null;
@@ -218,16 +232,14 @@ public class OverlayStatService extends AbstractService implements ImageJService
         } else if (overlay instanceof PolygonOverlay) {
             overlay = cleanOverlay((PolygonOverlay) overlay);
             try {
-            overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());
-            }
-            catch(Exception e) {
+                overlayStatistics = new PolygonOverlayStatistics(overlay, this.context());
+            } catch (Exception e) {
                 overlayStatistics = OverlayShapeStatistics.EMPTY;
             }
-        }
-        else {
+        } else {
             overlayStatistics = OverlayShapeStatistics.EMPTY;
         }
-        
+
         return overlayStatistics;
     }
 
@@ -269,7 +281,9 @@ public class OverlayStatService extends AbstractService implements ImageJService
     public HashMap<String, Double> getShapeStatisticsAsMap(OverlayShapeStatistics overlayStats) {
 
         HashMap<String, Double> statistics = new HashMap<>();
-        if(overlayStats == null) return statistics;
+        if (overlayStats == null) {
+            return statistics;
+        }
         statistics.put(MetaData.LBL_AREA, overlayStats.getArea());
         statistics.put(MetaData.LBL_MAX_FERET_DIAMETER, overlayStats.getFeretDiameter());
         statistics.put(MetaData.LBL_MIN_FERET_DIAMETER, overlayStats.getMinFeretDiameter());
@@ -287,6 +301,8 @@ public class OverlayStatService extends AbstractService implements ImageJService
     }
 
     public <T extends RealType<T>> OverlayStatistics getStatistics(Overlay overlay, Dataset dataset, long[] position) {
+
+        position = DimensionUtils.makeItRight(dataset, position);
 
         PixelStatistics pixelStats = new PixelStatisticsBase(new DescriptiveStatistics(ArrayUtils.toPrimitive(getValueList(dataset, overlay, position))));
         OverlayShapeStatistics shapeState = getShapeStatistics(overlay);
@@ -476,7 +492,7 @@ public class OverlayStatService extends AbstractService implements ImageJService
         private final RandomAccess<T> randomAccess;
 
         private final ArrayList<Double> stats = new ArrayList<Double>(10000);
-
+        
         public PixelMeasurer(RandomAccess<T> r) {
             this.randomAccess = r;
         }
