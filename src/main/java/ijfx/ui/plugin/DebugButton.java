@@ -100,6 +100,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Open performance monitor", this::openPerformanceMonitor);
         addItem("Open module browser", this::openWebApp);
         addItem("Reset Explorer Data", this::resetExplorerData);
+        addItem("Reset Hints History",this::resetHintHistory);
        
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED, this::updateReloadMenu);
@@ -191,4 +192,8 @@ public class DebugButton extends MenuButton implements UiPlugin {
         jsonService.resetConfig(FolderManagerService.FOLDER_PREFERENCE_FILE, ImageRecordService.JSON_FILE);
     }
 
+    
+    private void resetHintHistory(Object event) {
+        hintService.resetConfiguration();
+    }
 }
