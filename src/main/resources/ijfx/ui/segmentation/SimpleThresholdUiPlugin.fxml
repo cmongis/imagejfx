@@ -8,7 +8,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox spacing="20.0" BorderPane.alignment="CENTER">
@@ -38,7 +37,7 @@
       </VBox>
    </center>
    <top>
-      <HBox alignment="CENTER" styleClass="toggle-group" BorderPane.alignment="CENTER">
+      <HBox fx:id="modeHBox" alignment="CENTER" styleClass="toggle-group" BorderPane.alignment="CENTER">
          <children>
             <ToggleButton fx:id="fixedThresholdButton" mnemonicParsing="false" prefWidth="100.0" styleClass="first" text="Fixed" />
             <ToggleButton fx:id="autoThresholdButton" mnemonicParsing="false" prefWidth="100.0" styleClass="last" text="Auto" />

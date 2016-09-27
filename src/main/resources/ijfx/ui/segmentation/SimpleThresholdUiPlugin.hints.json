@@ -1,0 +1,22 @@
+[
+    {
+        "target":"#modeHBox"
+        ,"text":"Segmentation can be done using two modes : Fixed threshold or Auto"
+        
+    }
+    ,{
+        "target":"#fixedThresholdButton"
+        ,"text":"The fixed threshold allows you to set a fixed value in order to create the mask."
+    },
+    {
+        "target":"#thresholdSlider"
+        ,"text":"Use the slider to set the minimum and the maximum value for the threshold. All the pixels comprised between these two values will be part of the mask."
+    }
+    ,{
+        "target":"#autoThresholdButton"
+        ,"text":"Auto mode allows you to set a method that will select which value should be used for the threshold."
+    },{
+        "target":"#autoThresholdButton"
+        ,"text":"The best method usually depends on the type of data you are analysing."
+    }
+]
