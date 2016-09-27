@@ -850,6 +850,9 @@
     -fx-background:-bg-normal;
     -fx-border-bottom: solid 1px derive(-bg-normal,120%);
 }
+.tab-label {
+    -fx-text-fill:-flatter-warning;
+}
 @font-face {
     font-familly: 'fontAwesome';
     /*src: url('ijfx/ui/res/fontawesome-webfont.ttf');*/
@@ -1555,7 +1558,8 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-text-fill:red;
 }
 .tab-pane {
-    -tab-color:derive(-dark,40%);
+    /*-tab-color:derive(-dark,20%);*/
+    -tab-color:-flatter-primary;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:top {  
@@ -1574,18 +1578,21 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-pref-height: 40px;    
     -fx-background-insets: 0;  
 }  
-
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0;
+    -fx-border-color: transparent
+}
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {  
     -fx-alignment: CENTER;  
-    -fx-text-fill: derive(-dark,110%);  
+    -fx-text-fill: -txt-highlight;
     -fx-font-weight: bold;  
 }  
 
 
 .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {  
     -fx-alignment: CENTER;  
-    -fx-text-fill: #2381E9;  
+    -fx-text-fill: derive(-dark,50%);  
     -fx-font-weight: bold;  
 }  
 
