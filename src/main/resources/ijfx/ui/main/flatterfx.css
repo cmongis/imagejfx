@@ -154,7 +154,7 @@
  *                                                                             *
  ******************************************************************************/
 
-.toggle-button, .button,.menu-button,.split-menu-button .label{
+.toggle-button, .button,.menu-button,.split-menu-button > .label{
     -fx-background-color: -flatter-primary;
     -fx-background-insets:  0.0;
     -fx-background-radius: 2.0;
@@ -169,8 +169,14 @@
     -fx-effect: -flatter-shadow;
 
 }
+.split-menu-button > .label {
+    -fx-effect:none;
+}
+.split-menu-button {
+    -fx-effect:-flatter-shadow;
+}
 
-.button:hover, .toggle-button:hover, .combo-box:hover ,.split-menu-button:hover{
+.button:hover, .toggle-button:hover, .combo-box:hover ,.split-menu-button > .label:hover{
     -fx-background-color:derive(-flatter-primary,5%);
 
     -fx-stroke-width:3px;
@@ -183,9 +189,8 @@
 .toggle-button:focused,
 .button:focused,
 .button:default:focused
-,.split-menu-button:focused{
+,.split-menu-button > .label:focused{
     -fx-background-color: derive(-flatter-primary, 30.0%);
-
 }
 
 .toggle-button:focused:selected {
@@ -198,13 +203,14 @@
 .toggle-button:selected,
 .button:armed,
 .button:default:armed,
-.split-menu-button:default:armed{
+.split-menu-button > .label:default:armed{
     -fx-background-color: derive(-flatter-primary, -10.0%);
     -fx-text-fill: -txt-highlight;
 }
-.button,.toggle-button,.split-menu-button {
+.button,.toggle-button,.split-menu-button > .label {
     -fx-cursor:hand;
 }
+
 .button.danger {
     -fx-background-color:-flatter-danger;
 }
@@ -264,10 +270,10 @@
 
 }
 
-.toggle-group .toggle-button.first, .toggle-group .button.first {
+.toggle-group .toggle-button.first, .toggle-group .button.first, .split-menu-button > .label {
     -fx-background-radius: 2.0 0 0 2.0;
 }
-.toggle-group .toggle-button.last, .toggle-group .button.last, .toggle-group .menu-button.last{
+.toggle-group .toggle-button.last, .toggle-group .button.last, .toggle-group .menu-button.last, .split-menu-button > .arrow-button{
     -fx-background-radius: 0.0 2.0 2.0 0.0;
 }
 .toggle-group .toggle-button:hover {
@@ -287,6 +293,21 @@
     -fx-background-radius: 0.0 0 2.0 2.0;
 }
 
+.split-menu-button {
+    -fx-background-color:transparent;
+}
+.split-menu-button > .label:hover {
+    -fx-translate-x:0;
+}
+.split-menu-button > .arrow-button {
+    -fx-background-color: derive(-flatter-primary,-20%);
+    -fx-padding:9px;
+    -fx-margin:0 0 1px 0;
+    -fx-background-insets:0,1,2,0;
+}
+.split-menu-button > .arrow-button:hover {
+    -fx-background-color:-flatter-warning;
+}
 /*******************************************************************************
  *                                                                             *
  * TextField & TextArea                                                        *
