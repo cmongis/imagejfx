@@ -28,6 +28,7 @@ import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.metadata.MetaDataSetType;
 import ijfx.plugins.commands.BinaryToOverlay;
 import ijfx.service.IjfxService;
+import ijfx.service.ImagePlaneService;
 import ijfx.service.batch.DefaultSegmentedObject;
 import ijfx.service.batch.SegmentedObject;
 import ijfx.service.overlay.OverlaySelectionService;
@@ -46,6 +47,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
@@ -65,6 +67,7 @@ import net.imglib2.roi.BinaryMaskRegionOfInterest;
 import net.imglib2.roi.PolygonRegionOfInterest;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.IntervalView;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
@@ -96,12 +99,14 @@ public class MeasurementService extends AbstractService implements IjfxService {
     OverlayService overlayService;
 
     @Parameter
+    ImagePlaneService imagePlaneService;
+
+    @Parameter
     UIService uiService;
 
     @Parameter
     MetaDataSetDisplayService metaDataDisplaySrv;
 
-    
     Logger logger = ImageJFX.getLogger();
 
     private static final String COUNT_DISPLAY_NAME = "Object count";
@@ -163,6 +168,10 @@ public class MeasurementService extends AbstractService implements IjfxService {
         return img;
     }
 
+    public <T extends RealType<T>> void measureOverlays(List<? extends Overlay> overlaysList, RandomAccessibleInterval<T> rai, Predicate<SegmentedObject> filter) {
+
+    }
+
     public void measureOverlays(ImageDisplay imageDisplay, List<? extends Overlay> overlayList, Predicate<SegmentedObject> filter) {
 
         // the filter always return true if null
@@ -214,11 +223,11 @@ public class MeasurementService extends AbstractService implements IjfxService {
         return count;
 
     }
-    
-     public long countObjects(RandomAccessibleInterval interval, Predicate<OverlayShapeStatistics> filter, MetaDataSet set, boolean show) {
-         return countObjects(transform(interval, true), filter, set, show);
-         
-     }
+
+    public long countObjects(RandomAccessibleInterval interval, Predicate<OverlayShapeStatistics> filter, MetaDataSet set, boolean show) {
+        return countObjects(transform(interval, true), filter, set, show);
+
+    }
 
     public void measureAllOverlay(ImageDisplay imageDisplay) {
         measureOverlays(imageDisplay, overlayService.getOverlays(imageDisplay), null);
@@ -232,6 +241,27 @@ public class MeasurementService extends AbstractService implements IjfxService {
             logger.log(Level.SEVERE, "Error when creating SegmentedObject", e);
             return null;
         }
+    }
+
+    public <T extends RealType<T>> List<? extends SegmentedObject> measureOverlays(List<Overlay> overlays, Dataset dataset, long[] position) {
+        IntervalView<T> planeView = imagePlaneService.planeView(dataset, position);
+        return measureOverlays(overlays, planeView);
+    }
+
+    public <T extends RealType<T>> List<? extends SegmentedObject> measureOverlays(List<Overlay> overlays, RandomAccessibleInterval<T> rai) {
+        return overlays
+                .stream()
+                .map(o -> measure(rai, o))
+                .collect(Collectors.toList());
+    }
+
+    public <T extends RealType<T>> SegmentedObject measure(RandomAccessibleInterval<T> rai, Overlay overlay) {
+        try {
+            return new DefaultSegmentedObject(overlay, overlayStatsSrv.getOverlayStatistics(rai, overlay));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when creating SegmentedObject", e);
+        }
+        return null;
     }
 
     public synchronized Display getCurrentDisplay(SegmentedObject object) {
@@ -335,8 +365,5 @@ public class MeasurementService extends AbstractService implements IjfxService {
 
         return listOverlays;
     }
-    
-    
-   
 
 }
