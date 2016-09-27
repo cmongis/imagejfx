@@ -43,7 +43,7 @@ public class DatasetPlaneWrapper extends AbstractLoaderWrapper<Dataset>
     
     public DatasetPlaneWrapper(Context context,Dataset dataset, long[] planePosition) {
         super(dataset);
-        
+        context.inject(this);
         source = dataset;
         position = DimensionUtils.planarToAbsolute(planePosition);
         
