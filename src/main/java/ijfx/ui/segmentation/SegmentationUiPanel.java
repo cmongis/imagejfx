@@ -399,6 +399,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         nodeMap.get(newPane).setImageDisplay(getCurrentImageDisplay());
 
         hintService.displayHints(getActivePlugin().getClass(), false);
+        hintService.displayHints("/ijfx/ui/segmentation/SegmentationUiPanel-tutorial-hints.json",false);
     }
 
     private void onMaskChanged(Observable obs, Img<BitType> oldMask, Img<BitType> newMask) {

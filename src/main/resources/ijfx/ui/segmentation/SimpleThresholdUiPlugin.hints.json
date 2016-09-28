@@ -1,7 +1,7 @@
 [
     {
         "target":"#modeHBox"
-        ,"text":"Segmentation can be done using two modes : Fixed threshold or Auto"
+        ,"text":"Segmentation can be done using two modes : \"Fixed threshold\" or \"Automatic threshold\""
         
     }
     ,{
@@ -14,9 +14,9 @@
     }
     ,{
         "target":"#autoThresholdButton"
-        ,"text":"Auto mode allows you to set a method that will select which value should be used for the threshold."
+        ,"text":"\"Auto mode\" calculate the right threshold value based using a specific method."
     },{
         "target":"#autoThresholdButton"
-        ,"text":"The best method usually depends on the type of data you are analysing."
+        ,"text":"Change the method by using this menu. The right method usually depends on the type of data you are analysing."
     }
 ]

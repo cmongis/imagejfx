@@ -1,0 +1,24 @@
+[
+     
+    {
+        "target":"#actionVBox"
+        ,"text":"Once you satifisfied with the mask and the method, here are your possibilities..."
+    },
+    {
+        "target":"#analyseParticlesButton"
+        ,"text":"Separate all the individual objects and visualize there shape and pixel statistics in a table."
+                
+    },
+    {
+        "target":"#countObjectsButton"
+        ,"text":"Count the indivudual objects segmented from the mask and adds it to a table"
+    }
+    ,{
+        "target":"none"
+        ,"text":"Each button contains additional actions, useful  in multidimensional context"
+    },
+    {
+     "target":"#segmentMoreButton"
+     ,"text":"Finally, enter the Explorer and use the same segmentation on several files or planes coming from different files."
+    }
+]
