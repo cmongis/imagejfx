@@ -1,6 +1,6 @@
 [
     {
-        "text":"Here you will have access to common operations executed on images. The context of each category may be different depending on the image you are editing."
+        "text":"ImageJFX gathers commonly use image operation in this bar. It content will vary depending ont the type of images you work on."
         ,"target":"#imagej-top-toolbar"
     }
 ]

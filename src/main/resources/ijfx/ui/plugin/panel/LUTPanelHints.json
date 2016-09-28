@@ -9,10 +9,10 @@
     }
     ,{
         "target":"#autoRangeButton"
-        ,"text":"Click here if you want to adjust automatically the min/max value."
+        ,"text":"Or trigger automatic adjustment by using this button."
     }
     ,{
-        "target":"#lut-panel-lut-combox"
-        ,"text":"Change the LUT by using this Combobox."
+        "target":"#lutComboBox"
+        ,"text":"Give more colors to your image by quickly changing the LUT here."
     }
 ]

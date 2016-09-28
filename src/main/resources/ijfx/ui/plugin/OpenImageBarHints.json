@@ -1,6 +1,6 @@
 [
     {
-        "target":"#sideMenuMainTopVBox"
+        "target":"#sideMenu"
         ,"text":"Welcome to ImageJFX !\nThis bar give you access to the different tasks possible with ImageJFX."
     },
     {
