@@ -584,7 +584,7 @@ public class ArcItem<T> extends Control {
     ;
 
     private void onTickChanged(ObservableValue<? extends Number> obs, Number oldValue, Number newValue) {
-        //rebuildTickHashMap();
+        rebuildTickHashMap();
     }
     ;
 
@@ -621,7 +621,7 @@ public class ArcItem<T> extends Control {
                 System.out.println(node);
                        
                 System.out.println(node.getTranslateX());
-                //bar.getChildren().add(node);
+               bar.getChildren().add(node);
             });
         }
 
