@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
@@ -17,7 +22,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-<fx:root id="AnchorPane" fx:id="explorerActivity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="800.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root id="AnchorPane" fx:id="explorerActivity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="800.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane maxHeight="1.7976931348623157E308" prefWidth="290.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -113,7 +118,7 @@
          <center>
             <HBox fx:id="toolbarMiddleHbox" alignment="CENTER_LEFT" spacing="10.0" BorderPane.alignment="CENTER_LEFT">
                <children>
-                  <Label text="Acces:" />
+                  <Label styleClass="warning" text="Access :" />
                   <HBox fx:id="toggleButtonHBox" styleClass="toggle-group">
                      <children>
                         <ToggleButton fx:id="fileModeToggleButton" mnemonicParsing="false" styleClass="first" text="Files">
@@ -130,14 +135,15 @@
                            </graphic></ToggleButton>
                      </children>
                   </HBox>
-                  <HBox fx:id="filterHBox" spacing="5.0">
+                  <HBox fx:id="filterHBox" alignment="CENTER_LEFT" spacing="5.0">
                      <children>
-                        <ToggleButton fx:id="filterToggleButton" mnemonicParsing="false" styleClass="icon">
+                        <Label styleClass="warning" text="...and filter by :  " />
+                        <ToggleButton fx:id="filterToggleButton" mnemonicParsing="false" text="MetaData">
                            <graphic>
                               <FontAwesomeIconView glyphName="FILTER" styleClass="icon" />
                            </graphic>
                         </ToggleButton>
-                        <TextField fx:id="filterTextField" maxWidth="1.7976931348623157E308" promptText="Quick filter..." />
+                        <TextField fx:id="filterTextField" maxWidth="1.7976931348623157E308" prefWidth="100.0" promptText="...or by name..." />
                      </children>
                   </HBox>
                </children>
