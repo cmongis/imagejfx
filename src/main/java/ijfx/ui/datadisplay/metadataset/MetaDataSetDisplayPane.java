@@ -105,7 +105,7 @@ public class MetaDataSetDisplayPane extends BorderPane implements DisplayPanePlu
         try {
             logger.info("Creating display view");
             
-            FXUtilities.injectFXML(this);
+            FXUtilities.injectFXML(this,"MetaDataSetdisplayPane.fxml");
 
            
        

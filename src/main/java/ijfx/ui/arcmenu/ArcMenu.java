@@ -221,7 +221,7 @@ public class ArcMenu extends StackPane implements ArcMenuSkin{
         }
         //animate();
         addSlider();
-        
+       
         build = true;
     }
 

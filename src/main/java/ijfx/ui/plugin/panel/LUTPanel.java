@@ -317,6 +317,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         lutComboBox = new LUTComboBox();
         context.inject(lutComboBox);
         lutComboBox.init();
+        lutComboBox.setId("lutComboBox");
         lutComboBox.setPrefWidth(200);
         lutComboBox.setMinWidth(200);
         buildComboBox();

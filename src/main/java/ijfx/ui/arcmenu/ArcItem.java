@@ -23,10 +23,12 @@ package ijfx.ui.arcmenu;
 import ijfx.ui.arcmenu.skin.ArcItemSkin;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.ui.arcmenu.skin.ArcItemCircleSkin;
 import static ijfx.ui.arcmenu.skin.ArcItemSkin.CSS_ARC_MENU;
 import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.TranslateTransition;
 import javafx.beans.Observable;
@@ -110,7 +112,7 @@ public class ArcItem<T> extends Control {
     /**
      * Space between each discrete value that the slider can take
      */
-    protected final SimpleDoubleProperty sliderTick = new SimpleDoubleProperty(2.5);
+    protected final SimpleDoubleProperty sliderTick = new SimpleDoubleProperty(1.0);
 
     /**
      * Boolean that indicates if it's sliding
@@ -142,6 +144,9 @@ public class ArcItem<T> extends Control {
 
     Logger logger = ImageJFX.getLogger();
 
+    
+        HashMap<Double, Node> tickHashMap;
+    
     /**
      *
      * @return
@@ -181,6 +186,7 @@ public class ArcItem<T> extends Control {
      * @param choices
      */
     public void setChoices(T... choices) {
+        setType(ArcItemType.CHOICE);
         this.choices = new ArrayList<T>();
         for (T choice : choices) {
             this.choices.add(choice);
@@ -196,7 +202,7 @@ public class ArcItem<T> extends Control {
      * @param icon
      */
     public ArcItem(String title, FontAwesomeIcon icon) {
-
+        super();
         setTitle(title);
         //System.out.println(GlyphsDude.createIcon(icon));
         setIcon(GlyphsDude.createIcon(icon));
@@ -432,7 +438,7 @@ public class ArcItem<T> extends Control {
         selectionLabel.translateXProperty().bind(translateXProperty());
         selectionLabel.translateYProperty().bind(Bindings.createDoubleBinding(this::getLabelY, translateXProperty(), translateYProperty()));
         isSubscribed = true;
-// rebuildTickHashMap();
+        rebuildTickHashMap();
     }
 
     private void onSliderValueChanged(Observable value, Number oldValue, Number newValue) {
@@ -535,11 +541,11 @@ public class ArcItem<T> extends Control {
 
             double newSliderValue = sliderRatio.get() + diff / sliderWidth.getValue();
             
-            /*
+            
             if (newSliderValue < 0.0 || newSliderValue > 1.0) {
                 event.consume();
                 return;
-            }*/
+            }
 
             // setTranslateX(getTranslateX() + diff);
             setTranslateX(getPolarCoordinates().xProperty().getValue() + shift);
@@ -578,7 +584,7 @@ public class ArcItem<T> extends Control {
     ;
 
     private void onTickChanged(ObservableValue<? extends Number> obs, Number oldValue, Number newValue) {
-        rebuildTickHashMap();
+        //rebuildTickHashMap();
     }
     ;
 
@@ -608,11 +614,14 @@ public class ArcItem<T> extends Control {
         }
 
         bar.getChildren().addAll(rect);
-
-        if (getType() == ArcItemType.CHOICE) {
+        System.out.println(getType());
+        if (getType().equals(ArcItemType.CHOICE)) {
             getTickHashMap().forEach((value, node) -> {
                 node.setTranslateX(valueToSliderValue(value) * sliderWidth.getValue());
-                bar.getChildren().add(node);
+                System.out.println(node);
+                       
+                System.out.println(node.getTranslateX());
+                //bar.getChildren().add(node);
             });
         }
 
@@ -624,6 +633,8 @@ public class ArcItem<T> extends Control {
         getArcMenu().getChildren().add(0, bar);
 
     }
+    
+
 
     /**
      *
@@ -636,21 +647,21 @@ public class ArcItem<T> extends Control {
         return tickHashMap;
     }
 
-    HashMap<Double, Node> tickHashMap;
+
 
     /**
      *
      */
     public void rebuildTickHashMap() {
-        tickHashMap = new HashMap<>();
+        
         if (getSkin() == null) {
             return;
         }
-        
+        tickHashMap = new HashMap<>();
 
         for (double i = sliderMinValue.get(); i <= sliderMaxValue.get(); i += sliderTick.get()) {
 
-            tickHashMap.put(new Double(i), createTick(i));
+            tickHashMap.put(i, createTick(i));
 
         }
     }
@@ -660,11 +671,9 @@ public class ArcItem<T> extends Control {
      * @param newValue
      */
     protected void updateTicks(double newValue) {
-        if (tickHashMap == null) {
-            rebuildTickHashMap();
-        }
+        
 
-        tickHashMap.forEach((key, node) -> {
+        getTickHashMap().forEach((key, node) -> {
             
             if (key.equals(newValue)) {
                 node.getStyleClass().add(ArcItemSkin.CSS_ARC_ITEM_CHOICE_BOX_HOVER);
@@ -688,6 +697,7 @@ public class ArcItem<T> extends Control {
 
             return tick;
         } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error when creating tick",e);
             return null;
         }
     }
