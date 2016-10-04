@@ -4,6 +4,10 @@
         ,"target":"#segmentation-panel"
     }
     ,{
+        "text":"But first, select a threshold method"
+        ,"target":""
+    }
+    ,{
         "text":"Test your workflow on one image by clicking on this button."
         ,"target":"#testButton"
     }

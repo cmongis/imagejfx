@@ -469,17 +469,20 @@ public class MainWindowController extends AnchorPane {
     @EventHandler
     public synchronized void onHintRequested(HintRequestEvent event) {
 
-        event.getHintList().forEach(hint -> {
-
-            logger.info(String.format("Displayint hint %s", hint.getId()));
-
-            if (hintQueue.stream().filter(hint2 -> hint2.equals(hint)).count() == 0) {
-                hintQueue.add(hint);
-            }
-        });
+        for (Hint hint : event.getHintList()) {
+            queueHint(hint);
+        }
 
         //hintQueue.addAll(event.getHintList());
         Platform.runLater(this::nextHint);
+    }
+
+    private synchronized void queueHint(Hint hint) {
+        logger.info(String.format("Queuing hint %s (%d already in the queue)", hint.getId(),hintQueue.size()));
+        if (hintQueue.stream().filter(hint2 -> hint.getId().equals(hint2.getId())).count() == 0) {
+            hintQueue.add(hint);
+        }
+
     }
 
     @EventHandler
@@ -547,8 +550,8 @@ public class MainWindowController extends AnchorPane {
         if (isHintDisplaying) {
             return;
         }
-
-        showHelpSequence(hintQueue.poll());
+        if(hintQueue.size() > 0)
+        showHelpSequence(hintQueue.peek());
 
     }
 
@@ -571,17 +574,18 @@ public class MainWindowController extends AnchorPane {
             final double sceneWidth = getScene().getWidth();
             final double finalX;
             final double finalY;
+
+            Button gotItButton = new Button("Got it !");
             // rectangle representing the highlighted node
             Rectangle rectangle;
             if (node != null) {
                 Bounds nodeBounds = node.getLocalToSceneTransform().transform(node.getLayoutBounds());
                 rectangle = new Rectangle(nodeBounds.getMinX() - rectanglePadding, nodeBounds.getMinY() - rectanglePadding, nodeBounds.getWidth() + rectanglePadding * 2, nodeBounds.getHeight() + rectanglePadding * 2);
 
+            } else {
+                rectangle = new Rectangle(getWidth() / 2 + 100, 150, 0, 0);
             }
-            else {
-                rectangle = new Rectangle(getWidth() / 2, getHeight() / 2, 0, 0);
-            }
-            Bounds rectangleBounds;
+
             Rectangle bigOne = new Rectangle(0, 0, sceneWidth, sceneHeight);
 
             Shape highligther = Path.subtract(bigOne, rectangle);
@@ -596,47 +600,76 @@ public class MainWindowController extends AnchorPane {
             label.setWrapText(true);
             label.setPrefWidth(hintWidth);
 
-            rectangleBounds = rectangle.getBoundsInLocal();
-            
-            // callable determining the final position of the box
-            
-            
-            // generics:
-            
-            Callable<Double> verticalCenter = ()-> (sceneWidth - rectangleBounds.getWidth()) / 2;
-            Callable<Double> horizontalCenter = ()->(sceneWidth - rectangleBounds.getHeight()) / 2;
-            
-            
-            Callable<Double> toTheLeft = ()-> rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
-            Callable<Double> toTheRight = ()-> rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
-            
-          
-            
-            Callable<Double> onTop = ()->rectangleBounds.getMaxY() - label.getHeight();
-            Callable<Double> under = ()->rectangleBounds.getMinY();
-           
-            // deciding the last position
-            
-            
-            
-            Callable<Double> xPosition = rectangleBounds.getMinX() < hintWidth + hintMargin ? toTheLeft : toTheRight;
-            Callable<Double> yPosition = rectangleBounds.getMinY() + label.getHeight() > sceneHeight ? onTop : under;
-            
-            // correcting
-            if(rectangleBounds.getWidth() > sceneWidth * 0.9) {
-                xPosition = horizontalCenter;
-                yPosition = under;
-            }
-            
-            
-            label.translateXProperty().bind(Bindings.createDoubleBinding(xPosition, highligther.translateXProperty()));
-            label.translateYProperty().bind(Bindings.createDoubleBinding(yPosition, label.heightProperty()));
-            
-            
-            
-            //label.setTranslateY(nodeBounds.getMinY());
-            Button gotItButton = new Button("Got it !");
+            Callable<Double> nextToNodeX = () -> {
 
+                Bounds rectangleBounds;
+                rectangleBounds = rectangle.getBoundsInLocal();
+
+                Callable<Double> toTheLeft = () -> rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
+                Callable<Double> toTheRight = () -> rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
+
+                Callable<Boolean> putToRight = () -> rectangleBounds.getMinX() - label.getWidth() - hintMargin < 0;
+
+                return putToRight.call() ? toTheLeft.call() : toTheRight.call();
+
+                /// return null;
+            };
+
+            Callable<Double> nextToNodeY = () -> {
+                Bounds rectangleBounds;
+                rectangleBounds = rectangle.getBoundsInLocal();
+
+                Callable<Double> onTop = () -> rectangleBounds.getMaxY() - label.getHeight() - gotItButton.getHeight() - (hintMargin / 2);
+                Callable<Double> under = () -> rectangleBounds.getMinY();
+
+                Callable<Boolean> putOnTop = () -> rectangleBounds.getMinY() + label.getHeight() + (hintMargin) + gotItButton.getHeight() > sceneHeight;
+
+                return putOnTop.call() ? onTop.call() : under.call();
+            };
+
+            Callable<Double> saveLevelX = () -> {
+                Bounds rectangleBounds;
+                rectangleBounds = rectangle.getBoundsInLocal();
+
+                return rectangleBounds.getMinX();
+            };
+
+            Bounds rectangleBounds;
+            rectangleBounds = rectangle.getBoundsInLocal();
+
+            // callable determining the final position of the box
+            // generics:
+            //Callable<Double> verticalCenter = () -> 1d * (sceneWidth +  label.getWidth()) / 2;
+            //Callable<Double> horizontalCenter = () -> 1d * (sceneHeight + label.getHeight()+hintMargin+gotItButton.getHeight())/2;
+            Callable<Double> toTheLeft = () -> rectangleBounds.getMaxX() + hintMargin + highligther.getTranslateX();
+            Callable<Double> toTheRight = () -> rectangleBounds.getMinX() - hintWidth - hintMargin + highligther.getTranslateX();
+
+            Callable<Double> onTop = () -> rectangleBounds.getMaxY() - label.getHeight() - gotItButton.getHeight() - (hintMargin / 2);
+            Callable<Double> under = () -> rectangleBounds.getMinY();
+
+            // deciding the last position
+            Callable<Boolean> putToRight = () -> rectangleBounds.getMinX() - label.getWidth() - hintMargin < 0;
+            Callable<Boolean> putOnTop = () -> rectangleBounds.getMinY() + label.getHeight() + (hintMargin) + gotItButton.getHeight() > sceneHeight;
+
+            Callable<Double> xPosition = nextToNodeX;
+            Callable<Double> yPosition = nextToNodeY;
+
+            if (rectangle.getBoundsInLocal().getWidth() > sceneWidth * 0.8) {
+                xPosition = saveLevelX;
+                yPosition = () -> rectangleBounds.getMaxY() + hintMargin;
+            }
+
+            // correcting
+            // if (rectangleBounds.getWidth() > sceneWidth * 0.9) {
+            //   xPosition = horizontalCenter;
+            //  yPosition = under;
+            //}
+            //if(rectangle.getWidth() == 0) xPosition = verticalCenter;
+            //if(rectangle.getHeight() == 0) yPosition = horizontalCenter;
+            label.translateXProperty().bind(Bindings.createDoubleBinding(xPosition, highligther.translateXProperty(), rectangle.boundsInParentProperty()));
+            label.translateYProperty().bind(Bindings.createDoubleBinding(yPosition, label.heightProperty(), gotItButton.heightProperty()));
+
+            //label.setTranslateY(nodeBounds.getMinY());
             gotItButton.translateXProperty().bind(label.translateXProperty());
 
             gotItButton.setPrefWidth(hintWidth);
@@ -661,7 +694,7 @@ public class MainWindowController extends AnchorPane {
 
                 // set that the hint is not displayed again
                 isHintDisplaying = false;
-
+                hintQueue.poll();
                 // displaying the next hint
                 nextHint();
                 transition.play();
@@ -678,9 +711,6 @@ public class MainWindowController extends AnchorPane {
             gotItButton.setOnAction(event -> {
                 highligther.getOnMouseClicked().handle(null);
                 hint.setRead();
-
-                //if(hintQueue.size() ==0 ) {
-                //}
             });
 
             //if(isHintDisplaying) {

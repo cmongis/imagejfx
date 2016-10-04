@@ -1,0 +1,42 @@
+[
+    {
+        "text":"Youhou ! ImageJFX searched and indexed all scientifics Image Data located your folder."
+        ,"target":"none"
+    }
+    ,{
+        "target":"none"
+        ,"text":"Now let's see what we can do with it."
+    }
+    ,{
+        "target":"#toggleButtonHBox"
+        ,"text":"ImageJFX sees your data at different levels : Image files, planes, or objects"
+    }
+    ,{
+        "target":"#fileModeToggleButton"
+        ,"text":"In a \"File Level\", you see each and every individual image files from your dataset."
+    }
+    ,{
+        "target":"#fileModeToggleButton"
+        ,"text":"When using elements from this mode, the batch processing or the batch segmentation will use the whole file as input."
+    }
+    ,{
+        "target":"#planeModeToggleButton"
+        ,"text":"In the \"Plane Level\", ImageJFX indexes all the planes of your multidimensional image files."
+    }
+    ,{
+        "target":"#planeModeToggleButton"
+        ,"text":"In this mode, you can apply operations to specific planes or type of planes. e.g. only the first channel"
+    }
+    ,{
+        "target":"#objectModeToggleButton"
+        ,"text":"The last mode allows you to access all the object you previously segmented from your images."
+    }
+    ,{
+        "target":"#filterHBox",
+        "text":"...but no matter the mode, you can always filter the elements inside."
+    },
+    {
+        "target":"#moreMenuButton"
+        ,"text":"Now if you want me to tell you more about the explorer, use this button."
+    }
+]

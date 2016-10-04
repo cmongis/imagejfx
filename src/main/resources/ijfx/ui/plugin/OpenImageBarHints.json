@@ -1,10 +1,10 @@
 [
     {
         "target":"#sideMenu"
-        ,"text":"Welcome to ImageJFX !\nThis bar give you access to the different tasks possible with ImageJFX."
+        ,"text":"Welcome to ImageJFX !\nThis bar give you access to different Workspaces : Explore, Visualize, and Segment."
     },
     {
         "target":"#open-button"
-        ,"text":"But first, open an image by using this button.\nYou can also drop a file to open it or a folder to explorer it."
+        ,"text":"But first, open an image by using this button.\nYou can also drop a file to open it, or a folder to explore it."
     }
 ]

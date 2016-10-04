@@ -19,6 +19,7 @@
  */
 package ijfx.ui.activity;
 
+import ijfx.service.ui.HintService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.main.ImageJFX;
 import java.util.Collection;
@@ -66,8 +67,9 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     @Parameter
     Context context;
 
-    
-    
+    @Parameter
+    HintService hintService;
+
     Activity currentActivity;
 
     Logger logger = ImageJFX.getLogger();
@@ -108,14 +110,14 @@ public class DefaultActivityService extends AbstractService implements ActivityS
         activityMapById.clear();
         openByType(getCurrentActivity().getClass());
     }
-    
+
     @Override
     public <T extends Activity> T getActivity(Class<T> activityClass) {
         if (activityClass == null) {
             logger.severe("Passing NULL as activity parameter !");
             return null;
         }
-        if(activityMap.containsKey(activityClass.getName()) == false) {
+        if (activityMap.containsKey(activityClass.getName()) == false) {
             try {
                 logger.info("Loading activity : " + activityClass.getName());
                 PluginInfo<SciJavaPlugin> plugin;
@@ -186,7 +188,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     public void back() {
         State state = backStack.pop();
         forwardStack.add(state);
-        
+
         setCurrentActivity(state.getActivity());
         state.restoreContext();
     }
@@ -196,8 +198,7 @@ public class DefaultActivityService extends AbstractService implements ActivityS
         State activity = forwardStack.pop();
         activity.restoreContext();
         open(activity.getActivity());
-        
-        
+
     }
 
     @Override
@@ -227,13 +228,14 @@ public class DefaultActivityService extends AbstractService implements ActivityS
         uiContextService.update();
         eventService.publish(new ActivityChangedEvent(activity));
         logger.info("Event published");
+        hintService.displayHints(activity.getClass(), false);
     }
 
     @Override
     public Activity getCurrentActivity() {
         return currentActivity;
     }
-    
+
     @Override
     public String getCurrentActivityId() {
         return currentActivity.getActivityId();
@@ -243,14 +245,12 @@ public class DefaultActivityService extends AbstractService implements ActivityS
     public Class<?> getCurrentActivityAsClass() {
         return currentActivity.getClass();
     }
-    
-    
+
     private class State {
+
         final Activity activity;
         final Set<String> context;
 
-        
-        
         public State() {
             this.activity = getCurrentActivity();
             this.context = new HashSet<>(uiContextService.getContextList());
@@ -263,15 +263,13 @@ public class DefaultActivityService extends AbstractService implements ActivityS
         public Set<String> getContext() {
             return context;
         }
-        
+
         public void restoreContext() {
             uiContextService.clean();
             uiContextService.enter(context.toArray(new String[context.size()]));
             uiContextService.update();
         }
-        
-        
-        
+
     }
-    
+
 }

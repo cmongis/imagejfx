@@ -1,0 +1,20 @@
+[
+    {
+        "target":"#tabPane"
+        ,"text":"This pane allows you to visualize your data in different manners."
+    }
+    ,
+    {
+        "target":"#openButton"
+        ,"text":"Any element can be open. The resulting action depends on if it's a file, a plane or an object."
+    },
+    {
+        "target":"#statisticsButton"
+        ,"text":"This button allows you to gather pixel statistics concerning the different files or planes."
+    }
+    ,{
+        "target":"#filterToggleButton"
+        ,"text":"You can later use these statistics to filter your planes."
+    }
+    
+]

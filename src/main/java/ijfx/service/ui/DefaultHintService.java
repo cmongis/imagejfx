@@ -27,6 +27,7 @@ import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class DefaultHintService extends AbstractService implements HintService {
     }
 
     @Override
-    public void displayHints(List<? extends Hint> hintList, boolean force) {
+    public void displayHints(Collection<? extends Hint> hintList, boolean force) {
         if(force) {
             eventService.publishLater(new HintRequestEvent(hintList));
         }
@@ -124,7 +125,7 @@ public class DefaultHintService extends AbstractService implements HintService {
           
             
             List<DefaultHint> hintList = jsonToHintList(TextFileUtils.readFileFromJar(url,clazz));
-            hintList.forEach(hint->hint.setId(clazz.getSimpleName()+hint.getTarget()));
+            //hintList.forEach(hint->hint.setId(clazz.getSimpleName()+hint.getTarget()));
             logger.info(String.format ("%s had %d hints loaded",clazz.getSimpleName(),hintList.size()));
             displayHints(hintList, force);
         } catch (IOException ex) {

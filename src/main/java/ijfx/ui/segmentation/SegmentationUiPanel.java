@@ -85,9 +85,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
+import mongis.utils.transition.OpacityTransitionBinding;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -188,6 +190,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     private SplitMenuButton countObjectsButton;
 
+    @FXML
+            private VBox actionVBox;
+    
     Img<BitType> currentMask;
 
     private final Map<TitledPane, SegmentationUiPlugin> nodeMap = new HashMap<>();
@@ -264,6 +269,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         onExplorerPropertyChanged(isExplorerProperty, Boolean.FALSE, isExplorer());
 
+        new OpacityTransitionBinding(actionVBox, accordion.expandedPaneProperty().isNotNull());
+        
         //planeSettingCheckBox.textProperty().bind(Bindings.createStringBinding(this::getCheckBoxText, planeSettingCheckBox.selectedProperty()));
         return this;
     }

@@ -20,8 +20,7 @@
 package ijfx.service.ui;
 
 import ijfx.service.ui.hint.Hint;
-import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 import net.imagej.ImageJService;
 
 /**
@@ -31,7 +30,7 @@ import net.imagej.ImageJService;
 public interface HintService extends ImageJService{
     
     public void displayHint(Hint hint, boolean force);
-    public void displayHints(List<? extends Hint> hint, boolean force);
+    public void displayHints(Collection<? extends Hint> hint, boolean force);
     public void displayHints(String url, boolean force);
     public void displayHints(Class clazz, boolean force);
 

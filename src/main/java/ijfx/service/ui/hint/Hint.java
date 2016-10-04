@@ -33,4 +33,6 @@ public interface Hint {
     public boolean isRead();
     public void setRead();
     
+    
+    
 }

@@ -19,7 +19,7 @@
  */
 package ijfx.service.ui.hint;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.scijava.event.SciJavaEvent;
 
@@ -28,13 +28,13 @@ import org.scijava.event.SciJavaEvent;
  * @author cyril
  */
 public class HintRequestEvent extends SciJavaEvent{
-    private final List<? extends Hint> hintList;
+    private final Collection<? extends Hint> hintList;
 
-    public HintRequestEvent(List<? extends Hint> hintList) {
+    public HintRequestEvent(Collection<? extends Hint> hintList) {
         this.hintList = hintList;
     }
 
-    public List<? extends Hint> getHintList() {
+    public Collection<? extends Hint> getHintList() {
         return hintList;
     }
     

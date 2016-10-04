@@ -1,0 +1,12 @@
+[
+    {
+        "target": "none"
+        ,
+        "text": "Welcome to the Explorer Workspace !"
+    },
+    {
+        "target": "none"
+        ,
+        "text": "This workspace allows you to explore your image data and achieve operations at a larger scale."
+    }
+]

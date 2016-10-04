@@ -29,6 +29,7 @@ import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.batch.WorkflowPanel;
+import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.widgets.PopoverToggleButton;
 import ijfx.ui.widgets.PrettyStats;
 import javafx.beans.binding.Bindings;
@@ -43,6 +44,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
+import mongis.utils.transition.OpacityTransitionBinding;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.plugins.commands.assign.InvertDataValues;
@@ -62,7 +64,7 @@ import org.scijava.ui.UIService;
  *
  * @author cyril
  */
-@Plugin(type = SegmentationUiPlugin.class, label = "Process workflow")
+@Plugin(type = SegmentationUiPlugin.class, label = "Process workflow", priority = 0.9)
 public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiPlugin {
 
     @Parameter
@@ -94,6 +96,8 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
     protected ImageDisplay imageDisplay;
 
     private final BooleanProperty activatedProperty = new SimpleBooleanProperty();
+
+    protected UiContextProperty isExplorer;
 
     public WorkflowSegmentationUiPanel() {
 
@@ -140,6 +144,11 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
             workflowPanel.addStep(DilateBinaryImage.class);
             workflowPanel.setPrefHeight(500);
             workflowPanel.setPrefWidth(600);
+
+            isExplorer = new UiContextProperty(context, "explorerActivity");
+            
+            new OpacityTransitionBinding(testButton, isExplorer.not());
+            
             stepCount.valueProperty().bind(Bindings.createIntegerBinding(() -> workflowPanel.stepListProperty().size(), workflowPanel.stepListProperty()));
 
             // binding the toggle button to the workflow panel

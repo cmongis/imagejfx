@@ -44,6 +44,11 @@ public class DefaultHint implements Hint{
     
     public DefaultHint() {}
     
+    public DefaultHint(String target, String text) {
+        setTarget(target);
+        setText(text);
+    }
+    
     public DefaultHint(Hint h) {
         setId(h.getId());
         setText(h.getText());
@@ -55,7 +60,7 @@ public class DefaultHint implements Hint{
     
     public String getId() {
         if(id == null) {
-            id = UUID.nameUUIDFromBytes(getText().getBytes()).toString();
+            id = UUID.nameUUIDFromBytes((getTarget()+getText()).getBytes()).toString();
         }
         return id;
     }

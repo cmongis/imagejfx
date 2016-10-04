@@ -39,7 +39,7 @@
          <bottom>
             <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
                <children>
-                  <Button mnemonicParsing="false" onAction="#openSelection" text="Open">
+                  <Button fx:id="openButton" mnemonicParsing="false" onAction="#openSelection" text="Open">
                      <graphic>
                         <FontAwesomeIconView glyphName="IMAGE" />
                      </graphic>
@@ -52,10 +52,11 @@
                         <Insets />
                      </HBox.margin>
                   </Button>
-                  <MenuButton mnemonicParsing="false" styleClass="normal" text="More">
+                  <MenuButton fx:id="moreMenuButton" mnemonicParsing="false" styleClass="normal" text="More">
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#exportToCSV" text="Export displayed item to CSV" />
                       <MenuItem mnemonicParsing="false" text="Propositions are welcomed" />
+                        <MenuItem mnemonicParsing="false" onAction="#tellMeMore" text="Tell me more about the explorer" />
                     </items>
                      <HBox.margin>
                         <Insets right="20.0" />
@@ -102,7 +103,7 @@
          <left>
             <HBox fx:id="folderTitleHBox" prefWidth="250.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button mnemonicParsing="false" onAction="#addFolder" text="Add a folder">
+                  <Button fx:id="addFolderButton" mnemonicParsing="false" onAction="#addFolder" text="Add a folder">
                      <graphic>
                         <FontAwesomeIconView glyphName="PLUS" styleClass="h4" text="" />
                      </graphic>

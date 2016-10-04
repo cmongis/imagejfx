@@ -30,6 +30,7 @@ import ijfx.ui.notification.NotificationService;
 import ijfx.service.ui.AppService;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.JsonPreferenceService;
+import ijfx.service.ui.hint.DefaultHint;
 import ijfx.service.uicontext.UiContextService;
 import java.io.File;
 import javafx.event.ActionEvent;
@@ -101,7 +102,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Open module browser", this::openWebApp);
         addItem("Reset Explorer Data", this::resetExplorerData);
         addItem("Reset Hints History",this::resetHintHistory);
-       
+        addItem("Play Hints",this::playHints);
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED, this::updateReloadMenu);
         System.out.println("Added");
@@ -195,5 +196,15 @@ public class DebugButton extends MenuButton implements UiPlugin {
     
     private void resetHintHistory(Object event) {
         hintService.resetConfiguration();
+    }
+    
+    private void playHints(Object ob) {
+        
+       // hintService.displayHints(OpenImageBar.class, true);
+       String fakeText = "This is a very long text. But I will try to make it short... except if I fail like now.";
+        hintService.displayHint(new DefaultHint("#selectAllButton",fakeText), true);
+        hintService.displayHint(new DefaultHint("#folderTitleHBox",fakeText+" and let's make it longer"),true);
+        hintService.displayHint(new DefaultHint("","And me I should be in the middle like malcolm"),true);
+        
     }
 }

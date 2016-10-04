@@ -25,6 +25,7 @@ import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.core.metadata.MetaDataOwner;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.metadata.MetaDataSetUtils;
+import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.activity.Activity;
@@ -79,7 +80,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
@@ -155,6 +155,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @Parameter
     private UIService uiService;
+    
+    @Parameter
+    private HintService hintService;
     
     @FXML
     private TabPane tabPane;
@@ -295,6 +298,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         if (explorable != null) {
             view.setItem(explorable);
         }
+        
+        if(folderListEmpty.getValue()) {
+            hintService.displayHints("/ijfx/ui/explorer/ExplorerActivity-tutorial-1.hints.json", false);
+        }
     }
 
     // returns true if the folder is not displayed yet
@@ -308,6 +315,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
         if (f != null) {
             folderManagerService.addFolder(f);
+            
+            
+            
         }
     }
 
@@ -329,6 +339,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @EventHandler
     public void onExploredItemListChanged(ExploredListChanged event) {
         Platform.runLater(this::updateFilters);
+        hintService.displayHints("/ijfx/ui/explorer/ExplorerActivity-tutorial-2.hints.json", false);
     }
 
     @EventHandler
@@ -569,6 +580,11 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     public void explainMe() {
         uiService.showDialog("Function not implemented yet.");
+    }
+    
+    @FXML
+    public void tellMeMore() {
+        hintService.displayHints("/ijfx/ui/explorer/ExplorerActivity-tutorial-3.hints.json", true);
     }
 
     @FXML

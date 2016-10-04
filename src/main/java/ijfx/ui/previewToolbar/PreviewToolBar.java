@@ -55,7 +55,7 @@ import org.scijava.ui.UIService;
  * @author Tuan anh TRINH
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "imagej-top-toolbar", context = "imagej+image-open segmentation+image-open imagej+table-open imagej+image-open imagej+measure-open segmentation+measure-open", order = 13.0, localization = Localization.TOP_TOOLBAR)
+@UiConfiguration(id = "imagej-top-toolbar", context = "imagej+image-open segmentation+imagej+any-display-open", order = 13.0, localization = Localization.TOP_TOOLBAR)
 public class PreviewToolBar extends BorderPane implements UiPlugin {
 
     @Parameter

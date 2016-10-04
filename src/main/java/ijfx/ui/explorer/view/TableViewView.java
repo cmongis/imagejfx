@@ -23,9 +23,10 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.core.metadata.MetaDataSetType;
+import ijfx.service.ui.HintService;
+import ijfx.service.ui.hint.DefaultHint;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
-import ijfx.ui.explorer.ExplorationMode;
 import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
@@ -64,6 +65,12 @@ public class TableViewView implements ExplorerView {
     @Parameter
     FolderManagerService folderService;
 
+    @Parameter
+    HintService hintService;
+    
+    
+    private static final String TABLE_VIEW_ID = "tableViewView";
+    
     List<? extends Explorable> currentItems;
 
     Logger logger = ImageJFX.getLogger();
@@ -74,7 +81,7 @@ public class TableViewView implements ExplorerView {
         tableView.getSelectionModel().getSelectedItems().addListener(this::onListChange);
         tableView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
         tableView.setRowFactory(this::createRow);
-
+        tableView.setId(TABLE_VIEW_ID);
     }
 
     @Override
@@ -103,7 +110,7 @@ public class TableViewView implements ExplorerView {
                 .collect(Collectors.toList());
 
         setSelectedItem(selected);
-
+        displayHints();
         //tableView.getSelectionModel().getSelectedItems().addAll(selected);
     }
 
@@ -125,6 +132,8 @@ public class TableViewView implements ExplorerView {
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
         items.forEach(tableView.getSelectionModel()::select);
+        
+        
     }
 
     private void onListChange(ListChangeListener.Change<? extends Explorable> changes) {
@@ -143,8 +152,16 @@ public class TableViewView implements ExplorerView {
                     .forEach(explo -> explo.selectedProperty().setValue(false));
 
         }
+        
+    
     }
 
+    private void displayHints() {
+            
+            hintService.displayHint(new DefaultHint(String.format("#%s",TABLE_VIEW_ID),"Double click on an element to open it."), false);
+        
+    }
+    
     private void onSelectedItemChanged(Observable obs, Explorable oldValue, Explorable newValue) {
         currentItems.forEach(item -> {
             item.selectedProperty().setValue(tableView.getSelectionModel().getSelectedItems().contains(item));

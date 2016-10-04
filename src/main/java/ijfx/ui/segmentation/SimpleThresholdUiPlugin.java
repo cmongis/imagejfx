@@ -85,7 +85,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = SegmentationUiPlugin.class, label = "Fixed / Automatic threshold")
+@Plugin(type = SegmentationUiPlugin.class, label = "Fixed / Automatic threshold",priority=1)
 public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationUiPlugin {
 
     @FXML

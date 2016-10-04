@@ -1,0 +1,6 @@
+[
+    {
+        "target":"#addFolderButton"
+        ,"text":"But first, let's index some image data. Add a folder containing the images you would like to process."
+    }
+]
