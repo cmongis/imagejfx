@@ -88,6 +88,7 @@ import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.notification.DefaultNotification;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
@@ -276,6 +277,8 @@ public class MainWindowController extends AnchorPane {
 
         memoryProgressBar.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMemoryProgressBarClicked);
 
+        new GifRecorder(this).setNotifier(text->showNotification(new DefaultNotification("Gif Recorder", text)));
+        
     }
 
     private Scene myScene;
