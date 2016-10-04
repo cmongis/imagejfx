@@ -90,6 +90,8 @@ import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.notification.DefaultNotification;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 import javafx.animation.KeyFrame;
@@ -277,8 +279,8 @@ public class MainWindowController extends AnchorPane {
 
         memoryProgressBar.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMemoryProgressBarClicked);
 
-        new GifRecorder(this).setNotifier(text->showNotification(new DefaultNotification("Gif Recorder", text)));
-        
+        new GifRecorder(this).setNotifier(text -> showNotification(new DefaultNotification("Gif Recorder", text)));
+
     }
 
     private Scene myScene;
@@ -306,7 +308,12 @@ public class MainWindowController extends AnchorPane {
 
     public void onError(Throwable t) {
         ImageJFX.getLogger().log(Level.SEVERE, "Error when starting ImageJ", t);
-        new Alert(Alert.AlertType.ERROR, t.getMessage(), ButtonType.CLOSE).show();
+
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw, true);
+        t.printStackTrace(pw);
+
+        new Alert(Alert.AlertType.ERROR, sw.getBuffer().toString(), ButtonType.CLOSE).show();
     }
 
     public Boolean init(ProgressHandler handler) {
@@ -481,7 +488,7 @@ public class MainWindowController extends AnchorPane {
     }
 
     private synchronized void queueHint(Hint hint) {
-        logger.info(String.format("Queuing hint %s (%d already in the queue)", hint.getId(),hintQueue.size()));
+        logger.info(String.format("Queuing hint %s (%d already in the queue)", hint.getId(), hintQueue.size()));
         if (hintQueue.stream().filter(hint2 -> hint.getId().equals(hint2.getId())).count() == 0) {
             hintQueue.add(hint);
         }
@@ -553,8 +560,9 @@ public class MainWindowController extends AnchorPane {
         if (isHintDisplaying) {
             return;
         }
-        if(hintQueue.size() > 0)
-        showHelpSequence(hintQueue.peek());
+        if (hintQueue.size() > 0) {
+            showHelpSequence(hintQueue.peek());
+        }
 
     }
 
