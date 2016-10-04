@@ -35,4 +35,9 @@ public class OpacityTransitionBinding extends TransitionBinding<Double>{
         
     }
     
+    public OpacityTransitionBinding(Node node, ObservableValue<Boolean> property,double onFalse, double onTrue) {
+        super(onFalse,onTrue);
+        bind(property,node.opacityProperty().asObject());
+    }
+    
 }

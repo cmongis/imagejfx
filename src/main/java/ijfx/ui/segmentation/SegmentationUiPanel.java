@@ -75,6 +75,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -182,7 +183,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private FolderManagerService folderManagerService;
 
     @FXML
-    Accordion accordion;
+    private Accordion accordion;
 
     @FXML
     private SplitMenuButton analyseParticlesButton;
@@ -191,8 +192,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private SplitMenuButton countObjectsButton;
 
     @FXML
-            private VBox actionVBox;
-    
+    private VBox actionVBox;
+
     Img<BitType> currentMask;
 
     private final Map<TitledPane, SegmentationUiPlugin> nodeMap = new HashMap<>();
@@ -201,10 +202,12 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private ImageDisplayProperty imageJCurrentDisplay;
 
-    private BooleanProperty measureAllPlaneProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty measureAllPlaneProperty = new SimpleBooleanProperty(false);
 
-    private Property<ImageDisplay> explorerImageDisplay = new SimpleObjectProperty();
-
+    private final Property<ImageDisplay> explorerImageDisplay = new SimpleObjectProperty();
+    
+    private final ObjectProperty<SegmentationUiPlugin> currentPlugin = new SimpleObjectProperty();
+    
     private SilentImageDisplay fakeDisplay;
 
     private UiContextProperty segmentationContext;
@@ -213,6 +216,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private static final String ALL_PLANE_ONE_MASK = "... for all planes using this mask";
     private static final String SEGMENT_AND_MEASURE = "... after segmenting each planes";
 
+    private OpacityTransitionBinding opacityTransition;
+    
     public SegmentationUiPanel() {
 
         try {
@@ -246,9 +251,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         // initializing a fx property
         imageDisplayProperty = new SimpleObjectProperty<>();
         imageJCurrentDisplay = new ImageDisplayProperty(context);
-         segmentationContext = new UiContextProperty(context, "segmentation");
-         
-         
+        segmentationContext = new UiContextProperty(context, "segmentation");
+
         // when the display is changed, we want to notify only the current wrapper
         imageDisplayProperty.addListener(this::onImageDisplayChanged);
 
@@ -263,14 +267,12 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         isExplorerProperty.addListener(this::onExplorerPropertyChanged);
 
-       
-
         segmentationContext.addListener(this::onSegmentationContextChanged);
 
         onExplorerPropertyChanged(isExplorerProperty, Boolean.FALSE, isExplorer());
 
-        new OpacityTransitionBinding(actionVBox, accordion.expandedPaneProperty().isNotNull());
-        
+        actionVBox.disableProperty().bind(currentPlugin.isNull());
+
         //planeSettingCheckBox.textProperty().bind(Bindings.createStringBinding(this::getCheckBoxText, planeSettingCheckBox.selectedProperty()));
         return this;
     }
@@ -399,20 +401,28 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private void onExpandedPaneChanged(Observable obs, TitledPane oldPane, TitledPane newPane) {
 
+        
+        
+        
         if (newPane == null) {
+            currentPlugin.setValue(null);
             return;
         }
+        
+        currentPlugin.setValue(nodeMap.get(newPane));
         nodeMap.get(newPane).setImageDisplay(null);
         nodeMap.get(newPane).setImageDisplay(getCurrentImageDisplay());
 
         hintService.displayHints(getActivePlugin().getClass(), false);
-        hintService.displayHints("/ijfx/ui/segmentation/SegmentationUiPanel-tutorial-hints.json",false);
+        hintService.displayHints("/ijfx/ui/segmentation/SegmentationUiPanel-tutorial-hints.json", false);
     }
 
     private void onMaskChanged(Observable obs, Img<BitType> oldMask, Img<BitType> newMask) {
-        
-        if(segmentationContext.getValue() == false) return;
-        
+
+        if (segmentationContext.getValue() == false) {
+            return;
+        }
+
         if (newMask != null && getCurrentImageDisplay() != null) {
 
             new CallbackTask()
