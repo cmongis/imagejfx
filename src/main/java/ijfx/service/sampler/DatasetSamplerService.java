@@ -21,6 +21,7 @@ package ijfx.service.sampler;
 
 import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.IjfxService;
+import mongis.utils.FileUtils;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
@@ -32,6 +33,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
+import org.apache.commons.io.FilenameUtils;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -68,7 +70,10 @@ public class DatasetSamplerService extends AbstractService implements IjfxServic
         Dataset output = createOutputImage(dataset, def);
         
         copyData(def, dataset, output);
-        dataset.setName(String.format("%s - %s %d",dataset.getName(),axes.getLabel(),position));
+        String name = output.getName();
+        name = FilenameUtils.getBaseName(name);
+        String extension = FilenameUtils.getExtension(output.getName());
+        output.setName(String.format("%s - %s %d.%s",name,axes.getLabel(),position,extension));
         return output;
 
     }
