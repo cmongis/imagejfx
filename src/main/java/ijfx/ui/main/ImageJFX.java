@@ -111,10 +111,11 @@ public class ImageJFX extends Application {
             LogRecorderService.getInstance();
 
             getLogger().info("You running Java " + System.getProperty("java.version"));
-
-            getLogger().info(new File("./plugins").getAbsolutePath());
-            // System.setProperty("imagej.dir","/Applications/Fiji.app/");
-            // System.setProperty("plugins.dir","plugins/");
+            File pluginDir = new File("./","plugins/");
+            if(pluginDir.exists() == false) pluginDir.mkdir();
+            getLogger().info(pluginDir.getAbsolutePath());
+            System.setProperty("imagej.dir",new File(".").getAbsolutePath());
+            System.setProperty("plugins.dir",pluginDir.getAbsolutePath());
 
             //loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
             //root = loader.load();
