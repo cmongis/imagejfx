@@ -234,8 +234,7 @@ public class WorkflowModel {
         mapImages = new HashMap<>();
         
         // initializing property listeners
-        directoryProperty.addListener(this::onFolderChanged);
-        
+        directoryProperty.addListener(this::onFolderChanged);   
     }
     
     
@@ -378,7 +377,7 @@ public class WorkflowModel {
             imageDisplayPane1.getImageDisplay().close();
             imageDisplayPane2.getImageDisplay().close();
         } catch (NullPointerException ex) {
-            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
         CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
             try {
@@ -387,7 +386,7 @@ public class WorkflowModel {
                 displayDataset(dataset, imageDisplayPane1);
                 displayDataset(dataset, imageDisplayPane2);
             } catch (IOException ex) {
-                Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         })
                 .submit(loadingScreenService);
@@ -400,7 +399,7 @@ public class WorkflowModel {
         try {
             imageDisplayPane.getImageDisplay().close();
         } catch (NullPointerException ex) {
-            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
         CallbackTask<Void, Void> task = new CallbackTask<Void, Void>().run(() -> {
             try {
@@ -425,13 +424,13 @@ public class WorkflowModel {
         try {
             imageDisplayPane.getImageDisplay().close();
         } catch (Exception ex) {
-            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
         ImageDisplay imageDisplay = (ImageDisplay) displayService.createDisplayQuietly(dataset);
         try {
             commandService.run(AutoContrast.class, true, "imageDisplay", imageDisplay, "channelDependant", true).get();
         } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(WorkflowModel.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
         imageDisplayPane.display(imageDisplay);
         return imageDisplay;

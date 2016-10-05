@@ -19,9 +19,13 @@
  */
 package ijfx.ui.module.widget;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -39,6 +43,23 @@ import javafx.scene.control.ToggleButton;
             setText(value.toString());
             selectedProperty().addListener(this::onSelectionChanged);
             maxWidthProperty().setValue(Double.POSITIVE_INFINITY);
+            setTooltip(new Tooltip());
+            getTooltip().setText(value.toString());
+            
+            getTooltip().setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.INFO_CIRCLE));
+            
+            addEventHandler(MouseEvent.MOUSE_ENTERED, this::onMouseEntered);
+            addEventHandler(MouseEvent.MOUSE_EXITED, this::onMouseExited);
+        }
+        
+        private void onMouseEntered(MouseEvent event) {
+            double x =  event.getSceneX();
+            double y = event.getSceneY();
+            getTooltip().show(this,x,y);
+        }
+        
+        private void onMouseExited(MouseEvent event) {
+            getTooltip().hide();
         }
         
         public void onSelectionChanged(Observable obs, Boolean oldValue, Boolean newValue) {

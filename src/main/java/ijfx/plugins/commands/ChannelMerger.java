@@ -261,9 +261,13 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
         long[] position = new long[imgPlus.numDimensions()];
 
         final ARGBType color = new ARGBType();
+        
+        // the axis index of the channel of the input
         int channelAxisIndex = getChannelAxisIndex();
+        int outputChannelAxisIndex = output.dimensionIndex(Axes.CHANNEL);
         T t;
         inputCursor.reset();
+        int[] rgb = new int[3];
         while (inputCursor.hasNext()) {
 
             inputCursor.fwd();
@@ -296,12 +300,14 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
             final int blue = value & 0xff;
 
             // put it in a array
-            int[] rgb = new int[]{red, green, blue};
+            rgb[0] = red;
+            rgb[1] = green;
+            rgb[2] = blue;
             for (int c = 0; c != rgb.length; c++) {
 
                 // now we go from 0 to 2 (rgb) of the output and additionate
                 // the r, g and blue of the channel
-                outputCursor.setPosition(c, channelAxisIndex);
+                outputCursor.setPosition(c, outputChannelAxisIndex);
 
                 // calculate the new value of the pixel
                 double p = outputCursor.get().getRealDouble() + rgb[c];
@@ -310,7 +316,7 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
                 p = p > 255 ? 255 : p;
 
                 // set the new output
-                outputCursor.get().setReal(p);
+                outputCursor.get().set(new UnsignedByteType(new Double(p).intValue()));
             }
         }
     }

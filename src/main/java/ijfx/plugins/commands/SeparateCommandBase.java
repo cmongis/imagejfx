@@ -67,7 +67,8 @@ public abstract class SeparateCommandBase extends ContextCommand {
         for (int i = 0; i != size; i++) {
 
             output[i] = datasetSamplerService.isolateDimension(input, getAxis(), i);
-
+           
+          
         }
         
         
