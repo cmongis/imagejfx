@@ -35,7 +35,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = SegmentationUiPlugin.class,label="Deep learning",priority=0.1)
+@Plugin(type = SegmentationUiPlugin.class,label="Deep learning",priority=0.01)
 public class DeepLearning implements SegmentationUiPlugin{
 
     Label label = new Label("Not available yet");
