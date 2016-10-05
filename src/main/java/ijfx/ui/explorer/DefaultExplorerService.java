@@ -91,7 +91,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         }
 
         explorableList = items;
-
+        if(explorableList == null) explorableList = new ArrayList<>();
         if (explorableList != null) {
             explorableList.forEach(this::listenToExplorableSelection);
         }

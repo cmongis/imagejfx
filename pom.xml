@@ -49,12 +49,12 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej</artifactId>
-            <version>2.0.0-rc-50</version>
+            <version>2.0.0-rc-55</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-api</artifactId>
-            <version>5.1.10</version>
+            <version>5.2.2</version>
         </dependency>
         <dependency>
             <groupId>io.scif</groupId>
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>net.imglib2</groupId>
             <artifactId>imglib2-ij</artifactId>
-            <version>2.0.0-beta-33</version>
+            <version>2.0.0-beta-34</version>
         </dependency>
         <dependency>
             <groupId>org.scijava</groupId>
@@ -86,12 +86,12 @@
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-bsd</artifactId>
-            <version>5.1.10</version>
+            <version>5.2.2</version>
         </dependency>
         <dependency>
             <groupId>ome</groupId>
             <artifactId>formats-gpl</artifactId>
-            <version>5.1.10</version>
+            <version>5.2.2</version>
         </dependency>
         <dependency>
             <groupId>de.jensd</groupId>
@@ -163,7 +163,7 @@
         <dependency>
             <groupId>de.biomedical-imaging.ij</groupId>
             <artifactId>ij_blob</artifactId>
-            <version>1.4.8</version>
+            <version>1.4.9</version>
         </dependency>
         <dependency>
             <groupId>org.reactfx</groupId>
@@ -210,7 +210,7 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>imagej-legacy</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.2</version>
             <classifier>tests</classifier>
         </dependency>
         <dependency>

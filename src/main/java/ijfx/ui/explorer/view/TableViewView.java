@@ -158,7 +158,7 @@ public class TableViewView implements ExplorerView {
 
     private void displayHints() {
             
-            hintService.displayHint(new DefaultHint(String.format("#%s",TABLE_VIEW_ID),"Double click on an element to open it."), false);
+            //hintService.displayHint(new DefaultHint(String.format("#%s",TABLE_VIEW_ID),"Double click on an element to open it."), false);
         
     }
     
