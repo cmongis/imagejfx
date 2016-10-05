@@ -20,6 +20,8 @@
 package ijfx.core.assets.loader;
 
 import ijfx.core.Handles;
+import ijfx.core.assets.Asset;
+import ijfx.core.assets.AssetLoader;
 import io.scif.services.DatasetIOService;
 import java.io.IOException;
 import net.imagej.Dataset;
