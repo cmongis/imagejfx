@@ -66,8 +66,9 @@ public class DatasetSamplerService extends AbstractService implements IjfxServic
         def.constrain(axes, subrange);
         
         Dataset output = createOutputImage(dataset, def);
-
+        
         copyData(def, dataset, output);
+        dataset.setName(String.format("%s - %s %d",dataset.getName(),axes.getLabel(),position));
         return output;
 
     }
