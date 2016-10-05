@@ -291,11 +291,15 @@ public class MainWindowController extends AnchorPane {
 
     public void init() {
 
-        Task task = new CallbackTask<Void, Boolean>()
+        CallbackTask task = new CallbackTask<Void, Boolean>()
                 .runLongCallable(this::init)
                 .then(this::finishInitialization)
-                .error(this::onError)
-                .start();
+                .error(this::onError);
+        
+        Thread t = new Thread(task);
+        t.setContextClassLoader(ClassLoader.getSystemClassLoader());
+        t.start();
+              
 
         loadingPopup
                 .setCanCancel(false)
@@ -319,6 +323,8 @@ public class MainWindowController extends AnchorPane {
     public Boolean init(ProgressHandler handler) {
         handler.setStatus("Initializing ImageJ....");
         handler.setProgress(1, 3);
+        
+        logger.info(String.format("Class loader : %s",Thread.currentThread().getContextClassLoader().getClass().getSimpleName()));
         imageJ = new ImageJ();
 
         // service.removePlugin(service.getPlugin(Binarize.class));
