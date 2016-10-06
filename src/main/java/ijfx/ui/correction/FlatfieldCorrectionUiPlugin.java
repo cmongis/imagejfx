@@ -20,6 +20,7 @@
 package ijfx.ui.correction;
 
 import ijfx.core.assets.DatasetAsset;
+import ijfx.service.workflow.Workflow;
 import java.io.File;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -38,14 +39,18 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = CorrectionUiPlugin.class, label = "Flatfield Correction")
 public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
-    Property<DatasetAsset> datasetAssetProperty = new SimpleObjectProperty();
+    private Property<DatasetAsset> datasetAssetProperty = new SimpleObjectProperty();
 
-    ChannelSelector channelSelector = new ChannelSelector("Select channel");
+    private ChannelSelector channelSelector = new ChannelSelector("Select channel");
 
     Button selectionButton = new Button("Select flatfield image");
     
     Property<File> flatfieldImage;
     
+    FileButtonBinding binding = new FileButtonBinding(selectionButton);
+    
+    private static String EXPLANATION_FORMAT = "Corrects channel *%d* with *%s*";
+    private static String ALL_CHANNEL = "Correct *ALL* channels with *%s*";
     @Override
     public void init() {
         
@@ -56,11 +61,16 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
         setLeft(channelSelector);
         setRight(selectionButton);
         
-        flatfieldImage = new FileButtonBinding(selectionButton).fileProperty();
         
-        datasetAssetProperty.bind(Bindings.createObjectBinding(this::createDatasetAsset, flatfieldImage));
+        binding.setButtonDefaultText("Choose flatfield image...");
+        binding.setOpenFile(true);
+        flatfieldImage = binding.fileProperty();
         
+        bind(datasetAssetProperty,this::createDatasetAsset, flatfieldImage);
         
+        bind(explanationProperty,this::generateExplanation,flatfieldImage,channelSelector.selectedChannelProperty());
+       
+        bind(workflowProperty,this::generateWorkflow,datasetAssetProperty,channelSelector.selectedChannelProperty());
         
     }
 
@@ -68,6 +78,27 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
         return new DatasetAsset(flatfieldImage.getValue());
     }
     
+    protected Workflow generateWorkflow() {
+        
+        
+        return null;
+    }
+    
+    protected String generateExplanation() {
+        
+        int selectedChannel = channelSelector.selectedChannelProperty().getValue();
+        if(flatfieldImage.getValue() == null) {
+            return "*Please select the channel to correct and a flatfield*";
+        }
+        else {
+            
+            if(selectedChannel == -1) {
+                return String.format(ALL_CHANNEL,flatfieldImage.getValue());
+            }
+            
+            return String.format(EXPLANATION_FORMAT,selectedChannel,flatfieldImage.getValue().getName());
+        }
+    }
     
     @Override
     protected void onExampleDatasetChanged(Observable obs, Dataset oldValue, Dataset newValue) {

@@ -25,6 +25,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.Node;
 import net.imagej.Dataset;
+import org.scijava.plugin.Plugin;
 import org.scijava.plugin.SciJavaPlugin;
 
 /**
@@ -56,5 +57,9 @@ public interface CorrectionUiPlugin extends SciJavaPlugin{
     public ReadOnlyObjectProperty<Workflow> workflowProperty();
     
     public Node getContent();
+    
+    public default String getName() {
+        return getClass().getAnnotation(Plugin.class).label();
+    }
     
 }

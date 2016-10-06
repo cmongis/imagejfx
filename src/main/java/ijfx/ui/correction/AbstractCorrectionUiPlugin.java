@@ -22,12 +22,15 @@ package ijfx.ui.correction;
 import ijfx.service.workflow.Workflow;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -43,11 +46,11 @@ import net.imagej.Dataset;
  */
 public abstract class AbstractCorrectionUiPlugin extends BorderPane implements CorrectionUiPlugin{
 
-    protected StringProperty explanationProperty = new SimpleStringProperty();
+    protected final StringProperty explanationProperty = new SimpleStringProperty();
     
-    protected ObjectProperty<Dataset> datasetProperty = new SimpleObjectProperty<>();
+    protected final ObjectProperty<Dataset> datasetProperty = new SimpleObjectProperty<>();
     
-    protected ObjectProperty<Workflow> workflowProperty = new SimpleObjectProperty();
+    protected final ObjectProperty<Workflow> workflowProperty = new SimpleObjectProperty();
     
     Logger logger = ImageJFX.getLogger();
     
@@ -66,7 +69,9 @@ public abstract class AbstractCorrectionUiPlugin extends BorderPane implements C
         datasetProperty.addListener(this::onExampleDatasetChanged);
     }
     
-    
+    public <T> void bind(Property<T> property,Callable<T> callable,Observable... properties) {
+       property.bind(Bindings.createObjectBinding(callable, properties));
+    }
     
     @Override
     public ReadOnlyStringProperty explanationProperty() {

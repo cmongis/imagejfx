@@ -27,13 +27,13 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 /**
  *
  * @author cyril
  */
-public class ChannelSelector extends VBox {
+public class ChannelSelector extends HBox {
 
     private final Label titleLabel = new Label();
 
@@ -45,9 +45,11 @@ public class ChannelSelector extends VBox {
 
     public ChannelSelector(String title) {
         setTitle(title);
-        
+        getStyleClass().add("channel-selector");
         channelComboBox.getSelectionModel().selectedItemProperty().addListener(this::onSelectedChannelChanged);
         channelNumber.addListener(this::onChannelNumberChanged);
+        
+        getChildren().addAll(titleLabel,channelComboBox);
         
     }
 
