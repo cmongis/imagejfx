@@ -22,7 +22,6 @@ package ijfx.bridge;
 
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.context.animated.AnimatedPaneContextualView;
-import ijfx.ui.datadisplay.image.ImageWindowContainer;
 import ijfx.service.uicontext.UiContextService;
 import java.io.File;
 import javafx.collections.ListChangeListener;
@@ -52,6 +51,8 @@ import ijfx.ui.plugin.panel.RecentFilePanel;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import jfxtras.scene.control.window.Window;
 import mongis.utils.CallbackTask;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
@@ -101,6 +102,7 @@ public class ImageJContainer extends BorderPane implements Activity {
     @Parameter
     LoadingScreenService loadingScreenService;
     
+    AnchorPane anchorPane = new AnchorPane();
     
     private static final String DRAG_OVER_CSS_STYLE = "dragover";
 
@@ -126,8 +128,8 @@ public class ImageJContainer extends BorderPane implements Activity {
     public ImageJContainer() {
 
         // setting the singleton in the center
-        setCenter(ImageWindowContainer.getInstance());
-        ImageWindowContainer.getInstance().getChildren().addListener(this::onListChange);
+        setCenter(anchorPane);
+        anchorPane.getChildren().addListener(this::onListChange);
 
         
         this.setOnDragDropped(this::onDragDropped);
@@ -143,7 +145,7 @@ public class ImageJContainer extends BorderPane implements Activity {
         new CallbackTask<Display<?>,GenericDisplayWindow>()
                 .setInput(display)
                 .run(this::createWindow)
-                .then(ImageWindowContainer.getInstance().getChildren()::add)
+                .then(this::addWindow)
                 .start();
     }
     
@@ -154,13 +156,19 @@ public class ImageJContainer extends BorderPane implements Activity {
         return genericDisplayWindow;
     }
 
+    private void addWindow(Window window) {
+        anchorPane.getChildren().add(window);
+         int size = anchorPane.getChildren().size();
+        window.relocate(size*30, size*30);
+    }
+    
     private void updateCenter() {
-        if(ImageWindowContainer.getInstance().getChildren().size()  == 0) {
+        if(anchorPane.getChildren().isEmpty()) {
             setCenter(getRecentFilePanel());
             getRecentFilePanel().update();
         }
         else {
-            setCenter(ImageWindowContainer.getInstance());
+            if(getCenter() != anchorPane) setCenter(anchorPane);
         }
     }
     
