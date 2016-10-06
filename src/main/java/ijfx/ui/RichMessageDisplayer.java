@@ -20,12 +20,14 @@
 package ijfx.ui;
 
 import ijfx.ui.main.ImageJFX;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import javafx.beans.Observable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 import mongis.utils.TextFileUtils;
@@ -39,12 +41,15 @@ public class RichMessageDisplayer {
     private final WebView webView;
 
     private static final String CSS_URL = ImageJFX.class.getResource("/web/css/bijou.min.css").toExternalForm();
-    private static final String CSS_HEADER = "<html><head><link rel='stylesheet' href='%s'/></head><body style='padding:10px;margin:0'>%s</body></html>";
-
+    private static final String CSS_HEADER = "<html><head><link rel='stylesheet' href='%s'/></head><body style='padding:10px;margin:0'><style>%s</style>%s</body></html>";
+    private final  List<String> CSS_ADDITIONAL = new ArrayList<>();
     List<Callback<String, String>> stringProcessor = new ArrayList<>();
 
+    private final StringProperty messageProperty = new SimpleStringProperty();
+    
     public RichMessageDisplayer(WebView webView) {
         this.webView = webView;
+        messageProperty.addListener(this::onMessageChanged);
     }
 
     /**
@@ -57,6 +62,14 @@ public class RichMessageDisplayer {
         
         setMessage(TextFileUtils.readFileFromJar(clazz, path));
         
+    }
+    
+    private void onMessageChanged(Observable obs, String oldValue, String newValue) {
+        setMessage(newValue);
+    }
+    
+    public StringProperty messageProperty() {
+        return messageProperty;
     }
     
     public void setMessage(String text) {
@@ -83,13 +96,19 @@ public class RichMessageDisplayer {
         }
         webView
                 .getEngine()
-                .loadContent(String.format(CSS_HEADER, ImageJFX.class.getResource("/web/scss/bijou.min.css").toExternalForm(), text));
+                .loadContent(String.format(CSS_HEADER, ImageJFX.class.getResource("/web/scss/bijou.min.css").toExternalForm(),CSS_ADDITIONAL.stream().collect(Collectors.joining(";\n")), text));
     }
 
     public RichMessageDisplayer addStringProcessor(Callback<String, String> callback) {
         stringProcessor.add(callback);
         return this;
     }
+    
+    public RichMessageDisplayer addCss(String... css) {
+        for(String s : css) CSS_ADDITIONAL.add(s);
+        return this;
+    }
+    
     public static Callback<String, String> BACKLINE_ANDS_AND_ORS = txt -> txt.replaceAll(" (and|or) ", "<br><br><span style='text-transform:uppercase'>$1</span><br><br> - ");
 
     public static Callback<String, String> FORMAT_SECTION_TITLES = txt -> txt.replaceAll("^== (.*)$", "<h3>$1</h3>");
