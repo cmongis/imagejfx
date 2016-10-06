@@ -28,6 +28,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 /**
  *
@@ -53,16 +54,18 @@ public class FileButtonBinding {
     private final ObjectProperty<File> fileProperty = new SimpleObjectProperty<>(null);
 
     private String buttonDefaultText = "Choose a directory ...";
-    
+
+    private boolean openFile = false;
+
     public FileButtonBinding(Button button) {
-        this(button,null);
+        this(button, null);
     }
-    
+
     public FileButtonBinding(Button b, File defaultFile) {
         this.button = b;
 
         button.setOnAction(this::onClick);
-        
+
         fileProperty.setValue(defaultFile);
         fileProperty.addListener(this::onFileChanged);
 
@@ -71,12 +74,22 @@ public class FileButtonBinding {
     }
 
     protected void onClick(ActionEvent event) {
-        DirectoryChooser chooser = new DirectoryChooser();
 
-        File saveFolder = chooser.showDialog(null);
+        if (openFile) {
+            FileChooser chooser = new FileChooser();
+            File file = chooser.showOpenDialog(null);
+            if (file != null) {
+                fileProperty.setValue(file);
+            }
+        } else {
 
-        if (saveFolder != null) {
-            fileProperty.setValue(saveFolder);
+            DirectoryChooser chooser = new DirectoryChooser();
+
+            File saveFolder = chooser.showDialog(null);
+
+            if (saveFolder != null) {
+                fileProperty.setValue(saveFolder);
+            }
         }
     }
 
@@ -86,25 +99,26 @@ public class FileButtonBinding {
 
     public FileButtonBinding setButtonDefaultText(String buttonDefaultText) {
         this.buttonDefaultText = buttonDefaultText;
+        button.setText(buttonDefaultText);
         return this;
     }
 
     protected void onFileChanged(Observable obs, File oldValue, File newValue) {
         if (newValue == null) {
             button.setText(buttonDefaultText);
+        } else if (newValue.getParentFile() == null) {
+            button.setText(newValue.getName());
         } else {
-          
-
-            if (newValue.getParentFile() == null) {
-                button.setText(newValue.getName());
-            } else {
-                button.setText(newValue.getParentFile().getName() + " / " + newValue.getName());
-            }
+            button.setText(newValue.getParentFile().getName() + " / " + newValue.getName());
         }
     }
 
     public ObjectProperty<File> fileProperty() {
         return fileProperty;
+    }
+
+    public void setOpenFile(boolean b) {
+        openFile = b;
     }
 
 }

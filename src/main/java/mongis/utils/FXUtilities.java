@@ -40,6 +40,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -98,6 +99,10 @@ public class FXUtilities {
         }
     }
 
+    public static CallableTask<WebView> createWebView() {
+        return new CallableTask<>(WebView::new).startInFXThread();
+    }
+    
     public static void emptyPane(Pane pane) {
 
         if (pane == null) {
