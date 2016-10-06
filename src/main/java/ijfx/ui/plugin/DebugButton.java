@@ -44,7 +44,7 @@ import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.FileBatchProcessorPanel;
-import ijfx.ui.explorer.DefaultFolderManagerService;
+import ijfx.ui.correction.CorrectionSelector;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.PerformanceActivity;
 import java.util.List;
@@ -103,6 +103,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Reset Explorer Data", this::resetExplorerData);
         addItem("Reset Hints History",this::resetHintHistory);
         addItem("Play Hints",this::playHints);
+        addItem("Load test activity",event->activityService.openByType(CorrectionSelector.class));
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED, this::updateReloadMenu);
         System.out.println("Added");
