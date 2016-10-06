@@ -66,10 +66,10 @@ public class ImageDisplayProperty extends ReadOnlyObjectPropertyBase<ImageDispla
 
     private void checkNew(Display<?> display) {
          if(display == current) return;
-        if (ImageDisplay.class.isAssignableFrom(display.getClass())) {
+        if (display != null && ImageDisplay.class.isAssignableFrom(display.getClass())) {
             ImageDisplay imageDisplay = (ImageDisplay)display;
             
-            current = (ImageDisplay)display;
+            current = imageDisplay;
              Platform.runLater(this::fireValueChangedEvent);
         } else {
            // current = null;

@@ -22,9 +22,18 @@ package ijfx.core.assets.loader;
 import ijfx.core.Handles;
 import ijfx.core.assets.Asset;
 import ijfx.core.assets.AssetLoader;
+import ijfx.core.assets.FlatfieldAsset;
+import ijfx.plugins.flatfield.GenerateFlatfield;
+import ijfx.service.ui.CommandRunner;
 import io.scif.services.DatasetIOService;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.types.DataTypeService;
+import org.scijava.Context;
+import org.scijava.command.CommandService;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -33,20 +42,45 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = AssetLoader.class)
-@Handles(type = Dataset.class)
-public class DatasetAssetLoader implements AssetLoader<Dataset>{
+@Handles(type = FlatfieldAsset.class)
+public class FlatfieldAssetLoader implements AssetLoader<Dataset> {
 
     @Parameter
-    DatasetIOService datasetIOService;
+    DatasetIOService datasetIoService;
+
+    @Parameter
+    Context context;
+    
+    @Parameter
+    DataTypeService dataTypeService;
+    
+    @Parameter
+    ModuleService moduleService;
+    
+    @Parameter
+    CommandService commandService;
     
     @Override
     public Dataset load(Asset<Dataset> asset) {
         try {
-            if(asset.getFile().exists() == false) throw new IllegalArgumentException("The file to be loaded doesn't exist !");
-            return datasetIOService.open(asset.getFile().getAbsolutePath());
+
+            Dataset dataset = datasetIoService.open(asset.getFile().getAbsolutePath());
+           
+            
+            return new CommandRunner(context)
+                    .set("dataset",dataset)
+                    .runSync(GenerateFlatfield.class)
+                    .getOutput("dataset");
+                    
+            
+            //return dataset;
         } catch (IOException ex) {
-            return null;
+            Logger.getLogger(FlatfieldAssetLoader.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
     
+
+        
+
 }

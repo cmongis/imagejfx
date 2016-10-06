@@ -41,7 +41,7 @@ import net.imglib2.util.Intervals;
 import org.scijava.ItemIO;
 
 import org.scijava.command.Command;
-import org.scijava.command.DynamicCommand;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -61,7 +61,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Command.class)
 public class TypeChangerIJFX<U extends RealType<U>, V extends RealType<V> & NativeType<V>>
-	extends DynamicCommand
+	extends ContextCommand
 {
 
 	// TODO: expects types to be based on RealType and sometimes NativeType. The

@@ -21,32 +21,50 @@ package ijfx.core.assets;
 
 import ijfx.service.IjfxService;
 import ijfx.service.PluginUtilsService;
-import java.io.File;
 import java.util.HashMap;
+import java.util.UUID;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
 
 /**
- * The Asset service was created for batch processing.
- * It basically handles the loading and unloading of assets,
- * which can be any kind of data which is repeatedly reused.
- * The Asset Service loads each assets once and when not used for
- * a time, delete them from memory.
+ * The Asset service was created for batch processing. It basically handles the
+ * loading and unloading of assets, which can be any kind of data which is
+ * repeatedly reused. The Asset Service loads each assets once and when not used
+ * for a time, delete them from memory.
+ *
  * @author cyril
  */
-public class AssetService extends AbstractService implements IjfxService{
-    
+@Plugin(type = Service.class)
+public class AssetService extends AbstractService implements IjfxService {
+
     @Parameter
     PluginUtilsService pluginUtilsService;
-    
-    HashMap<File,Object> assets = new HashMap<>();
-    
+
+    HashMap<UUID, Object> assets = new HashMap<>();
+
     public <T> T load(Asset<T> asset) {
-        return (T)assets.computeIfAbsent(asset.getFile(), f->loadAsset(asset));
+        
+        if(assets.containsKey(asset.getId()) == false) {
+            Object o = loadAsset(asset);
+           
+            assets.put(asset.getId(), o);
+        }
+        return (T) assets.get(asset.getId());
     }
-    
+
     private <T> T loadAsset(Asset<T> asset) {
-        AssetLoader<T> loader = pluginUtilsService.createHandler(AssetLoader.class, asset.getAssetType());
-        return loader.load(asset);
-    }  
+        AssetLoader<T> loader;
+
+        loader = pluginUtilsService.createHandler(AssetLoader.class, asset.getClass());
+        if (loader == null) {
+            loader = pluginUtilsService.createHandler(AssetLoader.class, asset.getAssetType());
+        };
+        T t = loader.load(asset);
+        if(t == null) {
+            throw new IllegalArgumentException("Asset couldn't be loaded because the loader failed");
+        }
+        return t;
+    }
 }

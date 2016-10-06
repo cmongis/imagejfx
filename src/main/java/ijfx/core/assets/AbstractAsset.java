@@ -22,6 +22,7 @@ package ijfx.core.assets;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import java.io.File;
+import java.util.UUID;
 
 /**
  *
@@ -35,15 +36,28 @@ public abstract class AbstractAsset<T> implements Asset<T> {
     @JsonIgnore
     private final Class<T> type;
 
+    @JsonIgnore
+    private UUID id;
     public AbstractAsset(Class<T> type) {
         this.type = type;
     }
     
+    @JsonIgnore
+    public UUID getId() {
+        if(id == null) {
+            id = UUID.nameUUIDFromBytes((getClass().getSimpleName()+file.getAbsolutePath()).getBytes());
+        }
+        
+        return id;
+        
+    }
     
     
     @JsonSetter("file")
     public void setFile(File f) {
         this.file = f;
+        
+        
     }
     
     @Override

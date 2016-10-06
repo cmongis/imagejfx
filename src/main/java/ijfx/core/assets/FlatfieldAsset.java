@@ -20,14 +20,19 @@
 package ijfx.core.assets;
 
 import java.io.File;
-import java.util.UUID;
+import net.imagej.Dataset;
 
 /**
  *
  * @author cyril
  */
-public interface Asset<T> {
-    UUID getId();
-    File getFile();
-    Class<T> getAssetType();
+
+public class FlatfieldAsset extends AbstractAsset<Dataset>{
+    public FlatfieldAsset() {
+        super(Dataset.class);
+    }
+    public FlatfieldAsset(File f) {
+        this();
+        setFile(f);
+    }
 }
