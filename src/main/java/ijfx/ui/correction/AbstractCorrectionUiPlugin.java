@@ -51,13 +51,17 @@ public abstract class AbstractCorrectionUiPlugin extends BorderPane implements C
     
     Logger logger = ImageJFX.getLogger();
     
+    
+    
+    
     public AbstractCorrectionUiPlugin(String fxmlUrl) {
-        
+        if(fxmlUrl != null) {
         try {
             FXUtilities.injectFXML(this,fxmlUrl);
         }
         catch(IOException ioe) {
             logger.log(Level.SEVERE,"Error when creating Correction Plugin",ioe);
+        }
         }
         datasetProperty.addListener(this::onExampleDatasetChanged);
     }

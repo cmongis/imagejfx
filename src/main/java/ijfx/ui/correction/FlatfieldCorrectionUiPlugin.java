@@ -20,57 +20,78 @@
 package ijfx.ui.correction;
 
 import ijfx.core.assets.DatasetAsset;
+import java.io.File;
 import javafx.beans.Observable;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.Button;
+import mongis.utils.FileButtonBinding;
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
+@Plugin(type = CorrectionUiPlugin.class, label = "Flatfield Correction")
+public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
-    
     Property<DatasetAsset> datasetAssetProperty = new SimpleObjectProperty();
+
+    ChannelSelector channelSelector = new ChannelSelector("Select channel");
+
+    Button selectionButton = new Button("Select flatfield image");
     
-    IntegerProperty channelProperty = new SimpleIntegerProperty();
+    Property<File> flatfieldImage;
     
-    IntegerProperty totalChannel = new SimpleIntegerProperty();
-    
-    ComboBox<Integer> channelCombox;
-    
-     @Override
+    @Override
     public void init() {
-    
+        
     }
-    
-    
+
     public FlatfieldCorrectionUiPlugin() {
-        super("/ijfx/ui/correction/FlatfieldCorrectionUiPlugin.fxml");
+        super(null);
+        setLeft(channelSelector);
+        setRight(selectionButton);
+        
+        flatfieldImage = new FileButtonBinding(selectionButton).fileProperty();
+        
+        datasetAssetProperty.bind(Bindings.createObjectBinding(this::createDatasetAsset, flatfieldImage));
         
         
-        totalChannel.addListener(this::onTotalChannelChanged);
         
     }
+
+    protected DatasetAsset createDatasetAsset() {
+        return new DatasetAsset(flatfieldImage.getValue());
+    }
+    
     
     @Override
     protected void onExampleDatasetChanged(Observable obs, Dataset oldValue, Dataset newValue) {
-        
+
+        Long channelNumber;
+
+        if (newValue == null) {
+            channelNumber = new Long(0);
+        } else {
+
+            channelNumber = newValue.dimension(Axes.CHANNEL);
+        }
+
+        channelSelector.channelNumberProperty().setValue(channelNumber);
     }
 
     protected void onTotalChannelChanged(Observable obs, Number oldValue, Number newValue) {
-        
+
         int n = newValue.intValue();
-        
-        if( n == 0) {
-            
+
+        if (n == 0) {
+
         }
-        
+
     }
-   
-    
+
 }
