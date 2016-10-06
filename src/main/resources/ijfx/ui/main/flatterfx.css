@@ -1174,6 +1174,16 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .segmentation-accordion {
     
 }
+.correction-plugin {
+    -fx-background-color:-bg-darker;
+}
+.correction-plugin.titled-pane > .title {
+    -fx-background-color:transparent;
+}
+.correction-plugin .web-view {
+    -fx-pref-height:70px;
+    -fx-cursor:hand;
+}
 
 
 .range-slider .thumb {
@@ -2104,4 +2114,13 @@ Label.chart-legend-item{
 
 .area-chart {
     
+}
+
+/*
+    Correction Panel
+*/
+
+.channel-selector {
+    -fx-spacing:20px;
+    -fx-alignment:center-left;
 }
