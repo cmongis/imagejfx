@@ -27,7 +27,13 @@ import net.imagej.Dataset;
  * @author cyril
  */
 public class DatasetAsset extends AbstractAsset<Dataset>{
-    public DatasetAsset(Class<Dataset> type) {
-        super(type);
+    public DatasetAsset() {
+        super(Dataset.class);
     }
+    
+    public DatasetAsset(File file) {
+        this();
+        setFile(file);
+    }
+    
 }
