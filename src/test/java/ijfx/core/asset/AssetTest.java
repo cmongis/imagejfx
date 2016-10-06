@@ -40,14 +40,14 @@ public class AssetTest extends BaseImageJTest{
     @Parameter
     AssetService assertService;
     
-    @Test
+    
     public void serviceLoaded() {
         Assert.assertNotNull(assertService);
     }
     /**
      * The Assert Service should return the same object for two different asset object
      */
-    @Test
+    
     public void buffering() {
         DatasetAsset asset1 = new DatasetAsset(new File("./src/test/resources/multidim.tif"));
         DatasetAsset asset2 = new DatasetAsset(new File("./src/test/resources/multidim.tif"));
@@ -63,7 +63,7 @@ public class AssetTest extends BaseImageJTest{
      *  Test that the the FlatfieldAssetLoader which handles flatfield assets
      *  has priority over the DatasetAssetLoader which handles all Dataset containing asssets
      */
-    @Test
+    
     public void loaderPriority() {
         
         DatasetAsset datasetAsset = new DatasetAsset(new File("./src/test/resources/multidim.tif"));
@@ -86,7 +86,7 @@ public class AssetTest extends BaseImageJTest{
     @Override
     protected Class[] getService() {
         
-        return null;
+        return new Class[] {AssetService.class};
     }
     
 }
