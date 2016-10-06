@@ -34,7 +34,10 @@ This is a list of the features that should be tested before releasing any new ve
 - Isolate/delete  channels and slices
 
 
-
+## Segmentation
+- Check SimpleThreshold slider -> expect change of the mask
+- Check auto threshold -> expect change of the threshold slider and change of the mask
+- 		 
 
 
 
