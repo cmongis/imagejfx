@@ -46,12 +46,15 @@ import net.imagej.ImageJService;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import org.apache.commons.lang3.ArrayUtils;
+import org.scijava.command.Command;
+import org.scijava.command.CommandInfo;
+import org.scijava.command.CommandService;
 import org.scijava.display.DisplayPostprocessor;
 import org.scijava.display.DisplayService;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleItem;
 import org.scijava.module.ModuleService;
-import org.scijava.module.process.AbstractPreprocessorPlugin;
 import org.scijava.module.process.InitPreprocessor;
 import org.scijava.module.process.PostprocessorPlugin;
 import org.scijava.module.process.PreprocessorPlugin;
@@ -70,6 +73,9 @@ public class BatchService extends AbstractService implements ImageJService {
 
     @Parameter
     private ModuleService moduleService;
+
+    @Parameter
+    private CommandService commandService;
 
     private Logger logger = ImageJFX.getLogger();
 
@@ -359,6 +365,35 @@ public class BatchService extends AbstractService implements ImageJService {
 
     }
 
+    public Module createModule(Class<? extends Command> clazz) {
+
+        CommandInfo infos = commandService.getCommand(clazz);
+
+        Module module;
+
+        module = moduleService.createModule(infos);
+        try {
+            module.initialize();
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Error when initializing module...", ex);
+        }
+
+        return module;
+    }
+    
+    public void preProcessExceptFor(Module module, Class<? extends PreprocessorPlugin>... blacklist) {
+        
+        pluginService
+                .createInstancesOfType(PreprocessorPlugin.class)
+                .stream()
+                .sequential()
+                .filter(pp->ArrayUtils.contains(blacklist, pp.getClass()) == false)
+                .forEach(pp->{
+                    pp.process(module);
+                });
+ 
+    }
+
     public boolean isRunning() {
         return running;
     }
@@ -402,7 +437,5 @@ public class BatchService extends AbstractService implements ImageJService {
                 //.map(this::injectPlugin)
                 .collect(Collectors.toList());
     }
-    
-    
 
 }
