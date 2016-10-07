@@ -19,8 +19,10 @@
  */
 package ijfx.service.ui;
 
+import ijfx.bridge.FxUIPreprocessor;
 import ijfx.service.batch.BatchService;
 import ijfx.service.log.DefaultLoggingService;
+import ijfx.service.workflow.WorkflowRecorderPreprocessor;
 import ijfx.ui.main.ImageJFX;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +37,9 @@ import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
+import org.scijava.module.process.InitPreprocessor;
 import org.scijava.plugin.Parameter;
+import static weka.gui.beans.BeanConnection.inputs;
 
 /**
  *
@@ -76,19 +80,22 @@ public class CommandRunner {
     }
     
     public CommandRunner runSync(Class<? extends Command> command) {
+        
+        
+        Module module = batchService.createModule(command);
+        
+       batchService.preProcessExceptFor(module,InitPreprocessor.class,FxUIPreprocessor.class,WorkflowRecorderPreprocessor.class);
+        
+        Future<Module> run = moduleService.run(module, false, params);
         try {
+            lastRun = run.get();
             
-            CommandInfo infos = commandService.getCommand(command);
-            
-            Future<Module> run = moduleService.run(infos, batchService.getPreProcessors(), batchService.getPostprocessors(), params);
-            lastRun  = run.get();
-            
-            return this;
         } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            Logger.getLogger(CommandRunner.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            Logger.getLogger(CommandRunner.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         return this;
     }
     
