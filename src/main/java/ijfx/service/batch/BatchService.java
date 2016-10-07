@@ -51,6 +51,7 @@ import org.scijava.display.DisplayService;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleItem;
 import org.scijava.module.ModuleService;
+import org.scijava.module.process.AbstractPreprocessorPlugin;
 import org.scijava.module.process.InitPreprocessor;
 import org.scijava.module.process.PostprocessorPlugin;
 import org.scijava.module.process.PreprocessorPlugin;
@@ -378,7 +379,7 @@ public class BatchService extends AbstractService implements ImageJService {
         }
     }
 
-    private List<PreprocessorPlugin> getPreProcessors() {
+    public List<PreprocessorPlugin> getPreProcessors() {
         return pluginService
                 .createInstancesOfType(PreprocessorPlugin.class)
                 .stream()
@@ -392,7 +393,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 .collect(Collectors.toList());
     }
 
-    private List<PostprocessorPlugin> getPostprocessors() {
+    public List<PostprocessorPlugin> getPostprocessors() {
         return pluginService
                 .createInstancesOfType(PostprocessorPlugin.class)
                 .stream()
@@ -401,5 +402,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 //.map(this::injectPlugin)
                 .collect(Collectors.toList());
     }
+    
+    
 
 }
