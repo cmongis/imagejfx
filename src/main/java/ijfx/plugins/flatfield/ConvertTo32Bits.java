@@ -19,13 +19,11 @@
  */
 package ijfx.plugins.flatfield;
 
-import ijfx.core.stats.IjfxStatisticService;
 import ijfx.plugins.convertype.TypeChangerIJFX;
 import ijfx.service.ui.CommandRunner;
 import net.imagej.Dataset;
 import net.imagej.plugins.commands.typechange.TypeChanger;
 import net.imagej.types.DataTypeService;
-import net.imglib2.Cursor;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.Context;
 import org.scijava.ItemIO;
@@ -39,9 +37,8 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = Command.class)
-public class GenerateFlatfield extends ContextCommand {
-    
-    
+public class ConvertTo32Bits extends ContextCommand {
+
     @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
     
@@ -49,48 +46,24 @@ public class GenerateFlatfield extends ContextCommand {
     DataTypeService dataTypeService;
     
     @Parameter
-    IjfxStatisticService ijfxStatisticsService;
-    
-    @Parameter
     Context context;
     
-
     @Override
     public void run() {
-        
-        
-        dataset = convertTo32(dataset);
-        
-        double median = ijfxStatisticsService.getDatasetDescriptiveStatistics(dataset).getPercentile(50);
-        
-        
-        
-        Cursor<RealType<?>> cursor = dataset.cursor();
-        cursor.reset();
-        while(cursor.hasNext()) {
-            cursor.fwd();
-            cursor.get().setReal(cursor.get().getRealDouble() / median);
-        }
-        
-        
-        
-    }
-    
-     public Dataset convertTo32(Dataset dataset) {
-        RealType<?> firstElement = dataset.firstElement();
+       RealType<?> firstElement = dataset.firstElement();
         String typeFirstElement = dataTypeService.getTypeByAttributes(firstElement.getBitsPerPixel(), true, false, !dataset.isInteger(), dataset.isSigned()).longName();
 
         String type = dataTypeService.getTypeByAttributes(32, true, false, true, true).longName();
 
-        if (typeFirstElement.equals(type)) return dataset;
+        if (typeFirstElement.equals(type)) return;
         
-        Dataset output = new CommandRunner(context)
+        dataset = new CommandRunner(context)
                 .set("data", dataset)
                 .set("typeName",type)
                 .set("combineChannels",false)
                 .runSync(TypeChangerIJFX.class)
                 .getOutput("data");
-        return output;
+        //return output;
     }
     
 }
