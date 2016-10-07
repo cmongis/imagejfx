@@ -19,7 +19,7 @@
  */
 package ijfx.service.dataset;
 
-import ijfx.plugins.flatfield.FlatFieldCorrection;
+import ijfx.plugins.flatfield.FlatFieldCorrectionOld;
 import ijfx.service.sampler.DatasetSamplerService;
 import java.util.HashMap;
 import java.util.Map;
@@ -155,7 +155,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
         try {
             module.initialize();
         } catch (MethodCallException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlatFieldCorrectionOld.class.getName()).log(Level.SEVERE, null, ex);
         }
         parameters.forEach((k, v) -> {
             module.setInput(k, v);
@@ -167,7 +167,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
         try {
             run.get();
         } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlatFieldCorrectionOld.class.getName()).log(Level.SEVERE, null, ex);
         }
         return module;
     }
