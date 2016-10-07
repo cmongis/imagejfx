@@ -23,7 +23,6 @@ import ijfx.ui.module.input.Input;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
@@ -37,7 +36,7 @@ public abstract class AbstractNumberInput<T extends Number> extends AbstractInpu
     private TextField field;
 
     public static String CLASS_INVALID = "danger";
-
+    
     public AbstractNumberInput() {
         super();
 
