@@ -29,7 +29,7 @@ import ij.io.Opener;
 import ij.process.ImageProcessor;
 import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.plugins.adapter.IJ1Service;
-import ijfx.plugins.flatfield.FlatFieldCorrection;
+import ijfx.plugins.flatfield.FlatFieldCorrectionOld;
 import ijfx.plugins.stack.ImagesToStack;
 import ijfx.service.dataset.DatasetUtillsService;
 import java.awt.Point;
@@ -317,7 +317,7 @@ public class Pip2 implements Command {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("inputDataset", dataset);
         parameters.put("flatFieldDataset", flatField);
-        Module module = executeCommand(FlatFieldCorrection.class, parameters);
+        Module module = executeCommand(FlatFieldCorrectionOld.class, parameters);
         dataset = (Dataset) module.getOutput("outputDataset");
         return dataset;
 
@@ -357,7 +357,7 @@ public class Pip2 implements Command {
         try {
             module.initialize();
         } catch (MethodCallException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlatFieldCorrectionOld.class.getName()).log(Level.SEVERE, null, ex);
         }
         parameters.forEach((k, v) -> {
             module.setInput(k, v);
@@ -369,9 +369,9 @@ public class Pip2 implements Command {
         try {
             run.get();
         } catch (InterruptedException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlatFieldCorrectionOld.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
-            Logger.getLogger(FlatFieldCorrection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlatFieldCorrectionOld.class.getName()).log(Level.SEVERE, null, ex);
         }
         return module;
     }
