@@ -111,11 +111,11 @@ public class FileInputSkin extends AbstractInputSkinPlugin<File> {
             selected = chooser.showOpenDialog(null);
         }
         if (selected != null) {
-            
+            /*
             if(selected.getName().endsWith(".csv") == false) {
                 selected = new File(selected.getParentFile(),selected.getName()+".csv");
             }
-            
+            */
             selectedFolder.setValue(selected);
         }
     }
