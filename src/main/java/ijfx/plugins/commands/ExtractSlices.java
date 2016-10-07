@@ -75,9 +75,10 @@ public class ExtractSlices extends ContextCommand {
        if(interval == null && imageDisplayService.getActiveDataset() == input) {
            
            AxisType axis = AxisUtils.getSliceAxis(input);
-           
-           long min = input.min(input.dimensionIndex(axis));
-           long max = input.max(input.dimensionIndex(axis));
+           int axisId = input.dimensionIndex(axis);
+           if(axisId == -1) axisId = 2;
+           long min = input.min(axisId);
+           long max = input.max(axisId);
            long low = min;
            long high = max;
            interval = new DefaultInterval(low,high,min,max);
