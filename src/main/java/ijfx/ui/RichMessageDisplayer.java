@@ -109,12 +109,18 @@ public class RichMessageDisplayer {
         return this;
     }
     
+    public static String colorImportantWords(String txt) {
+        txt = txt.replaceAll("\\*([^\\*\\n]*)\\*", "<span class='warning'>$1</span>");
+        txt = txt.replaceAll("\\!([^\\*\\n]*)\\!", "<span class='danger'>$1</span>");
+        return txt;
+    }
+    
     public static Callback<String, String> BACKLINE_ANDS_AND_ORS = txt -> txt.replaceAll(" (and|or) ", "<br><br><span style='text-transform:uppercase'>$1</span><br><br> - ");
 
     public static Callback<String, String> FORMAT_SECTION_TITLES = txt -> txt.replaceAll("^== (.*)$", "<h3>$1</h3>");
     public static Callback<String, String> FORMAT_BOLD = txt -> txt.replaceAll("\\*\\*([^\\*]*)\\*\\*", "<b>$1</b>");
-    public static Callback<String, String> COLOR_IMPORTANT_WORDS = txt -> txt.replaceAll("\\*([^\\*\\n]*)\\*", "<span class='warning'>$1</span>");
-
+    public static Callback<String, String> COLOR_IMPORTANT_WORDS = RichMessageDisplayer::colorImportantWords;
+    
     public static Callback<String, String> BIGGER = txt -> String.format("<span style='font-size:1.2em'>%s</span>", txt);
 
     public static Callback<String, String> REPLACE_BACKLINE_WITH_BR = txt -> txt.replaceAll("\n", "<br>");
