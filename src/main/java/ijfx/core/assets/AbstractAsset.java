@@ -38,7 +38,9 @@ public abstract class AbstractAsset<T> implements Asset<T> {
 
     @JsonIgnore
     private UUID id;
-    public AbstractAsset(Class<T> type) {
+    
+    
+    protected AbstractAsset(Class<T> type) {
         this.type = type;
     }
     
