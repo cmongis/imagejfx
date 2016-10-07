@@ -25,7 +25,7 @@ import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.plugins.adapter.IJ1Service;
 import ijfx.plugins.bunwarpJ.ChromaticCorrection;
 import ijfx.plugins.commands.AutoContrast;
-import ijfx.plugins.flatfield.FlatFieldCorrection;
+import ijfx.plugins.flatfield.FlatFieldCorrectionOld;
 import ijfx.plugins.stack.ImagesToStack;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.TimerService;
@@ -509,7 +509,7 @@ public class WorkflowModel {
         Map<String, Object> map = new HashMap<>();
         map.put("flatFieldImageDisplay", flatFieldImageDisplay);
         map.put("inputImageDisplay", inputImageDisplay);
-        Module module = executeCommand(FlatFieldCorrection.class, map).orElseThrow(NullPointerException::new);
+        Module module = executeCommand(FlatFieldCorrectionOld.class, map).orElseThrow(NullPointerException::new);
         Dataset outputDataset = (Dataset) module.getOutput("outputDataset");
         return outputDataset;
     }

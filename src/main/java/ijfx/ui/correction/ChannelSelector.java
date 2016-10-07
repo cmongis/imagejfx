@@ -19,12 +19,18 @@
  */
 package ijfx.ui.correction;
 
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -43,13 +49,33 @@ public class ChannelSelector extends HBox {
 
     private final IntegerProperty channelNumber = new SimpleIntegerProperty(0);
 
+    private final BooleanProperty allowAllChannels = new SimpleBooleanProperty(true);
+    
+    private Property<String[]> choicesProperty = new SimpleObjectProperty();
+    
     public ChannelSelector(String title) {
         setTitle(title);
         getStyleClass().add("channel-selector");
         channelComboBox.getSelectionModel().selectedItemProperty().addListener(this::onSelectedChannelChanged);
-        channelNumber.addListener(this::onChannelNumberChanged);
+       
         
-        getChildren().addAll(titleLabel,channelComboBox);
+       
+        
+        
+        
+        
+        if(title != null) {
+            getChildren().add(titleLabel);
+        }
+        
+        getChildren().add(channelComboBox);
+        
+        channelComboBox.itemsProperty().bind(
+                Bindings.createObjectBinding(this::getChoices,channelNumber,allowAllChannels)
+        );
+        
+        channelComboBox.itemsProperty().addListener(this::onChoicesChanged);
+        
         
     }
 
@@ -57,19 +83,37 @@ public class ChannelSelector extends HBox {
         this.titleLabel.setText(title);
     }
     
-    private void onChannelNumberChanged(Observable obs, Number oldValue, Number newValue) {
-        updateChoices(newValue.intValue());
-    }
+ 
     
     private void onSelectedChannelChanged(Observable obs, Channel oldValue, Channel newValue) {
-        selectedChannel.setValue(newValue.getId());
+        if(newValue != null)selectedChannel.setValue(newValue.getId());
     }
 
-    private void updateChoices(Integer choiceNumber) {
-        List<Channel> choices = IntStream.range(-1, choiceNumber).mapToObj(Channel::new).collect(Collectors.toList());
-        channelComboBox.getItems().clear();
-        channelComboBox.getItems().addAll(choices);
+    public void onChoicesChanged(Observable obs, Object oldalue, Object newValue) {
+        channelComboBox.getSelectionModel().select(0);
     }
+   
+    
+    public int getChannelNumber() {
+        return channelNumber.getValue();
+    }
+    
+    private ObservableList<Channel> getChoices() {
+       
+        ObservableList<Channel> choices = FXCollections.observableArrayList();
+       
+        int choiceNumber = getChannelNumber();
+        
+       
+        
+        choices.addAll(IntStream.range(-1, choiceNumber).mapToObj(Channel::new).collect(Collectors.toList()));
+        
+       return choices;
+        
+    }
+    
+    
+    
     
     public IntegerProperty channelNumberProperty() {
         return channelNumber;
@@ -79,9 +123,24 @@ public class ChannelSelector extends HBox {
         return selectedChannel;
     }
 
+    private boolean allowAllChannels() {
+        return allowAllChannels.getValue();
+    }
+
+    void setAllowAllChannels(boolean b) {
+        allowAllChannels.setValue(b);
+    }
+
+    int getSelectedChannel() {
+        return selectedChannel.getValue();
+    }
+    
+    
+    
+    
     private class Channel {
 
-        private Integer id;
+        private final Integer id;
 
         public Channel(Integer id) {
             this.id = id;
@@ -90,9 +149,16 @@ public class ChannelSelector extends HBox {
         @Override
         public String toString() {
             if (id == -1) {
-                return "All channels";
+                
+                if(allowAllChannels()) {
+                
+                     return "All channels";
+                }
+                else {
+                    return "Select a channel";
+                }
             } else {
-                return String.format("Channel %d", id);
+                return String.format("Channel %d", id+1);
             }
         }
 

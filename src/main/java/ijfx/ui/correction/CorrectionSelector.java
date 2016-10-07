@@ -120,8 +120,10 @@ public class CorrectionSelector  extends BorderPane implements Activity{
     public void addCorrection(PluginInfo<CorrectionUiPlugin> infos) {
         
         CorrectionUiPlugin createInstance = pluginService.createInstance(infos);
-        accordion.getPanes().add(new CorrectionUiPluginWrapper(createInstance).deleteUsing(this::removeCorrection));
+        createInstance.init();
         createInstance.exampleDataset().bind(exampleDataset);
+        accordion.getPanes().add(new CorrectionUiPluginWrapper(createInstance).deleteUsing(this::removeCorrection));
+        
         
     }
     

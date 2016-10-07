@@ -39,6 +39,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
 
 /**
  *
@@ -60,7 +61,7 @@ public abstract class AbstractCorrectionUiPlugin extends BorderPane implements C
     public AbstractCorrectionUiPlugin(String fxmlUrl) {
         if(fxmlUrl != null) {
         try {
-            FXUtilities.injectFXML(this,fxmlUrl);
+            FXUtilities.injectFXML(this, fxmlUrl);
         }
         catch(IOException ioe) {
             logger.log(Level.SEVERE,"Error when creating Correction Plugin",ioe);
@@ -98,5 +99,17 @@ public abstract class AbstractCorrectionUiPlugin extends BorderPane implements C
       @Override
     public Node getContent() {
         return this;
+    }
+    
+    protected Integer getDatasetChannelNumber() {
+        
+        Dataset newValue = exampleDataset().getValue();
+        int channelNumber;
+        if (newValue == null) {
+            channelNumber = 0;
+        } else {
+            channelNumber = (int)newValue.dimension(Axes.CHANNEL);
+        }
+        return channelNumber;
     }
 }
