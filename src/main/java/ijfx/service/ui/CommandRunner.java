@@ -19,6 +19,7 @@
  */
 package ijfx.service.ui;
 
+import ijfx.service.batch.BatchService;
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.ui.main.ImageJFX;
 import java.util.HashMap;
@@ -29,9 +30,11 @@ import java.util.logging.Logger;
 import mongis.utils.CallbackTask;
 import org.scijava.Context;
 import org.scijava.command.Command;
+import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -47,8 +50,13 @@ public class CommandRunner {
     CommandService commandService;
 
     @Parameter
+    ModuleService moduleService;
+    
+    @Parameter
     DefaultLoggingService loggerService;
 
+    @Parameter
+            BatchService batchService;
     
     HashMap<String,Object> params = new HashMap<>();
     
@@ -69,7 +77,10 @@ public class CommandRunner {
     
     public CommandRunner runSync(Class<? extends Command> command) {
         try {
-            Future<CommandModule> run = commandService.run(command, true, params);
+            
+            CommandInfo infos = commandService.getCommand(command);
+            
+            Future<Module> run = moduleService.run(infos, batchService.getPreProcessors(), batchService.getPostprocessors(), params);
             lastRun  = run.get();
             
             return this;
