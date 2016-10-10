@@ -22,15 +22,18 @@ package ijfx.ui.correction;
 import ijfx.service.workflow.Workflow;
 import ijfx.ui.main.ImageJFX;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
+import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -56,7 +59,7 @@ public abstract class AbstractCorrectionUiPlugin extends BorderPane implements C
     Logger logger = ImageJFX.getLogger();
     
     
-    
+    List<Binding> binding = new ArrayList<>();
     
     public AbstractCorrectionUiPlugin(String fxmlUrl) {
         if(fxmlUrl != null) {
@@ -68,10 +71,14 @@ public abstract class AbstractCorrectionUiPlugin extends BorderPane implements C
         }
         }
         datasetProperty.addListener(this::onExampleDatasetChanged);
+       
     }
     
-    public <T> void bind(Property<T> property,Callable<T> callable,Observable... properties) {
-       property.bind(Bindings.createObjectBinding(callable, properties));
+    public <T> void bindP(Property<T> property,Callable<T> callable,Observable... properties) {
+       
+        ObjectBinding<T> createObjectBinding = Bindings.createObjectBinding(callable, properties);
+        property.bind(createObjectBinding);
+        binding.add(createObjectBinding);
     }
     
     @Override

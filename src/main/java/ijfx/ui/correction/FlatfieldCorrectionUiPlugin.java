@@ -73,9 +73,9 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
         //bind(datasetAssetProperty, this::createDatasetAsset, flatfieldImage);
 
-        bind(explanationProperty, this::generateExplanation, flatfieldImage, channelSelector.selectedChannelProperty());
+        bindP(explanationProperty, this::generateExplanation, flatfieldImage, channelSelector.selectedChannelProperty());
 
-        bind(workflowProperty, this::generateWorkflow, flatfieldImage, channelSelector.selectedChannelProperty());
+        bindP(workflowProperty, this::generateWorkflow, flatfieldImage, channelSelector.selectedChannelProperty());
 
     }
 
@@ -87,7 +87,7 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
         if (getSelectedFile() != null) {
             return new WorkflowBuilder(context)
-                    .addStep(FlatFieldCorrection.class, "channel", getSelectedChannel())
+                    .addStep(FlatFieldCorrection.class, "channel", getSelectedChannel(),"flatfield",flatfieldImage.getValue())
                     .getWorkflow("Flatfield correction");
         } else {
             return null;

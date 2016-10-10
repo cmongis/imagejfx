@@ -65,7 +65,7 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
         channel1Group.getChildren().add(sourceSelector);
         channel2Group.getChildren().add(targetSelector);
         
-        bind(explanationProperty, this::getMessage, sourceSelector.selectedChannelProperty(),targetSelector.selectedChannelProperty());
+        bindP(explanationProperty, this::getMessage, sourceSelector.selectedChannelProperty(),targetSelector.selectedChannelProperty());
         
         
         
