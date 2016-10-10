@@ -19,6 +19,7 @@
  */
 package mongis.utils;
 
+import ijfx.ui.main.ImageJFX;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import javafx.application.Platform;
@@ -35,11 +36,17 @@ public class CallableTask<T> extends Task<T>{
 
     Consumer<T> onSuccess;
     
-    public void setCallable(Callable<T> callable) {
+    public CallableTask<T> setCallable(Callable<T> callable) {
         this.callable = callable;
+        return this;
+    }
+    
+    public CallableTask() {
+        super();
     }
 
     public CallableTask(Callable<T> callable) {
+        this();
         this.callable = callable;
     }
     
@@ -66,5 +73,15 @@ public class CallableTask<T> extends Task<T>{
         if(onSuccess !=null)
         onSuccess.accept(getValue());
     }
+    
+    public CallableTask submit(Consumer<Task> consumer) {
+        consumer.accept(this);
+        return this;
+    }
+    
+    public CallableTask start() {
+        return submit(ImageJFX.getThreadPool()::execute);
+    }
+           
     
 }
