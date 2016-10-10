@@ -79,6 +79,16 @@ public class WorkflowBuilder {
         return this;
     }
 
+    public WorkflowBuilder addInput(File file) {
+        inputs.add(new BatchInputBuilder(context).from(file));
+        return this;
+    }
+    
+    public WorkflowBuilder addInputFiles(Collection<File> files) {
+        files.forEach(this::addInput);
+        return this;
+    }
+    
     public WorkflowBuilder addInput(Dataset dataset) {
         inputs.add(new BatchInputBuilder(context).from(dataset));
         return this;
@@ -135,7 +145,10 @@ public class WorkflowBuilder {
     protected void remapInputs(Function<? super BatchInputBuilder, ? extends BatchInputBuilder> remapper) {
         inputs = inputs.stream().map(remapper).collect(Collectors.toList());
     }
-
+    public WorkflowBuilder and(Consumer<BatchInputBuilder> consumer) {
+        inputs.forEach(consumer);
+        return this;
+    }
     public WorkflowBuilder saveTo(File directory) {
 
         remapInputs(builder -> builder.saveIn(directory));
