@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.web.WebView;
@@ -38,18 +40,27 @@ import mongis.utils.TextFileUtils;
  */
 public class RichMessageDisplayer {
 
-    private final WebView webView;
+ 
 
     private static final String CSS_URL = ImageJFX.class.getResource("/web/css/bijou.min.css").toExternalForm();
     private static final String CSS_HEADER = "<html><head><link rel='stylesheet' href='%s'/></head><body style='padding:10px;margin:0'><style>%s</style>%s</body></html>";
     private final  List<String> CSS_ADDITIONAL = new ArrayList<>();
     List<Callback<String, String>> stringProcessor = new ArrayList<>();
 
-    private final StringProperty messageProperty = new SimpleStringProperty();
+    private final StringProperty messageProperty = new SimpleStringProperty(null);
+    
+    private final ObjectProperty<WebView> webViewProperty = new SimpleObjectProperty();
+    
+    public RichMessageDisplayer() {
+        webViewProperty.addListener(this::onWebViewChanged);
+        messageProperty.addListener(this::onMessageChanged);
+         
+    }
     
     public RichMessageDisplayer(WebView webView) {
-        this.webView = webView;
-        messageProperty.addListener(this::onMessageChanged);
+        this();
+        this.webViewProperty.setValue(webView);
+       
     }
 
     /**
@@ -64,8 +75,12 @@ public class RichMessageDisplayer {
         
     }
     
+    private void onWebViewChanged(Observable obs, WebView oldValue, WebView newValue) {
+        displayMessage(newValue,messageProperty.getValue());
+    }
+    
     private void onMessageChanged(Observable obs, String oldValue, String newValue) {
-        setMessage(newValue);
+        displayMessage(webViewProperty.getValue(),newValue);
     }
     
     public StringProperty messageProperty() {
@@ -73,6 +88,15 @@ public class RichMessageDisplayer {
     }
     
     public void setMessage(String text) {
+        messageProperty.setValue(text);
+    }
+    
+    public RichMessageDisplayer setWebView(WebView webView) {
+        webViewProperty.setValue(webView);
+        return this;
+    }
+    
+    private void displayMessage(WebView webView,String text) {
         if (webView == null) {
             return;
         }
