@@ -106,14 +106,20 @@ public class TransitionBinding<T> {
         T value = getNewValue(newValue);
 
         currentTimeline.getKeyFrames().add(new KeyFrame(duration, new KeyValue(transitioned, value)));
-        currentTimeline.play();
-        // the state True is always set at the end of the transition while the state fall
+       
+        
+        
+        // the state True is always set at the end of the transition while the state false
         // is always turn on before
         if (newValue) {
-            currentTimeline.setOnFinished(event -> stateProperty.setValue(newValue));
+            currentTimeline.setOnFinished(event -> {
+                stateProperty.setValue(newValue);
+                currentTimeline = null;
+                    });
         } else {
             stateProperty.setValue(newValue);
         }
+         currentTimeline.play();
     }
 
     public ReadOnlyBooleanProperty stateProperty() {
