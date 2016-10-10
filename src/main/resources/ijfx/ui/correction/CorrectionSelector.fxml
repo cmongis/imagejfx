@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Rectangle?>
 
-
-<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <left>
       <ListView BorderPane.alignment="CENTER" />
    </left>
@@ -30,4 +31,22 @@
          </top>
       </BorderPane>
    </center>
+   <bottom>
+      <HBox fx:id="toolbarToolbox" alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="destinationFolderButton" mnemonicParsing="false" text="Button" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="10.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="100.0" />
+            <Button fx:id="testCorrectionButton" mnemonicParsing="false" onAction="#testCorrection" styleClass="warning" text="Test correction">
+               <graphic>
+                  <FontAwesomeIconView glyphName="CHECK" />
+               </graphic>
+            </Button>
+            <Button fx:id="startCorrectionButton" mnemonicParsing="false" onAction="#startCorrection" styleClass="success" text="Start batch correction">
+               <graphic>
+                  <FontAwesomeIconView glyphName="LIST" />
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
+   </bottom>
 </fx:root>
