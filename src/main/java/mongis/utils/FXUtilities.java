@@ -20,7 +20,9 @@
  */
 package mongis.utils;
 
+import com.github.rjeschke.txtmark.Processor;
 import ijfx.core.listenableSystem.Listening;
+import ijfx.ui.RichMessageDisplayer;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.io.IOException;
@@ -103,6 +105,23 @@ public class FXUtilities {
         return new CallableTask<>(WebView::new).startInFXThread();
     }
     
+    public static CallbackTask<String,WebView> createWebView(Object root,String mdFile) {
+        return new CallbackTask<String,WebView>()
+                .setInput(mdFile)
+                .run(input->{
+               WebView webView = new WebView();
+               RichMessageDisplayer displayer = new RichMessageDisplayer(webView)
+                       .addStringProcessor(Processor::process);
+               try {
+               displayer.setContent(root.getClass(), input);
+               }catch(Exception e) {
+                   e.printStackTrace();
+               }
+               return webView;
+            }).submit(Platform::runLater);
+
+    }
+
     public static void emptyPane(Pane pane) {
 
         if (pane == null) {
