@@ -20,6 +20,7 @@
 package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
+import ijfx.service.batch.FileBatchInput;
 import ijfx.service.batch.ImageDisplayBatchInput;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.ui.explorer.Explorable;
@@ -62,6 +63,11 @@ public class BatchInputBuilder {
         catch(Exception e) {
             
         }
+    }
+    
+    public BatchInputBuilder from(File file) {
+        input = new FileBatchInputLoader(file);
+        return this;
     }
     
     public BatchInputBuilder from(ImageDisplay imageDisplay) {
