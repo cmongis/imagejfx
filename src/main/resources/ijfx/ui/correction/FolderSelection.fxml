@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.scene.web.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -7,15 +8,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="with-padding" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="with-padding" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
       <BorderPane BorderPane.alignment="CENTER">
-         <right>
-              <fx:include source="./ActionBar.fxml" />
-         </right>
+        
          <left>
-            <Button fx:id="folderButton" mnemonicParsing="false" text="Button" BorderPane.alignment="CENTER" />
+            <Button fx:id="folderButton" mnemonicParsing="false" text="Select folder" BorderPane.alignment="CENTER" />
          </left>
+         <right>
+            <Button fx:id="nextButton" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#next" text="Next" BorderPane.alignment="CENTER">
+               <graphic>
+                  <FontAwesomeIconView glyphName="ARROW_RIGHT" text="" />
+               </graphic>
+            </Button>
+         </right>
       </BorderPane>
    </bottom>
-</BorderPane>
+</fx:root>
