@@ -20,54 +20,59 @@
 package ijfx.ui.correction;
 
 
+import com.github.rjeschke.txtmark.Processor;
 import ijfx.ui.widgets.ExplorableSelector;
-import io.datafx.controller.ViewController;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import ijfx.core.imagedb.ImageLoaderService;
+import ijfx.ui.RichMessageDisplayer;
+import ijfx.ui.activity.Activity;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.widgets.FileExplorableWrapper;
-import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
+import mongis.utils.FXUtilities;
 import mongis.utils.FileButtonBinding;
 import mongis.utils.transition.OpacityTransitionBinding;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-@ViewController(value = "FolderSelection.fxml")
-public class FolderSelection extends CorrectionFlow {
+@Plugin(type = Activity.class,label = "correction-folder-selection",name="Correction (Folder Selection)")
+public class FolderSelection extends BorderPane implements Activity {
 
-    @FXML
-    BorderPane borderPane;
+  
 
     @FXML
     Button folderButton;
 
+    @FXML
+    Button nextButton;
+    
+    
+    
     WebView webView;
 
     ExplorableSelector explorerSelector = new ExplorableSelector();
 
     FileButtonBinding fileButtonBinding;
 
-    @Inject
-    WorkflowModel workflowModel;
+   
 
     Logger logger = ImageJFX.getLogger();
     
@@ -76,62 +81,67 @@ public class FolderSelection extends CorrectionFlow {
     @Parameter
     ImageLoaderService imageLoaderService;
     
+    @Parameter
+    CorrectionUiService correctionUiService;
+    
+    @Parameter
+    ActivityService activityService;
+    
+    RichMessageDisplayer displayer;
+    
     public FolderSelection() {
-
+        try {
+            FXUtilities.injectFXML(this, "FolderSelection.fxml");
+        } catch (IOException ex) {
+            Logger.getLogger(FolderSelection.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    @PostConstruct
+  
     public void init() {
         
-        CorrectionActivity.getStaticContext().inject(this);
-        
-        borderPane.setCenter(explorerSelector);
+        setCenter(explorerSelector);
 
-        fileButtonBinding = new FileButtonBinding(folderButton,workflowModel.getSelectedDirectory())
+        fileButtonBinding = new FileButtonBinding(folderButton)
                 .setButtonDefaultText("Select folder to import");
         
         
         //logger.info(String.format("Current forlder : %s, %s files selected",workflowModel.getSelectedDirectory(),workflowModel.));
         
         
-        
-        fileButtonBinding.fileProperty().bindBidirectional(workflowModel.directoryProperty());
+        correctionUiService.sourceFolderProperty().bind(fileButtonBinding.fileProperty());
+        //fileButtonBinding.fileProperty().bindBidirectional(workflowModel.directoryProperty());
         
         
         // getting the observable list of items marked for processing
         ListProperty<Explorable> selectedItems = new SimpleListProperty(explorerSelector.markedItemProperty());
         ObservableValue<Boolean> selectionValid = selectedItems.emptyProperty();
         
+        // creating the webview when it can and initializing it
+        FXUtilities
+                .createWebView()
+                .then(this::initWebView);
         
-        Platform.runLater(()->{
-            webView = new WebView();
-            borderPane.setTop(webView);
-            initWebView(webView, "FolderSelection.md");
         
-        });
         
         // the next button can only be pressed if items are selected
         nextButton.disableProperty().bind(selectionValid);
-        finishButton.disableProperty().bind(selectionValid);
-        backButton.setDisable(true);
+        //finishButton.disableProperty().bind(selectionValid);
+        //backButton.setDisable(true);
         
         //
-        opacityBinding = new OpacityTransitionBinding(explorerSelector, fileButtonBinding.fileProperty().isNotNull());
-       
-        // setting the current list to the current value
-        onAvailableFileChanged(null, null, workflowModel.fileListProperty().getValue());
+        opacityBinding = new OpacityTransitionBinding(explorerSelector, correctionUiService.fileListProperty().isNotNull());
         
         // listening for change of the list
-        workflowModel.fileListProperty().addListener(this::onAvailableFileChanged);
+        correctionUiService.fileListProperty().addListener(this::onAvailableFileChanged);
+        
+        
         
         
     }
 
     @PreDestroy
     private void destroy() {
-        
-        workflowModel.directoryProperty().unbindBidirectional(fileButtonBinding.fileProperty());
-        workflowModel.fileListProperty().removeListener(this::onAvailableFileChanged);
         explorerSelector.dispose();
     }
     
@@ -141,6 +151,40 @@ public class FolderSelection extends CorrectionFlow {
     private void onAvailableFileChanged(Observable obs, List<? extends Explorable> oldValue, List<? extends Explorable> newValue) {
        
         explorerSelector.setItems(newValue);
+    }
+
+    @Override
+    public Node getContent() {
+        
+        if(opacityBinding == null) {
+            init();
+        }
+        
+        return this;
+    }
+
+    @Override
+    public Task updateOnShow() {
+        
+        return null;
+    }
+    
+     
+    protected void initWebView(WebView webView) {
+        try {
+            String resourceUrl = "FolderSelection.md";
+            webView.setPrefHeight(150);
+            setTop(webView);
+            displayer = new RichMessageDisplayer(webView).addStringProcessor(Processor::process);
+            displayer.setContent(this.getClass(), resourceUrl);
+        } catch (IOException ex) {
+            Logger.getLogger(FolderSelection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    @FXML
+    public void next() {
+        activityService.openByType(CorrectionSelector.class);
     }
     
 }
