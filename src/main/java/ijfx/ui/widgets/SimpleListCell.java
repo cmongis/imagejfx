@@ -29,7 +29,7 @@ import javafx.util.Callback;
  *
  * @author cyril
  */
-class SimpleListCell<T> extends ListCell<T> {
+public class SimpleListCell<T> extends ListCell<T> {
     
     Callback<T, String> callback;
 
