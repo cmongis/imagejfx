@@ -22,9 +22,15 @@ package ijfx.ui.widgets;
 import ijfx.core.metadata.FileSizeMetaData;
 import ijfx.core.metadata.MetaData;
 import ijfx.ui.explorer.AbstractExplorable;
+import ijfx.ui.main.ImageJFX;
+import io.scif.services.DatasetIOService;
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import net.imagej.Dataset;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -35,7 +41,10 @@ public class FileExplorableWrapper extends AbstractExplorable{
     
     private final File file;
     
+    @Parameter
+    DatasetIOService datasetIoService;
     
+    Dataset dataset;
     
     public FileExplorableWrapper(File f) {
         super();
@@ -72,7 +81,17 @@ public class FileExplorableWrapper extends AbstractExplorable{
 
     @Override
     public Dataset getDataset() {
-        return null;
+        try {
+            if(dataset == null) {
+            dataset =  datasetIoService.open(file.getAbsolutePath());
+            }
+        } catch (IOException ex) {
+           ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+        }
+        catch(NullPointerException ex) {
+            ImageJFX.getLogger().log(Level.SEVERE, "The context was not initalized", ex);
+        }
+        return dataset;
     }
 
     @Override
