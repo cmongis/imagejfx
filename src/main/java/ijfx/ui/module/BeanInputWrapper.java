@@ -31,9 +31,9 @@ import java.util.logging.Logger;
  */
 public class BeanInputWrapper<T> implements Input<T>{
     
-    final Object bean;
-    final Class<T> type;
-    final String name;
+    final protected Object bean;
+    final protected Class<T> type;
+    final protected String name;
 
     boolean isMultipleChoise = false;
     
