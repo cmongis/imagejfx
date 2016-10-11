@@ -44,6 +44,9 @@ public class FluidWebViewWrapper extends StackPane{
     
     public FluidWebViewWrapper() {
         FXUtilities.createWebView().then(this::setWebView);
+        //setMaxWidth(Double.MAX_VALUE);
+        //setPrefWidth(USE_PREF_SIZE);
+
     }
     
     public FluidWebViewWrapper withHeight(double height) {
@@ -55,9 +58,15 @@ public class FluidWebViewWrapper extends StackPane{
         displayer.addStringProcessor(Processor::process);
         return this;
     }
+    public FluidWebViewWrapper withNoOverflow() {
+        displayer.addCss("body { overflow-y:hidden; }");
+        return this;
+    }
     
     protected void setWebView(WebView webView) {
       
+        
+        double width = widthProperty().getValue();
        webView.prefHeightProperty().bind(heightProperty());
        webView.prefWidthProperty().bind(widthProperty());
        getChildren().add(webView);

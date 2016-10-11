@@ -67,6 +67,7 @@ public class BatchInputBuilder {
     
     public BatchInputBuilder from(File file) {
         input = new FileBatchInputLoader(file);
+        context.inject(input);
         return this;
     }
     

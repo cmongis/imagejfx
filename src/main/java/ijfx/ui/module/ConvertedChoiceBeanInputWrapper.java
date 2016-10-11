@@ -53,7 +53,9 @@ public class ConvertedChoiceBeanInputWrapper<R> extends BeanInputWrapper<String>
     @Override
     public String getValue() {
         try {
-            return converter.backward((R) bean.getClass().getField(name).get(bean));
+            R beanValue = (R)bean.getClass().getField(name).get(bean);
+            String backward =  converter.backward(beanValue);
+            return backward;
         } catch (Exception ex) {
             Logger.getLogger(ConvertedChoiceBeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -63,7 +65,7 @@ public class ConvertedChoiceBeanInputWrapper<R> extends BeanInputWrapper<String>
     @Override
     public void setValue(String value) {
         try {
-            bean.getClass().getField(name).set(bean,converter.forward(name));
+            bean.getClass().getField(name).set(bean,converter.forward(value));
         }
         catch (Exception ex) {
             Logger.getLogger(ConvertedChoiceBeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);

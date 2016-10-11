@@ -76,7 +76,7 @@ public class FlatFieldCorrection extends ContextCommand {
         double coeff;
         Cursor<RealType<?>> datasetCursor;
         
-        if(channel == -1 || dataset.dimension(Axes.CHANNEL) == -1) {
+        if(channel == -1 || dataset.dimension(Axes.CHANNEL) <= 0 || dataset.dimensionIndex(Axes.CHANNEL) == -1) {
             datasetCursor  = dataset.cursor();
         }
         else {

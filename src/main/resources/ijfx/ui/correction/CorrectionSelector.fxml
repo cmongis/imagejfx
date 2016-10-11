@@ -18,33 +18,49 @@
 
 <fx:root styleClass="with-padding" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <BorderPane BorderPane.alignment="CENTER">
+      <BorderPane fx:id="centerBorderPane" prefHeight="110.0" BorderPane.alignment="CENTER">
+         <bottom>
+            <HBox BorderPane.alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#back" text="Back">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="ARROW_LEFT" styleClass="danger" />
+                     </graphic>
+                  </Button>
+               </children>
+            </HBox>
+         </bottom>
          <center>
             <Accordion fx:id="accordion" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                <padding>
                   <Insets bottom="10.0" right="10.0" top="10.0" />
-               </padding></Accordion>
+               </padding>
+            </Accordion>
          </center>
          <top>
-            <HBox BorderPane.alignment="CENTER">
-               <children>
-                  <MenuButton fx:id="correctionListButton" mnemonicParsing="false" text="Add correction">
-                     <graphic>
-                        <FontAwesomeIconView glyphName="PLUS" />
-                     </graphic>
-                  </MenuButton>
-               </children>
-            </HBox>
+            <BorderPane fx:id="centerTopBorderPane" BorderPane.alignment="CENTER">
+               <right>
+                  <HBox BorderPane.alignment="CENTER">
+                     <children>
+                        <MenuButton fx:id="correctionListButton" mnemonicParsing="false" text="Add correction">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="PLUS" />
+                           </graphic>
+                        </MenuButton>
+                     </children>
+                  </HBox>
+               </right>
+            </BorderPane>
          </top>
       </BorderPane>
    </center>
    <right>
       <BorderPane fx:id="rightBorderPane" BorderPane.alignment="CENTER">
          <top>
-            <ImageView fx:id="previewImageView" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+            <ImageView fx:id="previewImageView" fitHeight="170.0" fitWidth="170.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
          </top>
          <center>
-            <ListView fx:id="listView" minWidth="150.0" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+            <ListView fx:id="listView" minWidth="150.0" prefHeight="170.0" prefWidth="170.0" BorderPane.alignment="CENTER" />
          </center>
          <styleClass>
             <String fx:value="darker-background" />

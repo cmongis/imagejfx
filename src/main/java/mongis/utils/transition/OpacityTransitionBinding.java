@@ -19,25 +19,32 @@
  */
 package mongis.utils.transition;
 
-import javafx.beans.value.ObservableValue;
+import javafx.beans.binding.Binding;
+import javafx.beans.property.ReadOnlyProperty;
 import javafx.scene.Node;
 
 /**
  *
  * @author cyril
  */
-public class OpacityTransitionBinding extends TransitionBinding<Double>{
+public class OpacityTransitionBinding extends TransitionBinding<Number>{
     
-    public OpacityTransitionBinding(Node node,ObservableValue<Boolean> property) {
+    public OpacityTransitionBinding(Node node,ReadOnlyProperty<Boolean> property) {
         super(0d, 1d);
         
-        bind(property, node.opacityProperty().asObject());
-        
+        bind(property, node.opacityProperty());
     }
     
-    public OpacityTransitionBinding(Node node, ObservableValue<Boolean> property,double onFalse, double onTrue) {
+    public OpacityTransitionBinding(Node node, Binding<Boolean> binding) {
+        super(0d,1d);
+        bind(binding,node.opacityProperty());
+    }
+    
+    
+    
+    public OpacityTransitionBinding(Node node, ReadOnlyProperty<Boolean> property,double onFalse, double onTrue) {
         super(onFalse,onTrue);
-        bind(property,node.opacityProperty().asObject());
+        bind(property,node.opacityProperty());
     }
     
 }

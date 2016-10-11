@@ -56,16 +56,10 @@ public class StringInputSkin extends AbstractInputSkinPlugin<String> {
     
     @Override
     public Property<String> valueProperty() {
-        if(isMultipleChoice()) {
-            return comboBox.valueProperty();
-        }
-        else if(isMessage()) {
-            return label.textProperty();
-        }
-    
-        else {
-            return textField.textProperty();
-        }
+        
+        return valueProperty;
+       
+       
     }
 
     @Override
@@ -93,18 +87,23 @@ public class StringInputSkin extends AbstractInputSkinPlugin<String> {
     @Override
     public void init(Input<String> input) {
         
+        
+        
         if(input.multipleChoices()) {
             comboBox = new ComboBox();
             comboBox.getItems().addAll(input.getChoices());
-            
-            
+            comboBox.valueProperty().bindBidirectional(valueProperty);
+            //String value = input.getDefaultValue();
+            //comboBox.getSelectionModel().select(input.getValue());
             
         }
         else if(input.isMessage()) {
             label = new Label(input.getValue());
+            label.textProperty().bind(valueProperty);
         }
         else {
             textField = new TextField();
+            textField.textProperty().bindBidirectional(valueProperty);
         }
     }
     

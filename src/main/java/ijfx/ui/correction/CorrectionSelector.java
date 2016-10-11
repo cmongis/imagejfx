@@ -19,6 +19,7 @@
  */
 package ijfx.ui.correction;
 
+import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.ui.widgets.SimpleListCell;
 import ijfx.service.thumb.ThumbService;
 import ijfx.service.ui.LoadingScreenService;
@@ -26,11 +27,14 @@ import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.service.workflow.WorkflowStep;
+import static ijfx.ui.UiContexts.and;
 import ijfx.ui.activity.Activity;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.save.DefaultSaveOptions;
 import ijfx.ui.save.SaveOptions;
+import ijfx.ui.save.SaveType;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
@@ -99,6 +103,11 @@ public class CorrectionSelector extends BorderPane implements Activity {
     @FXML
     ImageView previewImageView;
 
+  
+    
+    @FXML
+    BorderPane centerTopBorderPane;
+    
     @FXML
     VBox rightVBox;
     
@@ -120,6 +129,9 @@ public class CorrectionSelector extends BorderPane implements Activity {
     @Parameter
     LoadingScreenService loadingScreenService;
 
+    @Parameter
+    ActivityService activityService;
+    
     private final ObservableList<CorrectionUiPlugin> addedPlugins = FXCollections.observableArrayList();
 
     private final BooleanProperty allPluginsValid = new SimpleBooleanProperty(false);
@@ -153,8 +165,9 @@ public class CorrectionSelector extends BorderPane implements Activity {
 
         correctionListButton.getItems().addAll(pluginList.stream().map(this::createMenuItem).collect(Collectors.toList()));
 
-       setTop(new FluidWebViewWrapper()
-               .withHeight(150)
+       centerTopBorderPane.setCenter(new FluidWebViewWrapper()
+               .withHeight(90)
+               .withNoOverflow()
                .forMDFiles()
                .display(this,"CorrectionSelector.md")
        );
@@ -272,11 +285,21 @@ public class CorrectionSelector extends BorderPane implements Activity {
     @FXML
     public void startCorrection() {
         new WorkflowBuilder(context)
-                .addInputFiles(filesToCorrect)
-                .and(input -> input.saveIn(destinationFolder.getValue()))
+                .addInputFiles(correctionUiService.getSelectedFiles())
+                .and(this::applySaveParameter)
                 .execute(workflowProperty.getValue())
                 .startAndShow();
 
+    }
+    
+    public void applySaveParameter(BatchInputBuilder builder) {
+        
+        if(options.saveType().getValue() == SaveType.NEW) {
+            builder.saveIn(options.folder().getValue(),options.suffix().getValue());
+        }
+        else {
+            builder.saveIn(new File(builder.getInput().getSourceFile()));
+        }   
     }
 
     @FXML
@@ -288,6 +311,11 @@ public class CorrectionSelector extends BorderPane implements Activity {
                 .startAndShow();
     }
 
+    @FXML
+    public void back() {
+        activityService.openByType(FolderSelection.class);
+    }
+    
     private void onSelectedItemChanged(Observable obs, Explorable oldValue, Explorable newValue) {
         if (newValue != null) {
             new CallableTask<Dataset>()

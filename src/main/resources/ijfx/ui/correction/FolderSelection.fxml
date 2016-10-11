@@ -18,7 +18,7 @@
          <right>
             <Button fx:id="nextButton" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#next" text="Next" BorderPane.alignment="CENTER">
                <graphic>
-                  <FontAwesomeIconView glyphName="ARROW_RIGHT" text="" />
+                  <FontAwesomeIconView glyphName="ARROW_RIGHT" styleClass="warning" text="" />
                </graphic>
             </Button>
          </right>

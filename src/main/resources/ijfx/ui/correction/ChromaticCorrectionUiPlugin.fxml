@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -11,15 +15,15 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxWidth="1.7976931348623157E308" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
             <Tab text="General">
               <content>
-                <AnchorPane minHeight="400.0" minWidth="400.0">
+                <AnchorPane>
                      <children>
-                        <GridPane hgap="10.0" minWidth="400.0" styleClass="with-padding" vgap="10.0">
+                        <GridPane hgap="10.0" maxWidth="1.7976931348623157E308" minWidth="400.0" styleClass="with-padding" vgap="10.0">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -47,7 +51,10 @@
               </content>
             </Tab>
           <Tab text="Table" />
-          <Tab fx:id="advancedParameterTab" text="Additional parameters" />
+          <Tab fx:id="advancedParameterTab" text="Additional parameters">
+               <content>
+                  <ScrollPane fx:id="advancedParameterScrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+               </content></Tab>
         </tabs>
       </TabPane>
    </center>

@@ -58,7 +58,7 @@ public class ChannelSelector extends HBox {
         getStyleClass().add("channel-selector");
         channelComboBox.getSelectionModel().selectedItemProperty().addListener(this::onSelectedChannelChanged);
        
-        
+        channelComboBox.getStyleClass().add("normal");
        
         
         

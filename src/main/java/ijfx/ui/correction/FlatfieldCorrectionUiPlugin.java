@@ -65,10 +65,13 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
     public FlatfieldCorrectionUiPlugin() {
         super(null);
         setLeft(channelSelector);
-        setRight(selectionButton);
-
+        setBottom(selectionButton);
+        selectionButton.setMaxWidth(Double.POSITIVE_INFINITY);
+        getStyleClass().add("with-padding");
+        
         binding.setButtonDefaultText("Choose flatfield image...");
         binding.setOpenFile(true);
+        
         flatfieldImage = binding.fileProperty();
 
         //bind(datasetAssetProperty, this::createDatasetAsset, flatfieldImage);

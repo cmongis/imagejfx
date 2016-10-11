@@ -117,7 +117,7 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
 
         value.setValue(input.getValue());
 
-        if (input.getWidgetType().equals(NumberWidget.SLIDER_STYLE) || input.getWidgetType().equals(NumberWidget.SCROLL_BAR_STYLE)) {
+        if (input.getWidgetType() != null && ( input.getWidgetType().equals(NumberWidget.SLIDER_STYLE) || input.getWidgetType().equals(NumberWidget.SCROLL_BAR_STYLE))) {
             isSlider = true;
 
         } else {

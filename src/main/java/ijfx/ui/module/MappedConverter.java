@@ -50,7 +50,7 @@ public class MappedConverter<R> extends HashMap<String,R> implements Converter<S
     public String backward(R b) {
         return entrySet()
                 .stream()
-                .filter(set->set.getValue() == b)
+                .filter(entry->entry.getValue().equals(b))
                 .findFirst()
                 .map(set->set.getKey())
                 .orElse(null);
@@ -58,7 +58,8 @@ public class MappedConverter<R> extends HashMap<String,R> implements Converter<S
 
     @Override
     public R forward(String b) {
-        return get(b);
+        R r = get(b);
+        return r;
     }
     
 }

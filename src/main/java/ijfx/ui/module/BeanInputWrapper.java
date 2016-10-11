@@ -77,7 +77,10 @@ public class BeanInputWrapper<T> implements Input<T>{
     @Override
     public T getValue() {
         try {
-            return (T) bean.getClass().getField(name).get(bean);
+            
+            Object get = bean.getClass().getField(name).get(bean);
+            
+            return (T) get;
         } catch (NoSuchFieldException ex) {
             Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {

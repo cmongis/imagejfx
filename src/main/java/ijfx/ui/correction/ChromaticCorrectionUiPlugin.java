@@ -26,7 +26,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.IntegerBinding;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.control.Tab;
+import javafx.scene.control.ScrollPane;
 import net.imagej.Dataset;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
@@ -46,12 +46,12 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
     Group channel2Group;
     
     @FXML
-    Tab advancedParameterTab;
+    ScrollPane advancedParameterScrollPane;
     
     @Parameter
-            InputSkinPluginService skinService;
+    InputSkinPluginService skinService;
     @Parameter
-            Context context;
+    Context context;
     
     
     
@@ -71,7 +71,7 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
          sourceSelector.setAllowAllChannels(false);
          targetSelector.setAllowAllChannels(false);
         
-      
+         configurator.getStyleClass().add("with-padding");
         //sourceSelector.channelNumberProperty().bind(Bindings.createIntegerBinding(this::getDatasetChannelNumber, dependencies));
         IntegerBinding channelNumber = Bindings.createIntegerBinding(this::getDatasetChannelNumber, exampleDataset());
         
@@ -84,7 +84,7 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
         
         bindP(explanationProperty, this::getMessage, sourceSelector.selectedChannelProperty(),targetSelector.selectedChannelProperty());
         
-        advancedParameterTab.setContent(configurator);
+        advancedParameterScrollPane.setContent(configurator);
         
       
         
@@ -100,8 +100,9 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
         
           channelNumberProperty = new ChannelNumberProperty(datasetProperty);
           context.inject(configurator);
-            configurator.setObjectParameters(new bunwarpj.Param());
-          
+            configurator.setParameterSet(new bunwarpj.Param());
+         System.out.println(configurator.getParameterSet());
+                
     }
     
     protected String getMessage() {

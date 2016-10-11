@@ -24,6 +24,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.binding.Binding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -46,7 +47,7 @@ public class TransitionBinding<T> {
     protected final Property<T> onTrueValue = new SimpleObjectProperty<>();
 
     protected Property<T> transitioned;
-
+    protected ObservableValue<Boolean> listened;
     Timeline currentTimeline;
 
     protected Duration duration = new Duration(300);
@@ -60,20 +61,25 @@ public class TransitionBinding<T> {
 
     }
 
-    
-    
-    public TransitionBinding<T> bind(ObservableValue<Boolean> property, Property<T> toModify) {
+    public TransitionBinding<T> bind(Binding<Boolean> property, Property<T> toModify) {
         transitioned = toModify;
-        
-        
-        
+        listened = property;
         property.addListener(this::onValueChanged);
-
-        Platform.runLater(()->{
-                toModify.setValue(getNewValue(property.getValue()));
-        });
-        
+        Platform.runLater(this::update);
         return this;
+    }
+
+    public TransitionBinding<T> bind(ReadOnlyProperty<Boolean> property, Property<T> toModify) {
+        transitioned = toModify;
+        listened = property;
+        property.addListener(this::onValueChanged);
+        Platform.runLater(this::update);
+
+        return this;
+    }
+
+    protected void update() {
+        transitioned.setValue(getNewValue(listened.getValue()));
     }
 
     public TransitionBinding<T> setDuration(Duration t) {
@@ -94,9 +100,9 @@ public class TransitionBinding<T> {
     protected T getNewValue(Boolean value) {
         return value ? onTrueValue.getValue() : onFalseValue.getValue();
     }
-    
+
     public void onValueChanged(Observable o, Boolean oldValue, Boolean newValue) {
-        
+
         if (currentTimeline != null) {
             currentTimeline.stop();
         }
@@ -106,20 +112,18 @@ public class TransitionBinding<T> {
         T value = getNewValue(newValue);
 
         currentTimeline.getKeyFrames().add(new KeyFrame(duration, new KeyValue(transitioned, value)));
-       
-        
-        
+
         // the state True is always set at the end of the transition while the state false
         // is always turn on before
         if (newValue) {
             currentTimeline.setOnFinished(event -> {
                 stateProperty.setValue(newValue);
                 currentTimeline = null;
-                    });
+            });
         } else {
             stateProperty.setValue(newValue);
         }
-         currentTimeline.play();
+        currentTimeline.play();
     }
 
     public ReadOnlyBooleanProperty stateProperty() {

@@ -43,7 +43,7 @@ public class RichMessageDisplayer {
  
 
     private static final String CSS_URL = ImageJFX.class.getResource("/web/css/bijou.min.css").toExternalForm();
-    private static final String CSS_HEADER = "<html><head><link rel='stylesheet' href='%s'/></head><body style='padding:10px;margin:0'><style>%s</style>%s</body></html>";
+    private static final String CSS_HEADER = "<html><head><link rel='stylesheet' href='%s'/></head><body><style>%s</style>%s</body></html>";
     private final  List<String> CSS_ADDITIONAL = new ArrayList<>();
     List<Callback<String, String>> stringProcessor = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class RichMessageDisplayer {
     public RichMessageDisplayer() {
         webViewProperty.addListener(this::onWebViewChanged);
         messageProperty.addListener(this::onMessageChanged);
-         
+        addCss("body { margin:0; padding:0;}");
     }
     
     public RichMessageDisplayer(WebView webView) {
@@ -118,9 +118,18 @@ public class RichMessageDisplayer {
             }
            
         }
+        
+        String content = String
+                .format(
+                        CSS_HEADER
+                        ,ImageJFX.class.getResource("/web/scss/bijou.min.css").toExternalForm()
+                        ,CSS_ADDITIONAL.stream().collect(Collectors.joining("\n"))
+                        , text);
+        
+        
         webView
                 .getEngine()
-                .loadContent(String.format(CSS_HEADER, ImageJFX.class.getResource("/web/scss/bijou.min.css").toExternalForm(),CSS_ADDITIONAL.stream().collect(Collectors.joining(";\n")), text));
+                .loadContent(content);
     }
 
     public RichMessageDisplayer addStringProcessor(Callback<String, String> callback) {

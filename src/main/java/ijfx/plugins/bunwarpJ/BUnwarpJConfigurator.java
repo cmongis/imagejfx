@@ -38,7 +38,7 @@ import org.scijava.plugin.Parameter;
  */
 public class BUnwarpJConfigurator extends GridPane {
 
-    Property<bunwarpj.Param> parameterProperty = new SimpleObjectProperty();
+    Property<bunwarpj.Param> parameterSetProperty = new SimpleObjectProperty();
 
     MappedConverter<Integer> modeMap = new MappedConverter("Fast",0,"Accurate",1,"Mono",2);
     
@@ -48,17 +48,17 @@ public class BUnwarpJConfigurator extends GridPane {
     InputSkinPluginService inputSkinFactory;
 
     public BUnwarpJConfigurator() {
-        parameterProperty.addListener(this::onParameterObjectChanged);
+        parameterSetProperty.addListener(this::onParameterSetChanged);
         setHgap(5);
         setVgap(10);
 
     }
     
-    public void setObjectParameters(bunwarpj.Param params) {
-        parameterProperty.setValue(params);
+    public void setParameterSet(bunwarpj.Param params) {
+        parameterSetProperty.setValue(params);
     }
 
-    private void onParameterObjectChanged(Observable obs, bunwarpj.Param oldValue, bunwarpj.Param newValue) {
+    private void onParameterSetChanged(Observable obs, bunwarpj.Param oldValue, bunwarpj.Param newValue) {
         row = 0;
         getChildren().clear();
         
@@ -67,9 +67,10 @@ public class BUnwarpJConfigurator extends GridPane {
     }
     
     private void fillPane() {
-        addModeRow("Mode","mode");
-        addRow("Minimum scale deformation","min_scale_deformation",int.class);
-        addRow("Maximum scale deformation","min_scale_deformation",int.class);
+        addStringToIntegerRow("Mode","mode","Fast",0,"Accurate",1,"Mono",2);
+        addStringToIntegerRow("Minimum scale deformation","min_scale_deformation","Very Coarse", 0,"Coarse", 1, "Fine", 2,"Very Fine",3);
+        addStringToIntegerRow("Maximum scale deformation","min_scale_deformation","Very Coarse", 0, "Coarse",1, "Fine", 2,"Very Fine", 3,"Super Fine",4);
+        
         addRow("Image subsampling factor","img_subsamp_fact",int.class);
         addRow("Division weight","divWeight",double.class);
         addRow("Curl Weighe","curlWeight",double.class);
@@ -82,23 +83,26 @@ public class BUnwarpJConfigurator extends GridPane {
 
     public void addRow(String label, String name, Class<?> clazz) {
 
-        InputControl control = new InputControl(inputSkinFactory, new BeanInputWrapper(getParameterObject(), clazz, name));
+        InputControl control = new InputControl(inputSkinFactory, new BeanInputWrapper(getParameterSet(), clazz, name));
 
         add(new Label(label), 0, row);
         add(control, 1, row);
         row++;
     }
     
-    public  void addModeRow(String label, String name) {
+    public  void addStringToIntegerRow(String label, String name,Object... choices) {
         
-        InputControl control = new InputControl(inputSkinFactory, new ConvertedChoiceBeanInputWrapper(getParameterObject(),name, modeMap));
+        
+        MappedConverter<Integer> converter = new MappedConverter<>(choices);
+        
+        InputControl control = new InputControl(inputSkinFactory, new ConvertedChoiceBeanInputWrapper(getParameterSet(),name,converter));
         add(new Label(label), 0, row);
         add(control, 1, row);
         row++;
     }
 
-    public bunwarpj.Param getParameterObject() {
-        return parameterProperty.getValue();
+    public bunwarpj.Param getParameterSet() {
+        return parameterSetProperty.getValue();
     }
 
 }

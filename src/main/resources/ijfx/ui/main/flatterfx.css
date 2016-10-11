@@ -1181,7 +1181,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-background-color:transparent;
 }
 .correction-plugin .web-view {
-    -fx-pref-height:70px;
+    -fx-pref-height:55px;
     -fx-cursor:hand;
 }
 
