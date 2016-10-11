@@ -19,12 +19,17 @@
  */
 package ijfx.ui.correction;
 
+import ijfx.plugins.bunwarpJ.BUnwarpJConfigurator;
+import ijfx.ui.module.InputSkinPluginService;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.IntegerBinding;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.control.Tab;
 import net.imagej.Dataset;
+import org.scijava.Context;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -40,6 +45,16 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
     @FXML
     Group channel2Group;
     
+    @FXML
+    Tab advancedParameterTab;
+    
+    @Parameter
+            InputSkinPluginService skinService;
+    @Parameter
+            Context context;
+    
+    
+    
     ChannelNumberProperty channelNumberProperty;
     
     ChannelSelector sourceSelector = new ChannelSelector(null);
@@ -47,6 +62,8 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
     ChannelSelector targetSelector = new ChannelSelector(null);
     
     private static final String FINAL_EXPLANATION = "Aligning *channel %d* with *channel %d* using %s.";
+    
+    BUnwarpJConfigurator configurator = new BUnwarpJConfigurator();
     
     public ChromaticCorrectionUiPlugin() {
         super("ChromaticCorrectionUiPlugin.fxml");
@@ -67,7 +84,9 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
         
         bindP(explanationProperty, this::getMessage, sourceSelector.selectedChannelProperty(),targetSelector.selectedChannelProperty());
         
+        advancedParameterTab.setContent(configurator);
         
+      
         
     }
 
@@ -80,6 +99,9 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
     public void init() {
         
           channelNumberProperty = new ChannelNumberProperty(datasetProperty);
+          context.inject(configurator);
+            configurator.setObjectParameters(new bunwarpj.Param());
+          
     }
     
     protected String getMessage() {
