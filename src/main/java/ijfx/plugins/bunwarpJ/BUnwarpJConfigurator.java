@@ -19,11 +19,16 @@
  */
 package ijfx.plugins.bunwarpJ;
 
+import ijfx.ui.module.BeanInputWrapper;
+import ijfx.ui.module.ConvertedChoiceBeanInputWrapper;
 import ijfx.ui.module.InputSkinPluginService;
-import ijfx.ui.module.input.Input;
+import ijfx.ui.module.MappedConverter;
 import ijfx.ui.module.input.InputControl;
+import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import org.scijava.plugin.Parameter;
 
@@ -31,32 +36,69 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
+public class BUnwarpJConfigurator extends GridPane {
 
-public class BUnwarpJConfigurator extends GridPane{
-    
-    
     Property<bunwarpj.Param> parameterProperty = new SimpleObjectProperty();
+
+    MappedConverter<Integer> modeMap = new MappedConverter("Fast",0,"Accurate",1,"Mono",2);
     
     int row = 0;
-    
+
     @Parameter
     InputSkinPluginService inputSkinFactory;
-    
-    
-    
+
     public BUnwarpJConfigurator() {
-       
+        parameterProperty.addListener(this::onParameterObjectChanged);
+        setHgap(5);
+        setVgap(10);
+
+    }
+    
+    public void setObjectParameters(bunwarpj.Param params) {
+        parameterProperty.setValue(params);
+    }
+
+    private void onParameterObjectChanged(Observable obs, bunwarpj.Param oldValue, bunwarpj.Param newValue) {
+        row = 0;
+        getChildren().clear();
         
-       
+        Platform.runLater(this::fillPane);
         
     }
     
-    public void addRow(String name, Input input, Class<?> clazz) {
-        
-        
-        InputControl control = new InputControl(inputSkinFactory, input);
+    private void fillPane() {
+        addModeRow("Mode","mode");
+        addRow("Minimum scale deformation","min_scale_deformation",int.class);
+        addRow("Maximum scale deformation","min_scale_deformation",int.class);
+        addRow("Image subsampling factor","img_subsamp_fact",int.class);
+        addRow("Division weight","divWeight",double.class);
+        addRow("Curl Weighe","curlWeight",double.class);
+        addRow("Landmark Weight","landmarkWeight",double.class);
+        addRow("Image weight","imageWeight",double.class);
+        addRow("Consistency Weight","consistencyWeight",double.class);
+        addRow("Stop threshold","stopThreshold",double.class);
     }
     
+
+    public void addRow(String label, String name, Class<?> clazz) {
+
+        InputControl control = new InputControl(inputSkinFactory, new BeanInputWrapper(getParameterObject(), clazz, name));
+
+        add(new Label(label), 0, row);
+        add(control, 1, row);
+        row++;
+    }
     
-    
+    public  void addModeRow(String label, String name) {
+        
+        InputControl control = new InputControl(inputSkinFactory, new ConvertedChoiceBeanInputWrapper(getParameterObject(),name, modeMap));
+        add(new Label(label), 0, row);
+        add(control, 1, row);
+        row++;
+    }
+
+    public bunwarpj.Param getParameterObject() {
+        return parameterProperty.getValue();
+    }
+
 }
