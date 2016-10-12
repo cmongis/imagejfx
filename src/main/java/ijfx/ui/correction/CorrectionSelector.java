@@ -179,6 +179,7 @@ public class CorrectionSelector extends BorderPane implements Activity {
         startCorrectionButton.disableProperty().bind(allPluginsValid.not().or(destinationFolder.isNull()));
         testCorrectionButton.disableProperty().bind(allPluginsValid.not());
 
+       
         listView.getSelectionModel().selectedItemProperty().addListener(this::onSelectedItemChanged);
         
         destinationFolder.bind(options.folder());
@@ -192,6 +193,7 @@ public class CorrectionSelector extends BorderPane implements Activity {
             change.getAddedSubList().forEach(this::listenToPlugin);
             change.getRemoved().forEach(this::stopListeningToPlugin);
         }
+        Platform.runLater(this::updateFinalWorkflow);
     }
 
     private void listenToPlugin(CorrectionUiPlugin plugin) {
@@ -226,6 +228,11 @@ public class CorrectionSelector extends BorderPane implements Activity {
     }
 
     private void checkValidity() {
+        int addedPluginSize = addedPlugins.size();
+        long validPlugins = addedPlugins.stream().filter(plugin -> plugin.workflowProperty().getValue() != null).count();
+        
+        
+        
         allPluginsValid.setValue(addedPlugins.stream().filter(plugin -> plugin.workflowProperty().getValue() != null).count() == addedPlugins.size());
     }
 
@@ -246,6 +253,7 @@ public class CorrectionSelector extends BorderPane implements Activity {
     }
 
     public void removeCorrection(CorrectionUiPlugin correction) {
+        addedPlugins.remove(correction);
         accordion.getPanes().remove(getWrapper(correction));
     }
 

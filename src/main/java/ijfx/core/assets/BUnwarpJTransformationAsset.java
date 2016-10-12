@@ -23,6 +23,9 @@ import bunwarpj.Param;
 import bunwarpj.Transformation;
 import java.io.File;
 import java.util.UUID;
+import static javax.swing.Spring.height;
+import static javax.swing.Spring.width;
+import net.imagej.Dataset;
 
 /**
  *
@@ -45,13 +48,55 @@ public class BUnwarpJTransformationAsset implements Asset<Transformation>{
         
     }
     
-    public BUnwarpJTransformationAsset(File file, bunwarpj.Param parameters,) {
-        setLandmarkFile(landmarkFile);
+    public BUnwarpJTransformationAsset(
+            File file, bunwarpj.Param parameters
+            , int sourceWidth
+            , int sourceHeight
+            , int targetWidth
+            , int targetHeight) {
+        setLandmarkFile(file);
         setParameters(parameters);
+        setSourceWidth(sourceWidth);
+        setSourceHeight(sourceHeight);
+        setTargetWidth(targetWidth);
+        setTargetHeight(targetHeight);
+        
     }
     
-    public void setParameters(Param parameters) {
+    
+    public BUnwarpJTransformationAsset setSourceDimension(int width, int height) {
+        setSourceWidth(width);
+        setSourceHeight(height);
+        return this;
+    }
+    
+    
+    
+    public BUnwarpJTransformationAsset setTargetDimension(int width, int height) {
+        setSourceWidth(width);
+        setSourceHeight(height);
+        return this;
+    }
+    
+    
+    public BUnwarpJTransformationAsset setSourceDimension(Dataset source) {
+        setSourceWidth((int)source.dimension(0));
+        setSourceHeight((int)source.dimension(1));
+        return this;
+    }
+    
+    
+    
+    public BUnwarpJTransformationAsset setTargetDimension(Dataset target) {
+        setTargetWidth((int)target.dimension(0));
+        setTargetHeight((int)target.dimension(1));
+        return this;
+    }
+    
+    
+    public BUnwarpJTransformationAsset setParameters(Param parameters) {
         this.parameters = parameters;
+        return this;
     }
 
     public Param getParameters() {
@@ -60,8 +105,41 @@ public class BUnwarpJTransformationAsset implements Asset<Transformation>{
     
     
     
-    public void setLandmarkFile(File landmarkFile) {
+    public BUnwarpJTransformationAsset setLandmarkFile(File landmarkFile) {
         this.landmarkFile = landmarkFile;
+        return this;
+    }
+
+    public int getSourceWidth() {
+        return sourceWidth;
+    }
+
+    public void setSourceWidth(int sourceWidth) {
+        this.sourceWidth = sourceWidth;
+    }
+
+    public int getSourceHeight() {
+        return sourceHeight;
+    }
+
+    public void setSourceHeight(int sourceHeight) {
+        this.sourceHeight = sourceHeight;
+    }
+
+    public int getTargetWidth() {
+        return targetWidth;
+    }
+
+    public void setTargetWidth(int targetWidth) {
+        this.targetWidth = targetWidth;
+    }
+
+    public int getTargetHeight() {
+        return targetHeight;
+    }
+
+    public void setTargetHeight(int targetHeight) {
+        this.targetHeight = targetHeight;
     }
     
     

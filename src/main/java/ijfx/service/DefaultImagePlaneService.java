@@ -43,6 +43,8 @@ import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
+import org.scijava.Prioritized;
+import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -264,6 +266,39 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
 
     }
 
+
+    @Override
+    public <T extends RealType<T>> IntervalView<T> plane(RandomAccessibleInterval<T> source, long[] position) {
+        
+        int srcNumDimension = source.numDimensions();
+
+        if (position.length + 2 < srcNumDimension) {
+            if (logger != null) {
+                logger.warning("position incompatible with source. Correcting.");
+            }
+
+            long[] correctedPosition = new long[srcNumDimension - 2];
+            System.arraycopy(position, 0, correctedPosition, 0, position.length);
+            position = correctedPosition;
+
+        }
+
+        if (position.length <= 0) {
+            return (IntervalView<T>) Views.translate(source, 0, 0);
+        }
+        IntervalView<T> hyperSlice = (IntervalView<T>) Views.hyperSlice(source, 2, position[0]);
+        if (position.length == 1) {
+            return hyperSlice;
+        }
+        for (int d = 1; d != position.length; d++) {
+            hyperSlice = Views.hyperSlice(hyperSlice, 2, position[d]);
+        }
+        return hyperSlice;
+        
+        
+    }
+
+  
     private class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
 
         @Override

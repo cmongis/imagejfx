@@ -20,13 +20,21 @@
 package ijfx.ui.correction;
 
 import ijfx.plugins.bunwarpJ.BUnwarpJConfigurator;
+import ijfx.plugins.bunwarpJ.ElasticCorrection;
+import ijfx.service.workflow.Workflow;
+import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.module.InputSkinPluginService;
+import java.io.File;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.IntegerBinding;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import mongis.utils.FileButtonBinding;
 import net.imagej.Dataset;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
@@ -37,57 +45,69 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = ChromaticCorrectionUiPlugin.class, label = "Chromatic Correction")
-public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
+public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
     @FXML
     Group channel1Group;
-    
+
     @FXML
     Group channel2Group;
+
+    @FXML
+    Button landmarkFileButton;
     
     @FXML
     ScrollPane advancedParameterScrollPane;
-    
+
     @Parameter
     InputSkinPluginService skinService;
     @Parameter
     Context context;
-    
-    
-    
+
     ChannelNumberProperty channelNumberProperty;
-    
-    ChannelSelector sourceSelector = new ChannelSelector(null);
-    
+
+    //ChannelSelector sourceSelector = new ChannelSelector(null);
+
     ChannelSelector targetSelector = new ChannelSelector(null);
-    
-    private static final String FINAL_EXPLANATION = "Aligning *channel %d* with *channel %d* using %s.";
-    
+
+    private static final String FINAL_EXPLANATION = "Correcting *channel %d* using %s.";
+
     BUnwarpJConfigurator configurator = new BUnwarpJConfigurator();
+
+    Property<File> landmarkFileProperty = new SimpleObjectProperty();
+
+    FileButtonBinding buttonBinding;
     
     public ChromaticCorrectionUiPlugin() {
         super("ChromaticCorrectionUiPlugin.fxml");
+
+       // sourceSelector.setAllowAllChannels(false);
+        targetSelector.setAllowAllChannels(false);
         
-         sourceSelector.setAllowAllChannels(false);
-         targetSelector.setAllowAllChannels(false);
+        buttonBinding = new FileButtonBinding(landmarkFileButton)
+                .setButtonDefaultText("Select landmark file");
+        buttonBinding.setOpenFile(true);
+                
         
-         configurator.getStyleClass().add("with-padding");
+        configurator.getStyleClass().add("with-padding");
         //sourceSelector.channelNumberProperty().bind(Bindings.createIntegerBinding(this::getDatasetChannelNumber, dependencies));
         IntegerBinding channelNumber = Bindings.createIntegerBinding(this::getDatasetChannelNumber, exampleDataset());
-        
-        sourceSelector.channelNumberProperty().bind(channelNumber);
+
+      //  sourceSelector.channelNumberProperty().bind(channelNumber);
         targetSelector.channelNumberProperty().bind(channelNumber);
-        
-        
-        channel1Group.getChildren().add(sourceSelector);
+
+       // channel1Group.getChildren().add(sourceSelector);
         channel2Group.getChildren().add(targetSelector);
         
-        bindP(explanationProperty, this::getMessage, sourceSelector.selectedChannelProperty(),targetSelector.selectedChannelProperty());
+        landmarkFileProperty.bind(buttonBinding.fileProperty());
         
+        
+        bindP(explanationProperty, this::getMessage,targetSelector.selectedChannelProperty(),landmarkFileProperty);
+
         advancedParameterScrollPane.setContent(configurator);
-        
-      
-        
+
+        bindP(workflowProperty, this::generateWorkflow, landmarkFileProperty, targetSelector.selectedChannelProperty());
+
     }
 
     @Override
@@ -97,33 +117,42 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin{
 
     @Override
     public void init() {
-        
-          channelNumberProperty = new ChannelNumberProperty(datasetProperty);
-          context.inject(configurator);
-            configurator.setParameterSet(new bunwarpj.Param());
-         System.out.println(configurator.getParameterSet());
-                
+
+        channelNumberProperty = new ChannelNumberProperty(datasetProperty);
+        context.inject(configurator);
+        configurator.setParameterSet(new bunwarpj.Param());
+        System.out.println(configurator.getParameterSet());
+
     }
-    
+
+    protected Workflow generateWorkflow() {
+
+        int channel = targetSelector.getSelectedChannel();
+        File landmarkFile = landmarkFileProperty.getValue();
+        bunwarpj.Param parameters = configurator.getParameterSet();
+        Workflow workflow =  new WorkflowBuilder(context)
+                .addStep(ElasticCorrection.class, "landmarkFile", landmarkFile, "channel", channel, "parameters", parameters)
+                .getWorkflow("Elactic correction workflow");
+        
+        return workflow;
+
+    }
+
     protected String getMessage() {
-        
-        int channel1 = sourceSelector.getSelectedChannel();
+
+        // int channel1 = sourceSelector.getSelectedChannel();
         int channel2 = targetSelector.getSelectedChannel();
-        
-        
-        
-        if(channel1 == -1 && channel2 == -1) {
-            return "!Please configure!";
+        File landmarkFile = landmarkFileProperty.getValue();
+        if (landmarkFile == null) {
+            return "!First, select a landmark file.!";
         }
-        else if(channel1 == -1 || channel2 == -1) {
-            return "*Yes, one more to go...*";
+
+        if (channel2 == -1) {
+            return "*Now select the channel that will be modified*";
+        } else {
+            return String.format(FINAL_EXPLANATION, channel2, landmarkFile.getName());
         }
-        
-        else {
-            return String.format(FINAL_EXPLANATION,channel1,channel2,"nothing");
-        }
-        
+
     }
-    
-    
+
 }

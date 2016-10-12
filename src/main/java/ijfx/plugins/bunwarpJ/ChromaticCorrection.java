@@ -19,7 +19,10 @@
  */
 package ijfx.plugins.bunwarpJ;
 
+
 import bunwarpj.Transformation;
+import ijfx.core.assets.AssetService;
+import ijfx.core.assets.BUnwarpJTransformationAsset;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
@@ -86,6 +89,9 @@ public class ChromaticCorrection implements Command {
     @Parameter
     StatusService uiService;
     
+    @Parameter
+    AssetService assetService;
+    
     @Override
     public void run(){
 
@@ -99,7 +105,16 @@ public class ChromaticCorrection implements Command {
            
             Dataset smallSourceDataset = (Dataset) run.get().getOutput("outputDataset");//(Dataset) promise.getOutput("outputDataset");
             
-            //uiService.set
+            if(transformation == null) {
+                
+                transformation = assetService.load(new BUnwarpJTransformationAsset()
+                        .setSourceDimension(sourceDataset)
+                        .setTargetDimension(sourceDataset)
+                        .setParameters(parameter)
+                        .setLandmarkFile(landmarksFile)
+                );
+                
+            }
             
             Map<String, Object> map2 = new HashMap<>();
             map2.put("inputDataset", this.sourceDataset);

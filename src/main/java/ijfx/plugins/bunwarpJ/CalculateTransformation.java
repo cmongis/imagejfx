@@ -35,7 +35,6 @@ import org.scijava.plugin.Plugin;
  * @author Tuan anh TRINH
  */
 @Plugin(type = Command.class)
-
 public class CalculateTransformation implements Command {
 
     @Parameter(type = ItemIO.INPUT)

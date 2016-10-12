@@ -20,16 +20,19 @@
 package ijfx.plugins.adapter;
 
 import ij.ImagePlus;
+import ijfx.service.IjfxService;
 import net.imagej.Dataset;
-import net.imagej.ImageJService;
 import net.imagej.display.ImageDisplay;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.NumericType;
+import net.imglib2.type.numeric.RealType;
 
 /**
  *
  * @author Tuan anh TRINH
  */
-public interface IJ1Service extends ImageJService {
+public interface IJ1Service extends IjfxService {
 
     public ImagePlus getInput(Dataset dataset);
 
@@ -45,4 +48,8 @@ public interface IJ1Service extends ImageJService {
     
     public void copyAxesInto(Dataset dataset, Dataset output);
 
+    public <T extends RealType<T>> ImagePlus copyPlane(RandomAccessibleInterval<T> source, long[] position);
+    
+     public <R extends RealType<R>, T extends RealType<T> & NativeType<T>> void copyPlaneBack(ImagePlus imagePlus, RandomAccessibleInterval<R> target, long[] position);
+      
 }

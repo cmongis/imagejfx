@@ -21,6 +21,8 @@
 package ijfx.plugins.adapter;
 
 import ij.ImagePlus;
+import ijfx.core.utils.DimensionUtils;
+import ijfx.service.ImagePlaneService;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
@@ -28,11 +30,16 @@ import net.imagej.axis.CalibratedAxis;
 import net.imagej.axis.VariableAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
+import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.NumericType;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.IntervalView;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -57,7 +64,8 @@ public class DefaultIJ1Service extends AbstractService implements IJ1Service {
     EventService eventService;
 
 
-
+    @Parameter
+    ImagePlaneService imagePlaneService;
 
 
     @Override
@@ -202,5 +210,30 @@ public class DefaultIJ1Service extends AbstractService implements IJ1Service {
 //        return dataset;
 //    }
 
+  
+
+    @Override
+    public <T extends RealType<T>> ImagePlus copyPlane(RandomAccessibleInterval<T> source, long[] position) {
+        
+        IntervalView<T> plane = imagePlaneService.plane(source, DimensionUtils.absoluteToPlanar(position));
+        
+        return ImageJFunctions.wrap(plane, "");
+        
+    }
+
+   @Override
+    public <R extends RealType<R>, T extends RealType<T> & NativeType<T>> void copyPlaneBack(ImagePlus imagePlus, RandomAccessibleInterval<R> target, long[] position) {
+        Img<T> source = ImageJFunctions.wrapRealNative(imagePlus);
+        Cursor<T> sourceCursor = source.cursor();
+        RandomAccess<R> targetCursor = imagePlaneService.plane(target, position).randomAccess();
+        while(sourceCursor.hasNext()) {
+            
+            sourceCursor.fwd();
+            targetCursor.setPosition(sourceCursor);
+            
+            targetCursor.get().setReal(sourceCursor.get().getRealDouble());
+            
+        }
+    }
 
 }

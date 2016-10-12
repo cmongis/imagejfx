@@ -38,12 +38,13 @@
                           </rowConstraints>
                            <children>
                               <Label styleClass="h4" text="2. then choose the channel" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                              <Label text="Source channel" GridPane.rowIndex="3" />
+                              <Label opacity="0.4" text="Source channel" GridPane.rowIndex="3" />
                               <Label text="Target channel" GridPane.rowIndex="4" />
                               <Label text="1. First, import a landmark file" GridPane.columnSpan="2" />
                               <Button mnemonicParsing="false" text="What is a landmark ?" GridPane.columnIndex="2" />
                               <Group fx:id="channel1Group" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               <Group fx:id="channel2Group" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Button fx:id="landmarkFileButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>
                      </children>

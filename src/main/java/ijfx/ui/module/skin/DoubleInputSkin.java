@@ -61,7 +61,7 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
 
     public static String CLASS_INVALID = "danger";
 
-    private DoubleProperty value = new SimpleDoubleProperty();
+    private final DoubleProperty value = new SimpleDoubleProperty();
 
     public DoubleInputSkin() {
         super();

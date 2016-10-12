@@ -48,9 +48,21 @@ public class AssetService extends AbstractService implements IjfxService {
         
         if(assets.containsKey(asset.getId()) == false) {
             Object o = loadAsset(asset);
-           
-            assets.put(asset.getId(), o);
+           if(o != null) {
+                assets.put(asset.getId(), o);
+           }
+           else {
+               return null;
+           }
         }
+        else {
+            if(assets.get(asset.getId()) == null) {
+                assets.remove(asset.getId());
+                return null;
+            }
+        }
+        
+        
         return (T) assets.get(asset.getId());
     }
 
@@ -66,5 +78,9 @@ public class AssetService extends AbstractService implements IjfxService {
             throw new IllegalArgumentException("Asset couldn't be loaded because the loader failed");
         }
         return t;
+    }
+    
+    public void clear() {
+        assets.clear();
     }
 }
