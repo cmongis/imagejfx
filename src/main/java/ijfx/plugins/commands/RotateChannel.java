@@ -19,37 +19,26 @@
  */
 package ijfx.plugins.commands;
 
-import ijfx.ui.correction.ChannelSelector;
-import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
-import org.scijava.command.Command;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath="Image > Color > Isolate channel",initializer = "init")
-public class IsolateChannel extends AbstractExtractPlugin{
+public class RotateChannel extends ChannelSpecificPlugin{
 
-    @Parameter(label = "Channel to isolate",style = ChannelSelector.STYLE)
-    int position = 1;
+    @Parameter(label = "Angle")
+    int angle;
     
     
     @Override
-    AxisType getAxis() {
-        return Axes.CHANNEL;
-    }
-
-    @Override
-    public long getPosition() {
-        return position;
-    }
-
-    @Override
-    public void setPosition(long position) {
-        this.position = (int) position;
+    public <T extends RealType<T>> void process(RandomAccessibleInterval<T> channel) {
+       
+       
+        
+        
     }
     
 }

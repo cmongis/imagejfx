@@ -20,36 +20,47 @@
 package ijfx.plugins.commands;
 
 import ijfx.ui.correction.ChannelSelector;
+import net.imagej.Dataset;
 import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
-import org.scijava.command.Command;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.Views;
+import org.scijava.ItemIO;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-@Plugin(type = Command.class, menuPath="Image > Color > Isolate channel",initializer = "init")
-public class IsolateChannel extends AbstractExtractPlugin{
-
-    @Parameter(label = "Channel to isolate",style = ChannelSelector.STYLE)
-    int position = 1;
+public abstract class ChannelSpecificPlugin extends ContextCommand{
+    
+    @Parameter(type = ItemIO.BOTH)
+    Dataset dataset;
+    
+    @Parameter(style=ChannelSelector.STYLE)
+    int channel;
     
     
-    @Override
-    AxisType getAxis() {
-        return Axes.CHANNEL;
+    public void run() {
+        
+        
+        
+        process();
+       
+        
     }
-
-    @Override
-    public long getPosition() {
-        return position;
+    
+    public <T extends RealType<T>> void  process() {
+         if(dataset.dimension(Axes.CHANNEL) == -1) {
+            process((RandomAccessibleInterval<T>) dataset);
+        }
+        
+        else {
+            process(Views.hyperSlice((RandomAccessibleInterval<T>)dataset, dataset.dimensionIndex(Axes.CHANNEL), channel));
+        }
     }
-
-    @Override
-    public void setPosition(long position) {
-        this.position = (int) position;
-    }
+    public abstract <T extends RealType<T>> void process(RandomAccessibleInterval<T> channel);
+    
     
 }

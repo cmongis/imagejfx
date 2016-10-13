@@ -53,6 +53,10 @@ public class ChannelSelector extends HBox {
     
     private Property<String[]> choicesProperty = new SimpleObjectProperty();
     
+    public final static String STYLE="channel-selector";
+    
+    private int previousChoice;
+    
     public ChannelSelector(String title) {
         setTitle(title);
         getStyleClass().add("channel-selector");
@@ -86,7 +90,10 @@ public class ChannelSelector extends HBox {
  
     
     private void onSelectedChannelChanged(Observable obs, Channel oldValue, Channel newValue) {
-        if(newValue != null)selectedChannel.setValue(newValue.getId());
+        if(newValue != null) {
+            selectedChannel.setValue(newValue.getId());
+            previousChoice = newValue.getId();
+        }
     }
 
     public void onChoicesChanged(Observable obs, Object oldalue, Object newValue) {
@@ -135,7 +142,9 @@ public class ChannelSelector extends HBox {
         return selectedChannel.getValue();
     }
     
-    
+    public void selectChannel(int channel) {
+        channelComboBox.getSelectionModel().select(channel+1);
+    }
     
     
     private class Channel {

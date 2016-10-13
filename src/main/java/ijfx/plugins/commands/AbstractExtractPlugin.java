@@ -42,9 +42,6 @@ public abstract class AbstractExtractPlugin extends ContextCommand{
     Dataset output;
     
     @Parameter
-    long position;
-      
-    @Parameter
     DatasetSamplerService samplerService;
     
     @Parameter
@@ -55,25 +52,38 @@ public abstract class AbstractExtractPlugin extends ContextCommand{
     
     abstract AxisType getAxis();
     
+    long defaultPosition;
+    
+    
+    
     public void run() {
+        
+        if(isCanceled()) {
+            return;
+        }
+        
         
         
         if(input.dimensionIndex(getAxis()) == -1) {
             
+            cancel(String.format("This dataset don't present any %s axis",getAxis().getLabel()));
+            return;
             
         }
     
         
         
-        output = samplerService.isolateDimension(input, getAxis(), position);
+        output = samplerService.isolateDimension(input, getAxis(), getPosition());
         
         
     }
     
+    public abstract long getPosition();
+    public abstract void setPosition(long position);
     public void init() {
         
         if(imageDisplayService.getActiveDataset() == input) {
-            position = imageDisplayService.getActiveImageDisplay().getLongPosition(getAxis());
+           setPosition(imageDisplayService.getActiveImageDisplay().getLongPosition(getAxis()));
         }
         
     }

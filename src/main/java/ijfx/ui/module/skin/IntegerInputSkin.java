@@ -21,7 +21,10 @@
 package ijfx.ui.module.skin;
 
 
+import ijfx.ui.correction.ChannelSelector;
 import ijfx.ui.module.InputSkinPlugin;
+import ijfx.ui.module.input.Input;
+import javafx.scene.Node;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -31,6 +34,38 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = InputSkinPlugin.class)
 public class IntegerInputSkin extends AbstractNumberInput<Integer> {
 
+    Node node;
+    
+   ChannelSelector channelSelector;
+    
+    @Override
+    public void init(Input input) {
+        
+        if(ChannelSelector.STYLE.equals(input.getWidgetType())) {
+             channelSelector = new ChannelSelector(null);
+            channelSelector.channelNumberProperty().setValue(10);
+            channelSelector.selectedChannelProperty().asObject().bindBidirectional(valueProperty());
+            channelSelector.selectChannel((int)input.getValue());
+            node = channelSelector;
+        }
+        
+        else {
+             super.init(input);
+            node = super.getNode(); 
+        }
+        
+        
+        
+    }
+    
+    @Override
+    public Node getNode() {
+        
+        return node;
+        
+        
+    }
+    
     @Override
     Integer convert(String newValue) {
         return Integer.parseInt(newValue);
