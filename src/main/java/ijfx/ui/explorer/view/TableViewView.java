@@ -69,6 +69,7 @@ public class TableViewView implements ExplorerView {
     HintService hintService;
     
     
+    
     private static final String TABLE_VIEW_ID = "tableViewView";
     
     List<? extends Explorable> currentItems;

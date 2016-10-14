@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -37,9 +39,14 @@ public class ExplorableListeningManager {
     
     private BiConsumer<Explorable,Boolean> consumer;
 
+    
+    private ObservableList<Explorable> itemList = FXCollections.observableArrayList();
+    
     public ExplorableListeningManager(BiConsumer<Explorable, Boolean> consumer) {
         this.consumer = consumer;
     }
+    
+    public  
     
     
     
