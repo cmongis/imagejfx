@@ -106,7 +106,7 @@ public class ExplorableSelector extends BorderPane{
 
     private final static String MARK_LABEL_TEXT = "%d files marked for processing";
 
-    private final ExplorableListeningManager listeningManager = new ExplorableListeningManager(this::onExplorableMarked);
+    private final SelectableManager<Explorable> selectableManager = new SelectableManager<>(this::onExplorableMarked);
     
     public ExplorableSelector() {
 
@@ -284,10 +284,10 @@ public class ExplorableSelector extends BorderPane{
             updateFilter();
             
             change.getAddedSubList()
-                    .forEach(listeningManager::listen);
+                    .forEach(selectableManager::listen);
             
             change.getRemoved()
-                    .forEach(listeningManager::stopListening);
+                    .forEach(selectableManager::stopListening);
             
         }
     }

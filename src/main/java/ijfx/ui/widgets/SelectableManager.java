@@ -19,65 +19,96 @@
  */
 package ijfx.ui.widgets;
 
-import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.Selectable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 /**
  *
  * @author cyril
  */
-public class ExplorableListeningManager {
+public class SelectableManager<T extends Selectable> {
  
     
-    Map<Explorable,SelectionListener> listeners = new HashMap<>();
+    Map<T,SelectionListener> listeners = new HashMap<>();
     
-    private BiConsumer<Explorable,Boolean> consumer;
+    private BiConsumer<T,Boolean> consumer;
 
     
-    private ObservableList<Explorable> itemList = FXCollections.observableArrayList();
+    private ObservableList<T> itemList = FXCollections.observableArrayList();
     
-    public ExplorableListeningManager(BiConsumer<Explorable, Boolean> consumer) {
-        this.consumer = consumer;
+    
+    public SelectableManager() {
+        this.itemList.addListener(this::onItemListChanged);
     }
     
-    public  
+    public SelectableManager(BiConsumer<T, Boolean> consumer) {
+        
+        this();
+        this.consumer = consumer;
+        
+        
+        
+    }
     
     
     
-    public void listen(Explorable explorable) {
+    
+    public void onItemListChanged(ListChangeListener.Change<? extends T> change) {
+        
+        while(change.next()) {
+            change.getAddedSubList().forEach(this::listen);
+            change.getRemoved().forEach(this::stopListening);
+        }
+        
+        
+    }
+    
+    
+    
+    public void listen(T explorable) {
         
         SelectionListener listener = new SelectionListener(explorable);
         listeners.put(explorable, listener);
         
         explorable.selectedProperty().addListener(listener);
-        if(explorable.selectedProperty().getValue() && consumer != null) {
+        if(explorable.selectedProperty().getValue() && listener != null) {
             consumer.accept(explorable,true);
         }
         
     }
     
-    public void stopListening(Explorable explorable) {
+    public void stopListening(T explorable) {
         SelectionListener listener = listeners.get(explorable);
         explorable.selectedProperty().removeListener(listener);
         listeners.remove(explorable);
     }
     
+    public void setItem(Collection<? extends T> collection) {
+        
+        itemList.clear();
+        itemList.addAll(collection);
+        
+    }
+    
+   
     
     private class SelectionListener implements ChangeListener<Boolean>{
-        private final Explorable exp;
+        private final T exp;
 
-        public SelectionListener(Explorable exp) {
+        public SelectionListener(T exp) {
             this.exp = exp;
         }
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-            consumer.accept(exp, newValue);
+            if(consumer != null) consumer.accept(exp, newValue);
         }
     }
 }
