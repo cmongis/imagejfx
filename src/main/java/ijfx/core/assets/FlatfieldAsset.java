@@ -31,8 +31,26 @@ public class FlatfieldAsset extends AbstractAsset<Dataset>{
     public FlatfieldAsset() {
         super(Dataset.class);
     }
+    
+    private File darkfield;
+    
     public FlatfieldAsset(File f) {
         this();
         setFile(f);
     }
+    
+    public FlatfieldAsset(File flatfield, File darkfield) {
+        this(flatfield);
+    }
+
+    public void setDarkfield(File darkfield) {
+        this.darkfield = darkfield;
+    }
+
+    public File getDarkfield() {
+        return darkfield;
+    }
+    
+    
+    
 }

@@ -22,7 +22,10 @@ package ijfx.core.assets.loader;
 import ijfx.core.Handles;
 import ijfx.core.assets.Asset;
 import ijfx.core.assets.AssetLoader;
+import ijfx.core.assets.AssetService;
+import ijfx.core.assets.DatasetAsset;
 import ijfx.core.assets.FlatfieldAsset;
+import ijfx.plugins.flatfield.DarkfieldSubstraction;
 import ijfx.plugins.flatfield.GenerateFlatfield;
 import ijfx.service.ui.CommandRunner;
 import io.scif.services.DatasetIOService;
@@ -60,18 +63,33 @@ public class FlatfieldAssetLoader implements AssetLoader<Dataset> {
     @Parameter
     CommandService commandService;
     
+   
     @Override
     public Dataset load(Asset<Dataset> asset) {
         try {
 
-            Dataset dataset = datasetIoService.open(asset.getFile().getAbsolutePath());
+           
            
             
+            Dataset dataset = datasetIoService.open(asset.getFile().getAbsolutePath());
+           
+            if(asset instanceof FlatfieldAsset) {
+                FlatfieldAsset flAsset = (FlatfieldAsset)asset;
+                if(flAsset.getDarkfield() != null) {
+                   new CommandRunner(context)
+                           .set("dataset", dataset)
+                           .set("file",flAsset.getDarkfield())
+                           .runSync(DarkfieldSubstraction.class);
+                           
+                }
+            }
             return new CommandRunner(context)
                     .set("dataset",dataset)
                     .runSync(GenerateFlatfield.class)
                     .getOutput("dataset");
                     
+            
+            
             
             //return dataset;
         } catch (IOException ex) {
