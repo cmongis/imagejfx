@@ -22,6 +22,7 @@ package ijfx.service.dataset;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.display.ImageDisplay;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 
 /**
@@ -41,4 +42,9 @@ public interface DatasetUtillsService extends ImageJService{
     public Dataset divideActivePlaneByValue(Dataset dataset,long[] position, double value);
     
     public Dataset divideActivePlaneByActivePlane(Dataset dataset,long[] position, Dataset datasetValue, long [] positionValue);
+
+
+    public <T extends RealType<T> & NativeType<T>> Dataset emptyConversion(Dataset dataset, T t);
+
+    public <T extends RealType<T> & NativeType<T>> Dataset convert(Dataset dataset, T t);
 }

@@ -23,22 +23,27 @@ import ijfx.plugins.flatfield.FlatFieldCorrectionOld;
 import ijfx.service.sampler.DatasetSamplerService;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.plugins.commands.assign.DivideDataValuesBy;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.Views;
+import org.scijava.Prioritized;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
+import org.scijava.log.LogService;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
@@ -68,6 +73,9 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
 
     @Parameter
     DisplayService displayService;
+
+    @Parameter
+    DatasetService datasetService;
 
     @Override
     public Dataset extractPlane(ImageDisplay imageDisplay) throws NullPointerException {
@@ -173,7 +181,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     }
 
     @Override
-    public Dataset divideActivePlaneByValue(Dataset dataset,long[] position, double value) {
+    public Dataset divideActivePlaneByValue(Dataset dataset, long[] position, double value) {
         double width = dataset.max(0) + 1;
         double height = dataset.max(1) + 1;
 
@@ -183,7 +191,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
             randomAccess.setPosition(x, 0);
             for (int y = 0; y < height; y++) {
                 randomAccess.setPosition(y, 1);
-                Double d = (Double)randomAccess.get().getRealDouble() / value;
+                Double d = (Double) randomAccess.get().getRealDouble() / value;
                 randomAccess.get().setReal(d);
             }
         }
@@ -191,7 +199,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     }
 
     @Override
-    public Dataset divideActivePlaneByActivePlane(Dataset dataset,long[] position, Dataset datasetValue, long [] positionValue) {
+    public Dataset divideActivePlaneByActivePlane(Dataset dataset, long[] position, Dataset datasetValue, long[] positionValue) {
 //        long[] position = new long[dataset.numDimensions()];
 //        this.getImageDisplay(dataset).localize(position);
         double width = dataset.max(0) + 1;
@@ -224,6 +232,62 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
             }
         }
         return dataset;
+    }
+
+    @Override
+    public <T extends RealType<T> & NativeType<T>> Dataset emptyConversion(Dataset dataset, T t) {
+
+        long[] dimensions = new long[dataset.numDimensions()];
+        AxisType[] axisTypes = new AxisType[dataset.numDimensions()];
+        CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
+        dataset.axes(axes);
+
+        Dataset output = datasetService.create(t, dimensions, "", axisTypes);
+        output.setAxes(axes);
+        output.setName(dataset.getName());
+        output.setSource(dataset.getSource());
+
+        return output;
+
+    }
+
+    private void copyMetaData(Dataset source, Dataset target) {
+        CalibratedAxis[] axes = new CalibratedAxis[source.numDimensions()];
+        source.axes(axes);
+
+        target.setAxes(axes);
+        target.setName(target.getName());
+        target.setSource(target.getSource());
+
+    }
+
+    @Override
+    public <T extends RealType<T> & NativeType<T>> Dataset convert(Dataset dataset, T t) {
+        long[] dimensions = new long[dataset.numDimensions()];
+        AxisType[] axisTypes = new AxisType[dataset.numDimensions()];
+        
+        dataset.dimensions(dimensions);
+        
+        for(int i = 0;i!= dimensions.length;i++) {
+            axisTypes[i] = dataset.axis(i).type();
+        }
+        
+        Dataset output = datasetService.create(t, dimensions, "", axisTypes);
+        
+        Cursor<? extends RealType<?>> cursor = dataset.cursor();
+        cursor.reset();
+        RandomAccess<RealType<?>> randomAccess = output.randomAccess();
+        while(cursor.hasNext()) {
+            cursor.fwd();
+            
+            randomAccess.setPosition(cursor);
+            randomAccess.get().setReal(cursor.get().getRealDouble());
+            
+        }
+        
+        
+        copyMetaData(dataset, output);
+        return output;
     }
 
 }
