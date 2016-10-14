@@ -24,7 +24,6 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.core.metadata.MetaDataSetType;
 import ijfx.service.ui.HintService;
-import ijfx.service.ui.hint.DefaultHint;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
 import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
@@ -32,6 +31,7 @@ import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.ExplorerView;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.widgets.SelectableManager;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -68,7 +68,7 @@ public class TableViewView implements ExplorerView {
     @Parameter
     HintService hintService;
     
-    
+    SelectableManager<Explorable> selectableManager = new SelectableManager<>(this::onItemSelectionChanged);
     
     private static final String TABLE_VIEW_ID = "tableViewView";
     
@@ -103,6 +103,9 @@ public class TableViewView implements ExplorerView {
         helper.setPriority(priority);
         helper.setColumnsFromItems(items);
         helper.setItem(items);
+        
+        selectableManager.setItem(items);
+        
         currentItems = items;
 
         List<? extends Explorable> selected = items
@@ -112,7 +115,7 @@ public class TableViewView implements ExplorerView {
 
         setSelectedItem(selected);
         displayHints();
-        //tableView.getSelectionModel().getSelectedItems().addAll(selected);
+        
     }
 
     @Override
@@ -132,7 +135,7 @@ public class TableViewView implements ExplorerView {
 
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
-        items.forEach(tableView.getSelectionModel()::select);
+       items.forEach(tableView.getSelectionModel()::select);
         
         
     }
@@ -187,11 +190,8 @@ public class TableViewView implements ExplorerView {
         return row;
     }
 
-    private void select(Explorable owner) {
-        if (owner == null) {
-            return;
-        }
-        ((Explorable) owner).selectedProperty().setValue(true);
+    private void select(Explorable owner, boolean mode) {
+       
     }
 
     private void unselect(Explorable owner) {
@@ -205,4 +205,10 @@ public class TableViewView implements ExplorerView {
         return priority;
     }
 
+    private void onItemSelectionChanged(Explorable explorable, Boolean selected) {
+        
+        tableView.getSelectionModel().select(explorable);
+        
+    }
+    
 }

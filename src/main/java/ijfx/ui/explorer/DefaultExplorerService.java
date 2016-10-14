@@ -25,7 +25,7 @@ import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.event.DisplayedListChanged;
 import ijfx.ui.explorer.event.ExploredListChanged;
 import ijfx.ui.main.ImageJFX;
-import java.time.Duration;
+import ijfx.ui.widgets.SelectableManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,10 +36,7 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ObservableValue;
 import mongis.utils.CallbackTask;
-import org.reactfx.EventStream;
-import org.reactfx.EventStreams;
 import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -71,34 +68,26 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
 
     private final IntegerProperty selected = new SimpleIntegerProperty(0);
 
-    EventStream<Integer> selectEvents = EventStreams.changesOf((ObservableValue) selected);
+    List<Explorable> selectedItems = new ArrayList<>();
 
+    SelectableManager<Explorable> selectionManager = new SelectableManager<>(this::onExplorableSelected);
+    
     Logger logger = ImageJFX.getLogger();
 
     @Override
     public void initialize() {
-        selectEvents.successionEnds(Duration.ofSeconds(1)).subscribe(i -> {
-            eventService.publish(new ExplorerSelectionChangedEvent().setObject(getSelectedItems()));
-        });
+       
 
     }
 
     @Override
     public void setItems(List<Explorable> items) {
 
-        if (explorableList != null) {
-            explorableList.forEach(this::stopListeningToExplorable);
-        }
-
         explorableList = items;
         if(explorableList == null) explorableList = new ArrayList<>();
-        if (explorableList != null) {
-            explorableList.forEach(this::listenToExplorableSelection);
-        }
-
         eventService.publish(new ExploredListChanged().setObject(items));
         applyFilter(lastFilter);
-
+        selectionManager.setItem(explorableList);
     }
 
     @Override
@@ -174,22 +163,14 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         return keyList;
     }
 
-    private void listenToExplorableSelection(Explorable expl) {
-        if(expl != null)
-        expl.selectedProperty().addListener(this::onExplorableSelected);
-    }
+    
 
-    private void stopListeningToExplorable(Explorable expl) {
-        if(expl != null)
-        expl.selectedProperty().removeListener(this::onExplorableSelected);
-    }
-
-    private void onExplorableSelected(Observable obs, Boolean oldVAlue, Boolean newValue) {
-        if (newValue) {
-            selected.add(1);
-        } else {
-            selected.add(-1);
-        }
+    private void onExplorableSelected(Explorable explorable, Boolean selected) {
+       this.selected.add(selected ? 1 : -1);
+       
+       if(selected) selectedItems.add(explorable);
+       else selectedItems.remove(explorable);
+       
     }
 
     public void open(Iconazable explorable) {
