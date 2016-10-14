@@ -1176,6 +1176,8 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .correction-plugin {
     -fx-background-color:-bg-darker;
+    -fx-border-color:transparent;
+    -fx-border-width:2px;
 }
 .correction-plugin.titled-pane > .title {
     -fx-background-color:transparent;
@@ -1183,6 +1185,12 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .correction-plugin .web-view {
     -fx-pref-height:55px;
     -fx-cursor:hand;
+}
+.correction-plugin:hover {
+    -fx-border-color:-flatter-primary;   
+}
+.correction-plugin:hover.titled-pane:expanded {
+    -fx-border-color:transparent;
 }
 
 

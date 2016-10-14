@@ -86,10 +86,10 @@ class CorrectionUiPluginWrapper extends TitledPane {
         
         headerBorderPane.prefWidthProperty().bind(Bindings.createDoubleBinding(this::getHeaderWidth,widthProperty(),deleteButton.widthProperty()));
         
-        // putting the headre in a stack pane to be sure it takes all the space... I tried every other method
-       // headerStackPane.getChildren().add(headerBorderPane);
         
-        //headerBorderPane.setMaxWidth(Double.POSITIVE_INFINITY);
+        webViewWrapper.setOnMouseClicked(event->setExpanded(true));
+        
+        
          setGraphic(headerBorderPane);
         headerBorderPane.widthProperty().addListener(this::onHeaderBorderPaneChanged);
         deleteButton.setOnAction(this::delete);
@@ -126,9 +126,6 @@ class CorrectionUiPluginWrapper extends TitledPane {
         setGraphic(webViewStackPane);
         webView.setOnMouseClicked((event) -> setExpanded(!isExpanded()));
        // displayer = new RichMessageDisplayer(webView)
-                
-       
-        
     }
 
     private String updateHeader() {
