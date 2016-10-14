@@ -190,21 +190,6 @@ public class TableViewView implements ExplorerView {
         return row;
     }
 
-    private void select(Explorable owner, boolean mode) {
-       
-    }
-
-    private void unselect(Explorable owner) {
-        if (owner == null) {
-            return;
-        }
-        ((Explorable) owner).selectedProperty().setValue(false);
-    }
-
-    private String[] getPriority(MetaDataSetType t) {
-        return priority;
-    }
-
     private void onItemSelectionChanged(Explorable explorable, Boolean selected) {
         
         tableView.getSelectionModel().select(explorable);
