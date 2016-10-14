@@ -25,8 +25,10 @@ import ijfx.service.ui.CommandRunner;
 import java.io.File;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
+import net.imagej.ops.transform.intervalView.DefaultIntervalView;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
 import org.scijava.Context;
@@ -46,6 +48,9 @@ public class FlatFieldCorrection extends ContextCommand {
     @Parameter(label = "Flatfield image")
     File flatfield;
 
+    @Parameter(label = "Darkfield image (non requied, only for the flatfield)", required= false)
+    File darkfield;
+    
     @Parameter(label = "Convert original type")
     boolean keepType = true;
 
@@ -64,17 +69,22 @@ public class FlatFieldCorrection extends ContextCommand {
     @Override
     public void run() {
 
-        Dataset flatfieldData = assetService.load(new FlatfieldAsset(flatfield));
-
+        Dataset flatfieldData = assetService.load(new FlatfieldAsset(flatfield,darkfield));
+        
+        
         if (keepType == false) {
             dataset = new CommandRunner(context)
                     .set("dataset", dataset)
                     .runSync(ConvertTo32Bits.class)
                     .getOutput("dataset");
         }
+        
+       
+        
         double value;
         double coeff;
         Cursor<RealType<?>> datasetCursor;
+       
         
         if(channel == -1 || dataset.dimension(Axes.CHANNEL) <= 0 || dataset.dimensionIndex(Axes.CHANNEL) == -1) {
             datasetCursor  = dataset.cursor();
@@ -103,4 +113,44 @@ public class FlatFieldCorrection extends ContextCommand {
 
         }
     }
+    
+    public static <T extends RealType<T>,U extends RealType<T>> void correct(RandomAccessibleInterval<T> dataset, RandomAccess<T> flatfield,int channelAxisId,int channel) {
+        
+        double value;
+        double coeff;
+        Cursor<T> datasetCursor;
+       
+     
+        
+        if(channel == -1 || dataset.dimension(channelAxisId) <= 0 || channelAxisId == -1) {
+            datasetCursor  = Views.iterable(dataset).cursor();
+        }
+        else {
+            datasetCursor = Views.hyperSlice(dataset, channelAxisId, channel).cursor();
+        }
+
+        //RandomAccess<U> flatfield = flatfieldData.randomAccess();
+        datasetCursor.reset();
+        long[] xy = new long[2];
+        while (datasetCursor.hasNext()) {
+            datasetCursor.fwd();
+            xy[0] = datasetCursor.getLongPosition(0);
+            xy[1] = datasetCursor.getLongPosition(1);
+            value = datasetCursor.get().getRealDouble();
+
+            flatfield.setPosition(xy);
+
+            coeff = flatfield.get().getRealDouble();
+
+            value = value / coeff;
+
+            datasetCursor.get().setReal(value);
+
+        }
+        
+        
+        
+    }
+    
+    
 }

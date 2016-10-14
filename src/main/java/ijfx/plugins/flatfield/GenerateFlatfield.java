@@ -23,23 +23,26 @@ import ijfx.core.stats.IjfxStatisticService;
 import ijfx.plugins.convertype.TypeChangerIJFX;
 import ijfx.service.ui.CommandRunner;
 import net.imagej.Dataset;
-import net.imagej.plugins.commands.typechange.TypeChanger;
+import net.imagej.DatasetService;
 import net.imagej.types.DataTypeService;
 import net.imglib2.Cursor;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.FloatType;
 import org.scijava.Context;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import ucar.nc2.constants.AxisType;
 
 /**
  *
  * @author cyril
  */
 @Plugin(type = Command.class)
-public class GenerateFlatfield extends ContextCommand {
+public class GenerateFlatfield<T> extends ContextCommand {
     
     
     @Parameter(type = ItemIO.BOTH)
@@ -54,6 +57,8 @@ public class GenerateFlatfield extends ContextCommand {
     @Parameter
     Context context;
     
+    @Parameter
+    DatasetService datasetService;
 
     @Override
     public void run() {
@@ -75,6 +80,10 @@ public class GenerateFlatfield extends ContextCommand {
         
         
     }
+    
+    
+    
+   
     
      public Dataset convertTo32(Dataset dataset) {
         RealType<?> firstElement = dataset.firstElement();
