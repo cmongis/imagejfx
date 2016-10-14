@@ -48,8 +48,23 @@ public interface IJ1Service extends IjfxService {
     
     public void copyAxesInto(Dataset dataset, Dataset output);
 
-    public <T extends RealType<T>> ImagePlus copyPlane(RandomAccessibleInterval<T> source, long[] position);
+    /**
+     * 
+     * @param <T>
+     * @param source Source of the copy (image, view whatever)
+     * @param planarPositionposition Position of the plane (without X,Y coordinate)
+     * @return An ImagePlus that can be edited and re-inserted later
+     */
+    public <T extends RealType<T>> ImagePlus copyPlane(RandomAccessibleInterval<T> source, long[] planarPosition);
     
-     public <R extends RealType<R>, T extends RealType<T> & NativeType<T>> void copyPlaneBack(ImagePlus imagePlus, RandomAccessibleInterval<R> target, long[] position);
+    /**
+     * 
+     * @param <R>
+     * @param <T>
+     * @param imagePlus source of the copy (must contain only one plane)
+     * @param target RandomAccessible in which it will be copied
+     * @param position planar position (without X and Y coordinates)
+     */
+    public <R extends RealType<R>, T extends RealType<T> & NativeType<T>> void copyPlaneBack(ImagePlus imagePlus, RandomAccessibleInterval<R> target, long[] position);
       
 }

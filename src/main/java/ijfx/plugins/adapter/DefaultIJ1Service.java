@@ -215,7 +215,7 @@ public class DefaultIJ1Service extends AbstractService implements IJ1Service {
     @Override
     public <T extends RealType<T>> ImagePlus copyPlane(RandomAccessibleInterval<T> source, long[] position) {
         
-        IntervalView<T> plane = imagePlaneService.plane(source, DimensionUtils.absoluteToPlanar(position));
+        IntervalView<T> plane = imagePlaneService.plane(source, position);
         
         return ImageJFunctions.wrap(plane, "");
         

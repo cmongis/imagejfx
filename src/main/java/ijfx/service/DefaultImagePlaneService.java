@@ -271,16 +271,11 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     public <T extends RealType<T>> IntervalView<T> plane(RandomAccessibleInterval<T> source, long[] position) {
         
         int srcNumDimension = source.numDimensions();
-
-        if (position.length + 2 < srcNumDimension) {
-            if (logger != null) {
-                logger.warning("position incompatible with source. Correcting.");
-            }
-
-            long[] correctedPosition = new long[srcNumDimension - 2];
-            System.arraycopy(position, 0, correctedPosition, 0, position.length);
-            position = correctedPosition;
-
+        int positionLength = position.length;
+        
+        if(srcNumDimension == positionLength) {
+            logger.warning(String.format("An absolute dimension (%d-d) was given instead of a planar dimension (%d-d)",srcNumDimension,srcNumDimension-2));
+            position = DimensionUtils.absoluteToPlanar(position);
         }
 
         if (position.length <= 0) {

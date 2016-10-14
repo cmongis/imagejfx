@@ -313,7 +313,7 @@ public class CorrectionSelector extends BorderPane implements Activity {
     @FXML
     public void testCorrection() {
         new WorkflowBuilder(context)
-                .addInput(exampleDataset.getValue())
+                .addInput(exampleDataset.getValue().duplicate())
                 .and(input -> input.display())
                 .execute(workflowProperty.getValue())
                 .startAndShow();
