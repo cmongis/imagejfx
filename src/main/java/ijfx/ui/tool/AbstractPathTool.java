@@ -158,30 +158,13 @@ public abstract class AbstractPathTool implements FxTool {
             for (int i = 0; i != dimCount; i++) {
                 final long pos = getActiveImageDisplay().getLongPosition(i);
                 overlay.setAxis(getActiveImageDisplay().axis(i), i);
-                
-                
-                
             }
 
            
         }
          overlayService.addOverlays(display, list);
          list.stream().map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
-        /*
-        ImageJFX.getThreadQueue().execute(() -> {
-
-            double rangeMin = displayRangeService.getCurrentViewMinimum();
-            double rangeMax = displayRangeService.getCurrentViewMaximum();
-
-            overlayService.addOverlays(display, list);
-            if(list.size() == 1) {
-                overlaySelectionService.setOverlaySelection(display, list.get(0), true);
-            }
-            displayRangeService.updateCurrentDisplayRange(rangeMin, rangeMax);
-            
-            new OverlayCreatedEvent(overlay);
-            
-        });*/
+       
     }
 
     
