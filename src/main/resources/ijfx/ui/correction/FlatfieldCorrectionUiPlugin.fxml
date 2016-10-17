@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <GridPane styleClass="grid-pane" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <CheckBox fx:id="multichannelCheckbox" mnemonicParsing="false" text="Multichannel correction (darkfield and flatfield must be multichannel)" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+            <Button mnemonicParsing="false" onAction="#multichannelHelp" styleClass="success" GridPane.columnIndex="2" GridPane.rowIndex="3">
+               <graphic>
+                  <FontAwesomeIconView glyphName="INFO_CIRCLE" />
+               </graphic>
+            </Button>
+            <Label text="Flatfield image :" GridPane.rowIndex="2" />
+            <Label text="Darkfield image :" />
+            <Button fx:id="flatfieldButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Button fx:id="darkfieldButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button" GridPane.columnIndex="1" />
+            <Button mnemonicParsing="false" onAction="#darkfieldHelp" styleClass="success" GridPane.columnIndex="2">
+               <graphic>
+                  <FontAwesomeIconView glyphName="INFO_CIRCLE" />
+               </graphic>
+            </Button>
+            <Label text="Select the channel to correct" GridPane.rowIndex="4" />
+            <Group fx:id="channelSelectorGroup" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <CheckBox fx:id="darkfieldCorrectionCheckBox" mnemonicParsing="false" text="Apply darkfield only to the flatfield image" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+   </left>
+</fx:root>
