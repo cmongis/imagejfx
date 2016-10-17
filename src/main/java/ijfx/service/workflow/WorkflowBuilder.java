@@ -109,6 +109,15 @@ public class WorkflowBuilder {
         return this;
     }
 
+    public WorkflowBuilder addStepIfTrue(boolean predicateResult,Class<?> moduleClass, Object... params) {
+        if(predicateResult) {
+           return  addStep(moduleClass,params);
+        }
+        else {
+            return this;
+        }
+    }
+    
     public WorkflowBuilder addStep(Class<?> moduleClass, Object... params) {
 
         DefaultWorkflowStep step = new DefaultWorkflowStep(moduleClass.getName());
@@ -176,7 +185,7 @@ public class WorkflowBuilder {
         return inputs.stream().map(builder -> builder.getInput()).collect(Collectors.toList());
     }
 
-    public Task<Boolean> start() {
+    public CallbackTask<?,Boolean> start() {
 
         DefaultWorkflow workflow = new DefaultWorkflow(steps);
 
@@ -186,8 +195,10 @@ public class WorkflowBuilder {
                 .start();
     }
 
-    public void startAndShow() {
-        loadingScreenService.frontEndTask(start(), true);
+    public CallbackTask<?,Boolean> startAndShow() {
+        CallbackTask<?,Boolean> task = start();
+        loadingScreenService.frontEndTask(task, true);
+        return task;
     }
 
     public boolean runSync(ProgressHandler handler) {
