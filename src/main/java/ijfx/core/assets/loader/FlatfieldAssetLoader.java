@@ -27,6 +27,7 @@ import ijfx.core.assets.DatasetAsset;
 import ijfx.core.assets.FlatfieldAsset;
 import ijfx.plugins.flatfield.DarkfieldSubstraction;
 import ijfx.plugins.flatfield.GenerateFlatfield;
+import ijfx.plugins.flatfield.GenerateMultiChannelFlatfield;
 import ijfx.service.ui.CommandRunner;
 import io.scif.services.DatasetIOService;
 import java.io.IOException;
@@ -53,52 +54,60 @@ public class FlatfieldAssetLoader implements AssetLoader<Dataset> {
 
     @Parameter
     Context context;
-    
+
     @Parameter
     DataTypeService dataTypeService;
-    
+
     @Parameter
     ModuleService moduleService;
-    
+
     @Parameter
     CommandService commandService;
-    
-   
+
     @Override
     public Dataset load(Asset<Dataset> asset) {
         try {
 
-           
-           
-            
             Dataset dataset = datasetIoService.open(asset.getFile().getAbsolutePath());
-           
-            if(asset instanceof FlatfieldAsset) {
-                FlatfieldAsset flAsset = (FlatfieldAsset)asset;
-                if(flAsset.getDarkfield() != null) {
-                   new CommandRunner(context)
-                           .set("dataset", dataset)
-                           .set("file",flAsset.getDarkfield())
-                           .runSync(DarkfieldSubstraction.class);
-                           
+            
+            // if the asset is a flatfield asset
+            if (asset instanceof FlatfieldAsset) {
+                FlatfieldAsset flAsset = (FlatfieldAsset) asset;
+                
+                // if the asset also comes with a darkfield,
+                // the flatfield overgoes darkfield substraction
+                if (flAsset.getDarkfield() != null) {
+                    new CommandRunner(context)
+                            .set("dataset", dataset)
+                            .set("file", flAsset.getDarkfield())
+                            .set("multichannel", flAsset.isMultiChannel())
+                            .runSync(DarkfieldSubstraction.class);
+
                 }
+                
+                // if the asset is multichannel
+                // a multichannel flatfield image is generated
+                if (flAsset.isMultiChannel()) {
+                    return new CommandRunner(context)
+                            .set("input", dataset)
+                            .runSync(GenerateMultiChannelFlatfield.class)
+                            .getOutput("output");
+                }
+
             }
+
+            // happends is it wasn't a flatfield asset or if the flatfield asset
+            // is not multichannel
             return new CommandRunner(context)
-                    .set("dataset",dataset)
+                    .set("dataset", dataset)
                     .runSync(GenerateFlatfield.class)
                     .getOutput("dataset");
-                    
-            
-            
-            
+
             //return dataset;
         } catch (IOException ex) {
             Logger.getLogger(FlatfieldAssetLoader.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
-    
-
-        
 
 }
