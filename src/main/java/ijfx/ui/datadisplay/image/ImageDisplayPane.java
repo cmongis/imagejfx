@@ -783,7 +783,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     @Override
     public Pane getPane() { return this; }
-    
+   
     protected OverlayDrawer getDrawer(Overlay overlay) {
         //logger.info("Searching a drawer for "+overlay.getClass().getSimpleName());
         if (drawerMap.get(overlay.getClass()) == null) {
@@ -892,9 +892,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
      */
     private void onCanvasClick(MouseEvent event) {
 
-        System.out.println("canvas click");
+       
+        if(event.getButton() != MouseButton.PRIMARY) return;
+        
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
-        System.out.println(positionOnImage);
         logService.info(String.format("This image contains %s overlays", overlayService.getOverlays(imageDisplay).size()));
 
         boolean wasOverlaySelected;
