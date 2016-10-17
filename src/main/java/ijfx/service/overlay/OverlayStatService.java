@@ -159,7 +159,9 @@ public class OverlayStatService extends AbstractService implements ImageJService
 
         long[] position = new long[imageDisplay.numDimensions()];
         Double[] values = new Double[pixels.size()];
-
+        
+        imageDisplay.localize(position);
+        
         int i = 0;
         for (int[] coordinate : pixels) {
             position[0] = coordinate[0];
