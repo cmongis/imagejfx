@@ -117,8 +117,9 @@ public class FileButtonBinding {
         return fileProperty;
     }
 
-    public void setOpenFile(boolean b) {
+    public FileButtonBinding setOpenFile(boolean b) {
         openFile = b;
+        return this;
     }
 
 }
