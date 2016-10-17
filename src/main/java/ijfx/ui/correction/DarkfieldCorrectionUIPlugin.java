@@ -25,6 +25,7 @@ import ijfx.service.workflow.WorkflowBuilder;
 import java.io.File;
 import javafx.beans.Observable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import mongis.utils.FileButtonBinding;
@@ -46,6 +47,7 @@ public class DarkfieldCorrectionUIPlugin extends AbstractCorrectionUiPlugin{
     
     FileButtonBinding binding = new FileButtonBinding(fileButton);
     
+    CheckBox multichannelCheckBox = new CheckBox("Multichannel substraction image");
     
     @Parameter
     Context context;
@@ -57,9 +59,10 @@ public class DarkfieldCorrectionUIPlugin extends AbstractCorrectionUiPlugin{
         
         hbox.getChildren().add(new Label("Select flatfield image : "));
         hbox.getChildren().add(fileButton);
+        setBottom(multichannelCheckBox);
         binding.setOpenFile(true);
-        bindP(workflowProperty,this::generateWorkflow,binding.fileProperty());
-        bindP(explanationProperty,this::explain,binding.fileProperty());
+        bindP(workflowProperty,this::generateWorkflow,binding.fileProperty(),multichannelCheckBox.selectedProperty());
+        bindP(explanationProperty,this::explain,binding.fileProperty(),multichannelCheckBox.selectedProperty());
     }
     
     
@@ -79,10 +82,20 @@ public class DarkfieldCorrectionUIPlugin extends AbstractCorrectionUiPlugin{
         return binding.fileProperty().getValue();
     }
     
+    
+    private boolean isMultichannel() {
+        return multichannelCheckBox.isSelected();
+    }
+    
+    
     public Workflow generateWorkflow() {
+        
+        
+        
+        
         if(getFile() != null) {
             return new WorkflowBuilder(context)
-                    .addStep(DarkfieldSubstraction.class, "file",getFile())
+                    .addStep(DarkfieldSubstraction.class, "file",getFile(),"multichannel",isMultichannel())
                     .getWorkflow("");   
         }
         else {

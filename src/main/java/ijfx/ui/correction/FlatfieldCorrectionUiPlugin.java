@@ -20,14 +20,18 @@
 package ijfx.ui.correction;
 
 import ijfx.core.assets.DatasetAsset;
+import ijfx.plugins.flatfield.DarkfieldSubstraction;
 import ijfx.plugins.flatfield.FlatFieldCorrection;
+import ijfx.plugins.flatfield.MultiChannelFlatfieldCorrection;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import java.io.File;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import mongis.utils.FileButtonBinding;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
@@ -42,20 +46,35 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = CorrectionUiPlugin.class, label = "Flatfield Correction")
 public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
+    private ChannelSelector channelSelector = new ChannelSelector(null);
 
-    private ChannelSelector channelSelector = new ChannelSelector("Select channel");
+    @FXML
+    Button flatfieldButton;
 
-    Button selectionButton = new Button("Select flatfield image");
+    @FXML
+    Group channelSelectorGroup;
 
-    Property<File> flatfieldImage;
+    @FXML
+    Button darkfieldButton;
 
-    FileButtonBinding binding = new FileButtonBinding(selectionButton);
+    final Property<File> flatfieldImage;
 
+    final Property<File> darkfieldImage;
+
+    final FileButtonBinding flatfieldBinding;// = new FileButtonBinding(flatfieldButton);
+
+    final FileButtonBinding darkfieldBinding;
+
+    @FXML
+    CheckBox multichannelCheckbox;
+
+    @FXML
+    CheckBox darkfieldCorrectionCheckBox;
+    
     @Parameter
     Context context;
 
-    private static String EXPLANATION_FORMAT = "Corrects channel *%d* with *%s*";
-    private static String ALL_CHANNEL = "Correct *ALL* channels with *%s*";
+    private static String EXPLANATION_FORMAT = "%s correction of %s with *%s* (%s)";
 
     @Override
     public void init() {
@@ -63,22 +82,31 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
     }
 
     public FlatfieldCorrectionUiPlugin() {
-        super(null);
-        setLeft(channelSelector);
-        setBottom(selectionButton);
-        selectionButton.setMaxWidth(Double.POSITIVE_INFINITY);
+        super("/ijfx/ui/correction/FlatfieldCorrectionUiPlugin.fxml");
+        // setTop(multichannelCheckbox);
+        //setLeft(channelSelector);
+        //setBottom(flatfieldButton);
+        flatfieldButton.setMaxWidth(Double.POSITIVE_INFINITY);
         getStyleClass().add("with-padding");
-        
-        binding.setButtonDefaultText("Choose flatfield image...");
-        binding.setOpenFile(true);
-        
-        flatfieldImage = binding.fileProperty();
+
+        channelSelectorGroup.getChildren().add(channelSelector);
+
+        flatfieldBinding = new FileButtonBinding(flatfieldButton);
+        flatfieldBinding.setButtonDefaultText("Choose flatfield image...");
+        flatfieldBinding.setOpenFile(true);
+        flatfieldImage = flatfieldBinding.fileProperty();
+
+        darkfieldBinding = new FileButtonBinding(darkfieldButton)
+                .setButtonDefaultText("Choose flatfield image...")
+                .setOpenFile(true);
+        darkfieldImage = darkfieldBinding.fileProperty();
 
         //bind(datasetAssetProperty, this::createDatasetAsset, flatfieldImage);
+        bindP(explanationProperty, this::generateExplanation, flatfieldImage, darkfieldImage, channelSelector.selectedChannelProperty(), multichannelCheckbox.selectedProperty());
 
-        bindP(explanationProperty, this::generateExplanation, flatfieldImage, channelSelector.selectedChannelProperty());
+        bindP(workflowProperty, this::generateWorkflow, flatfieldImage, darkfieldImage, channelSelector.selectedChannelProperty(), multichannelCheckbox.selectedProperty());
 
-        bindP(workflowProperty, this::generateWorkflow, flatfieldImage, channelSelector.selectedChannelProperty());
+        channelSelector.disableProperty().bind(multichannelCheckbox.selectedProperty());
 
     }
 
@@ -86,14 +114,25 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
         return new DatasetAsset(flatfieldImage.getValue());
     }
 
+    protected boolean handleDarkfield() {
+        return !darkfieldCorrectionCheckBox.isSelected();
+    }
+    
     protected Workflow generateWorkflow() {
 
-        if (getSelectedFile() != null) {
-            return new WorkflowBuilder(context)
-                    .addStep(FlatFieldCorrection.class, "channel", getSelectedChannel(),"flatfield",flatfieldImage.getValue())
-                    .getWorkflow("Flatfield correction");
-        } else {
+        if (getSelectedFile() == null) {
             return null;
+        }
+
+        if (isMultiChannel()) {
+            return new WorkflowBuilder(context)
+                    .addStep(MultiChannelFlatfieldCorrection.class, "flatfield", flatfieldImage.getValue(), "darkfield", darkfieldImage.getValue())
+                    .getWorkflow("Multichannel Flatfield correction");
+        } else {
+            return new WorkflowBuilder(context)
+                    .addStepIfTrue(handleDarkfield(),DarkfieldSubstraction.class,"darkfield",darkfieldImage.getValue(),"multichannel",isMultiChannel())
+                    .addStep(FlatFieldCorrection.class, "channel", getSelectedChannel(), "flatfield", flatfieldImage.getValue(), "darkfield", darkfieldImage.getValue())
+                    .getWorkflow("Flatfield correction");
         }
     }
 
@@ -105,19 +144,30 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
         return flatfieldImage.getValue();
     }
 
+    protected boolean isMultiChannel() {
+        return multichannelCheckbox.isSelected();
+    }
+
     protected String generateExplanation() {
 
-        int selectedChannel = channelSelector.selectedChannelProperty().getValue();
         if (flatfieldImage.getValue() == null) {
-            return "*Please select the channel to correct and a flatfield*";
-        } else {
-
-            if (selectedChannel == -1) {
-                return String.format(ALL_CHANNEL, flatfieldImage.getValue());
-            }
-
-            return String.format(EXPLANATION_FORMAT, selectedChannel, flatfieldImage.getValue().getName());
+            return "!Please select the flafield image.!";
         }
+
+        int selectedChannel = channelSelector.selectedChannelProperty().getValue();
+
+        final String correctionType, target, file, isMultiChannel;
+
+        isMultiChannel = isMultiChannel() ? "*multi*-channel" : "*mono*-channel";
+
+        target = isMultiChannel() || selectedChannel == -1 ? "ALL" : "channel " + (selectedChannel + 1);
+
+        correctionType = "Flafield";
+
+        file = flatfieldImage.getName();
+
+        return String.format(EXPLANATION_FORMAT, correctionType,target,file,isMultiChannel);
+
     }
 
     @Override
@@ -142,6 +192,16 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
         if (n == 0) {
 
         }
+
+    }
+
+    @FXML
+    public void multichannelHelp() {
+
+    }
+
+    @FXML
+    public void darkfieldHelp() {
 
     }
 
