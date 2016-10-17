@@ -40,7 +40,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = Command.class,menuPath = "Process > Correction > Generate Flafield (Multichannel)")
+@Plugin(type = Command.class,menuPath = "Process > Correction > Generate Flafield (multi-channel)")
 public class GenerateMultiChannelFlatfield extends ContextCommand{
     
     @Parameter(type = ItemIO.INPUT)
@@ -65,13 +65,10 @@ public class GenerateMultiChannelFlatfield extends ContextCommand{
     @Override
     public void run() {
         
-        
         if(input.numDimensions() != 3) {
             cancel("This plugin only accept 3 dimensional images (X,Y, Channel).");
             return;
         }
-        
-        
         statusService.showStatus("Converting...");
         
         if(input.getTypeLabelLong().contains("float") == false) {
@@ -80,9 +77,6 @@ public class GenerateMultiChannelFlatfield extends ContextCommand{
         else {
             output = input;
         }
-        
-        
-        
        long channelNumber = output.dimension(2);
         
        for(long i = 0; i!= channelNumber;i++) {
