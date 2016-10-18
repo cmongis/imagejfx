@@ -21,6 +21,7 @@ package ijfx.service.dataset;
 
 import ijfx.plugins.flatfield.FlatFieldCorrectionOld;
 import ijfx.service.sampler.DatasetSamplerService;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -38,12 +39,10 @@ import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.view.Views;
-import org.scijava.Prioritized;
+import org.apache.commons.io.FilenameUtils;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
 import org.scijava.display.DisplayService;
-import org.scijava.log.LogService;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
@@ -77,6 +76,8 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     @Parameter
     DatasetService datasetService;
 
+    public final static String DEFAULT_SEPARATOR = " - ";
+    
     @Override
     public Dataset extractPlane(ImageDisplay imageDisplay) throws NullPointerException {
         CalibratedAxis[] calibratedAxises = new CalibratedAxis[imageDisplay.numDimensions()];
@@ -265,29 +266,49 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     public <T extends RealType<T> & NativeType<T>> Dataset convert(Dataset dataset, T t) {
         long[] dimensions = new long[dataset.numDimensions()];
         AxisType[] axisTypes = new AxisType[dataset.numDimensions()];
-        
+
         dataset.dimensions(dimensions);
-        
-        for(int i = 0;i!= dimensions.length;i++) {
+
+        for (int i = 0; i != dimensions.length; i++) {
             axisTypes[i] = dataset.axis(i).type();
         }
-        
+
         Dataset output = datasetService.create(t, dimensions, "", axisTypes);
-        
+
         Cursor<? extends RealType<?>> cursor = dataset.cursor();
         cursor.reset();
         RandomAccess<RealType<?>> randomAccess = output.randomAccess();
-        while(cursor.hasNext()) {
+        while (cursor.hasNext()) {
             cursor.fwd();
-            
+
             randomAccess.setPosition(cursor);
             randomAccess.get().setReal(cursor.get().getRealDouble());
-            
+
         }
-        
-        
+
         copyMetaData(dataset, output);
         return output;
+    }
+
+    public void addSuffix(Dataset dataset, String suffix, String separator) {
+        if(separator == null) separator = DEFAULT_SEPARATOR;
+
+        String datasetName = dataset.getName();
+        File datasetFolder;
+        if (dataset.getSource() != null) {
+            datasetFolder = new File(dataset.getSource()).getParentFile();
+        }
+        else {
+            datasetFolder = new File("./");
+        }
+        
+        String baseName = FilenameUtils.getBaseName(datasetName);
+       String extension = FilenameUtils.getExtension(datasetName);
+       
+       dataset.setName(baseName+separator+extension);
+       dataset.setSource(new File(datasetFolder,dataset.getName()).getAbsolutePath());
+       
+
     }
 
 }
