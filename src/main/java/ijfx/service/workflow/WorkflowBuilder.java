@@ -46,18 +46,20 @@ import org.scijava.plugin.Parameter;
 public class WorkflowBuilder {
 
     @Parameter
-    Context context;
+    private Context context;
 
     @Parameter
-    BatchService batchService;
+    private BatchService batchService;
 
     @Parameter
-    LoadingScreenService loadingScreenService;
+    private LoadingScreenService loadingScreenService;
 
-    List<BatchInputBuilder> inputs = new ArrayList<>();
+    private List<BatchInputBuilder> inputs = new ArrayList<>();
 
-    List<WorkflowStep> steps = new ArrayList<>();
+    private List<WorkflowStep> steps = new ArrayList<>();
 
+    private String name;
+    
     public WorkflowBuilder(Context context) {
         context.inject(this);
     }
@@ -139,6 +141,10 @@ public class WorkflowBuilder {
         remapInputs(builder -> builder.onFinished(consumer));
         return this;
     }
+    public WorkflowBuilder setName(String name) {
+        this.name = name;
+        return this;
+    }
 
     public WorkflowBuilder thenUseDataset(Consumer<Dataset> consumer) {
         then(batchInput -> consumer.accept(batchInput.getDataset()));
@@ -177,7 +183,7 @@ public class WorkflowBuilder {
 
     public Workflow getWorkflow(String name) {
         DefaultWorkflow workflow = new DefaultWorkflow(steps);
-        workflow.setName("No name");
+        workflow.setName(name);
         return workflow;
     }
 
