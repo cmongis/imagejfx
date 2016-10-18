@@ -38,6 +38,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.axis.DefaultLinearAxis;
 
 /**
  *
@@ -60,6 +63,8 @@ public class ImageJFX extends Application {
 
     public static Stage PRIMARY_STAGE;
 
+    public static final AxisType SERIES = Axes.get("Series");
+    
     public static Logger getLogger() {
         if (logger == null) {
             logger = Logger.getLogger("ImageJFX");

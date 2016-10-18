@@ -30,6 +30,9 @@ public interface ProgressHandler {
     public void setProgress(double workDone,double total);
     public void setProgress(long workDone,long total);
     public void setStatus(String message);
+    public default void setStatus(String format, Object... params) {
+        setStatus(String.format(format,params));
+    }
     public void setTotal(double total);
     public void increment(double inc);
     public boolean isCancelled();

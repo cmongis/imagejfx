@@ -87,6 +87,7 @@ import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.correction.CorrectionActivity;
+import ijfx.ui.correction.FolderSelection;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.notification.DefaultNotification;
 import java.io.IOException;
@@ -776,7 +777,7 @@ public class MainWindowController extends AnchorPane {
                 menuActivated.setValue(false);
             }
         });
-        addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, CorrectionActivity.class);
+        addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, FolderSelection.class);
 
         new TransitionBinding<Number>(0d, 1d)
                 .bind(sideMenuWidthBinding.stateProperty(), memoryLabel.opacityProperty())
