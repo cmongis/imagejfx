@@ -48,14 +48,14 @@ import org.scijava.plugin.Plugin;
  *
  * @author Tuan anh TRINH
  */
-@Plugin(type = ExplorerView.class,priority=0.5,label="XMean (exp)")
+@Plugin(type = ExplorerView.class, priority = 0.5, label = "XMean (exp)")
 public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Parameter
     WorkflowModel workflowModel;
     @Parameter
     HintService hintService;
-    
+
     @Parameter
     ExplorableClustererService explorableClustererService;
 
@@ -64,7 +64,7 @@ public class ChartView extends AbstractChartView implements ExplorerView {
 
     @Parameter
     LoadingScreenService loadingScreenService;
-    
+
     String[] metadatas;
 
     @FXML
@@ -144,21 +144,24 @@ public class ChartView extends AbstractChartView implements ExplorerView {
     public void computeItems() {
 
         if (metadatas.length > 1) {
+            try {
+                scatterChart.getData().clear();
 
-            scatterChart.getData().clear();
+                List<List<? extends Explorable>> clustersList = new CallbackTask<Void, List<List<? extends Explorable>>>()
+                        .run((a, b) -> explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas)))
+                        .submit(loadingScreenService)
+                        .call();
 
-            List<List<? extends Explorable>> clustersList = new CallbackTask<Void,List<List<? extends Explorable>>>()
-                    .run((a,b) ->  explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas)))
-                    .submit(loadingScreenService)
-                    .call();
-            
-            
 //            List<List<? extends Explorable>> clustersList = explorableClustererService.clusterExplorable(currentItems, Arrays.asList(metadatas));
-            clustersList
-                    .stream()
-                    .forEach(e -> addDataToChart(e, Arrays.asList(metadatas)));
+                clustersList
+                        .stream()
+                        .forEach(e -> addDataToChart(e, Arrays.asList(metadatas)));
 
-            bindLegend();
+                bindLegend();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -179,6 +182,5 @@ public class ChartView extends AbstractChartView implements ExplorerView {
         currentItems.stream()
                 .forEach(e -> e.selectedProperty().setValue(false));
     }
-
 
 }
