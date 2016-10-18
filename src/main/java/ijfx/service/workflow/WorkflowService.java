@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.concurrent.Task;
 import net.imagej.ImageJService;
 import org.scijava.Priority;
 import org.scijava.command.CommandService;
@@ -38,6 +37,7 @@ import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 import mongis.utils.FXUtilities;
+import mongis.utils.ProgressHandler;
 
 /**
  *
@@ -184,21 +184,26 @@ public class WorkflowService extends AbstractService implements ImageJService {
 
     }
 
-    public void executeStep(WorkflowStep step) {
+   
+    
+    public Boolean executeStep(ProgressHandler handler,WorkflowStep step) throws InterruptedException, ExecutionException {
        
-        /*
-        step.getParameters().forEach((key, value) -> {
+        handler = ProgressHandler.check(handler);
 
-
-        });*/
-
+        handler.setStatus("Re-executing...");
+        handler.setProgress(1, 10);
         //moduleService.run(step.getModule().getInfo(), false, step.getParameters());
         Module module = moduleService.createModule(step.getModule().getInfo());
+        handler.setProgress(3,10);
         step.getParameters().forEach((key, value) -> {
             module.setInput(key, value);
             module.setResolved(key, true);
         });
-        moduleService.run(module, true);
+        
+        Future<Module> run = moduleService.run(module, true);
+        run.get();
+        handler.setProgress(10);
+        return Boolean.TRUE;
     }
 
     public void executeModule(WorkflowStep step) {
