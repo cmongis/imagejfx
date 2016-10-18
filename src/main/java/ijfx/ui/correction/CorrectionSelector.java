@@ -23,6 +23,7 @@ import ijfx.bridge.ImageJContainer;
 import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.ui.widgets.SimpleListCell;
 import ijfx.service.thumb.ThumbService;
+import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
@@ -44,6 +45,8 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
@@ -60,6 +63,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -69,10 +73,12 @@ import mongis.utils.FXUtilities;
 import mongis.utils.FluidWebViewWrapper;
 import net.imagej.Dataset;
 import org.scijava.Context;
+import org.scijava.display.DisplayService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginInfo;
 import org.scijava.plugin.PluginService;
+import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
 
 /**
@@ -135,6 +141,12 @@ public class CorrectionSelector extends BorderPane implements Activity {
     @Parameter
     UIService uiService;
     
+    @Parameter
+    HintService hintService;
+    
+    @Parameter
+    DisplayService displayService;
+    
     private final ObservableList<CorrectionUiPlugin> addedPlugins = FXCollections.observableArrayList();
 
     private final BooleanProperty allPluginsValid = new SimpleBooleanProperty(false);
@@ -144,7 +156,9 @@ public class CorrectionSelector extends BorderPane implements Activity {
     private final ObjectProperty<File> destinationFolder = new SimpleObjectProperty<File>();
 
     private final ObservableList<File> filesToCorrect = FXCollections.observableArrayList();
-
+    
+    private  Binding<CorrectionUiPluginWrapper> expendedWrapper;
+    
     private Property<Dataset> exampleDataset = new SimpleObjectProperty();
 
     private SaveOptions options = new DefaultSaveOptions();
@@ -192,6 +206,13 @@ public class CorrectionSelector extends BorderPane implements Activity {
 
         rightVBox.getChildren().add(0, options.getContent());
         hasInit = true;
+        
+        
+        
+        expendedWrapper = Bindings.createObjectBinding(this::getExpendedWrapper,accordion.expandedPaneProperty());
+        
+        expendedWrapper.addListener(this::onExpendedPaneChanged);
+        
     }
 
     private void onAddedPluginListChanged(ListChangeListener.Change<? extends CorrectionUiPlugin> change) {
@@ -214,6 +235,13 @@ public class CorrectionSelector extends BorderPane implements Activity {
         Platform.runLater(this::updateFinalWorkflow);
     }
 
+    private void onExpendedPaneChanged(Observable observable, CorrectionUiPluginWrapper pane, CorrectionUiPluginWrapper newlySelected) {
+        if(newlySelected == null) return;
+        
+        hintService.displayHints(newlySelected.getPlugin().getClass(), true);
+        
+    }
+    
     private void updateFinalWorkflow() {
         checkValidity();
         compileWorkflow();
@@ -280,8 +308,15 @@ public class CorrectionSelector extends BorderPane implements Activity {
         
     }
 
-    public CorrectionUiPluginWrapper getWrapper(CorrectionUiPlugin correctionPlugin) {
+    private CorrectionUiPluginWrapper getWrapper(CorrectionUiPlugin correctionPlugin) {
         return accordion.getPanes().stream().map(pane -> (CorrectionUiPluginWrapper) pane).filter(pane -> pane.getPlugin() == correctionPlugin).findFirst().orElse(null);
+    }
+    
+    private CorrectionUiPluginWrapper getWrapper(TitledPane titledPane) {
+        return (CorrectionUiPluginWrapper)titledPane;
+    }
+    private CorrectionUiPluginWrapper getExpendedWrapper() {
+        return getWrapper(accordion.getExpandedPane());
     }
 
     @Override
@@ -319,7 +354,8 @@ public class CorrectionSelector extends BorderPane implements Activity {
                 .addInputFiles(correctionUiService.getSelectedFiles())
                 .and(this::applySaveParameter)
                 .execute(workflowProperty.getValue())
-                .startAndShow();
+                .startAndShow()
+                .error(this::onError);
 
     }
 
@@ -336,20 +372,24 @@ public class CorrectionSelector extends BorderPane implements Activity {
     public void testCorrection() {
         new WorkflowBuilder(context)
                 .addInput(exampleDataset.getValue().duplicate())
-                .and(input -> input.display())
+                .and(input -> input.displayWithSuffix("corrected"))
                 .execute(workflowProperty.getValue())
                 .startAndShow()
+                .then(this::onSuccessTest)
                 .error(this::onError);
                 
     }
 
     public void onError(Throwable e) {
+        uiService.showDialog("Error when executing test correction", DialogPrompt.MessageType.ERROR_MESSAGE);
         uiService.show(e);
     }
     
     public void onSuccessTest(Boolean result) {
         if(result) {
+            
             activityService.openByType(ImageJContainer.class);
+            uiService.show(exampleDataset.getValue());
         }
     }
     

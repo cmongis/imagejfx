@@ -70,7 +70,7 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
     @FXML
     CheckBox darkfieldCorrectionCheckBox;
-    
+
     @Parameter
     Context context;
 
@@ -92,12 +92,12 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
         channelSelectorGroup.getChildren().add(channelSelector);
 
         flatfieldBinding = new FileButtonBinding(flatfieldButton);
-        flatfieldBinding.setButtonDefaultText("Choose flatfield image...");
+        flatfieldBinding.setButtonDefaultText("Choose Flatfield image...");
         flatfieldBinding.setOpenFile(true);
         flatfieldImage = flatfieldBinding.fileProperty();
 
         darkfieldBinding = new FileButtonBinding(darkfieldButton)
-                .setButtonDefaultText("Choose flatfield image...")
+                .setButtonDefaultText("Choose darkfield image...")
                 .setOpenFile(true);
         darkfieldImage = darkfieldBinding.fileProperty();
 
@@ -117,23 +117,24 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
     protected boolean handleDarkfield() {
         return !darkfieldCorrectionCheckBox.isSelected();
     }
-    
+
     protected Workflow generateWorkflow() {
 
         if (getSelectedFile() == null) {
             return null;
         }
 
-        if (isMultiChannel()) {
-            return new WorkflowBuilder(context)
-                    .addStep(MultiChannelFlatfieldCorrection.class, "flatfield", flatfieldImage.getValue(), "darkfield", darkfieldImage.getValue())
-                    .getWorkflow("Multichannel Flatfield correction");
-        } else {
-            return new WorkflowBuilder(context)
-                    .addStepIfTrue(handleDarkfield(),DarkfieldSubstraction.class,"darkfield",darkfieldImage.getValue(),"multichannel",isMultiChannel())
-                    .addStep(FlatFieldCorrection.class, "channel", getSelectedChannel(), "flatfield", flatfieldImage.getValue(), "darkfield", darkfieldImage.getValue())
-                    .getWorkflow("Flatfield correction");
-        }
+        return new WorkflowBuilder(context)
+                // if darkfield should be handled for the files and for the flatfield, we had a step to the workflow
+                .addStepIfTrue(handleDarkfield(), DarkfieldSubstraction.class, "file", darkfieldImage.getValue(), "multichannel", isMultiChannel())
+                
+                // if it's multichannel flatfield, let's handle it
+                .addStepIfTrue(isMultiChannel(), MultiChannelFlatfieldCorrection.class, "flatfield", flatfieldImage.getValue(), "darkfield", darkfieldImage.getValue())
+                
+                // if not, we add a normal flatfield correction to the workflow
+                .addStepIfTrue(!isMultiChannel(), FlatFieldCorrection.class, "channel", getSelectedChannel(), "flatfield", flatfieldImage.getValue(), "darkfield", darkfieldImage.getValue())
+                .getWorkflow("Multichannel Flatfield correction");
+
     }
 
     protected Integer getSelectedChannel() {
@@ -164,9 +165,9 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
         correctionType = "Flafield";
 
-        file = flatfieldImage.getName();
+        file = flatfieldImage.getValue().getName();
 
-        return String.format(EXPLANATION_FORMAT, correctionType,target,file,isMultiChannel);
+        return String.format(EXPLANATION_FORMAT, correctionType, target, file, isMultiChannel);
 
     }
 
