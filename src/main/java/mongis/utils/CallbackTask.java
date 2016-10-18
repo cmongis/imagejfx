@@ -142,7 +142,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public OUTPUT call() {
+    public OUTPUT call() throws Exception{
 
         // first we check if the task was cancelled BEFORE RUNNING IT
         if (isCancelled()) {
@@ -285,7 +285,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return task;
     }
 
-    public CallbackTask<INPUT, OUTPUT> ui() {
+    public CallbackTask<INPUT, OUTPUT> ui() throws Exception{
         if (Platform.isFxApplicationThread()) {
             call();
         } else {
