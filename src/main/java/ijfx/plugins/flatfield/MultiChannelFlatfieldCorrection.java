@@ -42,66 +42,63 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = Command.class, menuPath = "Process > Correction > Flatfield correction (multi-channel)")
-public class MultiChannelFlatfieldCorrection extends ContextCommand{
+public class MultiChannelFlatfieldCorrection extends ContextCommand {
 
-   
     @Parameter
     Dataset dataset;
-    
-    @Parameter(label = "Flatfield image",required = true)
+
+    @Parameter(label = "Flatfield image", required = true)
     File flatfield;
-    
-    @Parameter(label = "Darkfield image (for flatfield only)",required = false)
+
+    @Parameter(label = "Darkfield image (for flatfield only)", required = false)
     File darkfield;
-    
+
     @Parameter
     AssetService assetService;
-    
+
     @Parameter
     boolean keepType = true;
-    
+
     @Parameter
     Context context;
-    
+
     @Override
     public void run() {
-        
-        
-        if(keepType == false) {
+
+        if (keepType == false) {
             dataset = new CommandRunner(context)
                     .set("dataset", dataset)
                     .runSync(ConvertTo32Bits.class)
                     .getOutput("dataset");
         }
-      
-        Dataset flatfieldDataset = assetService.load(new FlatfieldAsset(flatfield,darkfield).setMultiChannel(true));
-        
-         long datasetChannelNumber = dataset.dimension(Axes.CHANNEL);
-            long flatfieldChannelNumber = flatfieldDataset.dimension(Axes.CHANNEL);
-            
-            if(datasetChannelNumber == -1 || flatfieldChannelNumber == -1) {
-                cancel("No Channel Axis detected ! The flatfield image and the target image must both contain a channel axis.");
-                return;
-            }
-            
-            if(datasetChannelNumber != flatfieldChannelNumber) {
-                cancel("Flatfield and target must have the same number of channel !");
-                return;
-            }
-            
-            int datasetChannelAxis = dataset.dimensionIndex(Axes.CHANNEL);
-            int darkfieldChannelAxis = flatfieldDataset.dimensionIndex(Axes.CHANNEL);
-            
-            
-            for(long channel = 0; channel != datasetChannelNumber; channel++) {
-               
-                IntervalView target = Views.hyperSlice(dataset, datasetChannelAxis, channel);
-                IntervalView darkfieldChannel = Views.hyperSlice(flatfieldDataset, darkfieldChannelAxis, channel);
-                correct(target, darkfieldChannel); 
-            }
+
+        Dataset flatfieldDataset = assetService.load(new FlatfieldAsset(flatfield, darkfield).setMultiChannel(true));
+
+        long datasetChannelNumber = dataset.dimension(Axes.CHANNEL);
+        long flatfieldChannelNumber = flatfieldDataset.dimension(Axes.CHANNEL);
+
+        if (datasetChannelNumber == -1 || flatfieldChannelNumber == -1) {
+            cancel("No Channel Axis detected ! The flatfield image and the target image must both contain a channel axis.");
+            return;
+        }
+
+        if (datasetChannelNumber != flatfieldChannelNumber) {
+            cancel("Flatfield and target must have the same number of channel !");
+            return;
+        }
+
+        int datasetChannelAxis = dataset.dimensionIndex(Axes.CHANNEL);
+        int darkfieldChannelAxis = flatfieldDataset.dimensionIndex(Axes.CHANNEL);
+
+        for (long channel = 0; channel != datasetChannelNumber; channel++) {
+
+            IntervalView target = Views.hyperSlice(dataset, datasetChannelAxis, channel);
+            IntervalView darkfieldChannel = Views.hyperSlice(flatfieldDataset, darkfieldChannelAxis, channel);
+            correct(target, darkfieldChannel);
+        }
     }
-    
-     public static <T extends RealType<T>,U extends RealType<U>> void correct(RandomAccessibleInterval<T> dataset, RandomAccessibleInterval<U> flatfield) {
+
+    public static <T extends RealType<T>, U extends RealType<U>> void correct(RandomAccessibleInterval<T> dataset, RandomAccessibleInterval<U> flatfield) {
         double value;
         double coeff;
         Cursor<T> datasetCursor = Views.iterable(dataset).cursor();
@@ -123,9 +120,7 @@ public class MultiChannelFlatfieldCorrection extends ContextCommand{
             datasetCursor.get().setReal(value);
 
         }
-        
-        
-        
+
     }
-    
+
 }
