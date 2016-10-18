@@ -305,7 +305,15 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
         String baseName = FilenameUtils.getBaseName(datasetName);
        String extension = FilenameUtils.getExtension(datasetName);
        
-       dataset.setName(baseName+separator+extension);
+       dataset.setName(
+               new StringBuilder()
+               .append(baseName)
+               .append(separator)
+               .append(suffix)
+               .append(".")
+               .append(extension)
+               .toString());
+              
        dataset.setSource(new File(datasetFolder,dataset.getName()).getAbsolutePath());
        
 
