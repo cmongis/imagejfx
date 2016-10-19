@@ -72,6 +72,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import mongis.utils.CallbackTask;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.OverlayView;
 import net.imagej.display.event.DataViewUpdatedEvent;
@@ -221,17 +222,27 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
                 .filter(view->view instanceof OverlayView)
                 .cast(OverlayView.class)
                 .filter(view->view.isSelected())
-                .buffer(500, TimeUnit.MILLISECONDS)
-                .filter(list->list.isEmpty() == false)
-                .subscribe(list->{
-                    overlayProperty.setValue(list.get(0).getData());
+                .throttleWithTimeout(1000, TimeUnit.MILLISECONDS)
+                .subscribe(overlay->{
+                    overlayProperty.setValue(overlay.getData());
                 });
                 
+        eventBus.getStream(DataViewUpdatedEvent.class)
+                .filter(event->event.getView() instanceof DatasetView)
+                .map(event->event.getView())
+                .cast(DatasetView.class)
+                .map(view->{
+                    System.out.println(view);
+                    return view;
+                })
+                .filter(view->currentDisplay().contains(view))
+                .throttleWithTimeout(100, TimeUnit.MILLISECONDS)
+                .subscribe(event->Platform.runLater(this::updateStats));
                 
     }
 
     ImageDisplay imageDisplay;
-
+    
     public void onOverlaySelectionChanged() {
 
         if (imageDisplay == null) {
@@ -265,7 +276,12 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         updateTable();
 
     }
-
+    public void updateStats() {
+        System.out.println("Updating stats");
+        if(overlayProperty.getValue() == null) return;
+        updateChart(overlayProperty.getValue());
+        updateTable();
+    }
     protected void updateTable() {
 
         new CallbackTask<Overlay, Map<String, Double>>()

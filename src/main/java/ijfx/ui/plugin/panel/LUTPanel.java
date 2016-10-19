@@ -75,6 +75,7 @@ import org.scijava.thread.ThreadService;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.context.UiContextProperty;
+import ijfx.ui.utils.ConvertedProperty;
 import ijfx.ui.utils.ImageDisplayProperty;
 import javafx.beans.Observable;
 import javafx.concurrent.Task;
@@ -181,8 +182,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     UiContextService uiContextService;
 
     @Parameter
-            OverlayService overlayService;
-    
+    OverlayService overlayService;
+
     Node lutPanelCtrl;
 
     @FXML
@@ -191,8 +192,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @FXML
     ToggleButton minMaxButton;
 
-    
-    
     RangeSlider rangeSlider = new RangeSlider();
 
     @FXML
@@ -220,13 +219,15 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     protected StringConverter stringConverter;
 
     protected DoubleProperty thresholdLevel = new SimpleDoubleProperty();
-    
+
     protected Button analyseParticalButton = new Button("Analyze particles", new FontAwesomeIconView(FontAwesomeIcon.TABLE));
-    
-    protected final Property<ColorMode> colorMode = new SimpleObjectProperty(ColorMode.COLOR);
-    
-    protected final BooleanProperty isComposite = new SimpleBooleanProperty();
-    
+
+    //protected final Property<ColorMode> colorMode = new SimpleObjectProperty(ColorMode.COLOR);
+
+    //protected final BooleanProperty isComposite = new SimpleBooleanProperty();
+
+    protected final ConvertedProperty<ColorMode, Boolean> mergedModeProperty = new ConvertedProperty<>();
+
     public LUTPanel() {
 
         logger.info("Loading FXML");
@@ -257,13 +258,12 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             // analyse particle button
             analyseParticalButton.setMaxWidth(Double.POSITIVE_INFINITY);
-            analyseParticalButton.setOnAction(event->commandService.run(MeasureAllOverlays.class, true));
+            analyseParticalButton.setOnAction(event -> commandService.run(MeasureAllOverlays.class, true));
             analyseParticalButton.setOpacity(0.0);
-            gridPane.add(analyseParticalButton, 0, 3,2,1);
-            new TransitionBinding<Number>(0,1.0)
+            gridPane.add(analyseParticalButton, 0, 3, 2, 1);
+            new TransitionBinding<Number>(0, 1.0)
                     .bind(thresholdButton.selectedProperty(), analyseParticalButton.opacityProperty());
-            
-            
+
             // advanced threshold button
             thresholdMoreButton.setMaxWidth(Double.POSITIVE_INFINITY);
             thresholdMoreButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
@@ -285,7 +285,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             highValue.addListener(this::onHighValueChanging);
             lowValue.addListener(this::onLowValueChanging);
 
-           
             minTextField.addEventHandler(KeyEvent.KEY_TYPED, this::updateModelRangeFromView);
             maxTextField.addEventHandler(KeyEvent.KEY_TYPED, this::updateModelRangeFromView);
             // setting some insets... should be done int the FXML
@@ -295,22 +294,31 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             minMaxButton.addEventHandler(ActionEvent.ACTION, event -> updateHistogramAsync());
 
+            /*
             isComposite.addListener(this::syncCompositeSettings);
             colorMode.addListener(this::syncCompositeSettings);
-            
+
             colorMode.addListener(this::onColorModeChanged);
-            
-            mergedViewToggleButton.selectedProperty().bindBidirectional(isComposite);
-            
+            */
             
             
+            
+
+            mergedModeProperty
+                    .forward(this::ColorModeToBoolean)
+                    .backward(this::booleanToColorMode);
+            
+            mergedModeProperty.frontProperty().addListener(this::onColorModeChanged);
+            
+            mergedViewToggleButton.selectedProperty().bindBidirectional(mergedModeProperty.backProperty());
+
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 
-    
     }
-       @Override
+
+    @Override
     public UiPlugin init() {
 
         // creating the LUT Combobx
@@ -332,8 +340,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         // binding desabling the merged view button
         mergedViewToggleButton.disableProperty().bind(isMultiChannelImage.not());
 
-      
-        
         // binding the min and max textfield so it can display float precision depending on the image
         SmartNumberStringConverter smartNumberStringConverter = new SmartNumberStringConverter();
         smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentDisplay, lowValue));
@@ -341,18 +347,16 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         Bindings.bindBidirectional(minTextField.textProperty(), lowValue, smartNumberStringConverter);
         Bindings.bindBidirectional(maxTextField.textProperty(), highValue, smartNumberStringConverter);
 
-        
-        thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, lowValue,highValue,thresholdButton.selectedProperty()));
+        thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, lowValue, highValue, thresholdButton.selectedProperty()));
         thresholdLevel.addListener(this::onThresholdButtonChanged);
-        
+
         currentDisplay.addListener(this::onDisplayChanged);
-        
+
         return this;
     }
 
     public void buildComboBox() {
 
-      
         lutComboBox.setId("lutPanel");
 
         lutComboBox.getSelectionModel().selectedItemProperty().addListener(this::onComboBoxChanged);
@@ -369,8 +373,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     public void applyLUT(ColorTable table) {
         // applies the chosen LUT using the ImageJFX dedicated plugin
-        commandService.run(ApplyLUT.class,true,"channelId",displayRangeServ.getCurrentChannelId(),"colorTable",table);
-        
+        commandService.run(ApplyLUT.class, true, "channelId", displayRangeServ.getCurrentChannelId(), "colorTable", table);
+
     }
 
     @Override
@@ -378,36 +382,32 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return this;
     }
 
- 
-
     public void updateModelRangeFromView(Event event) {
         updateModelRangeFromView();
     }
 
     private void updateModelRangeFromView() {
-       
+
         logger.info("updating model from view");
-        
+
         displayRangeServ.updateCurrentDisplayRange(lowValue.doubleValue(), highValue.doubleValue());
     }
 
     private boolean isFloat() {
-        if(currentDisplay.getValue() == null) return false;
+        if (currentDisplay.getValue() == null) {
+            return false;
+        }
         return !imageDisplayService.getActiveDataset(currentDisplay.getValue()).isInteger();
     }
-    
+
+    /*
     private void syncCompositeSettings(Observable o, Object oldValue, Object newValue) {
-        if(newValue instanceof ColorMode) {
-            isComposite.setValue(ColorModeToBoolean((ColorMode)newValue));
+        if (newValue instanceof ColorMode) {
+            isComposite.setValue(ColorModeToBoolean((ColorMode) newValue));
+        } else if (newValue instanceof Boolean) {
+            colorMode.setValue(booleanToColorMode((Boolean) newValue));
         }
-        else {
-            if(newValue instanceof Boolean) {
-                colorMode.setValue(booleanToColorMode((Boolean)newValue));
-            }
-        }
-    }
-    
-    
+    }*/
 
     public void updateViewRangeFromModel() {
         logger.info("Updating view range from model");
@@ -417,26 +417,24 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         double range = high - low;
 
         if (rangeSlider.getMin() != low) {
-             lowValue.setValue(low);
+            lowValue.setValue(low);
         }
-        if(rangeSlider.getMax() != high) {
+        if (rangeSlider.getMax() != high) {
             highValue.setValue(high);
         }
-        
-        if(range > 0) {
-        if (range < 10 && isFloat()) {
 
-            rangeSlider.setMajorTickUnit(0.1);
-            rangeSlider.setMinorTickCount(10);
-        } else {
-            rangeSlider.setMajorTickUnit(displayRangeServ.getCurrentDatasetMaximum() - displayRangeServ.getCurrentDatasetMinimum());
+        if (range > 0) {
+            if (range < 10 && isFloat()) {
+
+                rangeSlider.setMajorTickUnit(0.1);
+                rangeSlider.setMinorTickCount(10);
+            } else {
+                rangeSlider.setMajorTickUnit(displayRangeServ.getCurrentDatasetMaximum() - displayRangeServ.getCurrentDatasetMinimum());
+            }
         }
-        }
-        
-        
+
         rangeSlider.setMin(displayRangeServ.getCurrentDatasetMinimum() * .1);
         rangeSlider.setMax(displayRangeServ.getCurrentDatasetMaximum() * 1.1);
-
 
         updateLabel();
 
@@ -461,9 +459,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         if (getCurrentDatasetView() == null) {
             return;
         }
-      
-        
-        
+
     }
 
     @EventHandler
@@ -472,7 +468,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             return;
         }
         updateLabel();
-      
+
         updateViewRangeFromModel();
 
     }
@@ -482,7 +478,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     }
 
     private void onHighValueChanging(Object notUsed) {
-       
+
         updateModelRangeFromView();
         updateLabel();
     }
@@ -493,7 +489,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         updateLabel();
     }
 
-  
     @FXML
     private void autoRange(ActionEvent event) {
 
@@ -519,24 +514,33 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return view;
     }
 
-    private void onColorModeChanged(Observable obs, ColorMode oldValue, ColorMode newValue) {  
+    private void onColorModeChanged(Observable obs, ColorMode oldValue, ColorMode newValue) {
         if (getCurrentImageDisplay() != null) {
             if (getCurrentDatasetView().getColorMode() != newValue) {
+                
+                
                 getCurrentDatasetView().setColorMode(mergedViewToggleButton.isSelected() ? ColorMode.COMPOSITE : ColorMode.COLOR);
-                getCurrentImageDisplay().update();
+                getCurrentDatasetView().update();
             }
         }
     }
 
-    private ColorMode booleanToColorMode(boolean isComposite) {
+    private void updateColorMode() {
+        mergedModeProperty.frontProperty().setValue(getCurrentDatasetView().getColorMode());
+    }
+    
+    private ColorMode booleanToColorMode(Boolean isComposite) {
         return isComposite ? ColorMode.COMPOSITE : ColorMode.COLOR;
     }
+
     private Boolean ColorModeToBoolean(ColorMode colorMode) {
         return colorMode == ColorMode.COMPOSITE;
     }
+
+    /*
     private Boolean isComposite() {
         return colorMode.getValue() == ColorMode.COMPOSITE;
-    }
+    }*/
 
     public ImageDisplay getCurrentImageDisplay() {
         return currentDisplay.getValue();
@@ -556,8 +560,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return dataset.isRGBMerged();
     }
 
-   
-
     private void updateHistogramAsync() {
         new CallbackTask<ImageDisplay, List<Number>>()
                 .setInput(imageDisplayService.getActiveImageDisplay())
@@ -570,7 +572,6 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         final Timer t = timerService.getTimer(this.getClass().getSimpleName());
 
-    
         t.start();
         long[] position = new long[display.numDimensions()];
         display.localize(position);
@@ -610,46 +611,50 @@ public class LUTPanel extends TitledPane implements UiPlugin {
                 })
                 .start();
     }
-    
+
     /*
      * Threshold releated functions
      * 
      */
-      
     private Double getThresholdValue() {
-        if(thresholdButton.isSelected()) {
+        if (thresholdButton.isSelected()) {
             return lowValue.getValue();
-        }
-        else {
+        } else {
             return Double.NaN;
         }
     }
-    
+
     private void deleteThresholdOverlay() {
         overlayService
                 .getOverlays(currentDisplay.getValue())
                 .stream()
-                .filter(o->o instanceof ThresholdOverlay)
-                .map(o->(ThresholdOverlay)o)
+                .filter(o -> o instanceof ThresholdOverlay)
+                .map(o -> (ThresholdOverlay) o)
                 .findFirst()
-                .ifPresent(ovrl->overlayService.removeOverlay(getCurrentImageDisplay(), ovrl));
+                .ifPresent(ovrl -> overlayService.removeOverlay(getCurrentImageDisplay(), ovrl));
     }
-    
-    
+
     private void onDisplayChanged(Observable obs, ImageDisplay oldValue, ImageDisplay newValue) {
-        if(newValue == null) return;
-        colorMode.setValue(imageDisplayService.getActiveDatasetView(newValue).getColorMode());
+        if (newValue == null) {
+            return;
+        }
+
+        // setting the color mode
+    //        colorMode.setValue(imageDisplayService.getActiveDatasetView(newValue).getColorMode());
+         Platform.runLater(this::updateColorMode);
+        //
         updateViewRangeFromModel();
         updateLabel();
         thresholdButton.setSelected(false);
     }
-    
+
     private void onThresholdButtonChanged(Observable obs, Number oldValue, Number newValue) {
-        
-        
-        if(getCurrentImageDisplay() == null) return;
-        
-        if(Double.isNaN(newValue.doubleValue()))  {
+
+        if (getCurrentImageDisplay() == null) {
+            return;
+        }
+
+        if (Double.isNaN(newValue.doubleValue())) {
             deleteThresholdOverlay();
             return;
         }
@@ -658,35 +663,34 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         ThresholdOverlay thresholdOverlay = getThresholdOverlay();
         t.elapsed("getting overlay");
         logger.info("Threshold value " + getThresholdValue());
-        
+
         thresholdOverlay.setRange(lowValue.getValue(), highValue.getValue());
         thresholdOverlay.setColorWithin(Colors.WHITE);
-			thresholdOverlay.setColorLess(Colors.BLACK);
-			thresholdOverlay.setColorGreater(Colors.BLACK);
+        thresholdOverlay.setColorLess(Colors.BLACK);
+        thresholdOverlay.setColorGreater(Colors.BLACK);
         thresholdOverlay.update();
         t.elapsed("updating");
         logger.info("update over");
         //eventService.publish(new OverlayUpdatedEvent(thresholdOverlay));
-        
-        
+
     }
-    
+
     private Dataset getCurrentDataset() {
         return imageDisplayService.getActiveDataset(getCurrentImageDisplay());
     }
-    
+
     private ThresholdOverlay getThresholdOverlay() {
-       logger.info("getting the overlay;");
+        logger.info("getting the overlay;");
         return overlayService
                 .getOverlays(currentDisplay.getValue())
                 .stream()
-                .filter(o->o instanceof ThresholdOverlay)
-                .map(o->(ThresholdOverlay)o)
+                .filter(o -> o instanceof ThresholdOverlay)
+                .map(o -> (ThresholdOverlay) o)
                 .findFirst()
                 .orElseGet(this::createThresholdOverlay);
-        
+
     }
-    
+
     private ThresholdOverlay createThresholdOverlay() {
         logger.info("Creating an overlay");
         ThresholdOverlay overlay = new ThresholdOverlay(context, getCurrentDataset(), lowValue.getValue(), highValue.getValue());
@@ -694,6 +698,5 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         eventService.publish(new OverlayCreatedEvent(overlay));
         return overlay;
     }
-    
 
 }
