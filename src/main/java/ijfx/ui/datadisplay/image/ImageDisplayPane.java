@@ -972,45 +972,6 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         return axisConfig;
     }
 
-    private class AxisConfiguration {
-
-        private CalibratedAxis[] axes;
-
-        public AxisConfiguration(ImageDisplay dataset) {
-
-            axes = new CalibratedAxis[dataset.numDimensions()];
-            dataset.axes(axes);
-
-        }
-
-        public int numAxis() {
-            return axes.length;
-        }
-
-        public CalibratedAxis[] axes() {
-            return axes;
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            if (object == null) {
-                return false;
-            }
-            if (object instanceof ImageDisplay) {
-                return equals(new AxisConfiguration((ImageDisplay) object));
-            }
-            if (object instanceof AxisConfiguration == false) {
-                return false;
-            }
-            AxisConfiguration other = (AxisConfiguration) object;
-            if (other.numAxis() != numAxis()) {
-                return false;
-            }
-            return Arrays.equals(axes, other.axes());
-
-        }
-
-    }
 
     public void dispose() {
 
