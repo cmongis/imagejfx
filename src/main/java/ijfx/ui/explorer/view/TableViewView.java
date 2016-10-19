@@ -192,7 +192,7 @@ public class TableViewView implements ExplorerView {
 
     private void onItemSelectionChanged(Explorable explorable, Boolean selected) {
         
-        tableView.getSelectionModel().select(explorable);
+        if(selected)tableView.getSelectionModel().select(explorable);
         
     }
     
