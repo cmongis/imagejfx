@@ -44,7 +44,7 @@ public class StringInputSkin extends AbstractInputSkinPlugin<String> {
     ComboBox<String> comboBox;
     TextField textField;
     Label label;
-    StringProperty valueProperty = new SimpleStringProperty();
+    StringProperty valueProperty = new SimpleStringProperty("");
     
     public boolean isMultipleChoice() {
         return getSkinnable().getInput().multipleChoices();
@@ -93,6 +93,8 @@ public class StringInputSkin extends AbstractInputSkinPlugin<String> {
             comboBox = new ComboBox();
             comboBox.getItems().addAll(input.getChoices());
             comboBox.valueProperty().bindBidirectional(valueProperty);
+            
+          
             //String value = input.getDefaultValue();
             //comboBox.getSelectionModel().select(input.getValue());
             
@@ -103,7 +105,11 @@ public class StringInputSkin extends AbstractInputSkinPlugin<String> {
         }
         else {
             textField = new TextField();
+            textField.setText(input.getValue());
+            valueProperty.setValue(input.getValue());
             textField.textProperty().bindBidirectional(valueProperty);
+            if(valueProperty.getValue() == null) valueProperty.setValue("");
+            if(input.getValue() == null) input.setValue("");
         }
     }
     
