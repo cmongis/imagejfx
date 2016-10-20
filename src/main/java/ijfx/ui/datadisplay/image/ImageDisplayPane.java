@@ -29,6 +29,7 @@ import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.core.Handles;
+import ijfx.service.ui.CommandRunner;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.canvas.utils.ViewPort;
@@ -174,6 +175,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     @Parameter
     private IjfxStatisticService statsService;
 
+    @Parameter
+    private Context context;
+    
     Logger logger = ImageJFX.getLogger();
 
     private FxTool currentTool;
@@ -281,12 +285,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         initEventBuffering();
         
 
-        new CallbackTask()
-                .setName("Enhancing contrast...")
-                .run(() -> AutoContrast.run(statsService, imageDisplay, getDataset(), true))
-                .submit(loadingScreenService)
-                .setInitialProgress(0.8)
-                .start();
+       new CommandRunner(context)
+               .set("imageDisplay",imageDisplay)
+                .set("dataset",getDataset())
+               .runAsync(AutoContrast.class, null, true);
 
     }
 
