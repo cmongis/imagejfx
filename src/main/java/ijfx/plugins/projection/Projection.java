@@ -34,6 +34,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ItemIO;
+import org.scijava.app.StatusService;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Attr;
@@ -65,6 +66,9 @@ public class Projection extends ContextCommand {
 
     @Parameter
     ImageDisplayService imageDisplayService;
+    
+    @Parameter
+    StatusService statusService;
     
     @Override
     public void run() {
@@ -108,9 +112,10 @@ public class Projection extends ContextCommand {
         dimensionToGenerate[indexToModify - 2] = 1;
         NDimensionalArray nDimensionalArray = new NDimensionalArray(dimensionToGenerate);
         long[][] possibilities = nDimensionalArray.getPossibilities();
-
-        for (int x = 0; x < dims[input.dimensionIndex(Axes.X)]; x++) {
-            for (int y = 0; y < dims[input.dimensionIndex(Axes.Y)]; y++) {
+        final long width = dims[input.dimensionIndex(Axes.X)];
+        final long height = dims[input.dimensionIndex(Axes.Y)];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 for (long[] possibilitie : possibilities) {
 
                     //Go throug th dimension to project
