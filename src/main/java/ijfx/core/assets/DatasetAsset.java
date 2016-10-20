@@ -35,5 +35,17 @@ public class DatasetAsset extends AbstractAsset<Dataset>{
         this();
         setFile(file);
     }
+
+    @Override
+    protected String getIdString() {
+        
+        return new StringBuilder()
+                .append("DatasetAsset")
+                .append(getFile().getAbsolutePath())
+                .toString();
+        
+    }
+    
+    
     
 }

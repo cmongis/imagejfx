@@ -61,4 +61,16 @@ public class FlatfieldAsset extends AbstractAsset<Dataset>{
         multiChannel = bool;
         return this;
     }
+
+    @Override
+    protected String getIdString() {
+        
+        return new StringBuilder()
+                .append("FlatfieldAsset")
+                .append(darkfield != null ? darkfield.getAbsolutePath() : "null")
+                .append(getFile().getAbsolutePath())
+                .append(multiChannel)
+                .toString();
+        
+    }
 }
