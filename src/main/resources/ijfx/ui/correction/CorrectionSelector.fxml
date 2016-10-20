@@ -40,12 +40,15 @@
          <top>
             <BorderPane fx:id="centerTopBorderPane" BorderPane.alignment="CENTER">
                <right>
-                  <HBox BorderPane.alignment="CENTER">
+                  <HBox BorderPane.alignment="BOTTOM_CENTER">
                      <children>
                         <MenuButton fx:id="correctionListButton" mnemonicParsing="false" text="Add correction">
                            <graphic>
                               <FontAwesomeIconView glyphName="PLUS" />
                            </graphic>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
                         </MenuButton>
                      </children>
                   </HBox>

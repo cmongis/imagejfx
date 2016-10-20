@@ -12,8 +12,9 @@
         "target":"#darkfieldCorrectionCheckBox"
         ,"text":"If you already apply darkfield correction to your dataset, please check this box"
         
-    },{
-        "target":"#darkfieldCorrectionCheckBox",
+    }
+    ,{
+        "target":"#darkfieldCorrectionCheckBox"
         ,"text":"... so the darkfield substraction is only applied to the flatfield image."
     }
     ,{
