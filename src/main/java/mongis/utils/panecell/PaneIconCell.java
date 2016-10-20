@@ -49,6 +49,7 @@ import mongis.utils.CallbackTask;
 
 import mongis.utils.BindingsUtils;
 import mongis.utils.FXUtilities;
+import mongis.utils.FailableCallback;
 
 /**
  * The PaneIconCell is a generic class used to display items in form of Icons
@@ -92,15 +93,15 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
     private final ObjectProperty<T> item = new SimpleObjectProperty<T>();
 
     // Callback 
-    private Callback<T, String> titleFactory = T -> "No title factory";
+    private FailableCallback<T, String> titleFactory = T -> "No title factory";
 
-    private Callback<T, String> subtitleFactory = T -> "No subtitle factory";
+    private FailableCallback<T, String> subtitleFactory = T -> "No subtitle factory";
 
-    private Callback<T, String> additionalInfoFactory = T -> "you could benefit from **Awesome display**\n";
+    private FailableCallback<T, String> additionalInfoFactory = T -> "you could benefit from **Awesome display**\n";
 
-    private Callback<T, Image> imageFactory;
+    private FailableCallback<T, Image> imageFactory;
 
-    private Callback<T, FontAwesomeIconView> iconFactory;
+    private FailableCallback<T, FontAwesomeIconView> iconFactory;
 
     private Task currentImageSearch;
 
@@ -321,7 +322,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .startIn(refreshThreadPool);
     }
 
-    public PaneIconCell<T> setAdditionalInfoFactory(Callback<T, String> additionalInfoFactory) {
+    public PaneIconCell<T> setAdditionalInfoFactory(FailableCallback<T, String> additionalInfoFactory) {
         this.additionalInfoFactory = additionalInfoFactory;
         return this;
     }
@@ -332,7 +333,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
      * a string representing the title of the titleIconView
      * @return the PaneIconCell for convenient reasons
      */
-    public PaneIconCell<T> setTitleFactory(Callback<T, String> titleFactory) {
+    public PaneIconCell<T> setTitleFactory(FailableCallback<T, String> titleFactory) {
         this.titleFactory = titleFactory;
         return this;
     }
@@ -343,7 +344,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
      * return a string representing the title of the titleIconView
      * @return the PaneIconcell for convenient reasons
      */
-    public PaneIconCell<T> setSubtitleFactory(Callback<T, String> subtitleFactory) {
+    public PaneIconCell<T> setSubtitleFactory(FailableCallback<T, String> subtitleFactory) {
         this.subtitleFactory = subtitleFactory;
         return this;
     }
@@ -356,12 +357,12 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
      * titleIconView.
      * @return the PaneIconCell for convenient reasons
      */
-    public PaneIconCell<T> setImageFactory(Callback<T, Image> imageFactory) {
+    public PaneIconCell<T> setImageFactory(FailableCallback<T, Image> imageFactory) {
         this.imageFactory = imageFactory;
         return this;
     }
 
-    public PaneIconCell<T> setIconFactory(Callback<T, FontAwesomeIconView> iconFactory) {
+    public PaneIconCell<T> setIconFactory(FailableCallback<T, FontAwesomeIconView> iconFactory) {
         this.iconFactory = iconFactory;
         return this;
     }

@@ -21,9 +21,7 @@ package mongis.utils.panecell;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import ijfx.service.preview.PreviewService;
 import ijfx.ui.context.PaneContextualView;
-import ijfx.ui.main.LoadingIcon;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,11 +37,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import mongis.utils.CallbackTask;
-import org.scijava.plugin.Parameter;
+import mongis.utils.FailableCallback;
 
 /**
  *
@@ -67,13 +64,13 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
     private final ObjectProperty<T> item = new SimpleObjectProperty<T>();
 
     // Callback 
-    private Callback<T, String> titleFactory = T -> "No title factory";
+    private FailableCallback<T, String> titleFactory = T -> "No title factory";
 
-    private Callback<T, String> subtitleFactory = T -> "No subtitle factory";
+    private FailableCallback<T, String> subtitleFactory = T -> "No subtitle factory";
 
-    private Callback<T, String> additionalInfoFactory = T -> "you could benefit from **Awesome display**\n";
+    private FailableCallback<T, String> additionalInfoFactory = T -> "you could benefit from **Awesome display**\n";
 
-    private Callback<T, Image> imageFactory;
+    private FailableCallback<T, Image> imageFactory;
 
     private Task currentImageSearch;
 
@@ -238,7 +235,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
                 .start();
     }
 
-    public PaneLabelCell<T> setAdditionalInfoFactory(Callback<T, String> additionalInfoFactory) {
+    public PaneLabelCell<T> setAdditionalInfoFactory(FailableCallback<T, String> additionalInfoFactory) {
         this.additionalInfoFactory = additionalInfoFactory;
         return this;
     }
@@ -249,7 +246,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
      * a string representing the title of the icon
      * @return the PaneLabelCell for convenient reasons
      */
-    public PaneLabelCell<T> setTitleFactory(Callback<T, String> titleFactory) {
+    public PaneLabelCell<T> setTitleFactory(FailableCallback<T, String> titleFactory) {
         this.titleFactory = titleFactory;
         return this;
     }
@@ -260,7 +257,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
      * return a string representing the title of the icon
      * @return the PaneIconcell for convenient reasons
      */
-    public PaneLabelCell<T> setSubtitleFactory(Callback<T, String> subtitleFactory) {
+    public PaneLabelCell<T> setSubtitleFactory(FailableCallback<T, String> subtitleFactory) {
         this.subtitleFactory = subtitleFactory;
         return this;
     }
@@ -272,7 +269,7 @@ public class PaneLabelCell<T> extends BorderPane implements PaneCell<T> {
      * separated thread in order to avoid blocking the display of the icon.
      * @return the PaneLabelCell for convenient reasons
      */
-    public PaneLabelCell<T> setImageFactory(Callback<T, Image> imageFactory) {
+    public PaneLabelCell<T> setImageFactory(FailableCallback<T, Image> imageFactory) {
         this.imageFactory = imageFactory;
         return this;
     }
