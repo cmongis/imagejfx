@@ -44,8 +44,10 @@ public class IntegerInputSkin extends AbstractNumberInput<Integer> {
         if(ChannelSelector.STYLE.equals(input.getWidgetType())) {
              channelSelector = new ChannelSelector(null);
             channelSelector.channelNumberProperty().setValue(10);
-            channelSelector.selectedChannelProperty().asObject().bindBidirectional(valueProperty());
+            valueProperty().bindBidirectional(channelSelector.selectedChannelProperty().asObject());
+            //channelSelector.selectedChannelProperty().asObject().bindBidirectional(valueProperty());
             channelSelector.selectChannel((int)input.getValue());
+            
             node = channelSelector;
         }
         

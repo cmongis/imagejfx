@@ -47,4 +47,13 @@ public interface DatasetUtillsService extends ImageJService{
     public <T extends RealType<T> & NativeType<T>> Dataset emptyConversion(Dataset dataset, T t);
 
     public <T extends RealType<T> & NativeType<T>> Dataset convert(Dataset dataset, T t);
+    
+    
+    /**
+     * Adds a suffix between the dataset name and extension and also to the source.
+     * @param dataset to modify
+     * @param suffix suffix to add
+     * @param separator text between the name and the suffix, let null for default
+     */
+    public void addSuffix(Dataset dataset, String suffix,String separator);
 }

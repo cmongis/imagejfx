@@ -36,7 +36,7 @@
       </FlowPane>
    </bottom>
    <center>
-      <ScrollPane hbarPolicy="NEVER" prefHeight="300.0" BorderPane.alignment="CENTER">
+      <ScrollPane hbarPolicy="NEVER" prefHeight="350.0" BorderPane.alignment="CENTER">
          <content>
               <VBox styleClass="content-vbox">
                   <children>

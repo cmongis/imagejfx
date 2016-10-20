@@ -19,6 +19,7 @@
  */
 package ijfx.ui.module.skin;
 
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import java.lang.reflect.Field;
@@ -99,6 +100,7 @@ public class AxisTypeInputSkin extends AbstractInputSkinPlugin<AxisType> {
                     }
                 }
             }
+            axisTypeList.add(ImageJFX.SERIES);
         }
 
         return axisTypeList;

@@ -22,6 +22,7 @@ package ijfx.core.stats;
 import ijfx.service.IjfxService;
 import java.io.File;
 import java.util.Map;
+import javafx.util.Pair;
 import net.imagej.Dataset;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccessibleInterval;
@@ -47,5 +48,8 @@ public interface IjfxStatisticService extends IjfxService{
     public Map<String,Double> summaryStatisticsToMap(StatisticalSummary stats);
     public Map<String,Double> descriptiveStatisticsToMap(DescriptiveStatistics descriptiveStats);
     
+    public double[] getChannelMinMax(Dataset dataset, int channelPosition);
+    
+    public  <T extends RealType<T>> double[] getMinMax(RandomAccessibleInterval<T> interval);
     
 }

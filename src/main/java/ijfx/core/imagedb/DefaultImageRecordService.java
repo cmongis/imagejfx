@@ -173,14 +173,21 @@ public class DefaultImageRecordService extends AbstractService implements ImageR
 
         handler.setTotal(total);
 
-        return files
+        List<ImageRecord> collect = files
                 .stream()
                 .map(f -> {
                     handler.increment(1.0);
-                    return getRecord(f);
+                    try {
+                     return getRecord(f);
+                    }
+                    catch(Exception e) {
+                        return null;
+                    }
                 })
+                .filter(record ->record != null)
                 .collect(Collectors.toList());
 
+        return collect;
       
     }
 

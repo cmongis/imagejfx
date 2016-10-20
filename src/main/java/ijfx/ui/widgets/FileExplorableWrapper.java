@@ -52,6 +52,7 @@ public class FileExplorableWrapper extends AbstractExplorable{
         
         getMetaDataSet().putGeneric(MetaData.NAME, f.getName());
         getMetaDataSet().put(new FileSizeMetaData(f.length()));
+        getMetaDataSet().putGeneric(MetaData.ABSOLUTE_PATH,f.getAbsolutePath());
     }
     
     @Override

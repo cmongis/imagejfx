@@ -23,6 +23,7 @@ package ijfx.ui.tool;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.overlay.OverlaySelectionService;
+import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.ui.plugin.panel.OverlayOptionsService;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,10 +40,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import net.imagej.DatasetService;
 import net.imagej.axis.AxisType;
+import net.imagej.display.DefaultOverlayView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
-import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.lut.LUTService;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
@@ -92,6 +93,9 @@ public abstract class AbstractPathTool implements FxTool {
 
     @Parameter
     private OverlaySelectionService overlaySelectionService;
+    
+    @Parameter
+    private OverlayUtilsService overlayUtilsService;
     
     @Parameter
     private LUTService lutService;
@@ -151,6 +155,9 @@ public abstract class AbstractPathTool implements FxTool {
         final ArrayList<Overlay> list = new ArrayList<>();
         Collections.addAll(list, overlays);
 
+        
+        
+        
         for (Overlay overlay : overlays) {
             final int dimCount = getActiveImageDisplay().numDimensions();
             final AxisType[] axes = new AxisType[dimCount];
@@ -158,30 +165,17 @@ public abstract class AbstractPathTool implements FxTool {
             for (int i = 0; i != dimCount; i++) {
                 final long pos = getActiveImageDisplay().getLongPosition(i);
                 overlay.setAxis(getActiveImageDisplay().axis(i), i);
-                
-                
-                
             }
 
+            DefaultOverlayView view = new DefaultOverlayView();
+            
            
         }
-         overlayService.addOverlays(display, list);
-         list.stream().map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
-        /*
-        ImageJFX.getThreadQueue().execute(() -> {
-
-            double rangeMin = displayRangeService.getCurrentViewMinimum();
-            double rangeMax = displayRangeService.getCurrentViewMaximum();
-
-            overlayService.addOverlays(display, list);
-            if(list.size() == 1) {
-                overlaySelectionService.setOverlaySelection(display, list.get(0), true);
-            }
-            displayRangeService.updateCurrentDisplayRange(rangeMin, rangeMax);
-            
-            new OverlayCreatedEvent(overlay);
-            
-        });*/
+        
+       
+      overlayUtilsService.addOverlay(display, list);
+      //   list.stream().map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
+       toolService.setCurrentTool(Hand.class);
     }
 
     

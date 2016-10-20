@@ -61,7 +61,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
 
     private Callable<INPUT> inputGetter;
 
-    private Callback<INPUT, OUTPUT> callback;
+    private FailableCallback<INPUT, OUTPUT> callback;
     private LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
     private Callback<ProgressHandler, OUTPUT> longCallable;
 
@@ -74,7 +74,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
 
     private Consumer<OUTPUT> successHandler;
 
-    private Consumer<INPUT> consumer;
+    private FailableConsumer<INPUT> consumer;
 
     private BiConsumer<ProgressHandler, INPUT> longConsumer;
 
@@ -92,7 +92,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         setInput(input);
     }
 
-    public CallbackTask(Callback<INPUT, OUTPUT> callback) {
+    public CallbackTask(FailableCallback<INPUT, OUTPUT> callback) {
         this();
         this.callback = callback;
     }
@@ -108,10 +108,11 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public CallbackTask<INPUT, OUTPUT> run(Callback<INPUT, OUTPUT> callback) {
+    public CallbackTask<INPUT, OUTPUT> run(FailableCallback<INPUT, OUTPUT> callback) {
         this.callback = callback;
         return this;
     }
+
 
     public CallbackTask<INPUT, OUTPUT> run(Runnable runnable) {
         if (runnable == null) {
@@ -122,7 +123,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public CallbackTask<INPUT, OUTPUT> consume(Consumer<INPUT> consumer) {
+    public CallbackTask<INPUT, OUTPUT> consume(FailableConsumer<INPUT> consumer) {
         this.consumer = consumer;
         return this;
     }
@@ -142,7 +143,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public OUTPUT call() {
+    public OUTPUT call() throws Exception {
 
         // first we check if the task was cancelled BEFORE RUNNING IT
         if (isCancelled()) {
@@ -277,7 +278,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return then(item -> runnable.run());
     }
 
-    public <NEXTOUTPUT> CallbackTask<OUTPUT, NEXTOUTPUT> thenTask(Callback<OUTPUT, NEXTOUTPUT> callback) {
+    public <NEXTOUTPUT> CallbackTask<OUTPUT, NEXTOUTPUT> thenTask(FailableCallback<OUTPUT, NEXTOUTPUT> callback) {
         CallbackTask<OUTPUT, NEXTOUTPUT> task = new CallbackTask<OUTPUT, NEXTOUTPUT>()
                 .setInput(this::getValue)
                 .run(callback);
@@ -285,7 +286,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return task;
     }
 
-    public CallbackTask<INPUT, OUTPUT> ui() {
+    public CallbackTask<INPUT, OUTPUT> ui() throws Exception {
         if (Platform.isFxApplicationThread()) {
             call();
         } else {
@@ -362,5 +363,12 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         setProgress(progress);
         return this;
     }
+
+    @FunctionalInterface
+    public interface FailableConsumer<T> {
+
+        void accept(T t) throws Exception;
+    }
+
 
 }

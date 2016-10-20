@@ -17,12 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.correction;
+package mongis.utils;
 
 /**
  *
  * @author cyril
  */
-public class MultiChannelFlatfieldCorrection {
+@FunctionalInterface
+public interface FailableCallback<INPUT, OUTPUT> {
+
+    OUTPUT call(INPUT input) throws Exception;
     
 }

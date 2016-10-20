@@ -35,14 +35,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.util.Pair;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.axis.Axes;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.ValuePair;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -69,6 +73,9 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     @Parameter
     ImageDisplayService imageDisplayService;
 
+    @Parameter
+    OpService opService;
+    
     @Override
     public SummaryStatistics getSummaryStatistics(Dataset dataset) {
         SummaryStatistics summary = new SummaryStatistics();
@@ -136,7 +143,7 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
     public SummaryStatistics getChannelStatistics(Dataset dataset, int channelPosition) {
         final SummaryStatistics stats = new SummaryStatistics();
 
-        final Timer timer = timerService.getTimer(this.getClass());
+       // final Timer timer = timerService.getTimer(this.getClass());
 
         final Cursor<RealType<?>> cursor;
 
@@ -148,7 +155,7 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
                 stats.addValue(cursor.get().getRealDouble());
             }
         } else {
-            timer.start();
+           // timer.start();
             final IntervalView<RealType<?>> hyperSlice = Views.hyperSlice(dataset, dataset.dimensionIndex(Axes.CHANNEL), channelPosition);
             cursor = hyperSlice.cursor();
             cursor.reset();
@@ -210,4 +217,39 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
         return statistics;
     }
 
+   
+
+    @Override
+    public double[] getChannelMinMax(Dataset dataset, int channelPosition) {
+        
+        
+        RandomAccessibleInterval interval;
+        
+        if(dataset.dimensionIndex(Axes.CHANNEL) == -1) {
+            interval = dataset;
+        }
+        
+        else {
+            interval = Views.hyperSlice(dataset, dataset.dimensionIndex(Axes.CHANNEL), channelPosition);
+        }
+        
+        return getMinMax(interval);
+        
+    }
+
+    @Override
+    public <T extends RealType<T>> double[] getMinMax(RandomAccessibleInterval<T> interval) {
+        
+        
+        //ValuePair<T,T> result =  new ValuePair(interval.randomAccess().get().copy(),interval.randomAccess().get().copy());
+        
+        net.imglib2.util.Pair<T, T> minMax = opService.stats().minMax(Views.iterable(interval));
+        
+        return new double[] {minMax.getA().getRealDouble(), minMax.getB().getRealDouble()};
+        //return minMax;
+    }
+
+    
+    
+    
 }

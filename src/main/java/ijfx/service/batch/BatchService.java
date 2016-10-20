@@ -22,6 +22,8 @@ package ijfx.service.batch;
 
 import ijfx.bridge.FxUIPreprocessor;
 import ijfx.plugins.process.DatasetArrayPostprocessor;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowRecorderPreprocessor;
@@ -32,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -88,10 +91,15 @@ public class BatchService extends AbstractService implements ImageJService {
     @Parameter
     private PluginService pluginService;
 
+    @Parameter
+    private TimerService timerService;
+    
     private boolean running = false;
 
     private List<Class<?>> processorBlackList = new ArrayList<>();
 
+  
+    
     public BatchService() {
         super();
         processorBlackList.add(FxUIPreprocessor.class);
@@ -138,12 +146,14 @@ public class BatchService extends AbstractService implements ImageJService {
     // applies a workflow to a list of inputs
     public Boolean applyWorkflow(ProgressHandler progress, List<? extends BatchSingleInput> inputs, Workflow workflow) {
 
+       final Timer t = timerService.getTimer("Workflow");
+        
         if (progress == null) {
             progress = new SilentProgressHandler();
         }
 
         Boolean lock = new Boolean(true);
-        int totalOps = inputs.size() * workflow.getStepList().size();
+        int totalOps = inputs.size() * (2 + workflow.getStepList().size());
         int count = 0;
 
         progress.setStatus("Starting batch processing...");
@@ -152,11 +162,21 @@ public class BatchService extends AbstractService implements ImageJService {
         BooleanProperty successProperty = new SimpleBooleanProperty();
         Exception error = null;
         setRunning(true);
-
-        for (BatchSingleInput input : inputs) {
+        
+        BiConsumer<String,String> logTime = (step,msg)->{
+            t.elapsed(String.format("[%s][%s]%s",workflow.getName(),step,msg));
+        };
+        
+        progress.setTotal(totalOps);
+        
+        for (int i = 0;i!=inputs.size();i++) {
             //inputs.parallelStream().forEach(input->{
             logger.info("Running...");
 
+            final BatchSingleInput input = inputs.get(i);
+            
+           
+            
             if (progress.isCancelled()) {
                 progress.setStatus("Batch Processing cancelled");
                 success = false;
@@ -165,8 +185,11 @@ public class BatchService extends AbstractService implements ImageJService {
 
             }
 
+             
+            t.start();
             synchronized (lock) {
                 logger.info("Loading input...");
+                progress.setStatus("Loading %s...",input.getName());
                 try {
                     getContext().inject(input);
                 } catch (IllegalStateException ise) {
@@ -182,15 +205,34 @@ public class BatchService extends AbstractService implements ImageJService {
                 }
                 logger.info("Input loaded");
             }
-
+            logTime.accept("loading", "done");
+            progress.increment(1);
+            if(i<inputs.size()-1) {
+                // loading the next one while processing the current one
+                BatchSingleInput next = inputs.get(i+1);
+                ImageJFX.getThreadPool().execute(()->{
+                    synchronized(lock) {
+                        logger.info("Loading next input...");
+                        next.load();
+                        logger.info("Next input loaded.");
+                        
+                    }
+                });
+            }
+            
+            
             for (WorkflowStep step : workflow.getStepList()) {
                 logger.info("Executing step : " + step.getId());
+                String title;
                 try {
-                    progress.setStatus(String.format("Processing %s with %s", input.getName(), step.getModule().getInfo().getTitle()));
+                    title = step.getModule().getInfo().getTitle();
+                    progress.setStatus(String.format("Processing %s with %s", input.getName(), title));
+                    
                 } catch (NullPointerException e) {
+                    title = "???";
                     progress.setStatus("...");
                 }
-                progress.setProgress(count++, totalOps);
+                progress.increment(1);
 
                 final Module module = moduleService.createModule(step.getModule().getInfo());
                 try {
@@ -198,6 +240,7 @@ public class BatchService extends AbstractService implements ImageJService {
                 } catch (Exception e) {
                     logger.warning("Context already injected in module ?");
                 }
+                logTime.accept("injection","done");
                 logger.info("Module created : " + module.getDelegateObject().getClass().getSimpleName());
                 if (!executeModule(input, module, step.getParameters())) {
 
@@ -207,6 +250,7 @@ public class BatchService extends AbstractService implements ImageJService {
                     logger.info("Error when executing module : " + module.getInfo().getName());
                     break;
                 };
+                logTime.accept(title,"done");
 
             }
 
@@ -215,8 +259,11 @@ public class BatchService extends AbstractService implements ImageJService {
             }
 
             synchronized (lock) {
+                progress.setStatus("Saving %s...",input.getName());
                 input.save();
+                progress.increment(1);
             }
+            logTime.accept("saving", "done");
             input.dispose();
         }
 

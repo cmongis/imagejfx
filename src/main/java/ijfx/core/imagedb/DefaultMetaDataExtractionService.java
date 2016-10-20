@@ -31,6 +31,7 @@ import ijfx.ui.main.ImageJFX;
 import io.scif.FormatException;
 import io.scif.Metadata;
 import io.scif.SCIFIO;
+import io.scif.bf.BioFormatsFormat;
 import io.scif.config.SCIFIOConfig;
 import io.scif.filters.ReaderFilter;
 import java.io.File;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+import loci.formats.codec.NikonCodec;
 import mongis.ndarray.NDimensionalArray;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
@@ -101,7 +103,16 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
         try {
             // ReaderFilter reader = getReaderFilter(file);
             t.start();
-            Metadata metadata = getSCIFIO().format().getFormat(file.getAbsolutePath()).createParser().parse(file.getAbsolutePath());
+
+            Metadata metadata;
+            try {
+                metadata = getSCIFIO().format().getFormat(file.getAbsolutePath()).createParser().parse(file.getAbsolutePath());
+            } catch (FormatException e) {
+                metadata = getSCIFIO().format().getFormatFromClass(BioFormatsFormat.class).createParser().parse(file);
+            }
+            if (metadata == null) {
+                throw new FormatException(String.format("Couldn't find a format for %s", file.getName()));
+            }
             t.elapsed("Metadata parser creation");
             long serieCount, timeCount, zCount, channelCount, width, height, imageSize, bitsPerPixel;
             String dimensionOrder;
@@ -221,11 +232,9 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
             long value = absoluteCoordinate[d];
             set.putGeneric(label, value);
 
-        }   
+        }
     }
 
- 
-    
     @Override
 
     public List<MetaDataSet> extractPlaneMetaData(File file) {
@@ -234,34 +243,31 @@ public class DefaultMetaDataExtractionService extends AbstractService implements
 
     @Override
     public MetaDataSet extractMetaData(Dataset dataset) {
-        
+
         MetaDataSet set = new MetaDataSet(MetaDataSetType.FILE);
         CalibratedAxis[] axes = AxisUtils.getAxes(dataset);
-        set.putGeneric(MetaData.NAME,dataset.getName());
-        for(int i = 2; i!= dataset.numDimensions();i++) {
-            set.putGeneric(axes[i].type().getLabel(),dataset.numDimensions());
+        set.putGeneric(MetaData.NAME, dataset.getName());
+        for (int i = 2; i != dataset.numDimensions(); i++) {
+            set.putGeneric(axes[i].type().getLabel(), dataset.numDimensions());
         }
-        
+
         return set;
     }
 
     @Override
     public MetaDataSet extractMetaData(ImageDisplay imageDisplay) {
-        
+
         MetaDataSet set = new MetaDataSet();
-      
-        
+
         long[] position = new long[imageDisplay.numDimensions()];
         CalibratedAxis[] axes = new CalibratedAxis[imageDisplay.numDimensions()];
-        
+
         imageDisplay.localize(position);
         imageDisplay.axes(axes);
-        
-        
+
         set.putGeneric(MetaData.NAME, imageDisplay.getName());
         fillPositionMetaData(set, axes, position);
-        
-        
+
         return set;
     }
 

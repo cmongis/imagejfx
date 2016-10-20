@@ -21,11 +21,13 @@ package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
 import ijfx.ui.main.ImageJFX;
+import io.scif.img.ImgIOException;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mongis.utils.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
@@ -71,10 +73,24 @@ public class SaveToFileWrapper extends AbstractSaverWrapper {
     
     @Override
     public void save() {
+        
+        
+        String savePath = saveTo.getAbsolutePath();
+        
         try {
-            ImageJFX.getLogger().info("Saving to ..."+saveTo.getAbsolutePath());
-            datasetIoService.save(getWrappedObject().getDataset(), saveTo.getAbsolutePath());
-        } catch (IOException ex) {
+           if( datasetIoService.canSave(savePath) == false) {
+               savePath = FileUtils.changeExtensionTo(savePath, "tif");
+           }
+        }
+        catch(Exception e) {
+            savePath = FileUtils.changeExtensionTo(savePath, "tif");
+        }
+        
+        try {
+            ImageJFX.getLogger().info("Saving to ..."+savePath);
+            datasetIoService.save(getWrappedObject().getDataset(), savePath);
+        } 
+        catch (IOException ex) {
             Logger.getLogger(SaveToFileWrapper.class.getName()).log(Level.SEVERE, null, ex);
         }
         

@@ -108,6 +108,11 @@ public class BatchInputBuilder {
         return this;
     }
     
+    public BatchInputBuilder displayWithSuffix(String suffix) {
+        input = new DisplayDatasetWrapper(context, input,suffix);
+        return this;
+    }
+    
    
     
     public BatchInputBuilder overwriteOriginal() {

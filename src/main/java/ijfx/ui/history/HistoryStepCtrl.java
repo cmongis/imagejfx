@@ -24,6 +24,7 @@ import ijfx.ui.main.ImageJFX;
 import ijfx.ui.module.InputEvent;
 import ijfx.ui.module.ModuleConfigPane;
 import ijfx.service.history.HistoryService;
+import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.workflow.WorkflowService;
 import ijfx.service.workflow.WorkflowStep;
 import java.io.File;
@@ -41,6 +42,7 @@ import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import mongis.utils.FXUtilities;
 import javafx.animation.FadeTransition;
+import mongis.utils.CallbackTask;
 
 /**
  *
@@ -59,6 +61,9 @@ public class HistoryStepCtrl extends BorderPane {
    @Parameter
    Context context;
 
+   @Parameter
+   LoadingScreenService loadingScreenService;
+   
     @FXML
     Label subtitleLabel;
 
@@ -218,7 +223,11 @@ public class HistoryStepCtrl extends BorderPane {
 
     @FXML
     public void execute() {
-        workflowService.executeStep(getStep());
+        new CallbackTask<WorkflowStep,Boolean>()
+                .setInput(getStep())
+                .run(workflowService::executeStep)
+                .submit(loadingScreenService)
+                .start();
     }
 
     @FXML

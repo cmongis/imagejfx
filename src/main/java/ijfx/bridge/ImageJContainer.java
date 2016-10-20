@@ -48,12 +48,14 @@ import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.plugin.panel.RecentFilePanel;
+import java.util.concurrent.Future;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import jfxtras.scene.control.window.Window;
 import mongis.utils.CallbackTask;
+import org.scijava.command.CommandModule;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.plugins.commands.io.OpenFile;
@@ -246,7 +248,7 @@ public class ImageJContainer extends BorderPane implements Activity {
 
     
     
-    private void openFile(File file) {
+    private void openFile(File file) throws Exception {
         
         if(file.isDirectory()) {
            Folder folder =  folderManagerService.addFolder(file);
@@ -254,7 +256,8 @@ public class ImageJContainer extends BorderPane implements Activity {
            activityService.openByType(ExplorerActivity.class);
         }
         
-        commandService.run(OpenFile.class, true, "inputFile", file);
+        Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile", file);
+        run.get();
     }
 
 }

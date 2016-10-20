@@ -48,7 +48,7 @@ public class FlatFieldCorrection extends ContextCommand {
     @Parameter(label = "Flatfield image")
     File flatfield;
 
-    @Parameter(label = "Darkfield image (non requied, only for the flatfield)", required= false)
+    @Parameter(label = "Darkfield image (for the flatfield)", required= false,description="The darkfield image will be only applied to the flatfield image.")
     File darkfield;
     
     @Parameter(label = "Convert original type")

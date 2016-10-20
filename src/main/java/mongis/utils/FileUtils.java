@@ -20,6 +20,7 @@
 package mongis.utils;
 
 import java.text.DecimalFormat;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  *
@@ -34,5 +35,15 @@ public class FileUtils {
         final String[] units = new String[]{"B", "kB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
+    
+    public static String changeExtensionTo(String path,String extension) {
+        
+        return new StringBuilder()
+                .append(FilenameUtils.removeExtension(path))
+                .append(".")
+                .append(extension)
+                .toString();
+        
     }
 }

@@ -46,18 +46,20 @@ import org.scijava.plugin.Parameter;
 public class WorkflowBuilder {
 
     @Parameter
-    Context context;
+    private Context context;
 
     @Parameter
-    BatchService batchService;
+    private BatchService batchService;
 
     @Parameter
-    LoadingScreenService loadingScreenService;
+    private LoadingScreenService loadingScreenService;
 
-    List<BatchInputBuilder> inputs = new ArrayList<>();
+    private List<BatchInputBuilder> inputs = new ArrayList<>();
 
-    List<WorkflowStep> steps = new ArrayList<>();
+    private List<WorkflowStep> steps = new ArrayList<>();
 
+    private String name;
+    
     public WorkflowBuilder(Context context) {
         context.inject(this);
     }
@@ -109,6 +111,15 @@ public class WorkflowBuilder {
         return this;
     }
 
+    public WorkflowBuilder addStepIfTrue(boolean predicateResult,Class<?> moduleClass, Object... params) {
+        if(predicateResult) {
+           return  addStep(moduleClass,params);
+        }
+        else {
+            return this;
+        }
+    }
+    
     public WorkflowBuilder addStep(Class<?> moduleClass, Object... params) {
 
         DefaultWorkflowStep step = new DefaultWorkflowStep(moduleClass.getName());
@@ -128,6 +139,10 @@ public class WorkflowBuilder {
     public WorkflowBuilder then(Consumer<BatchSingleInput> consumer) {
 
         remapInputs(builder -> builder.onFinished(consumer));
+        return this;
+    }
+    public WorkflowBuilder setName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -168,7 +183,7 @@ public class WorkflowBuilder {
 
     public Workflow getWorkflow(String name) {
         DefaultWorkflow workflow = new DefaultWorkflow(steps);
-        workflow.setName("No name");
+        workflow.setName(name);
         return workflow;
     }
 
@@ -176,7 +191,7 @@ public class WorkflowBuilder {
         return inputs.stream().map(builder -> builder.getInput()).collect(Collectors.toList());
     }
 
-    public Task<Boolean> start() {
+    public CallbackTask<?,Boolean> start() {
 
         DefaultWorkflow workflow = new DefaultWorkflow(steps);
 
@@ -186,8 +201,10 @@ public class WorkflowBuilder {
                 .start();
     }
 
-    public void startAndShow() {
-        loadingScreenService.frontEndTask(start(), true);
+    public CallbackTask<?,Boolean> startAndShow() {
+        CallbackTask<?,Boolean> task = start();
+        loadingScreenService.frontEndTask(task, true);
+        return task;
     }
 
     public boolean runSync(ProgressHandler handler) {

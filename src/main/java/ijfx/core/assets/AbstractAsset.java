@@ -47,7 +47,7 @@ public abstract class AbstractAsset<T> implements Asset<T> {
     @JsonIgnore
     public UUID getId() {
         if(id == null) {
-            id = UUID.nameUUIDFromBytes((getClass().getSimpleName()+file.getAbsolutePath()).getBytes());
+            id = UUID.nameUUIDFromBytes(getIdString().getBytes());
         }
         
         return id;
@@ -72,5 +72,7 @@ public abstract class AbstractAsset<T> implements Asset<T> {
     public Class<T> getAssetType() {
         return type;
     }
+    
+    protected abstract String getIdString();
     
 }

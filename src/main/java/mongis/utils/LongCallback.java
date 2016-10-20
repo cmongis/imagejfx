@@ -25,5 +25,5 @@ package mongis.utils;
  */
 @FunctionalInterface
 public interface LongCallback<PARAM1,PARAM2,OUTPUT> {
-    public OUTPUT handle(PARAM1 param1,PARAM2 param2);
+    public OUTPUT handle(PARAM1 param1,PARAM2 param2) throws Exception;
 }

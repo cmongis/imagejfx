@@ -55,54 +55,90 @@ public class CommandRunner {
 
     @Parameter
     ModuleService moduleService;
-    
+
     @Parameter
     DefaultLoggingService loggerService;
 
     @Parameter
-            BatchService batchService;
-    
-    HashMap<String,Object> params = new HashMap<>();
-    
+    BatchService batchService;
+
+    HashMap<String, Object> params = new HashMap<>();
+
     Logger logger = ImageJFX.getLogger();
-    
+
     private Module lastRun;
+
+    String title = "Please wait...";
     
     public CommandRunner(Context context) {
         context.inject(this);
     }
-    
-    
-    
+
     public CommandRunner set(String paramName, Object value) {
         params.put(paramName, value);
         return this;
     }
-    
+
     public CommandRunner runSync(Class<? extends Command> command) {
-        
-        
+
         Module module = batchService.createModule(command);
-        
-       batchService.preProcessExceptFor(module,InitPreprocessor.class,FxUIPreprocessor.class,WorkflowRecorderPreprocessor.class);
-        
+
+        batchService.preProcessExceptFor(module, InitPreprocessor.class, FxUIPreprocessor.class, WorkflowRecorderPreprocessor.class);
+
         Future<Module> run = moduleService.run(module, false, params);
         try {
             lastRun = run.get();
-            
+
         } catch (InterruptedException ex) {
             Logger.getLogger(CommandRunner.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
             Logger.getLogger(CommandRunner.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
+        return this;
+    }
+
+    public <T> CallbackTask<Module, T> runAsync(Class<? extends Command> clazz, String outputName, boolean show) {
+
+        Module module = batchService.createModule(clazz);
+
+        batchService.preProcessExceptFor(module, InitPreprocessor.class, FxUIPreprocessor.class, WorkflowRecorderPreprocessor.class);
+
+        Future<Module> run = moduleService.run(module, false, params);
+
+        CallbackTask<Module, T> task = new CallbackTask<Module, T>()
+                .setInput(module)
+                .setName(title)
+                .run(m->runModule(clazz,outputName));
+
+        if (show) {
+            task.submit(loadScreenService);
+        }
+        return task.start();
+    }
+
+    private CommandRunner setTitle(String title) {
+        this.title = title;
         return this;
     }
     
-    public <T> T getOutput(String name) {
-       return (T) lastRun.getOutput(name);
+    private <T> T runModule(Class<? extends Command> command, String outputName) throws Exception {
+
+        Module module = batchService.createModule(command);
+
+        batchService.preProcessExceptFor(module, InitPreprocessor.class, FxUIPreprocessor.class, WorkflowRecorderPreprocessor.class);
+        Module finishedModule = moduleService.run(module, false, params).get();
+        if (outputName != null) {
+            return (T) finishedModule.getOutput(outputName);
+        } else {
+            return null;
+        }
     }
-    
+
+    public <T> T getOutput(String name) {
+        return (T) lastRun.getOutput(name);
+    }
+
     public CommandRunner run(String title, Class<? extends Command> clazz, Object... params) {
 
         loadScreenService.frontEndTask(new CallbackTask<Object, Object>()

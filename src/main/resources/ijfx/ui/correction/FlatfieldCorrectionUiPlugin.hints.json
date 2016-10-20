@@ -1,0 +1,28 @@
+[
+    {
+        "target":"#flatfieldButton"
+        ,"text":"First choose a raw flatfield image to apply (no normalization)."
+    }
+    
+    ,{
+        "target":"#darkfieldButton"
+        ,"text":"If you also want to do darkfield correction, select a raw darkfield image"
+    }
+    ,{
+        "target":"#darkfieldCorrectionCheckBox"
+        ,"text":"If you already apply darkfield correction to your dataset, please check this box"
+        
+    }
+    ,{
+        "target":"#darkfieldCorrectionCheckBox"
+        ,"text":"... so the darkfield substraction is only applied to the flatfield image."
+    }
+    ,{
+        "target":"#multichannelCheckBox"
+        ,"text":"If you want to correct multiple channels simeoutanously with a multichannel flatfield image, check this box."
+    }
+    ,{
+        "target":"#channelSelectorGroup"
+        ,"text":"Otherwise, select the channel you want to correct. The flatfield image should be a flat mono-channel image."
+    }
+]

@@ -25,6 +25,7 @@ import ijfx.core.assets.AssetService;
 import ijfx.core.assets.BUnwarpJTransformationAsset;
 import ijfx.core.utils.DimensionUtils;
 import ijfx.plugins.adapter.IJ1Service;
+import ijfx.ui.correction.ChannelSelector;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
 import java.util.logging.Logger;
@@ -35,6 +36,7 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.scijava.ItemIO;
+import org.scijava.app.StatusService;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
@@ -44,7 +46,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type =  Command.class)
+@Plugin(type =  Command.class,menuPath="Process > Correction > Elastic correction")
 public class ElasticCorrection extends ContextCommand {
 
     @Parameter
@@ -59,7 +61,7 @@ public class ElasticCorrection extends ContextCommand {
     @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
 
-    @Parameter(label = "Channel to correct")
+    @Parameter(label = "Channel to correct",style=ChannelSelector.STYLE)
     int channel = 0;
 
     @Parameter
@@ -68,6 +70,9 @@ public class ElasticCorrection extends ContextCommand {
     @Parameter(required = false)
     Transformation transformation;
 
+    @Parameter
+    StatusService statusService;
+    
     Logger logger = ImageJFX.getLogger();    
     
     @Override

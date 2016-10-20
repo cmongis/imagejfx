@@ -22,15 +22,18 @@ package ijfx.ui.correction;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.ui.RichMessageDisplayer;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import mongis.utils.FluidWebViewWrapper;
@@ -50,7 +53,7 @@ class CorrectionUiPluginWrapper extends TitledPane {
     private static final String HEADER_FORMAT = "<h4>%s <small>%s</small></h4>";
     private final StackPane webViewStackPane = new StackPane();
     private final StackPane contentStackPane = new StackPane();
-    private Consumer<CorrectionUiPlugin> deleteHandler;
+    private BiConsumer<String,CorrectionUiPlugin> actionHandler;
     
     private FluidWebViewWrapper webViewWrapper;
     
@@ -59,6 +62,21 @@ class CorrectionUiPluginWrapper extends TitledPane {
         getStyleClass().add("correction-plugin");
         
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        
+        // MenuButton
+        MenuButton button = new MenuButton();
+        button.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.BARS));
+        
+        MenuItem moveUp = new MenuItem("Move up");
+        MenuItem moveDown = new MenuItem("Move down");
+        moveUp.setOnAction(this::moveUp);
+        moveDown.setOnAction(this::moveDown);
+        
+        
+        deleteButton.getStyleClass().add("icon");
+        button.getItems().addAll(moveUp,moveDown);
+        
+        button.getStyleClass().addAll("normal","icon");
         
         // creating the header web view
         webViewWrapper = new FluidWebViewWrapper()
@@ -79,9 +97,15 @@ class CorrectionUiPluginWrapper extends TitledPane {
         contentStackPane.getChildren().add(plugin.getContent());
         contentScrollPane.setContent(contentStackPane);
         
+        
+        HBox hbox = new HBox();
+        hbox.getStyleClass().add("hbox");
+        
+       hbox.getChildren().addAll(deleteButton,button);
+        
         // setting the header
         headerBorderPane.setCenter(webViewWrapper);
-        headerBorderPane.setRight(deleteButton);
+        headerBorderPane.setRight(hbox);
         headerBorderPane.setMaxWidth(Double.MAX_VALUE);
         
         headerBorderPane.prefWidthProperty().bind(Bindings.createDoubleBinding(this::getHeaderWidth,widthProperty(),deleteButton.widthProperty()));
@@ -102,14 +126,21 @@ class CorrectionUiPluginWrapper extends TitledPane {
         return getWidth() - deleteButton.getWidth() - 70;
     }
     
-    public CorrectionUiPluginWrapper deleteUsing(Consumer<CorrectionUiPlugin> deleteHandler) {
-        this.deleteHandler = deleteHandler;
+    public CorrectionUiPluginWrapper setActionHandler(BiConsumer<String,CorrectionUiPlugin> deleteHandler) {
+        this.actionHandler = deleteHandler;
         return this;
     }
     
     private void delete(ActionEvent event) {
-        if(deleteHandler != null) deleteHandler.accept(plugin);
-      
+        if(actionHandler != null) actionHandler.accept("delete",plugin); 
+    }
+    
+ 
+    private void moveDown(ActionEvent event) {
+        if(actionHandler != null) actionHandler.accept("move-down",plugin);
+    }
+    private void moveUp(ActionEvent event) {
+        if(actionHandler != null) actionHandler.accept("move-up",plugin);
     }
 
     public void onHeaderBorderPaneChanged(Observable obs, Number oldValue, Number newValue) {

@@ -23,9 +23,13 @@ import ijfx.core.assets.AssetService;
 import ijfx.core.assets.DatasetAsset;
 import java.io.File;
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.IntervalView;
+import net.imglib2.view.Views;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -48,10 +52,70 @@ public class DarkfieldSubstraction extends ContextCommand{
     @Parameter
     AssetService assetService;
 
+    @Parameter(label = "Multi-channel substraction",description="The darkfield and the source are both multichannel. The plugin will use a specific darkfield image corresponding to each channel")
+    boolean multichannel = false;
+    
+    
+    
     public void run() {
         Dataset darkfield = assetService.load(new DatasetAsset(file));
-        substract(darkfield);
+        
+        
+        if(!multichannel) {
+            substract(darkfield);
+        
+        }
+        else {
+            
+            long datasetChannelNumber = dataset.dimension(Axes.CHANNEL);
+            long darkfieldChannelNumber = darkfield.dimension(Axes.CHANNEL);
+            
+            if(datasetChannelNumber == -1 || darkfieldChannelNumber == -1) {
+                cancel("No Channel Axis detected ! The darkfield image and the target image must both contain a channel axis.");
+                return;
+            }
+            
+            if(datasetChannelNumber != darkfieldChannelNumber) {
+                cancel("Darkfield and target should have the same number of channel !");
+                return;
+            }
+            
+            int datasetChannelAxis = dataset.dimensionIndex(Axes.CHANNEL);
+            int darkfieldChannelAxis = darkfield.dimensionIndex(Axes.CHANNEL);
+            
+            
+            for(long channel = 0; channel != datasetChannelNumber; channel++) {
+               
+                IntervalView target = Views.hyperSlice(dataset, datasetChannelAxis, channel);
+                IntervalView darkfieldChannel = Views.hyperSlice(darkfield, darkfieldChannelAxis, channel);
+                substract(target, darkfieldChannel); 
+            }
+            
+        }
     }
+    
+    
+    public <T extends RealType<T>,U extends RealType<U>> void substract(RandomAccessibleInterval<T> target, RandomAccessibleInterval<U> darkfield) {
+        
+         long[] xyPosition = new long[2];
+
+       
+        Cursor<T> cursor = (Cursor<T>) Views.iterable(target).cursor();
+        RandomAccess<U> rai = darkfield.randomAccess();
+        cursor.reset();
+        double value;
+        while (cursor.hasNext()) {
+            cursor.fwd();
+            xyPosition[0] = cursor.getLongPosition(0);
+            xyPosition[1] = cursor.getLongPosition(1);
+            rai.setPosition(xyPosition);
+            value = cursor.get().getRealDouble() - rai.get().getRealDouble();
+            cursor.get().setReal(value);
+        }
+        
+    }
+    
+    
 
     public <T extends RealType<T>> void substract(Dataset darkfield) {
         long[] xyPosition = new long[2];

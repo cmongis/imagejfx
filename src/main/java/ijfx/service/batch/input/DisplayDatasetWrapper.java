@@ -20,6 +20,7 @@
 package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
+import ijfx.service.dataset.DatasetUtillsService;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.ui.UIService;
@@ -33,15 +34,31 @@ public class DisplayDatasetWrapper extends AbstractSaverWrapper {
     @Parameter
     UIService uiService;
     
-    public DisplayDatasetWrapper(Context context, BatchSingleInput input) {
+    @Parameter
+    DatasetUtillsService datasetUtilsService;
+    
+    String suffix;
+    
+    public DisplayDatasetWrapper(Context context, BatchSingleInput input, String suffix) {
         super(input);
+        this.suffix = suffix;
+        context.inject(this);
     }
+    
+    public DisplayDatasetWrapper(Context context, BatchSingleInput input) {
+        super(input);  
+    }
+    
+    
 
     
     
     
     @Override
     public void save() {
+        if(suffix != null) {
+           datasetUtilsService.addSuffix(getWrappedObject().getDataset(),suffix,null);
+        }
         uiService.show(getWrappedObject().getDataset());
         getWrappedObject().save();
     }

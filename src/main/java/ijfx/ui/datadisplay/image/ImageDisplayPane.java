@@ -29,6 +29,7 @@ import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.core.Handles;
+import ijfx.service.ui.CommandRunner;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
 import ijfx.ui.canvas.utils.ViewPort;
@@ -174,6 +175,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     @Parameter
     private IjfxStatisticService statsService;
 
+    @Parameter
+    private Context context;
+    
     Logger logger = ImageJFX.getLogger();
 
     private FxTool currentTool;
@@ -281,12 +285,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         initEventBuffering();
         
 
-        new CallbackTask()
-                .setName("Enhancing contrast...")
-                .run(() -> AutoContrast.run(statsService, imageDisplay, getDataset(), true))
-                .submit(loadingScreenService)
-                .setInitialProgress(0.8)
-                .start();
+       new CommandRunner(context)
+               .set("imageDisplay",imageDisplay)
+                .set("dataset",getDataset())
+               .runAsync(AutoContrast.class, null, true);
 
     }
 
@@ -783,7 +785,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     @Override
     public Pane getPane() { return this; }
-    
+   
     protected OverlayDrawer getDrawer(Overlay overlay) {
         //logger.info("Searching a drawer for "+overlay.getClass().getSimpleName());
         if (drawerMap.get(overlay.getClass()) == null) {
@@ -892,9 +894,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
      */
     private void onCanvasClick(MouseEvent event) {
 
-        System.out.println("canvas click");
+       
+        if(event.getButton() != MouseButton.PRIMARY) return;
+        
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
-        System.out.println(positionOnImage);
         logService.info(String.format("This image contains %s overlays", overlayService.getOverlays(imageDisplay).size()));
 
         boolean wasOverlaySelected;
@@ -971,45 +974,6 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         return axisConfig;
     }
 
-    private class AxisConfiguration {
-
-        private CalibratedAxis[] axes;
-
-        public AxisConfiguration(ImageDisplay dataset) {
-
-            axes = new CalibratedAxis[dataset.numDimensions()];
-            dataset.axes(axes);
-
-        }
-
-        public int numAxis() {
-            return axes.length;
-        }
-
-        public CalibratedAxis[] axes() {
-            return axes;
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            if (object == null) {
-                return false;
-            }
-            if (object instanceof ImageDisplay) {
-                return equals(new AxisConfiguration((ImageDisplay) object));
-            }
-            if (object instanceof AxisConfiguration == false) {
-                return false;
-            }
-            AxisConfiguration other = (AxisConfiguration) object;
-            if (other.numAxis() != numAxis()) {
-                return false;
-            }
-            return Arrays.equals(axes, other.axes());
-
-        }
-
-    }
 
     public void dispose() {
 
