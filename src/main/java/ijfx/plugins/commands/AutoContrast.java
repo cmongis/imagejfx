@@ -43,7 +43,7 @@ public class AutoContrast extends ContextCommand {
     @Parameter
     ImageDisplayService imageDisplayService;
 
-    @Parameter(type = ItemIO.BOTH)
+    @Parameter(required = false)
     ImageDisplay imageDisplay;
 
     @Parameter
@@ -55,41 +55,72 @@ public class AutoContrast extends ContextCommand {
     @Parameter
     EventService eventService;
 
+    @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
 
     @Override
     public void run() {
 
-        dataset = imageDisplayService.getActiveDataset(imageDisplay);
-
-        run(statsService, imageDisplay, dataset, channelDependant);
-
-       
-    }
-
-    public static void run(IjfxStatisticService statsService, ImageDisplay imageDisplay, Dataset dataset, boolean channelDependant) {
-
         
-        if(dataset.isRGBMerged()) {
+        
+        if(imageDisplay == null && imageDisplayService.getActiveDataset() == dataset) {
+            imageDisplay = imageDisplayService.getActiveImageDisplay();
+        }
+        
+        if(dataset != null && dataset.isRGBMerged()) {
             return;
         }
         boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
 
         if (multiChannel && channelDependant == true) {
             for (int i = 0; i <= dataset.max(dataset.dimensionIndex(Axes.CHANNEL)); i++) {
-                SummaryStatistics stats = statsService.getChannelStatistics(dataset, i);
-                setMinMax(imageDisplay, dataset, stats, i);
+                
+                autoChannelMinMax(imageDisplay, dataset, i);
+                //SummaryStatistics stats = statsService.getChannelStatistics(dataset, i);
+                //setMinMax(imageDisplay, dataset, stats, i);
             }
         } else {
-            SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
-            setMinMax(imageDisplay, dataset, stats, 0);
-
+           // SummaryStatistics stats = statsService.getSummaryStatistics(dataset);
+            //setMinMax(imageDisplay, dataset, stats, 0);
+            autoChannelMinMax(imageDisplay, dataset, 0);
         }
        
+        
+        if(dataset != null) {
+            dataset.update();
+        }
+        
+        if(imageDisplay != null) {
+             DatasetView view = (DatasetView) imageDisplay.getActiveView();
+              view.getProjector().map();
+        }
     }
 
+    
+    private void autoChannelMinMax(ImageDisplay imageDisplay, Dataset dataset, int channel) {
+        
+        double[] minMax = statsService.getChannelMinMax(dataset, channel);
+        
+        if(dataset!= null) {
+            dataset.setChannelMinimum(channel, minMax[0]);
+            dataset.setChannelMaximum(channel, minMax[1]);
+        }
+        
+        if(imageDisplay != null) {
+            DatasetView view = (DatasetView) imageDisplay.getActiveView();
+            view.setChannelRange(channel,minMax[0],minMax[1]);
+        }
+        
+        
+        
+    }
+    
+    
     private static void setMinMax(ImageDisplay imageDisplay, Dataset dataset, SummaryStatistics stats, int channel) {
        
+        double[] minMax;
+        
+        
         if (dataset != null) {
             dataset.setChannelMinimum(channel, stats.getMin());
              dataset.setChannelMaximum(channel, stats.getMax());
