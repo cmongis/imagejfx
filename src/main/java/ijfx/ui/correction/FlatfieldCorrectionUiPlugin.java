@@ -43,7 +43,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author cyril
  */
-@Plugin(type = CorrectionUiPlugin.class, label = "Flatfield Correction")
+@Plugin(type = CorrectionUiPlugin.class, label = "Dark & Flatfield Correction")
 public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
     private ChannelSelector channelSelector = new ChannelSelector(null);
