@@ -38,6 +38,7 @@ import ijfx.ui.main.Localization;
 import ijfx.ui.plugin.LUTComboBox;
 import ijfx.ui.plugin.LUTView;
 import ijfx.service.display.DisplayRangeService;
+import ijfx.service.ui.CommandRunner;
 import ijfx.service.ui.FxImageService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.uicontext.UiContextService;
@@ -492,6 +493,14 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @FXML
     private void autoRange(ActionEvent event) {
 
+        
+        new CommandRunner(context)
+                .set("dataset", imageDisplayService.getActiveDataset())
+                .set("imageDisplay",imageDisplayService.getActiveImageDisplay())
+                .runAsync(AutoContrast.class,null,true)
+                .then(o->updateLabel());
+        
+        /*
         Task task
                 = new CallbackTask<DatasetView, DatasetView>()
                 .setName("Auto-contrast...")
@@ -503,6 +512,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
                 }).start();
 
         loadingService.frontEndTask(task);
+        * 
+        */
     }
 
     private DatasetView autoContrast(DatasetView view) {
