@@ -232,64 +232,53 @@ public class ModuleConfigPane extends BorderPane {
 
         // setting the module
         setModule(module);
-        
+
         // puting the module name as title
         getTitleLabel().setText(WorkflowService.getModuleLabel(module));
-
+        
         // for each input, a field is generated
         // The InputControl object can deal with different type of value,
         // each value associated to a special skin
         module.getInfo().inputs().forEach(inputInfo -> {
 
             Input input = new ModuleInputWrapper(module, inputInfo);
-            
+
             // generating the input
             InputControl inputControl;
             
-            System.out.println(inputInfo.getName() + " : " + inputInfo.getIOType());
-            
-            //if(inputInfo.getIOType() == ItemIO.INPUT || inputInfo.getIOType() == ItemIO.BOTH) return;
             if (module.isResolved(inputInfo.getName()) && step == null) {
                 return;
             }
-            
-            if(step != null && (inputInfo.getLabel() == null || inputInfo.getLabel().equals(""))) return;
-            
-            //if( inputInfo.getType() == Dataset.class && module.isResolved(inputInfo.getName()))
-            // return;
-            
-            {
-                if (inputSkinPluginService.canCreateSkinFor(input)) {
-
-                    // the control is created
-                    inputControl = new InputControl(inputSkinPluginService, input);
-                    
-                    // setting the value to the control
-                    inputControl.setValue(input.getValue());
-
-                    // if it's a message, the control is added to the MessageBox
-                    if (inputInfo.getVisibility() == ItemVisibility.MESSAGE) {
-                        //inputControl.setSkin(new StringMessageInput());
-                        //inputControl.setDefaultValue(defaultInput);
-                        inputControl.getStyleClass().add("module-config-pane-message");
-                        messageBox.getChildren().add(inputControl);
-                    } // if it's an HistogramBundle, it's added to the GraphicsBox
-                    else if (inputInfo.getType() == HistogramBundle.class) {
-                        graphicsBox.getChildren().add(inputControl);
-                    } // if it's a Button, it's added to the Button Box
-                    else if (inputInfo.getType() == org.scijava.widget.Button.class) {
-                        buttonBox.getChildren().add(inputControl);
-                    } // other wise, it's added to the gridpane containing the other fields
-                    else {
-                        addField(inputInfo.getName(), inputControl);
-                    }
-
-                    // when a input is changed, the panel will be notified
-                    inputControl.addEventHandler(InputEvent.ALL, this::handleInputValueChanged);
-
-                }
+            if (step != null && (inputInfo.getLabel() == null || inputInfo.getLabel().equals(""))) {
+                return;
             }
+            if (inputSkinPluginService.canCreateSkinFor(input)) {
 
+                // the control is created
+                inputControl = new InputControl(inputSkinPluginService, input);
+
+                // setting the value to the control
+                inputControl.setValue(input.getValue());
+
+                // if it's a message, the control is added to the MessageBox
+                if (inputInfo.getVisibility() == ItemVisibility.MESSAGE) {
+                    
+                    inputControl.getStyleClass().add("module-config-pane-message");
+                    messageBox.getChildren().add(inputControl);
+                } // if it's an HistogramBundle, it's added to the GraphicsBox
+                else if (inputInfo.getType() == HistogramBundle.class) {
+                    graphicsBox.getChildren().add(inputControl);
+                } // if it's a Button, it's added to the Button Box
+                else if (inputInfo.getType() == org.scijava.widget.Button.class) {
+                    buttonBox.getChildren().add(inputControl);
+                } // other wise, it's added to the gridpane containing the other fields
+                else {
+                    addField(inputInfo.getName(), inputControl);
+                }
+
+                // when a input is changed, the panel will be notified
+                inputControl.addEventHandler(InputEvent.ALL, this::handleInputValueChanged);
+            }
         });
     }
 
