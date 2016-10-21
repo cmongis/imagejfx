@@ -195,16 +195,11 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
         
         
        rangeUpdateQueue.add(() -> {
-            imageDisplayService.getActiveDatasetView().getProjector().map();
-            eventService.publishLater(new DisplayUpdatedEvent(displayService.getActiveDisplay(), DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
+          imageDisplayService.getActiveDatasetView().getProjector().map();
+          eventService.publishLater(new DisplayUpdatedEvent(displayService.getActiveDisplay(), DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
         });
 
-    }
-
-    public void autoRange() {
-        updateCurrentDisplayRange(getCurrentPixelMinimumValue(), getCurrentPixelMaximumValue());
-
-    }
+    }   
 
     private SummaryStatistics getDisplayStatistics(ImageDisplay display, int channel) {
 
