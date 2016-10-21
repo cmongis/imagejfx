@@ -244,7 +244,7 @@ public class CorrectionSelector extends BorderPane implements Activity {
             return;
         }
 
-        hintService.displayHints(newlySelected.getPlugin().getClass(), true);
+        hintService.displayHints(newlySelected.getPlugin().getClass(), false);
 
     }
 
