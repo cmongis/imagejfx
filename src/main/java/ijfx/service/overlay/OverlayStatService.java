@@ -414,45 +414,18 @@ public class OverlayStatService extends AbstractService implements ImageJService
 
         points.add(overlay.getRegionOfInterest().getVertex(npoints - 1));
 
-        return createPolytonOverlay(getContext(), points, p -> new RealPoint(p));
+        return createPolygonOverlay(getContext(), points, p -> new RealPoint(p));
 
-        /*
-        if (npoints >= 3) {
-
-            int i;
-            for (i = 0; i <= npoints - 1; i++) {
-                int j = i + 1;
-                int k = i + 2;
-                if (i == npoints - 1) {
-                    j = 0;
-                    k = 1;
-                }
-                if (i == npoints - 2) {
-                    k = 0;
-                }
-                Point pt1 = new Point((int) roi.getVertex(i).getDoublePosition(0), (int) roi.getVertex(i).getDoublePosition(1));
-                Point pt2 = new Point((int) roi.getVertex(j).getDoublePosition(0), (int) roi.getVertex(j).getDoublePosition(1));
-                Point pt3 = new Point((int) roi.getVertex(k).getDoublePosition(0), (int) roi.getVertex(k).getDoublePosition(1));
-
-                if (areColinear(pt1, pt2, pt3)) {
-                    roi.removeVertex(j);
-                    i--;
-                    npoints--;
-                }
-            }
-            
-        }
-
-        return overlay;*/
+     
     }
 
     public PolygonOverlay createPolygonOverlay(Context context, List<Point> pointList) {
-        return createPolytonOverlay(context, pointList, point -> {
+        return createPolygonOverlay(context, pointList, point -> {
             return new RealPoint(point.getX(), point.getY());
         });
     }
 
-    public <T> PolygonOverlay createPolytonOverlay(Context context, List<T> pointList, Callback<T, RealPoint> pointFactory) {
+    public <T> PolygonOverlay createPolygonOverlay(Context context, List<T> pointList, Callback<T, RealPoint> pointFactory) {
 
         PolygonOverlay overlay = new PolygonOverlay(context);
 
