@@ -88,13 +88,13 @@ public class MultiChannelFlatfieldCorrection extends ContextCommand {
         }
 
         int datasetChannelAxis = dataset.dimensionIndex(Axes.CHANNEL);
-        int darkfieldChannelAxis = flatfieldDataset.dimensionIndex(Axes.CHANNEL);
+        int flatfieldChannelAxis = flatfieldDataset.dimensionIndex(Axes.CHANNEL);
 
         for (long channel = 0; channel != datasetChannelNumber; channel++) {
 
             IntervalView target = Views.hyperSlice(dataset, datasetChannelAxis, channel);
-            IntervalView darkfieldChannel = Views.hyperSlice(flatfieldDataset, darkfieldChannelAxis, channel);
-            correct(target, darkfieldChannel);
+            IntervalView flatfieldChannel = Views.hyperSlice(flatfieldDataset, flatfieldChannelAxis, channel);
+            correct(target, flatfieldChannel);
         }
     }
 

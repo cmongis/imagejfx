@@ -19,6 +19,7 @@
  */
 package ijfx.plugins.flatfield;
 
+import ij.IJ;
 import ijfx.core.assets.AssetService;
 import ijfx.core.assets.DatasetAsset;
 import java.io.File;
@@ -31,6 +32,7 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.scijava.ItemIO;
+import org.scijava.app.StatusService;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
@@ -55,15 +57,21 @@ public class DarkfieldSubstraction extends ContextCommand{
     @Parameter(label = "Multi-channel substraction",description="The darkfield and the source are both multichannel. The plugin will use a specific darkfield image corresponding to each channel")
     boolean multichannel = false;
     
+    @Parameter
+    StatusService statusService;
     
     
     public void run() {
+        
+        statusService.showStatus(1, 3, "Loading darkfield image...");
         Dataset darkfield = assetService.load(new DatasetAsset(file));
         
         
         if(!multichannel) {
+            statusService.showStatus(2, 3,"Substracting background...");
             substract(darkfield);
-        
+            statusService.showStatus(3,3,"Background substraction complete.");
+            
         }
         else {
             
@@ -85,11 +93,14 @@ public class DarkfieldSubstraction extends ContextCommand{
             
             
             for(long channel = 0; channel != datasetChannelNumber; channel++) {
-               
+                statusService.showStatus(String.format("Correctinng Channel %d/%d",channel+1,datasetChannelNumber));
+                statusService.showProgress((int)channel, (int)datasetChannelNumber);
                 IntervalView target = Views.hyperSlice(dataset, datasetChannelAxis, channel);
                 IntervalView darkfieldChannel = Views.hyperSlice(darkfield, darkfieldChannelAxis, channel);
                 substract(target, darkfieldChannel); 
             }
+            
+            statusService.showStatus(1, 1,"Substraction finished.");
             
         }
     }
