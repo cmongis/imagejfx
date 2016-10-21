@@ -115,6 +115,7 @@ public class Projection extends ContextCommand {
         final long width = dims[input.dimensionIndex(Axes.X)];
         final long height = dims[input.dimensionIndex(Axes.Y)];
         for (int x = 0; x < width; x++) {
+            if(x % 50 == 0) statusService.showStatus(x, (int)width, "Projecting...");
             for (int y = 0; y < height; y++) {
                 for (long[] possibilitie : possibilities) {
 
@@ -138,6 +139,8 @@ public class Projection extends ContextCommand {
                 }
             }
         }
+        
+        statusService.showStatus(1, 1, "Projection finished");
     }
 
     public void init() {
