@@ -86,6 +86,8 @@ public class ElasticCorrection extends ContextCommand {
         
         assetService.clear();
 
+        parameters = new bunwarpj.Param();
+        
         transformation = assetService
                 .load(new BUnwarpJTransformationAsset()
                         .setLandmarkFile(landmarkFile)
