@@ -47,16 +47,17 @@ public class DoubleAccess extends DatasetRelatedBenchmark{
         cursor.reset();
         
         RandomAccess<RealType<?>> randomAccess = dataset2.randomAccess();
-        double[] position = new double[cursor.numDimensions()];
+        long[] position = new long[cursor.numDimensions()];
         while(cursor.hasNext()) {
             cursor.fwd();
             //randomAccess.setPosition(cursor);
             //randomAccess.get().setReal(cursor.get().getRealDouble());
             cursor.localize(position);
             
-            cursor2.get().setReal(cursor.get().getRealDouble());
+            //cursor2.get().setReal(cursor.get().getRealDouble());
             //randomAccess.setPosition(cursor.getIntPosition(0),1);
             //randomAccess.setPosition(cursor.getIntPosition(0), 0);
+            randomAccess.setPosition(position);
         }
         
         

@@ -24,6 +24,7 @@ package ijfx.ui.module.skin;
 import ijfx.ui.correction.ChannelSelector;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
+import javafx.beans.property.Property;
 import javafx.scene.Node;
 import org.scijava.plugin.Plugin;
 
@@ -56,8 +57,20 @@ public class IntegerInputSkin extends AbstractNumberInput<Integer> {
             node = super.getNode(); 
         }
         
+        valueProperty().addListener(event->{
+            System.out.println("It did changed !!!!");
+        });
         
-        
+    }
+    
+    @Override
+    public Property<Integer> valueProperty() {
+        if(channelSelector != null) {
+            return channelSelector.selectedChannelProperty().asObject();
+        }
+        else {
+            return super.valueProperty();
+        }
     }
     
     @Override
@@ -78,6 +91,6 @@ public class IntegerInputSkin extends AbstractNumberInput<Integer> {
         return clazz == int.class || clazz == Integer.class;
     }
 
-  
+    
 
 }
