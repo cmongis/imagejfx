@@ -88,6 +88,7 @@ public class ImageDisplayObserver {
         
         positionProperty.addListener(this::onPositionChanged);
         
+        currentChannelProperty.setValue(0);
         
         
     }
@@ -167,6 +168,7 @@ public class ImageDisplayObserver {
     }
     
     private int currentChannel() {
+        if(currentChannelProperty.getValue() == null) return 0;
         return currentChannelProperty.getValue();
     }
     
@@ -178,6 +180,7 @@ public class ImageDisplayObserver {
             updateLater(currentChannelMax,10);
         }
         else {
+            
             double min = datasetView().getChannelMin(currentChannel());
             double max = datasetView().getChannelMax(currentChannel());
             
@@ -225,6 +228,7 @@ public class ImageDisplayObserver {
     }
     
     private boolean arrayEquals(long[] arrays, long[] Arrays) {
+        if(arrays == null || Arrays == null) return false;
         if(arrays.length != Arrays.length) return false;
         return ArrayUtils.isEquals(arrays, Arrays);
     }
