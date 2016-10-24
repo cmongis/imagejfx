@@ -170,6 +170,7 @@ public class GenericMetaData implements MetaData, Comparable<Object> {
         if(type == TYPE_DOUBLE || type == TYPE_NUMBER ||type == TYPE_INTEGER) {
             return StringUtils.numberToString(getDoubleValue(), 3);
         }
+        if(getValue() == null) return null;
         return getValue().toString();
         
         
