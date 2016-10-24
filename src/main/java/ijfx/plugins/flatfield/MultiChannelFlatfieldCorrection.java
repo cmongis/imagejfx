@@ -25,10 +25,6 @@ import ijfx.service.ui.CommandRunner;
 import java.io.File;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
-import net.imglib2.Cursor;
-import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.scijava.Context;
@@ -94,33 +90,7 @@ public class MultiChannelFlatfieldCorrection extends ContextCommand {
 
             IntervalView target = Views.hyperSlice(dataset, datasetChannelAxis, channel);
             IntervalView flatfieldChannel = Views.hyperSlice(flatfieldDataset, flatfieldChannelAxis, channel);
-            correct(target, flatfieldChannel);
+            FlatFieldCorrection.correct(target, flatfieldChannel);
         }
-    }
-
-    public static <T extends RealType<T>, U extends RealType<U>> void correct(RandomAccessibleInterval<T> dataset, RandomAccessibleInterval<U> flatfield) {
-        double value;
-        double coeff;
-        Cursor<T> datasetCursor = Views.iterable(dataset).cursor();
-        RandomAccess<U> flatfieldRai = flatfield.randomAccess();
-        datasetCursor.reset();
-        long[] xy = new long[2];
-        while (datasetCursor.hasNext()) {
-            datasetCursor.fwd();
-            xy[0] = datasetCursor.getLongPosition(0);
-            xy[1] = datasetCursor.getLongPosition(1);
-            value = datasetCursor.get().getRealDouble();
-
-            flatfieldRai.setPosition(xy);
-
-            coeff = flatfieldRai.get().getRealDouble();
-
-            value = value / coeff;
-
-            datasetCursor.get().setReal(value);
-
-        }
-
-    }
-
+    }   
 }
