@@ -66,6 +66,7 @@ public class DarkfieldSubstraction extends ContextCommand{
         statusService.showStatus(1, 3, "Loading darkfield image...");
         Dataset darkfield = assetService.load(new DatasetAsset(file));
         
+        if(isCanceled()) return;
         
         if(!multichannel) {
             statusService.showStatus(2, 3,"Substracting background...");
@@ -115,13 +116,15 @@ public class DarkfieldSubstraction extends ContextCommand{
         RandomAccess<U> rai = darkfield.randomAccess();
         cursor.reset();
         double value;
+        final double minValue = target.randomAccess().get().getMinValue();
         while (cursor.hasNext()) {
             cursor.fwd();
             xyPosition[0] = cursor.getLongPosition(0);
             xyPosition[1] = cursor.getLongPosition(1);
             rai.setPosition(xyPosition);
+            
             value = cursor.get().getRealDouble() - rai.get().getRealDouble();
-            cursor.get().setReal(value);
+            cursor.get().setReal(value < minValue ? minValue : value);
         }
         
     }
