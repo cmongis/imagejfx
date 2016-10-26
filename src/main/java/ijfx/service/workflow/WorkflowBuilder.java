@@ -24,6 +24,7 @@ import ijfx.service.batch.BatchSingleInput;
 import ijfx.service.batch.input.BatchInputBuilder;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.save.SaveOptions;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javafx.concurrent.Task;
 import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import net.imagej.Dataset;
@@ -164,6 +164,12 @@ public class WorkflowBuilder {
         inputs.forEach(consumer);
         return this;
     }
+    
+    public WorkflowBuilder saveUsingOptions(SaveOptions options) {
+        remapInputs(builder->builder.saveUsingOptions(options));
+        return this;
+    }
+    
     public WorkflowBuilder saveTo(File directory) {
 
         remapInputs(builder -> builder.saveIn(directory));
