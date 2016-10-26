@@ -98,6 +98,9 @@ public class WorkflowIOService extends AbstractService implements IjfxService {
     public void saveWorkflow(Workflow workflow, File dest) {
 
         try {
+            if(dest.getName().endsWith(".json") == false) {
+                dest = new File(dest.getParentFile(),dest.getName()+".json");
+            }
             mapper.writeValue(dest, workflow);
         } catch (IOException ex) {
             Logger.getLogger(WorkflowIOService.class.getName()).log(Level.SEVERE, null, ex);
