@@ -13,14 +13,23 @@
       <BorderPane BorderPane.alignment="CENTER">
         
          <left>
-            <Button fx:id="folderButton" mnemonicParsing="false" text="Select folder" BorderPane.alignment="CENTER" />
+            <Button fx:id="folderButton" mnemonicParsing="false" text="Apply saved correction" BorderPane.alignment="CENTER" />
          </left>
          <right>
-            <Button fx:id="nextButton" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#next" text="Next" BorderPane.alignment="CENTER">
-               <graphic>
-                  <FontAwesomeIconView glyphName="ARROW_RIGHT" styleClass="warning" text="" />
-               </graphic>
-            </Button>
+            <HBox styleClass="hbox" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="redoButton" mnemonicParsing="false" onAction="#redo" text="Apply saved workflow">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="REPEAT" />
+                     </graphic>
+                  </Button>
+                  <Button fx:id="nextButton" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#next" styleClass="success" text="Create correction workflow">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="PLUS_CIRCLE" styleClass="warning" />
+                     </graphic>
+                  </Button>
+               </children>
+            </HBox>
          </right>
       </BorderPane>
    </bottom>
