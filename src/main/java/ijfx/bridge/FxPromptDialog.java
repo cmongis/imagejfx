@@ -52,17 +52,19 @@ public class FxPromptDialog extends Dialog<Result> implements DialogPrompt {
         getDialogPane().getStylesheets().add(ImageJFX.getStylesheet());
         switch (ot) {
             case YES_NO_OPTION:
-                addButton(ButtonType.YES);
-                addButton(ButtonType.NO);
+                addButton(ButtonType.YES,"success");
+                addButton(ButtonType.NO,"danger");
+                
+               
                 break;
             case OK_CANCEL_OPTION:
-                addButton(ButtonType.OK);
-                addButton(ButtonType.CANCEL);
+                addButton(ButtonType.OK,"success");
+                addButton(ButtonType.CANCEL,"warning");
                 break;
             case YES_NO_CANCEL_OPTION:
-                addButton(ButtonType.OK);
-                addButton(ButtonType.NO);
-                addButton(ButtonType.CANCEL);
+                addButton(ButtonType.OK,"success");
+                addButton(ButtonType.NO,"danger");
+                addButton(ButtonType.CANCEL,"warning");
                 break;
 
             case DEFAULT_OPTION:
@@ -71,6 +73,8 @@ public class FxPromptDialog extends Dialog<Result> implements DialogPrompt {
 
         }
 
+       
+        
         setResultConverter(new Callback<ButtonType, Result>() {
 
             @Override
@@ -99,9 +103,19 @@ public class FxPromptDialog extends Dialog<Result> implements DialogPrompt {
 
     }
 
+     private void addClass(ButtonType type,String cssClass) {
+            getDialogPane().lookupButton(type).getStyleClass().add(cssClass);
+    }
+    
     public void addButton(ButtonType type) {
         getDialogPane().getButtonTypes().add(type);
     }
+    
+    public void addButton(ButtonType type, String cssClass) {
+        addButton(type);
+        addClass(type,cssClass);
+    }
+    
     Result result;
 
     @Override

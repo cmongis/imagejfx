@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplayService;
@@ -111,11 +112,11 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     }
 
     @Override
-    public DialogPrompt dialogPrompt(String string, String string1, DialogPrompt.MessageType mt, DialogPrompt.OptionType ot) {
+    public DialogPrompt dialogPrompt(String string, String string1, DialogPrompt.MessageType messageType, DialogPrompt.OptionType ot) {
 
         // runs a FX Dialog in the JavaFX Thread and wait for it to be finished
         try {
-            FXUtilities.runAndWait(() -> lastDialog = new FxPromptDialog(string, string1, mt, ot));
+            FXUtilities.runAndWait(() -> lastDialog = new FxPromptDialog(string, string1, messageType, ot));
         } catch (InterruptedException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
         } catch (ExecutionException ex) {
