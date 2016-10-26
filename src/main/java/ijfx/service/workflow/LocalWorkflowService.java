@@ -37,11 +37,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import mongis.utils.FXUtilities;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 import mongis.utils.SimpleTask;
+import org.scijava.Prioritized;
+import org.scijava.log.LogService;
 
 /**
  *
@@ -127,6 +130,31 @@ public class LocalWorkflowService extends AbstractService implements MyWorkflowS
         } catch (Exception e) {
             return false;
         }
+    }
+
+    
+
+    @Override
+    public Workflow importWorkflow() {
+        
+        File file = FXUtilities.openFileSync("Open existing workflow", null, "Workflow JSON file", "json");
+        
+        if(file != null) {
+            return workflowIOService.loadWorkflow(file);
+        }
+        else {
+            return null;
+        }
+        
+    }
+
+    @Override
+    public void exportWorkflow(Workflow workflow) {
+        File file = FXUtilities.saveFileSync("Save workflow as...", null, "Workflow JSON file", "json");
+        if(file != null) {
+         workflowIOService.saveWorkflow(workflow, file);
+        }
+        
     }
 
     public class WorkflowList {
