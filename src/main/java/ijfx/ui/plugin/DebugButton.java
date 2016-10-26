@@ -44,6 +44,7 @@ import ijfx.ui.UiConfiguration;
 import ijfx.service.uiplugin.UiPluginService;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.FileBatchProcessorPanel;
+import ijfx.ui.correction.CorrectionSelector;
 import ijfx.ui.correction.FolderSelection;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.PerformanceActivity;
@@ -104,6 +105,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Reset Hints History",this::resetHintHistory);
         addItem("Play Hints",this::playHints);
         addItem("Load test activity",event->activityService.openByType(FolderSelection.class));
+        addItem("Other action",this::other);
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED, this::updateReloadMenu);
         System.out.println("Added");
@@ -207,5 +209,9 @@ public class DebugButton extends MenuButton implements UiPlugin {
         hintService.displayHint(new DefaultHint("#folderTitleHBox",fakeText+" and let's make it longer"),true);
         hintService.displayHint(new DefaultHint("","And me I should be in the middle like malcolm"),true);
         
+    }
+    
+    public void other(ActionEvent event) {
+        activityService.getActivity(CorrectionSelector.class).onWorkflowOver(true);
     }
 }
