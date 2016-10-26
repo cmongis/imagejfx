@@ -20,6 +20,7 @@
 package ijfx.plugins.commands;
 
 import net.imagej.Dataset;
+import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
@@ -72,6 +73,19 @@ public class AxisUtils {
         return null;
 
     }
+    
+    public static CalibratedAxis[] getAxes(ImgPlus img) {
+        CalibratedAxis[] axes = new CalibratedAxis[img.numDimensions()];
+        img.axes(axes);
+        return axes;
+    }
+    
+    public static long[] getDimensions(ImgPlus img) {
+        long[] dims = new long[img.numDimensions()];
+        img.dimensions(dims);
+        return dims;
+    }
+    
 
     public static long getAxisMax(Dataset dataset, AxisType axisType) {
         int d = dataset.dimensionIndex(axisType);
