@@ -28,6 +28,7 @@ import ijfx.service.thumb.ThumbService;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.workflow.DefaultWorkflow;
+import ijfx.service.workflow.MyWorkflowService;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.service.workflow.WorkflowStep;
@@ -153,6 +154,9 @@ public class CorrectionSelector extends BorderPane implements Activity {
     @Parameter
     ImagePlaneService imagePlaneService;
 
+    @Parameter
+    MyWorkflowService myWorkflowService;
+    
     private final ObservableList<CorrectionUiPlugin> addedPlugins = FXCollections.observableArrayList();
 
     private final BooleanProperty allPluginsValid = new SimpleBooleanProperty(false);
@@ -362,6 +366,7 @@ public class CorrectionSelector extends BorderPane implements Activity {
                 .and(this::applySaveParameter)
                 .execute(workflowProperty.getValue())
                 .startAndShow()
+                .then(this::onWorkflowOver)
                 .error(this::onError);
 
     }
@@ -375,10 +380,14 @@ public class CorrectionSelector extends BorderPane implements Activity {
         }
     }
 
+    private Explorable getSelectedItem() {
+        return listView.getSelectionModel().getSelectedItem();
+    }
+    
     @FXML
     public void testCorrection() {
         new WorkflowBuilder(context)
-                .addInput(listView.getSelectionModel().getSelectedItem())
+                .addInput(new File(getSelectedItem().getMetaDataSet().get(MetaData.ABSOLUTE_PATH).getStringValue()))
                 .and(input -> input.displayWithSuffix("corrected"))
                 .execute(workflowProperty.getValue())
                 .startAndShow()
@@ -441,5 +450,21 @@ public class CorrectionSelector extends BorderPane implements Activity {
 
         // return thumb;// previewImageView.setImage(thumb);
     }
+    
+    public void onWorkflowOver(Object result) {
+        if(Boolean.TRUE.equals(result)) {
+            DialogPrompt.Result answer = uiService.showDialog("Your worklow was successfully applied to each file. Do you want to save the worklow for later use ?",DELETE, DialogPrompt.MessageType.ERROR_MESSAGE, DialogPrompt.OptionType.YES_NO_OPTION);
+            if(answer == DialogPrompt.Result.YES_OPTION) {
+                
+                myWorkflowService.exportWorkflow(workflowProperty.getValue());
+                uiService.showDialog("Workflow saved.");
+
+            }
+            
+        }
+    }
+    
+    
+    
 
 }
