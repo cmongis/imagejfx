@@ -154,7 +154,7 @@ public class BatchService extends AbstractService implements ImageJService {
 
         Boolean lock = new Boolean(true);
         int totalOps = inputs.size() * (2 + workflow.getStepList().size());
-        int count = 0;
+       
 
         progress.setStatus("Starting batch processing...");
 
@@ -200,7 +200,9 @@ public class BatchService extends AbstractService implements ImageJService {
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Couldn't load input", e);
                     error = e;
-                    continue;
+                    success = false;
+                    break;
+                    
 
                 }
                 logger.info("Input loaded");
