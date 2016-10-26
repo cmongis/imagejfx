@@ -20,17 +20,111 @@
  */
 package ijfx.ui.main;
 
-import net.imagej.ImageJ;
+import io.scif.services.DatasetIOService;
+import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imglib2.Cursor;
+import net.imglib2.type.numeric.RealType;
+import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.ui.UIService;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public class ImageJTest {
-    public static void main(String... args) {
-        
-        ImageJ imagej = new ImageJ();
+@Plugin(type = Command.class, menuPath=" Plugins > Test > Open/Saving")
+public class ImageJTest extends ContextCommand{
 
+   
+    @Parameter
+    DatasetIOService datasetIOService;
+
+    @Parameter
+    DatasetService datasetService;
+
+    @Parameter
+    UIService uiService;
+   
+    public void go() throws Exception {
+
+        AxisType[] axes = {Axes.X, Axes.Y, Axes.CHANNEL, Axes.TIME, Axes.get("Series")};
         
+        
+        /*
+        Dataset created = datasetService.create(new UnsignedShortType(), new long[]{200, 200, 4, 2, 5}, "some name", axes);
+
+        Cursor<RealType<?>> cursor = created.cursor();
+
+        cursor.reset();
+        long[] position = new long[5];
+        while (cursor.hasNext()) {
+            cursor.fwd();
+            cursor.localize(position);
+            cursor.get().setReal(getPositionId(position));
+        }*/
+        
+
+        String pathToLoad = "/Users/cyril/test_img/daniel/nd_file_read.nd2";
+        String pathToSave = "/Users/cyril/test_img/daniel/nd_file_read.tif";
+        
+        
+        Dataset created = datasetIOService.open(pathToLoad);
+        Cursor<RealType<?>> cursor = created.cursor();
+        
+        created.setCompositeChannelCount(5);
+        created.update();
+        created.setDirty(false);
+        for(int i = 0;i!=5;i++)
+        created.setChannelMinimum(i, 200);
+        datasetIOService.save(created,pathToSave);
+        
+        
+        Dataset reloaded = datasetIOService.open(pathToSave);
+        
+        cursor.reset();
+        Cursor<RealType<?>> loadedCursor = reloaded.cursor();
+        loadedCursor.reset();
+        while (cursor.hasNext()) {
+            cursor.fwd();
+            loadedCursor.fwd();
+            
+            if(cursor.get().getRealDouble() != loadedCursor.get().getRealDouble()) {
+               uiService.showDialog("Haha ! It was different !");
+               break;
+            }
+            
+        }
+        uiService.showDialog("It did worked...");
+      
     }
+
+    public long getPositionId(long[] position) {
+
+        long result = 0;
+        long m = 0;
+        for (long i : position) {
+            
+                result += (i * m++);
+            
+        }
+
+        return result;
+
+    }
+
+    @Override
+    public void run() {
+        try {
+        go();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
