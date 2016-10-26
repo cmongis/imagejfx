@@ -46,8 +46,8 @@ public class MultiChannelFlatfieldCorrection extends ContextCommand {
     @Parameter(label = "Flatfield image", required = true)
     File flatfield;
 
-    @Parameter(label = "Darkfield image (for flatfield only)", required = false)
-    File darkfield;
+    @Parameter(label = "Darkfield image (for flatfield only)", required = false,persist = false)
+    File darkfield = null;
 
     @Parameter
     AssetService assetService;
