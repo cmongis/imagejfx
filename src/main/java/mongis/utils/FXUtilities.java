@@ -338,14 +338,7 @@ public class FXUtilities {
     public static File openFile(String title, String defaultFolder, String extensionTitle, String... extensions) {
         Task<File> task = new Task<File>() {
             public File call() {
-                FileChooser fileChooser = new FileChooser();
-
-                File file = null;
-                fileChooser.setTitle(title);
-                fileChooser.setInitialDirectory(new File(defaultFolder));
-                fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter(extensionTitle, extensions));
-                file = fileChooser.showOpenDialog(null);
-                return file;
+               return openFileSync(title,defaultFolder,extensionTitle,extensions);
             }
         };
         Platform.runLater(task);
@@ -353,12 +346,23 @@ public class FXUtilities {
         try {
             return task.get();
         } catch (InterruptedException ex) {
-            ImageJFX.getLogger();
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when selecting file",ex);
         } catch (ExecutionException ex) {
-            ImageJFX.getLogger();
+           ImageJFX.getLogger().log(Level.SEVERE,"Error when selecting file",ex);
         }
 
         return null;
+    }
+    
+    public static File openFileSync(String title, String defaultFolder, String extensionTitle, String... extensions) {
+         FileChooser fileChooser = new FileChooser();
+
+                File file = null;
+                fileChooser.setTitle(title);
+                if(defaultFolder != null) fileChooser.setInitialDirectory(new File(defaultFolder));
+                fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter(extensionTitle, extensions));
+                file = fileChooser.showOpenDialog(null);
+                return file;
     }
 
     public static List<File> openFiles(String title, String defaultFolder, String extensionTitle, String... extensions) {
