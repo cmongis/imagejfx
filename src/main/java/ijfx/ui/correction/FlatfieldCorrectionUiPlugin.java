@@ -126,7 +126,7 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
         return new WorkflowBuilder(context)
                 // if darkfield should be handled for the files and for the flatfield, we had a step to the workflow
-                .addStepIfTrue(handleDarkfield(), DarkfieldSubstraction.class, "file", darkfieldImage.getValue(), "multichannel", isMultiChannel())
+                .addStepIfTrue(darkfieldBinding.fileProperty().getValue() != null && handleDarkfield(), DarkfieldSubstraction.class, "file", darkfieldImage.getValue(), "multichannel", isMultiChannel())
                 
                 // if it's multichannel flatfield, let's handle it
                 .addStepIfTrue(isMultiChannel(), MultiChannelFlatfieldCorrection.class, "flatfield", flatfieldImage.getValue(), "darkfield", darkfieldImage.getValue())
