@@ -45,6 +45,7 @@ public class FileBatchInputLoader extends AbstractLoaderWrapper<File>{
     
     @Override
     public void load() {
+       if(getDataset() != null) return;
        try {
            setDataset(datasetIoService.open(getWrappedValue().getAbsolutePath()));
        }

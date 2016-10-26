@@ -20,10 +20,11 @@
 package ijfx.service.batch.input;
 
 import ijfx.service.batch.BatchSingleInput;
-import ijfx.service.batch.FileBatchInput;
 import ijfx.service.batch.ImageDisplayBatchInput;
 import ijfx.service.batch.SilentImageDisplay;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.save.SaveOptions;
+import ijfx.ui.save.SaveType;
 import ijfx.ui.utils.NamingUtils;
 import java.io.File;
 import java.util.function.Consumer;
@@ -126,12 +127,27 @@ public class BatchInputBuilder {
     }
     
     
+    public BatchInputBuilder saveUsingOptions(SaveOptions options) {
+        
+        if(options.saveType().getValue() == SaveType.REPLACE) {
+            return overwriteOriginal();
+        }
+        else {
+            return saveIn(options.folder().getValue(),options.suffix().getValue());
+        }
+        
+    }
+    
     public BatchInputBuilder saveIn(File directory) {
         input =  new SaveToFileWrapper(context,input, new File(directory,input.getName()));
         return this;
     }
     
     public BatchInputBuilder saveIn(File directory, String suffix) {
+        
+        if(suffix == null || "".equals(suffix.trim())) {
+            return saveIn(directory);
+        }
         input = new SaveToFileWrapper(context,input,new File(directory,input.getName()),suffix);
         return this;
     }

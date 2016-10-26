@@ -86,7 +86,11 @@ public class NaiveBatchInput implements BatchSingleInput {
 
     @Override
     public void dispose() {
-        
+       
+        dataset = null;
+        imageDisplay= null;
+        datasetView = null;
+       
     }
 
     @Override
