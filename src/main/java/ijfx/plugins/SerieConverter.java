@@ -48,7 +48,7 @@ import org.scijava.ui.UIService;
  *
  * @author cyril
  */
-@Plugin(type = Command.class,menuPath="Plugins > Knoplab > Serie Separator",description="Separate files containing multiple series into multiple files.")
+@Plugin(type = Command.class,menuPath="Plugins > KnopLab > Serie Separator",description="Separate files containing multiple series into multiple files.")
 public class SerieConverter extends ContextCommand {
 
     @Parameter
