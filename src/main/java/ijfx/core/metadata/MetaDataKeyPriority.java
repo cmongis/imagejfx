@@ -34,6 +34,7 @@ public class MetaDataKeyPriority {
         MetaData.BITS_PER_PIXEL,
         MetaData.SLICE_NUMBER,
         MetaData.SERIE_COUNT,
+        MetaData.SERIE,
         MetaData.SLICE_NUMBER,
         MetaData.ZSTACK_NUMBER,
         MetaData.CHANNEL_COUNT,

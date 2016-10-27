@@ -138,7 +138,7 @@ public class SimpleDirectoryWatchService extends AbstractService implements Dire
      * {@inheritDoc}
      */
     @Override
-    public void register(FileChangeListener listener, String dirPath, String... globPatterns)
+    public synchronized void register(FileChangeListener listener, String dirPath, String... globPatterns)
             throws IOException {
         Path dir = Paths.get(dirPath);
 

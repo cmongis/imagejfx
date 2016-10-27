@@ -19,6 +19,8 @@
  */
 package ijfx.service.dataset;
 
+import java.io.File;
+import java.io.IOException;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.display.ImageDisplay;
@@ -56,4 +58,7 @@ public interface DatasetUtillsService extends ImageJService{
      * @param separator text between the name and the suffix, let null for default
      */
     public void addSuffix(Dataset dataset, String suffix,String separator);
+    
+    public Dataset open(File file, int imgId,boolean virtual) throws IOException;
+    
 }

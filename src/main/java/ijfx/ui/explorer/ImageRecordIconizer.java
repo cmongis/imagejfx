@@ -21,7 +21,11 @@ package ijfx.ui.explorer;
 
 import ijfx.bridge.ImageJContainer;
 import ijfx.core.imagedb.ImageRecord;
+import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaDataSetType;
+import ijfx.plugins.OpenImageFX;
+import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.ui.activity.ActivityService;
 import io.scif.services.DatasetIOService;
@@ -39,10 +43,10 @@ import org.scijava.Context;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  * Wrapper class that transform an ImageRecord to an Explorable
+ *
  * @author cyril
  */
 public class ImageRecordIconizer implements Explorable {
@@ -51,32 +55,60 @@ public class ImageRecordIconizer implements Explorable {
 
     @Parameter
     ThumbService thumbService;
-    
+
     @Parameter
     CommandService commandService;
-    
+
     @Parameter
     ActivityService activityService;
-    
+
     @Parameter
     DatasetIOService datasetIoService;
-    
+
+    @Parameter
+    DatasetUtillsService datasetUtilsService;
+
     private BooleanProperty selectedProperty;
-    
+
     boolean selected = false;
-    
+
+    int imageId = 0;
+
+    boolean series = false;
+
+    MetaDataSet set;
+
     public ImageRecordIconizer(Context context, ImageRecord imageRecord) {
         context.inject(this);
         this.imageRecord = imageRecord;
-        
-    } 
+        set = imageRecord.getMetaDataSet();
+    }
+
+    public ImageRecordIconizer(Context context, ImageRecord imageRecord, int imageId) {
+
+        context.inject(this);
+        this.imageRecord = imageRecord;
+
+        series = true;
+
+        this.imageId = imageId;
+        set = new MetaDataSet();
+        set.merge(imageRecord.getMetaDataSet());
+        set.setType(MetaDataSetType.FILE);
+        set.putGeneric(MetaData.SERIE, imageId);
+    }
+
     @Override
     public String getTitle() {
+       
         return imageRecord.getFile().getName();
     }
 
     @Override
     public String getSubtitle() {
+        if(series) {
+            return String.format("Image %d/%d",imageId+1,set.get(MetaData.SERIE).getIntegerValue());
+        }
         return FileUtils.readableFileSize(imageRecord.getFile().length());
     }
 
@@ -88,8 +120,8 @@ public class ImageRecordIconizer implements Explorable {
     @Override
     public Image getImage() {
         try {
-            return thumbService.getThumb(imageRecord.getFile(), 0, 100, 100);
-        } catch (IOException ex) {
+            return thumbService.getThumb(imageRecord.getFile(),imageId,null,100, 100);
+        } catch (Exception ex) {
             Logger.getLogger(ImageRecordIconizer.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -97,19 +129,19 @@ public class ImageRecordIconizer implements Explorable {
 
     @Override
     public void open() throws Exception {
-        
-        HashMap<String,Object> inputs = new HashMap<>();
-        inputs.put("inputFile",imageRecord.getFile());
-        
-        Future<CommandModule> run = commandService.run(OpenFile.class,true,inputs);
+
+        HashMap<String, Object> inputs = new HashMap<>();
+        inputs.put("file", imageRecord.getFile());
+        inputs.put("imageId",imageId);
+        Future<CommandModule> run = commandService.run(OpenImageFX.class, true, inputs);
         run.get();
         activityService.openByType(ImageJContainer.class);
     }
 
     @Override
     public MetaDataSet getMetaDataSet() {
-        
-        return imageRecord.getMetaDataSet();
+
+        return set;
     }
 
     public ImageRecord getImageRecord() {
@@ -126,22 +158,25 @@ public class ImageRecordIconizer implements Explorable {
 
     @Override
     public BooleanProperty selectedProperty() {
-        if(selectedProperty == null) {
-           selectedProperty = new SimpleBooleanProperty(this, "selected", selected);
+        if (selectedProperty == null) {
+            selectedProperty = new SimpleBooleanProperty(this, "selected", selected);
         }
-        return  selectedProperty;
+        return selectedProperty;
     }
 
     @Override
     public Dataset getDataset() {
         try {
-            return datasetIoService.open(getImageRecord().getFile().getAbsolutePath());
+
+            if (series) {
+                return datasetUtilsService.open(getImageRecord().getFile(), imageId, false);
+            } else {
+                return datasetIoService.open(getImageRecord().getFile().getAbsolutePath());
+            }
         } catch (IOException ex) {
             Logger.getLogger(ImageRecordIconizer.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
-    
-    
-    
+
 }

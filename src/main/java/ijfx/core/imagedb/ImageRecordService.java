@@ -38,9 +38,6 @@ public interface ImageRecordService extends IjfxService{
     // add a single record to the database
     public void addRecord(ImageRecord imageRecord);
     
-    // the database never returns record because every analysis
-    // is done asynchronisily in a separate thread
-    //public void addRecord(File file);
     
     // adds a record manually
     public ImageRecord addRecord(File file, MetaDataSet metaDataSet);

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
-import ijfx.core.metadata.MetaDataSet;
+import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSetType;
 
 import ijfx.core.stats.IjfxStatisticService;
@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
@@ -72,7 +74,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
     private File file;
     private String name;
     private List<Explorable> files;
-    private List<Explorable> planes;
+    private List<Explorable> planes = new ArrayList<>();
     private List<Explorable> objects = new ArrayList<>();
 
     Logger logger = ImageJFX.getLogger();
@@ -173,7 +175,6 @@ public class DefaultFolder implements Folder, FileChangeListener {
         listenToDirectoryChange();
         return files;
     }
-    
 
     private List<Explorable> fetchFiles(ProgressHandler progress, Void v) {
 
@@ -182,20 +183,21 @@ public class DefaultFolder implements Folder, FileChangeListener {
 
         Timer timer = timerService.getTimer(this.getClass());
         timer.start();
-        Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(progress,file);
+        Collection<? extends ImageRecord> records = imageRecordService.getRecordsFromDirectory(progress, file);
         timer.elapsed("record fetching");
         progress.setStatus("Reading folder...");
 
         progress.setTotal(records.size());
-        
+
         List<Explorable> explorables = records
                 .stream()
                 .parallel()
                 .map(record -> {
-                    
-                    finalProgress.increment(1);
+                    progress.increment(1);
                     return addFile(record);
                 })
+                .flatMap(self -> self)
+                .map(this::addPlanes)
                 .collect(Collectors
                         .toList());
 
@@ -203,27 +205,37 @@ public class DefaultFolder implements Folder, FileChangeListener {
         imageRecordService.forceSave();
         return explorables;
     }
-    
-    private Explorable addFile(File file) {
-        return addFile(imageRecordService.getRecord(file));
+
+    private Stream<ImageRecordIconizer> addFile(File file) {
+        ImageRecord record = imageRecordService.getRecord(file);
+        return addFile(record);
     }
-    
-    private Explorable addFile(ImageRecord record) {
-        
-        record.getMetaDataSet().setType(MetaDataSetType.FILE);
-        Explorable fileExplorable = new ImageRecordIconizer(context, record);
-        
-        List<Explorable> planeExplorableList = metadataExtractionService.extractPlaneMetaData(fileExplorable.getMetaDataSet())
+
+    private Stream<ImageRecordIconizer> addFile(ImageRecord record) {
+        if (record.getMetaDataSet().containsKey(MetaData.SERIE_COUNT) && record.getMetaDataSet().get(MetaData.SERIE_COUNT).getIntegerValue() > 1) {
+
+            int serieCount = record.getMetaDataSet().get(MetaData.SERIE_COUNT).getIntegerValue();
+
+            return IntStream
+                    .range(0,serieCount)
+                    .mapToObj(i -> new ImageRecordIconizer(context, record, i));
+
+        } else {
+            return Stream.of(new ImageRecordIconizer(context, record));
+        }
+    }
+
+    private Explorable addPlanes(ImageRecordIconizer explorable) {
+
+        List<Explorable> planeExplorableList = metadataExtractionService.extractPlaneMetaData(explorable.getMetaDataSet())
                 .stream()
                 .map(m -> new PlaneMetaDataSetWrapper(context, m))
                 .collect(Collectors.toList());
-        
-        
-        files.add(fileExplorable);
-        if(planes == null) planes = new ArrayList<>();
-        planes.addAll(planeExplorableList);
-        
-        return fileExplorable;
+        synchronized (planes) {
+           
+            planes.addAll(planeExplorableList);
+        }
+        return explorable;
     }
 
     @JsonSetter("path")
@@ -279,19 +291,14 @@ public class DefaultFolder implements Folder, FileChangeListener {
         logger.info("File added " + filePath);
 
         File file = new File(getDirectory(), filePath);
-        
-        addFile(file);
+
+        addFile(file).forEach(this::addPlanes);
         notifyFolderChange();
         if (file.getName().endsWith(OverlayIOService.OVERLAY_FILE_EXTENSION)) {
             File imageFile = overlayIOService.getImageFileFromOverlayFile(file);
-            
+
             getObjectList().addAll(loadOverlay(imageFile, file));
         }
-        
-       
-        
-        
-        
 
     }
 
@@ -317,48 +324,45 @@ public class DefaultFolder implements Folder, FileChangeListener {
     public Property<Task> currentTaskProperty() {
         return currentTaskProperty;
     }
-    
+
     @EventHandler
     public void onObjectSegmented(ObjectSegmentedEvent event) {
-        if(event.getFile().getAbsolutePath().indexOf(file.getAbsolutePath()) == 0) {
+        if (event.getFile().getAbsolutePath().indexOf(file.getAbsolutePath()) == 0) {
             logger.info("Adding objects");
             getObjectList().addAll(event
                     .getObject()
                     .stream()
-                    .map(o->new MetaDataSetExplorerWrapper(o.getMetaDataSet()))
+                    .map(o -> new MetaDataSetExplorerWrapper(o.getMetaDataSet()))
                     .collect(Collectors.toList())
-            ); 
+            );
         }
     }
 
     @Override
     public void addObjects(List<SegmentedObject> objects) {
-        
-        
-        logger.info(String.format("Adding %d objects",objects.size()));
-        
-        getObjectList().clear();
-        
-        getObjectList().addAll(objects.stream()
-        .map(o->new SegmentedObjectExplorerWrapper(o))
-        .map(o->{context.inject(o); return o;})
-        .collect(Collectors.toList()));
-        
 
-        
+        logger.info(String.format("Adding %d objects", objects.size()));
+
+        getObjectList().clear();
+
+        getObjectList().addAll(objects.stream()
+                .map(o -> new SegmentedObjectExplorerWrapper(o))
+                .map(o -> {
+                    context.inject(o);
+                    return o;
+                })
+                .collect(Collectors.toList()));
+
         eventService.publishLater(new FolderUpdatedEvent().setObject(this));
-        
+
     }
-    
-    
+
     public boolean isFilePartOf(File f) {
         return f.getAbsolutePath().startsWith(file.getAbsolutePath());
     }
-    
+
     private void notifyFolderChange() {
         eventService.publishLater(new FolderUpdatedEvent().setObject(this));
     }
-    
 
-    
 }

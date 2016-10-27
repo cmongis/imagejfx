@@ -294,13 +294,5 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
     }
 
   
-    private class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
-
-        @Override
-        public <T extends NativeType<T>> ImgFactory<T> createFactory(Metadata mtdt, SCIFIOConfig.ImgMode[] ims, T t) throws IncompatibleTypeException {
-            return new SCIFIOCellImgFactory<>(20);
-        }
-
-    }
 
 }

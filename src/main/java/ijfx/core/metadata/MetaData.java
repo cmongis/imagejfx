@@ -122,6 +122,7 @@ public interface MetaData {
     public final static String WAS_MODIFIED = "modified";
 
     public final static String SERIE_COUNT = "Series";
+    public final static String SERIE = "Serie";
     public final static String CHANNEL_COUNT = "Channel number";
 
     public final static String ZSTACK_NUMBER = "Z Slice number";

@@ -21,7 +21,11 @@ package ijfx.service.dataset;
 
 import ijfx.plugins.flatfield.FlatFieldCorrectionOld;
 import ijfx.service.sampler.DatasetSamplerService;
+import io.scif.config.SCIFIOConfig;
+import ijfx.service.CellImgFactoryHeuristic;
+import io.scif.services.DatasetIOService;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -76,6 +80,9 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     @Parameter
     DatasetService datasetService;
 
+    @Parameter
+    DatasetIOService datasetIOService;
+    
     public final static String DEFAULT_SEPARATOR = " - ";
     
     @Override
@@ -317,6 +324,28 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
        dataset.setSource(new File(datasetFolder,dataset.getName()).getAbsolutePath());
        
 
+    }
+    
+    
+    public Dataset open(File file, int imageId, boolean virtual) throws IOException {
+        
+        SCIFIOConfig config = new SCIFIOConfig();
+        
+        
+        if(virtual) {
+            config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
+            config.imgOpenerSetImgFactoryHeuristic(new CellImgFactoryHeuristic());
+        }
+        
+        config.imgOpenerSetIndex(imageId);
+        config.imgOpenerSetComputeMinMax(false);
+        config.imgOpenerSetOpenAllImages(false);
+        config.groupableSetGroupFiles(false);
+        
+        
+        return datasetIOService.open(file.getAbsolutePath(), config);
+        
+        
     }
 
 }
