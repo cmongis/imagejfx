@@ -23,6 +23,11 @@ import ijfx.plugins.flatfield.FlatFieldCorrectionOld;
 import ijfx.service.sampler.DatasetSamplerService;
 import io.scif.config.SCIFIOConfig;
 import ijfx.service.CellImgFactoryHeuristic;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
+import io.scif.MetadataLevel;
+import io.scif.img.ImgOpener;
+import io.scif.img.SCIFIOImgPlus;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplay;
@@ -82,9 +88,12 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
 
     @Parameter
     DatasetIOService datasetIOService;
-    
+
+    @Parameter
+    TimerService timerService;
+
     public final static String DEFAULT_SEPARATOR = " - ";
-    
+
     @Override
     public Dataset extractPlane(ImageDisplay imageDisplay) throws NullPointerException {
         CalibratedAxis[] calibratedAxises = new CalibratedAxis[imageDisplay.numDimensions()];
@@ -298,54 +307,67 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
     }
 
     public void addSuffix(Dataset dataset, String suffix, String separator) {
-        if(separator == null) separator = DEFAULT_SEPARATOR;
+        if (separator == null) {
+            separator = DEFAULT_SEPARATOR;
+        }
 
         String datasetName = dataset.getName();
         File datasetFolder;
         if (dataset.getSource() != null) {
             datasetFolder = new File(dataset.getSource()).getParentFile();
-        }
-        else {
+        } else {
             datasetFolder = new File("./");
         }
-        
+
         String baseName = FilenameUtils.getBaseName(datasetName);
-       String extension = FilenameUtils.getExtension(datasetName);
-       
-       dataset.setName(
-               new StringBuilder()
-               .append(baseName)
-               .append(separator)
-               .append(suffix)
-               .append(".")
-               .append(extension)
-               .toString());
-              
-       dataset.setSource(new File(datasetFolder,dataset.getName()).getAbsolutePath());
-       
+        String extension = FilenameUtils.getExtension(datasetName);
+
+        dataset.setName(
+                new StringBuilder()
+                .append(baseName)
+                .append(separator)
+                .append(suffix)
+                .append(".")
+                .append(extension)
+                .toString());
+
+        dataset.setSource(new File(datasetFolder, dataset.getName()).getAbsolutePath());
 
     }
-    
-    
+
     public Dataset open(File file, int imageId, boolean virtual) throws IOException {
-        
+
+        Timer timer = timerService.getTimer(this.getClass());
+        Dataset dataset= null;
         SCIFIOConfig config = new SCIFIOConfig();
-        
-        
-        if(virtual) {
+
+        config.parserSetLevel(MetadataLevel.MINIMUM);
+
+        if (virtual) {
             config.imgOpenerSetImgModes(SCIFIOConfig.ImgMode.CELL);
             config.imgOpenerSetImgFactoryHeuristic(new CellImgFactoryHeuristic());
+
         }
-        
+
         config.imgOpenerSetIndex(imageId);
         config.imgOpenerSetComputeMinMax(false);
         config.imgOpenerSetOpenAllImages(false);
         config.groupableSetGroupFiles(false);
+
+        final ImgOpener imageOpener = new ImgOpener(getContext());
         
-        
-        return datasetIOService.open(file.getAbsolutePath(), config);
-        
-        
+        try {
+            final SCIFIOImgPlus<?> imgPlus
+                    = imageOpener.openImgs(file.getAbsolutePath(), config).get(0);
+            
+            dataset = datasetService.create((ImgPlus)imgPlus);
+            
+        } catch (Exception e) {
+            throw new IOException();
+        }
+        //Dataset dataset = datasetIOService.open(file.getAbsolutePath(), config);
+        timer.elapsed(String.format("Dataset opening (%s) (virtual = %s)", file.getName(), virtual));
+        return dataset;
     }
 
 }

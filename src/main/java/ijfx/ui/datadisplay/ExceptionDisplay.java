@@ -17,29 +17,25 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
+package ijfx.ui.datadisplay;
 
-import io.scif.Metadata;
-import io.scif.config.SCIFIOConfig;
-import io.scif.img.ImgFactoryHeuristic;
-import io.scif.img.cell.SCIFIOCellImgFactory;
-import net.imglib2.exception.IncompatibleTypeException;
-import net.imglib2.img.ImgFactory;
-import net.imglib2.type.NativeType;
+import org.scijava.display.AbstractDisplay;
+import org.scijava.display.Display;
+import org.scijava.plugin.Plugin;
 
 /**
  *
  * @author cyril
  */
-public class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
+@Plugin(type = Display.class)
+public class ExceptionDisplay extends AbstractDisplay<Throwable>{
     
-    public CellImgFactoryHeuristic() {
-        
+    public ExceptionDisplay(Class<Throwable> type) {
+        super(type);
     }
     
-    @Override
-    public <T extends NativeType<T>> ImgFactory<T> createFactory(Metadata mtdt, SCIFIOConfig.ImgMode[] ims, T t) throws IncompatibleTypeException {
-        return new SCIFIOCellImgFactory<>(10);
-    }
+    
+    
+    
     
 }

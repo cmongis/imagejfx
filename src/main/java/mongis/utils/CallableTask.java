@@ -33,9 +33,9 @@ public class CallableTask<T> extends Task<T>{
 
     
     Callable<T> callable;
-
+    LongCallable<T> longCallable;
     Consumer<T> onSuccess;
-    
+    Consumer<Throwable> onError;
     public CallableTask<T> setCallable(Callable<T> callable) {
         this.callable = callable;
         return this;
@@ -54,6 +54,8 @@ public class CallableTask<T> extends Task<T>{
     
     @Override
     protected T call() throws Exception {
+        
+       
         return callable.call();
     }
     
@@ -66,12 +68,22 @@ public class CallableTask<T> extends Task<T>{
         onSuccess = t;
         return this;
     }
+    public CallableTask<T> orCatch(Consumer<Throwable> onError) {
+        this.onError = onError;
+        return this;
+    }
     
     @Override
     protected void succeeded() {
         super.succeeded();
         if(onSuccess !=null)
         onSuccess.accept(getValue());
+    }
+    
+    @Override
+    protected void failed() {
+        super.failed();
+        onError.accept(getException());
     }
     
     public CallableTask submit(Consumer<Task> consumer) {

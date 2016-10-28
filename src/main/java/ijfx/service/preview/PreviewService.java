@@ -41,6 +41,8 @@ import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.lut.LUTService;
+import net.imglib2.Cursor;
+import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.converter.RealLUTConverter;
@@ -265,23 +267,19 @@ public class PreviewService extends AbstractService implements ImageJService {
         return bufferedImage;
     }
 
-    
     public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable) {
-        
-        
-        
+
         SummaryStatistics summaryStatistics = ijfxStatsService.getSummaryStatistics(Views.iterable(dataset).cursor());
-        
+
         return datasetToImage(dataset, colorTable, summaryStatistics.getMin(), summaryStatistics.getMax());
-        
+
     }
-    
+
     public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset) {
         return datasetToImage(dataset, new ColorTable8());
     }
-    
-    
-     public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable, double min, double max, WritableImage image) {
+
+    public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable, double min, double max, WritableImage image) {
 
         //int width = (int) dataset.dimension(0);
         //int height = (int) dataset.dimension(1);
@@ -289,30 +287,28 @@ public class PreviewService extends AbstractService implements ImageJService {
         RealLUTConverter<T> converter = new RealLUTConverter<T>(min, max, colorTable);
         ARGBType argb = new ARGBType();
         RandomAccess<T> ra = dataset.randomAccess();
-        
-        int width = (int)dataset.dimension(0);
-        int height = (int)dataset.dimension(1);
-        
-        for (int x = 0; x != width; x++) {
-            for (int y = 0; y != height; y++) {
-                ra.setPosition(x, 0);
-                ra.setPosition(y, 1);
-                converter.convert(ra.get(), argb);
-                
-                image.getPixelWriter().setArgb(x, y, argb.get());
-            }
+
+       
+
+        Cursor<T> cursor = Views.iterable(dataset).cursor();
+        cursor.reset();
+        int[] position = new int[dataset.numDimensions()];
+        while (cursor.hasNext()) {
+            cursor.fwd();
+            cursor.localize(position);
+            converter.convert(cursor.get(), argb);
+            image.getPixelWriter().setArgb(position[0], position[1], argb.get());
         }
+
         return image;
     }
-    
-    
-    
+
     public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable, double min, double max) {
 
         int width = (int) dataset.dimension(0);
         int height = (int) dataset.dimension(1);
         WritableImage image = new WritableImage(width, height);
-        
+
         /*
         RealLUTConverter<T> converter = new RealLUTConverter<T>(min, max, colorTable);
         ARGBType argb = new ARGBType();
@@ -325,13 +321,10 @@ public class PreviewService extends AbstractService implements ImageJService {
                 image.getPixelWriter().setArgb(x, y, argb.get());
             }
         }*/
-        
-        datasetToImage(dataset, colorTable, min, max,image);
-        
+        datasetToImage(dataset, colorTable, min, max, image);
+
         return image;
     }
-
- 
 
     /**
      * Apply the <code>command</code> to the <code>dataset</code> using
@@ -392,9 +385,8 @@ public class PreviewService extends AbstractService implements ImageJService {
 
 //        long[] dimension = new long[output.getData().numDimensions() - 2];
 //        activePosition.localize(dimension);
-
         //Set LUT
-        if (colorTables.size()>1) {
+        if (colorTables.size() > 1) {
             output.setColorTable(colorTables.get(activePosition.getIntPosition(0)), 0);
         } else {
             output.setColorTable(colorTables.get(0), 0);

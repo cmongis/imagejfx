@@ -107,7 +107,7 @@ public class ImageRecordIconizer implements Explorable {
     @Override
     public String getSubtitle() {
         if(series) {
-            return String.format("Image %d/%d",imageId+1,set.get(MetaData.SERIE).getIntegerValue());
+            return String.format("Image %d/%d",imageId+1,set.get(MetaData.SERIE_COUNT).getIntegerValue());
         }
         return FileUtils.readableFileSize(imageRecord.getFile().length());
     }

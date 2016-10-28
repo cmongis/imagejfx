@@ -17,29 +17,38 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
+package ijfx.ui.explorer.smartaction;
 
-import io.scif.Metadata;
-import io.scif.config.SCIFIOConfig;
-import io.scif.img.ImgFactoryHeuristic;
-import io.scif.img.cell.SCIFIOCellImgFactory;
-import net.imglib2.exception.IncompatibleTypeException;
-import net.imglib2.img.ImgFactory;
-import net.imglib2.type.NativeType;
+import mongis.utils.ProgressHandler;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.ui.UIService;
 
 /**
  *
  * @author cyril
  */
-public class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
-    
-    public CellImgFactoryHeuristic() {
-        
-    }
+@Plugin(type = ExplorerAction.class,label = "Test action",iconPath="BARS")
+public class ComputeSelectedItemStatistics implements ExplorerAction<Void>{
+
+    @Parameter
+    UIService uiService;
     
     @Override
-    public <T extends NativeType<T>> ImgFactory<T> createFactory(Metadata mtdt, SCIFIOConfig.ImgMode[] ims, T t) throws IncompatibleTypeException {
-        return new SCIFIOCellImgFactory<>(10);
+    public void run(ProgressHandler handler) throws Exception {
+        
+        uiService.showDialog("it works !");
+        
+    }
+
+    @Override
+    public void onFinished(Void t) {
+    
+    }
+
+    @Override
+    public Void call(ProgressHandler param) {
+        return null;
     }
     
 }

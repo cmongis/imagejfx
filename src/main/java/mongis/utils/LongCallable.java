@@ -17,29 +17,13 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service;
-
-import io.scif.Metadata;
-import io.scif.config.SCIFIOConfig;
-import io.scif.img.ImgFactoryHeuristic;
-import io.scif.img.cell.SCIFIOCellImgFactory;
-import net.imglib2.exception.IncompatibleTypeException;
-import net.imglib2.img.ImgFactory;
-import net.imglib2.type.NativeType;
+package mongis.utils;
 
 /**
  *
  * @author cyril
  */
-public class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
-    
-    public CellImgFactoryHeuristic() {
-        
-    }
-    
-    @Override
-    public <T extends NativeType<T>> ImgFactory<T> createFactory(Metadata mtdt, SCIFIOConfig.ImgMode[] ims, T t) throws IncompatibleTypeException {
-        return new SCIFIOCellImgFactory<>(10);
-    }
-    
+@FunctionalInterface
+public interface LongCallable<T>{
+    public T call (ProgressHandler progress) throws Exception;
 }

@@ -122,7 +122,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
 
-    private static final ExecutorService refreshThreadPool = Executors.newFixedThreadPool(2);
+    private static final ExecutorService refreshThreadPool = Executors.newFixedThreadPool(3);
     
    LoadingIcon loadingIcon = new LoadingIcon(20);
 

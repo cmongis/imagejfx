@@ -65,7 +65,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     private FailableCallable<OUTPUT> callable;
     private LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
     private LongCallable<OUTPUT> longCallable;
-    private Runnable runnable;
+    private FailableRunnable runnable;
     private FailableConsumer<INPUT> consumer;
     private FailableBiConsumer<ProgressHandler,INPUT> longConsumer;
     
@@ -114,11 +114,17 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
+    
     public CallbackTask<INPUT, OUTPUT> run(Runnable runnable) {
         if (runnable == null) {
             logger.warning("Setting null as runnable");
             return this;
         }
+        this.runnable = ()->runnable.run();
+        return this;
+    }
+    
+    public CallbackTask<INPUT,OUTPUT> tryRun(FailableRunnable runnable) {
         this.runnable = runnable;
         return this;
     }
@@ -351,6 +357,10 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     @FunctionalInterface
     public interface FailableBiConsumer<T,R> {
         void accept(T t, R r);
+    }
+    @FunctionalInterface
+    public interface FailableRunnable{
+        void run() throws Exception;
     }
 
 }

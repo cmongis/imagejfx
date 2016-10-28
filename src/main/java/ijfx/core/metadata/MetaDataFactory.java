@@ -38,7 +38,7 @@ import java.util.ArrayList;
 public class MetaDataFactory {
     
     private final static ArrayList<String> createdKeys = new ArrayList<String>();
-    public static String createKey(String string) {
+    public synchronized static String createKey(String string) {
         for(String key : createdKeys) {
             
             if(key.equals(string)) {
@@ -48,25 +48,19 @@ public class MetaDataFactory {
             }
         }
         //System.out.println("[MetaDataFacotyr] Creating key "+string);
-        createdKeys.add(string);
+       createdKeys.add(string);
        return string;
     }
-    
-    
     public static final ArrayList<Object> createdValues = new ArrayList<Object>();
-    
-    
     public static Object createValue(Object o) {
-        
         for(Object value : createdValues) {
            if(value == null) continue;
             if(value.equals(o)) {
                 
-                //System.out.println("[MetaDataFacotyr] Existing value : "+value);
+                
                 return value;
             }
         }
-        //System.out.println("[MetaDataFacotyr] Creating value : "+o);
         createdValues.add(o);
        return o;
     }

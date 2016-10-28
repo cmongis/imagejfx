@@ -20,6 +20,7 @@
  */
 package ijfx.core.imagedb;
 
+import com.google.common.collect.Lists;
 import ijfx.core.hash.HashService;
 import ijfx.ui.main.ImageJFX;
 import java.io.File;
@@ -111,6 +112,7 @@ public class DefaultImageLoaderService extends AbstractService implements ImageL
 
     @Override
     public Collection<File> getAllImagesFromDirectory(File file) {
+        if(file.isDirectory() == false) return Lists.newArrayList(file);
         return FileUtils.listFiles(file, getSupportedExtensions(), true);
     }
 

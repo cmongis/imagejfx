@@ -254,6 +254,9 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         }
         for (int d = 1; d != position.length; d++) {
             hyperSlice = Views.hyperSlice(hyperSlice, 2, position[d]);
+            if(d > 10) {
+                throw new IllegalArgumentException("Wierd loop detected !");
+            }
         }
         return hyperSlice;
     }
@@ -287,6 +290,9 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         }
         for (int d = 1; d != position.length; d++) {
             hyperSlice = Views.hyperSlice(hyperSlice, 2, position[d]);
+            if(d > 10) {
+                throw new IllegalArgumentException("Wierd loop detected !");
+            }
         }
         return hyperSlice;
         

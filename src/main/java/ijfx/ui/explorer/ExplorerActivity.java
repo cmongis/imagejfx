@@ -20,6 +20,7 @@
 package ijfx.ui.explorer;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.core.metadata.MetaDataOwner;
@@ -35,6 +36,7 @@ import ijfx.ui.explorer.event.FolderAddedEvent;
 import ijfx.ui.explorer.event.FolderDeletedEvent;
 import ijfx.ui.explorer.event.ExploredListChanged;
 import ijfx.ui.explorer.event.FolderUpdatedEvent;
+import ijfx.ui.explorer.smartaction.ExplorerAction;
 import ijfx.ui.filter.DefaultMetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataFilterFactory;
 import ijfx.ui.filter.MetaDataOwnerFilter;
@@ -70,6 +72,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -78,6 +82,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import static javafx.scene.input.KeyCode.T;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.CallbackTask;
@@ -85,10 +90,12 @@ import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.TextFileUtils;
 import org.reactfx.EventStreams;
+import org.scijava.InstantiableException;
 import org.scijava.app.StatusService;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.plugin.PluginInfo;
 import org.scijava.plugin.PluginService;
 import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
@@ -130,7 +137,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     @FXML
     private Button statisticsButton;
 
-
+    @FXML
+    private MenuButton moreMenuButton;
 
     private ToggleGroup explorationModeToggleGroup;
 
@@ -155,13 +163,13 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @Parameter
     private UIService uiService;
-    
+
     @Parameter
     private HintService hintService;
-    
+
     @FXML
     private TabPane tabPane;
-    
+
     private ExplorerView view;
 
     private List<Runnable> folderUpdateHandler = new ArrayList<>();
@@ -180,9 +188,9 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     private final FontAwesomeIcon EMPTY_FOLDER_ICON = FontAwesomeIcon.FROWN_ALT;
 
     Logger logger = ImageJFX.getLogger();
-    
+
     List<Explorable> currentItems;
-    
+
     public ExplorerActivity() {
         try {
             FXUtilities.injectFXML(this);
@@ -205,12 +213,12 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
             explorationModeToggleGroup.selectedToggleProperty().addListener(this::onToggleSelectionChanged);
 
-            tabPane.getSelectionModel().selectedItemProperty().addListener((obs,oldTab,newTab)->{
-            
-                currentView.setValue((ExplorerView)newTab.getUserData());
-            
+            tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+
+                currentView.setValue((ExplorerView) newTab.getUserData());
+
             });
-            
+
             currentView.addListener(this::onViewModeChanged);
 
             dragPanel = new DragPanel("No folder open", FontAwesomeIcon.DASHCUBE);
@@ -239,8 +247,14 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
             //buttons.get(0).getStyleClass().add("first");
             //buttons.get(buttons.size() - 1).getStyleClass().add("last");
-
             currentView.setValue(views.get(0));
+
+            // add the items to the menu in the background
+            new CallbackTask<PluginService,List<MenuItem>>().
+                    setInput(pluginService)
+                    .run(this::initActionMenu)
+                    .then(moreMenuButton.getItems()::addAll)
+                    .start();
         }
     }
 
@@ -277,7 +291,6 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     public void updateFolderList() {
 
-        
         CollectionUtils.syncronizeContent(folderManagerService.getFolderList(), folderListView.getItems());
 
     }
@@ -285,7 +298,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void updateExplorerView(ExplorerView view) {
         this.view = view;
         //contentBorderPane.setCenter(view.getNode());
-        
+
         view.setItem(explorerService.getFilteredItems());
     }
 
@@ -298,8 +311,8 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         if (explorable != null) {
             view.setItem(explorable);
         }
-        
-        if(folderListEmpty.getValue()) {
+
+        if (folderListEmpty.getValue()) {
             hintService.displayHints("/ijfx/ui/explorer/ExplorerActivity-tutorial-1.hints.json", false);
         }
     }
@@ -315,9 +328,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
         if (f != null) {
             folderManagerService.addFolder(f);
-            
-            
-            
+
         }
     }
 
@@ -434,7 +445,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         Set<String> keySet = new HashSet();
         items
                 .stream()
-                .filter(owner->owner!=null)
+                .filter(owner -> owner != null)
                 .map(owner -> owner.getMetaDataSet().keySet())
                 .forEach(keys -> keySet.addAll(keys));
 
@@ -443,7 +454,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         return keySet
                 .stream()
                 .filter(MetaData::canDisplay)
-                .sorted((k1,k2)->k1.compareTo(k2))
+                .sorted((k1, k2) -> k1.compareTo(k2))
                 .map(key -> {
                     handler.increment(0.9 / keySet.size());
                     return new MetaDataFilterWrapper(key, filterFactory.generateFilter(explorerService.getItems(), key));
@@ -461,7 +472,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     private void onFilterChanged(Observable obs, Predicate<MetaDataOwner> oldValue, Predicate<MetaDataOwner> newValue) {
-      
+
         Predicate<MetaDataOwner> predicate = e -> true;
 
         List<Predicate<MetaDataOwner>> predicateList = currentFilters
@@ -486,16 +497,16 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         View related functions
      */
     private Tab createTab(ExplorerView view) {
-        
+
         Tab tab = new Tab(view.toString(), view.getNode());
         tab.closableProperty().setValue(false);
         tab.setGraphic(view.getIcon());
         tab.setUserData(view);
-        
+
         tab.setText(view.getClass().getAnnotation(Plugin.class).label());
-        
+
         return tab;
-        
+
     }
 
     private void onViewModeChanged(Observable obs, ExplorerView oldValue, ExplorerView newValue) {
@@ -551,8 +562,6 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         uiContextService.update();
 
     }
-    
-    
 
     @FXML
     public void onProcessButtonPressed() {
@@ -562,15 +571,10 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
     public void openSelection() {
-        
-      
-        
+
         explorerService.openSelection();
-        
-        
+
     }
-    
-    
 
     @FXML
     public void computeStatistics() {
@@ -581,7 +585,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     public void explainMe() {
         uiService.showDialog("Function not implemented yet.");
     }
-    
+
     @FXML
     public void tellMeMore() {
         hintService.displayHints("/ijfx/ui/explorer/ExplorerActivity-tutorial-3.hints.json", true);
@@ -589,28 +593,27 @@ public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
     public void exportToCSV() {
-        
+
         List<MetaDataSet> mList = explorerService.getItems().stream()
-                .map(e->e.getMetaDataSet())
+                .map(e -> e.getMetaDataSet())
                 .collect(Collectors.toList());
-        
+
         String csvFile = MetaDataSetUtils.exportToCSV(mList, ",", true, MetaDataKeyPriority.getPriority(mList.get(0)));
-                
-        
+
         File saveFile = FXUtilities.saveFileSync("Export to CSV", null, "CSV", ".csv");
-        if(saveFile != null) {
+        if (saveFile != null) {
             try {
                 TextFileUtils.writeTextFile(saveFile, csvFile);
-                
+
                 uiService.showDialog("CSV File successfully saved");
             } catch (IOException ex) {
-               ImageJFX.getLogger().log(Level.SEVERE, null, ex);
-               uiService.showDialog("Error when saving CSV File", DialogPrompt.MessageType.ERROR_MESSAGE);
+                ImageJFX.getLogger().log(Level.SEVERE, null, ex);
+                uiService.showDialog("Error when saving CSV File", DialogPrompt.MessageType.ERROR_MESSAGE);
             }
         }
-        
+
     }
-    
+
     private void onFolderListEmptyPropertyChange(Observable obs, Boolean oldV, Boolean isEmpty) {
         if (isEmpty) {
             dragPanel.setLabel(NO_FOLDER_TEXT)
@@ -678,7 +681,7 @@ public class ExplorerActivity extends AnchorPane implements Activity {
         if (event.getObject().size() == 0) {
             logger.info("Nothing to selected");
         } else {
-           logger.info("Selected objects :  " + event.getObject().size());
+            logger.info("Selected objects :  " + event.getObject().size());
         }
     }
 
@@ -707,8 +710,67 @@ public class ExplorerActivity extends AnchorPane implements Activity {
     }
 
     private static boolean shouldHideText(ButtonBase node) {
-       
+
         return node.getWidth() < 40;
+    }
+
+    /*
+        Action Menu
+     */
+    public List<MenuItem> initActionMenu(PluginService pluginService) {
+
+        return pluginService
+                .getPluginsOfClass(ExplorerAction.class, ExplorerAction.class)
+                .stream()
+                .map(this::createMenuItem)
+                .collect(Collectors.toList());
+
+    }
+
+    public <T> MenuItem createMenuItem(PluginInfo<ExplorerAction> infos) {
+        String label = infos.getLabel();
+        String icon = infos.getIconPath();
+        String description = infos.getDescription();
+
+        try {
+            
+            
+            MenuItem item = new MenuItem();
+            item.setOnAction(event->{
+                runAction(infos);
+            });
+            item.setText(label);
+            item.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.valueOf(icon)));
+            return item;
+
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error when loading " + label, e);
+            return null;
+        }
+
+    }
+
+    private void runAction(PluginInfo<ExplorerAction> infos){
+        try {
+        ExplorerAction action = infos.createInstance();
+        runAction(action);
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE,"Error when creating action "+infos.getLabel());
+            uiService.showDialog("Error when creating action "+infos.getLabel());
+        }
+    }
+    
+    private <T> void runAction(ExplorerAction<T> action) {
+        
+       new CallbackTask<Void, T>()
+               
+                .runLongCallable(action::call)
+               .submit(loadingScreenService)
+                .then(action::onFinished)
+                .start();
+        
+
     }
 
 }

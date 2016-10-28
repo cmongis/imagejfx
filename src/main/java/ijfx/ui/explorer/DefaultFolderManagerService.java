@@ -258,7 +258,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     private synchronized void load() {
         Map<String, String> folderMap = jsonPrefService.loadMapFromJson(FOLDER_PREFERENCE_FILE, String.class, String.class);
         folderMap.forEach((name, folderPath) -> {
-            DefaultFolder folder = new DefaultFolder(new File(folderPath));
+            File file = new File(folderPath);
+            if(file.exists() == false) return;
+            DefaultFolder folder = new DefaultFolder(file);
             context.inject(folder);
             folder.setName(name);
             folderList.add(folder);
