@@ -52,7 +52,7 @@
                         <Insets />
                      </HBox.margin>
                   </Button>
-                  <MenuButton fx:id="moreMenuButton" mnemonicParsing="false" styleClass="normal" text="More">
+                  <MenuButton fx:id="moreMenuButton" mnemonicParsing="false" styleClass="normal" text="Actions">
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#exportToCSV" text="Export displayed item to CSV" />
                       <MenuItem mnemonicParsing="false" text="Propositions are welcomed" />
@@ -62,7 +62,7 @@
                         <Insets right="20.0" />
                      </HBox.margin>
                      <graphic>
-                        <FontAwesomeIconView glyphName="PLUS_SQUARE" />
+                        <FontAwesomeIconView glyphName="BARS" />
                      </graphic>
                   </MenuButton>
                   <Button fx:id="selectAllButton" mnemonicParsing="false" onAction="#selectAll" styleClass="success" text="Select all">
