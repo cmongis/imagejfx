@@ -25,7 +25,7 @@ import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 
 

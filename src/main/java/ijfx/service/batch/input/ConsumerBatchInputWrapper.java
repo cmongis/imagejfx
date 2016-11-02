@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ConsumerBatchInputWrapper extends AbstractSaverWrapper{
 

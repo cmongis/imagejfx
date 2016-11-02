@@ -29,7 +29,7 @@ import net.imglib2.type.NativeType;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
     

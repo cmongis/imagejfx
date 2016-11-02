@@ -31,7 +31,7 @@ import org.apache.commons.io.FilenameUtils;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface OverlayIOService extends IjfxService{
     

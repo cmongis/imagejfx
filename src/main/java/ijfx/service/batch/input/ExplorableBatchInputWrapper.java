@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ExplorableBatchInputWrapper extends  AbstractLoaderWrapper<Explorable>{
 

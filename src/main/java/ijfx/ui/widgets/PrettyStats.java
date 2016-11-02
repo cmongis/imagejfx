@@ -28,7 +28,7 @@ import javafx.scene.layout.HBox;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class PrettyStats extends HBox{
         

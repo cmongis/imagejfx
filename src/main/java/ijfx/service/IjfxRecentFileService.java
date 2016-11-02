@@ -33,7 +33,7 @@ import org.scijava.service.Service;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class,priority=Priority.NORMAL_PRIORITY+1)
 public class IjfxRecentFileService extends AbstractService implements RecentFileService {

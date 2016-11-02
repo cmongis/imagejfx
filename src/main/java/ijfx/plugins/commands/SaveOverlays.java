@@ -34,7 +34,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Image > Overlay > Save Overlays")
 public class SaveOverlays implements Command {

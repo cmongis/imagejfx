@@ -26,7 +26,7 @@ import javafx.scene.shape.Rectangle;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ArcMenuSkinTester extends BaseTester {
 

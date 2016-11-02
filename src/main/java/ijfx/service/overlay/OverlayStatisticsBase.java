@@ -23,7 +23,7 @@ import net.imagej.overlay.Overlay;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class OverlayStatisticsBase implements OverlayStatistics{
     Overlay overlay;

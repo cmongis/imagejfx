@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ConvertedChoiceBeanInputWrapper<R> extends BeanInputWrapper<String>{
     

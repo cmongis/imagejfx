@@ -30,7 +30,7 @@ import org.scijava.service.SciJavaService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = SciJavaService.class)
 public class OverlayDisplayService extends AbstractService implements IjfxService {

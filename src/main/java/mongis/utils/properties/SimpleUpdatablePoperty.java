@@ -23,7 +23,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class SimpleUpdatablePoperty<T> extends SimpleObjectProperty<T> implements UpdatableProperty<T>{
     @Override

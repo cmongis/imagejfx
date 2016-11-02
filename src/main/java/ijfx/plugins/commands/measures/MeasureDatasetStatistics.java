@@ -35,7 +35,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type  = Command.class, menuPath = "Analyze > Compute statistics > Whole dataset", headless  = false)
 public class MeasureDatasetStatistics extends ContextCommand

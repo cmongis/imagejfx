@@ -30,7 +30,7 @@ import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface CorrectionUiPlugin extends SciJavaPlugin{
     

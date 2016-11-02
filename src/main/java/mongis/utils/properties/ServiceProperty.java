@@ -24,7 +24,7 @@ import javafx.util.Callback;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ServiceProperty<ITEM,VALUE> extends SimpleUpdatablePoperty<VALUE>{
     

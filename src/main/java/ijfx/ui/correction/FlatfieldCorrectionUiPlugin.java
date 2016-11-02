@@ -41,7 +41,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = CorrectionUiPlugin.class, label = "Dark & Flatfield Correction")
 public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {

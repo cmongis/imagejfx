@@ -61,7 +61,7 @@ import org.scijava.util.IntArray;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class, priority = Priority.HIGH_PRIORITY)
 public class IjfxDatasetIOService extends DefaultDatasetIOService implements IjfxService, DatasetIOService {

@@ -52,7 +52,7 @@ import javafx.concurrent.Task;
  *
  *
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler, Consumer<INPUT> {
 

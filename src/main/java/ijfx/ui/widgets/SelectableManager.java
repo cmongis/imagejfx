@@ -32,7 +32,7 @@ import javafx.collections.ObservableList;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class SelectableManager<T extends Selectable> {
  

@@ -39,7 +39,7 @@ import javafx.scene.control.TableView;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class MetaDataSetOwnerHelper<T extends MetaDataOwner> {
 

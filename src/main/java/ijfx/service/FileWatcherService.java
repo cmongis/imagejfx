@@ -23,7 +23,7 @@ import org.scijava.service.AbstractService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class FileWatcherService extends AbstractService implements IjfxService {
     

@@ -29,7 +29,7 @@ import org.scijava.plugin.Parameter;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class AbstractLoaderWrapper<T> implements BatchSingleInput {
 

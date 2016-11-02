@@ -46,7 +46,7 @@ import net.imagej.axis.Axes;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class AbstractCorrectionUiPlugin extends BorderPane implements CorrectionUiPlugin{
 

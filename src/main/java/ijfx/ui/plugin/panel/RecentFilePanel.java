@@ -46,7 +46,7 @@ import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class RecentFilePanel extends BorderPane{
     private final Context context;

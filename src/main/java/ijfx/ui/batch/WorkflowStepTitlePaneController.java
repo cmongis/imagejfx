@@ -33,7 +33,7 @@ import org.scijava.plugin.Parameter;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class WorkflowStepTitlePaneController extends TitledPane implements ListCellController<WorkflowStep>{
 

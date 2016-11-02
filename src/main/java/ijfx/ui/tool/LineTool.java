@@ -35,7 +35,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = FxTool.class,priority=99.5)
 public class LineTool extends AbstractPathTool {

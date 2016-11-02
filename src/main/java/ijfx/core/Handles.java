@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Documented
 @Target(ElementType.TYPE)

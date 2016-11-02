@@ -27,7 +27,7 @@ import net.imglib2.RandomAccessibleInterval;
 /**
  * Set of methods easing dealing with dimension arrays in Datasets
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class DimensionUtils {
 

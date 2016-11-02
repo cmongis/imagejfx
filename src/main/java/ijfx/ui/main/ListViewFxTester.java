@@ -33,7 +33,7 @@ import jfxtras.scene.control.ToggleGroupValue;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ListViewFxTester extends BaseTester {
 

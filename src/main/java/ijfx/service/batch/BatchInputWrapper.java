@@ -26,7 +26,7 @@ import net.imagej.display.ImageDisplay;
 
 /**
  * Implementation that wrap a single input and allow to take the result at the end and do something with the result
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class BatchInputWrapper implements BatchSingleInput {
 

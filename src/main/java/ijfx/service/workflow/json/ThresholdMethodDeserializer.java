@@ -32,7 +32,7 @@ import org.scijava.plugin.Parameter;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Deprecated
 public class ThresholdMethodDeserializer<T extends ThresholdMethod> extends JsonDeserializer<T> {

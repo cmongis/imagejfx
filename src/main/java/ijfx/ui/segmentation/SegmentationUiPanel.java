@@ -126,7 +126,7 @@ import org.scijava.plugin.PluginService;
  *
  * TODO: getting all the logic out of the controller
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "explorerActivity+segmentation segmentation+any-display-open -overlay-selected")

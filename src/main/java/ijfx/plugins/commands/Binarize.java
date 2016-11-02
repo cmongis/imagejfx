@@ -59,7 +59,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, initializer = "init", menu = {
 	@Menu(label = MenuConstants.PROCESS_LABEL,

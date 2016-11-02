@@ -33,7 +33,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class,menuPath = "Image > Color > Spread current channel settings")
 public class SpreadCurrentChannelSettings extends ContextCommand{

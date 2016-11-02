@@ -38,7 +38,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "observer-test",context = "imagej",localization = Localization.BOTTOM_CENTER)

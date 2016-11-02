@@ -35,7 +35,7 @@ import org.scijava.Context;
 /**
  * Work in progress, allow to build any BatchSingleInput from any situation. Uses the Builder and Decorator Pattern.
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class BatchInputBuilder {
 

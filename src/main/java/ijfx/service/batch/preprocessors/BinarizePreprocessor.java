@@ -28,7 +28,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = BatchPrepreprocessorPlugin.class)
 public class BinarizePreprocessor implements BatchPrepreprocessorPlugin {

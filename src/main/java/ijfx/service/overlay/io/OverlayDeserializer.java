@@ -38,7 +38,7 @@ import org.scijava.util.ColorRGB;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 class OverlayDeserializer extends JsonDeserializer<Overlay> {
     

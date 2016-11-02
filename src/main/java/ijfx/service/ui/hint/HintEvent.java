@@ -24,7 +24,7 @@ import javafx.event.EventType;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class HintEvent  extends Event{
      

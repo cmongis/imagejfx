@@ -102,7 +102,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Activity.class, name = "explorerActivity")
 public class ExplorerActivity extends AnchorPane implements Activity {

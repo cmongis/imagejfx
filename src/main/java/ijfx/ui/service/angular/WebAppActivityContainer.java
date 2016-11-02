@@ -30,7 +30,7 @@ import org.scijava.plugin.Plugin;
  */
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Activity.class,name="webapp")
 public class WebAppActivityContainer implements Activity{

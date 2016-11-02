@@ -45,7 +45,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Activity.class,label="performance-activity")
 public class PerformanceActivity extends BorderPane implements Activity {

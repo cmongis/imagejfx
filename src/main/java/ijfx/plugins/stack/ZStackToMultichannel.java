@@ -32,7 +32,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, label="Z-stack to multi-channel",menuPath = "Image > Stacks > Z-Axis to channels",description = "Transform the 3-rd axis into a channel axis. Only works on 3D images.")
 public class ZStackToMultichannel extends ContextCommand{

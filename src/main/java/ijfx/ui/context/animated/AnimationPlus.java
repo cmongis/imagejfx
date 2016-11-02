@@ -30,7 +30,7 @@ import javafx.util.Duration;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 
 @FunctionalInterface

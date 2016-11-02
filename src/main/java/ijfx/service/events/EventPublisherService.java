@@ -23,7 +23,7 @@ import ijfx.service.IjfxService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface EventPublisherService extends IjfxService{
     

@@ -28,7 +28,7 @@ import javafx.util.Callback;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ConvertedProperty<A,B> implements Converter<A,B>{
 

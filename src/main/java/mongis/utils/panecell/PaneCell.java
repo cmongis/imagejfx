@@ -24,7 +24,7 @@ import javafx.scene.Node;
 
 /**
  * Interface that dictate the behaviour of object controlled by the PaneCellController.
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface PaneCell<T> {
     

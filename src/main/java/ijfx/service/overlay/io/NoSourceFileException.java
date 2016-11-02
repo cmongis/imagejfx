@@ -21,7 +21,7 @@ package ijfx.service.overlay.io;
 
 /**
  * Exception thrown when a dataset has no source file specified
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class NoSourceFileException extends Exception{
     

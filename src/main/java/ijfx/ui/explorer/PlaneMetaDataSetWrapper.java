@@ -44,7 +44,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class PlaneMetaDataSetWrapper implements Explorable{
          private final MetaDataSet m;

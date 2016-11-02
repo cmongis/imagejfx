@@ -24,7 +24,7 @@ import ijfx.ui.IjfxEvent;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class SegmentedObjectAddedEvent extends IjfxEvent<SegmentedObject>{
     

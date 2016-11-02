@@ -23,7 +23,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class PixelStatisticsBase implements PixelStatistics{
     

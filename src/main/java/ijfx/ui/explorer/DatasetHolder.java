@@ -23,7 +23,7 @@ import net.imagej.Dataset;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface DatasetHolder {
         Dataset getDataset();

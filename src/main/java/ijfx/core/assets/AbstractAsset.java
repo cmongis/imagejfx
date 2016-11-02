@@ -26,7 +26,7 @@ import java.util.UUID;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class AbstractAsset<T> implements Asset<T> {
 

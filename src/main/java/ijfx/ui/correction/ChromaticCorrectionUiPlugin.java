@@ -42,7 +42,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = ChromaticCorrectionUiPlugin.class, label = "Chromatic Correction")
 public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin {

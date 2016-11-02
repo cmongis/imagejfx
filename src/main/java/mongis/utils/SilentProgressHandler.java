@@ -21,7 +21,7 @@ package mongis.utils;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class SilentProgressHandler implements ProgressHandler{
 

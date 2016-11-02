@@ -30,7 +30,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class AbstractExtractPlugin extends ContextCommand{
     

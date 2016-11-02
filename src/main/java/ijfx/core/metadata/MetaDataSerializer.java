@@ -27,7 +27,7 @@ import java.io.IOException;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class MetaDataSerializer extends JsonSerializer<MetaDataSet> {
 

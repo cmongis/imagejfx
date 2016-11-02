@@ -24,7 +24,7 @@ import javafx.event.EventType;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ScrollWindowEvent extends Event  {
      public static final EventType<ScrollWindowEvent> SCROLL_WINDOW_EVENT = new EventType(ANY, "SCROLL_WINDOW_EVENT");

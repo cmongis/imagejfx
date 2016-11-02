@@ -24,7 +24,7 @@ import ijfx.ui.smartaction.SmartAction;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface FolderSmartAction extends SmartAction<Folder>{
     

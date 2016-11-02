@@ -25,7 +25,7 @@ import org.scijava.display.Display;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class StatisticsDisplay extends AbstractDisplay<DescriptiveStatistics>{
     

@@ -42,7 +42,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Analyze > Compute statistics > Current slice", headless = false)
 public class MeasurePlaneStatistics extends ContextCommand {

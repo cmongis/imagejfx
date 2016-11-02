@@ -25,7 +25,7 @@ import javafx.geometry.Point2D;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class Point2DUtils {
     

@@ -43,7 +43,7 @@ import static weka.gui.beans.BeanConnection.inputs;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class CommandRunner {
 

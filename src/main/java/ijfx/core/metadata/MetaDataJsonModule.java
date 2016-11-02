@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class MetaDataJsonModule extends SimpleModule{
     public MetaDataJsonModule() {

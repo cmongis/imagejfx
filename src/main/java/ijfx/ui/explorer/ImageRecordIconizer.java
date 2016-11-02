@@ -47,7 +47,7 @@ import org.scijava.plugin.Parameter;
 /**
  * Wrapper class that transform an ImageRecord to an Explorable
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ImageRecordIconizer implements Explorable {
 

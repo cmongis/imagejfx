@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class CollectionUtils {
     public static <T> void syncronizeContent(List<T> source, List<T> dest) {

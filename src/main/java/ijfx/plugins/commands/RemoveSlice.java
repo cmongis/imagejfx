@@ -38,7 +38,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, initializer = "init")
 public class RemoveSlice implements Command {

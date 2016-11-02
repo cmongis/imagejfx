@@ -30,7 +30,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ExplorableTableHelper extends MetaDataSetOwnerHelper<Explorable>{
     

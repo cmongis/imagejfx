@@ -45,7 +45,7 @@ import javafx.stage.FileChooser;
  * fileButtonBinding
  *
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class FileButtonBinding {
 

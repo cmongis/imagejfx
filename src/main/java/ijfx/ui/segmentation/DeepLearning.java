@@ -33,7 +33,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = SegmentationUiPlugin.class,label="Deep learning",priority=0.01)
 public class DeepLearning implements SegmentationUiPlugin{

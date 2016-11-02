@@ -39,7 +39,7 @@ import ucar.nc2.constants.AxisType;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class)
 public class GenerateFlatfield<T> extends ContextCommand {

@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class MappedConverter<R> extends HashMap<String,R> implements Converter<String,R> {
 

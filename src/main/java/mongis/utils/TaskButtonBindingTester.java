@@ -25,7 +25,7 @@ import javafx.scene.control.Button;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class TaskButtonBindingTester extends BaseTester{
 

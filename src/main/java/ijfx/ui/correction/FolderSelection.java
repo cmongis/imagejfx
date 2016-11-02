@@ -57,7 +57,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Activity.class, label = "correction-folder-selection", name = "Correction (Folder Selection)")
 public class FolderSelection extends BorderPane implements Activity {

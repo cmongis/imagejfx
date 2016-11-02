@@ -30,7 +30,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Deprecated
 public class ThresholdMethodSerializer<T extends ThresholdMethod> extends JsonSerializer<T>{

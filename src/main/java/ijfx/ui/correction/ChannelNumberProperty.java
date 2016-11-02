@@ -27,7 +27,7 @@ import net.imagej.axis.Axes;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ChannelNumberProperty extends ReadOnlyIntegerPropertyBase {
 

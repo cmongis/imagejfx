@@ -26,7 +26,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = ExplorerAction.class,label = "Test action",iconPath="BARS")
 public class ComputeSelectedItemStatistics implements ExplorerAction<Void>{

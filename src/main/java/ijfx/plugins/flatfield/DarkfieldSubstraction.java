@@ -40,7 +40,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Process > Correction > Darkfield substraction")
 public class DarkfieldSubstraction extends ContextCommand{

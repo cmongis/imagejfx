@@ -25,7 +25,7 @@ import java.util.Comparator;
 /**
  * Orders metadata by priority list
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class MetaDataKeyPrioritizer implements Comparator<String> {
 

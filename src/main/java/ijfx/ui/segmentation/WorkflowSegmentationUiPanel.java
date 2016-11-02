@@ -64,7 +64,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = SegmentationUiPlugin.class, label = "Process workflow", priority = 0.09)
 public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiPlugin {

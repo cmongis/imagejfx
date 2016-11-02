@@ -24,7 +24,7 @@ import mongis.utils.TextFileUtils;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class FileSizeMetaData extends GenericMetaData{
     

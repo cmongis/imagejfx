@@ -97,7 +97,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 //@Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "segmentation-panel", context = "segmentation -overlay-selected", localization = Localization.RIGHT)

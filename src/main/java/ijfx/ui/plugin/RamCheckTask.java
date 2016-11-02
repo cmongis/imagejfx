@@ -26,7 +26,7 @@ import mongis.utils.MemoryUtils;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class RamCheckTask extends Task<Void> {
 

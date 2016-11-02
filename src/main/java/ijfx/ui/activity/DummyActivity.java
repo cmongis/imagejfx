@@ -25,7 +25,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type=Activity.class,name="dummy-activity",label="Dummy Activity",headless = false)
 public class DummyActivity implements Activity{

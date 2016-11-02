@@ -44,7 +44,7 @@ import org.scijava.util.ColorRGB;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = FxTool.class)
 public class PointTool implements FxTool {

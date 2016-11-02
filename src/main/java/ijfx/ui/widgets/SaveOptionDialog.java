@@ -30,7 +30,7 @@ import javafx.scene.control.Dialog;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class SaveOptionDialog extends Dialog<SaveOptions>{
     
