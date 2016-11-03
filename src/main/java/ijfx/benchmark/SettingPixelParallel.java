@@ -19,16 +19,26 @@
  */
 package ijfx.benchmark;
 
-import org.scijava.plugin.SciJavaPlugin;
+import ijfx.core.RandomAccessibleStream;
+import net.imglib2.Cursor;
+import net.imglib2.type.numeric.RealType;
+import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author Cyril MONGIS, 2016
+ * @author cyril
  */
-public interface BenchMarkPlugin extends SciJavaPlugin{
-    public void init();
-    public void repeat();
-    public void finish();
-    
-    public default int repeatNumber() { return 300; };
+@Plugin(type = BenchMarkPlugin.class)
+public class SettingPixelParallel extends DatasetRelatedBenchmark {
+
+    @Override
+    public void repeat() {
+        Cursor<RealType<?>> cursor = dataset.cursor();
+        //System.out.println(dataset.size());
+        RandomAccessibleStream.generate(cursor,1077856)
+                .parallel()
+                .forEach(t -> t.setReal(10));
+
+    }
+
 }

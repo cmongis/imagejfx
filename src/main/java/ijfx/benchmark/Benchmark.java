@@ -79,6 +79,6 @@ public class Benchmark {
         }
         plugin.finish();
         timer.logAll();
-
+        
     }
 }

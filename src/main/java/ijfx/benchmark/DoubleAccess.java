@@ -29,7 +29,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Cyril MONGIS, 2016
  */
-@Plugin(type = BenchMarkPlugin.class)
+
 public class DoubleAccess extends DatasetRelatedBenchmark{
     
     Dataset dataset2;

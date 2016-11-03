@@ -39,8 +39,6 @@ public class SettingPixel extends DatasetRelatedBenchmark{
             cursor.fwd();
             cursor.get().setReal(10);
         }
-        
-        
     }
     
 }
