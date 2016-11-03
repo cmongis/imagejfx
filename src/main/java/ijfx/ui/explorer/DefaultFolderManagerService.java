@@ -101,6 +101,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
+    private Folder recentFileFolder;
     
     @Override
     public Folder addFolder(File file) {
@@ -256,6 +257,9 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         jsonPrefService.savePreference(folderMap, FOLDER_PREFERENCE_FILE);
     }
     private synchronized void load() {
+        
+        //recentFileFolder = new RecentFileFolder(getContext());
+        //folderList.add(recentFileFolder);
         Map<String, String> folderMap = jsonPrefService.loadMapFromJson(FOLDER_PREFERENCE_FILE, String.class, String.class);
         folderMap.forEach((name, folderPath) -> {
             File file = new File(folderPath);
@@ -292,7 +296,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     public Folder getFolderContainingFile(File f) {
         return getFolderList()
                 .stream()
-                .filter(folder->folder.isFilePartOf(f))
+                .filter(folder->folder != null && folder.isFilePartOf(f))
                 .findFirst()
                 .orElse(null);
     }
