@@ -28,7 +28,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Cyril MONGIS
  */
-@Plugin(type=Command.class,label = "Extract channels", menuPath = "Image > Color > Extract channels...")
+@Plugin(type=Command.class,label = "Extract channels", menuPath = "Image > Color > Extract channels...",initializer = "init")
 public class ExtractChannels extends ExtractCommand{
 
     @Override

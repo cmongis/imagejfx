@@ -21,13 +21,18 @@ package ijfx.plugins.extraction;
 
 import ijfx.plugins.DefaultInterval;
 import ijfx.plugins.LongInterval;
-import ijfx.plugins.commands.AxisUtils;
+import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.service.sampler.DatasetSamplerService;
 import ijfx.service.sampler.SamplingDefinition;
 import net.imagej.Dataset;
+import net.imagej.DatasetService;
 import net.imagej.axis.AxisType;
+import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.sampler.AxisSubrange;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.view.Views;
+import org.scijava.ItemIO;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 
@@ -39,10 +44,10 @@ import org.scijava.plugin.Parameter;
 public abstract class ExtractCommand extends ContextCommand{
 
     
-    @Parameter
+    @Parameter(type = ItemIO.INPUT)
     Dataset input;
     
-    @Parameter
+    @Parameter(type = ItemIO.OUTPUT)
     Dataset output;
     
     
@@ -55,14 +60,42 @@ public abstract class ExtractCommand extends ContextCommand{
     @Parameter
     protected DatasetSamplerService datasetSamplerService;
     
-    protected AxisType axisType;
+    @Parameter
+    protected DatasetUtillsService datasetUtilsService;
+    
+    @Parameter
+    protected DatasetService datasetService;
     
     @Override
     public void run() {
+        
+        
+        
         SamplingDefinition def = new SamplingDefinition(input);
-        def.constrain(AxisUtils.getSliceAxis(input), new AxisSubrange(interval.getLowValue(),interval.getHighValue()));
-        output = datasetSamplerService.duplicateData(input, def);
-        output.setSource("");
+
+        long[] mins = new long[input.numDimensions()];
+        long[] maxs = new long[input.numDimensions()];
+        input.min(mins);
+        input.max(maxs);
+        
+        int axisId = input.dimensionIndex(getAxisType());
+        if(axisId == -1) {
+            cancel(String.format("The input doesn't have an %s axis",getAxisType().getLabel()));
+            return;
+        }
+        
+        mins[axisId] = interval.getLowValue();
+        maxs[axisId] = interval.getHighValue();
+        
+        output = datasetService.create(Views.interval((RandomAccessibleInterval)input, mins, maxs));
+        
+        CalibratedAxis[] axes = new CalibratedAxis[input.numDimensions()];
+        
+        input.axes(axes);
+        
+        output.setAxes(axes);
+        output.setName(input.getName());  
+        datasetUtilsService.addSuffix(output, String.format("%s %d-%d",getAxisType().getLabel(),interval.getLowValue(),interval.getHighValue()), " ");
     }
     
     protected abstract AxisType getAxisType();
