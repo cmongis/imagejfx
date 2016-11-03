@@ -269,9 +269,15 @@ public class PreviewService extends AbstractService implements ImageJService {
 
     public <T extends RealType<T>> Image datasetToImage(RandomAccessibleInterval<T> dataset, ColorTable colorTable) {
 
-        SummaryStatistics summaryStatistics = ijfxStatsService.getSummaryStatistics(Views.iterable(dataset).cursor());
-
-        return datasetToImage(dataset, colorTable, summaryStatistics.getMin(), summaryStatistics.getMax());
+        double[] minMax = ijfxStatsService.getMinMax(dataset);
+        double min = minMax[0];
+        double max = minMax[1];
+        double range = max-min;
+        min += range*0.1;
+        max -= range*0.1;
+        //SummaryStatistics summaryStatistics = ijfxStatsService.getSummaryStatistics(Views.iterable(dataset).cursor());
+       
+        return datasetToImage(dataset, colorTable, min, max);
 
     }
 
