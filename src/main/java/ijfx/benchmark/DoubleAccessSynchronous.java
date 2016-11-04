@@ -19,6 +19,7 @@
  */
 package ijfx.benchmark;
 
+import net.imagej.Dataset;
 import net.imglib2.Cursor;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.plugin.Plugin;
@@ -28,17 +29,36 @@ import org.scijava.plugin.Plugin;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type = BenchMarkPlugin.class)
-public class SettingPixel extends DatasetRelatedBenchmark{
+public class DoubleAccessSynchronous extends DatasetRelatedBenchmark{
+    
+    Dataset dataset2;
+    
+    @Override
+    public void init() {
+        super.init();
+        dataset2 = dataset.duplicateBlank();
+    }
 
     @Override
     public void repeat() {
-        Cursor<RealType<?>> cursor = dataset.cursor();
         
+        
+        copy();
+        
+    }
+    
+    public <T extends RealType<T>> void  copy() {
+        Cursor<T> cursor = (Cursor<T>) dataset.cursor();
+        Cursor<T> cursor2 = (Cursor<T>) dataset2.cursor();
         cursor.reset();
+        cursor2.reset();
+       
         while(cursor.hasNext()) {
             cursor.fwd();
-            cursor.get().setReal(10 * 10 / 20 * (cursor.get().getRealDouble() > 2 ? 1 : 0));
+            cursor2.fwd();
+            cursor2.get().set(cursor.get());
         }
     }
+    
     
 }

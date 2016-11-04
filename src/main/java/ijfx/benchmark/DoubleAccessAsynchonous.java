@@ -19,26 +19,36 @@
  */
 package ijfx.benchmark;
 
+import ijfx.core.RandomAccessibleStream;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.imglib2.Cursor;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.plugin.Plugin;
+import rx.schedulers.Schedulers;
 
 /**
  *
- * @author Cyril MONGIS, 2016
+ * @author cyril
  */
 @Plugin(type = BenchMarkPlugin.class)
-public class SettingPixel extends DatasetRelatedBenchmark{
+public class DoubleAccessAsynchonous extends DoubleAccessSynchronous {
 
     @Override
-    public void repeat() {
-        Cursor<RealType<?>> cursor = dataset.cursor();
+    public <T extends RealType<T>> void copy() {
+
+        Cursor<T> cursor = (Cursor<T>) dataset.cursor();
+        Cursor<T> cursor2 = (Cursor<T>) dataset2.cursor();
         
-        cursor.reset();
-        while(cursor.hasNext()) {
-            cursor.fwd();
-            cursor.get().setReal(10 * 10 / 20 * (cursor.get().getRealDouble() > 2 ? 1 : 0));
-        }
+        final Boolean lock = new Boolean(false);
+        
+        AtomicReference<Throwable> ref = new AtomicReference<>();
+        RandomAccessibleStream
+                .synchronous(cursor, cursor2)
+                .subscribeOn(Schedulers.io())
+                .subscribe(pair -> pair.getB().set(pair.getA()));
+        
     }
-    
+
 }

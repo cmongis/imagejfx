@@ -37,7 +37,7 @@ public class SettingPixelParallel extends DatasetRelatedBenchmark {
         //System.out.println(dataset.size());
         RandomAccessibleStream.generate(cursor,1077856)
                 .parallel()
-                .forEach(t -> t.setReal(10));
+                .forEach(t -> t.setReal(10 * 10 / 20 * (t.getRealDouble() > 2 ? 1 : 0)));
 
     }
 
