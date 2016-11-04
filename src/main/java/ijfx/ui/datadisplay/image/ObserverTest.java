@@ -40,7 +40,7 @@ import org.scijava.plugin.Plugin;
  *
  * @author Cyril MONGIS, 2016
  */
-@Plugin(type = UiPlugin.class)
+
 @UiConfiguration(id = "observer-test",context = "imagej",localization = Localization.BOTTOM_CENTER)
 public class ObserverTest extends PropertySheet implements UiPlugin{
 
