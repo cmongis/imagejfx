@@ -27,7 +27,7 @@ import javafx.util.converter.NumberStringConverter;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class SmartNumberStringConverter extends NumberStringConverter{
 

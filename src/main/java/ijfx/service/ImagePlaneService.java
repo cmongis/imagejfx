@@ -28,7 +28,7 @@ import net.imglib2.view.IntervalView;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface ImagePlaneService extends IjfxService {
 

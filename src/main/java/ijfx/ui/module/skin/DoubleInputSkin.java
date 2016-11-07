@@ -117,7 +117,7 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
 
         value.setValue(input.getValue());
 
-        if (input.getWidgetType() != null && ( input.getWidgetType().equals(NumberWidget.SLIDER_STYLE) || input.getWidgetType().equals(NumberWidget.SCROLL_BAR_STYLE))) {
+        if (input.getWidgetType() != null && (input.getWidgetType().equals(NumberWidget.SLIDER_STYLE) || input.getWidgetType().equals(NumberWidget.SCROLL_BAR_STYLE))) {
             isSlider = true;
 
         } else {
@@ -127,28 +127,31 @@ public class DoubleInputSkin extends AbstractInputSkinPlugin<Double> {
         if (isSlider) {
             slider = new Slider();
             //slider.setShowTickLabels(true);
-            slider.setMin(input.getMinimumValue()+1);
-            slider.setMax(input.getMaximumValue());
+            Double min = input.getMinimumValue();
+            Double max = input.getMaximumValue();
+            min = min == null ? 0 : min;
+            max = max == null ? 100 : max;
 
-            double range = input.getMaximumValue() - input.getMinimumValue();
-            
-            if(range <= 10) {
+            slider.setMin(min);
+            slider.setMax(max);
+
+            double range = max - min;
+
+            if (range <= 10) {
                 slider.setMajorTickUnit(0.1);
-            }
-            else {
+            } else {
                 slider.setMajorTickUnit(1.0);
             }
-            
+
             value.bindBidirectional(slider.valueProperty());
-            
-            hbox.getChildren().addAll(sliderLabel,slider);
+
+            hbox.getChildren().addAll(sliderLabel, slider);
             sliderLabel.setPrefWidth(60);
             sliderLabel.setMaxWidth(60);
             sliderLabel.getStyleClass().add("warning");
             hbox.setSpacing(10.0);
-            
-            sliderLabel.textProperty().bind(Bindings.createStringBinding(()->StringUtils.numberToString(value.getValue(),3), value));
-            
+
+            sliderLabel.textProperty().bind(Bindings.createStringBinding(() -> StringUtils.numberToString(value.getValue(), 3), value));
 
         } else {
             field = new TextField();

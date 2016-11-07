@@ -55,7 +55,7 @@ import org.scijava.service.Service;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class)
 public class DefaultFolderManagerService extends AbstractService implements FolderManagerService {
@@ -101,6 +101,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
 
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
+    private Folder recentFileFolder;
     
     @Override
     public Folder addFolder(File file) {
@@ -256,9 +257,14 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         jsonPrefService.savePreference(folderMap, FOLDER_PREFERENCE_FILE);
     }
     private synchronized void load() {
+        
+        //recentFileFolder = new RecentFileFolder(getContext());
+        //folderList.add(recentFileFolder);
         Map<String, String> folderMap = jsonPrefService.loadMapFromJson(FOLDER_PREFERENCE_FILE, String.class, String.class);
         folderMap.forEach((name, folderPath) -> {
-            DefaultFolder folder = new DefaultFolder(new File(folderPath));
+            File file = new File(folderPath);
+            if(file.exists() == false) return;
+            DefaultFolder folder = new DefaultFolder(file);
             context.inject(folder);
             folder.setName(name);
             folderList.add(folder);
@@ -290,7 +296,7 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     public Folder getFolderContainingFile(File f) {
         return getFolderList()
                 .stream()
-                .filter(folder->folder.isFilePartOf(f))
+                .filter(folder->folder != null && folder.isFilePartOf(f))
                 .findFirst()
                 .orElse(null);
     }

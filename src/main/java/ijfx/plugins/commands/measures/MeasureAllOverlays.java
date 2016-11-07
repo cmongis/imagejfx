@@ -47,7 +47,7 @@ import org.scijava.widget.NumberWidget;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Analyze > Analyse particles")
 public class MeasureAllOverlays extends ContextCommand {

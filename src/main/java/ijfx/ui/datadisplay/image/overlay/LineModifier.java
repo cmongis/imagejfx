@@ -33,7 +33,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = OverlayModifier.class)
 public class LineModifier implements OverlayModifier<LineOverlay> {

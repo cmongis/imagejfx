@@ -29,7 +29,7 @@ import javafx.scene.input.MouseEvent;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
  public class ListToggle<T> extends ToggleButton {
         

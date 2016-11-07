@@ -24,7 +24,7 @@ import java.util.Set;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class UiContextUpdatedEvent extends IjfxEvent<Set<String>>{
     

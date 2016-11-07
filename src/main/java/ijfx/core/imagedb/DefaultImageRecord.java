@@ -28,7 +28,7 @@ import java.util.Date;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class DefaultImageRecord implements ImageRecord {
 

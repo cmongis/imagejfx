@@ -31,7 +31,7 @@ import org.scijava.menu.ShadowMenu;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ChoiceBoxMenuCreator extends AbstractMenuCreator<MenuButton, Menu> {
     

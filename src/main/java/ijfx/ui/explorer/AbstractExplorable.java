@@ -29,7 +29,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class AbstractExplorable implements Explorable{
     

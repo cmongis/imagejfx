@@ -50,7 +50,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Image > Binary > Convert to overlay")
 public class BinaryToOverlay implements Command {

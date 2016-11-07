@@ -34,7 +34,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = PostprocessorPlugin.class)
 public class OverlayPostProcessor extends AbstractPostprocessorPlugin implements PostprocessorPlugin {

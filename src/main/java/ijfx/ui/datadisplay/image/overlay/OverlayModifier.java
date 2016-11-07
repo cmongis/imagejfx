@@ -27,7 +27,7 @@ import net.imagej.overlay.Overlay;
 /**
  * A modifier is a set of MoveablePoints which should be listened by the Modifier. Each time a point is moved
  * the modifier should update the Overlay (and note its representation).
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 
 public interface OverlayModifier<T extends Overlay> extends ClassHandler<Overlay>  {

@@ -33,7 +33,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Display.class)
 public class DefaultObjectDisplay  extends AbstractDisplay<SegmentedObject> implements SegmentedObjectDisplay{

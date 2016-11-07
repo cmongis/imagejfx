@@ -35,7 +35,7 @@ import org.scijava.ui.DialogPrompt;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Image > Color > Delete channel", initializer = "init")
 public class DeleteChannel extends ContextCommand {

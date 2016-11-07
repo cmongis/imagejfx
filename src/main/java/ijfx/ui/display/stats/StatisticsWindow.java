@@ -21,7 +21,7 @@ package ijfx.ui.display.stats;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class StatisticsWindow {
     

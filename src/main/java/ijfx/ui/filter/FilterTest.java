@@ -31,7 +31,7 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class FilterTest extends Application {
 

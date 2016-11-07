@@ -27,7 +27,7 @@ import javafx.event.Event;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  * @param <OUTPUT> The type of object the callable should output and handle
  */
 public class AsyncCallable<OUTPUT> extends Task<OUTPUT> {

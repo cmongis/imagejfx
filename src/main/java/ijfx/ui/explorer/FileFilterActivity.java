@@ -42,7 +42,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Activity.class, name = "file-filter-activity")
 public class FileFilterActivity extends BorderPane implements Activity {
@@ -117,7 +117,7 @@ public class FileFilterActivity extends BorderPane implements Activity {
 
         public Image fetchThumb(ImageRecord imageRecord) {
             try {
-                return thumbService.getThumb(imageRecord.getFile(), 0, 100, 100);
+                return thumbService.getThumb(imageRecord.getFile(), null, 100, 100);
             } catch (IOException ex) {
                 Logger.getLogger(FileFilterActivity.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -32,7 +32,7 @@ import net.imagej.overlay.RectangleOverlay;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Deprecated
 public class RectangleRepresentation extends OverlayRepresentationBase<RectangleOverlay> {

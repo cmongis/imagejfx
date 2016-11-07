@@ -141,7 +141,7 @@ public class SimpleDirectoryWatchService extends AbstractService implements Dire
     public synchronized void register(FileChangeListener listener, String dirPath, String... globPatterns)
             throws IOException {
         Path dir = Paths.get(dirPath);
-
+        if(Files.exists(dir) == false) return;
         if (!Files.isDirectory(dir)) {
             throw new IllegalArgumentException(dirPath + " is not a directory.");
         }

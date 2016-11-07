@@ -36,7 +36,7 @@ import static mongis.utils.panecell.ScrollWindowEvent.SCROLL_WINDOW_EXITED;
  * This class takes a Parent and a @Scrollpane and takes care of notifying the
  * children when they are shown.
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ScrollBinder {
 

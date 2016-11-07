@@ -29,7 +29,7 @@ import javafx.scene.input.KeyEvent;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class AbstractNumberInput<T extends Number> extends AbstractInputSkinPlugin<T> {
 

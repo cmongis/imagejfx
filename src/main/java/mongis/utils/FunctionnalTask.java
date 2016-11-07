@@ -26,7 +26,7 @@ import javafx.event.EventHandler;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class FunctionnalTask<T> extends Task<T> {
     

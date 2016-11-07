@@ -27,7 +27,7 @@ import org.scijava.Context;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class DraggableStepCell extends DraggableListCell<WorkflowStep> {
     

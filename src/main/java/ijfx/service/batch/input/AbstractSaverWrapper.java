@@ -26,7 +26,7 @@ import net.imagej.display.ImageDisplay;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public abstract class AbstractSaverWrapper implements BatchSingleInput{
     final private BatchSingleInput wrappedObject;

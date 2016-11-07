@@ -28,7 +28,7 @@ import mongis.utils.ProgressHandler;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface ImageRecordService extends IjfxService{
     

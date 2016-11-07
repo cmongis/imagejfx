@@ -32,7 +32,7 @@ import org.scijava.service.Service;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class)
 public class PluginUtilsService extends AbstractService implements IjfxService {

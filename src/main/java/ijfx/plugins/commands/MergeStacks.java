@@ -39,7 +39,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Image > Stacks > Merge into channels...")
 public class MergeStacks extends ContextCommand {

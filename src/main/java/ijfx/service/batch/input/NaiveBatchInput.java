@@ -27,7 +27,7 @@ import net.imagej.display.ImageDisplay;
 /**
  * Naive implementation of the Batch Input
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class NaiveBatchInput implements BatchSingleInput {
 

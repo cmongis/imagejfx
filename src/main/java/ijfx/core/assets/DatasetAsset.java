@@ -24,7 +24,7 @@ import net.imagej.Dataset;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class DatasetAsset extends AbstractAsset<Dataset>{
     public DatasetAsset() {

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @JsonDeserialize(as = DefaultInterval.class)
 public interface LongInterval {

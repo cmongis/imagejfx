@@ -82,6 +82,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TitledPane;
@@ -126,7 +127,7 @@ import org.scijava.plugin.PluginService;
  *
  * TODO: getting all the logic out of the controller
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "explorerActivity+segmentation segmentation+any-display-open -overlay-selected")
@@ -194,6 +195,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     private VBox actionVBox;
 
+    @FXML
+    private Button segmentMoreButton;
+
     Img<BitType> currentMask;
 
     private final Map<TitledPane, SegmentationUiPlugin> nodeMap = new HashMap<>();
@@ -205,9 +209,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private final BooleanProperty measureAllPlaneProperty = new SimpleBooleanProperty(false);
 
     private final Property<ImageDisplay> explorerImageDisplay = new SimpleObjectProperty();
-    
+
     private final ObjectProperty<SegmentationUiPlugin> currentPlugin = new SimpleObjectProperty();
-    
+
     private SilentImageDisplay fakeDisplay;
 
     private UiContextProperty segmentationContext;
@@ -217,7 +221,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private static final String SEGMENT_AND_MEASURE = "... after segmenting each planes";
 
     private OpacityTransitionBinding opacityTransition;
-    
+
     public SegmentationUiPanel() {
 
         try {
@@ -273,6 +277,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         actionVBox.disableProperty().bind(currentPlugin.isNull());
 
+        segmentMoreButton.visibleProperty().bind(isExplorerProperty.not());
+        
         //planeSettingCheckBox.textProperty().bind(Bindings.createStringBinding(this::getCheckBoxText, planeSettingCheckBox.selectedProperty()));
         return this;
     }
@@ -282,12 +288,12 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         MenuItem item = new MenuItem(label, new FontAwesomeIconView(icon));
         item.setOnAction(
                 event -> new CallbackTask<Void, Void>()
-                .run((progress, voiid) -> {
-                    action.accept(progress);
-                    return null;
-                })
-                .submit(loadingScreenService)
-                .start()
+                        .run((progress, voiid) -> {
+                            action.accept(progress);
+                            return null;
+                        })
+                        .submit(loadingScreenService)
+                        .start()
         );
 
         menuButton.getItems().add(item);
@@ -354,8 +360,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             overlays = measurementService
                     .extractOverlays(
                             overlayUtilsService
-                            .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
-                            ));
+                                    .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
+                                    ));
 
             // now we remove all the present overlays just in case
             overlayUtilsService.removeAllOverlay(getCurrentImageDisplay());
@@ -400,15 +406,11 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     }
 
     private void onExpandedPaneChanged(Observable obs, TitledPane oldPane, TitledPane newPane) {
-
-        
-        
-        
         if (newPane == null) {
             currentPlugin.setValue(null);
             return;
         }
-        
+
         currentPlugin.setValue(nodeMap.get(newPane));
         nodeMap.get(newPane).setImageDisplay(null);
         nodeMap.get(newPane).setImageDisplay(getCurrentImageDisplay());

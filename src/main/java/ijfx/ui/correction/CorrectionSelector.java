@@ -87,7 +87,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Activity.class, name = "correction-activity-2")
 public class CorrectionSelector extends BorderPane implements Activity {

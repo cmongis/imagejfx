@@ -53,7 +53,7 @@ import org.scijava.ui.UIService;
  *  merger.run();
  *  Dataset output = merger.getOutput();
  * 
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Image > Stacks > Merge channels")
 public class ChannelMerger<T extends RealType<T>> extends ContextCommand {

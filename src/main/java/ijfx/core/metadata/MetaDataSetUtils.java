@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class MetaDataSetUtils {
 

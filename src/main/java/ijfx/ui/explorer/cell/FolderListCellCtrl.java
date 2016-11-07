@@ -38,7 +38,7 @@ import static org.reactfx.util.Tuples.t;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class FolderListCellCtrl extends VBox implements ListCellController<Folder> {
 

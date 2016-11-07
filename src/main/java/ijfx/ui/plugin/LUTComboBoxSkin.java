@@ -28,7 +28,7 @@ import javafx.scene.control.Label;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class LUTComboBoxSkin extends ComboBoxBaseSkin<LUTView> {
     

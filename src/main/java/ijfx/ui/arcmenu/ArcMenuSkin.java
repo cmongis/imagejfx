@@ -23,7 +23,7 @@ import javafx.scene.control.Skin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface ArcMenuSkin extends Skin<PopArcMenu>{
     

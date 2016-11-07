@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class BeanInputWrapper<T> implements Input<T>{
     

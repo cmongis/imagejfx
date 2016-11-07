@@ -34,7 +34,7 @@ import org.scijava.util.ColorRGB;
  * on the Overlay condition.
  * 
  * 
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface OverlayDrawer<T extends Overlay> extends SciJavaPlugin{
     

@@ -25,7 +25,7 @@ import org.scijava.event.SciJavaEvent;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class HintRequestEvent extends SciJavaEvent{
     private final Collection<? extends Hint> hintList;

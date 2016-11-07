@@ -53,7 +53,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 
 @UiConfiguration(id = "overlay-manager-panel", context = "image-open+imagej+overlay-selected", localization = Localization.RIGHT)

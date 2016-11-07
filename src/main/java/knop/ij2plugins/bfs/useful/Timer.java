@@ -7,7 +7,7 @@ package knop.ij2plugins.bfs.useful;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
  public class Timer {
         

@@ -26,7 +26,7 @@ import javafx.scene.layout.BorderPane;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class SegmentationActivity extends BorderPane implements Activity {
 

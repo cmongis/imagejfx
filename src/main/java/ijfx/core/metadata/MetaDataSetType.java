@@ -21,7 +21,7 @@ package ijfx.core.metadata;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public enum MetaDataSetType {
         UNKNOWN

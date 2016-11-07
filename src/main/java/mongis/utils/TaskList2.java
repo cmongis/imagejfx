@@ -32,7 +32,7 @@ import javafx.concurrent.Task;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class TaskList2 {
     

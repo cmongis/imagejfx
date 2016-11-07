@@ -29,7 +29,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Image > Overlay > Remove all")
 public class RemoveAllOverlays extends ContextCommand{

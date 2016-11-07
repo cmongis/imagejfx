@@ -52,7 +52,7 @@ import org.scijava.service.Service;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class)
 public class DefaultImagePlaneService extends AbstractService implements ImagePlaneService {
@@ -254,6 +254,9 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         }
         for (int d = 1; d != position.length; d++) {
             hyperSlice = Views.hyperSlice(hyperSlice, 2, position[d]);
+            if(d > 10) {
+                throw new IllegalArgumentException("Wierd loop detected !");
+            }
         }
         return hyperSlice;
     }
@@ -287,6 +290,9 @@ public class DefaultImagePlaneService extends AbstractService implements ImagePl
         }
         for (int d = 1; d != position.length; d++) {
             hyperSlice = Views.hyperSlice(hyperSlice, 2, position[d]);
+            if(d > 10) {
+                throw new IllegalArgumentException("Wierd loop detected !");
+            }
         }
         return hyperSlice;
         

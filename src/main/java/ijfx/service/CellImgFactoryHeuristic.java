@@ -29,7 +29,7 @@ import net.imglib2.type.NativeType;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
     
@@ -39,7 +39,7 @@ public class CellImgFactoryHeuristic implements ImgFactoryHeuristic {
     
     @Override
     public <T extends NativeType<T>> ImgFactory<T> createFactory(Metadata mtdt, SCIFIOConfig.ImgMode[] ims, T t) throws IncompatibleTypeException {
-        return new SCIFIOCellImgFactory<>(20);
+        return new SCIFIOCellImgFactory<>(10);
     }
     
 }

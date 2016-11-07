@@ -101,7 +101,7 @@ public class UITesterCtrl implements Initializable {
 
                     @Override
                     protected Image call() throws Exception {
-                        return thumbService.getThumb(newValue, 20, 300, 300);
+                        return thumbService.getThumb(newValue, null, 300, 300);
                     }
 
                     @Override

@@ -23,7 +23,7 @@ import org.scijava.event.SciJavaEvent;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ActivityEvent extends SciJavaEvent{
    private final Activity activity;

@@ -27,7 +27,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class DisplayDatasetWrapper extends AbstractSaverWrapper {
 

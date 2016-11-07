@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ExploredListChanged extends IjfxEvent<List<? extends Explorable>>{
     

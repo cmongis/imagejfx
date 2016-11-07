@@ -29,7 +29,7 @@ import javafx.scene.layout.Pane;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class PaneContextualView implements ContextualView<Node> {
 

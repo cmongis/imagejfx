@@ -28,7 +28,7 @@ import javafx.beans.property.SimpleLongProperty;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @JsonTypeInfo(use =JsonTypeInfo.Id.CLASS,defaultImpl = LongInterval.class)
 public class DefaultInterval implements LongInterval{

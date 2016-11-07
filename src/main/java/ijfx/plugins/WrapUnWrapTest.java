@@ -38,7 +38,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Deprecated
 public class WrapUnWrapTest implements Command{

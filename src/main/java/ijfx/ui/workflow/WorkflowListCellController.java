@@ -32,7 +32,7 @@ import mongis.utils.ListCellController;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class WorkflowListCellController extends VBox implements ListCellController<Workflow>{
 

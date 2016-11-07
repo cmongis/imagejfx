@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.concurrent.Task;
-import javafx.util.Callback;
 
 /**
  * The callback task allows you to easily run a method/lambda in a new thread
@@ -53,7 +52,7 @@ import javafx.util.Callback;
  *
  *
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements ProgressHandler, Consumer<INPUT> {
 
@@ -61,22 +60,24 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
 
     private Callable<INPUT> inputGetter;
 
+    // Possible operation
     private FailableCallback<INPUT, OUTPUT> callback;
+    private FailableCallable<OUTPUT> callable;
     private LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
-    private Callback<ProgressHandler, OUTPUT> longCallable;
+    private LongCallable<OUTPUT> longCallable;
+    private FailableRunnable runnable;
+    private FailableConsumer<INPUT> consumer;
+    private FailableBiConsumer<ProgressHandler,INPUT> longConsumer;
+    
+    
+    // handlers
+    private Consumer<Throwable> onError = e -> logger.log(Level.SEVERE, null, e);
 
-    private Consumer<Throwable> errorHandler = e -> logger.log(Level.SEVERE, null, e);
-    private Throwable error;
-
-    private Runnable runnable;
-
+    private Consumer<OUTPUT> onSuccess = e->logger.info("Callback is a success.");
+    
     private ExecutorService executor = ImageJFX.getThreadPool();
 
-    private Consumer<OUTPUT> successHandler;
-
-    private FailableConsumer<INPUT> consumer;
-
-    private BiConsumer<ProgressHandler, INPUT> longConsumer;
+   
 
     private final static Logger logger = Logger.getLogger(CallbackTask.class.getName());
 
@@ -113,12 +114,17 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-
+    
     public CallbackTask<INPUT, OUTPUT> run(Runnable runnable) {
         if (runnable == null) {
             logger.warning("Setting null as runnable");
             return this;
         }
+        this.runnable = ()->runnable.run();
+        return this;
+    }
+    
+    public CallbackTask<INPUT,OUTPUT> tryRun(FailableRunnable runnable) {
         this.runnable = runnable;
         return this;
     }
@@ -128,8 +134,13 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public CallbackTask<INPUT, OUTPUT> conusmer(BiConsumer<ProgressHandler, INPUT> biConsumer) {
+    public CallbackTask<INPUT, OUTPUT> consume(FailableBiConsumer<ProgressHandler, INPUT> biConsumer) {
         this.longConsumer = biConsumer;
+        return this;
+    }
+    
+    public CallbackTask<INPUT,OUTPUT> call(FailableCallable<OUTPUT> callable) {
+        this.callable = callable;
         return this;
     }
 
@@ -138,93 +149,61 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public CallbackTask<INPUT, OUTPUT> runLongCallable(Callback<ProgressHandler, OUTPUT> longCallable) {
+    public CallbackTask<INPUT, OUTPUT> runLongCallable(LongCallable<OUTPUT> longCallable) {
         this.longCallable = longCallable;
         return this;
     }
 
+    @Override
     public OUTPUT call() throws Exception {
 
         // first we check if the task was cancelled BEFORE RUNNING IT
         if (isCancelled()) {
             return null;
         }
-
+        
         if (inputGetter != null) {
-            try {
                 input = inputGetter.call();
-            } catch (Exception ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
         }
 
-        try {
-            if (longCallback != null) {
-                OUTPUT output = longCallback.handle(this, input);
-
-                if (isCancelled()) {
-                    return null;
-                } else {
-                    return output;
-                }
-
-            } // now if we should execute a callback
-            else if (callback != null) {
-                // executing and betting the output
-                OUTPUT output = callback.call(input);
-                // if the task has been cancelled during execution,
-                // we cancel the output and return null
-                if (isCancelled()) {
-                    return null;
-                } else {
-                    return output;
-                }
-            } else if (longCallable != null) {
-                if (isCancelled()) {
-                    return null;
-                } else {
-                    OUTPUT output = longCallable.call(this);
-                    if (isCancelled()) {
-                        return null;
-                    } else {
-                        return output;
-                    }
-                }
-            } else if (consumer != null) {
-                if (isCancelled()) {
-                    return null;
-                } else {
-                    consumer.accept(input);
-                    return null;
-                }
-            } else if (longConsumer != null) {
-                if (isCancelled()) {
-                    return null;
-                } else {
-                    longConsumer.accept(this, input);
-                    return null;
-                }
-            } // now if we have a runnable as part of the task
-            else if (runnable != null) {
-                runnable.run();
-                // same if it was cancelled during the problem
-
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-
-            Logger.getLogger(CallbackTask.class.getSimpleName()).log(Level.SEVERE, "Error when executing callback task ", e);
-            throw e;
+        OUTPUT output = null;
+        
+        
+        if(longCallback != null) {
+            output = longCallback.handle(this,input);
         }
-        return null;
+        else if(callback != null) {
+            output = callback.call(input);
+        }
+        else if(longCallable != null) {
+            output = longCallable.call(this);
+        }
+        else if(callable != null){
+            output = callable.call();
+        }
+        else if(consumer != null) {
+            consumer.accept(input);
+        }
+        else if(longConsumer != null) {
+            longConsumer.accept(this, input);
+        }
+        else if(runnable != null) {
+            runnable.run();
+        }
+         
+        if(isCancelled()) {
+            return null;
+        }
+        
+        return output;
     }
 
     @Override
     protected void failed() {
         super.failed();
-        if (errorHandler != null) {
-            errorHandler.accept(getException());
+        Logger.getLogger(getClass().getName()).log(Level.SEVERE,null,getException());
+        if (onError != null) {
+            onError.accept(getException());
         }
     }
 
@@ -256,8 +235,8 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     @Override
     public void succeeded() {
         logger.info("succeeded");
-        if (successHandler != null) {
-            successHandler.accept(getValue());
+        if (onSuccess != null) {
+            onSuccess.accept(getValue());
         }
         super.succeeded();
 
@@ -270,7 +249,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     }
 
     public CallbackTask<INPUT, OUTPUT> then(Consumer<OUTPUT> consumer) {
-        successHandler = consumer;
+        onSuccess = consumer;
         return this;
     }
 
@@ -325,7 +304,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     }
 
     public CallbackTask<INPUT, OUTPUT> error(Consumer<Throwable> handler) {
-        errorHandler = handler;
+        onError = handler;
         return this;
     }
 
@@ -369,6 +348,19 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
 
         void accept(T t) throws Exception;
     }
-
+    
+    @FunctionalInterface
+    public interface FailableCallable<T> {
+        T call() throws Exception;
+    }
+    
+    @FunctionalInterface
+    public interface FailableBiConsumer<T,R> {
+        void accept(T t, R r);
+    }
+    @FunctionalInterface
+    public interface FailableRunnable{
+        void run() throws Exception;
+    }
 
 }

@@ -26,7 +26,7 @@ import net.imglib2.type.numeric.RealType;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ColorCopier {
     public static <T extends RealType,U extends ARGBType> void toRGB (T input, U output) {

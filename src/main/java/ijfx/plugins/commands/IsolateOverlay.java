@@ -35,7 +35,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Image > Overlay > Isolate selected overlay")
 public class IsolateOverlay extends ContextCommand{

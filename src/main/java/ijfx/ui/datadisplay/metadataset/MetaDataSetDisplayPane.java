@@ -57,7 +57,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = DisplayPanePlugin.class)
 @Handles(type=MetaDataSetDisplay.class)

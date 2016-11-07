@@ -34,7 +34,7 @@ import org.scijava.plugin.PluginService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = InputSkinPlugin.class)
 public class ThresholdMethodInput extends AbstractInputSkinPlugin<ThresholdMethod> {

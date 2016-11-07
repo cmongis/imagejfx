@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ExplorerSelectionChangedEvent extends IjfxEvent<List<? extends Explorable>>{
     

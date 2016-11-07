@@ -26,7 +26,7 @@ import net.imagej.overlay.PointOverlay;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public final class PointOverlayHelper {
 

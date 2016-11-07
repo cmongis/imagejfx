@@ -25,7 +25,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = BenchMarkPlugin.class)
 public class SettingPixel extends DatasetRelatedBenchmark{
@@ -37,10 +37,8 @@ public class SettingPixel extends DatasetRelatedBenchmark{
         cursor.reset();
         while(cursor.hasNext()) {
             cursor.fwd();
-            cursor.get().setReal(10);
+            cursor.get().setReal(10 * 10 / 20 * (cursor.get().getRealDouble() > 2 ? 1 : 0));
         }
-        
-        
     }
     
 }

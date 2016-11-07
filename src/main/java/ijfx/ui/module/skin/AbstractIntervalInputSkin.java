@@ -34,7 +34,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 
 public abstract class AbstractIntervalInputSkin<T extends LongInterval> extends AbstractInputSkinPlugin<T> {

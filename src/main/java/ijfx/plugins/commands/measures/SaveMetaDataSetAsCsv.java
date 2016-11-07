@@ -40,7 +40,7 @@ import org.scijava.widget.FileWidget;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class,label = "Save table as")
 public class SaveMetaDataSetAsCsv extends ContextCommand {

@@ -31,7 +31,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = OverlayDrawer.class)
 public class LineDrawer implements OverlayDrawer<LineOverlay> {

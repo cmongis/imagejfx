@@ -70,7 +70,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class)
 public class SegmentationService extends AbstractService implements IjfxService {

@@ -56,7 +56,7 @@ import org.scijava.plugin.Parameter;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class WorkflowPanel extends GridPane {
 

@@ -28,7 +28,7 @@ import org.scijava.plugin.PluginService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class Benchmark {
     
@@ -79,6 +79,6 @@ public class Benchmark {
         }
         plugin.finish();
         timer.logAll();
-
+        
     }
 }

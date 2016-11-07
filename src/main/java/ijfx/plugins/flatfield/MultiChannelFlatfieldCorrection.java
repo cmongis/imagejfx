@@ -35,7 +35,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Process > Correction > Flatfield correction (multi-channel)")
 public class MultiChannelFlatfieldCorrection extends ContextCommand {

@@ -23,7 +23,7 @@ import javafx.beans.property.Property;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface UpdatableProperty<T> extends Property<T>{
     

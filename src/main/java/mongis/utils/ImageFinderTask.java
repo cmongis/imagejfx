@@ -29,7 +29,7 @@ import org.apache.commons.io.FileUtils;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ImageFinderTask extends Task<List<File>> {
     

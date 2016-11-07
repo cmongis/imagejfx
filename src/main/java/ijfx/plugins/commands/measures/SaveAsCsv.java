@@ -41,7 +41,7 @@ import org.scijava.widget.FileWidget;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class)
 public class SaveAsCsv extends ContextCommand{

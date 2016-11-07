@@ -19,7 +19,7 @@
  */
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 package ijfx.service.ui;
 

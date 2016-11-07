@@ -24,7 +24,7 @@ import javafx.beans.property.BooleanProperty;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface Explorable extends Iconazable,MetaDataOwner,DatasetHolder,Selectable{
      

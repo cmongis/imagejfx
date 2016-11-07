@@ -15,7 +15,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, headless = true, menuPath = "Image > Correction > Average flatfield from stack")
 public class FlatfieldCreator extends ImageJ2PluginAdapter{

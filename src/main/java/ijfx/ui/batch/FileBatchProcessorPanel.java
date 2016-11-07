@@ -74,7 +74,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Activity.class,name=UiContexts.FILE_BATCH_PROCESSING)
 //@UiConfiguration(id = "file-batch-processing-panel", context = UiContexts.FILE_BATCH_PROCESSING, localization = Localization.CENTER)

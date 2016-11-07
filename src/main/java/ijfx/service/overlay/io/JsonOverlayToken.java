@@ -21,7 +21,7 @@ package ijfx.service.overlay.io;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public final class JsonOverlayToken {
 

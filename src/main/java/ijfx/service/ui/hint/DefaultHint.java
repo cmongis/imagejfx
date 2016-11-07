@@ -24,7 +24,7 @@ import java.util.UUID;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class DefaultHint implements Hint{
     

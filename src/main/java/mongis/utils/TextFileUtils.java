@@ -30,7 +30,7 @@ import java.nio.charset.Charset;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class TextFileUtils {
 

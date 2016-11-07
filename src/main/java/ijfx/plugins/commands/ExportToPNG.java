@@ -49,7 +49,7 @@ import org.scijava.widget.FileWidget;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Command.class, menuPath = "Edit > Copy to PNG...")
 public class ExportToPNG extends ContextCommand {

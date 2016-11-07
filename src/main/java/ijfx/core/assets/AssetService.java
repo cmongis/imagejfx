@@ -34,7 +34,7 @@ import org.scijava.service.Service;
  * repeatedly reused. The Asset Service loads each assets once and when not used
  * for a time, delete them from memory.
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class)
 public class AssetService extends AbstractService implements IjfxService {

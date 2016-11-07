@@ -79,7 +79,7 @@ import org.scijava.ui.UIService;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = UiPlugin.class)
 @UiConfiguration(id = "batch-processing-panel", context = "batch", localization = Localization.RIGHT)

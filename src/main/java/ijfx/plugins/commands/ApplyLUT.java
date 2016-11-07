@@ -37,7 +37,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(menuPath = "Image > Color > Change LUT...",type = Command.class,initializer = "init")
 public class ApplyLUT extends ContextCommand{

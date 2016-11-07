@@ -27,7 +27,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class ThreadSafeTimerWrapper implements Timer{
 

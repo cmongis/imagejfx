@@ -56,7 +56,7 @@ import org.scijava.service.Service;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class, priority = Priority.VERY_LOW_PRIORITY)
 public class DefaultMetaDataExtractionService extends AbstractService implements MetaDataExtractionService {

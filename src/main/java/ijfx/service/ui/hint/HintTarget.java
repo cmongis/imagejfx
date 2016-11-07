@@ -21,7 +21,7 @@ package ijfx.service.ui.hint;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface HintTarget {
     

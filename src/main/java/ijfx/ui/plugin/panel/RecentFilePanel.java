@@ -46,7 +46,7 @@ import org.scijava.plugins.commands.io.OpenFile;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class RecentFilePanel extends BorderPane{
     private final Context context;
@@ -136,7 +136,7 @@ public class RecentFilePanel extends BorderPane{
             }
             else {
                 try {
-                    return thumbService.getThumb(file, new long[0],100, 100);
+                    return thumbService.getThumb(file, 0, null,100, 100);
                 } catch (Exception ex) {
                     logService.warn(ex,"Couldn't load file %s",file.getAbsolutePath());
                 }

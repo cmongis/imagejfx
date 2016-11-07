@@ -25,7 +25,7 @@ import javafx.scene.layout.VBox;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class MessageBoxTest2 extends BaseTester{
 

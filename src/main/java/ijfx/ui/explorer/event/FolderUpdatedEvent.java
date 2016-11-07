@@ -24,7 +24,7 @@ import ijfx.ui.explorer.Folder;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class FolderUpdatedEvent extends IjfxEvent<Folder>{
     

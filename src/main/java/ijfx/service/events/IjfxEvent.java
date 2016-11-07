@@ -21,7 +21,7 @@ package ijfx.service.events;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface IjfxEvent<T,D> {
     

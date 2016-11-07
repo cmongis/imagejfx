@@ -23,7 +23,7 @@ import net.imagej.overlay.Overlay;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface OverlayStatistics {
     Overlay getOverlay();

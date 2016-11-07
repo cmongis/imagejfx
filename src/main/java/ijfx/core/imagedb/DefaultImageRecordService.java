@@ -55,7 +55,7 @@ import rx.subjects.PublishSubject;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = Service.class, priority = Priority.VERY_LOW_PRIORITY)
 public class DefaultImageRecordService extends AbstractService implements ImageRecordService {

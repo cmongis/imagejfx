@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -42,13 +43,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import jfxtras.scene.control.ToggleGroupValue;
-import mongis.utils.BindingsUtils;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.SmartNumberStringConverter;
@@ -83,7 +82,7 @@ import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 @Plugin(type = SegmentationUiPlugin.class, label = "Fixed / Automatic threshold",priority=0.1)
 public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationUiPlugin {
@@ -191,11 +190,12 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     public void setImageDisplay(ImageDisplay display) {
 
         if(display == imageDisplay) return;
-     
+        
         imageDisplay = display;
         if (display != null) {
             updatePosition(imageDisplay);
             if (isAutothreshold()) {
+                
                 calculateThresholdValues();
             }
             requestMaskUpdate();
@@ -333,7 +333,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     private void onMinMaxChanged(Observable obs) {
         if(isDisabled()) return;
         logger.info("min max request !");
-        requestMaskUpdate();
+        Platform.runLater(this::requestMaskUpdate);
     }
 
     private DataView getDatasetView() {
@@ -434,8 +434,8 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
         final double min, max;
 
-        min = rangeSlider.getLowValue();
-        max = rangeSlider.getHighValue();
+        min = lowValue.get();
+        max = highValue.get();
 
         double value;
 

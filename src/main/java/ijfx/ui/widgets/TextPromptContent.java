@@ -36,7 +36,7 @@ import mongis.utils.FXUtilities;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class TextPromptContent extends VBox {
 

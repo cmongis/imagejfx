@@ -23,12 +23,12 @@ import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public interface BenchMarkPlugin extends SciJavaPlugin{
     public void init();
     public void repeat();
     public void finish();
     
-    public default int repeatNumber() { return 100; };
+    public default int repeatNumber() { return 300; };
 }

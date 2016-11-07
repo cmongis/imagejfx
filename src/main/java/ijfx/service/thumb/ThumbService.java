@@ -22,34 +22,26 @@ package ijfx.service.thumb;
 
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
+import ijfx.service.Timer;
+import ijfx.service.TimerService;
 import ijfx.service.dataset.DatasetUtillsService;
 import ijfx.service.preview.PreviewService;
 import ijfx.ui.main.ImageJFX;
-import io.scif.Format;
-import io.scif.FormatException;
-import io.scif.ImageMetadata;
-import io.scif.Plane;
-import io.scif.Reader;
 import io.scif.SCIFIO;
-import io.scif.bf.BioFormatsFormat;
-import io.scif.gui.AWTImageTools;
 import io.scif.services.FormatService;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 import javax.imageio.ImageIO;
+import mongis.utils.CallbackTask;
 import net.imagej.ImageJService;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.view.SubsampleIntervalView;
 import net.imglib2.view.Views;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
@@ -84,7 +76,12 @@ public class ThumbService extends AbstractService implements ImageJService {
     @Parameter
     PreviewService previewService;
 
+    @Parameter
+    TimerService timerService;
+
     Logger logger = ImageJFX.getLogger();
+
+    private static final Boolean lock = new Boolean(true);
 
     private static final String THUMB_FORMAT = ".png";
 
@@ -97,12 +94,13 @@ public class ThumbService extends AbstractService implements ImageJService {
         return scifio;
     }
 
-    public Image getThumb(File file, long[] nonSpacialPosition, int width, int height) {
+    public Image getThumb(File file, long[] nonSpacialPosition, int width, int height) throws IOException {
         return getThumb(file, 0, nonSpacialPosition, width, height);
     }
 
-    public Image getThumb(File file, int imageId, long[] nonSpacialPosition, int width, int height) {
+    public Image getThumb(File file, int imageId, long[] nonSpacialPosition, int width, int height) throws IOException {
 
+        Timer timer = timerService.getTimer(this.getClass());
         String position;
         if (nonSpacialPosition == null) {
             position = "file";
@@ -112,47 +110,68 @@ public class ThumbService extends AbstractService implements ImageJService {
                     .mapToObj(l -> "" + l)
                     .collect(Collectors.joining());
         }
+
         File thumbFile = getThumbFile(file, position, width, height);
 
         if (thumbFile.exists()) {
+
             logger.info("Loading thumb " + thumbFile.getAbsolutePath());
-            return new Image("file:" + thumbFile.getAbsolutePath());
+            timer.start();
+            Image image = new Image("file:" + thumbFile.getAbsolutePath());
+            timer.elapsed("loading png");
+        }
+        RandomAccessibleInterval interval;
+        timer.start();
+        synchronized (lock) {
+
+            interval = datasetUtilsService.open(file, imageId, true);
+        }
+        timer.elapsed("opening dataset");
+        if (nonSpacialPosition == null) {
+            nonSpacialPosition = new long[interval.numDimensions() - 2];
         }
 
-        try {
+        interval = imagePlaneService.plane(interval, nonSpacialPosition);
 
-            RandomAccessibleInterval interval = datasetUtilsService.open(file, imageId, true);
-            if (nonSpacialPosition == null) {
-                nonSpacialPosition = new long[interval.numDimensions() - 2];
-            }
-            interval = imagePlaneService.plane(interval, nonSpacialPosition);
-            int sub = (int) interval.dimension(0) / width;
-            sub = sub <= 2 ? 1 : sub - 1;
-            SubsampleIntervalView subsample = Views.subsample(interval, sub);
-            Image image = previewService.datasetToImage(subsample);
+        Image image = getThumb(interval, width, height);
 
+        new CallbackTask<>()
+                .tryRun(() -> saveImage(image, thumbFile))
+                .start();
+
+        return image;
+
+    }
+
+    public void saveImage(Image image, File file) throws Exception {
+        synchronized (lock) {
             BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
 
-            ImageIO.write(bImage, "png", thumbFile);
-
-            return image;
-
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            return null;
+            ImageIO.write(bImage, "png", file);
         }
-
     }
 
     public Image getThumb(RandomAccessibleInterval interval, int width, int height) {
 
+        if (width == 0 || height == 0) {
+            throw new IllegalArgumentException("Width or height cannot be equals to 0");
+        }
         int sub = (int) interval.dimension(0) / width;
-        sub = sub <= 2 ? 1 : sub - 1;
-        SubsampleIntervalView subsample = Views.subsample(interval, sub);
+
+        sub = sub <= 2 ? 0 : sub - 1;
+
+        RandomAccessibleInterval subsample;
+        if (sub == 0) {
+            subsample = interval;
+        } else {
+            subsample = Views.subsample(interval, sub);
+        }
+
         Image image = previewService.datasetToImage(subsample);
         return image;
     }
 
+    /*
     public Image getThumb(File file, Integer imageId, Integer planeIndex, int width, int height) throws IOException {
 
         // we use SCIFIO initializer to get the right reader
@@ -221,10 +240,10 @@ public class ThumbService extends AbstractService implements ImageJService {
         return wi;
     }
 
+    /*
     public Image getThumb(File file, Integer planeIndex, int width, int height) throws IOException {
         return getThumb(file, 0, planeIndex, width, height);
-    }
-
+    }*/
     private boolean thumbExists(File file, String planeIndex, int width, int height) {
         return getThumbFile(file, planeIndex, width, height).exists();
     }
@@ -259,6 +278,7 @@ public class ThumbService extends AbstractService implements ImageJService {
         return getThumbUUID(file, planeIndex.toString(), width, height) + THUMB_FORMAT;
     }
 
+    /*
     public Task<Image> getThumbTask(final File file, int planeIndex, int width, int height) {
         Task<Image> task = new Task<Image>() {
             public Image call() throws IOException {
@@ -268,6 +288,5 @@ public class ThumbService extends AbstractService implements ImageJService {
         };
 
         return task;
-    }
-
+    }*/
 }

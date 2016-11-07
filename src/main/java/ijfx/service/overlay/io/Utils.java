@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class Utils {
 

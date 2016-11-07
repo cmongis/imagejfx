@@ -21,7 +21,7 @@ package ijfx.ui.explorer;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public enum ExplorationMode {
     FILE,

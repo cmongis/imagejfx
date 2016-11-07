@@ -40,7 +40,7 @@ import mongis.utils.FluidWebViewWrapper;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 class CorrectionUiPluginWrapper extends TitledPane {
     

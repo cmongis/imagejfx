@@ -59,7 +59,7 @@ import org.controlsfx.control.RangeSlider;
 
 /**
  *
- * @author cyril
+ * @author Cyril MONGIS, 2016
  */
 public class DefaultNumberFilter extends BorderPane implements NumberFilter {
 
