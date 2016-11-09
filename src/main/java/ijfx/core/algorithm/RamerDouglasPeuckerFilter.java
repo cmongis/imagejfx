@@ -29,7 +29,7 @@ import static java.lang.Math.sqrt;
 /**
  * Filters data using Ramer-Douglas-Peucker algorithm with specified tolerance
  * 
- * @author RzeÅºnik
+ * @author Rzeanik
  * @see <a href="http://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm">Ramer-Douglas-Peucker algorithm</a>
  */
 public class RamerDouglasPeuckerFilter  {

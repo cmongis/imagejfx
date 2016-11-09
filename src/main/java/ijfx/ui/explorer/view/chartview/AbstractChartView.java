@@ -106,7 +106,7 @@ public abstract class AbstractChartView extends AnchorPane {
         }
                 series.getData().addAll(listExplorers);
                 scatterChart.getData().add(series);
-                series.setName("Series n° " + scatterChart.getData().size());
+                series.setName("Series #" + scatterChart.getData().size());
 
     }
 
