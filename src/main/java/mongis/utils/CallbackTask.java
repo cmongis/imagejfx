@@ -343,24 +343,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    @FunctionalInterface
-    public interface FailableConsumer<T> {
-
-        void accept(T t) throws Exception;
-    }
     
-    @FunctionalInterface
-    public interface FailableCallable<T> {
-        T call() throws Exception;
-    }
     
-    @FunctionalInterface
-    public interface FailableBiConsumer<T,R> {
-        void accept(T t, R r);
-    }
-    @FunctionalInterface
-    public interface FailableRunnable{
-        void run() throws Exception;
-    }
 
 }
