@@ -54,6 +54,10 @@ public abstract class AbstractExplorable implements Explorable{
         return new File(getMetaDataSet().get(MetaData.ABSOLUTE_PATH).getStringValue());
     }
   
+    @Override
+    public void dispose() {
+        
+    }
     
     
 }
