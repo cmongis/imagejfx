@@ -154,6 +154,10 @@ public class RecentFilePanel extends BorderPane{
         public Dataset getDataset() {
             return null;
         }
+        
+        public void dispose() {
+            
+        }
     }
     
     private class FileIconCell extends PaneIconCell<Iconazable> {

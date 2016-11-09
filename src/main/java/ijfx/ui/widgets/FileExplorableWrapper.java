@@ -101,4 +101,8 @@ public class FileExplorableWrapper extends AbstractExplorable{
     }
     
     
+    public void dispose() {
+        dataset = null;
+    }
+    
 }

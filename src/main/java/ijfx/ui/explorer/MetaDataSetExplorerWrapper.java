@@ -78,4 +78,8 @@ public class MetaDataSetExplorerWrapper extends AbstractExplorable implements Ex
         return wrappedMetaDataSet;
     }
     
+    public void dispose() {
+        
+    }
+    
 }

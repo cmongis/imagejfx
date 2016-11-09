@@ -35,18 +35,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.util.Pair;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.axis.Axes;
 import net.imagej.ops.OpService;
-import net.imagej.ops.Ops;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.util.ValuePair;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -249,6 +246,22 @@ public class DefaultIjfxStatisticService extends AbstractService implements Ijfx
         //return minMax;
     }
 
+    
+    public <T extends RealType<T>> DescriptiveStatistics getDescriptiveStatistics(RandomAccessibleInterval<T> interval) {
+        
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        
+        Cursor<T> cursor = Views.iterable(interval).cursor();
+        
+        cursor.reset();
+        while(cursor.hasNext()) {
+            cursor.fwd();
+            stats.addValue(cursor.get().getRealDouble());
+        }
+        
+        return stats;
+        
+    }
     
     
     

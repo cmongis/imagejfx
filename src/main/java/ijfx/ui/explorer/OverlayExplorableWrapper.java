@@ -237,4 +237,8 @@ public class OverlayExplorableWrapper extends AbstractExplorable {
         return statistics != null;
     }
 
+    
+    public void dispose(){
+        
+    }
 }

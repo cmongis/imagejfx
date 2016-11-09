@@ -27,4 +27,5 @@ import net.imagej.Dataset;
  */
 public interface DatasetHolder {
         Dataset getDataset();
+        public void dispose();
 }

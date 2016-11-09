@@ -178,5 +178,9 @@ public class ImageRecordIconizer implements Explorable {
         }
         return null;
     }
+    
+    public void dispose() {
+        
+    }
 
 }

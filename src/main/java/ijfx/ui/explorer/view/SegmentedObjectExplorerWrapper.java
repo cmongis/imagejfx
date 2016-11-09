@@ -165,5 +165,7 @@ public class SegmentedObjectExplorerWrapper extends AbstractExplorable {
         return object;
     }
     
-    
+    public void dispose() {
+        
+    }
 }

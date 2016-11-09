@@ -167,6 +167,9 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                 ImageJFX.getLogger().log(Level.SEVERE, null, ex);
             }
             return null;
-        }        
+        }
+        public void dispose() {
+            
+        }
     }
 
