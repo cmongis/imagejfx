@@ -173,7 +173,7 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
         // creating the workflow panel
         workflowPanel = new WorkflowPanel(context);
         workflowPanel.setPrefHeight(400);
-
+        workflowPanel.setPrefWidth(800);
         // creating the toggle button displaying the workflow panel
         toggleButton = new ToggleButton("Edit workflow");
         toggleButton.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.GEARS));
