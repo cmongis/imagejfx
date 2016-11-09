@@ -119,6 +119,7 @@ public class ThumbService extends AbstractService implements ImageJService {
             timer.start();
             Image image = new Image("file:" + thumbFile.getAbsolutePath());
             timer.elapsed("loading png");
+            return image;
         }
         RandomAccessibleInterval interval;
         timer.start();

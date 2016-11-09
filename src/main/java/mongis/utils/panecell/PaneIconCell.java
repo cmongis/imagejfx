@@ -140,11 +140,12 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             titleLabel.setPrefHeight(100);
              imageView.setSmooth(false);
              
-            imageView.fitWidthProperty().bind(widthProperty());
-            imageView.fitHeightProperty().bind(widthProperty());
-
-            imageView.fitWidthProperty().bind(imageViewContainer.widthProperty());
-            imageView.fitHeightProperty().bind(imageViewContainer.widthProperty());
+            //imageView.fitWidthProperty().bind(widthProperty());
+            //imageView.fitHeightProperty().bind(widthProperty());
+            imageView.setFitWidth(100);
+            //imageView.fitWidthProperty().bind(imageViewContainer.widthProperty());
+            imageView.setPreserveRatio(true);
+            //imageView.fitHeightProperty().bind(imageViewContainer.widthProperty());
            
            
             item.addListener(this::onItemChanged);

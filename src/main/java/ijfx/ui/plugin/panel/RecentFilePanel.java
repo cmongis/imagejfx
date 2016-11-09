@@ -19,17 +19,24 @@
  */
 package ijfx.ui.plugin.panel;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.thumb.ThumbService;
+import ijfx.service.ui.CommandRunner;
 import ijfx.service.ui.LoadingScreenService;
+import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.AbstractExplorable;
+import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.Iconazable;
 import ijfx.ui.explorer.view.IconView;
+import ijfx.ui.widgets.ExplorableButton;
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import static java.util.Collections.list;
+import java.util.List;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -48,72 +55,81 @@ import org.scijava.plugins.commands.io.OpenFile;
  *
  * @author Cyril MONGIS, 2016
  */
-public class RecentFilePanel extends BorderPane{
+public class RecentFilePanel extends BorderPane {
+
     private final Context context;
 
-    
-    
     private final IconView iconView;
-    
+
     @Parameter
     RecentFileService recentFileService;
-    
+
     @Parameter
     ThumbService thumbService;
-    
+
     @Parameter
     DefaultLoggingService logService;
-    
+
     @Parameter
     CommandService commandService;
-    
+
     @Parameter
     LoadingScreenService loadingScreenService;
-    
+
     @Parameter
     ExplorerService explorerService;
-    
+
+    @Parameter
+    ActivityService activityService;
+
+    ExplorableButton openImageButton = new ExplorableButton("Open image", "", FontAwesomeIcon.FOLDER_OPEN)
+            .setAction(this::openImage);
+
+    ExplorableButton exploreFolderButton = new ExplorableButton("Explore folder", "", FontAwesomeIcon.COMPASS)
+            .setAction(this::exploreFolder);
+
     public RecentFilePanel(Context context) {
         this.context = context;
         context.inject(this);
-        
+
         iconView = new IconView();
         context.inject(iconView);
-        
-       Label title = new Label("Recent files");
-       title.getStyleClass().add("h2");
-       title.getStyleClass().add("with-top-padding");
-       getStyleClass().add("with-padding");
+
+        Label title = new Label("Recent files");
+        title.getStyleClass().add("h2");
+        title.getStyleClass().add("with-top-padding");
+        getStyleClass().add("with-padding");
         setTop(title);
         setCenter(iconView);
-         iconView.setCellFactory(this::createIcon);
+        iconView.setCellFactory(this::createIcon);
         update();
-       
+
     }
-    
-    
+
     private PaneCell<Iconazable> createIcon() {
         return new FileIconCell();
     }
-    
+
     public void update() {
-         iconView.setItem(
-                recentFileService.getRecentFiles().stream()
-                .map(str-> new FileExplorableWrapper(new File(str)))
-                .collect(Collectors.toList())
-        );
+
+        ArrayList<Explorable> items = new ArrayList<>();
+        items.add(openImageButton);
+        items.add(exploreFolderButton);
+        recentFileService.getRecentFiles().stream()
+                .map(str -> new FileExplorableWrapper(new File(str)))
+                .forEach(items::add);
+        iconView.setItem(items);
+        
     }
-    
+
     private class FileExplorableWrapper extends AbstractExplorable {
 
-        
         private final File file;
 
         public FileExplorableWrapper(File file) {
             this.file = file;
         }
-        
-        
+
         @Override
         public String getTitle() {
             return file.getName();
@@ -131,14 +147,13 @@ public class RecentFilePanel extends BorderPane{
 
         @Override
         public Image getImage() {
-            if(file.getName().endsWith("png") || file.getName().endsWith("jpg")) {
+            if (file.getName().endsWith("png") || file.getName().endsWith("jpg")) {
                 return new Image(file.getAbsolutePath());
-            }
-            else {
+            } else {
                 try {
-                    return thumbService.getThumb(file, 0, null,100, 100);
+                    return thumbService.getThumb(file, 0, null, 100, 100);
                 } catch (Exception ex) {
-                    logService.warn(ex,"Couldn't load file %s",file.getAbsolutePath());
+                    logService.warn(ex, "Couldn't load file %s", file.getAbsolutePath());
                 }
             }
             return null;
@@ -146,7 +161,7 @@ public class RecentFilePanel extends BorderPane{
 
         @Override
         public void open() throws Exception {
-            Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile",file);
+            Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile", file);
             run.get();
         }
 
@@ -154,30 +169,40 @@ public class RecentFilePanel extends BorderPane{
         public Dataset getDataset() {
             return null;
         }
-        
+
         public void dispose() {
-            
+
         }
     }
-    
+
     private class FileIconCell extends PaneIconCell<Iconazable> {
+
         public FileIconCell() {
             super();
-            
-            setImageFactory(item->item.getImage());
-            setTitleFactory(item->item.getTitle());
-            setSubtitleFactory(item->item.getSubtitle());
+
+            setImageFactory(item -> item.getImage());
+            setTitleFactory(item -> item.getTitle());
+            setSubtitleFactory(item -> item.getSubtitle());
             setPrefWidth(150);
             showIconProperty().setValue(false);
-            
+
         }
-        
+
         @Override
         public void onSimpleClick() {
-          
+
             explorerService.open(getItem());
-            
+
         }
     }
-    
+
+    private void openImage() {
+        new CommandRunner(context)
+                .runSync(OpenFile.class);
+    }
+
+    private void exploreFolder() {
+        activityService.openByType(ExplorerActivity.class);
+    }
+
 }

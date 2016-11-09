@@ -137,6 +137,7 @@ public class DefaultWidget implements ItemWidget {
         } 
         
         else if(getIcon().startsWith("char:")) {
+            size *= 1.2;
             Canvas canvas = new Canvas(size,size);
             GraphicsContext graphicsContext2D = canvas.getGraphicsContext2D();
             
