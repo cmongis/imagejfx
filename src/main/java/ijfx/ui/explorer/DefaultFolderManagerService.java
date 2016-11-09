@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSetType;
+import ijfx.core.stats.DefaultIjfxStatisticService;
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ui.JsonPreferenceService;
 import ijfx.service.ui.LoadingScreenService;
@@ -44,6 +45,8 @@ import mongis.utils.AsyncCallable;
 import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
+import net.imglib2.RandomAccessibleInterval;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.Context;
 import org.scijava.event.EventHandler;
@@ -86,12 +89,13 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
     LoadingScreenService loadingScreenService;
     
     @Parameter
-    IjfxStatisticService statsService;
+    DefaultIjfxStatisticService statsService;
     
     @Parameter
     NotificationService notificationService;
     
-   
+    
+    
 
     Logger logger = ImageJFX.getLogger();
 
@@ -224,21 +228,13 @@ public class DefaultFolderManagerService extends AbstractService implements Fold
         for (Explorable e : explorableList) {
             if (!e.getMetaDataSet().containsKey(MetaData.STATS_PIXEL_MIN)) {
                 progress.setProgress(i,elements);
-                if (e.getMetaDataSet().getType() == MetaDataSetType.FILE) {
-                    ImageRecordIconizer iconizer = (ImageRecordIconizer) e;
-                    SummaryStatistics stats = statsService.getStatistics(iconizer.getImageRecord().getFile());
-                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
-                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
-                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
-                    iconizer.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
-                    elementAnalyzedCount++;
-                }
-                if(e.getMetaDataSet().getType() == MetaDataSetType.PLANE) {
+               MetaDataSetType type = e.getMetaDataSet().getType();
+                if (type == MetaDataSetType.FILE || type == MetaDataSetType.PLANE) {
+                    
                     SummaryStatistics stats = statsService.getSummaryStatistics(e.getDataset());
-                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MIN, stats.getMin());
-                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MAX, stats.getMax());
-                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_MEAN, stats.getMean());
-                    e.getMetaDataSet().putGeneric(MetaData.STATS_PIXEL_STD_DEV,stats.getMean());
+                    
+                    e.getMetaDataSet().merge(statsService.summaryStatisticsToMap(stats));  
+                    elementAnalyzedCount++;
                 }
             }
             i++;
