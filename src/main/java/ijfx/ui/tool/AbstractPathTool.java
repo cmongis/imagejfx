@@ -168,14 +168,15 @@ public abstract class AbstractPathTool implements FxTool {
             }
 
             DefaultOverlayView view = new DefaultOverlayView();
-            
+            //view.setSelected(true);
            
         }
         
        
       overlayUtilsService.addOverlay(display, list);
       //   list.stream().map(o->new OverlayCreatedEvent(o)).forEach(eventService::publish);
-       toolService.setCurrentTool(Hand.class);
+      if(list.size() == 1)overlaySelectionService.selectOnlyOneOverlay(display, list.get(0));
+      toolService.setCurrentTool(Hand.class);
     }
 
     

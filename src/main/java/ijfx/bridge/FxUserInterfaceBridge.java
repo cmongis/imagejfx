@@ -29,6 +29,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.scene.image.PixelFormat;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplayService;
@@ -44,6 +49,7 @@ import org.scijava.ui.UIService;
 import org.scijava.ui.UserInterface;
 import org.scijava.ui.viewer.DisplayWindow;
 import mongis.utils.FXUtilities;
+import org.scijava.ui.ARGBPlane;
 
 /**
  * UI bridge between ImageJFX and ImageJ
@@ -73,6 +79,7 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Parameter
     private ActivityService activityService;
+
     
     private static final Logger logger = ImageJFX.getLogger();
 
@@ -84,10 +91,21 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     private File lastOpenedFile;
 
-    public FxUserInterfaceBridge() {
-
+    
+    private SystemClipboard systemClipboard;
+    
+    public FxUserInterfaceBridge() { 
+        Platform.runLater(this::initiateClipbard);
     }
 
+    
+    public void initiateClipbard() {
+        
+       systemClipboard = new JavaFXClipboard();
+       
+       
+    }
+    
     public void initialize() {
         // making sure the StatusBar is created
         getStatusBar();
@@ -99,7 +117,7 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Override
     public SystemClipboard getSystemClipboard() {
-        return null;
+        return systemClipboard;
     }
 
     @Override
@@ -176,11 +194,11 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     public void show(final Display<?> dspl) {
 
         logger.info("Showing display");
-        
+
         ImageJContainer activity = activityService.getActivity(ImageJContainer.class);
-        
+
         activity.display(dspl);
-        
+
     }
 
     @Override
@@ -199,6 +217,35 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     @Override
     public boolean isVisible() {
         return true;
+    }
+
+    public class JavaFXClipboard implements SystemClipboard {
+
+        Clipboard clipboard;
+
+        public JavaFXClipboard() {
+            clipboard = Clipboard.getSystemClipboard();
+        }
+
+        @Override
+        public void pixelsToSystemClipboard(ARGBPlane plane) {
+
+            final int width = plane.getWidth();
+            final int height = plane.getHeight();
+
+            final WritableImage image = new WritableImage(width,height);
+            final PixelWriter writer = image.getPixelWriter();
+            final int[] pixels = plane.getData();
+            writer.setPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), pixels, 0, width);
+           
+            ClipboardContent content = new ClipboardContent();
+            content.putImage(image);
+            Platform.runLater(()->{
+            clipboard.setContent(content);
+            });
+            
+        }
+
     }
 
 }
