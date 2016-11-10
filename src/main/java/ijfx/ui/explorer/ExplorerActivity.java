@@ -104,7 +104,7 @@ import org.scijava.ui.UIService;
  *
  * @author Cyril MONGIS, 2016
  */
-@Plugin(type = Activity.class, name = "explorerActivity")
+@Plugin(type = Activity.class, name = "explore")
 public class ExplorerActivity extends AnchorPane implements Activity {
 
     @FXML
