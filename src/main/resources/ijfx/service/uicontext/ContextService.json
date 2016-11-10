@@ -1,7 +1,11 @@
 [
     {
         "name": "imagej",
-        "incompatibleWith": ["webapp", "image-browser","segmentation"]
+        "incompatibleWith": ["webapp", "image-browser","explorer"]
+    }
+    ,{
+        "name":"explorer"
+        ,"incompatibleWith":["webapp","imagej"]
     }
     ,{
         "name":"project-manager"
@@ -26,7 +30,11 @@
     }
     ,{
         "name":"segmentation"
-        ,"incompatibleWith":["imagej","webapp"]
+        ,"incompatibleWith":["visualize"]
+    }
+    ,{
+        "name":"visualize"
+        ,"incompatibleWith":["segmentation"]
     }
     ,{
         "name":"batch"
