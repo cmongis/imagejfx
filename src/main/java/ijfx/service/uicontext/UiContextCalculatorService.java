@@ -24,6 +24,7 @@ package ijfx.service.uicontext;
 import ijfx.plugins.commands.AxisUtils;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.overlay.OverlaySelectionEvent;
+import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.ui.datadisplay.object.SegmentedObjectDisplay;
 import mongis.utils.RequestBuffer;
 import mongis.utils.TimedBuffer;
@@ -33,6 +34,7 @@ import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.table.TableDisplay;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
@@ -63,7 +65,8 @@ public class UiContextCalculatorService extends AbstractService implements Image
     public final static String CTX_IMAGE_BINARY = "binary";
     public final static String CTX_MEASURE_DISPLAY = "measure-open";
     public final static String CTX_ANY_DISPLAY = "any-display-open";
-    
+    public final static String CTX_MASK = "mask";
+
     @Parameter
     DisplayService displayService;
 
@@ -79,10 +82,13 @@ public class UiContextCalculatorService extends AbstractService implements Image
     @Parameter
     UiContextService contextService;
 
+    @Parameter
+    OverlayUtilsService overlayUtilsService;
+
     private final RequestBuffer requestBuffer = new RequestBuffer(2);
 
-    TimedBuffer<Runnable> requestBuffer2 = new TimedBuffer<Runnable>().setAction(list->list.get(list.size()-1).run());
-    
+    TimedBuffer<Runnable> requestBuffer2 = new TimedBuffer<Runnable>().setAction(list -> list.get(list.size() - 1).run());
+
     public void determineContext(Display display) {
         requestBuffer2.add(() -> {
 
@@ -92,11 +98,11 @@ public class UiContextCalculatorService extends AbstractService implements Image
             ImageDisplay imageDisplay = null;
 
             contextService.toggleContext(CTX_IMAGE_DISPLAY, display != null && ImageDisplay.class.isAssignableFrom(display.getClass()));
-            contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()) );
+            contextService.toggleContext(CTX_TABLE_DISPLAY, display != null && TableDisplay.class.isAssignableFrom(display.getClass()));
             contextService.toggleContext(CTX_MEASURE_DISPLAY, display != null && SegmentedObjectDisplay.class.isAssignableFrom(display.getClass()));
             contextService.toggleContext(CTX_ANY_DISPLAY, displayService.getDisplays().size() > 0);
 
-// calculation specific to iamge display
+            // calculation specific to iamge display
             if (display instanceof ImageDisplay) {
                 imageDisplay = (ImageDisplay) display;
 
@@ -113,7 +119,9 @@ public class UiContextCalculatorService extends AbstractService implements Image
                 contextService.toggleContext(CTX_IMAGE_BINARY, imageDisplay != null && imageDisplayService.getActiveDataset(imageDisplay).getValidBits() == 1);
 
                 contextService.toggleContext(CTX_MULTI_N_IMG, imageDisplay != null && imageDisplay.numDimensions() > 2);
-                
+
+                contextService.toggleContext(CTX_MASK, overlayUtilsService.findOverlayOfType(imageDisplay, BinaryMaskOverlay.class) != null);
+
                 Dataset dataset = null;
                 if (display != null) {
                     dataset = (Dataset) imageDisplay.getActiveView().getData();
@@ -149,7 +157,6 @@ public class UiContextCalculatorService extends AbstractService implements Image
     @EventHandler
     public void handleEvent(OverlaySelectionEvent event) {
         determineContext(event.getDisplay());
-        
 
     }
 
