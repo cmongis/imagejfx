@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "imagej-toolbar", context = "imagej+image-open", localization = Localization.LEFT)
+@UiConfiguration(id = "imagej-toolbar", context = "imagej+visualize+image-open", localization = Localization.LEFT)
 public class ImageJToolBar extends VBox implements UiPlugin {
 
     @Parameter

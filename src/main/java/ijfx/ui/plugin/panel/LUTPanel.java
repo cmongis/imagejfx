@@ -124,7 +124,7 @@ import org.scijava.util.Colors;
  *
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "lutPanel", context = "imagej+image-open -overlay-selected", localization = Localization.RIGHT, order = 0)
+@UiConfiguration(id = "lutPanel", context = "imagej+visualize+image-open -overlay-selected", localization = Localization.RIGHT, order = 0)
 public class LUTPanel extends TitledPane implements UiPlugin {
 
     LUTComboBox lutComboBox;

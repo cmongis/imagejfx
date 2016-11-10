@@ -315,7 +315,7 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
     private void init() {
         if (thresholdMethods == null) {
             
-            isExplorer = new UiContextProperty(context,"explorerActivity");
+            isExplorer = new UiContextProperty(context,"explorer");
             
             initListeners();
         }

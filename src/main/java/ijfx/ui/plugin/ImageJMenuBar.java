@@ -53,7 +53,7 @@ import org.scijava.menu.event.MenusRemovedEvent;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "imagej-menu-bar", context = "imagej", localization = "topCenterHBox")
+@UiConfiguration(id = "imagej-menu-bar", context = "imagej+visualize", localization = "topCenterHBox")
 public class ImageJMenuBar extends MenuBar implements UiPlugin {
 
     @Parameter

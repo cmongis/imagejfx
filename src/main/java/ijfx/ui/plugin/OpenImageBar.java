@@ -53,7 +53,7 @@ import mongis.utils.FXUtilities;
  * @author Cyril MONGIS, 2015
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "open-image-button", localization = "topLeftHBox", context = "imagej segment segmentation explorerActivity explorer")
+@UiConfiguration(id = "open-image-button", localization = "topLeftHBox", context = "imagej+visualize+image-open")
 public class OpenImageBar extends HBox implements UiPlugin {
 
     MenuButton openButton;

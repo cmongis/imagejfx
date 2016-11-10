@@ -130,7 +130,7 @@ import org.scijava.plugin.PluginService;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "explorerActivity+segmentation segmentation+any-display-open -overlay-selected")
+@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "any-display-open+segmentation -overlay-selected")
 public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -267,7 +267,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                 .map(PluginWrapper::new)
                 .forEach(this::addPlugin);
 
-        isExplorerProperty = new UiContextProperty(context, "explorerActivity");
+        isExplorerProperty = new UiContextProperty(context, "explorer");
 
         isExplorerProperty.addListener(this::onExplorerPropertyChanged);
 

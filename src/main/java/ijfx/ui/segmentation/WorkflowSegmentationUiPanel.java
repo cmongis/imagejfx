@@ -147,7 +147,7 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
             workflowPanel.setPrefHeight(500);
             workflowPanel.setPrefWidth(600);
 
-            isExplorer = new UiContextProperty(context, "explorerActivity");
+            isExplorer = new UiContextProperty(context, "explorer");
             
             new OpacityTransitionBinding(testButton, isExplorer.not());
             
