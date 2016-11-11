@@ -2,7 +2,7 @@
     {
         "name": "Math"
         ,
-        "context": "imagej+image-open"
+        "context": "visualize+image-open"
         ,
         "icon": "CALCULATOR"
         ,
@@ -17,7 +17,6 @@
                 "icon": "char:+"
                 ,
                 "context": "image-open"
-
             },
             {
                 "type": "Command"
@@ -29,7 +28,6 @@
                 "icon": "char:-"
                 ,
                 "context": "image-open"
-
             },
             {
                 "type": "Command"
@@ -41,7 +39,6 @@
                 "icon": "char:x"
                 ,
                 "context": "image-open"
-
             },
             {
                 "type": "Command"
@@ -53,7 +50,6 @@
                 "icon": "char:/"
                 ,
                 "context": "image-open"
-
             }
 
 
@@ -63,7 +59,7 @@
     {
         "name": "Colors"
         ,
-        "context": "image-open"
+        "context": "visualize+image-open"
         ,
         "icon": "PAINT_BRUSH"
         ,
@@ -78,7 +74,6 @@
                 "icon": "ADJUST"
                 ,
                 "context": "image-open"
-
             },
             {
                 "type": "Command"
@@ -102,7 +97,7 @@
                 "icon": "USERS"
                 ,
                 "context": "multi-channel-img"
-            }, {
+            },{
                 "type": "Command"
                 ,
                 "label": "Stacks to multi-channel"
@@ -112,7 +107,7 @@
                 "icon": "USERS"
                 ,
                 "context": "multi-channel-img"
-            }, {
+            },{
                 "type": "Command"
                 ,
                 "label": "Isolate Channel"
@@ -127,10 +122,10 @@
 
         ]
     }
-    , {
+    ,{
         "name": "Stacks"
         ,
-        "context": "imagej+multi-n-img"
+        "context": "visualize+multi-n-img"
         ,
         "icon": "STACK_OVERFLOW"
         ,
@@ -156,10 +151,9 @@
                 "icon": "UPLOAD"
                 ,
                 "context": "multi-z-img multi-time-img"
-
             }
 
-            , {
+            ,{
                 "type": "Command"
                 ,
                 "label": "Delete Slices"
@@ -170,7 +164,7 @@
                 ,
                 "context": "multi-z-img multi-time-img"
             }
-            , {
+            ,{
                 "type": "Command"
                 ,
                 "label": "Reorder Data"
@@ -181,7 +175,7 @@
                 ,
                 "context": "image-open"
             }
-            , {
+            ,{
                 "type": "Command"
                 ,
                 "label": "Convert to Hyperstack..."
@@ -192,7 +186,7 @@
                 ,
                 "context": "multi-z-img multi-time-img"
             }
-            , {
+            ,{
                 "type": "Command"
                 ,
                 "label": "Hyperstack to Stack..."
@@ -203,7 +197,7 @@
                 ,
                 "context": "multi-n-img"
             }
-            , {
+            ,{
                 "type": "Command"
                 ,
                 "label": "Merge stacks into a multi-channel"
@@ -220,7 +214,7 @@
     {
         "name": "Filters"
         ,
-        "context": "imagej+image-open"
+        "context": "visuliaze+image-open"
         ,
         "icon": "BULLSEYE"
         ,
@@ -240,7 +234,6 @@
                     "sigma": 3
                     ,
                     "useUnits": false
-
                 }
             },
             {
@@ -256,10 +249,7 @@
                 ,
                 "parameters": {
                     "neighTypeString": "RADIAL_STRING"
-
                 }
-
-
             }
 
             ,
@@ -276,10 +266,7 @@
                 ,
                 "parameters": {
                     "neighTypeString": "RADIAL_STRING"
-
                 }
-
-
             }
 
             ,
@@ -296,7 +283,6 @@
                 ,
                 "parameters": {
                     "neighTypeString": "RADIAL_STRING"
-
                 }
             }
         ]
@@ -304,7 +290,7 @@
     {
         "name": "Noises"
         ,
-        "context": "imagej+image-open"
+        "context": "visualize+image-open"
         ,
         "icon": "BITCOIN"
         ,
@@ -322,10 +308,7 @@
                 ,
                 "parameters": {
                     "allPlanes": false
-
                 }
-
-
             },
             {
                 "type": "Command"
@@ -337,9 +320,6 @@
                 "icon": "preview"
                 ,
                 "context": "image-open"
-
-
-
             }
 
 
@@ -349,7 +329,7 @@
     {
         "name": "Image"
         ,
-        "context": "imagej+image-open"
+        "context": "visualize+image-open"
         ,
         "icon": "FILE_IMAGE_ALT"
         ,
@@ -368,8 +348,6 @@
                 "parameters": {
                     "method": "ToObject:net.imagej.threshold.DefaultThresholdMethod"
                 }
-
-
             }
             ,
             {
@@ -382,9 +360,6 @@
                 "icon": "EXPAND"
                 ,
                 "context": "image-open"
-
-
-
             }
 
             ,
@@ -401,10 +376,7 @@
                 ,
                 "parameters": {
                     "angle": 90
-
                 }
-
-
             }
             ,
             {
@@ -417,9 +389,6 @@
                 "icon": "REPEAT"
                 ,
                 "context": "image-open"
-
-
-
             }
             ,
             {
@@ -432,9 +401,6 @@
                 "icon": "UNDO"
                 ,
                 "context": "image-open"
-
-
-
             }
             ,
             {
@@ -450,10 +416,7 @@
                 ,
                 "parameters": {
                     "deltasString": "0=100.0, 1=0.0, 2=0.0"
-
                 }
-
-
             }
 
             ,
@@ -467,9 +430,6 @@
                 "icon": "CROP"
                 ,
                 "context": "image-open"
-
-
-
             }
             ,
             {
@@ -482,9 +442,6 @@
                 "icon": "CLONE"
                 ,
                 "context": "image-open"
-
-
-
             }
         ]
     }
@@ -493,7 +450,7 @@
     {
         "name": "Binary"
         ,
-        "context": "imagej+image-open"
+        "context": "visualize+image-open"
         ,
         "icon": "BARCODE"
         ,
@@ -513,7 +470,6 @@
                     "method": "ToObject:net.imagej.threshold.DefaultThresholdMethod",
                     "maskColor": "Black"
                 }
-
             }
             ,
             {
@@ -526,8 +482,6 @@
                 "icon": "preview"
                 ,
                 "context": "binary"
-
-
             }
             ,
             {
@@ -540,8 +494,6 @@
                 "icon": "preview"
                 ,
                 "context": "binary"
-
-
             }
             ,
             {
@@ -554,8 +506,6 @@
                 "icon": "preview"
                 ,
                 "context": "binary"
-
-
             }
             ,
             {
@@ -569,7 +519,7 @@
                 ,
                 "context": "binary"
             }
-            , {
+            ,{
                 "type": "Command"
                 ,
                 "label": "Invert"
@@ -586,38 +536,8 @@
             }
         ]
     }
-    , {
-        "name": "Overlay"
-        ,
-        "context": "segmentation+image-open imagej+overlay-selected"
-        ,
-        "icon": "BARCODE"
-        ,
-        "items": [
-            {
-                "type": "Command"
-                ,
-                "label": "Remove selected"
-                ,
-                "action": "ijfx.plugins.commands.removeAllOverlays"
-                ,
-                "context": "overlay-selected"
-            }
-            , {
-                "type": "Command"
-                ,
-                "label": "Delete all"
-                ,
-                "action": "ijfx.plugins.commands.RemoveAllOverlays"
-                ,
-                "icon": "REMOVE"
-                ,
-                "context": "image-open"
-            }
 
-        ]
-    }
-    , {
+    ,{
         "name": "Table"
         ,
         "context": "table-open table-open"
@@ -638,29 +558,37 @@
             }
         ]
     }
-    , {
+    ,{
         "name": "Measures"
         ,
-        "context": "image-open"
+        "context": "visualize+image-open"
         ,
         "icon": "CUTLERY"
         ,
         "items": [
             {
-                "type":"Command"
-                ,"label":"Slice statistics"
-                ,"action":"ijfx.plugins.commands.measures.MeasurePlaneStatistics"
-                ,"icon":"INDENT"
-                ,"context":"image-open"
+                "type": "Command"
+                ,
+                "label": "Slice statistics"
+                ,
+                "action": "ijfx.plugins.commands.measures.MeasurePlaneStatistics"
+                ,
+                "icon": "INDENT"
+                ,
+                "context": "image-open"
             }
             ,{
-                "type":"Command"
-                ,"label":"Global statistics"
-                ,"action":"ijfx.plugins.commands.measures.DatasetStatistics"
-                ,"icon":"GLOBE"
-                ,"context":"image-open"
+                "type": "Command"
+                ,
+                "label": "Global statistics"
+                ,
+                "action": "ijfx.plugins.commands.measures.DatasetStatistics"
+                ,
+                "icon": "GLOBE"
+                ,
+                "context": "image-open"
             }
-            
+
             ,{
                 "type": "Command"
                 ,
@@ -670,9 +598,9 @@
                 ,
                 "icon": "TH"
                 ,
-                "context": "image-open"
+                "context": "image-open+overlay-selected"
             }
-            , {
+            ,{
                 "type": "Command"
                 ,
                 "label": "Selected object"
@@ -683,12 +611,107 @@
                 ,
                 "context": "image-open+overlay-selected"
             }
-           
+
         ]
+    },
+    {
+        "name": "Selection"
+        ,
+        "context": "imagej+overlay-selected"
+        ,
+        "icon": "BARCODE"
+        ,
+        "items": [
 
+            {
+                "type": "Command"
+                ,
+                "label": "Measure"
+                ,
+                "action": "ijfx.plugins.commands.measures.MeasureAllOverlays"
+                ,
+                "icon": "TH"
+                ,
+                "context": "image-open"
+            }
+            ,{
+                "type": "Command"
+                ,
+                "label": "Measure all"
+                ,
+                "action": "ijfx.plugins.commands.measures.MeasureSelectedOverlay"
+                ,
+                "icon": "SQUARE"
+                ,
+                "context": "image-open"
+            },
 
+            {
+                "type": "Command"
+                ,
+                "label": "Delete"
+
+                ,
+                "icon": "REMOVE"
+
+                ,
+                "action": "ijfx.plugins.commands.removeAllOverlays"
+                ,
+                "context": "overlay-selected"
+            }
+            ,{
+                "type": "Command"
+                ,
+                "label": "Delete all"
+                ,
+                "action": "ijfx.plugins.commands.RemoveAllOverlays"
+                ,
+                "icon": "REMOVE"
+                ,
+                "context": "image-open"
+            }
+
+        ]
     }
-    , {
+    ,{
+        "name": "Mask"
+        ,
+        "context": "image-open+mask"
+        ,
+        "icon": ""
+        ,
+        "items": [
+            
+            {
+                "type":"Command"
+                ,"label":"Apply..."
+                ,"action":"ijfx.plugins.commands.mask.ApplyMask"
+                ,"icon":"char:A"
+                ,"context":"image-open"
+            }
+            ,
+            {
+                "type":"Command"
+                ,"label":"Intersect with..."
+                ,"action":"ijfx.plugins.commands.mask.IntersectMasks"
+                ,"icon":"char:A"
+                ,"context":"image-open"
+            }
+            
+            ,{
+                "type": "Command"
+                ,
+                "label": "Delete"
+                ,
+                "action": "ijfx.plugins.commands.RemoveAllOverlays"
+                ,
+                "icon": "REMOVE"
+                ,
+                "context": "image-open"
+            }
+        ]
+    }
+    ,{
         "name": "Save"
         ,
         "context": "measure-open"
@@ -697,10 +720,8 @@
         ,
         "items": [
             {
-                "type": "Command"
-                ,
-                "label": "Save as CSV"
-                ,
+                "type": "Command",
+                "label": "Save as CSV",
                 "action": "ijfx.ui.plugins.commands.measures.SaveAsCsv"
                 ,
                 "icon": "TABLE"
