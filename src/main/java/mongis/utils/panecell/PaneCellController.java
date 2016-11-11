@@ -93,7 +93,7 @@ public class PaneCellController<T extends Object> {
      *
      * @param items List of items coming from the model
      */
-    public synchronized Task update(List<T> items) {
+    public synchronized CallbackTask update(List<T> items) {
 
         return new CallbackTask<Integer, List<PaneCell<T>>>()
                 .setInput(items.size())
@@ -201,26 +201,7 @@ public class PaneCellController<T extends Object> {
         return null;
     }
 
-    private class CellClickHandler implements EventHandler<MouseEvent> {
-
-        PaneCell<T> cell;
-        private final static long DOUBLE_CLICK_INTERVAL = 1000;
-        long lastClick;
-
-        @Override
-        public void handle(MouseEvent event) {
-
-            long now = System.currentTimeMillis();
-
-            if (now - lastClick <= DOUBLE_CLICK_INTERVAL) {
-
-            } else {
-                setSelected(cell.getItem(), Boolean.TRUE);
-            }
-
-        }
-
-    }
+    
 
     public Boolean isSelected(T item) {
         return selectedItems.contains(item);

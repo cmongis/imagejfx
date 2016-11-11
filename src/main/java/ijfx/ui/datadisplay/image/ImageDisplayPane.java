@@ -814,7 +814,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         long width = getDataset().dimension(0);
         long height = getDataset().dimension(1);
         CalibratedAxis[] axes = new CalibratedAxis[imageDisplay.numDimensions()];
-        int[] position = new int[imageDisplay.numDimensions()];
+        long[] position = new long[imageDisplay.numDimensions()];
+        
         getDataset().axes(axes);
         imageDisplay.localize(position);
         String positionStr

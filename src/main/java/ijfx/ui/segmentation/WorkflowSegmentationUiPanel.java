@@ -32,11 +32,11 @@ import ijfx.ui.batch.WorkflowPanel;
 import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.widgets.PopoverToggleButton;
 import ijfx.ui.widgets.PrettyStats;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
@@ -67,7 +67,7 @@ import org.scijava.ui.UIService;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type = SegmentationUiPlugin.class, label = "Process workflow", priority = 0.09)
-public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiPlugin {
+public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiPlugin<FakeSegmentation> {
 
     @Parameter
     private Context context;
@@ -118,8 +118,8 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     }
 
-    @Override
-    public void setImageDisplay(ImageDisplay display) {
+   
+    public void process(ImageDisplay display) {
         if (display == imageDisplay) {
             return;
         }
@@ -160,25 +160,17 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
         return this;
     }
 
-    @Override
-    public Workflow getWorkflow() {
-        return new DefaultWorkflow(workflowPanel.stepListProperty());
-    }
-
-    @Override
-    public Property<Img<BitType>> maskProperty() {
-        return maskProperty;
-    }
-
+    
     private void onTestClicked(ActionEvent event) {
 
         Task task = new WorkflowBuilder(context)
                 .addInput(imageDisplay)
                 .execute(workflowPanel.stepListProperty())
+                
                 .then(output -> {
                     Dataset dataset = output.getDataset();
                     if (dataset.getType().getBitsPerPixel() == 1) {
-                        maskProperty().setValue((Img<BitType>) dataset.getImgPlus().getImg());
+                       
                     } else {
                         uiService.showDialog("Your workflow should result into a binary image.");
 
@@ -188,9 +180,15 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
         loadingService.frontEndTask(task, true);
     }
 
+  
     @Override
-    public BooleanProperty activatedProperty() {
-        return activatedProperty;
+    public FakeSegmentation createSegmentation(ImageDisplay imageDisplay) {
+        return new FakeSegmentation();
+    }
+
+    @Override
+    public void bind(FakeSegmentation t) {
+      
     }
 
 }

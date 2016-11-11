@@ -63,7 +63,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     // Possible operation
     private FailableCallback<INPUT, OUTPUT> callback;
     private FailableCallable<OUTPUT> callable;
-    private LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback;
+    private LongCallback<INPUT, OUTPUT> longCallback;
     private LongCallable<OUTPUT> longCallable;
     private FailableRunnable runnable;
     private FailableConsumer<INPUT> consumer;
@@ -144,7 +144,7 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
         return this;
     }
 
-    public CallbackTask<INPUT, OUTPUT> run(LongCallback<ProgressHandler, INPUT, OUTPUT> longCallback) {
+    public CallbackTask<INPUT, OUTPUT> run(LongCallback<INPUT, OUTPUT> longCallback) {
         this.longCallback = longCallback;
         return this;
     }
@@ -325,6 +325,11 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
     public CallbackTask<INPUT, OUTPUT> submit(Consumer<Task> consumer) {
         consumer.accept(this);
         return this;
+    }
+    
+    public CallbackTask<INPUT,OUTPUT> submit(Consumer<Task> consumer,boolean condition) {
+        if(condition) return submit(consumer);
+        else return this;
     }
 
     @Override

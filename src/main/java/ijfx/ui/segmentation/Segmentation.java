@@ -20,34 +20,25 @@
 package ijfx.ui.segmentation;
 
 import ijfx.service.workflow.Workflow;
-import java.util.List;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
-import javafx.scene.Node;
 import net.imagej.display.ImageDisplay;
-import net.imagej.ops.Initializable;
 import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
-import org.scijava.plugin.Plugin;
-import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
- * @author Cyril MONGIS, 2016
+ * @author cyril
  */
-public interface SegmentationUiPlugin<T extends Segmentation> extends SciJavaPlugin,Initializable{
+public interface Segmentation {
     
-    //void process(ImageDisplay display);
     
-    Node getContentNode();
-    
+    Property<Img<BitType>> maskProperty();
    
-    T createSegmentation(ImageDisplay imageDisplay);
     
-    void bind(T t);
+    public void update(ImageDisplay imageDisplay);
     
-    public default String getName() {
-        return getClass().getAnnotation(Plugin.class).label();
-    }
+    
+    public Workflow getWorkflow();
+    
     
 }

@@ -102,7 +102,7 @@ public class RecentFilePanel extends BorderPane {
         setTop(title);
         setCenter(iconView);
         iconView.setCellFactory(this::createIcon);
-        update();
+     
 
     }
 

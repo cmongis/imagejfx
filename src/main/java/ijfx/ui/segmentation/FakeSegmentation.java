@@ -19,35 +19,27 @@
  */
 package ijfx.ui.segmentation;
 
+import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
-import java.util.List;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
-import javafx.scene.Node;
+import ijfx.ui.segmentation.threshold.AbstractSegmentation;
 import net.imagej.display.ImageDisplay;
-import net.imagej.ops.Initializable;
-import net.imglib2.img.Img;
-import net.imglib2.type.logic.BitType;
-import org.scijava.plugin.Plugin;
-import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
- * @author Cyril MONGIS, 2016
+ * @author cyril
  */
-public interface SegmentationUiPlugin<T extends Segmentation> extends SciJavaPlugin,Initializable{
-    
-    //void process(ImageDisplay display);
-    
-    Node getContentNode();
-    
+public class FakeSegmentation extends AbstractSegmentation{
+
    
-    T createSegmentation(ImageDisplay imageDisplay);
-    
-    void bind(T t);
-    
-    public default String getName() {
-        return getClass().getAnnotation(Plugin.class).label();
+
+    @Override
+    public void update(ImageDisplay imageDisplay) {
+       
+    }
+
+    @Override
+    public Workflow getWorkflow() {
+        return new DefaultWorkflow();
     }
     
 }

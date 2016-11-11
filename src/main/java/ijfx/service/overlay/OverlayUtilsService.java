@@ -26,6 +26,7 @@ import ijfx.ui.activity.ActivityService;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -39,7 +40,14 @@ import net.imagej.display.OverlayService;
 import net.imagej.display.OverlayView;
 import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.event.OverlayDeletedEvent;
+import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.overlay.Overlay;
+import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.Img;
+import net.imglib2.roi.BinaryMaskRegionOfInterest;
+import net.imglib2.type.logic.BitType;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.event.EventService;
@@ -210,5 +218,50 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
         
     }
     
+   /*
+        Binary mask related operation
+    */
+    
+    public Img<BitType> extractBinaryMask(ImageDisplay imageDisplay) {
+        BinaryMaskOverlay maskOverlay = findOverlayOfType(imageDisplay, BinaryMaskOverlay.class);
+        return extractBinaryMask(maskOverlay);
+    }
+    
+    public Img<BitType> extractBinaryMask(BinaryMaskOverlay overlay) {
+        return ((BinaryMaskRegionOfInterest<BitType, Img<BitType>>) overlay.getRegionOfInterest()).getImg();
+    }
+    
+    public void updateBinaryMask(ImageDisplay imageDisplay, Img<BitType> mask) {
+        
+        if(mask == null) return;
+        BinaryMaskOverlay overlay = findOverlayOfType(imageDisplay, BinaryMaskOverlay.class);
+        
+        if (overlay == null) {
+            overlay = createBinaryMaskOverlay(imageDisplay, mask);
+        } else {
+
+            BinaryMaskRegionOfInterest regionOfInterest = (BinaryMaskRegionOfInterest) overlay.getRegionOfInterest();
+
+            RandomAccessibleInterval<BitType> img = regionOfInterest.getImg();
+            RandomAccess<BitType> randomAccess = img.randomAccess();
+            Cursor<BitType> cursor = mask.cursor();
+
+            cursor.reset();
+            while (cursor.hasNext()) {
+                cursor.fwd();
+                randomAccess.setPosition(cursor);
+                randomAccess.get().set(cursor.get());
+            }
+
+        }
+    }
+    
+    public BinaryMaskOverlay createBinaryMaskOverlay(ImageDisplay imageDisplay, Img<BitType> mask) {
+
+        BinaryMaskOverlay overlay = new BinaryMaskOverlay(getContext(), new BinaryMaskRegionOfInterest<>(mask));
+        overlayService.addOverlays(imageDisplay, Arrays.asList(overlay));
+        return overlay;
+
+    }
     
 }

@@ -17,37 +17,50 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.segmentation;
+package ijfx.ui.segmentation.threshold;
 
-import ijfx.service.workflow.Workflow;
-import java.util.List;
-import javafx.beans.property.BooleanProperty;
+import ijfx.ui.segmentation.Segmentation;
+import java.lang.ref.WeakReference;
+import java.util.Optional;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
-import javafx.scene.Node;
+import javafx.beans.property.SimpleObjectProperty;
 import net.imagej.display.ImageDisplay;
-import net.imagej.ops.Initializable;
 import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
-import org.scijava.plugin.Plugin;
-import org.scijava.plugin.SciJavaPlugin;
 
 /**
  *
- * @author Cyril MONGIS, 2016
+ * @author cyril
  */
-public interface SegmentationUiPlugin<T extends Segmentation> extends SciJavaPlugin,Initializable{
+public abstract class AbstractSegmentation implements Segmentation{
     
-    //void process(ImageDisplay display);
+    private ObjectProperty<Img<BitType>> maskProperty = new SimpleObjectProperty();
     
-    Node getContentNode();
     
-   
-    T createSegmentation(ImageDisplay imageDisplay);
+    private WeakReference<ImageDisplay> imageDisplay;
     
-    void bind(T t);
     
-    public default String getName() {
-        return getClass().getAnnotation(Plugin.class).label();
+    protected void setImageDisplay(ImageDisplay display) {
+        imageDisplay = new WeakReference<>(display);
+    
     }
+    
+    protected Optional<ImageDisplay> getImageDisplay() {
+        return Optional.of(imageDisplay.get());
+    }
+    
+    
+    protected void setMask(Img<BitType> mask) {
+        maskProperty.setValue(mask);
+    }
+    
+    public Property<Img<BitType>> maskProperty() {
+        return maskProperty;
+    }
+    
+    
+    
+    
     
 }

@@ -19,11 +19,12 @@
  */
 package mongis.utils.panecell;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -84,6 +85,10 @@ public class ScrollBinder {
         Bounds scrollWindow = new BoundingBox(minX, minY, scrollPane.getWidth(), scrollPane.getHeight());
 
         Parent parentNode = (Parent) scrollPane.getContent();
+        
+        List<Node> toAdd = new ArrayList<>();
+        List<Node> toRemove = new ArrayList<>();
+        
         parentNode.getChildrenUnmodifiable().forEach(child -> {
             Bounds boundsInParent = child.getBoundsInParent();
 
@@ -92,15 +97,19 @@ public class ScrollBinder {
             if (scrollWindow.intersects(boundsInParent)) {
                 if (!visiblesNode.contains(child)) {
 
-                    visiblesNode.add(child);
+                    toAdd.add(child);
                 }
 
                 // if it doesn't belong to the visible node window,
                 // then it's remove from the visible node list.
             } else if (visiblesNode.contains(child)) {
 
-                visiblesNode.remove(child);
+                toRemove.remove(child);
             }
         });
+        
+        visiblesNode.addAll(toAdd);
+        visiblesNode.removeAll(toRemove);
+        
     }
 }

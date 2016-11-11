@@ -142,7 +142,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
              
             //imageView.fitWidthProperty().bind(widthProperty());
             //imageView.fitHeightProperty().bind(widthProperty());
-            imageView.setFitWidth(100);
+            imageView.setFitWidth(120);
             //imageView.fitWidthProperty().bind(imageViewContainer.widthProperty());
             imageView.setPreserveRatio(true);
             //imageView.fitHeightProperty().bind(imageViewContainer.widthProperty());

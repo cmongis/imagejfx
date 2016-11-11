@@ -358,7 +358,7 @@ public class MainWindowController extends AnchorPane {
 
         logger.info("finishing initialization...");
         // entering the right context
-        uiContextService.enter(UiContexts.list(UiContexts.DEBUG));
+        uiContextService.enter(UiContexts.list(UiContexts.DEBUG),"visualize");
 
         // showing the intro app
         // updating the context
@@ -762,21 +762,10 @@ public class MainWindowController extends AnchorPane {
 
         addSideMenuButton("Explore", FontAwesomeIcon.COMPASS, ExplorerActivity.class);
 
-        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class);
-        addSideMenuButton("Segment", FontAwesomeIcon.EYE, null).setOnMouseClicked(event -> {
-            uiContextService.enter("segmentation");
-            uiContextService.update();
-            menuActivated.setValue(false);
-
-        });
-        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, null).setOnMouseClicked(event -> {
-            uiContextService.enter("batch");
-            uiContextService.update();
-            if (activityService.getCurrentActivityAsClass() != ExplorerActivity.class) {
-                activityService.openByType(ExplorerActivity.class);
-                menuActivated.setValue(false);
-            }
-        });
+        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class,"visualize");
+        addSideMenuButton("Segment", FontAwesomeIcon.EYE, ImageJContainer.class,"segmentation");
+        
+        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, ExplorerActivity.class,"batch");
         addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, FolderSelection.class);
 
         new TransitionBinding<Number>(0d, 1d)
@@ -797,6 +786,25 @@ public class MainWindowController extends AnchorPane {
         sideMenuTopVBox.getChildren().add(sideMenuButton);
 
         return sideMenuButton;
+    }
+    private void addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass, String context) {
+        
+        SideMenuButton button = new SideMenuButton(title);
+        button.setIcon(icon);
+        
+        button.setOnMouseClicked(click->{
+        
+                uiContextService.enter(context);
+                if(activityService.getCurrentActivityAsClass() != actClass) {
+                    activityService.openByType(actClass);
+                }
+                uiContextService.update();
+                menuActivated.setValue(false);
+                
+        });
+        
+        sideMenuTopVBox.getChildren().add(button);
+        
     }
 
     public void removeBlacklisted() {

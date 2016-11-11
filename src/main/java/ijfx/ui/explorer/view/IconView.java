@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
@@ -95,7 +96,7 @@ public class IconView extends ScrollPane implements ExplorerView {
     @Override
     public void setItem(List<? extends Explorable> items) {
         loadingScreenService.frontEndTask(cellPaneCtrl.update(new ArrayList<Iconazable>(items)),false);
-        binder.update();
+        Platform.runLater(binder::update);
     }
 
     private PaneCell<Iconazable> createIcon() {

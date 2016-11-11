@@ -20,6 +20,8 @@
 package ijfx.ui.segmentation;
 
 import ijfx.service.workflow.Workflow;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -36,7 +38,7 @@ import org.scijava.plugin.Plugin;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type = SegmentationUiPlugin.class,label="Deep learning",priority=0.01)
-public class DeepLearning implements SegmentationUiPlugin{
+public class DeepLearning implements SegmentationUiPlugin<FakeSegmentation>{
 
     Label label = new Label("Not available yet");
 
@@ -50,30 +52,28 @@ public class DeepLearning implements SegmentationUiPlugin{
     
     
     
-    @Override
-    public void setImageDisplay(ImageDisplay display) {
-        
-    }
+   
 
     @Override
     public Node getContentNode() {
         return label;
     }
 
+
+
+   
+
+
     @Override
-    public Workflow getWorkflow() {
-        return null;
+    public FakeSegmentation createSegmentation(ImageDisplay imageDisplay) {
+       return new FakeSegmentation();
     }
 
     @Override
-    public Property<Img<BitType>> maskProperty() {
-        return maskProperty;
-        
+    public void bind(FakeSegmentation t) {
+       
     }
 
-    @Override
-    public BooleanProperty activatedProperty() {
-        return activated;
-    }
+   
     
 }
