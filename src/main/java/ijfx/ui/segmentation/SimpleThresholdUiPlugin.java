@@ -24,9 +24,11 @@ import ijfx.service.display.DisplayRangeService;
 import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.segmentation.threshold.ThresholdSegmentation;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
@@ -148,6 +150,8 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     BooleanProperty autoThreshold = new SimpleBooleanProperty();
 
+    Collection<? extends String> thresholdMethods;
+
     public SimpleThresholdUiPlugin() {
 
         try {
@@ -161,6 +165,12 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
             autoThreshold.bindBidirectional(toggleGroupValue.valueProperty());
 
+            methodComboBox.disableProperty().bind(autoThreshold.not());
+
+             // binding text field to the low/high values
+        Bindings.bindBidirectional(minValueTextField.textProperty(), lowValue, converter);
+        Bindings.bindBidirectional(maxValueTextField.textProperty(), highValue, converter);
+            
         } catch (IOException ex) {
             Logger.getLogger(SimpleThresholdUiPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -178,26 +188,39 @@ public class SimpleThresholdUiPlugin extends BorderPane implements SegmentationU
 
     @Override
     public void bind(ThresholdSegmentation t) {
-        segmentationProperty.addListener(this::onSegmentationPropertyChanged);
+        segmentationProperty.setValue(t);
     }
 
     private void onSegmentationPropertyChanged(Observable obs, ThresholdSegmentation oldValue, ThresholdSegmentation newValue) {
 
-        if (oldValue != null) {
-            oldValue.minValue.unbindBidirectional(minValue);
-            oldValue.lowValue.unbindBidirectional(lowValue);
-            oldValue.maxValue.unbindBidirectional(maxValue);
-            oldValue.highValue.unbindBidirectional(highValue);
-            oldValue.autoThreshold.unbindBidirectional(autoThreshold);
+        if (thresholdMethods == null) {
+            // filling the threshold methods
+            thresholdMethods = thresholdService.getThresholdMethods().keySet();
+
+            //
+            methodComboBox.getItems().addAll(thresholdMethods);
         }
 
-        newValue.minValue.bindBidirectional(minValue);
-        newValue.lowValue.bindBidirectional(lowValue);
-        newValue.maxValue.bindBidirectional(maxValue);
-        newValue.highValue.bindBidirectional(highValue);
-        newValue.autoThreshold.bindBidirectional(autoThreshold);
-        
-        
+        if (oldValue != null) {
+            minValue.unbind();
+            maxValue.unbind();
+
+            lowValue.unbindBidirectional(oldValue.lowValue);
+            highValue.unbindBidirectional(oldValue.highValue);
+            autoThreshold.unbind();
+            methodComboBox.valueProperty().unbindBidirectional(oldValue.methodProperty);
+        }
+        if (newValue != null) {
+            highValue.bindBidirectional(newValue.highValue);
+            lowValue.bindBidirectional(newValue.lowValue);
+            maxValue.bind(newValue.maxValue);
+            minValue.bind(newValue.minValue);
+            autoThreshold.setValue(newValue.autoThreshold.getValue());
+            newValue.autoThreshold.bind(autoThreshold);
+            methodComboBox.setValue(newValue.methodProperty.getValue());
+            methodComboBox.valueProperty().bindBidirectional(newValue.methodProperty);
+        }
+
     }
 
     /*

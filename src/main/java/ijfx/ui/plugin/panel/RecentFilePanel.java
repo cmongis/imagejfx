@@ -95,11 +95,11 @@ public class RecentFilePanel extends BorderPane {
         iconView = new IconView();
         context.inject(iconView);
 
-        Label title = new Label("Recent files");
-        title.getStyleClass().add("h2");
-        title.getStyleClass().add("with-top-padding");
+        //Label title = new Label("Recent files");
+        //title.getStyleClass().add("h2");
+        //title.getStyleClass().add("with-top-padding");
         getStyleClass().add("with-padding");
-        setTop(title);
+        //setTop(title);
         setCenter(iconView);
         iconView.setCellFactory(this::createIcon);
      

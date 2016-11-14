@@ -71,12 +71,7 @@ import org.scijava.plugin.Parameter;
  *
  * @author cyril
  */
-public class ThresholdSegmentation extends AbstractSegmentation{
-    
-    
-  
-
-   
+public class ThresholdSegmentation extends AbstractSegmentation {
 
     // ** min max representing the model
     public final DoubleProperty lowValue = new SimpleDoubleProperty();
@@ -89,13 +84,10 @@ public class ThresholdSegmentation extends AbstractSegmentation{
     private final Property<Img<BitType>> maskProperty = new SimpleObjectProperty();
 
     private final BooleanProperty activatedProperty = new SimpleBooleanProperty();
-    
-    StringProperty methodProperty = new SimpleStringProperty("Default");
-    
-    
-    public BooleanProperty autoThreshold = new SimpleBooleanProperty();
 
- 
+    public final StringProperty methodProperty = new SimpleStringProperty("Default");
+
+    public BooleanProperty autoThreshold = new SimpleBooleanProperty();
 
     Logger logger = ImageJFX.getLogger();
 
@@ -116,8 +108,7 @@ public class ThresholdSegmentation extends AbstractSegmentation{
     @Parameter
     private ImageDisplayService imageDisplayService;
 
-    @Parameter
-    private HistogramBundle histogramService;
+
 
     @Parameter
     private AutoscaleService autoScaleService;
@@ -125,16 +116,16 @@ public class ThresholdSegmentation extends AbstractSegmentation{
     @Parameter
     private Context context;
 
-  
-
     TimedBuffer<Runnable> maskUpdateBuffer = new TimedBuffer(100);
-
-   
+    
+    
+    
     public ThresholdSegmentation(ImageDisplay imageDisplay) {
         imageDisplay.getContext().inject(this);
         setImageDisplay(imageDisplay);
+        initListeners();
+        requestMaskUpdate();
     }
-   
 
     @Override
     public Workflow getWorkflow() {
@@ -163,17 +154,12 @@ public class ThresholdSegmentation extends AbstractSegmentation{
         // setting the autothreshold status to true
         autoThreshold.setValue(Boolean.TRUE);
 
-       
-      
-
-     
-
         // listening the min and max values for updating the max
         lowValue.addListener(this::onAnyChange);
         highValue.addListener(this::onAnyChange);
 
         // listenening for the mode -> should calculate threshold values
-        autoThreshold.addListener(this::onAutothresholdChanged);
+        autoThreshold.addListener(this::onAnyChange);
 
         // a mask update should be only occurs every 50ms
         maskUpdateBuffer.setAction(list -> updateMask());
@@ -183,8 +169,6 @@ public class ThresholdSegmentation extends AbstractSegmentation{
 
         methodProperty.addListener(this::onAnyChange);
     }
-
-   
 
     private void setPosition(double[] position) {
         this.position.setValue(ArrayUtils.toObject(position));
@@ -198,12 +182,10 @@ public class ThresholdSegmentation extends AbstractSegmentation{
 
     @Override
     public void update(ImageDisplay imageDisplay) {
-        
+
         setImageDisplay(imageDisplay);
-        
+
         int channel = displayRangeService.getCurrentChannelId();
-        double low = displayRangeService.getChannelMinimum(imageDisplay, channel);
-        double high = displayRangeService.getChannelMinimum(imageDisplay, channel);
         double min = displayRangeService.getDatasetMinimum(imageDisplay, channel);
         double max = displayRangeService.getDatasetMaximum(imageDisplay, channel);
 
@@ -212,27 +194,20 @@ public class ThresholdSegmentation extends AbstractSegmentation{
         requestMaskUpdate();
     }
 
-  
-    private void onMethodChanged(Observable obs, String oldValue, String newValue) {
-        if (!isAutothreshold()) {
-            autoThreshold.setValue(Boolean.TRUE);
-
-        } else {
-            calculateThresholdValues();
-        }
-    }
+   
 
     private void onAnyChange(Observable obs) {
         logger.info("min max request !");
         Platform.runLater(this::requestMaskUpdate);
     }
-    
-    private DataView getDatasetView() {
-        if(getImageDisplay().get() == null) return null;
-       return getImageDisplay().get().getActiveView();
-    }
 
-   
+    /*
+    private DataView getDatasetView() {
+        if (getImageDisplay().get() == null) {
+            return null;
+        }
+        return getImageDisplay().get().getActiveView();
+    }
 
     private void updatePosition(ImageDisplay imageDisplay) {
         if (imageDisplay == null) {
@@ -242,7 +217,7 @@ public class ThresholdSegmentation extends AbstractSegmentation{
 
         imageDisplay.localize(position);
         setPosition(position);
-    }
+    }*/
 
     private void requestMaskUpdate() {
         maskUpdateBuffer.add(this::updateMask);
@@ -260,8 +235,6 @@ public class ThresholdSegmentation extends AbstractSegmentation{
 
     private <T extends RealType<T>> IntervalView<T> getAccessInterval(ImageDisplay imageDisplay) {
 
-       
-        
         Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
 
         // localizing
@@ -274,12 +247,14 @@ public class ThresholdSegmentation extends AbstractSegmentation{
 
     }
 
-    private <T extends RealType<T>> void calculateThresholdValues() {
+    private <T extends RealType<T>> double[] calculateThresholdValues() {
 
         ImageDisplay imageDisplay = getImageDisplay().orElse(null);
-        
-        if(imageDisplay == null) return;
-        
+
+        if (imageDisplay == null) {
+            return null;
+        }
+
         logger.info("Calculating the threshold values");
 
         IntervalView<T> planeView = getAccessInterval(imageDisplay);
@@ -300,14 +275,16 @@ public class ThresholdSegmentation extends AbstractSegmentation{
         double min = val.getRealDouble();
         double max = range.getMax();
 
-        lowValue.setValue(min);
-        highValue.setValue(max);
+        return new double[]{min, max};
+
     }
 
     private <T extends RealType<T>> Img<BitType> generateMask(ImageDisplay imageDisplay) {
 
-        if(imageDisplay == null) return null;
-        
+        if (imageDisplay == null) {
+            return null;
+        }
+
         logger.info("Generating mask !");
         IntervalView<T> planeView = getAccessInterval(imageDisplay);
 
@@ -319,9 +296,16 @@ public class ThresholdSegmentation extends AbstractSegmentation{
 
         final double min, max;
 
-        min = lowValue.get();
-        max = highValue.get();
+        if (isAutothreshold()) {
 
+            final double[] minMax  = calculateThresholdValues();
+
+            min = minMax[0];
+            max = minMax[1];
+        } else {
+            min = lowValue.get();
+            max = highValue.get();
+        }
         double value;
 
         Cursor<T> cursor = planeView.cursor();
@@ -333,6 +317,9 @@ public class ThresholdSegmentation extends AbstractSegmentation{
             randomAccess.setPosition(cursor);
             randomAccess.get().set(value >= min && value <= max);
         }
+        
+        lowValue.setValue(min);
+        highValue.setValue(max);
 
         return img;
 
@@ -348,9 +335,4 @@ public class ThresholdSegmentation extends AbstractSegmentation{
 
     }
 
-   
-
-
-    
-    
 }

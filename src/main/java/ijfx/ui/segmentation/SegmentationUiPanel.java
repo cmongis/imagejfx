@@ -282,7 +282,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         segmentMoreButton.visibleProperty().bind(isExplorerProperty.not());
 
-        
+        maskProperty.addListener(this::onMaskChanged);
         currentPlugin.addListener(this::onCurrentPluginChanged);
         //planeSettingCheckBox.textProperty().bind(Bindings.createStringBinding(this::getCheckBoxText, planeSettingCheckBox.selectedProperty()));
         return this;
@@ -434,7 +434,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     
     private void onCurrentPluginChanged(Observable obs, SegmentationUiPlugin oldValue, SegmentationUiPlugin newValue) {
        Segmentation segmentation =  segmentationMap.get(newValue,getCurrentImageDisplay()).orElse(newValue.createSegmentation(getCurrentImageDisplay()));
-       maskProperty.bind(maskProperty);
+       maskProperty.bind(segmentation.maskProperty()
+       );
        newValue.bind(segmentation);
        segmentation.update(getCurrentImageDisplay());
     }
@@ -447,12 +448,19 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         if (newMask != null && getCurrentImageDisplay() != null) {
 
-            new CallbackTask()
-                    .run(() -> overlayUtilsService.updateBinaryMask(getCurrentImageDisplay(), newMask))
+            new CallbackTask<Img<BitType>,Void>()
+                    .setInput(newMask)
+                    .run(this::updateMask)
                     .start();
 
         }
 
+    }
+    
+    private Void updateMask(Img<BitType> mask) {
+        overlayUtilsService.updateBinaryMask(getCurrentImageDisplay(), mask);
+        getCurrentImageDisplay().update();
+        return null;
     }
 
     // 
