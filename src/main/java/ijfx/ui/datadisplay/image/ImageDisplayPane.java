@@ -817,6 +817,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         long[] position = new long[imageDisplay.numDimensions()];
         
         getDataset().axes(axes);
+        try {
         imageDisplay.localize(position);
         String positionStr
                 = IntStream.range(2, position.length)
@@ -829,6 +830,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                 })
                 .collect(Collectors.joining("   -  "));
         infoLabel.setText(String.format("%s - %d x %d - %s", imageType, width, height, positionStr));
+        }
+        catch(Exception e) {
+            logger.warning("Error when updating label");
+        }
 
     }
 
