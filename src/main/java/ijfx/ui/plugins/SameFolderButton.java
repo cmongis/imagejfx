@@ -23,6 +23,7 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.explorer.view.IconView;
 import ijfx.ui.main.Localization;
+import ijfx.ui.widgets.PopoverToggleButton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +31,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
+import mongis.utils.FXUtilities;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
+import org.controlsfx.control.PopOver;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -41,7 +44,7 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id="same-folder-button",context="imagej image-open",localization=Localization.TOP_LEFT)
+@UiConfiguration(id="same-folder-button",context="",localization=Localization.TOP_LEFT)
 public class SameFolderButton extends ToggleButton implements UiPlugin{
 
     @Parameter
@@ -59,6 +62,7 @@ public class SameFolderButton extends ToggleButton implements UiPlugin{
         iconView.setPrefWidth(300);
         iconView.setPrefHeight(300);
         
+        PopoverToggleButton.bind(this, iconView, PopOver.ArrowLocation.LEFT_TOP);
         
     }
     
