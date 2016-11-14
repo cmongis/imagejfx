@@ -62,8 +62,8 @@ public class UUIDMap<T> extends HashMap<UUID,T>{
 
         
         public T orElse(T t) {          
-            put(t);
-            return t;
+            if(containsKey(uuid) == false) return t;
+            return get(uuid);
         }
         
         @Override
