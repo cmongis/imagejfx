@@ -48,6 +48,9 @@ public class UUIDMap<T> extends HashMap<UUID,T>{
        return new DefaultPutter(this,uuid);
     }
     
+    public UUID getId(Object... object) {
+        return transform(object);
+    }
     
     
     protected class DefaultPutter implements MapPutter<T> {
@@ -61,8 +64,11 @@ public class UUIDMap<T> extends HashMap<UUID,T>{
         }
 
         
-        public T orElse(T t) {          
-            if(containsKey(uuid) == false) return t;
+        public T orPut(T t) {          
+            if(containsKey(uuid) == false)  {
+                put(t);
+            }
+            
             return get(uuid);
         }
         
@@ -77,13 +83,20 @@ public class UUIDMap<T> extends HashMap<UUID,T>{
            return containsKey(uuid);
         }
         
+        public UUID id() {
+            return uuid;
+        }
+        
     }
     
    
     public interface MapPutter<T> {
         UUIDMap<T> put(T t);
         boolean has();
-        public T orElse(T t);
+        public T orPut(T t);
+        
+        UUID id();
+        
     }
     
     
