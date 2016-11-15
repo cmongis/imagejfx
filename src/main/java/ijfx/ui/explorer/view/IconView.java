@@ -82,8 +82,15 @@ public class IconView extends ScrollPane implements ExplorerView {
         addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
         
     }
+    
+    public void setTileDimension(double width, double height, double vgap, double hgap) {
+        tilePane.setPrefTileWidth(width);
+        tilePane.setPrefTileHeight(height);
+        tilePane.setVgap(vgap);
+        tilePane.setHgap(hgap);
+    }
 
-    public void setCellFactory(Callable<PaneCell<Iconazable>> callable) {
+    public void setCellFactory(Callable<PaneCell<? extends Iconazable>> callable) {
         cellPaneCtrl.setCellFactory(callable);
     }
     
