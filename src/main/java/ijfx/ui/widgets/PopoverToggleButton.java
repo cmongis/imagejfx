@@ -118,7 +118,7 @@ public class PopoverToggleButton extends ToggleButton {
         });
         
     }
-    public static void bind(ToggleButton button, Node panel, ArrowLocation location) {
+    public static PopOver bind(ToggleButton button, Node panel, ArrowLocation location) {
 
         PopOver popover = new PopOver(panel);
 
@@ -126,7 +126,7 @@ public class PopoverToggleButton extends ToggleButton {
         
         bind(button,popover);
         
-        
+        return popover;
         /*
         popover.addEventHandler(POPOVER_CLOSE_REQUEST, event -> {
             popover.hide();
