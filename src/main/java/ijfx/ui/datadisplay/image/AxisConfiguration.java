@@ -41,7 +41,12 @@ class AxisConfiguration {
 
     private void rebuild() {
         axes = new CalibratedAxis[imageDisplay.numDimensions()];
+        try {
         imageDisplay.axes(axes);
+        }
+        catch(Exception e) {
+            axes = new CalibratedAxis[0];
+        }
 
     }
 
@@ -70,6 +75,8 @@ class AxisConfiguration {
 
     @Override
     public boolean equals(Object object) {
+        
+        try {
         if (object == null) {
             return false;
         }
@@ -84,6 +91,10 @@ class AxisConfiguration {
             return false;
         }
         return Arrays.equals(axes, other.axes());
+        }
+        catch(Exception e) {
+            return false;
+        }
     }
 
 }
