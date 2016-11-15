@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root prefWidth="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.101" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefWidth="200.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <Accordion fx:id="accordion" prefHeight="250.0" styleClass="segmentation-accordion" BorderPane.alignment="CENTER" />
    </center>
@@ -36,11 +36,32 @@
                   <FontAwesomeIconView glyphName="CHILD" text="" />
                </graphic>
             </SplitMenuButton>
-            <HBox styleClass="toggle-group" />
-            <Button fx:id="segmentMoreButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#segmentMore" text="Segment more images">
-               <graphic>
-                  <FontAwesomeIconView glyphName="TASKS" />
-               </graphic></Button>
+            <HBox styleClass="toggle-group">
+               <children>
+                  <Button fx:id="segmentMoreButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#segmentMore" prefWidth="120.0" text="Batch">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="TASKS" />
+                     </graphic>
+                     <styleClass>
+                        <String fx:value="first" />
+                        <String fx:value="success" />
+                     </styleClass>
+                  </Button>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#close" prefWidth="120.0" text="Close">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="CLOSE">
+                           <styleClass>
+                              <String fx:value="warning" />
+                              <String fx:value="last" />
+                           </styleClass>
+                        </FontAwesomeIconView>
+                     </graphic>
+                     <styleClass>
+                        <String fx:value="last" />
+                        <String fx:value="danger" />
+                     </styleClass>
+                  </Button>
+               </children></HBox>
          </children>
          <styleClass>
             <String fx:value="vbox" />

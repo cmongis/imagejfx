@@ -833,6 +833,10 @@
 
 
 }
+.text-field.warning {
+    -fx-background-color: derive(-flatter-warning,50%);
+    -fx-stroke-fill:-flatter-danger;
+}
 
 .hbox {
     -fx-stroke-width: 0.2em;
@@ -1978,6 +1982,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .pane-icon-cell:selected .subtitle-label {
     -fx-text-fill:black;
 }
+
 .label.normal {
     -fx-text-fill:-txt-normal;
 }
@@ -2125,10 +2130,29 @@ Label.chart-legend-item{
 }
 
 /*
-    Correction Panel
+    Correction Panelo
 */
 
 .channel-selector {
     -fx-spacing:20px;
     -fx-alignment:center-left;
+    
+}
+
+
+.simple-pane-cell:hover {
+    -fx-background-color:-flatter-primary;
+   
+}
+.simple-pane-cell .label {
+    -fx-pref-height:10px;
+    -fx-padding:5px;
+    -fx-text-alignment:center;
+
+    -fx-pref-width:150px;
+    -fx-alignment:center;
+}
+.simple-pane-cell .image-view {
+    -fx-background-color:red;
+    -fx-margin:0px;
 }
