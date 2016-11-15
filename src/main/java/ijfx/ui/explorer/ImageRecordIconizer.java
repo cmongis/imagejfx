@@ -76,25 +76,21 @@ public class ImageRecordIconizer implements Explorable {
 
     boolean series = false;
 
-    MetaDataSet set;
+    final MetaDataSet set;
 
     public ImageRecordIconizer(Context context, ImageRecord imageRecord) {
         context.inject(this);
         this.imageRecord = imageRecord;
-        set = imageRecord.getMetaDataSet();
+        set = new MetaDataSet(MetaDataSetType.FILE);
+        //set.setType(MetaDataSetType.FILE);
+        set.merge(imageRecord.getMetaDataSet());
     }
 
     public ImageRecordIconizer(Context context, ImageRecord imageRecord, int imageId) {
-
-        context.inject(this);
-        this.imageRecord = imageRecord;
-
+        
+        this(context,imageRecord);
         series = true;
-
         this.imageId = imageId;
-        set = new MetaDataSet();
-        set.merge(imageRecord.getMetaDataSet());
-        set.setType(MetaDataSetType.FILE);
         set.putGeneric(MetaData.SERIE, imageId);
     }
 
