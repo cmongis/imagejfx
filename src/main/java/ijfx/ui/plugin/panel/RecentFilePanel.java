@@ -95,14 +95,9 @@ public class RecentFilePanel extends BorderPane {
         iconView = new IconView();
         context.inject(iconView);
 
-        //Label title = new Label("Recent files");
-        //title.getStyleClass().add("h2");
-        //title.getStyleClass().add("with-top-padding");
         getStyleClass().add("with-padding");
-        //setTop(title);
         setCenter(iconView);
         iconView.setCellFactory(this::createIcon);
-     
 
     }
 
@@ -119,7 +114,7 @@ public class RecentFilePanel extends BorderPane {
                 .map(str -> new FileExplorableWrapper(new File(str)))
                 .forEach(items::add);
         iconView.setItem(items);
-        
+
     }
 
     private class FileExplorableWrapper extends AbstractExplorable {
@@ -175,7 +170,7 @@ public class RecentFilePanel extends BorderPane {
         }
     }
 
-    private class FileIconCell extends PaneIconCell<Iconazable> {
+    public class FileIconCell extends PaneIconCell<Iconazable> {
 
         public FileIconCell() {
             super();
