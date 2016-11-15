@@ -36,7 +36,7 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class,menuPath = "Image > Mask > Overlap with...")
 public class IntersectMasks extends ContextCommand{
 
-    @Parameter(type = ItemIO.BOTH)
+    @Parameter(type = ItemIO.BOTH,autoFill = true,required = true)
     ImageDisplay imageDisplay;
     
     @Parameter(label = "Compare to")
@@ -54,7 +54,7 @@ public class IntersectMasks extends ContextCommand{
         
         Img<BitType> binaryOverlap = IntersectToBinary.getBinaryOverlap(sourceImg, refImg);
         
-        overlayUtilsService.updateBinaryMask(imageDisplay, refImg);
+        overlayUtilsService.updateBinaryMask(imageDisplay, binaryOverlap);
         
     }
     
