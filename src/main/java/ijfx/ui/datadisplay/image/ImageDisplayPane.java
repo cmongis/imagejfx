@@ -564,7 +564,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
             }
         };
         anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, myHandler);
-
+        if(getDatasetview() == null) {
+            arcMenu = null;
+            return;
+        }
         double min = getDatasetview().getChannelMin(0);
         double max = getDatasetview().getChannelMax(0);
 
