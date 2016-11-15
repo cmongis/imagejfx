@@ -35,6 +35,7 @@ import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplayService;
@@ -78,7 +79,7 @@ public class LUTComboBox extends ComboBox<LUTView> {
         setCellFactory(callback);
         //setSkin(new LUTComboBoxSkin(this, new LUTComboBoxBehaviour(this, null)));
         //setStyle(getStyle() + "-fx-skin: \"ijfx.ui.plugin.LUTComboBoxSkin\";");
-
+        setButtonCell(new ColorTableCell().setDimension(150, 20));
         setPrefWidth(150);
         setMaxWidth(150);
 
@@ -108,18 +109,25 @@ public class LUTComboBox extends ComboBox<LUTView> {
 
     class ColorTableCell extends ListCell<LUTView> {
 
+        ImageView imageView = new ImageView();
+        
         public ColorTableCell() {
             super();
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             itemProperty().addListener(this::onItemChanged);
         }
         
-        
+       public ColorTableCell setDimension(double width, double height) {
+           imageView.setFitHeight(height);
+           imageView.setFitWidth(width);
+           return this;
+       }
        
         protected void onItemChanged(Observable obs, LUTView odValue, LUTView newValue) {
             if(newValue == null) setGraphic(null);
             else {
-                setGraphic(newValue.getImageView());
+                imageView.setImage(newValue.getImageView());
+                setGraphic(imageView);
             }         
         }
         

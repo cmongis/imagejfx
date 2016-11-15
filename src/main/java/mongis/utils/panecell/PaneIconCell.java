@@ -161,6 +161,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
             subtibleVisibleProperty().addListener(this::onSubtitleVisibleChanged);
             
+            
 
         } catch (IOException ex) {
             Logger.getLogger(PaneIconCell.class.getName()).log(Level.SEVERE, null, ex);

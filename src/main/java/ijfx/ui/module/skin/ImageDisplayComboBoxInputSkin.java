@@ -19,20 +19,23 @@
  */
 package ijfx.ui.module.skin;
 
+import ijfx.service.thumb.ThumbService;
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
-import java.awt.Rectangle;
 import java.util.List;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.paint.Color;
-import javafx.util.Callback;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import mongis.utils.CallbackTask;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -57,6 +60,9 @@ public class ImageDisplayComboBoxInputSkin extends AbstractInputSkinPlugin<Image
     @Parameter
     DisplayService displayService;
 
+    @Parameter
+    ThumbService thumbService;
+    
     ComboBox<ImageDisplay> imageDisplayComboBox = new ComboBox<>();
 
     @Override
@@ -92,20 +98,58 @@ public class ImageDisplayComboBoxInputSkin extends AbstractInputSkinPlugin<Image
             valueProperty.setValue(newValue);
         });
         setCellFactory(imageDisplayComboBox);
-
+        imageDisplayComboBox.setButtonCell(new ImageDisplayListCell(null));
         //input.getValue();
     }
 
     public void setCellFactory(ComboBox<ImageDisplay> cmb) {
-        cmb.setCellFactory((ListView<ImageDisplay> p) -> new ListCell<ImageDisplay>() {
-            @Override
-            protected void updateItem(ImageDisplay item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item != null) {
-                    setText(item.getName());
-                }
+        cmb.setCellFactory(ImageDisplayListCell::new);
+    }
+    
+    
+    
+    public class ImageDisplayListCell extends ListCell<ImageDisplay> {
+        
+        private BorderPane borderPane = new BorderPane();
+        
+        private Label label = new Label();
+        
+        private ImageView imageView = new ImageView();
+        
+        
+        
+        public ImageDisplayListCell(ListView<ImageDisplay> listView) {
+            super();
+            
+            borderPane.setLeft(imageView);
+            borderPane.setCenter(label);
+            imageView.setFitWidth(64);
+            imageView.setFitHeight(64);
+            
+            borderPane.getStyleClass().add("image-display-list-cell");
+            itemProperty().addListener(this::onItemChanged);
+        }
+        
+        
+        
+        public void onItemChanged(Observable obs, ImageDisplay oldValue, ImageDisplay newValue) {
+            
+            if(newValue == null) {
+                setGraphic(null);
+                return;
             }
-        });
+            setGraphic(borderPane);
+            
+            label.setText(newValue.getName());
+            
+            new CallbackTask<ImageDisplay,Image>()
+                    .setInput(newValue)
+                    .run(display->thumbService.getThumb(display, 64, 64))
+                    .then(imageView::setImage)
+                    .start();
+                    
+        }
+        
     }
 
 }

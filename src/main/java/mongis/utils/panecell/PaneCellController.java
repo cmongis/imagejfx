@@ -61,7 +61,7 @@ public class PaneCellController<T extends Object> {
     private LinkedList<PaneCell<T>> itemControllerList = new LinkedList<PaneCell<T>>();
     private LinkedList<PaneCell<T>> cachedControllerList = new LinkedList<>();
 
-    private Callable<PaneCell<T>> cellFactory;
+    private Callable<PaneCell<? extends T>> cellFactory;
 
     private Logger logger = ImageJFX.getLogger();
 
@@ -82,7 +82,7 @@ public class PaneCellController<T extends Object> {
         this.pane = pane;
     }
 
-    public void setCellFactory(Callable<PaneCell<T>> cellFactory) {
+    public void setCellFactory(Callable<PaneCell<? extends T>> cellFactory) {
         this.cellFactory = cellFactory;
     }
 

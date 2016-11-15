@@ -21,7 +21,7 @@
 package ijfx.ui.plugin;
 
 import ijfx.service.ui.FxImageService;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import net.imagej.Dataset;
 import net.imagej.lut.LUTService;
 import net.imglib2.display.ColorTable;
@@ -35,7 +35,7 @@ public class LUTView {
     String name;
 
     ColorTable table;
-    protected ImageView imageView;
+    protected Image image;
 
     public LUTView(String name, ColorTable table) {
 
@@ -45,7 +45,7 @@ public class LUTView {
 
     public LUTView render(LUTService lutService, FxImageService fxImageService) {
         final Dataset dataset = lutService.createDataset(name, table);
-        imageView = new ImageView(fxImageService.datasetToImage(dataset));
+        image = fxImageService.datasetToImage(dataset);
         return this;
     }
 
@@ -53,8 +53,8 @@ public class LUTView {
         this.name = name;
     }
 
-    public ImageView getImageView() {
-        return imageView;
+    public Image getImageView() {
+        return image;
     }
 
     public String toString() {

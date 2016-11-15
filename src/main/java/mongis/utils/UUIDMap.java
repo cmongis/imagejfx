@@ -20,8 +20,12 @@
 package mongis.utils;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,11 +38,11 @@ public class UUIDMap<T> extends HashMap<UUID,T>{
     private UUID transform(Object... object) {
         
         ByteBuffer allocate = ByteBuffer
-                .allocate(object.length*4);
+                .allocate(object.length*8);
         for(Object o : object) {
             allocate.putInt(o.hashCode());
         }
-        
+        Arrays.toString(allocate.array());
         return UUID.nameUUIDFromBytes(allocate.array());
         
     }
@@ -72,6 +76,21 @@ public class UUIDMap<T> extends HashMap<UUID,T>{
             return get(uuid);
         }
         
+        public T orRetrieveAndPut(Callable<T> getter){
+            
+            if(containsKey(uuid) == false) {
+                try {
+                    put(getter.call());
+                }
+                catch(Exception e) {
+                    Logger.getLogger(UUIDMap.class.getName()).log(Level.SEVERE,"Error when getting value",e);
+                }
+                
+            }
+            
+            return get(uuid);
+        }
+        
         @Override
         public UUIDMap<T> put(T t) {
            parent.put(uuid,t);
@@ -94,8 +113,9 @@ public class UUIDMap<T> extends HashMap<UUID,T>{
         UUIDMap<T> put(T t);
         boolean has();
         public T orPut(T t);
-        
+        public T orRetrieveAndPut(Callable<T> getter);
         UUID id();
+        
         
     }
     
