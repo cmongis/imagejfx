@@ -43,6 +43,7 @@ import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.service.ui.MeasurementService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
@@ -96,7 +97,6 @@ import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.UUIDMap;
-import mongis.utils.transition.OpacityTransitionBinding;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -185,6 +185,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @Parameter
     private FolderManagerService folderManagerService;
 
+    @Parameter
+    private UiContextService uiContextSrv;
+    
     @FXML
     private Accordion accordion;
 
@@ -200,6 +203,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     private Button segmentMoreButton;
 
+   
+    
     Img<BitType> currentMask;
 
     private final Map<TitledPane, SegmentationUiPlugin> nodeMap = new HashMap<>();
@@ -741,6 +746,17 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         folderManagerService.setExplorationMode(ExplorationMode.FILE);
 
         activityService.openByType(ExplorerActivity.class);
+    }
+    
+    @FXML
+    private void close() {
+        uiContextSrv
+                .leave("segment")
+                .leave("segmentation");
+        if(!isExplorer()) {
+            uiContextSrv.enter("visualize");
+        }
+        uiContextSrv.update();
     }
 
     private boolean filterSegmentedObject(SegmentedObject segmentedObject) {
