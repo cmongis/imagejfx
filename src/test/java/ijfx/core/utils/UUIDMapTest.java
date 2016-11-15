@@ -45,7 +45,7 @@ public class UUIDMapTest {
         
         Assert.assertTrue(uuidMap.get(str1,str2,str3).has());
         
-        Assert.assertEquals(str3,uuidMap.get(str1,str2,str3).orElse(null));
+        Assert.assertEquals(str3,uuidMap.get(str1,str2,str3).orPut(null));
                 
         Assert.assertFalse(uuidMap.get(str2,str1,str3).has());
         
