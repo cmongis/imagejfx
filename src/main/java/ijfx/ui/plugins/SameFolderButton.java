@@ -19,19 +19,26 @@
  */
 package ijfx.ui.plugins;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
+import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.view.IconView;
 import ijfx.ui.main.Localization;
+import ijfx.ui.widgets.ExplorableButton;
+import ijfx.ui.widgets.FileExplorableWrapper;
 import ijfx.ui.widgets.PopoverToggleButton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import javafx.beans.Observable;
 import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
-import mongis.utils.FXUtilities;
+import mongis.utils.panecell.PaneCell;
+import mongis.utils.panecell.SimplePaneCell;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplayService;
 import org.controlsfx.control.PopOver;
@@ -44,95 +51,146 @@ import org.scijava.plugin.Plugin;
  * @author cyril
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id="same-folder-button",context="",localization=Localization.TOP_LEFT)
-public class SameFolderButton extends ToggleButton implements UiPlugin{
+@UiConfiguration(id = "same-folder-button", context = "imagej+image-open", localization = Localization.TOP_LEFT)
+public class SameFolderButton extends ToggleButton implements UiPlugin {
 
     @Parameter
-            Context context;
-    
+    Context context;
+
     IconView iconView = new IconView();
 
     @Parameter
     ImageDisplayService imageDisplayService;
-    
-    
+
+    @Parameter
+    ImageLoaderService imageLoaderService;
+
+    @Parameter
+    ExplorerService explorerService;
+
     int radius = 2;
-    
+
+    PopOver popOver;
+
     public SameFolderButton() {
-        iconView.setPrefWidth(300);
-        iconView.setPrefHeight(300);
-        
-        PopoverToggleButton.bind(this, iconView, PopOver.ArrowLocation.LEFT_TOP);
-        
+        iconView.setPrefWidth(830);
+        iconView.setPrefHeight(200);
+        iconView.setCellFactory(this::createIcon);
+        setText("Quick open...");
+        //iconView.setCellFactory(RecentFilePanel.FileIconCell::new);
+        popOver = PopoverToggleButton
+                .bind(this, iconView, PopOver.ArrowLocation.TOP_LEFT);
+        popOver
+                .showingProperty()
+                .addListener(this::onPopOverShowing);
+        iconView.setTileDimension(150, 150, 0,0);
     }
-    
-    
+
+    private void onPopOverShowing(Observable obs, Boolean oldValue, Boolean showing) {
+        if (showing) {
+            update();
+        }
+    }
+
+    private PaneCell<Explorable> createIcon() {
+
+        return new SimplePaneCell<Explorable>()
+                .setTitleFactory(Explorable::getTitle)
+                .setImageFactory(Explorable::getImage)
+                .setWidth(120)
+                .setOnMouseClicked(this::open);
+
+    }
+
+    private void open(Explorable explorable) {
+        popOver.hide();
+
+        explorerService.open(explorable);
+    }
+
     private void update() {
-        
+
         Dataset dataset = imageDisplayService.getActiveDataset();
-        
+
         File file = new File(dataset.getSource());
 
         List<File> toShow = new ArrayList<>();
-        
-        if(file.exists()) {
-            
+
+        if (file.exists()) {
+
             File parent = file.getParentFile();
-            
-            List<File> files = Stream
-                    .of(parent.listFiles())
-                    .sorted()
-                    .collect(Collectors.toList());
-            
-            if(files.size() > radius * 2) {
-                int filePosition = indexOf(files,file);
+
+            List<File> files = new ArrayList(imageLoaderService.getAllImagesFromDirecoty(parent, false));
+
+            if (files.size() > radius * 2) {
+                int filePosition = indexOf(files, file);
                 int maxIndex = files.size() - 1;
                 int minIndex = 0;
                 int start = filePosition - radius;
-                if(filePosition - radius < minIndex) {
+                if (filePosition - radius < minIndex) {
                     start = minIndex;
                 }
-                if(filePosition + radius > maxIndex) {
+                if (filePosition + radius > maxIndex) {
                     start = maxIndex - (radius * 2) - 1;
                 }
-                
-                
-                for(int i = start; i!= start+(radius*2)+1;i++) {
-                    
-                    if(files.get(i) != file) toShow.add(files.get(i));
-                    
-                    
+
+                for (int i = start; i != start + (radius * 2) + 1; i++) {
+
+                    //if (files.get(i).equals(file) != true) {
+                    toShow.add(files.get(i));
+                    //}
+                    //else {
+                    //   toShow.add();
+                    //}
+
                 }
-                
-                
+
+            } else {
+                files
+                        .stream()
+                        .forEach(toShow::add);
             }
-            else {
-                //Stream.of(parent.getF
-            }
-            
-            
+
         }
-        
+
+        iconView.setItem(
+                toShow
+                        .stream()
+                        .map(f -> {
+                            if (f.equals(file)) {
+                                return new ExplorableButton("<- Current file ->", "", FontAwesomeIcon.SQUARE);
+                            } else {
+                                return new FileExplorableWrapper(context, f);
+                            }
+                        })
+                        .collect(Collectors.toList())
+        );
+
     }
-    
+
     private <T> int indexOf(List<T> list, T t) {
-        
-        for(int i = 0;i!=list.size();i++) {
-            
-            if(t.equals(list.get(i))) return i;
+
+        for (int i = 0; i != list.size(); i++) {
+
+            if (t.equals(list.get(i))) {
+                return i;
+            }
         }
         return -1;
-        
+
     }
-    
+
     @Override
     public Node getUiElement() {
-       return this;
+        return this;
     }
 
     @Override
     public UiPlugin init() {
-       return this;
+
+        context.inject(iconView);
+
+        return this;
     }
-    
+
 }
