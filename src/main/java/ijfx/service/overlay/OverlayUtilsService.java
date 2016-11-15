@@ -61,181 +61,170 @@ import org.scijava.service.Service;
  *
  * @author Cyril MONGIS, 2016
  */
-@Plugin(type=Service.class)
+@Plugin(type = Service.class)
 public class OverlayUtilsService extends AbstractService implements IjfxService {
-    
+
     @Parameter
     CommandService commandService;
-    
+
     @Parameter
     DatasetIOService datasetIoService;
-    
+
     @Parameter
     ImageDisplayService imageDisplayService;
-    
+
     @Parameter
     OverlayService overlayService;
-    
+
     @Parameter
     EventService eventService;
-    
+
     @Parameter
     OverlaySelectionService overlaySelectionSrv;
-    
+
     @Parameter
     ActivityService activityService;
-    
+
     Logger logger = ImageJFX.getLogger();
-    
+
     public void openOverlay(File file, Overlay selected) {
-        
-       
+
         ImageDisplay display;
-        
-       
+
         display = findDisplay(file);
-        
+
         //if we couldn't find the display, we open the image
-        if(display == null) {
-            
-            Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile",file);
-            
+        if (display == null) {
+
+            Future<CommandModule> run = commandService.run(OpenFile.class, true, "inputFile", file);
+
             try {
                 run.get();
-                
+
                 display = findDisplay(file);
-                
-                
-                
-            } catch(Exception e) {
-                logger.log(Level.SEVERE,"Couldn't open "+file.getAbsolutePath(),e);
+
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Couldn't open " + file.getAbsolutePath(), e);
                 return;
             }
         }
-        
+
         // now we check that it's still not null so we can
-        if(display != null) {
-            if(findOverlay(selected, display) ==null) {
+        if (display != null) {
+            if (findOverlay(selected, display) == null) {
                 display.display(selected);
-            }
-            else {
+            } else {
                 overlaySelectionSrv.selectOnlyOneOverlay(display, selected);
             }
-            
+
             activityService.openByType(ImageJContainer.class);
-            
-        }
-        else {
+
+        } else {
             logger.severe("Couldn't find open file nor overlay");
-            
+
         }
     }
-    
+
     public Overlay findOverlay(Overlay overlay, ImageDisplay imageDisplay) {
         return imageDisplay
                 .stream()
-                .filter(dataview->dataview instanceof OverlayView)
-                .map(overlayView->(Overlay)overlayView.getData())
-                .filter(o->o==overlay)
+                .filter(dataview -> dataview instanceof OverlayView)
+                .map(overlayView -> (Overlay) overlayView.getData())
+                .filter(o -> o == overlay)
                 .findFirst()
                 .orElse(null);
     }
-    
+
     public <T extends Overlay> T findOverlayOfType(ImageDisplay imageDisplay, Class<T> clazz) {
         return (T) imageDisplay.
                 stream()
-                .filter(dataview->dataview instanceof OverlayView)
-                .map(overlayView->(Overlay)overlayView.getData())
-                .filter(o->o.getClass().isAssignableFrom(clazz))
+                .filter(dataview -> dataview instanceof OverlayView)
+                .map(overlayView -> (Overlay) overlayView.getData())
+                .filter(o -> o.getClass().isAssignableFrom(clazz))
                 .findFirst()
                 .orElse(null);
     }
-    
+
     public <T extends Overlay> List<T> findOverlaysOfType(ImageDisplay imageDisplay, Class<T> clazz) {
-        return  imageDisplay.
+        return imageDisplay.
                 stream()
-                .filter(dataview->dataview instanceof OverlayView)
-                .map(overlayView->(Overlay)overlayView.getData())
-                .filter(o->o.getClass().isAssignableFrom(clazz))
-                .map(o->(T)o)
+                .filter(dataview -> dataview instanceof OverlayView)
+                .map(overlayView -> (Overlay) overlayView.getData())
+                .filter(o -> o.getClass().isAssignableFrom(clazz))
+                .map(o -> (T) o)
                 .collect(Collectors.toList());
     }
-    
-    public <T extends Overlay> T findOverlayOfType(ImageDisplay imageDisplay, Class<T> clazz, Callback<ImageDisplay,T> factory) {
+
+    public <T extends Overlay> T findOverlayOfType(ImageDisplay imageDisplay, Class<T> clazz, Callback<ImageDisplay, T> factory) {
         return (T) imageDisplay.
                 stream()
-                .filter(dataview->dataview instanceof OverlayView)
-                .map(overlayView->(Overlay)overlayView.getData())
-                .filter(o->o.getClass().isAssignableFrom(clazz))
+                .filter(dataview -> dataview instanceof OverlayView)
+                .map(overlayView -> (Overlay) overlayView.getData())
+                .filter(o -> o.getClass().isAssignableFrom(clazz))
                 .findFirst()
-                .orElseGet(()->factory.call(imageDisplay));
+                .orElseGet(() -> factory.call(imageDisplay));
     }
-    
+
     public void addOverlay(ImageDisplay imageDisplay, List<? extends Overlay> overlays) {
-        
-        
+
         imageDisplay.addAll(overlays.stream().map(o -> imageDisplayService.createDataView(o)).collect(Collectors.toList()));
         imageDisplay.update();
         overlays.stream().map(o -> new OverlayCreatedEvent(o)).forEach(eventService::publish);
-        
+
     }
-    
+
     public void addOverlay(ImageDisplay imageDisplay, Overlay[] overlayArray) {
-        addOverlay(imageDisplay,Lists.newArrayList(overlayArray));
+        addOverlay(imageDisplay, Lists.newArrayList(overlayArray));
     }
-    
+
     public void removeAllOverlay(ImageDisplay imageDisplay) {
-        
-        removeOverlay(imageDisplay,overlayService.getOverlays(imageDisplay));
-        
+
+        removeOverlay(imageDisplay, overlayService.getOverlays(imageDisplay));
+
     }
-    
-    public void removeOverlay(ImageDisplay imageDisplay, List<Overlay> overlays) {
-        
+
+    public void removeOverlay(ImageDisplay imageDisplay, List<? extends Overlay> overlays) {
+
         List<DataView> dataviewList = overlays.stream()
                 .parallel()
-                .map(o->imageDisplay.stream().filter(view->view.getData() == o).findFirst().orElse(null))
-                .filter(o->o!=null)
+                .map(o -> imageDisplay.stream().filter(view -> view.getData() == o).findFirst().orElse(null))
+                .filter(o -> o != null)
                 .collect(Collectors.toList());
-        
-        
+
         imageDisplay.removeAll(dataviewList);
-        overlays.forEach(o->eventService.publish(new OverlayDeletedEvent(o)));
+        overlays.forEach(o -> eventService.publish(new OverlayDeletedEvent(o)));
         imageDisplay.update();
-        
-        
+
     }
-    
-    private ImageDisplay findDisplay(File file){
-        
-        
-        
+
+    private ImageDisplay findDisplay(File file) {
+
         return imageDisplayService.getImageDisplays().stream()
-                .filter(display->imageDisplayService.getActiveDataset(display).getSource().equals(file.getAbsolutePath()))
+                .filter(display -> imageDisplayService.getActiveDataset(display).getSource().equals(file.getAbsolutePath()))
                 .findFirst()
                 .orElse(null);
-        
-        
+
     }
-    
-   /*
+
+    /*
         Binary mask related operation
-    */
-    
+     */
     public Img<BitType> extractBinaryMask(ImageDisplay imageDisplay) {
         BinaryMaskOverlay maskOverlay = findOverlayOfType(imageDisplay, BinaryMaskOverlay.class);
         return extractBinaryMask(maskOverlay);
     }
-    
+
     public Img<BitType> extractBinaryMask(BinaryMaskOverlay overlay) {
         return ((BinaryMaskRegionOfInterest<BitType, Img<BitType>>) overlay.getRegionOfInterest()).getImg();
     }
-    
+
     public void updateBinaryMask(ImageDisplay imageDisplay, Img<BitType> mask) {
-        
-        if(mask == null) return;
+
+        if (mask == null) {
+            return;
+        }
         BinaryMaskOverlay overlay = findOverlayOfType(imageDisplay, BinaryMaskOverlay.class);
-        
+
         if (overlay == null) {
             overlay = createBinaryMaskOverlay(imageDisplay, mask);
         } else {
@@ -255,7 +244,7 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
 
         }
     }
-    
+
     public BinaryMaskOverlay createBinaryMaskOverlay(ImageDisplay imageDisplay, Img<BitType> mask) {
 
         BinaryMaskOverlay overlay = new BinaryMaskOverlay(getContext(), new BinaryMaskRegionOfInterest<>(mask));
@@ -263,5 +252,5 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
         return overlay;
 
     }
-    
+
 }
