@@ -21,6 +21,7 @@
 package ijfx.service.thumb;
 
 import ijfx.core.stats.IjfxStatisticService;
+import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
@@ -39,9 +40,14 @@ import java.util.stream.LongStream;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javax.imageio.ImageIO;
+import mongis.ndarray.Dimension;
 import mongis.utils.CallbackTask;
 import net.imagej.ImageJService;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
@@ -67,6 +73,9 @@ public class ThumbService extends AbstractService implements ImageJService {
     @Parameter
     ImagePlaneService imagePlaneService;
 
+    @Parameter
+    ImageDisplayService imageDisplayService;
+    
     @Parameter
     IjfxStatisticService statsService;
 
@@ -150,6 +159,18 @@ public class ThumbService extends AbstractService implements ImageJService {
 
             ImageIO.write(bImage, "png", file);
         }
+    }
+    
+    public Image getThumb(ImageDisplay display, int width, int height) {
+        
+        long[] position = new long[display.numDimensions()];
+        display.localize(position);
+        position = DimensionUtils.absoluteToPlanar(position);
+        IntervalView<? extends RealType<?>> planeView = imagePlaneService.planeView(imageDisplayService.getActiveDataset(), position);
+        
+        
+        return getThumb(planeView, width, height);
+        
     }
 
     public Image getThumb(RandomAccessibleInterval interval, int width, int height) {
