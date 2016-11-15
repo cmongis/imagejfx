@@ -19,6 +19,7 @@
  */
 package ijfx.ui.filter;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,6 +52,7 @@ import javafx.util.StringConverter;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import mongis.utils.SmartNumberStringConverter;
+import mongis.utils.bindings.TextToNumberBinding;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.EmpiricalDistribution;
@@ -116,9 +118,12 @@ public class DefaultNumberFilter extends BorderPane implements NumberFilter {
             categoryAxis.tickUnitProperty().bind(rangeSlider.majorTickUnitProperty());
             converter.setFloatingPoint(true);
             converter.floatingPointNumberProperty().bind(Bindings.createIntegerBinding(this::getDisplayedFloatingPoint, rangeSlider.minProperty(),rangeSlider.maxProperty()));
-
-            Bindings.bindBidirectional(lowTextField.textProperty(), rangeSlider.lowValueProperty(), converter);
-            Bindings.bindBidirectional(highTextField.textProperty(), rangeSlider.highValueProperty(), converter);
+            
+            new TextToNumberBinding(lowTextField,rangeSlider.lowValueProperty());
+            new TextToNumberBinding(highTextField,rangeSlider.highValueProperty());
+            
+            //Bindings.bindBidirectional(lowTextField.textProperty(), rangeSlider.lowValueProperty(), converter);
+            //Bindings.bindBidirectional(highTextField.textProperty(), rangeSlider.highValueProperty(), converter);
 
             lowTextField.addEventFilter(KeyEvent.KEY_RELEASED, this::updatePredicate);
             highTextField.addEventHandler(KeyEvent.KEY_PRESSED, this::updatePredicate);
