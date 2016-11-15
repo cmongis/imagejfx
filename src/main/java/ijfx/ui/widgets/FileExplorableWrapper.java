@@ -21,15 +21,22 @@ package ijfx.ui.widgets;
 
 import ijfx.core.metadata.FileSizeMetaData;
 import ijfx.core.metadata.MetaData;
+import ijfx.plugins.OpenImageFX;
+import ijfx.service.log.DefaultLoggingService;
+import ijfx.service.thumb.ThumbService;
 import ijfx.ui.explorer.AbstractExplorable;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import net.imagej.Dataset;
+import org.scijava.Context;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -44,7 +51,23 @@ public class FileExplorableWrapper extends AbstractExplorable{
     @Parameter
     DatasetIOService datasetIoService;
     
+    @Parameter
+    ThumbService thumbService;
+    
+    @Parameter
+    DefaultLoggingService logService;
+    
+    @Parameter
+            CommandService commandService;
+    
     Dataset dataset;
+    
+    Logger logger = ImageJFX.getLogger();
+    
+    public FileExplorableWrapper(Context context, File f) {
+        this(f);
+        context.inject(this);
+    }
     
     public FileExplorableWrapper(File f) {
         super();
@@ -72,12 +95,22 @@ public class FileExplorableWrapper extends AbstractExplorable{
 
     @Override
     public Image getImage() {
-        return null;
+        if (file.getName().endsWith("png") || file.getName().endsWith("jpg")) {
+                return new Image(file.getAbsolutePath());
+            } else {
+                try {
+                    return thumbService.getThumb(file, 0, null, 100, 100);
+                } catch (Exception ex) {
+                    logService.warn(ex, "Couldn't load file %s", file.getAbsolutePath());
+                }
+            }
+            return null;
     }
 
     @Override
     public void open() throws Exception {
-        
+          Future<CommandModule> run = commandService.run(OpenImageFX.class, true, "file", file);
+            run.get();
     }
 
     @Override
