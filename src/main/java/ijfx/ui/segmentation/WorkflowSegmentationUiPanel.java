@@ -67,7 +67,7 @@ import org.scijava.ui.UIService;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type = SegmentationUiPlugin.class, label = "Process workflow", priority = 0.09)
-public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiPlugin<FakeSegmentation> {
+public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiPlugin<WorkflowSegmentation> {
 
     @Parameter
     private Context context;
@@ -101,6 +101,9 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     protected UiContextProperty isExplorer;
 
+    
+    WorkflowSegmentation currentSegmentation; 
+    
     public WorkflowSegmentationUiPanel() {
 
         getStyleClass().add("vbox");
@@ -119,19 +122,7 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
     }
 
    
-    public void process(ImageDisplay display) {
-        if (display == imageDisplay) {
-            return;
-        }
-        this.imageDisplay = display;
-        if (this.imageDisplay == null) {
-            return;
-        }
-        if (stepCount.valueProperty().get() > 0) {
-            onTestClicked(null);
-        }
-
-    }
+   
 
     @Override
     public Node getContentNode() {
@@ -162,33 +153,27 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     
     private void onTestClicked(ActionEvent event) {
-
-        Task task = new WorkflowBuilder(context)
-                .addInput(imageDisplay)
-                .execute(workflowPanel.stepListProperty())
-                
-                .then(output -> {
-                    Dataset dataset = output.getDataset();
-                    if (dataset.getType().getBitsPerPixel() == 1) {
-                       
-                    } else {
-                        uiService.showDialog("Your workflow should result into a binary image.");
-
-                    }
-                })
-                .start();
-        loadingService.frontEndTask(task, true);
+        
+        currentSegmentation.reprocess(workflowPanel.stepListProperty());
+        
     }
 
   
     @Override
-    public FakeSegmentation createSegmentation(ImageDisplay imageDisplay) {
-        return new FakeSegmentation();
+    public WorkflowSegmentation createSegmentation(ImageDisplay imageDisplay) {
+        WorkflowSegmentation segmentation =  new WorkflowSegmentation(imageDisplay);
+        segmentation.reprocess(workflowPanel.stepListProperty());
+        currentSegmentation = segmentation;
+        return segmentation;
+        
     }
 
+    
+    
+    
     @Override
-    public void bind(FakeSegmentation t) {
-      
+    public void bind(WorkflowSegmentation t) {
+        currentSegmentation = t;
     }
 
 }

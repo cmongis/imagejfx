@@ -57,6 +57,7 @@ import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.utils.ImageDisplayProperty;
 import java.io.File;
@@ -66,18 +67,22 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
@@ -209,7 +214,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private final ObjectProperty<SegmentationUiPlugin> currentPlugin = new SimpleObjectProperty();
 
-    private final ObjectProperty<Img<BitType>> maskProperty = new SimpleObjectProperty<>();
+    private Property<Img<BitType>> maskProperty;
 
     private UiContextProperty segmentationContext;
 
@@ -217,22 +222,28 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private static final String ALL_PLANE_ONE_MASK = "... for all planes using this mask";
     private static final String SEGMENT_AND_MEASURE = "... after segmenting each planes";
 
-    private OpacityTransitionBinding opacityTransition;
-
     private UUIDMap<Segmentation> segmentationMap = new UUIDMap<>();
-    
-    //private WeahHashMap<ImageDisplay,ConfigurationMapper<ImageDisplay>> configuration = new WeakHashMap<>();
-    
+
+    private WeakHashMap<ImageDisplay, SegmentationUiPlugin> selectedPlugin = new WeakHashMap<>();
+
+    Logger logger = ImageJFX.getLogger();
+
+    ConfigurationMapper<ImageDisplay> configuration;
+
+    private ChangeListener<Img<BitType>> onMaskChanged;
+
     public SegmentationUiPanel() {
 
         try {
             FXUtilities.injectFXML(this, "/ijfx/ui/segmentation/SegmentationUiPanel.fxml");
             setPrefWidth(200);
             accordion.expandedPaneProperty().addListener(this::onExpandedPaneChanged);
-            //measureAllPlaneProperty.bind(planeSettingCheckBox.selectedProperty());
 
             addAction(FontAwesomeIcon.COPY, ALL_PLANE_ONE_MASK, this::analyseParticlesFromAllPlanes, analyseParticlesButton);
             addAction(FontAwesomeIcon.TASKS, SEGMENT_AND_MEASURE, this::segmentAndAnalyseEachPlane, analyseParticlesButton);
+
+            onMaskChanged = this::onMaskChanged;
+
         } catch (IOException ex) {
             Logger.getLogger(SegmentationUiPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -264,8 +275,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         // adding all the UI Plugins
         List<SegmentationUiPlugin> plugins = pluginService
                 .createInstancesOfType(SegmentationUiPlugin.class);
-               
-        for(SegmentationUiPlugin plugin : plugins) {
+
+        for (SegmentationUiPlugin plugin : plugins) {
             PluginWrapper wrapper = new PluginWrapper(plugin);
             addPlugin(wrapper);
         }
@@ -274,17 +285,16 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         isExplorerProperty.addListener(this::onExplorerPropertyChanged);
 
-        segmentationContext.addListener(this::onSegmentationContextChanged);
-
         onExplorerPropertyChanged(isExplorerProperty, Boolean.FALSE, isExplorer());
 
         actionVBox.disableProperty().bind(currentPlugin.isNull());
 
         segmentMoreButton.visibleProperty().bind(isExplorerProperty.not());
 
-        maskProperty.addListener(this::onMaskChanged);
         currentPlugin.addListener(this::onCurrentPluginChanged);
-        //planeSettingCheckBox.textProperty().bind(Bindings.createStringBinding(this::getCheckBoxText, planeSettingCheckBox.selectedProperty()));
+
+        configuration = new ConfigurationMapper<>(imageDisplayProperty, currentPlugin, accordion.expandedPaneProperty(), currentPlugin);
+
         return this;
     }
 
@@ -319,7 +329,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     }
 
     //adds a wrapper
-    private  void addPlugin(PluginWrapper<?> wrapper) {
+    private void addPlugin(PluginWrapper<?> wrapper) {
         // put it in a map with the corresponding plugin
         nodeMap.put(wrapper, wrapper.getPlugin());
         getPanes().add(wrapper);
@@ -344,8 +354,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     }
 
- 
-    
     private SegmentationUiPlugin getActivePlugin() {
         return nodeMap.get(getExpandedPane());
     }
@@ -391,53 +399,25 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         return o -> true;
     }
 
-
-    /*
-        EVENT HANDLERS
-     */
-    private void onSegmentationContextChanged(Observable obs, Boolean oldValue, Boolean isSegmentationContext) {
-
-        if (isSegmentationContext) {
-            if (getCurrentPlugin() != null) {
-                //onMaskChanged(null, null, getCurrentPlugin().maskProperty().getValue());
-            }
-        } else {
-            //ImageDisplay display = getCurrentImageDisplay();
-            //Overlay overlay = overlayUtilsService.findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class);
-            //overlayService.removeOverlay(overlay);
-        }
-
-    }
-
-    private boolean hasMask(ImageDisplay imageDisplay) {
-
-        return overlayUtilsService.findOverlayOfType(imageDisplay, BinaryMaskOverlay.class) != null;
-
-    }
-
     private void deleteCurrentMask() {
-        if(getCurrentImageDisplay() != null) {
+        if (getCurrentImageDisplay() != null) {
             overlayUtilsService.removeAllOverlay(getCurrentImageDisplay());
         }
     }
-    
+
     private void onExpandedPaneChanged(Observable obs, TitledPane oldPane, TitledPane newPane) {
         if (newPane == null) {
             deleteCurrentMask();
             return;
         }
         currentPlugin.setValue(nodeMap.get(newPane));
-
         hintService.displayHints(getActivePlugin().getClass(), false);
         hintService.displayHints("/ijfx/ui/segmentation/SegmentationUiPanel-tutorial-hints.json", false);
     }
-    
+
     private void onCurrentPluginChanged(Observable obs, SegmentationUiPlugin oldValue, SegmentationUiPlugin newValue) {
-       Segmentation segmentation =  segmentationMap.get(newValue,getCurrentImageDisplay()).orElse(newValue.createSegmentation(getCurrentImageDisplay()));
-       maskProperty.bind(segmentation.maskProperty()
-       );
-       newValue.bind(segmentation);
-       segmentation.update(getCurrentImageDisplay());
+        Platform.runLater(this::updateView);
+
     }
 
     private void onMaskChanged(Observable obs, Img<BitType> oldMask, Img<BitType> newMask) {
@@ -448,7 +428,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         if (newMask != null && getCurrentImageDisplay() != null) {
 
-            new CallbackTask<Img<BitType>,Void>()
+            new CallbackTask<Img<BitType>, Void>()
                     .setInput(newMask)
                     .run(this::updateMask)
                     .start();
@@ -456,31 +436,50 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         }
 
     }
-    
+
     private Void updateMask(Img<BitType> mask) {
+        List<PolygonOverlay> overlays = overlayUtilsService.findOverlaysOfType(getCurrentImageDisplay(), PolygonOverlay.class);
+        overlayUtilsService.removeOverlay(getCurrentImageDisplay(), overlays);
         overlayUtilsService.updateBinaryMask(getCurrentImageDisplay(), mask);
         getCurrentImageDisplay().update();
         return null;
     }
 
-    // 
     private void onImageDisplayChanged(Observable obs, ImageDisplay oldValue, ImageDisplay display) {
         if (segmentationContext.getValue() == false || segmentationContext.getValue() == false || getCurrentPlugin() == null) {
             return;
         }
-        
+
+        Platform.runLater(this::updateView);
+
+    }
+
+    private void updateView() {
+
+        ImageDisplay display = getCurrentImageDisplay();
+
+        SegmentationUiPlugin plugin = getCurrentPlugin();
+
+        if (maskProperty != null) {
+            maskProperty.removeListener(onMaskChanged);
+        }
+
         // we create (or fetch) a segmentation for a specific display and a specific plugin
         Segmentation segmentation = segmentationMap
-                .get(getCurrentPlugin(),display)
-                .orElse(getCurrentPlugin().createSegmentation(display));
-        
+                .get(plugin, display)
+                .orRetrieveAndPut(() -> plugin.createSegmentation(display));
+
+        UUID id = segmentationMap.getId(getCurrentPlugin(), display, display.getName());
+
+        logger.info("Changing segmentation uuid=" + id.toString());
+
         // we bind the plugin to the segmentation
         getCurrentPlugin().bind(segmentation);
-        
-        
-        // we bind the mask to the segmentation
-        maskProperty.bind(segmentation.maskProperty());
-        
+        segmentation.update(display);
+
+        segmentation.maskProperty().addListener(onMaskChanged);
+        maskProperty = segmentation.maskProperty();
+
     }
 
     @FXML
@@ -620,10 +619,10 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private Segmentation getCurrentSegmentation() {
         return segmentationMap
-                .get(getCurrentPlugin(),getCurrentImageDisplay())
-                .orElse(getCurrentPlugin().createSegmentation(getCurrentImageDisplay()));
+                .get(getCurrentPlugin(), getCurrentImageDisplay())
+                .orPut(getCurrentPlugin().createSegmentation(getCurrentImageDisplay()));
     }
-    
+
     private Void countParticles(ProgressHandler handler) {
 
         if (isExplorer()) {
@@ -644,7 +643,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             MetaDataSet set = getDisplayMetaDataSet();
             handler.setProgress(1.5, 3);
             handler.setStatus("Transforming masks...");
-            List<Overlay> overlayList = measurementService.transform(currentMask, true);
+            List<Overlay> overlayList = measurementService.transform(getCurrentMask(), true);
 
             measurementService.countObjects(overlayList, o -> true, set, true);
 
@@ -652,6 +651,11 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             countParticlesFromPlane(handler, getCurrentImageDisplay());
         }
         return null;
+
+    }
+
+    private Img<BitType> getCurrentMask() {
+        return overlayUtilsService.extractBinaryMask(imageDisplayService.getActiveImageDisplay());
 
     }
 
@@ -764,8 +768,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             return this;
         }
 
-        
-
         public String getName() {
             return plugin.getName();
         }
@@ -779,8 +781,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         public void bind(T t) {
             plugin.bind(t);
         }
-
-      
 
     }
 

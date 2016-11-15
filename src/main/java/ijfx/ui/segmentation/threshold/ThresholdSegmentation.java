@@ -87,6 +87,8 @@ public class ThresholdSegmentation extends AbstractSegmentation {
 
     public final StringProperty methodProperty = new SimpleStringProperty("Default");
 
+    public boolean hasChanged = true;
+    
     public BooleanProperty autoThreshold = new SimpleBooleanProperty();
 
     Logger logger = ImageJFX.getLogger();
@@ -196,28 +198,12 @@ public class ThresholdSegmentation extends AbstractSegmentation {
 
    
 
-    private void onAnyChange(Observable obs) {
+    private void onAnyChange(Observable obs, Object oldValue, Object newValue) {
         logger.info("min max request !");
+        hasChanged = true;
         Platform.runLater(this::requestMaskUpdate);
     }
 
-    /*
-    private DataView getDatasetView() {
-        if (getImageDisplay().get() == null) {
-            return null;
-        }
-        return getImageDisplay().get().getActiveView();
-    }
-
-    private void updatePosition(ImageDisplay imageDisplay) {
-        if (imageDisplay == null) {
-            return;
-        }
-        double[] position = new double[imageDisplay.numDimensions()];
-
-        imageDisplay.localize(position);
-        setPosition(position);
-    }*/
 
     private void requestMaskUpdate() {
         maskUpdateBuffer.add(this::updateMask);
@@ -275,6 +261,11 @@ public class ThresholdSegmentation extends AbstractSegmentation {
         double min = val.getRealDouble();
         double max = range.getMax();
 
+        if(histogram.firstDataValue().getMinIncrement() == 1) {
+            min = Math.floor(min);
+            max = Math.floor(max);
+        }
+        
         return new double[]{min, max};
 
     }
@@ -285,6 +276,8 @@ public class ThresholdSegmentation extends AbstractSegmentation {
             return null;
         }
 
+        if(hasChanged == false) return maskProperty.getValue();
+        
         logger.info("Generating mask !");
         IntervalView<T> planeView = getAccessInterval(imageDisplay);
 
@@ -294,6 +287,7 @@ public class ThresholdSegmentation extends AbstractSegmentation {
 
         Img<BitType> img = factory.create(dimension, new BitType());
 
+        
         final double min, max;
 
         if (isAutothreshold()) {
@@ -318,9 +312,11 @@ public class ThresholdSegmentation extends AbstractSegmentation {
             randomAccess.get().set(value >= min && value <= max);
         }
         
-        lowValue.setValue(min);
-        highValue.setValue(max);
+        if(lowValue.get() != min)lowValue.setValue(min);
+        if(highValue.get() != max) highValue.setValue(max);
 
+        hasChanged = false;
+        
         return img;
 
     }
