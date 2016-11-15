@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import mongis.utils.TextFileUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AndFileFilter;
@@ -114,6 +116,18 @@ public class DefaultImageLoaderService extends AbstractService implements ImageL
     public Collection<File> getAllImagesFromDirectory(File file) {
         if(file.isDirectory() == false) return Lists.newArrayList(file);
         return FileUtils.listFiles(file, getSupportedExtensions(), true);
+    }
+
+    @Override
+    public Collection<File> getAllImagesFromDirecoty(File file, boolean recursive) {
+        if(recursive) return getAllImagesFromDirectory(file);
+        else {
+            final IOFileFilter filter = getIOFileFilter();
+            return Stream.of(file.listFiles())
+                    .filter(filter::accept)
+                    .collect(Collectors.toList());
+            
+        }
     }
 
 }
