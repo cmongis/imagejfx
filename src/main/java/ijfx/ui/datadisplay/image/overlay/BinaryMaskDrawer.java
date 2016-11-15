@@ -69,6 +69,10 @@ public class BinaryMaskDrawer implements OverlayDrawer<BinaryMaskOverlay> {
         RandomAccessibleInterval<BitType> rai = roi.getImg();
         RandomAccess<BitType> randomAccess = rai.randomAccess();
         
+        Color selectedColor = Color.RED.deriveColor(1.0, 1.0, 1.0, 0.8);
+        Color unselectedColor = Color.RED.deriveColor(1.0, 1.0, 1.0, 0.5);
+        
+        Color color = viewConfig.isSelected() ? selectedColor : unselectedColor;
         
         if (image == null) {
             width = new Double(viewport.getRealImageWidth()).intValue();
@@ -89,13 +93,15 @@ public class BinaryMaskDrawer implements OverlayDrawer<BinaryMaskOverlay> {
         if(maxX > width) maxX = width;
         if(maxY > height) maxY = height;
        
+        
+        
         for (int x = minX; x != maxX; x++) {
             for (int y = minY; y != maxY; y++) {
    
                 randomAccess.setPosition(x, 0);
                 randomAccess.setPosition(y,1);
                 if (randomAccess.get().get()) {
-                    image.getPixelWriter().setColor(x, y, Color.RED);
+                    image.getPixelWriter().setColor(x, y, color);
                 } else {
                     image.getPixelWriter().setColor(x, y, Color.TRANSPARENT);
                 }
