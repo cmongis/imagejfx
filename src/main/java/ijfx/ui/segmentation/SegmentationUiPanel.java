@@ -48,6 +48,7 @@ import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.UiConfiguration;
+import ijfx.ui.UiContexts;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.context.UiContextProperty;
@@ -132,7 +133,7 @@ import org.scijava.plugin.PluginService;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "any-display-open+segmentation -overlay-selected")
+@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "any-display-open+segment -overlay-selected")
 public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -272,7 +273,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         // initializing a fx property
         imageDisplayProperty = new SimpleObjectProperty<>();
         imageJCurrentDisplay = new ImageDisplayProperty(context);
-        segmentationContext = new UiContextProperty(context, "segmentation");
+        segmentationContext = new UiContextProperty(context, UiContexts.SEGMENT);
 
         // when the display is changed, we want to notify only the current wrapper
         imageDisplayProperty.addListener(this::onImageDisplayChanged);
@@ -286,7 +287,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             addPlugin(wrapper);
         }
 
-        isExplorerProperty = new UiContextProperty(context, "explorer");
+        isExplorerProperty = new UiContextProperty(context, UiContexts.EXPLORER);
 
         isExplorerProperty.addListener(this::onExplorerPropertyChanged);
 

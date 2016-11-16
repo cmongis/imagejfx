@@ -28,6 +28,7 @@ import ijfx.service.ui.MeasurementService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
+import ijfx.ui.UiContexts;
 import ijfx.ui.batch.WorkflowPanel;
 import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.widgets.PopoverToggleButton;
@@ -138,7 +139,7 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
             workflowPanel.setPrefHeight(500);
             workflowPanel.setPrefWidth(600);
 
-            isExplorer = new UiContextProperty(context, "explorer");
+            isExplorer = new UiContextProperty(context, UiContexts.EXPLORER);
             
             new OpacityTransitionBinding(testButton, isExplorer.not());
             

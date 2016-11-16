@@ -122,8 +122,8 @@ public class DefaultNotificationService extends AbstractService implements Notif
         notifyNewUptdate();
 
         // entering a new context
-        contextService.enter(UPDATE_AVAILABLE_CONTEXT);
-        contextService.update();
+        //contextService.enter(UPDATE_AVAILABLE_CONTEXT);
+        //contextService.update();
     }
 
     private void notifyNewUptdate() {

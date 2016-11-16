@@ -37,6 +37,7 @@ import ijfx.service.uicontext.UiContextService;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.UiConfiguration;
+import ijfx.ui.UiContexts;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
@@ -100,7 +101,7 @@ import org.scijava.ui.UIService;
  * @author Cyril MONGIS, 2016
  */
 //@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "segmentation-panel", context = "segmentation -overlay-selected", localization = Localization.RIGHT)
+@UiConfiguration(id = "segment-panel", context = "segment -overlay-selected", localization = Localization.RIGHT)
 public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     /*
@@ -214,7 +215,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         workflowPanel.addStep(GaussianBlur.class);
         workflowPanel.addStep(Binarize.class);
 
-        isExplorer = new UiContextProperty(context, "explorer");
+        isExplorer = new UiContextProperty(context, UiContexts.EXPLORER);
 
         isMultidimensional = new UiContextProperty(context, "multi-n-img");
         //startButton.visibleProperty().bind(isExplorer);

@@ -111,6 +111,7 @@ import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
 import mongis.utils.TextFileUtils;
 import mongis.utils.transition.TransitionBinding;
+import org.controlsfx.control.action.Action;
 import org.scijava.plugin.PluginService;
 
 /**
@@ -296,11 +297,10 @@ public class MainWindowController extends AnchorPane {
                 .runLongCallable(this::init)
                 .then(this::finishInitialization)
                 .error(this::onError);
-        
+
         Thread t = new Thread(task);
         t.setContextClassLoader(ClassLoader.getSystemClassLoader());
         t.start();
-              
 
         loadingPopup
                 .setCanCancel(false)
@@ -324,8 +324,8 @@ public class MainWindowController extends AnchorPane {
     public Boolean init(ProgressHandler handler) {
         handler.setStatus("Initializing ImageJ....");
         handler.setProgress(1, 3);
-        
-        logger.info(String.format("Class loader : %s",Thread.currentThread().getContextClassLoader().getClass().getSimpleName()));
+
+        logger.info(String.format("Class loader : %s", Thread.currentThread().getContextClassLoader().getClass().getSimpleName()));
         imageJ = new ImageJ();
 
         // service.removePlugin(service.getPlugin(Binarize.class));
@@ -358,7 +358,7 @@ public class MainWindowController extends AnchorPane {
 
         logger.info("finishing initialization...");
         // entering the right context
-        uiContextService.enter(UiContexts.list(UiContexts.DEBUG),"visualize");
+        uiContextService.enter(UiContexts.list(UiContexts.DEBUG), "visualize");
 
         // showing the intro app
         // updating the context
@@ -547,7 +547,8 @@ public class MainWindowController extends AnchorPane {
 
             ns.position(Pos.TOP_RIGHT);
             ns.hideAfter(Duration.seconds(120));
-            ns.show();
+            ns.action(new Action("Close", event -> autosize()));
+            ns.showInformation();
 
         });
     }
@@ -762,10 +763,10 @@ public class MainWindowController extends AnchorPane {
 
         addSideMenuButton("Explore", FontAwesomeIcon.COMPASS, ExplorerActivity.class);
 
-        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class,"visualize");
-        addSideMenuButton("Segment", FontAwesomeIcon.EYE, ImageJContainer.class,"segmentation");
-        
-        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, ExplorerActivity.class,"batch");
+        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class, "visualize");
+        addSideMenuButton("Segment", FontAwesomeIcon.EYE, ImageJContainer.class, "segmentation");
+
+        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, ExplorerActivity.class, "batch");
         addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, FolderSelection.class);
 
         new TransitionBinding<Number>(0d, 1d)
@@ -787,24 +788,25 @@ public class MainWindowController extends AnchorPane {
 
         return sideMenuButton;
     }
+
     private void addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass, String context) {
-        
+
         SideMenuButton button = new SideMenuButton(title);
         button.setIcon(icon);
-        
-        button.setOnMouseClicked(click->{
-        
-                uiContextService.enter(context);
-                if(activityService.getCurrentActivityAsClass() != actClass) {
-                    activityService.openByType(actClass);
-                }
-                uiContextService.update();
-                menuActivated.setValue(false);
-                
+
+        button.setOnMouseClicked(click -> {
+
+            uiContextService.enter(context);
+            if (activityService.getCurrentActivityAsClass() != actClass) {
+                activityService.openByType(actClass);
+            }
+            uiContextService.update();
+            menuActivated.setValue(false);
+
         });
-        
+
         sideMenuTopVBox.getChildren().add(button);
-        
+
     }
 
     public void removeBlacklisted() {

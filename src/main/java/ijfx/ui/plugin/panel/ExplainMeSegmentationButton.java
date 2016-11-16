@@ -37,7 +37,7 @@ import org.scijava.plugin.Plugin;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type=UiPlugin.class,priority=1.0)
-@UiConfiguration(context = "segment segmentation",id="explain-me-segmentation-button",localization = Localization.TOP_RIGHT)
+@UiConfiguration(context = "segment",id="explain-me-segment-button",localization = Localization.TOP_RIGHT)
 public class ExplainMeSegmentationButton extends AbstractContextButton {
 
     
