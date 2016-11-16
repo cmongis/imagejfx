@@ -25,6 +25,7 @@ import io.scif.config.SCIFIOConfig;
 import ijfx.service.CellImgFactoryHeuristic;
 import ijfx.service.Timer;
 import ijfx.service.TimerService;
+import ijfx.ui.main.ImageJFX;
 import io.scif.MetadataLevel;
 import io.scif.img.ImgOpener;
 import io.scif.img.SCIFIOImgPlus;
@@ -363,6 +364,7 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
             dataset = datasetService.create((ImgPlus)imgPlus);
             
         } catch (Exception e) {
+            ImageJFX.getLogger().log(Level.SEVERE,"Error when opening "+file.getName(),e);
             throw new IOException();
         }
         //Dataset dataset = datasetIOService.open(file.getAbsolutePath(), config);
