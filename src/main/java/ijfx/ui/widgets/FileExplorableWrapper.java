@@ -109,7 +109,7 @@ public class FileExplorableWrapper extends AbstractExplorable{
 
     @Override
     public void open() throws Exception {
-          Future<CommandModule> run = commandService.run(OpenImageFX.class, true, "file", file);
+          Future<CommandModule> run = commandService.run(OpenImageFX.class, true, "file", file,"imageId",-1);
             run.get();
     }
 
