@@ -1,10 +1,10 @@
 [
     {
         "name": "imagej",
-        "incompatibleWith": ["webapp", "image-browser","explorer"]
+        "incompatibleWith": ["webapp", "image-browser","explore"]
     }
     ,{
-        "name":"explorer"
+        "name":"explore"
         ,"incompatibleWith":["webapp","imagej"]
     }
     ,{
@@ -29,15 +29,15 @@
         ,"incompatibleWith":["project-rule-list","project-manager"]
     }
     ,{
-        "name":"segmentation"
+        "name":"segment"
         ,"incompatibleWith":["visualize"]
     }
     ,{
         "name":"visualize"
-        ,"incompatibleWith":["segmentation"]
+        ,"incompatibleWith":["segment"]
     }
     ,{
         "name":"batch"
-        ,"incompatibleWith":["imagej","segmentation","webapp"]
+        ,"incompatibleWith":["segment","visualize"]
     }
 ]

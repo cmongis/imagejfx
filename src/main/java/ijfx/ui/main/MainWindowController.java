@@ -763,10 +763,10 @@ public class MainWindowController extends AnchorPane {
 
         addSideMenuButton("Explore", FontAwesomeIcon.COMPASS, ExplorerActivity.class);
 
-        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class, "visualize");
-        addSideMenuButton("Segment", FontAwesomeIcon.EYE, ImageJContainer.class, "segmentation");
+        addSideMenuButton("Visualize", FontAwesomeIcon.PICTURE_ALT, ImageJContainer.class, UiContexts.VISUALIZE);
+        addSideMenuButton("Segment", FontAwesomeIcon.EYE, ImageJContainer.class, UiContexts.SEGMENT);
 
-        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, ExplorerActivity.class, "batch");
+        addSideMenuButton("Batch process", FontAwesomeIcon.LIST, ExplorerActivity.class, UiContexts.BATCH);
         addSideMenuButton("Correction", FontAwesomeIcon.COFFEE, FolderSelection.class);
 
         new TransitionBinding<Number>(0d, 1d)

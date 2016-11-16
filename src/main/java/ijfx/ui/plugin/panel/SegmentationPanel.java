@@ -215,7 +215,7 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         workflowPanel.addStep(GaussianBlur.class);
         workflowPanel.addStep(Binarize.class);
 
-        isExplorer = new UiContextProperty(context, UiContexts.EXPLORER);
+        isExplorer = new UiContextProperty(context, UiContexts.EXPLORE);
 
         isMultidimensional = new UiContextProperty(context, "multi-n-img");
         //startButton.visibleProperty().bind(isExplorer);

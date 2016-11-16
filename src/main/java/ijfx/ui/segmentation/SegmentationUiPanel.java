@@ -133,7 +133,7 @@ import org.scijava.plugin.PluginService;
  * @author Cyril MONGIS, 2016
  */
 @Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "any-display-open+segment -overlay-selected")
+@UiConfiguration(id = "segmentation-panel-2", localization = Localization.RIGHT, context = "any-display-open+segment explore+segment -overlay-selected")
 public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     @Parameter
@@ -287,7 +287,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             addPlugin(wrapper);
         }
 
-        isExplorerProperty = new UiContextProperty(context, UiContexts.EXPLORER);
+        isExplorerProperty = new UiContextProperty(context, UiContexts.EXPLORE);
 
         isExplorerProperty.addListener(this::onExplorerPropertyChanged);
 
@@ -326,7 +326,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
      * 
      */
     private ImageDisplay getCurrentImageDisplay() {
-
+        if(imageDisplayProperty.getValue() == null) {
+            return imageDisplayService.getActiveImageDisplay();
+        }
         return imageDisplayProperty.getValue();
     }
 
@@ -462,8 +464,12 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private void updateView() {
 
-        ImageDisplay display = getCurrentImageDisplay();
+        ImageDisplay display = getCurrentImageDisplay() == null ? 
+                imageDisplayService.getActiveImageDisplay()
+                : getCurrentImageDisplay();
 
+        
+        
         SegmentationUiPlugin plugin = getCurrentPlugin();
 
         if (maskProperty != null) {
@@ -498,13 +504,11 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                     .submit(loadingScreenService)
                     .start();
         } else {
-
-        }
-
-        new CallbackTask<Object, Object>()
+            new CallbackTask<Object, Object>()
                 .run(this::analyseParticleFromCurrentPlane)
                 .submit(loadingScreenService)
                 .start();
+        }    
     }
 
     private Object analyseParticleFromCurrentPlane(ProgressHandler progress, Object object) {
@@ -752,10 +756,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     private void close() {
         uiContextSrv
-                .leave("segment")
-                .leave("segmentation");
+                .leave(UiContexts.SEGMENT);
         if(!isExplorer()) {
-            uiContextSrv.enter("visualize");
+            uiContextSrv.enter(UiContexts.VISUALIZE);
         }
         uiContextSrv.update();
     }
