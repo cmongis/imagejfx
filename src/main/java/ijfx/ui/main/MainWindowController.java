@@ -86,7 +86,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
-import ijfx.ui.correction.CorrectionActivity;
 import ijfx.ui.correction.FolderSelection;
 import ijfx.ui.explorer.ExplorerActivity;
 import ijfx.ui.notification.DefaultNotification;
@@ -111,7 +110,7 @@ import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
 import mongis.utils.TextFileUtils;
 import mongis.utils.transition.TransitionBinding;
-import org.controlsfx.control.action.Action;
+import org.scijava.app.StatusService;
 import org.scijava.plugin.PluginService;
 
 /**
@@ -226,6 +225,9 @@ public class MainWindowController extends AnchorPane {
 
     BooleanProperty menuActivated = new SimpleBooleanProperty(false);
 
+    @Parameter
+    StatusService statusService;
+    
     private Thread memoryThread = new Thread(() -> {
 
         while (true) {
@@ -281,7 +283,7 @@ public class MainWindowController extends AnchorPane {
 
         memoryProgressBar.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMemoryProgressBarClicked);
 
-        new GifRecorder(this).setNotifier(text -> showNotification(new DefaultNotification("Gif Recorder", text)));
+       
 
     }
 
@@ -369,6 +371,8 @@ public class MainWindowController extends AnchorPane {
         initMenuAction();
         new Timeline(new KeyFrame(Duration.millis(300), new KeyValue(sideMenu.translateXProperty(), 0.0))).play();
         logger.info("Start over");
+        
+         new GifRecorder(this).setNotifier(statusService::showStatus);
 
     }
 
@@ -547,7 +551,7 @@ public class MainWindowController extends AnchorPane {
 
             ns.position(Pos.TOP_RIGHT);
             ns.hideAfter(Duration.seconds(120));
-            ns.action(new Action("Close", event -> autosize()));
+            
             ns.showInformation();
 
         });

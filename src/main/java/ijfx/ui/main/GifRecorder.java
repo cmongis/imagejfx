@@ -62,7 +62,7 @@ public class GifRecorder {
         }
         this.node = node;
 
-        node.addEventHandler(KeyEvent.KEY_PRESSED, this::onKeyPressed);
+        node.getScene().addEventHandler(KeyEvent.KEY_PRESSED, this::onKeyPressed);
         node.addEventHandler(MouseEvent.ANY, this::onMouseMoved);
         node.addEventHandler(DragEvent.ANY, this::onMouseDraged);
     }
@@ -72,7 +72,7 @@ public class GifRecorder {
     private int delay = 1000 / 10;
 
     private boolean shouldContinue;
-
+    private long lastClick;
     private Thread currentThread;
 
     Consumer<String> notifier = System.out::println;
@@ -120,6 +120,9 @@ public class GifRecorder {
             recorder.setRepeat(0);
             int radius = 15;
             int x, y;
+            Color color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+            Color border = color.darker().darker();
+
             ExecutorService executor = Executors.newFixedThreadPool(1);
             while (shouldContinue) {
                 long time = System.currentTimeMillis();
@@ -127,13 +130,17 @@ public class GifRecorder {
                 y = toInt(lastY) - (radius / 2);
                 BufferedImage image = capture();
                 Graphics graphics = image.getGraphics();
-                graphics.setColor(Color.WHITE);
+                graphics.setColor(border);
 
                 graphics.drawOval(x, y, radius, radius);
                 graphics.drawOval(x + 1, y + 1, radius - 2, radius - 2);
-                if (isMousePressed) {
-                    graphics.fillOval(x, y, radius, radius);
+
+                if (System.currentTimeMillis() - lastClick < 1000) {
+                    graphics.setColor(Color.WHITE);
+                } else {
+                    graphics.setColor(color);
                 }
+                graphics.fillOval(x, y, radius, radius);
 
                 executor.execute(() -> recorder.addFrame(image));
 
@@ -149,6 +156,7 @@ public class GifRecorder {
             notify("Stop Gif recording");
             executor.shutdown();
             executor.awaitTermination(60, TimeUnit.SECONDS);
+
             recorder.finish();
             notify("Gif written");
 
@@ -214,6 +222,7 @@ public class GifRecorder {
         lastX = event.getSceneX();
         lastY = event.getSceneY();
         isMousePressed = event.isPrimaryButtonDown() || event.isSecondaryButtonDown() || event.isMiddleButtonDown();
+        if(isMousePressed) lastClick = System.currentTimeMillis();
     }
 
     private void onMouseDraged(DragEvent event) {
