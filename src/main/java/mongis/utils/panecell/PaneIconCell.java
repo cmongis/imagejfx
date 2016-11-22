@@ -252,6 +252,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
         // cancelling the possible image search
         if (currentImageSearch != null) {
+            logger.info("Cancelling image change");
             currentImageSearch.cancel();
         }
 
@@ -298,6 +299,11 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
                 .then(this::setAdditionalData)
                 .start();
 
+        if(currentImageSearch != null) {
+            currentImageSearch.cancel();
+            currentImage = null;
+        }
+        
         if (loadImageOnChange.getValue() == true || isInsideScrollWindow) {
             updateImageAsync(newItem);
         }

@@ -86,6 +86,8 @@ public class PaneCellController<T extends Object> {
         this.cellFactory = cellFactory;
     }
 
+    PaneCellUpdateProcess<T> updateProcess;
+
     /**
      * Give it a list of items coming from the model and the controller will
      * update the pane. If necessary, new PanelCell will be created. Unnecessary
@@ -95,6 +97,7 @@ public class PaneCellController<T extends Object> {
      */
     public synchronized CallbackTask update(List<T> items) {
 
+        /*
         return new CallbackTask<Integer, List<PaneCell<T>>>()
                 .setInput(items.size())
                 .setName("Loading...")
@@ -113,8 +116,16 @@ public class PaneCellController<T extends Object> {
                 })
                 .start();
                 
-   
-        
+                * 
+         */
+        if (updateProcess != null) {
+            updateProcess.cancel();
+        }
+
+        updateProcess = new PaneCellUpdateProcess(items, cachedControllerList, pane.getChildren(), cellFactory);
+
+        return new CallbackTask<Void, Void>().start();
+
     }
 
     public synchronized void update3DList(List<List<List<T>>> items, int size, List<String> metaDatas) {
@@ -200,8 +211,6 @@ public class PaneCellController<T extends Object> {
         }
         return null;
     }
-
-    
 
     public Boolean isSelected(T item) {
         return selectedItems.contains(item);

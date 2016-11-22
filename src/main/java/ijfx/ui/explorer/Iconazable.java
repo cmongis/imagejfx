@@ -34,5 +34,6 @@ public interface Iconazable {
     Image getImage();
     public void open() throws Exception;
     public BooleanProperty selectedProperty();
+    public BooleanProperty visibleProperty();
     
 }

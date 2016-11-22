@@ -102,7 +102,9 @@ public class IconView extends ScrollPane implements ExplorerView {
 
     @Override
     public void setItem(List<? extends Explorable> items) {
-        loadingScreenService.frontEndTask(cellPaneCtrl.update(new ArrayList<Iconazable>(items)),false);
+        //loadingScreenService.frontEndTask(cellPaneCtrl.update(new ArrayList<Iconazable>(items)),false);
+        cellPaneCtrl.update(new ArrayList<Iconazable>(items));
+        
         Platform.runLater(binder::update);
     }
 
