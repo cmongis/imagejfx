@@ -34,5 +34,7 @@ public interface PaneCell<T> {
     public Node getContent();
     
     public BooleanProperty selectedProperty();
+    public BooleanProperty onScreenProperty();
+ 
     
 }

@@ -208,7 +208,7 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
 
         labelCategory.getContextualView().getPane().getChildren().forEach((e) -> {
             PaneIconCellPreview paneIconCellPreview = (PaneIconCellPreview) e;
-            paneIconCellPreview.forceImageUpdate();
+            paneIconCellPreview.onScreenProperty().setValue(true);
             paneIconCellPreview.setSubtitleVisible(false);
         });
         if (!labelCategory.getPane().getChildren().isEmpty()) {

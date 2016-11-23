@@ -70,6 +70,8 @@ public class ImageRecordIconizer implements Explorable {
 
     private BooleanProperty selectedProperty;
 
+    private final BooleanProperty visibleProperty = new SimpleBooleanProperty(false);
+    
     boolean selected = false;
 
     int imageId = 0;
@@ -177,6 +179,10 @@ public class ImageRecordIconizer implements Explorable {
     
     public void dispose() {
         
+    }
+    
+    public BooleanProperty visibleProperty() {
+        return visibleProperty;
     }
 
 }

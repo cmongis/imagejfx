@@ -46,6 +46,7 @@ public class SimplePaneCell<T> implements PaneCell<T> {
     FailableCallback<T, Image> imageFactory = (i) -> null;
     T item;
     BooleanProperty booleanProperty = new SimpleBooleanProperty();
+    BooleanProperty onScreenProperty = new SimpleBooleanProperty();
     Consumer<T> onClick;
 
     public SimplePaneCell() {
@@ -103,5 +104,8 @@ public class SimplePaneCell<T> implements PaneCell<T> {
         return this;
     }
     
+    public BooleanProperty onScreenProperty() {
+        return onScreenProperty;
+    }
     
 }

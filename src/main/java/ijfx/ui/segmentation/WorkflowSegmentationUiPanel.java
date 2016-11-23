@@ -165,6 +165,7 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
         WorkflowSegmentation segmentation =  new WorkflowSegmentation(imageDisplay);
         segmentation.reprocess(workflowPanel.stepListProperty());
         currentSegmentation = segmentation;
+        segmentation.stepList = workflowPanel.stepListProperty();
         return segmentation;
         
     }

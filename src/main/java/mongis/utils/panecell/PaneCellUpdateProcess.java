@@ -80,7 +80,7 @@ public class PaneCellUpdateProcess<T> {
             if (cachedController.size() > 0) // creating CellUpdate request
             {
                 IntStream
-                        .of(cachedController.size())
+                        .range(0,cachedController.size())
                         .mapToObj(i -> new CellUpdate(cachedController.get(i), items.get(i)))
                         .forEach(updateQueue::onNext);
             }
@@ -96,7 +96,7 @@ public class PaneCellUpdateProcess<T> {
 
             // creating CellUpdate request
             IntStream
-                    .of(items.size())
+                    .range(0,items.size())
                     .mapToObj(i -> new CellUpdate(cachedController.get(i), items.get(i)))
                     .forEach(updateQueue::onNext);
 
@@ -137,6 +137,13 @@ public class PaneCellUpdateProcess<T> {
             return;
         }
 
+        List<PaneCell<T>> cells = updates
+                .stream()
+                .map(u->u.paneCell)
+                .filter(p->cachedController.contains(p) == false)
+                .collect(Collectors.toList());
+        cachedController.addAll(cells);
+        
         List<Node> collect = updates
                 .stream()
                 .map(r -> r.paneCell.getContent())

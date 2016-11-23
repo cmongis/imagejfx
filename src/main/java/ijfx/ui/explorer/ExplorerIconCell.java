@@ -41,7 +41,7 @@ public class ExplorerIconCell extends PaneIconCell<Iconazable>{
         setTitleFactory(this::getTitle);
         setSubtitleFactory(this::getSubtitle);
         setImageFactory(this::getImage);
-        setLoadImageOnChange(false);
+        onScreenProperty().setValue(Boolean.FALSE);
         
     }
     

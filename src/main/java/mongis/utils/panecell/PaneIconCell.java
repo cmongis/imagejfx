@@ -116,13 +116,14 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
   
 
    
-    private BooleanProperty loadImageOnChange = new SimpleBooleanProperty(true);
 
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty(false);
 
     private static final PseudoClass SELECTED = PseudoClass.getPseudoClass("selected");
 
     private static final ExecutorService refreshThreadPool = Executors.newFixedThreadPool(3);
+    
+    private final BooleanProperty onScreenProperty = new SimpleBooleanProperty(false);
     
    LoadingIcon loadingIcon = new LoadingIcon(20);
 
@@ -150,9 +151,9 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
            
             item.addListener(this::onItemChanged);
 
-            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindowEntered);
+            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_ENTERED, this::onScrollWindow);
 
-            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED, event -> isInsideScrollWindow = false);
+            addEventHandler(ScrollWindowEvent.SCROLL_WINDOW_EXITED, this::onScrollWindow);
 
             addEventHandler(MouseEvent.MOUSE_PRESSED, this::onClick);
             BindingsUtils.bindNodeToPseudoClass(SELECTED, this, selectedProperty());
@@ -161,6 +162,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
             subtibleVisibleProperty().addListener(this::onSubtitleVisibleChanged);
             
+            onScreenProperty().addListener(this::onAppearingOnScreen);
             
 
         } catch (IOException ex) {
@@ -173,11 +175,8 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         this.titleIconView = icon;
     }
 
-    public void onScrollWindowEntered(ScrollWindowEvent event) {
-        isInsideScrollWindow = true;
-        if (currentImage == null && currentImageSearch == null) {
-            updateImageAsync(getItem());
-        }
+    public void onScrollWindow(ScrollWindowEvent event) {
+        onScreenProperty().setValue(event.getEventType() == ScrollWindowEvent.SCROLL_WINDOW_ENTERED);
     }
 
     /**
@@ -264,12 +263,12 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         if (newItem == null) {
             return;
         }
-
+        
         forceUpdate(newItem);
 
     }
 
-    public void forceUpdate(T newItem) {
+    protected void forceUpdate(T newItem) {
         //otherwise starting to charge everything
         new CallbackTask<T, String>()
                 .setInput(newItem)
@@ -304,14 +303,10 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             currentImage = null;
         }
         
-        if (loadImageOnChange.getValue() == true || isInsideScrollWindow) {
+        if(onScreenProperty.getValue() == true) {
             updateImageAsync(newItem);
         }
 
-    }
-    
-    public void forceImageUpdate() {
-        updateImageAsync(itemProperty().getValue());
     }
 
     protected void updateImageAsync(T newItem) {
@@ -375,20 +370,7 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
         return this;
     }
 
-    /**
-     * When true, the image is loaded whenever the item is updated. When false,
-     * the image is loaded only if the UI element receive an SCROLL_WINDOW_ENTERED EVENT or if the forceUpdate
-     * method is called
-     *
-     * @param loadImageOnlyWhenVisible
-     */
-    public void setLoadImageOnChange(boolean loadImageOnlyWhenVisible) {
-        this.loadImageOnChange.setValue(loadImageOnlyWhenVisible);
-    }
-    
-    public Boolean isLoadImageOnChange() {
-        return loadImageOnChange.getValue();
-    }
+   
 
     public BooleanProperty subtibleVisibleProperty() {
         return subtitleLabel.visibleProperty();
@@ -401,6 +383,10 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
 
     public boolean isSubtitleVisible() {
         return subtibleVisibleProperty().getValue();
+    }
+    
+    public BooleanProperty onScreenProperty() {
+        return onScreenProperty;
     }
 
     @Override
@@ -434,6 +420,12 @@ public class PaneIconCell<T> extends BorderPane implements PaneCell<T> {
             titleVBox.getChildren().add(subtitleLabel);
         } else {
             titleVBox.getChildren().remove(subtitleLabel);
+        }
+    }
+    
+    protected void onAppearingOnScreen(Observable obs, Boolean oldValue, Boolean newValue) {
+        if(newValue) {
+            updateImageAsync(getItem());
         }
     }
 

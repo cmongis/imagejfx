@@ -43,7 +43,7 @@ public class DefaultFactoryPaneCell implements FactoryPaneCell {
         paneIconCellPreview.setImageFactory(i -> i.getImage(previewService,80));
         paneIconCellPreview.setSubtitleVisible(false);
         paneIconCellPreview.setTitleFactory(f -> f.getLabel());
-        paneIconCellPreview.setLoadImageOnChange(false);
+        paneIconCellPreview.onScreenProperty().setValue(Boolean.FALSE);
         paneIconCellPreview.setItem(itemWidget);
 
         return paneIconCellPreview;

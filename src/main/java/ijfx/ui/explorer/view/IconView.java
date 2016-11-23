@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
@@ -80,7 +81,7 @@ public class IconView extends ScrollPane implements ExplorerView {
         cellPaneCtrl.setCellFactory(this::createIcon);
         
         addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMouseClick);
-        
+         tilePane.getChildren().addListener(this::onDisplayedNodesChanged);
     }
     
     public void setTileDimension(double width, double height, double vgap, double hgap) {
@@ -104,8 +105,8 @@ public class IconView extends ScrollPane implements ExplorerView {
     public void setItem(List<? extends Explorable> items) {
         //loadingScreenService.frontEndTask(cellPaneCtrl.update(new ArrayList<Iconazable>(items)),false);
         cellPaneCtrl.update(new ArrayList<Iconazable>(items));
+       
         
-        Platform.runLater(binder::update);
     }
 
     private PaneCell<Iconazable> createIcon() {
@@ -146,6 +147,14 @@ public class IconView extends ScrollPane implements ExplorerView {
     @Override
     public void setSelectedItem(List<? extends Explorable> items) {
       
+    }
+    
+    private void onDisplayedNodesChanged(ListChangeListener.Change<? extends Node> change) {
+            
+        while(change.next());
+        
+       Platform.runLater(binder::update);
+        
     }
     
 }

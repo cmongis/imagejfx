@@ -46,10 +46,10 @@ import org.scijava.ui.UIService;
  *
  * @author Cyril MONGIS, 2016
  */
-public class PlaneMetaDataSetWrapper implements Explorable{
+public class PlaneMetaDataSetWrapper extends AbstractExplorable{
          private final MetaDataSet m;
 
-        BooleanProperty selectedProperty = new SimpleBooleanProperty(false);
+       
 
         @Parameter
         ThumbService thumbService;
@@ -119,12 +119,9 @@ public class PlaneMetaDataSetWrapper implements Explorable{
                     .start();
         }
 
-        @Override
-        public BooleanProperty selectedProperty() {
-            return selectedProperty;
-        }
+        
 
-        private File getFile() {
+        public File getFile() {
             return new File(getMetaDataSet().get(MetaData.ABSOLUTE_PATH).getStringValue());
         }
 

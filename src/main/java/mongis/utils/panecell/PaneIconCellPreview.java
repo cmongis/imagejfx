@@ -32,7 +32,7 @@ public class PaneIconCellPreview<T extends ItemWidget> extends PaneIconCell<T> {
         super();
         setPrefWidth(120);
         showIconProperty().setValue(false);
-        setLoadImageOnChange(false);
+        
         
     }
     

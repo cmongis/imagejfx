@@ -188,7 +188,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     private UiContextService uiContextSrv;
-    
+
     @FXML
     private Accordion accordion;
 
@@ -204,8 +204,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     private Button segmentMoreButton;
 
-   
-    
     Img<BitType> currentMask;
 
     private final Map<TitledPane, SegmentationUiPlugin> nodeMap = new HashMap<>();
@@ -309,12 +307,12 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         MenuItem item = new MenuItem(label, new FontAwesomeIconView(icon));
         item.setOnAction(
                 event -> new CallbackTask<Void, Void>()
-                        .run((progress, voiid) -> {
-                            action.accept(progress);
-                            return null;
-                        })
-                        .submit(loadingScreenService)
-                        .start()
+                .run((progress, voiid) -> {
+                    action.accept(progress);
+                    return null;
+                })
+                .submit(loadingScreenService)
+                .start()
         );
 
         menuButton.getItems().add(item);
@@ -326,7 +324,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
      * 
      */
     private ImageDisplay getCurrentImageDisplay() {
-        if(imageDisplayProperty.getValue() == null) {
+        if (imageDisplayProperty.getValue() == null) {
             return imageDisplayService.getActiveImageDisplay();
         }
         return imageDisplayProperty.getValue();
@@ -380,8 +378,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
             overlays = measurementService
                     .extractOverlays(
                             overlayUtilsService
-                                    .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
-                                    ));
+                            .findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class
+                            ));
 
             // now we remove all the present overlays just in case
             overlayUtilsService.removeAllOverlay(getCurrentImageDisplay());
@@ -464,12 +462,10 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     private void updateView() {
 
-        ImageDisplay display = getCurrentImageDisplay() == null ? 
-                imageDisplayService.getActiveImageDisplay()
+        ImageDisplay display = getCurrentImageDisplay() == null
+                ? imageDisplayService.getActiveImageDisplay()
                 : getCurrentImageDisplay();
 
-        
-        
         SegmentationUiPlugin plugin = getCurrentPlugin();
 
         if (maskProperty != null) {
@@ -505,10 +501,10 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
                     .start();
         } else {
             new CallbackTask<Object, Object>()
-                .run(this::analyseParticleFromCurrentPlane)
-                .submit(loadingScreenService)
-                .start();
-        }    
+                    .run(this::analyseParticleFromCurrentPlane)
+                    .submit(loadingScreenService)
+                    .start();
+        }
     }
 
     private Object analyseParticleFromCurrentPlane(ProgressHandler progress, Object object) {
@@ -739,25 +735,33 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         if (activeDataset != null) {
 
             String source = activeDataset.getSource();
-
-            Folder folderContainingFile = folderManagerService.getFolderContainingFile(new File(source));
-
-            if (folderContainingFile == null) {
-                folderContainingFile = folderManagerService.addFolder(new File(source).getParentFile());
+            if (source == null) {
+                source = (String) activeDataset.getProperties().get(MetaData.ABSOLUTE_PATH);
             }
 
-            folderManagerService.setCurrentFolder(folderContainingFile);
+            File sourceFile = new File(source);
+
+            if (sourceFile.exists()) {
+
+                Folder folderContainingFile = folderManagerService.getFolderContainingFile(new File(source));
+
+                if (folderContainingFile == null) {
+                    folderContainingFile = folderManagerService.addFolder(new File(source).getParentFile());
+                }
+
+                folderManagerService.setCurrentFolder(folderContainingFile);
+                folderManagerService.setExplorationMode(ExplorationMode.FILE);
+            }
         }
-        folderManagerService.setExplorationMode(ExplorationMode.FILE);
 
         activityService.openByType(ExplorerActivity.class);
     }
-    
+
     @FXML
     private void close() {
         uiContextSrv
                 .leave(UiContexts.SEGMENT);
-        if(!isExplorer()) {
+        if (!isExplorer()) {
             uiContextSrv.enter(UiContexts.VISUALIZE);
         }
         uiContextSrv.update();
