@@ -60,5 +60,7 @@ public interface DatasetUtillsService extends ImageJService{
     public void addSuffix(Dataset dataset, String suffix,String separator);
     
     public Dataset open(File file, int imgId,boolean virtual) throws IOException;
+
+    public void copyInfos(Dataset input, Dataset output);
     
 }

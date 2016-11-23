@@ -24,6 +24,7 @@ import ijfx.service.IjfxService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import javafx.beans.property.IntegerProperty;
 
 /**
  *
@@ -55,6 +56,8 @@ public interface ExplorerService extends IjfxService{
     void open(Iconazable iconazable);
     
     void openSelection();
+    
+    IntegerProperty selectedCountProperty();
     
     public ArrayList<String> getMetaDataKey(List<? extends Explorable> items);
 }
