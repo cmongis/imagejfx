@@ -98,31 +98,29 @@ public class BinaryToOverlay implements Command {
     }
 
     private <T extends RealType<T>> void perform(Dataset dataset) {
-        
-        overlays = transform(context, (RandomAccessibleInterval<T>)dataset, USE_WHITE_PIXEL.equals(objectColor));
-        
+
+        overlays = transform(context, (RandomAccessibleInterval<T>) dataset, USE_WHITE_PIXEL.equals(objectColor));
+
         if (overlays != null && display != null) {
             logger.info(String.format("%d overlays added to %s", overlays.length, display.toString()));
-        }
-        else {
+        } else {
             logger.info("No overlay added");
         }
-        
-        
+
     }
-    
+
     public static Overlay[] transform(Context context, Dataset dataset, boolean recognizeWhiteObject) {
-        return transform(context, (RandomAccessibleInterval)dataset, recognizeWhiteObject);
+        return transform(context, (RandomAccessibleInterval) dataset, recognizeWhiteObject);
     }
-    
-    public static <T extends RealType<T>> Overlay[] transform(Context context, RandomAccessibleInterval<T> dataset,boolean recognizeWhiteObject) {
+
+    public static <T extends RealType<T>> Overlay[] transform(Context context, RandomAccessibleInterval<T> dataset, boolean recognizeWhiteObject) {
         // converting 
-        
+
         int width = (int) dataset.max(0);
         int height = (int) dataset.max(1);
-       
+
         RandomAccess<T> randomAccess = dataset.randomAccess();
-       
+
         ByteProcessor byteProcessor = new ByteProcessor(width, height);
 
         long[] position = new long[dataset.numDimensions()];
@@ -139,10 +137,9 @@ public class BinaryToOverlay implements Command {
 
             }
         }
-      
+
         ImagePlus imp = new ImagePlus("Temporary mask", byteProcessor);
 
-       
         ManyBlobs blobs = new ManyBlobs(imp);
 
         // inverting if necessary because the
@@ -152,7 +149,7 @@ public class BinaryToOverlay implements Command {
         }
         //launching the search
         blobs.findConnectedComponents();
-        
+
         // creating a list
         List<Overlay> listOverlays = new ArrayList<>(blobs.size());
 
@@ -160,19 +157,17 @@ public class BinaryToOverlay implements Command {
 
         // converting each Blob into a PolygonOverlay
         for (Blob b : blobs) {
-            
-            
-            
+
             PolygonOverlay po = new PolygonOverlay(context);
-            po.setName(String.format("%d",count++));
-            
+            po.setName(String.format("%d", count++));
+
             // we modifiy the PolygonOverlay by modifying it region of interest
             PolygonRegionOfInterest roi = po.getRegionOfInterest();
 
             Polygon polygon = b.getOuterContour();
-            
+
             if (polygon.getBounds().getWidth() <= 2 && polygon.getBounds().getHeight() <= 2) {
-                
+
                 continue;
             }
 
@@ -181,9 +176,8 @@ public class BinaryToOverlay implements Command {
             //System.out.println(polygon);
             for (int i = 0; i != pointCount; i++) {
                 RealLocalizable localizable = new RealPoint(polygon.xpoints[i], polygon.ypoints[i]);
-                
+
                 //System.out.println(String.format("%.0f,%.0f",localizable.getDoublePosition(0),localizable.getDoublePosition(1)));
-                
                 roi.addVertex(i, localizable);
 
             }
@@ -194,5 +188,5 @@ public class BinaryToOverlay implements Command {
 
         return listOverlays.toArray(new Overlay[listOverlays.size()]);
     }
-    
+
 }
