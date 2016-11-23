@@ -22,6 +22,8 @@ package ijfx.service.overlay;
 import com.google.common.collect.Lists;
 import ijfx.bridge.ImageJContainer;
 import ijfx.service.IjfxService;
+import ijfx.service.uicontext.UiContextService;
+import ijfx.ui.UiContexts;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.main.ImageJFX;
 import io.scif.services.DatasetIOService;
@@ -85,6 +87,9 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
     @Parameter
     ActivityService activityService;
 
+    @Parameter
+    UiContextService uiContextService;
+    
     Logger logger = ImageJFX.getLogger();
 
     public void openOverlay(File file, Overlay selected) {
@@ -116,7 +121,7 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
             } else {
                 overlaySelectionSrv.selectOnlyOneOverlay(display, selected);
             }
-
+            uiContextService.enter(UiContexts.VISUALIZE);
             activityService.openByType(ImageJContainer.class);
 
         } else {
