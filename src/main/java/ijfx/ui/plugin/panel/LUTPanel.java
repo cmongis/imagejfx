@@ -76,10 +76,10 @@ import org.scijava.thread.ThreadService;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.context.UiContextProperty;
+import ijfx.ui.service.ImageDisplayFXService;
 import ijfx.ui.utils.ConvertedProperty;
 import ijfx.ui.utils.ImageDisplayProperty;
 import javafx.beans.Observable;
-import javafx.concurrent.Task;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
@@ -88,11 +88,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -113,6 +109,7 @@ import net.imglib2.view.IntervalView;
 
 import org.scijava.module.ModuleService;
 import org.scijava.util.Colors;
+import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte1.other;
 
 /**
  *
@@ -185,6 +182,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @Parameter
     OverlayService overlayService;
 
+    @Parameter
+    ImageDisplayFXService imageDisplayFxSrv;
+    
     Node lutPanelCtrl;
 
     @FXML
@@ -309,7 +309,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
                     .forward(this::ColorModeToBoolean)
                     .backward(this::booleanToColorMode);
             
-            mergedModeProperty.frontProperty().addListener(this::onColorModeChanged);
+           // mergedModeProperty.frontProperty().addListener(this::onColorModeChanged);
             
             mergedViewToggleButton.selectedProperty().bindBidirectional(mergedModeProperty.backProperty());
 
@@ -353,6 +353,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         currentDisplay.addListener(this::onDisplayChanged);
 
+        mergedModeProperty.frontProperty().bindBidirectional(imageDisplayFxSrv.currentColorModeProperty());
+        
         return this;
     }
 

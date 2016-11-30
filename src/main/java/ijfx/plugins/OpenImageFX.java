@@ -58,6 +58,8 @@ public class OpenImageFX extends ContextCommand {
     @Parameter
     UIService uiService;
     
+    
+    
     Logger logger = ImageJFX.getLogger();
     
     @Override

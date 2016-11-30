@@ -77,6 +77,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -263,6 +265,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         canvas.widthProperty().bind(stackPane.widthProperty());
         canvas.heightProperty().bind(stackPane.heightProperty());
 
+        canvas.addEventHandler(KeyEvent.KEY_TYPED, this::onKeyPressed);
+        
         /*
         this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
@@ -686,6 +690,12 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         //getOverlays().forEach(this::updateOverlay);
         repaint();
     }
+    
+    protected void onKeyPressed(KeyEvent event) {
+        if(event.getCode() == KeyCode.DELETE || event.getCode() == KeyCode.BACK_SPACE) {
+            deleteOverlay(overlaySelectionService.getSelectedOverlay(imageDisplay));
+        }
+    }
 
     @EventHandler
     protected void onOverlaySelectionChanged(OverlaySelectionEvent event) {
@@ -772,7 +782,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         if (event.getView() == getDatasetview()) {
             logService.info("Updating dataset");
             ImageJFX.getThreadPool().execute(getDataset()::update);
-            // getDatasetview().getProjector().map();
+           // getDatasetview().getProjector().map();
         }
     }
 
