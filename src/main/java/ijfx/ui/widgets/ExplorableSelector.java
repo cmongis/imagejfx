@@ -21,6 +21,7 @@ package ijfx.ui.widgets;
 
 import static com.squareup.okhttp.internal.Internal.logger;
 import ijfx.core.metadata.MetaData;
+import ijfx.core.metadata.MetaDataKeyPriority;
 import ijfx.ui.batch.ExplorableTableHelper;
 import ijfx.ui.batch.MetaDataSetOwnerHelper;
 import ijfx.ui.explorer.Explorable;
@@ -271,17 +272,16 @@ public class ExplorableSelector extends BorderPane{
         addItem(items);
     }
     
-    public void addItem(Collection<? extends Explorable> items) {
+    private void addItem(Collection<? extends Explorable> items) {
         if(items != null)
         this.addedFiles.addAll(items);
     }
 
-    public void onItemsAdded(Change<? extends Explorable> change) {
+    private void onItemsAdded(Change<? extends Explorable> change) {
         while(change.next()) {
             
             
-            helper.setColumnsFromItems(addedFiles);
-            updateFilter();
+           
             
             change.getAddedSubList()
                     .forEach(selectableManager::listen);
@@ -290,6 +290,11 @@ public class ExplorableSelector extends BorderPane{
                     .forEach(selectableManager::stopListening);
             
         }
+        
+        helper.setColumnsFromItems(addedFiles);
+        if(addedFiles.size() > 0)
+        helper.setPriority(MetaDataKeyPriority.getPriority(addedFiles.get(0).getMetaDataSet()));
+        updateFilter();
     }
     
    private void onExplorableMarked(Explorable exp, Boolean newValue) {

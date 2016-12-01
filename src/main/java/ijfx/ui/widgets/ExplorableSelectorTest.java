@@ -37,7 +37,7 @@ public class ExplorableSelectorTest extends BaseTester{
         
         ExplorableSelector selector = new ExplorableSelector();
         
-        selector.addItem(
+        selector.setItems(
                 Stream
                         .of(new File("./").listFiles())
                         .filter(f->f.isDirectory() == false)
