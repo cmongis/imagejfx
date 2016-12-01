@@ -122,7 +122,7 @@ public class DefaultFolder implements Folder, FileChangeListener {
     LoadingScreenService loadingScreenService;
 
     @Parameter
-    IndexationService indexationService;
+    IndexingService indexationService;
     
     Property<Task> currentTaskProperty = new SimpleObjectProperty<>();
 
