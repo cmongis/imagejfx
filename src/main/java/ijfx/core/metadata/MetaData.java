@@ -133,6 +133,7 @@ public interface MetaData {
     public final static String DIMENSION_ORDER = "*Dimension order";
     public final static String DIMENSION_LENGHS = "*Dimension lengths";
     public final static String PLANE_NON_PLANAR_POSITION = "*Non planar position";
+    public final static String SAVE_NAME = "*Save name"; // Metadata used for explorable that should be saved under an other name
     
     public final static String STATS_PIXEL_MIN = "Min";
     public final static String STATS_PIXEL_MAX = "Max";
