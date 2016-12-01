@@ -87,7 +87,7 @@ public class FlatFieldCorrection extends ContextCommand {
             target = dataset;
         } else {
             int channelAxisId = dataset.dimensionIndex(Axes.CHANNEL);
-            target = (RandomAccessibleInterval) Views.hyperSlice(dataset, channelAxisId, channel).cursor();
+            target = (RandomAccessibleInterval) Views.hyperSlice(dataset, channelAxisId, channel);
         }
         correct(target, (RandomAccessibleInterval) flatfieldData);
     }
