@@ -52,4 +52,6 @@ public interface BatchSingleInput {
     
     public String getSourceFile();
     
+    public String getDefaultSaveName();
+    
 }

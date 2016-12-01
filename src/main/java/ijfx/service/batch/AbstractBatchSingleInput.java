@@ -109,6 +109,9 @@ public abstract class AbstractBatchSingleInput implements BatchSingleInput {
         this.sourceFile = sourceFile;
     }
     
+    public String getDefaultSaveName() {
+        return null;
+    }
     
     
 

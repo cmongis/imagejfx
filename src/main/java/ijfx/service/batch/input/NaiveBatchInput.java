@@ -109,6 +109,11 @@ public class NaiveBatchInput implements BatchSingleInput {
         
         return name;
     }
+    
+    @Override
+    public String getDefaultSaveName() {
+        return name;
+    }
 
     public void setSourceFile(String sourceFile) {
         this.sourceFile = sourceFile;

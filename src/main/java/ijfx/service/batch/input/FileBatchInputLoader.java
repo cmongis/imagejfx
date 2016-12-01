@@ -63,5 +63,10 @@ public class FileBatchInputLoader extends AbstractLoaderWrapper<File>{
     public String getSourceFile() {
         return getWrappedValue().getAbsolutePath();
     }
+
+    @Override
+    public String getDefaultSaveName() {
+       return null;
+    }
     
 }

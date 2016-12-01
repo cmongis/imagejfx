@@ -86,7 +86,7 @@ public class WorkflowBuilder {
         return this;
     }
     
-    public WorkflowBuilder addInputFiles(Collection<File> files) {
+    public WorkflowBuilder addInputFiles(Collection<Explorable> files) {
         files.forEach(this::addInput);
         return this;
     }

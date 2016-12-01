@@ -44,7 +44,9 @@ public abstract class AbstractSaverWrapper implements BatchSingleInput{
     }
 
     
-    
+    public String getDefaultSaveName() {
+        return wrappedObject.getDefaultSaveName();
+    }
     
 
     @Override
