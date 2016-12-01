@@ -57,7 +57,7 @@ import mongis.utils.FXUtilities;
  *
  * @author Cyril MONGIS, 2016
  */
-public class ExplorableSelector extends BorderPane{
+public class ExplorableSelector extends BorderPane {
 
     @FXML
     TableView<Explorable> tableView;
@@ -76,9 +76,7 @@ public class ExplorableSelector extends BorderPane{
     final ObservableList<Explorable> addedFiles = FXCollections.observableArrayList();
 
     final ObservableList<Explorable> markedItemProperty = FXCollections.observableArrayList();
-    
-  
-    
+
     MetaDataSetOwnerHelper<Explorable> helper;
 
     BooleanBinding isFilterOn;
@@ -89,7 +87,8 @@ public class ExplorableSelector extends BorderPane{
     ListProperty<Explorable> selectedCountProperty;
 
     /**
-     * Binding representing is multiple object are selected inside the table view
+     * Binding representing is multiple object are selected inside the table
+     * view
      */
     BooleanBinding isMultipleSelection;
 
@@ -108,14 +107,14 @@ public class ExplorableSelector extends BorderPane{
     private final static String MARK_LABEL_TEXT = "%d files marked for processing";
 
     private final SelectableManager<Explorable> selectableManager = new SelectableManager<>(this::onExplorableMarked);
-    
+
     public ExplorableSelector() {
 
         try {
-            FXUtilities.injectFXML(this,"/ijfx/ui/widgets/ExplorableSelector.fxml");
+            FXUtilities.injectFXML(this, "/ijfx/ui/widgets/ExplorableSelector.fxml");
 
             helper = new ExplorableTableHelper(tableView);
-            helper.setPriority(MetaData.NAME,MetaData.FILE_SIZE);
+            helper.setPriority(MetaData.NAME, MetaData.FILE_SIZE);
             tableView.setItems(filteredFiles);
 
             //markedColumn.setCellFactory(this::generateCheckBoxCell);
@@ -147,11 +146,8 @@ public class ExplorableSelector extends BorderPane{
             markedLabel.textProperty().bind(markLabelText);
 
             addedFiles.addListener(this::onItemsAdded);
-            
+
             //new OpacityTransitionBinding(this, selectedCountProperty.emptyProperty().not());
-            
-            
-            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -171,10 +167,6 @@ public class ExplorableSelector extends BorderPane{
 
     }
 
-   
-
-   
-
     @FXML
     private void markSelection() {
         if (isMultipleSelection.getValue()) {
@@ -193,7 +185,7 @@ public class ExplorableSelector extends BorderPane{
     @FXML
     private void unmarkSelection() {
         addedFiles.forEach(fileInputModel -> fileInputModel.selectedProperty().setValue(false));
-        
+
     }
 
     @FXML
@@ -203,8 +195,6 @@ public class ExplorableSelector extends BorderPane{
 
     @FXML
     private void deleteAll() {
-
-        
 
         addedFiles.clear();
         filteredFiles.clear();
@@ -231,10 +221,6 @@ public class ExplorableSelector extends BorderPane{
 
     }
 
-   
-
-
-
     private void onKeyTyped(KeyEvent event) {
         updateFilter();
     }
@@ -253,9 +239,9 @@ public class ExplorableSelector extends BorderPane{
             List<Explorable> filteredFiles = addedFiles
                     .parallelStream()
                     .filter(explorable -> {
-               return explorable.getTitle().toLowerCase().contains(filterContent);
+                        return explorable.getTitle().toLowerCase().contains(filterContent);
 
-            }).collect(Collectors.toList());
+                    }).collect(Collectors.toList());
 
             this.filteredFiles.clear();
             this.filteredFiles.addAll(filteredFiles);
@@ -263,65 +249,65 @@ public class ExplorableSelector extends BorderPane{
         }
     }
 
-   
-
-   
-    
     public void setItems(Collection<? extends Explorable> items) {
         this.addedFiles.clear();
         addItem(items);
     }
-    
+
     private void addItem(Collection<? extends Explorable> items) {
-        if(items != null)
-        this.addedFiles.addAll(items);
+        if (items != null) {
+            this.addedFiles.addAll(items);
+        }
+        
     }
 
     private void onItemsAdded(Change<? extends Explorable> change) {
-        while(change.next()) {
-            
-            
-           
-            
+        while (change.next()) {
+
             change.getAddedSubList()
                     .forEach(selectableManager::listen);
-            
+
             change.getRemoved()
                     .forEach(selectableManager::stopListening);
-            
+
         }
-        
+        if (addedFiles.size() > 0) {
+            helper.setPriority(MetaDataKeyPriority.getPriority(addedFiles.get(0).getMetaDataSet()));
+        }
+
         helper.setColumnsFromItems(addedFiles);
-        if(addedFiles.size() > 0)
-        helper.setPriority(MetaDataKeyPriority.getPriority(addedFiles.get(0).getMetaDataSet()));
+
         updateFilter();
     }
-    
-   private void onExplorableMarked(Explorable exp, Boolean newValue) {
-       if(newValue) markedItemProperty.add(exp);
-       else markedItemProperty.remove(exp);
-       
-       markLabelText.invalidate();
+
+    private void onExplorableMarked(Explorable exp, Boolean newValue) {
+        if (newValue) {
+            markedItemProperty.add(exp);
+        } else {
+            markedItemProperty.remove(exp);
+        }
+
+        markLabelText.invalidate();
         markLabelText.getValue();
-   }
-    
+    }
+
     public ObservableList<Explorable> itemProperty() {
         return addedFiles;
     }
-    
-    
+
     /**
-     * Return the list of items explicitly marked for processing (using checkboxs)
-     * @return the observable list of items which have been marked for processing
+     * Return the list of items explicitly marked for processing (using
+     * checkboxs)
+     *
+     * @return the observable list of items which have been marked for
+     * processing
      */
     public ObservableList<Explorable> markedItemProperty() {
         return markedItemProperty;
     }
-    
-    
+
     public void dispose() {
         addedFiles.clear();
     }
-    
-    
-}  
+
+}
