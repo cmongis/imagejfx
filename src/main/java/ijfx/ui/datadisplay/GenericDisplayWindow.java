@@ -21,8 +21,12 @@ package ijfx.ui.datadisplay;
 
 import ijfx.service.PluginUtilsService;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import mongis.utils.CallbackTask;
 import org.scijava.Context;
 import org.scijava.display.Display;
 import org.scijava.plugin.Parameter;
@@ -36,7 +40,11 @@ public class GenericDisplayWindow extends AbstractDisplayWindow{
     @Parameter
     PluginUtilsService pluginUtilsService;
     
+    
     DisplayPanePlugin displayPane;
+    
+    Display display;
+    
     
     public GenericDisplayWindow(Context context) {
         super(context);
@@ -46,23 +54,62 @@ public class GenericDisplayWindow extends AbstractDisplayWindow{
     @Override
     protected void display(Display<?> display) {
         
+        this.display = display;
+        
+        
+        new CallbackTask<Display<?>,DisplayPanePlugin>()
+                .setInput(display)
+                .run(this::createPane)
+                .then(this::bind)
+          
+                .start();
+            
+        
+    }
+    
+    public DisplayPanePlugin createPane(Display<?> display) {
         displayPane = pluginUtilsService.createHandler(DisplayPanePlugin.class, display.getClass());
         
         if(displayPane == null) {
-            setContentPane(new AnchorPane(new Label("No pane plugin for this type of display.")));
+            displayPane = NO_PLUGIN_FOUND;
         }
-        else {
-            
-            setContentPane(displayPane.getPane());
-            displayPane.display(display);
-            
-            Platform.runLater(()->{
-            
-                displayPane.titleProperty().setValue(display.getName());
-                titleProperty().bind(displayPane.titleProperty());
-            
-            });
-            
-        }   
+        
+        displayPane.display(display);
+        
+        return displayPane;
     }
+    
+    
+    
+    public void bind(DisplayPanePlugin plugin) {
+         setContentPane(displayPane.getPane());
+         displayPane.titleProperty().setValue(display.getName());
+        titleProperty().bind(displayPane.titleProperty());
+    }
+    
+    private static final DisplayPanePlugin NO_PLUGIN_FOUND = new DisplayPanePlugin() {
+        
+        StringProperty stringProperty = new SimpleStringProperty();
+        
+        @Override
+        public void display(Display display) {
+            stringProperty.setValue(display.getName());
+        }
+
+        @Override
+        public void dispose() {
+            
+        }
+
+        @Override
+        public StringProperty titleProperty() {
+           return stringProperty;
+        }
+
+        @Override
+        public Pane getPane() {
+            return new AnchorPane(new Label("No pane plugin for this type of display."));
+        }
+    };
+    
 }

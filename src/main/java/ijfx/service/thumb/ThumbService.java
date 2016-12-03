@@ -90,7 +90,6 @@ public class ThumbService extends AbstractService implements ImageJService {
 
     Logger logger = ImageJFX.getLogger();
 
-    private static final Boolean lock = new Boolean(true);
 
     private static final String THUMB_FORMAT = ".png";
 
@@ -132,10 +131,10 @@ public class ThumbService extends AbstractService implements ImageJService {
         }
         RandomAccessibleInterval interval;
         timer.start();
-        synchronized (lock) {
+       
 
-            interval = datasetUtilsService.open(file, imageId, true);
-        }
+        interval = datasetUtilsService.open(file, imageId, true);
+        
         timer.elapsed("opening dataset");
         if (nonSpacialPosition == null) {
             nonSpacialPosition = new long[interval.numDimensions() - 2];
@@ -154,11 +153,11 @@ public class ThumbService extends AbstractService implements ImageJService {
     }
 
     public void saveImage(Image image, File file) throws Exception {
-        synchronized (lock) {
+       
             BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
 
             ImageIO.write(bImage, "png", file);
-        }
+        
     }
     
     public Image getThumb(ImageDisplay display, int width, int height) {

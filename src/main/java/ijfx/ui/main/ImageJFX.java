@@ -64,7 +64,7 @@ public class ImageJFX extends Application {
     public static Stage PRIMARY_STAGE;
 
     public static final AxisType SERIES = Axes.get("Series");
-    
+
     public static Logger getLogger() {
         if (logger == null) {
             logger = Logger.getLogger("ImageJFX");
@@ -93,6 +93,10 @@ public class ImageJFX extends Application {
 
     public static final ScheduledExecutorService scheduleThreadPool = Executors.newScheduledThreadPool(2);
 
+    public static final int CORE_NUMBER = getCoreNumber() > 1 ? getCoreNumber() - 1 : getCoreNumber();
+    
+    private static final ExecutorService service = Executors.newFixedThreadPool(CORE_NUMBER);
+
     public static double getAnimationDurationAsDouble() {
         return ANIMATION_DURATION.toMillis();
     }
@@ -116,11 +120,13 @@ public class ImageJFX extends Application {
             LogRecorderService.getInstance();
 
             getLogger().info("You running Java " + System.getProperty("java.version"));
-            File pluginDir = new File("./","plugins/");
-            if(pluginDir.exists() == false) pluginDir.mkdir();
+            File pluginDir = new File("./", "plugins/");
+            if (pluginDir.exists() == false) {
+                pluginDir.mkdir();
+            }
             getLogger().info(pluginDir.getAbsolutePath());
-            System.setProperty("imagej.dir",new File(".").getAbsolutePath());
-            System.setProperty("plugins.dir",pluginDir.getAbsolutePath());
+            System.setProperty("imagej.dir", new File(".").getAbsolutePath());
+            System.setProperty("plugins.dir", pluginDir.getAbsolutePath());
 
             //loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
             //root = loader.load();
@@ -176,8 +182,6 @@ public class ImageJFX extends Application {
         return new File(getConfigDirectory(), filename).getAbsolutePath();
     }
 
-    private static ExecutorService service = Executors.newCachedThreadPool();
-
     public static ExecutorService getThreadPool() {
         return service;
     }
@@ -197,6 +201,10 @@ public class ImageJFX extends Application {
             resourceBundle = ResourceBundle.getBundle(RESSOURCE_BUNDLE_ADDR);
         }
         return resourceBundle;
+    }
+
+    public static int getCoreNumber() {
+        return Runtime.getRuntime().availableProcessors();
     }
 
 }
