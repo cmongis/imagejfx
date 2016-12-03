@@ -87,7 +87,7 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
 
     @Parameter
     UiContextService contextService;
-    
+
     Logger logger = ImageJFX.getLogger();
 
     public static final String MSG_INITALIZE = "[%s] Initializing...";
@@ -98,14 +98,10 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
     public static final String MSG_NODE_NULL = "[%s] getWidget() returns null !";
     public static final String MSG_LOADING_COUNT = "Loading widget %d / %d";
 
-    public Collection<UiPlugin> loadAll(ProgressHandler handler) {
+    public Collection<UiPlugin> loadAll(final ProgressHandler handler) {
 
-        if (handler == null) {
-            handler = new SilentProgressHandler();
-        }
-        
         Timer timer = timerService.getTimer(this.getClass());
-        
+
         if (uiPluginMap == null) {
             uiPluginMap = new HashMap<>();
 
@@ -114,11 +110,24 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
             int total = pluginService.getPluginsOfType(UiPlugin.class).size();
 
             // starting a timer
-           
-            
-            timer.start();
+            handler.setTotal(total);
 
-            // for each plugin   
+            timer.start();
+            handler.setStatus("Initializing UI...");
+            pluginService.getPluginsOfType(UiPlugin.class)
+                    .stream()
+                    .parallel()
+                    .forEach(pi -> {
+
+                        loadWidget(pi);
+                        timer.elapsed("Widget loading");
+                        // Updating task progress
+                        handler.increment(1.0);
+
+                    });
+
+            // for each plugin
+            /*
             for (PluginInfo<UiPlugin> pi : pluginService.getPluginsOfType(UiPlugin.class)) {
 
                 count++;
@@ -128,10 +137,10 @@ public final class DefaultUiPluginService extends AbstractService implements UiP
                 handler.setProgress((long) count, total);
                 handler.setStatus(String.format(MSG_LOADING_COUNT, count, total));
 
-            }
-            logger.info(String.format("%d UiPlugins created",count));
+            }*/
+            logger.info(String.format("%d UiPlugins created", count));
         }
-        
+
         timer.logAll();
         return uiPluginMap.values();
     }

@@ -128,8 +128,7 @@ public class ImageJFX extends Application {
             System.setProperty("imagej.dir", new File(".").getAbsolutePath());
             System.setProperty("plugins.dir", pluginDir.getAbsolutePath());
 
-            //loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
-            //root = loader.load();
+          
             controller = new MainWindowController();//loader.<MainWindowController>getController();
 
             Scene scene = new Scene(controller);
