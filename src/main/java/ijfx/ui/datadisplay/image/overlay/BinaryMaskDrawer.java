@@ -69,8 +69,8 @@ public class BinaryMaskDrawer implements OverlayDrawer<BinaryMaskOverlay> {
         RandomAccessibleInterval<BitType> rai = roi.getImg();
         RandomAccess<BitType> randomAccess = rai.randomAccess();
         
-        Color selectedColor = Color.RED.deriveColor(1.0, 1.0, 1.0, 0.8);
-        Color unselectedColor = Color.RED.deriveColor(1.0, 1.0, 1.0, 0.5);
+        Color selectedColor = Color.YELLOW.deriveColor(1.0, 1.0, 1.0, 0.8);
+        Color unselectedColor = Color.YELLOW.deriveColor(1.0, 1.0, 1.0, 0.5);
         
         Color color = viewConfig.isSelected() ? selectedColor : unselectedColor;
         

@@ -36,6 +36,7 @@ import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.measure.StatisticsService;
+import net.imglib2.display.ColorTable;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayUpdatedEvent;
@@ -161,6 +162,15 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
         int channelId = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
         return channelId;
 
+    }
+    
+    public int getChannelId(ImageDisplay display) {
+        int channelId = imageDisplayService.getActiveDatasetView(display).getIntPosition(Axes.CHANNEL);
+        return channelId == -1 ? 0 : channelId;
+    }
+    
+    public ColorTable getColorTable(ImageDisplay display) {
+        return imageDisplayService.getActiveDataset(display).getColorTable(getChannelId(display));
     }
 
     public void updateDisplayRange(ImageDisplay imageDisplay,int channel,double min, double max) {
