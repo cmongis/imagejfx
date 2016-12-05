@@ -38,6 +38,7 @@ import ijfx.ui.main.Localization;
 import ijfx.ui.plugin.LUTComboBox;
 import ijfx.ui.plugin.LUTView;
 import ijfx.service.display.DisplayRangeService;
+import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.CommandRunner;
 import ijfx.service.ui.FxImageService;
 import ijfx.service.ui.LoadingScreenService;
@@ -109,7 +110,6 @@ import net.imglib2.view.IntervalView;
 
 import org.scijava.module.ModuleService;
 import org.scijava.util.Colors;
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte1.other;
 
 /**
  *
@@ -182,6 +182,9 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @Parameter
     OverlayService overlayService;
 
+    @Parameter
+    OverlayUtilsService overlayUtilsService;
+    
     @Parameter
     ImageDisplayFXService imageDisplayFxSrv;
     
@@ -678,7 +681,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         logger.info("Threshold value " + getThresholdValue());
 
         thresholdOverlay.setRange(lowValue.getValue(), highValue.getValue());
-        thresholdOverlay.setColorWithin(Colors.WHITE);
+        thresholdOverlay.setColorWithin(Colors.YELLOW);
         thresholdOverlay.setColorLess(Colors.BLACK);
         thresholdOverlay.setColorGreater(Colors.BLACK);
         thresholdOverlay.update();
@@ -707,7 +710,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     private ThresholdOverlay createThresholdOverlay() {
         logger.info("Creating an overlay");
         ThresholdOverlay overlay = new ThresholdOverlay(context, getCurrentDataset(), lowValue.getValue(), highValue.getValue());
-        overlayService.addOverlays(getCurrentImageDisplay(), Lists.newArrayList(overlay));
+        overlayUtilsService.addOverlay(getCurrentImageDisplay(), Lists.newArrayList(overlay));
         eventService.publish(new OverlayCreatedEvent(overlay));
         return overlay;
     }
