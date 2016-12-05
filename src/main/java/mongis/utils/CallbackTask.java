@@ -234,7 +234,6 @@ public class CallbackTask<INPUT, OUTPUT> extends Task<OUTPUT> implements Progres
 
     @Override
     public void succeeded() {
-        logger.info("succeeded");
         if (onSuccess != null) {
             onSuccess.accept(getValue());
         }
