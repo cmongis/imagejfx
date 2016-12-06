@@ -76,7 +76,7 @@ public class FxImageCanvas extends Canvas {
     
     private Consumer<FxImageCanvas> afterDrawing; 
     
-   
+    private static final String CSS_STYLE_CLASS = "fx-image-canvas";
     
     /**
      * Creates an FxImageCanvas
@@ -91,6 +91,7 @@ public class FxImageCanvas extends Canvas {
 
         // add the different mouse listener (only the zoom)
         addMouseListeners();
+        getStyleClass().add(CSS_STYLE_CLASS);
 
     }
 
@@ -212,11 +213,11 @@ public class FxImageCanvas extends Canvas {
         logger.info(String.format("Drawing borders : %.3f x %.3f", borderWidth, borderHeight));
 
         GraphicsContext ctx = getGraphicsContext2D();
-        ctx.setFill(Color.GRAY);
-        ctx.fillRect(0, 0, getWidth(), borderHeight);
-        ctx.fillRect(0, 0, borderWidth, getHeight());
-        ctx.fillRect(0, bottomBorderY, getWidth(), borderHeight);
-        ctx.fillRect(bottomBorderX, 0, borderWidth, getHeight());
+
+        ctx.clearRect(0, 0, getWidth(), borderHeight);
+        ctx.clearRect(0, 0, borderWidth, getHeight());
+        ctx.clearRect(0, bottomBorderY, getWidth(), borderHeight);
+        ctx.clearRect(bottomBorderX, 0, borderWidth, getHeight());
     }
 
     /**

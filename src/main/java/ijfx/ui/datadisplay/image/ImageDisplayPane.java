@@ -259,7 +259,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         FXUtilities.injectFXML(this);
 
         canvas = new FxImageCanvas();
-
+            
+        
+        getStyleClass().add("image-display-pane");
         stackPane.getChildren().add(canvas);
 
         canvas.setAfterDrawing(this::redrawOverlays);
