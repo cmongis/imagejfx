@@ -25,11 +25,9 @@ import ijfx.core.imagedb.ImageRecord;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.core.imagedb.MetaDataExtractionService;
 import ijfx.core.metadata.MetaData;
-import ijfx.core.metadata.MetaDataSetType;
 
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.ImagePlaneService;
-import ijfx.service.Timer;
 import ijfx.service.TimerService;
 import ijfx.service.batch.ObjectSegmentedEvent;
 import ijfx.service.batch.SegmentedObject;
@@ -46,7 +44,6 @@ import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,6 +121,9 @@ public class DefaultFolder implements Folder, FileChangeListener {
     @Parameter
     LoadingScreenService loadingScreenService;
 
+    @Parameter
+    IndexingService indexationService;
+    
     Property<Task> currentTaskProperty = new SimpleObjectProperty<>();
 
     public DefaultFolder() {
@@ -178,6 +178,8 @@ public class DefaultFolder implements Folder, FileChangeListener {
 
     private List<Explorable> fetchFiles(ProgressHandler progress, Void v) {
 
+        
+        /*
         //if(progress == null) progress = new SilentProgressHandler();
         final ProgressHandler finalProgress = ProgressHandler.check(progress);
 
@@ -203,29 +205,24 @@ public class DefaultFolder implements Folder, FileChangeListener {
 
         logger.info(String.format("%d records fetched", records.size()));
         imageRecordService.forceSave();
+        */
+        
+        List<Explorable> explorables = indexationService.indexDirectory(progress,file)
+                .map(this::addPlanes)
+                .collect(Collectors.toList());
+                
+        
         return explorables;
     }
 
-    private Stream<ImageRecordIconizer> addFile(File file) {
+    private Stream<Explorable> addFile(File file) {
         ImageRecord record = imageRecordService.getRecord(file);
-        return addFile(record);
+        return indexationService.getSeries(record);
     }
 
-    private Stream<ImageRecordIconizer> addFile(ImageRecord record) {
-        if (record.getMetaDataSet().containsKey(MetaData.SERIE_COUNT) && record.getMetaDataSet().get(MetaData.SERIE_COUNT).getIntegerValue() > 1) {
+  
 
-            int serieCount = record.getMetaDataSet().get(MetaData.SERIE_COUNT).getIntegerValue();
-
-            return IntStream
-                    .range(0,serieCount)
-                    .mapToObj(i -> new ImageRecordIconizer(context, record, i));
-
-        } else {
-            return Stream.of(new ImageRecordIconizer(context, record));
-        }
-    }
-
-    private Explorable addPlanes(ImageRecordIconizer explorable) {
+    private Explorable addPlanes(Explorable explorable) {
 
         List<Explorable> planeExplorableList = metadataExtractionService.extractPlaneMetaData(explorable.getMetaDataSet())
                 .stream()

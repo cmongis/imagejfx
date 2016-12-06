@@ -25,11 +25,15 @@ import ijfx.ui.main.ImageJFX;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import net.imagej.display.ImageDisplay;
 import net.imagej.overlay.Overlay;
@@ -57,10 +61,10 @@ public class FxImageCanvas extends Canvas {
     final protected Logger logger = ImageJFX.getLogger();
 
     // position of the mouse on the screen
-    protected Point2D mousePositionOnScreen;
+    protected Property<Point2D> mousePositionOnScreen = new SimpleObjectProperty<>();
 
     // position of the mouse on the image
-    protected Point2D mousePositionOnImage;
+    protected Property<Point2D> mousePositionOnImage = new SimpleObjectProperty<>();
 
     // Overlay ... to be taken care of 
     private ArrayList<Overlay> overlays;
@@ -71,6 +75,8 @@ public class FxImageCanvas extends Canvas {
     
     
     private Consumer<FxImageCanvas> afterDrawing; 
+    
+   
     
     /**
      * Creates an FxImageCanvas
@@ -227,6 +233,8 @@ public class FxImageCanvas extends Canvas {
                 repaint();
             }
         });
+        
+        addEventHandler(MouseEvent.MOUSE_MOVED, this::onMouseMoved);
 
     }
 
@@ -257,7 +265,7 @@ public class FxImageCanvas extends Canvas {
      * @return the cursor position of the camera
      */
     public Point2D getCursorPositionOnScreen() {
-        return mousePositionOnScreen;
+        return mousePositionOnScreen.getValue();
     }
 
     /**
@@ -265,6 +273,10 @@ public class FxImageCanvas extends Canvas {
      * @return the cursor position on the image
      */
     public Point2D getCursorPositionOnImage() {
+        return mousePositionOnImage.getValue();
+    }
+    
+    public ReadOnlyProperty<Point2D> positionOnImageProperty() {
         return mousePositionOnImage;
     }
 
@@ -285,6 +297,18 @@ public class FxImageCanvas extends Canvas {
         
         double zoom = image.getWidth() / getWidth();
         getCamera().setZoom(zoom);
+        
+    }
+    
+    
+    private void onMouseMoved(MouseEvent event) {
+        
+        Point2D positionOnScreen = new Point2D(event.getX(),event.getY());
+        Point2D positionOnImage = getPositionOnImage(positionOnScreen);
+        
+        mousePositionOnScreen.setValue(positionOnScreen);
+        mousePositionOnImage.setValue(positionOnImage);
+        
         
     }
     

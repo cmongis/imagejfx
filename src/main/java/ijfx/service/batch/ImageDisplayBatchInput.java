@@ -130,4 +130,8 @@ public class ImageDisplayBatchInput implements BatchSingleInput{
         return source;
     }
     
+    public String getDefaultSaveName() {
+        return null;
+    }
+    
 }

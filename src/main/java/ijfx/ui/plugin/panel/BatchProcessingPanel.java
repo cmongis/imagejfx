@@ -200,7 +200,7 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
 
         // setting the 
         // binding the counters to the right property
-        selectedItemCount.valueProperty().bind(selectedItems);
+        selectedItemCount.valueProperty().bind(explorerService.selectedCountProperty());
         stepCount.valueProperty().bind(Bindings.createIntegerBinding(() -> workflowPanel.stepListProperty().size(), workflowPanel.stepListProperty()));
        
         Platform.runLater(this::initUi);
@@ -223,6 +223,9 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
         
         // adding the message box just before the buttons
         resultVBox.getChildren().add(0, messageBox.getContent());
+        
+        selectedItems.bind(explorerService.selectedCountProperty());
+        
     }
 
     public Task<Boolean> generateBatchTask(TaskButtonBinding binding) {
@@ -370,9 +373,5 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
         }
     }
 
-    @EventHandler
-    public void onExplorerSelectionChanged(ExplorerSelectionChangedEvent event) {
-        Platform.runLater(() -> selectedItems.setValue(event.getObject().size()));
-    }
-
+ 
 }

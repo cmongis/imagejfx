@@ -35,6 +35,7 @@ import ijfx.service.batch.SegmentedObject;
 import ijfx.service.batch.input.AbstractLoaderWrapper;
 import ijfx.service.batch.input.DatasetPlaneWrapper;
 import ijfx.service.batch.input.ExplorableBatchInputWrapper;
+import ijfx.service.display.DisplayRangeService;
 import ijfx.service.overlay.OverlayShapeStatistics;
 import ijfx.service.overlay.OverlayStatService;
 import ijfx.service.overlay.OverlayStatistics;
@@ -62,6 +63,7 @@ import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.utils.ImageDisplayProperty;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,8 +108,9 @@ import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.display.ColorTable;
+import net.imglib2.display.ColorTable8;
 import net.imglib2.img.Img;
-import net.imglib2.roi.BinaryMaskRegionOfInterest;
 import net.imglib2.type.logic.BitType;
 import org.scijava.Context;
 import org.scijava.plugin.Parameter;
@@ -180,6 +183,9 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @Parameter
     private OverlayStatService overlayStatService;
 
+    @Parameter
+    private DisplayRangeService displayRangeService;
+    
     @Parameter
     private HintService hintService;
 
@@ -389,17 +395,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         return overlays;
     }
 
-    private BinaryMaskOverlay getBinaryMask(ImageDisplay imageDisplay) {
-        return overlayUtilsService.findOverlayOfType(imageDisplay, BinaryMaskOverlay.class);
-    }
-
-    private BinaryMaskOverlay createBinaryMaskOverlay(ImageDisplay imageDisplay, Img<BitType> mask) {
-
-        BinaryMaskOverlay overlay = new BinaryMaskOverlay(context, new BinaryMaskRegionOfInterest<>(mask));
-        overlayService.addOverlays(imageDisplay, Arrays.asList(overlay));
-        return overlay;
-
-    }
+    
 
     private Predicate<OverlayShapeStatistics> getShapeFilter() {
         return o -> true;
@@ -468,6 +464,12 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         SegmentationUiPlugin plugin = getCurrentPlugin();
 
+        
+       
+        
+        
+        
+        
         if (maskProperty != null) {
             maskProperty.removeListener(onMaskChanged);
         }

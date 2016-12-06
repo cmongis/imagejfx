@@ -61,6 +61,14 @@ public class ExplorableBatchInputWrapper extends  AbstractLoaderWrapper<Explorab
     } 
     
   
-    
+    public String getDefaultSaveName() {
+        MetaData m = getWrappedValue().getMetaDataSet().get(MetaData.SAVE_NAME);
+        if( m== null || m == MetaData.NULL) {
+            return null;
+        }
+        else {
+            return m.getStringValue();
+        }
+    }
     
 }

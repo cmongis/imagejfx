@@ -68,4 +68,8 @@ public class DatasetPlaneWrapper extends AbstractLoaderWrapper<Dataset>
         return position;
     }
     
+    public String getDefaultSaveName() {
+        return source.getName();
+    }
+    
 }

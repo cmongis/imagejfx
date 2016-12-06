@@ -1267,6 +1267,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 #imagej-toolbar  {
     -fx-spacing:10;
+    -fx-padding: 0 0 0 10;
 }
 #imagej-toolbar .toggle-button {
     -fx-background-color:-flatter-primary;

@@ -24,6 +24,7 @@ import ijfx.core.metadata.MetaData;
 import ijfx.core.metadata.MetaDataSet;
 import ijfx.core.metadata.MetaDataSetType;
 import ijfx.core.utils.DimensionUtils;
+import ijfx.core.utils.FileName;
 import ijfx.service.ImagePlaneService;
 import ijfx.service.thumb.ThumbService;
 import ijfx.ui.activity.ActivityService;
@@ -71,6 +72,7 @@ public class PlaneMetaDataSetWrapper extends AbstractExplorable{
             context.inject(this);
             this.m = m;
             m.setType(MetaDataSetType.PLANE);
+            m.putGeneric(MetaData.SAVE_NAME, m.get(MetaData.SAVE_NAME)+" - "+getSubtitle());
         }
 
         @Override

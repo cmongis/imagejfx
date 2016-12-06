@@ -23,6 +23,7 @@ import ijfx.core.imagedb.ImageLoaderService;
 import ijfx.service.IjfxService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.ui.explorer.Explorable;
+import ijfx.ui.explorer.IndexingService;
 import ijfx.ui.widgets.FileExplorableWrapper;
 import java.io.File;
 import java.util.List;
@@ -34,7 +35,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import mongis.utils.CallbackTask;
 import mongis.utils.ProgressHandler;
 import net.imagej.Dataset;
-import org.scijava.Context;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -53,8 +53,10 @@ public class CorrectionUiService extends AbstractService implements IjfxService 
     @Parameter
     LoadingScreenService loadingScreenService;
 
+    @Parameter
+    IndexingService indexationService;
 
-    private final ObjectProperty<List<FileExplorableWrapper>> fileListProperty = new SimpleObjectProperty();
+    private final ObjectProperty<List<Explorable>> fileListProperty = new SimpleObjectProperty();
 
     private final ObjectProperty<Dataset> exampleDataset = new SimpleObjectProperty<Dataset>();
 
@@ -69,7 +71,7 @@ public class CorrectionUiService extends AbstractService implements IjfxService 
 
     private void onSourceFolderChanged(Observable obs, File oldFile, File newFile) {
 
-        new CallbackTask<File, List<FileExplorableWrapper>>()
+        new CallbackTask<File, List<Explorable>>()
                 .setInput(newFile)
                 .run(this::checkFolder)
                 .then(this::onFoldedChecked)
@@ -77,27 +79,19 @@ public class CorrectionUiService extends AbstractService implements IjfxService 
                 .start();
     }
 
-    protected List<FileExplorableWrapper> checkFolder(ProgressHandler handler, File input) {
+    protected List<Explorable> checkFolder(ProgressHandler handler, File input) {
 
         handler.setProgress(1, 3);
         handler.setStatus(String.format("Checking folder %s", input.getName()));
 
         handler.setProgress(2, 3);
 
-        return imageLoaderService
-                .getAllImagesFromDirectory(input)
-                .stream()
-                .map(FileExplorableWrapper::new)
-                .map(exp->{
-                    getContext().inject(exp);
-                    return exp;
-                
-                })
+        return indexationService.indexDirectory(handler, input)
                 .collect(Collectors.toList());
 
     }
 
-    protected void onFoldedChecked(List<FileExplorableWrapper> list) {
+    protected void onFoldedChecked(List<Explorable> list) {
         fileListProperty.setValue(list);
     }
 
@@ -108,12 +102,11 @@ public class CorrectionUiService extends AbstractService implements IjfxService 
                 .collect(Collectors.toList());
     }
     
-    public List<File> getSelectedFiles() {
+    public List<Explorable> getSelectedFiles() {
        return fileListProperty
                .getValue()
                .stream()
                .filter(f->f.selectedProperty().getValue())
-               .map(wrapper->wrapper.getFile())
                .collect(Collectors.toList());
    }
     
@@ -125,7 +118,7 @@ public class CorrectionUiService extends AbstractService implements IjfxService 
         return sourceFolder;
     }
 
-    ObjectProperty<List<FileExplorableWrapper>> fileListProperty() {
+    ObjectProperty<List<Explorable>> fileListProperty() {
         return fileListProperty;
     }
 

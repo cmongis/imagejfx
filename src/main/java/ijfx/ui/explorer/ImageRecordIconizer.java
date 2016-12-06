@@ -39,6 +39,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import mongis.utils.FileUtils;
 import net.imagej.Dataset;
+import org.apache.commons.io.FilenameUtils;
 import org.scijava.Context;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
@@ -72,6 +73,9 @@ public class ImageRecordIconizer implements Explorable {
 
     private final BooleanProperty visibleProperty = new SimpleBooleanProperty(false);
     
+    private final static String SERIE_NAME_FORMAT = "%s - Serie %d";
+    private final static String SERIE_SAVE_FORMAT = "%s_serie_%d";
+    
     boolean selected = false;
 
     int imageId = 0;
@@ -84,8 +88,8 @@ public class ImageRecordIconizer implements Explorable {
         context.inject(this);
         this.imageRecord = imageRecord;
         set = new MetaDataSet(MetaDataSetType.FILE);
-        //set.setType(MetaDataSetType.FILE);
         set.merge(imageRecord.getMetaDataSet());
+        set.putGeneric(MetaData.SAVE_NAME, imageRecord.getFile().getName());
     }
 
     public ImageRecordIconizer(Context context, ImageRecord imageRecord, int imageId) {
@@ -94,6 +98,13 @@ public class ImageRecordIconizer implements Explorable {
         series = true;
         this.imageId = imageId;
         set.putGeneric(MetaData.SERIE, imageId);
+        
+        String baseName = FilenameUtils.getBaseName(imageRecord.getFile().getName());
+        String saveName = String.format(SERIE_SAVE_FORMAT,baseName,imageId+1);
+        set.putGeneric(MetaData.FILE_NAME,
+               String.format(SERIE_NAME_FORMAT,imageRecord.getFile().getName(),imageId+1)
+        );
+        set.putGeneric(MetaData.SAVE_NAME,saveName);
     }
 
     @Override

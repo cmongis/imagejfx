@@ -253,7 +253,7 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
     public BinaryMaskOverlay createBinaryMaskOverlay(ImageDisplay imageDisplay, Img<BitType> mask) {
 
         BinaryMaskOverlay overlay = new BinaryMaskOverlay(getContext(), new BinaryMaskRegionOfInterest<>(mask));
-        overlayService.addOverlays(imageDisplay, Arrays.asList(overlay));
+        addOverlay(imageDisplay, Arrays.asList(overlay));
         return overlay;
 
     }

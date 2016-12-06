@@ -42,7 +42,9 @@ public class DefaultTimerService extends AbstractService implements TimerService
 
     @Override
     public Timer getTimer(String id) {
-        timerMap.putIfAbsent(id, new DefaultTimer(id));
+        if(timerMap.containsKey(id) == false) {
+            timerMap.put(id,new DefaultTimer(id));
+        }
         return new ThreadSafeTimerWrapper((DefaultTimer)timerMap.get(id));
     }
     

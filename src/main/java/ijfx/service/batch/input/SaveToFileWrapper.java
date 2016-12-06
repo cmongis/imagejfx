@@ -39,62 +39,76 @@ import org.scijava.plugin.Parameter;
 public class SaveToFileWrapper extends AbstractSaverWrapper {
 
     private File saveTo;
-            
+
     @Parameter
     private DatasetIOService datasetIoService;
 
     private String suffix = null;
-    
-    
+
     private SaveToFileWrapper(Context context, BatchSingleInput input) {
         super(input);
         context.inject(this);
     }
-    
-    public SaveToFileWrapper(Context context,BatchSingleInput input, File saveFile) {
-        
-       this(context,input);
-        
-        saveTo = saveFile;
-        
+
+    public SaveToFileWrapper(Context context, BatchSingleInput input, File saveFile) {
+
+        this(context, input, saveFile, null);
+
     }
-    
+
     public SaveToFileWrapper(Context context, BatchSingleInput input, File saveFile, String suffix) {
-        
-       this(context,input);
-        
-        String baseName = FilenameUtils.getBaseName(saveFile.getName());
+
+        this(context, input);
+        String baseName;
+        if (input.getDefaultSaveName() != null) {
+            baseName = input.getDefaultSaveName();
+        } else {
+            baseName = FilenameUtils.getBaseName(saveFile.getName());
+        }
+
         String ext = FilenameUtils.getExtension(saveFile.getName());
-        String finalName = new StringBuilder().append(baseName).append("_").append(suffix).append(".").append(ext).toString();
-        
-        saveTo = new File(saveFile.getParentFile(),finalName);
+
+        String finalName;
+
+        if (suffix != null) {
+            finalName = new StringBuilder()
+                    .append(baseName)
+                    .append("_")
+                    .append(suffix)
+                    .append(".")
+                    .append(ext)
+                    .toString();
+        } else {
+            finalName = new StringBuilder()
+                    .append(baseName)
+                    .append(".")
+                    .append(ext)
+                    .toString();
+        }
+        saveTo = new File(saveFile.getParentFile(), finalName);
     }
-            
-    
+
     @Override
     public void save() {
-        
-        
+
         String savePath = saveTo.getAbsolutePath();
-        
+
         try {
-           if( datasetIoService.canSave(savePath) == false) {
-               savePath = FileUtils.changeExtensionTo(savePath, "tif");
-           }
-        }
-        catch(Exception e) {
+            if (datasetIoService.canSave(savePath) == false) {
+                savePath = FileUtils.changeExtensionTo(savePath, "tif");
+            }
+        } catch (Exception e) {
             savePath = FileUtils.changeExtensionTo(savePath, "tif");
         }
-        
+
         try {
-            ImageJFX.getLogger().info("Saving to ..."+savePath);
+            ImageJFX.getLogger().info("Saving to ..." + savePath);
             datasetIoService.save(getWrappedObject().getDataset(), savePath);
-        } 
-        catch (IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(SaveToFileWrapper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         getWrappedObject().save();
     }
-    
+
 }

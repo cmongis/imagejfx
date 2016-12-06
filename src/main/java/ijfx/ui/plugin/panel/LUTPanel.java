@@ -38,6 +38,7 @@ import ijfx.ui.main.Localization;
 import ijfx.ui.plugin.LUTComboBox;
 import ijfx.ui.plugin.LUTView;
 import ijfx.service.display.DisplayRangeService;
+import ijfx.service.overlay.OverlayUtilsService;
 import ijfx.service.ui.CommandRunner;
 import ijfx.service.ui.FxImageService;
 import ijfx.service.ui.LoadingScreenService;
@@ -76,10 +77,10 @@ import org.scijava.thread.ThreadService;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.context.UiContextProperty;
+import ijfx.ui.service.ImageDisplayFXService;
 import ijfx.ui.utils.ConvertedProperty;
 import ijfx.ui.utils.ImageDisplayProperty;
 import javafx.beans.Observable;
-import javafx.concurrent.Task;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
@@ -88,11 +89,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -185,6 +182,12 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     @Parameter
     OverlayService overlayService;
 
+    @Parameter
+    OverlayUtilsService overlayUtilsService;
+    
+    @Parameter
+    ImageDisplayFXService imageDisplayFxSrv;
+    
     Node lutPanelCtrl;
 
     @FXML
@@ -309,7 +312,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
                     .forward(this::ColorModeToBoolean)
                     .backward(this::booleanToColorMode);
             
-            mergedModeProperty.frontProperty().addListener(this::onColorModeChanged);
+           // mergedModeProperty.frontProperty().addListener(this::onColorModeChanged);
             
             mergedViewToggleButton.selectedProperty().bindBidirectional(mergedModeProperty.backProperty());
 
@@ -353,6 +356,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         currentDisplay.addListener(this::onDisplayChanged);
 
+        mergedModeProperty.frontProperty().bindBidirectional(imageDisplayFxSrv.currentColorModeProperty());
+        
         return this;
     }
 
@@ -676,7 +681,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         logger.info("Threshold value " + getThresholdValue());
 
         thresholdOverlay.setRange(lowValue.getValue(), highValue.getValue());
-        thresholdOverlay.setColorWithin(Colors.WHITE);
+        thresholdOverlay.setColorWithin(Colors.YELLOW);
         thresholdOverlay.setColorLess(Colors.BLACK);
         thresholdOverlay.setColorGreater(Colors.BLACK);
         thresholdOverlay.update();
@@ -705,7 +710,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     private ThresholdOverlay createThresholdOverlay() {
         logger.info("Creating an overlay");
         ThresholdOverlay overlay = new ThresholdOverlay(context, getCurrentDataset(), lowValue.getValue(), highValue.getValue());
-        overlayService.addOverlays(getCurrentImageDisplay(), Lists.newArrayList(overlay));
+        overlayUtilsService.addOverlay(getCurrentImageDisplay(), Lists.newArrayList(overlay));
         eventService.publish(new OverlayCreatedEvent(overlay));
         return overlay;
     }

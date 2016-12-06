@@ -29,6 +29,7 @@ import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.core.Handles;
+import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ui.CommandRunner;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
@@ -46,7 +47,6 @@ import ijfx.ui.tool.overlay.MoveablePoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,7 +62,9 @@ import java.util.stream.Stream;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -77,6 +79,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -100,6 +104,8 @@ import net.imagej.event.OverlayCreatedEvent;
 import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.Overlay;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.display.screenimage.awt.ARGBScreenImage;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
@@ -131,7 +137,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = DisplayPanePlugin.class)
 @Handles(type = ImageDisplay.class)
-public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<ImageDisplay>{
+public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<ImageDisplay> {
 
     @FXML
     private StackPane stackPane;
@@ -141,6 +147,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     @FXML
     private Label infoLabel;
+
+    @FXML
+    private Label pixelValueLabel;
 
     @Parameter
     private OverlayDisplayService overlayDisplayService;
@@ -177,7 +186,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     @Parameter
     private Context context;
-    
+
     Logger logger = ImageJFX.getLogger();
 
     private FxTool currentTool;
@@ -201,6 +210,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     private final Property<FxTool> currentToolProperty = new SimpleObjectProperty();
 
     private final SciJavaEventBus bus = new SciJavaEventBus();
+
+    private final DoubleProperty pixelValueProperty = new SimpleDoubleProperty();
 
     @Parameter
     LoadingScreenService loadingScreenService;
@@ -247,7 +258,6 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         FXUtilities.injectFXML(this);
 
-  
         canvas = new FxImageCanvas();
 
         stackPane.getChildren().add(canvas);
@@ -263,6 +273,13 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         canvas.widthProperty().bind(stackPane.widthProperty());
         canvas.heightProperty().bind(stackPane.heightProperty());
 
+        canvas.addEventHandler(KeyEvent.KEY_TYPED, this::onKeyPressed);
+
+        canvas.positionOnImageProperty().addListener(this::onPositionOnImageChanged);
+
+        // setting the pixel value label to a binding retrieving the value of the current pixel and displaying it
+        pixelValueLabel.textProperty().bind(Bindings.createStringBinding(this::getPixelValueLabelText, pixelValueProperty));
+        
         /*
         this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
@@ -276,19 +293,18 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         this();
         context.inject(this);
     }
-    
+
     public void display(ImageDisplay display) {
         imageDisplay = (ImageDisplay) display;
         canvas.setImageDisplay(imageDisplay);
         build();
         setCurrentTool(toolService.getCurrentTool());
         initEventBuffering();
-        
 
-       new CommandRunner(context)
-               .set("imageDisplay",imageDisplay)
-                .set("dataset",getDataset())
-               .runAsync(AutoContrast.class, null, true);
+        new CommandRunner(context)
+                .set("imageDisplay", imageDisplay)
+                .set("dataset", getDataset())
+                .runAsync(AutoContrast.class, null, true);
 
     }
 
@@ -389,7 +405,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         final WritableImage image = getWrittableImage();
 
         final DatasetView view = imageDisplayService.getActiveDatasetView(imageDisplay);
-        if(view == null) return;
+        if (view == null) {
+            return;
+        }
         final ARGBScreenImage screenImage = view.getScreenImage();
 
         t.elapsed("getting screen image");
@@ -564,7 +582,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
             }
         };
         anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, myHandler);
-        if(getDatasetview() == null) {
+        if (getDatasetview() == null) {
             arcMenu = null;
             return;
         }
@@ -605,13 +623,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                     refreshSourceImage();
 
                 });
-
-        /**
-         * bus.getStream(OverlayCreatedEvent.class)
-         * .map(event->event.getObject())
-         * //.filter(overlay->overlayService.getOverlays(getImageDisplay()).contains(overlay))
-         * .subscribe(this::updateOverlay);
-         */
+        // stream intercepting all the overlay updates 
         bus.getStream(DataViewUpdatedEvent.class)
                 .map(dataviewEvent -> dataviewEvent.getView())
                 .filter(dataview -> dataview instanceof OverlayView)
@@ -685,6 +697,12 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     protected void onMoveablePointMoved(Observable obs, Point2D oldValue, Point2D newValue) {
         //getOverlays().forEach(this::updateOverlay);
         repaint();
+    }
+
+    protected void onKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.DELETE || event.getCode() == KeyCode.BACK_SPACE) {
+            deleteOverlay(overlaySelectionService.getSelectedOverlay(imageDisplay));
+        }
     }
 
     @EventHandler
@@ -780,15 +798,17 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     protected void onAnyEvent(SciJavaEvent event) {
         logService.info(event.getClass().getSimpleName());
     }
-    
+
     @EventHandler
     protected void onToolChangedEvent(ToolChangeEvent event) {
         setCurrentTool(event.getTool());
     }
 
     @Override
-    public Pane getPane() { return this; }
-   
+    public Pane getPane() {
+        return this;
+    }
+
     protected OverlayDrawer getDrawer(Overlay overlay) {
         //logger.info("Searching a drawer for "+overlay.getClass().getSimpleName());
         if (drawerMap.get(overlay.getClass()) == null) {
@@ -818,23 +838,22 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         long height = getDataset().dimension(1);
         CalibratedAxis[] axes = new CalibratedAxis[imageDisplay.numDimensions()];
         long[] position = new long[imageDisplay.numDimensions()];
-        
+
         getDataset().axes(axes);
         try {
-        imageDisplay.localize(position);
-        String positionStr
-                = IntStream.range(2, position.length)
-                .mapToObj(e -> {
-                    long p = position[e];
-                    long max = imageDisplay.dimension(e) - 1;
-                    String axe = axes[e].type().toString();
-                    return String.format("%s : %d / %d", axe, p, max);
+            imageDisplay.localize(position);
+            String positionStr
+                    = IntStream.range(2, position.length)
+                            .mapToObj(e -> {
+                                long p = position[e];
+                                long max = imageDisplay.dimension(e) - 1;
+                                String axe = axes[e].type().toString();
+                                return String.format("%s : %d / %d", axe, p, max);
 
-                })
-                .collect(Collectors.joining("   -  "));
-        infoLabel.setText(String.format("%s - %d x %d - %s", imageType, width, height, positionStr));
-        }
-        catch(Exception e) {
+                            })
+                            .collect(Collectors.joining("   -  "));
+            infoLabel.setText(String.format("%s - %d x %d - %s", imageType, width, height, positionStr));
+        } catch (Exception e) {
             logger.warning("Error when updating label");
         }
 
@@ -903,9 +922,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
      */
     private void onCanvasClick(MouseEvent event) {
 
-       
-        if(event.getButton() != MouseButton.PRIMARY) return;
-        
+        if (event.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
+
         Point2D positionOnImage = canvas.getPositionOnImage(event.getX(), event.getY());
         logService.info(String.format("This image contains %s overlays", overlayService.getOverlays(imageDisplay).size()));
 
@@ -983,9 +1003,59 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         return axisConfig;
     }
 
-
     public void dispose() {
 
     }
 
+    private void onPositionOnImageChanged(Observable obs, Point2D oldValue, Point2D position) {
+
+        if (position == null) {
+            return;
+        }
+
+        // get the pixel value async and set the property
+        new CallbackTask<Point2D, Double>()
+                .setInput(position)
+                .run(this::getPixelValue)
+                .then(pixelValueProperty::setValue)
+                .start();
+
+    }
+    
+
+    private Double getPixelValue(Point2D point) {
+
+        final long x = Math.round(point.getX());
+        final long y = Math.round(point.getY());
+
+        DatasetView datasetView = imageDisplayService.getActiveDatasetView(imageDisplay);
+
+        RandomAccess<? extends RealType<?>> randomAccess = datasetView.xyPlane().randomAccess();
+        long[] position = new long[imageDisplay.numDimensions()];
+        imageDisplay.localize(position);
+        position[0] = x;
+        position[1] = y;
+        randomAccess.setPosition(position);
+        double realDouble = randomAccess.get().getRealDouble();
+        return realDouble;
+    }
+    
+    
+    private final static String PIXEL_INTEGER_FORMAT = "%.0f x %.0f = %.0f";
+    
+    private final static String PIXEL_FLOAT_FORMAT = "%.0f x %.0f = %.4f";
+    
+    private String getPixelValueLabelText() {
+        double value = pixelValueProperty.doubleValue();
+        Point2D position = canvas.getCursorPositionOnImage();
+        String format;
+        if(new Double(value).doubleValue() == new Long(Math.round(value)).doubleValue()) {
+            format =  PIXEL_INTEGER_FORMAT;
+        }
+        else {
+            format = PIXEL_INTEGER_FORMAT;
+        }
+        return String.format(format,position.getX(),position.getY(),value);
+    }
+    
 }

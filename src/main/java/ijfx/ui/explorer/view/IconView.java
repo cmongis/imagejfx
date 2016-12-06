@@ -58,6 +58,8 @@ public class IconView extends ScrollPane implements ExplorerView {
 
     private final PaneCellController<Iconazable> cellPaneCtrl = new PaneCellController<>(tilePane);
 
+    private List<? extends Explorable> itemsList;
+    
     @Parameter
     private ExplorerService explorerService;
     
@@ -104,6 +106,8 @@ public class IconView extends ScrollPane implements ExplorerView {
     @Override
     public void setItem(List<? extends Explorable> items) {
         //loadingScreenService.frontEndTask(cellPaneCtrl.update(new ArrayList<Iconazable>(items)),false);
+        
+        this.itemsList = items;
         cellPaneCtrl.update(new ArrayList<Iconazable>(items));
        
         
@@ -117,8 +121,7 @@ public class IconView extends ScrollPane implements ExplorerView {
 
     @Override
     public List<? extends Explorable> getSelectedItems() {
-        return cellPaneCtrl
-                .getItems()
+        return itemsList
                 .stream()
                 .map(item->(Explorable)item)
                 .filter(item->item.selectedProperty().getValue())

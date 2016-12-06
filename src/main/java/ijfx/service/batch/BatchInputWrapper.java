@@ -111,4 +111,8 @@ public class BatchInputWrapper implements BatchSingleInput {
         return null;
     }
     
+    public String getDefaultSaveName() {
+        return singleInput.getDefaultSaveName();
+    }
+    
 }

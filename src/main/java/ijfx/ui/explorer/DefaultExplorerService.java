@@ -77,6 +77,8 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     @Override
     public void initialize() {
        
+        
+        selected.addListener(this::notifySelectionChanged);
 
     }
 
@@ -88,6 +90,7 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         eventService.publish(new ExploredListChanged().setObject(items));
         applyFilter(lastFilter);
         selectionManager.setItem(explorableList);
+        
     }
 
     @Override
@@ -166,10 +169,13 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
     
 
     private void onExplorableSelected(Explorable explorable, Boolean selected) {
-       this.selected.add(selected ? 1 : -1);
+      
        
        if(selected) selectedItems.add(explorable);
        else selectedItems.remove(explorable);
+       
+       
+       this.selected.setValue(selectedItems.size());
        
     }
 
@@ -210,6 +216,18 @@ public class DefaultExplorerService extends AbstractService implements ExplorerS
         boolean value = explorable.selectedProperty().getValue();
         logger.log(Level.INFO, String.format("Toggling selection for {0} from {1} to {2}", explorable.getTitle(), value, !value));
         explorable.selectedProperty().setValue(!value);
+    }
+    
+    
+    private void notifySelectionChanged(Observable obs, Object oldValue, Object newValue) {
+        
+       logger.info("The selection has changed to "+newValue);
+        
+        
+    }
+    
+    public IntegerProperty selectedCountProperty() {
+        return selected;
     }
 
 }

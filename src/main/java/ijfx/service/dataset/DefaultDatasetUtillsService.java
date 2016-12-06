@@ -372,4 +372,23 @@ public class DefaultDatasetUtillsService extends AbstractService implements Data
         return dataset;
     }
 
+    public void copyInfos(Dataset source, Dataset target) {
+        
+        target.setName(source.getName());
+        
+        target.setSource(source.getName());
+        
+        
+        for(int i = 0;i!= target.numDimensions();i++) {
+            
+            CalibratedAxis sAxis = source.axis(i);
+            target.setAxis(sAxis, i);
+            
+        }
+        
+        
+        
+    }
+    
+    
 }
