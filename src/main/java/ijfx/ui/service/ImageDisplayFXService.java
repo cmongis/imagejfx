@@ -20,7 +20,9 @@
 package ijfx.ui.service;
 
 import ijfx.service.IjfxService;
+import ijfx.service.display.DisplayRangeService;
 import ijfx.ui.main.ImageJFX;
+import java.util.Arrays;
 import java.util.function.BiConsumer;
 import javafx.application.Platform;
 import javafx.beans.Observable;
@@ -28,6 +30,7 @@ import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.util.Callback;
+import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
@@ -52,10 +55,17 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
 
     private ControlableProperty<ImageDisplay, DatasetView> currentDatasetView;
 
-    private ControlableProperty<DatasetView, ColorMode> currentColorMode;
+    private ControlableProperty<DatasetView, Boolean> isComposite;
 
     private ControlableProperty<ImageDisplayService, ImageDisplay> currentImageDisplay;
 
+    private ControlableProperty<DatasetView, Number> minLUTValue;
+
+    private ControlableProperty<DatasetView, Number> maxLUTValue;
+
+    private ControlableProperty<DatasetView, long[]> currentPosition;
+    
+    
     @Parameter
     ImageDisplayService imageDisplayService;
 
@@ -74,31 +84,61 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
                 .bindBeanTo(currentImageDisplay)
                 .setGetter(imageDisplayService::getActiveDatasetView);
 
-        currentColorMode = new ControlableProperty<DatasetView, ColorMode>()
+        isComposite = new ControlableProperty<DatasetView, Boolean>()
                 .bindBeanTo(currentDatasetView)
-                .setCaller(DatasetView::getColorMode)
-                .setBiSetter(this::setColorMode);
+                .setCaller(this::isComposite)
+                .setBiSetter(this::setComposite);
 
-    }
-
-    public Property<ColorMode> currentColorModeProperty() {
-        return currentColorMode;
-    }
-
-    public void setColorMode(DatasetView view, ColorMode mode) {
-        view.setColorMode(mode);
+        minLUTValue = new ControlableProperty<DatasetView,Number>()
+                .setBiSetter(this::setCurrentChannelMin)
+                .setCaller(this::getCurrentChannelMin)
+                .setSilently(0.0)
+                .bindBeanTo(currentDatasetView);
         
+         maxLUTValue = new ControlableProperty<DatasetView,Number>()
+                .setBiSetter(this::setCurrentChannelMax)
+                .setCaller(this::getCurrentChannelMax)
+                 .setSilently(255d)
+                .bindBeanTo(currentDatasetView);
+         
+         
+         currentPosition = new ControlableProperty<DatasetView,long[]>()
+                 .setCaller(this::getCurrentPosition)
+                 .bindBeanTo(currentDatasetView);
+         
+         
+        
+    }
+    
+    
+
+    public Property<Boolean> currentColorModeProperty() {
+        return isComposite;
+    }
+
+    public Property<Number> currentLUTMinProperty() {
+        return minLUTValue;
+    }
+    
+    public Property<Number> currentLUTMaxProperty() {
+        return maxLUTValue;
+    }
+    
+    public Boolean isComposite(DatasetView view) {
+        return view.getColorMode() == ColorMode.COMPOSITE;
+    }
+
+    public void setComposite(DatasetView view, Boolean composite) {
+        view.setColorMode(composite ? ColorMode.COMPOSITE : ColorMode.COLOR);
         ImageJFX.getThreadPool().submit(view::update);
-        
+
     }
-    
-    
 
     @EventHandler
     public void onImageDisplayChanged(DisplayActivatedEvent event) {
 
         if (event.getDisplay() instanceof ImageDisplay) {
-            currentImageDisplay.setSilently((ImageDisplay) event.getDisplay());
+            currentImageDisplay.checkFromGetter();
         }
 
     }
@@ -106,152 +146,67 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
     @EventHandler
     public void onDatasetViewUpdated(DataViewUpdatedEvent event) {
         if (currentDatasetView.getValue() == event.getView()) {
-            currentColorMode.getValue();
+            isComposite.checkFromGetter();
+            maxLUTValue.checkFromGetter();
+            minLUTValue.checkFromGetter();
+            currentPosition.checkFromGetter();
         }
     }
 
     @EventHandler
     public void onLutChangedEvent(LUTsChangedEvent event) {
         if (currentDatasetView.getValue() == event.getView()) {
-            currentColorMode.getValue();
+            isComposite.checkFromGetter();
         }
     }
 
-    private class ControlableProperty<R, T> extends ObjectPropertyBase<T> {
-
-        private Getter<T> getter;
-
-        private Setter<T> setter;
-
-        private BiConsumer<R, T> doubleSetter;
-
-        private Callback<R, T> doubleGetter;
-
-        private final Property<R> beanProperty = new SimpleObjectProperty<R>();
-
-        public ControlableProperty() {
-
-            beanProperty().addListener(this::onBeanChanged);
-
+    public Integer getCurrentChannelPosition(DatasetView view) {
+        Integer position = view.getIntPosition(Axes.CHANNEL);
+        if (position == -1) {
+            return 0;
+        } else {
+            return position;
         }
-
-        public ControlableProperty<R, T> setBean(R bean) {
-            beanProperty.setValue(bean);
-            return this;
-        }
-
-        public Property<R> beanProperty() {
-            return beanProperty;
-        }
-
-        public ControlableProperty<R, T> bindBeanTo(Property<R> property) {
-            beanProperty.bind(property);
-            return this;
-        }
-
-        @Override
-        public void setValue(T t) {
-
-            T oldValue = super.getValue();
-
-            // avoid loop
-            if (oldValue != t) {
-
-                if (doubleSetter != null) {
-                    doubleSetter.accept(beanProperty.getValue(), t);
-
-                } else if (setter != null) {
-                    setter.set(t);
-
-                }
-
-                super.setValue(t);
-
-            }
-
-            Platform.runLater(() -> this.getValue());
-
-        }
-
-        public void setSilently(T t) {
-            super.setValue(t);
-        }
-
-        public ControlableProperty<R, T> setGetter(Getter<T> g) {
-            this.getter = g;
-            getValue();
-            return this;
-        }
-
-        public ControlableProperty<R, T> setCaller(Callback<R, T> callback) {
-            doubleGetter = callback;
-            getValue();
-            return this;
-        }
-
-        public ControlableProperty<R, T> setBiSetter(BiConsumer<R, T> biConsumer) {
-            doubleSetter = biConsumer;
-
-            return this;
-        }
-
-        public ControlableProperty<R, T> setSetter(Setter<T> s) {
-            this.setter = s;
-            return this;
-        }
-
-        public void onBeanChanged(Observable obs, R oldBean, R newBean) {
-            Platform.runLater(this::getValue);
-        }
-
-        @Override
-        public Object getBean() {
-            return beanProperty.getValue();
-
-        }
-
-        public T getValue() {
-
-            T t;
-
-            if (doubleGetter != null && beanProperty.getValue() != null) {
-                t = doubleGetter.call(beanProperty.getValue());
-
-            } else if (getter != null) {
-                t = getter.get();
-            } else {
-                t = super.getValue();
-            }
-
-            if (super.getValue() != t) {
-                super.setValue(t);
-            }
-            return t;
-
-        }
-
-        @Override
-        public String getName() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public void notifyChanged() {
-            getValue();
-
-        }
-
     }
 
-    @FunctionalInterface
-    private interface Getter<T> {
-
-        public T get();
+    private Double getCurrentChannelMin(DatasetView view) {
+        if(view == null) return 0d;
+        return view.getChannelMin(getCurrentChannelPosition(view));
     }
 
-    @FunctionalInterface
-    private interface Setter<T> {
-
-        public void set(T t);
+    private Double getCurrentChannelMax(DatasetView view) {
+        if(view == null) return 255d;
+        return view.getChannelMax(getCurrentChannelPosition(view));
     }
 
+    private void setCurrentChannelMin(DatasetView view, Number min) {
+        if(view == null) return;
+        view.setChannelRange(getCurrentChannelPosition(view), min.doubleValue(), getCurrentChannelMax(view));
+    }
+
+    private void setCurrentChannelMax(DatasetView view, Number max) {
+        if(view == null) return;
+        view.setChannelRange(getCurrentChannelPosition(view), getCurrentChannelMin(view), max.doubleValue());
+    }
+    
+    public Property<long[]> currentPositionProperty() {
+        return currentPosition;
+    }
+    
+    
+    private long[] lastPosition;
+    private long[] getCurrentPosition(DatasetView view) {
+        
+        long[] position = new long[view.numDimensions()];
+        view.localize(position);
+        
+        if(lastPosition == null || Arrays.equals(lastPosition, position) == false) {
+            lastPosition = position;
+        }
+        
+        return lastPosition;
+    }
+   
+    
+    
 }
