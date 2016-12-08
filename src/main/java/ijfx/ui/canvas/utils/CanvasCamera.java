@@ -94,6 +94,7 @@ public class CanvasCamera implements ViewPort {
     }
 
     public double getX() {
+        if(imageSpace == null) return 0;
         if (Double.isNaN(xCenterProperty.get())) {
             xCenterProperty.set(imageSpace.getWidth() / 2);
         }
@@ -105,6 +106,7 @@ public class CanvasCamera implements ViewPort {
     }
 
     public double getY() {
+        if(imageSpace == null) return 0;
         if (Double.isNaN(yCenterProperty.get())) {
             yCenterProperty.setValue(imageSpace.getHeight() / 2);
         }
