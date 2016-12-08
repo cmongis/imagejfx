@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<fx:root id="AnchorPane" styleClass="axis-slider" type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65">
+   <center>
+      <Slider fx:id="slider" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+   </center>
+   <left>
+      <Label fx:id="axisNameLabel" styleClass="axis-name-label" text="Channel" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <Label fx:id="axisPositionLabel" styleClass="axis-position-label" text="0 / 0" BorderPane.alignment="CENTER" />
+   </right>
+</fx:root>
