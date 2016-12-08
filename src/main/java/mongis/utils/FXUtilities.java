@@ -227,6 +227,15 @@ public class FXUtilities {
         //System.out.println(rootAndController.getClass().getResource(fileName));
         injectFXML(rootAndController, fileName);
     }
+    
+    public static void injectFXMLUnsafe(Object rootAndController) {
+        try {
+            injectFXML(rootAndController);
+        }
+        catch(IOException ioe) {
+            ImageJFX.getLogger().log(Level.SEVERE,null,ioe);
+        }
+    }
 
     private static FXMLLoader loader = new FXMLLoader();
 
