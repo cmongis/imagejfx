@@ -3,20 +3,36 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
 <fx:root fx:id="anchorPane" type="AnchorPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane fx:id="topBorderPane" prefHeight="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <left>
-            <Label fx:id="infoLabel" text="" BorderPane.alignment="CENTER" />
-         </left>
-      </BorderPane>
-      <StackPane fx:id="stackPane" layoutX="106.0" layoutY="146.0" minHeight="100.0" minWidth="100.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
-      <BorderPane prefHeight="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <left>
-            <Label fx:id="pixelValueLabel" text="pixel label" BorderPane.alignment="CENTER" />
-         </left>
+      <BorderPane fx:id="mainBorderPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <BorderPane fx:id="topBorderPane" prefHeight="30.0" BorderPane.alignment="CENTER">
+               <left>
+                  <Label fx:id="infoLabel" text="" BorderPane.alignment="CENTER" />
+               </left>
+               <right>
+                  <HBox fx:id="buttonHBox" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
+         </top>
+         <bottom>
+            <BorderPane prefHeight="30.0" BorderPane.alignment="CENTER">
+               <left>
+                  <Label fx:id="pixelValueLabel" text="pixel label" BorderPane.alignment="CENTER" />
+               </left>
+               <bottom>
+                  <VBox fx:id="sliderVBox" BorderPane.alignment="CENTER" />
+               </bottom>
+            </BorderPane>
+         </bottom>
+         <center>
+            <StackPane fx:id="stackPane" minHeight="100.0" minWidth="100.0" BorderPane.alignment="CENTER" />
+         </center>
       </BorderPane>
    </children>
 </fx:root>

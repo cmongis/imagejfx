@@ -1085,12 +1085,60 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-text-fill:-txt-normal;
     -fx-padding:0 0 0 10;
 }
+.image-display-pane #buttonHBox {
+    -fx-spacing:5px;
+    -fx-padding:0 10 0 0;
+}
+.image-display-pane .color-button {
+    -fx-padding:2px 2px 2px 2px;
+    -fx-margin: 0px 3px 0px 0px;
+    -fx-border:0;
+    -fx-insets:0;
+    -fx-opacity:0.5;
+    
+    -fx-background-color:transparent;
+    -fx-content-display:graphic-only;
+    -fx-background-insets:0;
+    -fx-effect:none;
+    -fx-translate-y:0;
+}
+.image-display-pane .color-button:hover {
+   -fx-opacity:1.0;
+    
+}.image-display-pane .color-button:selected {
+   -fx-opacity:1.0;
+   -fx-translate-y:-3px;
+   -fx-background-color:black;
+}
+.image-display-pane .color-button:hover:selected {
+    
+    -fx-opacity:0.4;
+}
 
+.image-display-pane .color-button .rectangle {
+   
+}
+.axis-name-label , .axis-position-label {
+    
+    -fx-font-size:13px;
+    -fx-translate-y:-4px;
+}
+.axis-name-label {
+    -fx-text-alignment:right;
+    -fx-pref-width:70px;
+}
+.axis-slider {
+    -fx-padding:5px 10px 5px 10px;
+}
+.axis-slider .slider {
+    -fx-padding:4px;
+}
 .info-label {
     -fx-padding:10px;
     
     
 }
+
 
 .button .label {
     -fx-padding-left: 1em;
