@@ -29,7 +29,6 @@ import ijfx.service.overlay.OverlaySelectionEvent;
 import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.core.Handles;
-import ijfx.core.utils.DimensionUtils;
 import ijfx.service.ui.CommandRunner;
 import ijfx.ui.arcmenu.PopArcMenu;
 import ijfx.ui.canvas.FxImageCanvas;
@@ -40,6 +39,7 @@ import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
 import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.service.ControlableProperty;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.FxToolService;
 import ijfx.ui.tool.ToolChangeEvent;
@@ -84,8 +84,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
@@ -105,7 +107,6 @@ import net.imagej.event.OverlayDeletedEvent;
 import net.imagej.event.OverlayUpdatedEvent;
 import net.imagej.overlay.Overlay;
 import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.display.screenimage.awt.ARGBScreenImage;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
@@ -151,6 +152,12 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     @FXML
     private Label pixelValueLabel;
 
+    @FXML
+    private HBox buttonHBox;
+    
+    @FXML
+    private VBox sliderVBox;
+    
     @Parameter
     private OverlayDisplayService overlayDisplayService;
 
@@ -213,6 +220,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     private final DoubleProperty pixelValueProperty = new SimpleDoubleProperty();
 
+    private final Property<DatasetView> viewProperty = new SimpleObjectProperty();
+    
     @Parameter
     LoadingScreenService loadingScreenService;
 
@@ -282,13 +291,11 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         // setting the pixel value label to a binding retrieving the value of the current pixel and displaying it
         pixelValueLabel.textProperty().bind(Bindings.createStringBinding(this::getPixelValueLabelText, pixelValueProperty));
         
-        /*
-        this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
-
-            if (e.getButton() == MouseButton.PRIMARY && this.getImageDisplay() != null) {
-                displayService.setActiveDisplay(this.getImageDisplay());
-            }
-        });*/
+        
+        
+        
+        
+        
     }
 
     public ImageDisplayPane(Context context) throws IOException {
@@ -308,6 +315,11 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                 .set("dataset", getDataset())
                 .runAsync(AutoContrast.class, null, true);
 
+        viewProperty.setValue(imageDisplayService.getActiveDatasetView(display));
+        
+        
+        createColorButtons();
+        
     }
 
     public DatasetView getDatasetview() {
@@ -572,6 +584,20 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
      */
     public void build() {
 
+        
+        
+        sliderVBox.getChildren().clear();
+        
+        for(int i = 2; i!=imageDisplay.numDimensions();i++) {
+            
+            AxisSlider slider = new AxisSlider(imageDisplay, i);
+            
+            sliderVBox.getChildren().add(slider);
+            
+        }
+        
+        
+        
         if (arcMenu != null) {
             anchorPane.removeEventHandler(MouseEvent.MOUSE_PRESSED, myHandler);
             arcMenu = null;
@@ -959,44 +985,6 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         return canvas;
     }
 
-    /*
-      
-    Helper Classes
-    
-     */
-    public class AxisSlider extends Slider {
-
-        CalibratedAxis axis;
-        ImageDisplay display;
-        int axisId;
-
-        public AxisSlider(ImageDisplay display, int id) {
-            this.axis = display.axis(id);
-            this.display = display;
-
-            setMin(display.min(id));
-            setMax(display.max(id));
-            setValue(display.getLongPosition(id));
-            setMajorTickUnit(1.0);
-            setMinorTickCount(0);
-            setSnapToTicks(true);
-            setBlockIncrement(1.0f);
-            setShowTickMarks(true);
-            logService.info(String.format("Adding axis %s (%.1f - %.1f) with initial value : %.3f", axis.type(), getMin(), getMax(), getValue()));
-
-            //setMinorTickCount((int)Math.round(getMax()-getMin()));
-            valueProperty().addListener((event, oldValue, newValue) -> {
-
-                if (display.getLongPosition(axisId) == newValue.longValue()) {
-                    return;
-                }
-
-                display.setPosition(newValue.longValue(), axis.type());
-                logService.info(String.format("Changing %s to %.3f", axis.type().getLabel(), newValue.doubleValue()));
-            });
-        }
-
-    }
 
     public AxisConfiguration getAxisConfiguration() {
         if (axisConfig == null) {
@@ -1037,6 +1025,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         imageDisplay.localize(position);
         position[0] = x;
         position[1] = y;
+        if(x < 0 || y < 0 )return 0.0;
         randomAccess.setPosition(position);
         double realDouble = randomAccess.get().getRealDouble();
         return realDouble;
@@ -1059,5 +1048,36 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         }
         return String.format(format,position.getX(),position.getY(),value);
     }
+    
+    
+    private void createColorButtons() {
+        
+        
+        if(getDatasetview().getChannelCount() > 1) {
+            
+            for(int i = 1; i!= getDatasetview().getChannelCount()+1;i++) {
+                TableColorButton button = new TableColorButton();
+                context.inject(button); 
+                final int channel = i-1;
+                button.datasetViewProperty().bind(viewProperty);
+                button.channelProperty().set(channel);
+               
+                
+               
+                
+                
+                buttonHBox.getChildren().add(button);
+                
+                
+           }
+                
+        }
+        
+        
+        
+        
+    }
+    
+    
     
 }
