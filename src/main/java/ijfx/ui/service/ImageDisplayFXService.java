@@ -66,6 +66,7 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
     private ControlableProperty<DatasetView, long[]> currentPosition;
     
     
+    
     @Parameter
     ImageDisplayService imageDisplayService;
 
@@ -182,11 +183,13 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
     private void setCurrentChannelMin(DatasetView view, Number min) {
         if(view == null) return;
         view.setChannelRange(getCurrentChannelPosition(view), min.doubleValue(), getCurrentChannelMax(view));
+        ImageJFX.getThreadPool().execute(new ViewUpdate(view));
     }
 
     private void setCurrentChannelMax(DatasetView view, Number max) {
         if(view == null) return;
         view.setChannelRange(getCurrentChannelPosition(view), getCurrentChannelMin(view), max.doubleValue());
+       ImageJFX.getThreadPool().execute(new ViewUpdate(view));
     }
     
     public Property<long[]> currentPositionProperty() {
@@ -207,6 +210,20 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
         return lastPosition;
     }
    
+    
+    private class ViewUpdate implements Runnable{
+        final DatasetView view;
+
+        public ViewUpdate(DatasetView view) {
+            this.view = view;
+        }
+        
+        public void run() {
+            view.getProjector().map();
+            view.update();
+        }
+        
+    }
     
     
 }
