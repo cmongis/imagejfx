@@ -1025,7 +1025,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         imageDisplay.localize(position);
         position[0] = x;
         position[1] = y;
-        if(x < 0 || y < 0 )return 0.0;
+        if(x < 0 || y < 0 || x > imageDisplay.max(0) || y > imageDisplay.max(1))return 0.0;
         randomAccess.setPosition(position);
         double realDouble = randomAccess.get().getRealDouble();
         return realDouble;

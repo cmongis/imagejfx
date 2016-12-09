@@ -19,7 +19,9 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import ijfx.ui.main.ImageJFX;
 import ijfx.ui.service.ControlableProperty;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -30,8 +32,10 @@ import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.event.DataViewUpdatedEvent;
+import net.imglib2.meta.Axes;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
+import rx.subjects.PublishSubject;
 
 /*
 Helper Classes
@@ -56,6 +60,8 @@ public class AxisSlider extends BorderPane {
     @Parameter
     ImageDisplayService imageDisplayService;
     
+    PublishSubject<Runnable> updateRequest = PublishSubject.create();
+    
     public AxisSlider(ImageDisplay display, int id) {
         
         super();
@@ -75,13 +81,20 @@ public class AxisSlider extends BorderPane {
         slider.setBlockIncrement(1.0f);
         slider.setShowTickMarks(true);
         //ImageDisplayPane.logService.info(String.format("Adding axis %s (%.1f - %.1f) with initial value : %.3f", axis.type(), getMin(), getMax(), getValue()));
-        position = new ControlableProperty<ImageDisplay, Number>().setGetter(this::getPosition).setSetter(this::setPosition);
+        position = new ControlableProperty<ImageDisplay, Number>()
+                .setGetter(this::getPosition)
+                .setSetter(this::setPosition);
         slider.valueProperty().bindBidirectional(position);
+        axisNameLabel.setText(axis.type().getLabel());
+        axisPositionLabel.textProperty().bind(Bindings.createStringBinding(this::getAxisPosition, slider.valueProperty()));
+        
+        
+       
         
     }
 
-    private Double getPosition() {
-        return new Long(display.getLongPosition(axisId)).doubleValue();
+    private Number getPosition() {
+        return display.getLongPosition(axisId);
     }
 
     private Long getMinSlider() {
@@ -93,19 +106,25 @@ public class AxisSlider extends BorderPane {
     }
 
     private void setPosition(Number position) {
-        if(slider.isValueChanging()) return;
+        
         int p = position.intValue();
         DatasetView datasetView = imageDisplayService.getActiveDatasetView(display);
         
         if(position.longValue() == getPosition().longValue()) return;
         
-        if(datasetView.getProjector().isComposite(p) == false) {
+        if(axis.type().getLabel().toLowerCase().contains("channel") && datasetView.getProjector().isComposite(position.intValue()) == false) {
             datasetView.getProjector().setComposite(p, true);
         }
         
-        datasetView.setPosition(position.longValue(), axisId);
-        datasetView.getProjector().map();
-        datasetView.update();
+             datasetView.setPosition(position.longValue(), axisId);
+        ImageJFX.getThreadQueue().execute(()->{
+            
+            datasetView.getProjector().map();
+            System.out.println("projection over");
+            datasetView.update();
+        });
+        
+       
     }
 
     
@@ -114,7 +133,7 @@ public class AxisSlider extends BorderPane {
     }
     
     private String getAxisPosition() {
-        return String.format("%d / %d",getPosition()+1,display.max(axisId));
+        return String.format("%d / %d",getPosition().longValue()+1,display.dimension(axisId));
     }
     
     
