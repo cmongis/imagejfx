@@ -71,6 +71,9 @@ public class OpenImageFX extends ContextCommand {
             else {
                 output = datasetUtilsService.open(file, imageId, false);
             }
+            
+            logger.info("Image opened "+file.getAbsolutePath());
+            
         } catch (Exception e) {
             uiService.showDialog(String.format("Can't open file : %s",file.getName()));
             logger.log(Level.SEVERE,"Error when opening "+file.getName(),e);

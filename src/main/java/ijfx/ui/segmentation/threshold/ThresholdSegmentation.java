@@ -25,8 +25,8 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
-import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.main.ImageJFX;
+import ijfx.ui.service.ImageDisplayFXService;
 import java.util.Map;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -39,19 +39,15 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import jfxtras.scene.control.ToggleGroupValue;
 import mongis.utils.CallbackTask;
-import mongis.utils.SmartNumberStringConverter;
 import mongis.utils.TimedBuffer;
 import net.imagej.Dataset;
 import net.imagej.autoscale.AutoscaleService;
 import net.imagej.autoscale.DataRange;
-import net.imagej.display.DataView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.threshold.ThresholdMethod;
 import net.imagej.threshold.ThresholdService;
-import net.imagej.widget.HistogramBundle;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.histogram.Histogram1d;
@@ -118,6 +114,9 @@ public class ThresholdSegmentation extends AbstractSegmentation {
     @Parameter
     private Context context;
 
+    @Parameter
+    private ImageDisplayFXService imageDisplayFXService;
+    
     TimedBuffer<Runnable> maskUpdateBuffer = new TimedBuffer(100);
     
     
@@ -127,6 +126,10 @@ public class ThresholdSegmentation extends AbstractSegmentation {
         setImageDisplay(imageDisplay);
         initListeners();
         requestMaskUpdate();
+        
+        minValue.bind(imageDisplayFXService.currentDatasetMinimumValue());
+        maxValue.bind(imageDisplayFXService.currentDatasetMaximumValue());
+        
     }
 
     @Override
@@ -187,12 +190,8 @@ public class ThresholdSegmentation extends AbstractSegmentation {
 
         setImageDisplay(imageDisplay);
 
-        int channel = displayRangeService.getCurrentChannelId();
-        double min = displayRangeService.getDatasetMinimum(imageDisplay, channel);
-        double max = displayRangeService.getDatasetMaximum(imageDisplay, channel);
 
-        minValue.setValue(min);
-        maxValue.setValue(max);
+
         requestMaskUpdate();
     }
 

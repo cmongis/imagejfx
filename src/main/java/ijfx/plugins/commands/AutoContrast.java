@@ -20,6 +20,8 @@
 package ijfx.plugins.commands;
 
 import ijfx.core.stats.IjfxStatisticService;
+import ijfx.service.display.DisplayRangeService;
+import ijfx.ui.service.ImageDisplayFXService;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.DatasetView;
@@ -58,6 +60,12 @@ public class AutoContrast extends ContextCommand {
     @Parameter(type = ItemIO.BOTH)
     Dataset dataset;
 
+    @Parameter
+    DisplayRangeService displayRangeService;
+    
+    @Parameter
+    ImageDisplayFXService imgDisplayFXService;
+    
     @Override
     public void run() {
 
@@ -70,7 +78,7 @@ public class AutoContrast extends ContextCommand {
         if(dataset != null && dataset.isRGBMerged()) {
             return;
         }
-        boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) != -1;
+        boolean multiChannel = dataset.dimensionIndex(Axes.CHANNEL) > -1;
 
         if (multiChannel && channelDependant == true) {
             for (int i = 0; i <= dataset.max(dataset.dimensionIndex(Axes.CHANNEL)); i++) {
@@ -93,6 +101,7 @@ public class AutoContrast extends ContextCommand {
         if(imageDisplay != null) {
              DatasetView view = (DatasetView) imageDisplay.getActiveView();
               view.getProjector().map();
+              view.update();
         }
     }
 
@@ -107,11 +116,12 @@ public class AutoContrast extends ContextCommand {
         }
         
         if(imageDisplay != null) {
-            DatasetView view = (DatasetView) imageDisplay.getActiveView();
+            DatasetView view = imageDisplayService.getActiveDatasetView(imageDisplay);
             view.setChannelRange(channel,minMax[0],minMax[1]);
         }
         
-        
+        imgDisplayFXService.saveDatasetMinimum(dataset, channel, minMax[0]);
+        imgDisplayFXService.saveDatasetMaximum(dataset, channel, minMax[1]);
         
     }
     

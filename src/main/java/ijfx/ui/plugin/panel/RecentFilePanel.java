@@ -34,10 +34,7 @@ import ijfx.ui.explorer.view.IconView;
 import ijfx.ui.widgets.ExplorableButton;
 import java.io.File;
 import java.util.ArrayList;
-import static java.util.Collections.list;
-import java.util.List;
 import java.util.concurrent.Future;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FileUtils;
@@ -50,6 +47,7 @@ import org.scijava.command.CommandService;
 import org.scijava.io.RecentFileService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugins.commands.io.OpenFile;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -82,6 +80,9 @@ public class RecentFilePanel extends BorderPane {
     @Parameter
     ActivityService activityService;
 
+    @Parameter
+            UIService uiService;
+    
     ExplorableButton openImageButton = new ExplorableButton("Open image", "", FontAwesomeIcon.FOLDER_OPEN)
             .setAction(this::openImage);
 
@@ -192,8 +193,12 @@ public class RecentFilePanel extends BorderPane {
     }
 
     private void openImage() {
-        new CommandRunner(context)
-                .runSync(OpenFile.class);
+        Object dataset = new CommandRunner(context)
+                .runSync(OpenFile.class)
+                .getOutput("data");
+        
+        uiService.show(dataset);
+        
     }
 
     private void exploreFolder() {

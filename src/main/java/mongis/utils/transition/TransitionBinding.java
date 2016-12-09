@@ -54,11 +54,28 @@ public class TransitionBinding<T> {
 
     protected final BooleanProperty stateProperty = new SimpleBooleanProperty(false);
 
+    
+    public TransitionBinding() {
+        
+    }
+    
+    
+    
     public TransitionBinding(T onFalse, T onTrue) {
 
         onFalseValue.setValue(onFalse);
         onTrueValue.setValue(onTrue);
 
+    }
+    
+    public TransitionBinding<T> bindOnTrue(ReadOnlyProperty<T> onTrueProperty) {
+        onTrueValue.bind(onTrueProperty);
+        return this;
+    }
+    
+    public TransitionBinding<T> bindOnFalse(ReadOnlyProperty<T> onFalseProperty) {
+        onFalseValue.bind(onFalseProperty);
+        return this;
     }
 
     public TransitionBinding<T> bind(Binding<Boolean> property, Property<T> toModify) {

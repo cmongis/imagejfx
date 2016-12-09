@@ -52,11 +52,7 @@ public class CanvasCamera implements ViewPort {
     private Rectangle2D seenRectangle;
     
     public CanvasCamera() {
-        //zoomProperty.addListener(e -> fireValueChangedEvent());
-        //xCenterProperty.addListener(e -> fireValueChangedEvent());
-        //yCenterProperty.addListener(e -> fireValueChangedEvent());
-        //widthProperty().addListener(e->fireValueChangedEvent());
-        //heightProperty().addListener(e->fireValueChangedEvent());
+       
         
         Stream
                 .of(zoomProperty,xCenterProperty,yCenterProperty,widthProperty(),heightProperty())

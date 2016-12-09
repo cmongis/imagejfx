@@ -94,7 +94,12 @@ public class AxisSlider extends BorderPane {
     }
 
     private Number getPosition() {
-        return display.getLongPosition(axisId);
+        try {
+        return imageDisplayService.getActiveDatasetView(display).getLongPosition(axisId);
+        }
+        catch(NullPointerException e) {
+            return 0;
+        }
     }
 
     private Long getMinSlider() {
@@ -105,15 +110,44 @@ public class AxisSlider extends BorderPane {
         return display.max(axisId);
     }
 
+    
+    private int getActivatedChannelNumber() {
+        DatasetView datasetView = imageDisplayService.getActiveDatasetView(display);
+        
+        int count = 0;
+        for(int i = 0; i!= datasetView.getChannelCount(); i++) {
+            if(datasetView.getProjector().isComposite(i)) count++;
+            
+        }
+        
+        return count;
+        
+    }
+    
     private void setPosition(Number position) {
         
         int p = position.intValue();
+        
+       
+        
         DatasetView datasetView = imageDisplayService.getActiveDatasetView(display);
         
-        if(position.longValue() == getPosition().longValue()) return;
+         long oldValue = getPosition().longValue();
+         long newValue = position.longValue();
+        
+        if(oldValue == newValue) return;
         
         if(axis.type().getLabel().toLowerCase().contains("channel") && datasetView.getProjector().isComposite(position.intValue()) == false) {
+            
+            int activatedChannel = getActivatedChannelNumber();
+            
+            // if only one channel is activated, then we desactivate the other ones
+            // (it allows the user to go through channels one by one)
+            if(activatedChannel == 1) {
+                datasetView.getProjector().setComposite((int)oldValue, false);
+            }
             datasetView.getProjector().setComposite(p, true);
+            
         }
         
              datasetView.setPosition(position.longValue(), axisId);
@@ -139,6 +173,8 @@ public class AxisSlider extends BorderPane {
     
     @EventHandler
     private void onDatasetViewChanged(DataViewUpdatedEvent event) {
+        if(position == null) return;
+        if(event.getView() == imageDisplayService.getActiveDatasetView(display))
         position.checkFromGetter();
     }
     

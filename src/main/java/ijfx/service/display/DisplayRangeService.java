@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import mongis.utils.TimedBuffer;
+import mongis.utils.UUIDMap;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import net.imagej.axis.Axes;
@@ -69,8 +70,6 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
     @Parameter
     private IjfxStatisticService ijfxStatsService;
 
-    private final Map<String, SummaryStatistics> datasetMinMax = new HashMap<>();
-
     
     private final TimedBuffer<Runnable> rangeUpdateQueue = new TimedBuffer<Runnable>(100);
     
@@ -111,24 +110,6 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
 
         return axises;
 
-    }
-
-    public double getDatasetMinimum(ImageDisplay display,int channel) {
-        return getDisplayStatistics(display, channel).getMin();
-    }
-    
-    public double getDatasetMaximum(ImageDisplay display, int channel) {
-        return getDisplayStatistics(display, channel).getMax();
-    }
-    
-    
-    public double getCurrentDatasetMinimum() {
-        return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMin();
-    }
-
-    public double getCurrentDatasetMaximum() {
-        //return imageDisplayService.getActiveDataset(displayService.getActiveDisplay(ImageDisplay.class)).getChannelMaximum(getCurrentChannelId());
-        return getDisplayStatistics(displayService.getActiveDisplay(ImageDisplay.class), getCurrentChannelId()).getMax();
     }
 
     public double getChannelMinimum(ImageDisplay display, int channel) {
@@ -173,7 +154,7 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
         return imageDisplayService.getActiveDataset(display).getColorTable(getChannelId(display));
     }
 
-    public void updateDisplayRange(ImageDisplay imageDisplay,int channel,double min, double max) {
+    private void updateDisplayRange(ImageDisplay imageDisplay,int channel,double min, double max) {
         
         final Dataset dataset = imageDisplayService.getActiveDataset(imageDisplay);
         final DatasetView datasetView = imageDisplayService.getActiveDatasetView(imageDisplay);
@@ -211,18 +192,7 @@ public class DisplayRangeService extends AbstractService implements ImageJServic
 
     }   
 
-    private SummaryStatistics getDisplayStatistics(ImageDisplay display, int channel) {
-
-        String uuid = getDisplayChannelId(display, channel);
-        Dataset dataset = imageDisplayService.getActiveDataset(display);
-        if (datasetMinMax.containsKey(uuid) == false) {
-
-            SummaryStatistics stats = ijfxStatsService.getChannelStatistics(dataset, channel);
-            datasetMinMax.put(uuid, stats);
-        }
-        return datasetMinMax.get(uuid);
-
-    }
+   
 
     private String getDisplayChannelId(ImageDisplay display, int channel) {
         return UUID.nameUUIDFromBytes(new String(display.hashCode() + "" + channel).getBytes()).toString();

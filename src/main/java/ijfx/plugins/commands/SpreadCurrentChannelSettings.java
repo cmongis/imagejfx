@@ -77,7 +77,8 @@ public class SpreadCurrentChannelSettings extends ContextCommand{
                              lutService.applyLUT(table, display);
                        }
                       
-                       displayRangeService.updateDisplayRange(display, channel, min, max);
+                      imageDisplayService.getActiveDatasetView(display).setChannelRange(channel, min, max);
+                      imageDisplayService.getActiveDatasetView(display).update();
            });
         
     

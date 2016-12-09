@@ -84,6 +84,7 @@ import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
 import net.imagej.display.DataView;
 import ijfx.ui.widgets.PopoverToggleButton;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -107,6 +108,7 @@ import net.imagej.overlay.Overlay;
 import net.imagej.overlay.ThresholdOverlay;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
+import org.reactfx.EventStreams;
 
 import org.scijava.module.ModuleService;
 import org.scijava.util.Colors;
@@ -230,6 +232,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     protected Button analyseParticalButton = new Button("Analyze particles", new FontAwesomeIconView(FontAwesomeIcon.TABLE));
 
+    private RangeSliderHelper rangeHelper;
+    
     //protected final Property<ColorMode> colorMode = new SimpleObjectProperty(ColorMode.COLOR);
     //protected final BooleanProperty isComposite = new SimpleBooleanProperty();
     public LUTPanel() {
@@ -247,7 +251,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
             // taking care of the range slider configuration
             rangeSlider.setShowTickLabels(true);
-            rangeSlider.setPrefWidth(255);
+            rangeSlider.setPrefWidth(400);
             minMaxButton.setPrefWidth(200);
 
             // threshold button
@@ -298,6 +302,10 @@ public class LUTPanel extends TitledPane implements UiPlugin {
     public UiPlugin init() {
 
         
+       
+       
+        rangeSlider.minProperty().bind(imageDisplayFxSrv.currentDatasetMinimumValue());
+        rangeSlider.maxProperty().bind(imageDisplayFxSrv.currentDatasetMaximumValue());
         
         lowValue = imageDisplayFxSrv.currentLUTMinProperty();
         highValue = imageDisplayFxSrv.currentLUTMaxProperty();
@@ -310,7 +318,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         rangeSlider.lowValueProperty().bindBidirectional(lowValue);
         rangeSlider.highValueProperty().bindBidirectional(highValue);
 
-        imageDisplayFxSrv.currentPositionProperty().addListener(this::onPositionChanged);
+        //imageDisplayFxSrv.currentPositionProperty().addListener(this::onPositionChanged);
         
         // creating the LUT Combobx
         lutComboBox = new LUTComboBox();
@@ -333,13 +341,15 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         // binding the min and max textfield so it can display float precision depending on the image
         SmartNumberStringConverter smartNumberStringConverter = new SmartNumberStringConverter();
-        smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentDisplay, lowValue));
+        smartNumberStringConverter.floatingPointProperty().bind(Bindings.createBooleanBinding(this::isFloat, currentDisplay, lowValue,highValue));
 
        
         
         Bindings.bindBidirectional(minTextField.textProperty(), lowValue, smartNumberStringConverter);
         Bindings.bindBidirectional(maxTextField.textProperty(), highValue, smartNumberStringConverter);
 
+       
+        
         thresholdLevel.bind(Bindings.createDoubleBinding(this::getThresholdValue, lowValue, highValue, thresholdButton.selectedProperty()));
         thresholdLevel.addListener(this::onThresholdButtonChanged);
 
@@ -347,6 +357,13 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         mergedViewToggleButton.selectedProperty().bindBidirectional(imageDisplayFxSrv.currentColorModeProperty());
 
+        rangeSlider.setMinorTickCount(0);
+        rangeSlider.setMajorTickUnit(1.0);
+        rangeSlider.setSnapToTicks(true);
+        
+        
+        
+        
         return this;
     }
 
@@ -431,7 +448,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
         double min = imageDisplayFxSrv.currentLUTMinProperty().getValue().doubleValue();
         double max = imageDisplayFxSrv.currentLUTMaxProperty().getValue().doubleValue();
-
+        
         
        return String.format("Min/Max : %.0f - %.0f", min, max);
        
@@ -463,6 +480,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         new CommandRunner(context)
                 .set("dataset", imageDisplayService.getActiveDataset())
                 .set("imageDisplay", imageDisplayService.getActiveImageDisplay())
+                .set("channelDependant", true)
                 .runAsync(AutoContrast.class, null, true)
                 .then(o -> updateLabel());
 
@@ -650,21 +668,41 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         return overlay;
     }
     
-    private Double getMinValue() {
-        return displayRangeServ.getCurrentDatasetMinimum() * .1;
-    }
-    
-    private Double getMaxValue() {
-       return displayRangeServ.getCurrentDatasetMaximum() * 1.1;
+    private class RangeSliderHelper {
+        
+        final RangeSlider slider;
+
+        double range = 0.30;
+        
+        
+        public RangeSliderHelper(RangeSlider ranslider) {
+            this.slider = ranslider;
+            
+            EventStreams
+                    .changesOf(slider.lowValueProperty())
+                    .successionEnds(Duration.ofMillis(1000))
+                    .subscribe(this::updateRange);
+            
+             EventStreams
+                    .changesOf(slider.highValueProperty())
+                    .successionEnds(Duration.ofMillis(1000))
+                    .subscribe(this::updateRange);
+        }
+        
+        
+        
+        
+        public void updateRange(Object o) {
+            double value = slider.getLowValue();
+            
+            slider.setMin(slider.getLowValue()*(1-range));
+            slider.setMax(slider.getHighValue()*(1+range));
+        }
+        
+        
+        
     }
 
-    private void onPositionChanged(Observable obs, Object o1, Object o2) {
-        Platform.runLater(this::updateMinMax);
-    }
     
-    private void updateMinMax() {
-        rangeSlider.setMin(getMinValue());
-        rangeSlider.setMax(getMaxValue());
-    }
-    
+   
 }

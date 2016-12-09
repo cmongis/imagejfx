@@ -23,6 +23,7 @@ import ijfx.plugins.DefaultAxisInterval;
 import ijfx.plugins.DefaultInterval;
 import ijfx.plugins.LongInterval;
 import ijfx.service.display.DisplayRangeService;
+import ijfx.ui.service.ImageDisplayFXService;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;
@@ -63,6 +64,10 @@ public class ApplyLUT extends ContextCommand{
     
     @Parameter
     DisplayRangeService displayRangeService;
+    
+    @Parameter
+    ImageDisplayFXService imgDisplayFXService;
+    
     void init() {
         
         if(imageDisplayService.getActiveDataset() == input) {
@@ -70,8 +75,8 @@ public class ApplyLUT extends ContextCommand{
             if(channelId == -1) channelId = 0;
             else {
                 ImageDisplay display = imageDisplayService.getActiveImageDisplay();
-                long min = Math.round(displayRangeService.getCurrentDatasetMinimum());
-                long max = Math.round(displayRangeService.getCurrentDatasetMaximum());
+                long min = imgDisplayFXService.getDatasetMinimum(input, channelId).longValue();
+                long max = imgDisplayFXService.getDatasetMaximum(input, channelId).longValue();
                 long low = Math.round(displayRangeService.getCurrentViewMinimum());
                 long high = Math.round(displayRangeService.getCurrentViewMaximum());
                 displayRange = new DefaultInterval(low,high,min,max);

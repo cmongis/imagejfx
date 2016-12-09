@@ -20,16 +20,12 @@
 package ijfx.ui.service;
 
 import ijfx.service.IjfxService;
-import ijfx.service.display.DisplayRangeService;
 import ijfx.ui.main.ImageJFX;
 import java.util.Arrays;
-import java.util.function.BiConsumer;
-import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.util.Callback;
+import mongis.utils.UUIDMap;
+import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
@@ -37,6 +33,7 @@ import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.display.event.LUTsChangedEvent;
+import net.imagej.event.DatasetUpdatedEvent;
 import org.scijava.Priority;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayActivatedEvent;
@@ -65,7 +62,25 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
 
     private ControlableProperty<DatasetView, long[]> currentPosition;
     
+    private ControlableProperty<ImageDisplay, Dataset> currentDataset;
     
+    private ControlableProperty<Dataset,Number> minDatasetValue;
+    
+    private ControlableProperty<Dataset,Number> maxDatasetValue;
+    
+    private ControlableProperty<DatasetView,Integer> currentChannel;
+    
+     private static final String MINIMUM = "minimum";
+    
+    private static final String MAXIMUM = "maximum";
+    
+    //private final Map<String, SummaryStatistics> datasetMinMax = new HashMap<>();
+
+    private final UUIDMap<Double> datasetChannelMin = new UUIDMap();
+    
+    private Property<Double> possibleMinLUTValue = new SimpleObjectProperty<Double>();
+    
+    private Property<Double> possibleMaxLUTValue = new SimpleObjectProperty<Double>();
     
     @Parameter
     ImageDisplayService imageDisplayService;
@@ -107,8 +122,26 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
                  .setCaller(this::getCurrentPosition)
                  .bindBeanTo(currentDatasetView);
          
-         
+         currentDataset = new ControlableProperty<ImageDisplay,Dataset>()
+                 .setGetter(imageDisplayService::getActiveDataset)
+                 .bindBeanTo(currentImageDisplay);
         
+        
+         
+         
+         currentChannel = new ControlableProperty<DatasetView,Integer>()
+                 .setCaller(this::getCurrentChannel)
+                 .bindBeanTo(currentDatasetView);
+         
+         
+         minDatasetValue = new ControlableProperty<Dataset,Number>()
+                 .setCaller(this::getDatasetMinimumValue)
+                 .bindBeanTo(currentDataset);
+         
+         maxDatasetValue = new ControlableProperty<Dataset,Number>()
+                 .setCaller(this::getDatasetMaximumValue)
+                 .bindBeanTo(currentDataset);
+         
     }
     
     
@@ -123,6 +156,26 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
     
     public Property<Number> currentLUTMaxProperty() {
         return maxLUTValue;
+    }
+    
+    public Property<Double> possibeMinLUTValueProperty() {
+        return possibleMinLUTValue;
+    }
+    
+    public Property<Double> possibleMaxLUTValueProperty() {
+        return possibleMaxLUTValue;
+    }
+    
+    public Property<Number> currentDatasetMaximumValue() {
+        return maxDatasetValue;
+    }
+    
+    public Property<Number> currentDatasetMinimumValue() {
+        return minDatasetValue;
+    }
+    
+    public Property<Dataset> currentDatasetProperty() {
+        return currentDataset;
     }
     
     public Boolean isComposite(DatasetView view) {
@@ -148,9 +201,13 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
     public void onDatasetViewUpdated(DataViewUpdatedEvent event) {
         if (currentDatasetView.getValue() == event.getView()) {
             isComposite.checkFromGetter();
+            
+            currentPosition.checkFromGetter();
+            minDatasetValue.checkFromGetter();
+            maxDatasetValue.checkFromGetter();
             maxLUTValue.checkFromGetter();
             minLUTValue.checkFromGetter();
-            currentPosition.checkFromGetter();
+            
         }
     }
 
@@ -159,6 +216,12 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
         if (currentDatasetView.getValue() == event.getView()) {
             isComposite.checkFromGetter();
         }
+    }
+    
+    @EventHandler
+    public void onDatasetUpdatedEvent(DatasetUpdatedEvent event) {
+        minDatasetValue.checkFromGetter();
+        maxDatasetValue.checkFromGetter();
     }
 
     public Integer getCurrentChannelPosition(DatasetView view) {
@@ -172,12 +235,14 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
 
     private Double getCurrentChannelMin(DatasetView view) {
         if(view == null) return 0d;
-        return view.getChannelMin(getCurrentChannelPosition(view));
+        double value =  view.getChannelMin(getCurrentChannelPosition(view));
+        return value;
     }
 
     private Double getCurrentChannelMax(DatasetView view) {
         if(view == null) return 255d;
-        return view.getChannelMax(getCurrentChannelPosition(view));
+        double value =  view.getChannelMax(getCurrentChannelPosition(view));
+        return value;
     }
 
     private void setCurrentChannelMin(DatasetView view, Number min) {
@@ -191,6 +256,34 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
         view.setChannelRange(getCurrentChannelPosition(view), getCurrentChannelMin(view), max.doubleValue());
        ImageJFX.getThreadPool().execute(new ViewUpdate(view));
     }
+    
+    
+    
+    public void saveDatasetMinimum(Dataset dataset, int channel, double value) {
+        datasetChannelMin.get(dataset,channel,MINIMUM).put(value);
+        minDatasetValue.checkFromGetter();
+    }
+    
+    public void saveDatasetMaximum(Dataset dataset, int channel, double value) {
+        datasetChannelMin.get(dataset,channel,MAXIMUM).put(value);
+       maxDatasetValue.checkFromGetter();
+    }
+    
+     public Number getDatasetMinimum(Dataset dataset,int channel) {
+         System.out.printf("DatasetMinMax : Minimum : %s,%d,%s\n",dataset.toString(),channel,datasetChannelMin.get(dataset,channel,MINIMUM).id().toString());
+        return datasetChannelMin.get(dataset,channel,MINIMUM).orPut(dataset.getChannelMinimum(channel));
+       
+    }
+    
+    public Number getDatasetMaximum(Dataset dataset, int channel) {
+        System.out.printf("DatasetMinMax : Maximum : %s,%d,%s\n",dataset.toString(),channel,datasetChannelMin.get(dataset,channel,MAXIMUM).id().toString());
+        return datasetChannelMin.get(dataset,channel,MAXIMUM).orPut(dataset.getChannelMaximum(channel));
+    }
+    
+    public Integer getCurrentChannel(DatasetView datasetView) {
+        return datasetView.getChannelCount() == 1 ? 0 : datasetView.getIntPosition(Axes.CHANNEL);
+    }
+    
     
     public Property<long[]> currentPositionProperty() {
         return currentPosition;
@@ -211,6 +304,23 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
     }
    
     
+    
+    public Number getDatasetMinimumValue(Dataset dataset) {
+        return getDatasetMinimum(dataset, getCurrentChannel());
+    }
+    
+   
+    
+    public int getCurrentChannel() {
+        return currentChannel.getValue();
+    }
+    
+    public Number getDatasetMaximumValue(Dataset dataset) {
+        return getDatasetMaximum(dataset, getCurrentChannel());
+    }
+    
+   
+    
     private class ViewUpdate implements Runnable{
         final DatasetView view;
 
@@ -222,6 +332,8 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
             view.getProjector().map();
             view.update();
         }
+        
+        
         
     }
     

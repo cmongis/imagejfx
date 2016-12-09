@@ -39,7 +39,6 @@ import ijfx.ui.datadisplay.image.overlay.OverlayDisplayService;
 import ijfx.ui.datadisplay.image.overlay.OverlayDrawer;
 import ijfx.ui.datadisplay.image.overlay.OverlayModifier;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.service.ControlableProperty;
 import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.FxToolService;
 import ijfx.ui.tool.ToolChangeEvent;
@@ -75,7 +74,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -84,13 +82,16 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import mongis.utils.CallbackTask;
 import mongis.utils.FXUtilities;
+import mongis.utils.transition.TransitionBinding;
 import net.imagej.Dataset;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
@@ -157,6 +158,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     
     @FXML
     private VBox sliderVBox;
+    
+    @FXML
+    private BorderPane bottomPane;
     
     @Parameter
     private OverlayDisplayService overlayDisplayService;
@@ -291,10 +295,18 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         // setting the pixel value label to a binding retrieving the value of the current pixel and displaying it
         pixelValueLabel.textProperty().bind(Bindings.createStringBinding(this::getPixelValueLabelText, pixelValueProperty));
         
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(widthProperty());
+        clip.heightProperty().bind(heightProperty().add(-5));
         
+        setClip(clip);
         
-        
-        
+        new TransitionBinding<Number>()
+                .bindOnFalse(sliderVBox.heightProperty())
+                .setOnTrue(0.0)
+                .bind(bottomPane.hoverProperty(), bottomPane.translateYProperty());
+                
+       
         
     }
 
@@ -312,13 +324,14 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         new CommandRunner(context)
                 .set("imageDisplay", imageDisplay)
-                .set("dataset", getDataset())
+                .set("dataset", imageDisplayService.getActiveDataset(display))
+                .set("channelDependant",true)
                 .runAsync(AutoContrast.class, null, true);
 
         viewProperty.setValue(imageDisplayService.getActiveDatasetView(display));
         
         
-        createColorButtons();
+      
         
     }
 
@@ -480,15 +493,25 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         t.elapsed("canvas repainting");
     }
 
+    
+    
+    
     private void updateImageAndOverlays(Void v) {
 
         // Timer t = timerService.getTimer(this.getClass());
         repaint();
 
+        
+        
+    }
+    private void checkAxis() {
+
+        if(imageDisplay.size() == 0) return;
+        
         if (imageDisplay.getName().equals(titleProperty.getName()) == false) {
             titleProperty.setValue(imageDisplay.getName());
         }
-
+        
         // t.elapsed("canvas.repaint");
         updateInfoLabel();
 
@@ -582,11 +605,20 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         Arc Menu building
     
      */
+    
+    
+    
+    
+   
+    
     public void build() {
 
         
-        
+        logger.info("rebuilding");
         sliderVBox.getChildren().clear();
+        
+        
+        
         
         for(int i = 2; i!=imageDisplay.numDimensions();i++) {
             
@@ -596,6 +628,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
             
         }
         
+        createColorButtons();
         
         
         if (arcMenu != null) {
@@ -783,6 +816,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
             }
         } catch (Exception e) {
         }
+        
+        
+        Platform.runLater(this::checkAxis);
     }
 
     @EventHandler
@@ -1022,7 +1058,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         RandomAccess<? extends RealType<?>> randomAccess = datasetView.xyPlane().randomAccess();
         long[] position = new long[imageDisplay.numDimensions()];
-        imageDisplay.localize(position);
+        viewProperty.getValue().localize(position);
         position[0] = x;
         position[1] = y;
         if(x < 0 || y < 0 || x > imageDisplay.max(0) || y > imageDisplay.max(1))return 0.0;
@@ -1049,9 +1085,15 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         return String.format(format,position.getX(),position.getY(),value);
     }
     
+    private Double getSliderTranslateY() {
+        return sliderVBox.getHeight();
+    }
+    
     
     private void createColorButtons() {
         
+        
+        buttonHBox.getChildren().clear();
         
         if(getDatasetview().getChannelCount() > 1) {
             
@@ -1077,6 +1119,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         
         
     }
+    
     
     
     

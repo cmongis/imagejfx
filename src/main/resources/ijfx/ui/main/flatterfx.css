@@ -1089,6 +1089,10 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-spacing:5px;
     -fx-padding:0 10 0 0;
 }
+
+.image-display-pane #bottomPane {
+    -fx-background-color:derive(-bg-darker,-15%);
+}
 .image-display-pane .color-button {
     -fx-padding:2px 2px 2px 2px;
     -fx-margin: 0px 3px 0px 0px;
