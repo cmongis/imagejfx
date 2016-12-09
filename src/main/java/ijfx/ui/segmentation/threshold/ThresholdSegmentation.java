@@ -75,7 +75,7 @@ public class ThresholdSegmentation extends AbstractSegmentation {
     public final DoubleProperty minValue = new SimpleDoubleProperty();
     public final DoubleProperty maxValue = new SimpleDoubleProperty();
 
-    private final Property<Double[]> position = new SimpleObjectProperty();
+    private final ImageDisplayPositionProperty position;
 
     private final Property<Img<BitType>> maskProperty = new SimpleObjectProperty();
 

@@ -63,7 +63,6 @@ import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
 import ijfx.ui.utils.ImageDisplayProperty;
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -104,15 +103,15 @@ import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.overlay.BinaryMaskOverlay;
 import net.imagej.overlay.Overlay;
 import net.imagej.overlay.PolygonOverlay;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.display.ColorTable;
-import net.imglib2.display.ColorTable8;
 import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
 import org.scijava.Context;
+import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
@@ -454,6 +453,13 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         Platform.runLater(this::updateView);
 
+    }
+    
+    @EventHandler
+    private void onDatasetViewUpdated(DataViewUpdatedEvent event) {
+        if(event.getView() == imageDisplayService.getActiveDatasetView(getCurrentImageDisplay())) {
+            updateView();
+        }
     }
 
     private void updateView() {
