@@ -25,6 +25,7 @@ import ijfx.service.ImagePlaneService;
 import ijfx.service.display.DisplayRangeService;
 import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
+import ijfx.ui.datadisplay.image.ImageDisplayPositionProperty;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.service.ImageDisplayFXService;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class ThresholdSegmentation extends AbstractSegmentation {
     public final DoubleProperty minValue = new SimpleDoubleProperty();
     public final DoubleProperty maxValue = new SimpleDoubleProperty();
 
-    private final ImageDisplayPositionProperty position;
+    private ImageDisplayPositionProperty position;
 
     private final Property<Img<BitType>> maskProperty = new SimpleObjectProperty();
 
@@ -124,11 +125,15 @@ public class ThresholdSegmentation extends AbstractSegmentation {
     public ThresholdSegmentation(ImageDisplay imageDisplay) {
         imageDisplay.getContext().inject(this);
         setImageDisplay(imageDisplay);
+        
         initListeners();
         requestMaskUpdate();
-        
+        position = new ImageDisplayPositionProperty(imageDisplay);
         minValue.bind(imageDisplayFXService.currentDatasetMinimumValue());
         maxValue.bind(imageDisplayFXService.currentDatasetMaximumValue());
+        position.addListener(this::onAnyChange);
+        
+        
         
     }
 
@@ -175,9 +180,7 @@ public class ThresholdSegmentation extends AbstractSegmentation {
         methodProperty.addListener(this::onAnyChange);
     }
 
-    private void setPosition(double[] position) {
-        this.position.setValue(ArrayUtils.toObject(position));
-    }
+    
 
     private void onAutothresholdChanged(Observable obs, Boolean oldValue, Boolean newValue) {
         if (newValue) {
@@ -190,7 +193,7 @@ public class ThresholdSegmentation extends AbstractSegmentation {
 
         setImageDisplay(imageDisplay);
 
-
+        position.check();
 
         requestMaskUpdate();
     }

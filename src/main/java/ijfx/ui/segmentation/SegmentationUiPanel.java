@@ -441,8 +441,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private Void updateMask(Img<BitType> mask) {
         List<PolygonOverlay> overlays = overlayUtilsService.findOverlaysOfType(getCurrentImageDisplay(), PolygonOverlay.class);
         overlayUtilsService.removeOverlay(getCurrentImageDisplay(), overlays);
-        overlayUtilsService.updateBinaryMask(getCurrentImageDisplay(), mask);
-        getCurrentImageDisplay().update();
+        overlayUtilsService.updateBinaryMask(getCurrentImageDisplay(), mask).update();
+        
         return null;
     }
 

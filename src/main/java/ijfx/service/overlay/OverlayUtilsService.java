@@ -198,7 +198,7 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
 
         imageDisplay.removeAll(dataviewList);
         overlays.forEach(o -> eventService.publish(new OverlayDeletedEvent(o)));
-        imageDisplay.update();
+        //if(overlays.size() > 0) imageDisplay.update();
 
     }
 
@@ -223,10 +223,10 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
         return ((BinaryMaskRegionOfInterest<BitType, Img<BitType>>) overlay.getRegionOfInterest()).getImg();
     }
 
-    public void updateBinaryMask(ImageDisplay imageDisplay, Img<BitType> mask) {
+    public BinaryMaskOverlay updateBinaryMask(ImageDisplay imageDisplay, Img<BitType> mask) {
 
         if (mask == null) {
-            return;
+            return null;
         }
         BinaryMaskOverlay overlay = findOverlayOfType(imageDisplay, BinaryMaskOverlay.class);
 
@@ -248,6 +248,7 @@ public class OverlayUtilsService extends AbstractService implements IjfxService 
             }
 
         }
+        return overlay;
     }
 
     public BinaryMaskOverlay createBinaryMaskOverlay(ImageDisplay imageDisplay, Img<BitType> mask) {
