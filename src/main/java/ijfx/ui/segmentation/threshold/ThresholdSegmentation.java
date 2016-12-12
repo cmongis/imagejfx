@@ -124,7 +124,7 @@ public class ThresholdSegmentation extends AbstractSegmentation {
     
     public ThresholdSegmentation(ImageDisplay imageDisplay) {
         imageDisplay.getContext().inject(this);
-        setImageDisplay(imageDisplay);
+       
         
         initListeners();
         requestMaskUpdate();
@@ -189,7 +189,7 @@ public class ThresholdSegmentation extends AbstractSegmentation {
     }
 
     @Override
-    public void update(ImageDisplay imageDisplay) {
+    public void preview(ImageDisplay imageDisplay) {
 
         setImageDisplay(imageDisplay);
 

@@ -25,6 +25,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.util.Callback;
 import org.scijava.Context;
 import org.scijava.event.EventService;
@@ -60,7 +61,7 @@ public class ControlableProperty<R, T> extends ObjectPropertyBase<T> {
         return beanProperty;
     }
 
-    public ControlableProperty<R, T> bindBeanTo(Property<R> property) {
+    public ControlableProperty<R, T> bindBeanTo(ObservableValue<R> property) {
         beanProperty.bind(property);
         return this;
     }

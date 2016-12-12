@@ -35,7 +35,7 @@ public interface Segmentation {
     Property<Img<BitType>> maskProperty();
    
     
-    public void update(ImageDisplay imageDisplay);
+    public void preview(ImageDisplay imageDisplay);
     
     
     public Workflow getWorkflow();

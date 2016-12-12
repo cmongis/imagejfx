@@ -43,6 +43,7 @@ public class ImageDisplayPositionProperty extends ObjectPropertyBase<long[]>{
     public void check() {
         long[] position = new long[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
+        imageDisplay.getActiveView().localize(position);
         setValue(position);
     }
     

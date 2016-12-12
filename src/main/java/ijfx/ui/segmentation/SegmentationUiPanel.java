@@ -62,6 +62,7 @@ import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
+import ijfx.ui.service.ControlableProperty;
 import ijfx.ui.utils.ImageDisplayProperty;
 import java.io.File;
 import java.io.IOException;
@@ -100,6 +101,7 @@ import mongis.utils.FXUtilities;
 import mongis.utils.ProgressHandler;
 import mongis.utils.UUIDMap;
 import net.imagej.Dataset;
+import net.imagej.display.ColorMode;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
@@ -184,7 +186,7 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
     @Parameter
     private DisplayRangeService displayRangeService;
-    
+
     @Parameter
     private HintService hintService;
 
@@ -231,6 +233,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private static final String ALL_PLANE_ONE_MASK = "... for all planes using this mask";
     private static final String SEGMENT_AND_MEASURE = "... after segmenting each planes";
 
+  
+    
     private UUIDMap<Segmentation> segmentationMap = new UUIDMap<>();
 
     private WeakHashMap<ImageDisplay, SegmentationUiPlugin> selectedPlugin = new WeakHashMap<>();
@@ -304,6 +308,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         configuration = new ConfigurationMapper<>(imageDisplayProperty, currentPlugin, accordion.expandedPaneProperty(), currentPlugin);
 
+        
+        
         return this;
     }
 
@@ -353,6 +359,16 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     private TitledPane getExpandedPane() {
         return accordion.getExpandedPane();
     }
+    
+    private Boolean isGreyscale(ImageDisplay display) {
+       return imageDisplayService.getActiveDatasetView(display).getColorMode() == ColorMode.GRAYSCALE;
+    };
+    
+    private void setGreyScale(ImageDisplay display, Boolean greyscale) {
+        if(display == null) return;
+        imageDisplayService.getActiveDatasetView(display).setColorMode(greyscale ? ColorMode.GRAYSCALE : ColorMode.COLOR);
+        //  imageDisplayService.getActiveDatasetView(display).update();
+    }
 
     private void onExplorerPropertyChanged(Observable obs, Boolean oldValue, Boolean isExplorer) {
 
@@ -364,7 +380,15 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         }
 
     }
+    
+    private void onSegmentationContextChanged(Observable obs, Boolean oldValue, Boolean isSegmentation) {
+        
+            setGreyScale(getCurrentImageDisplay(), isSegmentation);
+        
+    }
 
+   
+    
     private SegmentationUiPlugin getActivePlugin() {
         return nodeMap.get(getExpandedPane());
     }
@@ -393,8 +417,6 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
 
         return overlays;
     }
-
-    
 
     private Predicate<OverlayShapeStatistics> getShapeFilter() {
         return o -> true;
@@ -442,60 +464,62 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         List<PolygonOverlay> overlays = overlayUtilsService.findOverlaysOfType(getCurrentImageDisplay(), PolygonOverlay.class);
         overlayUtilsService.removeOverlay(getCurrentImageDisplay(), overlays);
         overlayUtilsService.updateBinaryMask(getCurrentImageDisplay(), mask).update();
-        
+
         return null;
     }
 
     private void onImageDisplayChanged(Observable obs, ImageDisplay oldValue, ImageDisplay display) {
         if (segmentationContext.getValue() == false || segmentationContext.getValue() == false || getCurrentPlugin() == null) {
+            
             return;
         }
 
         Platform.runLater(this::updateView);
 
     }
-    
+
     @EventHandler
     private void onDatasetViewUpdated(DataViewUpdatedEvent event) {
-        if(event.getView() == imageDisplayService.getActiveDatasetView(getCurrentImageDisplay())) {
+        if (event.getView() == imageDisplayService.getActiveDatasetView(getCurrentImageDisplay())) {
             updateView();
         }
     }
 
     private void updateView() {
-
+        
+        if(segmentationContext.get() == false) return;
+       
         ImageDisplay display = getCurrentImageDisplay() == null
                 ? imageDisplayService.getActiveImageDisplay()
                 : getCurrentImageDisplay();
 
+         setGreyScale(display, Boolean.TRUE);
+        
+        // getting the plugin corresponding to the display and to the method
         SegmentationUiPlugin plugin = getCurrentPlugin();
 
-        
-       
-        
-        
-        
-        
         if (maskProperty != null) {
             maskProperty.removeListener(onMaskChanged);
         }
-
+        
+        
+        
         // we create (or fetch) a segmentation for a specific display and a specific plugin
         Segmentation segmentation = segmentationMap
                 .get(plugin, display)
                 .orRetrieveAndPut(() -> plugin.createSegmentation(display));
 
         UUID id = segmentationMap.getId(getCurrentPlugin(), display, display.getName());
-
+        
         logger.info("Changing segmentation uuid=" + id.toString());
 
         // we bind the plugin to the segmentation
         getCurrentPlugin().bind(segmentation);
-        segmentation.update(display);
+        segmentation.preview(display);
 
         segmentation.maskProperty().addListener(onMaskChanged);
         maskProperty = segmentation.maskProperty();
-
+       
     }
 
     @FXML

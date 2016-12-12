@@ -62,7 +62,7 @@ public class WorkflowSegmentation extends AbstractSegmentation {
     }
 
     @Override
-    public void update(ImageDisplay imageDisplay) {
+    public void preview(ImageDisplay imageDisplay) {
 
     }
 

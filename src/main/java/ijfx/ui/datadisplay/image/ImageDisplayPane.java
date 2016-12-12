@@ -263,10 +263,11 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     private final StringProperty titleProperty = new SimpleStringProperty();
 
-    private int refreshDelay = 1000 / 24; // in milliseconds
+    private final int refreshDelay = 1000 / 24; // in milliseconds
 
     private AxisConfiguration axisConfig;
 
+   
     public ImageDisplayPane() throws IOException {
 
         FXUtilities.injectFXML(this);
@@ -500,7 +501,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         // Timer t = timerService.getTimer(this.getClass());
         repaint();
-
+        
+        checkAxis();
         
         
     }
@@ -700,6 +702,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                 .buffer(refreshDelay, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
                 .subscribe(this::deleteOverlays);
+        
+       
+        
     }
 
     protected void treatOverlayViewUpdatedEvent(Set<OverlayView> set) {
@@ -818,7 +823,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         }
         
         
-        Platform.runLater(this::checkAxis);
+      
     }
 
     @EventHandler
@@ -827,6 +832,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         if (event.getDisplay() == imageDisplay) {
             bus.channel(event);
         }
+        
+        Platform.runLater(this::checkAxis);
     }
 
     @EventHandler

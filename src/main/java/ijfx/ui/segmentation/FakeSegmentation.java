@@ -33,7 +33,7 @@ public class FakeSegmentation extends AbstractSegmentation{
    
 
     @Override
-    public void update(ImageDisplay imageDisplay) {
+    public void preview(ImageDisplay imageDisplay) {
        
     }
 

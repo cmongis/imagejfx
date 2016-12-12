@@ -42,7 +42,10 @@ class AxisConfiguration {
     private void rebuild() {
         axes = new CalibratedAxis[imageDisplay.numDimensions()];
         try {
-        imageDisplay.axes(axes);
+            for(int i = 0; i!= axes.length;i++) {
+                axes[i] = imageDisplay.axis(i).copy();
+            }
+        
         }
         catch(Exception e) {
             axes = new CalibratedAxis[0];
@@ -90,6 +93,13 @@ class AxisConfiguration {
         if (other.numAxis() != numAxis()) {
             return false;
         }
+        
+        for(int i = 0;i != numAxis();i++) {
+            CalibratedAxis axis = axes[i];
+            CalibratedAxis otherAxis = other.axes()[i];
+            if(axis.type() != otherAxis.type()) return false;
+        }
+        
         return Arrays.equals(axes, other.axes());
         }
         catch(Exception e) {

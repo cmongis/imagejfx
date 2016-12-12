@@ -151,6 +151,7 @@ public class AxisSlider extends BorderPane {
         }
         
              datasetView.setPosition(position.longValue(), axisId);
+             display.setPosition(position.longValue(),axisId);
         ImageJFX.getThreadQueue().execute(()->{
             
             datasetView.getProjector().map();

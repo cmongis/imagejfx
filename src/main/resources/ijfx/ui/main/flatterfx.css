@@ -1104,14 +1104,14 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-content-display:graphic-only;
     -fx-background-insets:0;
     -fx-effect:none;
-    -fx-translate-y:0;
+    -fx-translate-y:3px;
 }
 .image-display-pane .color-button:hover {
    -fx-opacity:1.0;
     
 }.image-display-pane .color-button:selected {
    -fx-opacity:1.0;
-   -fx-translate-y:-3px;
+   -fx-translate-y:0px;
    -fx-background-color:black;
 }
 .image-display-pane .color-button:hover:selected {
