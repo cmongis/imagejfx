@@ -27,7 +27,7 @@ import ijfx.service.workflow.Workflow;
 import ijfx.service.workflow.WorkflowBuilder;
 import ijfx.ui.datadisplay.image.ImageDisplayPositionProperty;
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.service.ImageDisplayFXService;
+import ijfx.service.ui.ImageDisplayFXService;
 import java.util.Map;
 import java.util.logging.Logger;
 import javafx.application.Platform;

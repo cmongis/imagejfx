@@ -20,7 +20,7 @@
 package ijfx.ui.datadisplay.image;
 
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.service.ControlableProperty;
+import ijfx.service.ui.ControlableProperty;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

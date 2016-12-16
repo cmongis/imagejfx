@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.service;
+package ijfx.service.ui;
 
 import java.util.function.BiConsumer;
 import javafx.application.Platform;

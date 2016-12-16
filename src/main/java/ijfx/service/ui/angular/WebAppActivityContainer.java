@@ -1,4 +1,4 @@
-package ijfx.ui.service.angular;
+package ijfx.service.ui.angular;
 import ijfx.service.ui.AppService;
 import ijfx.ui.activity.Activity;
 import javafx.application.Platform;

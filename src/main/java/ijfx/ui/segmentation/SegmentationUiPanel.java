@@ -62,7 +62,7 @@ import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
-import ijfx.ui.service.ControlableProperty;
+import ijfx.service.ui.ControlableProperty;
 import ijfx.ui.utils.ImageDisplayProperty;
 import java.io.File;
 import java.io.IOException;

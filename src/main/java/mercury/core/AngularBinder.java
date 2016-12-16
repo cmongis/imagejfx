@@ -21,7 +21,7 @@
 package mercury.core;
 
 import ijfx.ui.main.ImageJFX;
-import ijfx.ui.service.angular.TaskWatcher;
+import ijfx.service.ui.angular.TaskWatcher;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

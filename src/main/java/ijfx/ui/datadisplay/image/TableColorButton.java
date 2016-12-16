@@ -19,7 +19,7 @@
  */
 package ijfx.ui.datadisplay.image;
 
-import ijfx.ui.service.ControlableProperty;
+import ijfx.service.ui.ControlableProperty;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;

@@ -18,7 +18,7 @@
  * 	Copyright 2015,2016 Cyril MONGIS, Michael Knop
  *
  */
-package ijfx.ui.service.angular;
+package ijfx.service.ui.angular;
 
 import ijfx.ui.main.ImageJFX;
 import javafx.concurrent.Task;

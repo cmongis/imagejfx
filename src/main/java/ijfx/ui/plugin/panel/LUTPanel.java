@@ -77,7 +77,7 @@ import org.scijava.thread.ThreadService;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.context.UiContextProperty;
-import ijfx.ui.service.ImageDisplayFXService;
+import ijfx.service.ui.ImageDisplayFXService;
 import ijfx.ui.utils.ImageDisplayProperty;
 import javafx.beans.Observable;
 import mongis.utils.CallbackTask;

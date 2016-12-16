@@ -23,7 +23,7 @@ import ijfx.plugins.DefaultAxisInterval;
 import ijfx.plugins.DefaultInterval;
 import ijfx.plugins.LongInterval;
 import ijfx.service.display.DisplayRangeService;
-import ijfx.ui.service.ImageDisplayFXService;
+import ijfx.service.ui.ImageDisplayFXService;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;

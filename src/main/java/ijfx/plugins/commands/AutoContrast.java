@@ -21,7 +21,7 @@ package ijfx.plugins.commands;
 
 import ijfx.core.stats.IjfxStatisticService;
 import ijfx.service.display.DisplayRangeService;
-import ijfx.ui.service.ImageDisplayFXService;
+import ijfx.service.ui.ImageDisplayFXService;
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.display.DatasetView;

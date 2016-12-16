@@ -17,15 +17,15 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.service;
+package ijfx.service.ui;
 
 /**
  *
  * @author cyril
  */
 @FunctionalInterface
-public interface Getter<T> {
+public interface Setter<T> {
 
-    public T get();
+    public void set(T t);
     
 }

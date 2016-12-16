@@ -17,7 +17,7 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.ui.service;
+package ijfx.service.ui;
 
 import ijfx.service.IjfxService;
 import ijfx.ui.main.ImageJFX;
