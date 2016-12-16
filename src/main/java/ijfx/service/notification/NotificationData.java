@@ -17,21 +17,14 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.ui;
-
-import ijfx.service.IjfxService;
-import org.scijava.plugin.Parameter;
-import org.scijava.service.AbstractService;
+package ijfx.service.notification;
 
 /**
  *
  * @author cyril
  */
-public class UsageReportService extends AbstractService implements IjfxService{
+public interface NotificationData {
     
-    @Parameter
-    
-    
-    
+    Object[] getData();
     
 }

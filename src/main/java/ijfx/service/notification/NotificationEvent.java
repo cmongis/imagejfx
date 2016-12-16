@@ -18,7 +18,7 @@
  * 	Copyright 2015,2016 Cyril MONGIS, Michael Knop
  *
  */
-package ijfx.ui.notification;
+package ijfx.service.notification;
 
 import org.scijava.event.SciJavaEvent;
 

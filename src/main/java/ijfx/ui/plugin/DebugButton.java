@@ -26,7 +26,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.core.imagedb.ImageRecordService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
-import ijfx.ui.notification.NotificationService;
+import ijfx.service.notification.NotificationService;
 import ijfx.service.ui.AppService;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.JsonPreferenceService;

@@ -18,17 +18,15 @@
  * 	Copyright 2015,2016 Cyril MONGIS, Michael Knop
  *
  */
-package ijfx.ui.notification;
+package ijfx.service.notification;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public enum NotificationType {
+public interface NotificationAction extends Runnable{
+    public String getTitle();
     
-        DANGER,
-        SUCCESS,
-        WARNING,
-        PRIMARY
+    
     
 }

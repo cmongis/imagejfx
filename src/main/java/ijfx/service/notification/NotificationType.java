@@ -18,23 +18,17 @@
  * 	Copyright 2015,2016 Cyril MONGIS, Michael Knop
  *
  */
-package ijfx.ui.notification;
-
-import java.util.List;
-import net.imagej.ImageJService;
+package ijfx.service.notification;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public interface NotificationService extends ImageJService{
+public enum NotificationType {
     
-    
-    public void publish(Notification notification);
-    
-    public List<Notification> getAllNotification();
-    
-   
-   
+        DANGER,
+        SUCCESS,
+        WARNING,
+        PRIMARY
     
 }

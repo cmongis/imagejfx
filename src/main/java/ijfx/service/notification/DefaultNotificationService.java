@@ -18,7 +18,7 @@
  * 	Copyright 2015,2016 Cyril MONGIS, Michael Knop
  *
  */
-package ijfx.ui.notification;
+package ijfx.service.notification;
 
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.uicontext.UiContextService;
@@ -53,12 +53,12 @@ public class DefaultNotificationService extends AbstractService implements Notif
 
     final static private Logger logger = ImageJFX.getLogger();
 
-    private final String updateServerAddress = "http://update.imagejfx.net/";
+    private static final String updateServerAddress = "http://update.imagejfx.net/";
 
-    private final String EVENT_WELCOME = "welcome";
-    private final String EVENT_NEW_UPDATE = "new update";
+    private static final String EVENT_WELCOME = "welcome";
+    private static final String EVENT_NEW_UPDATE = "new update";
 
-    Socket socket;
+    private Socket socket;
 
     public static final String UPDATE_AVAILABLE_CONTEXT = "update-available";
 
@@ -103,7 +103,7 @@ public class DefaultNotificationService extends AbstractService implements Notif
         
         // subscribe to the update notification push service
         socket.emit("subscribe");
-
+        
     }
 
     private void onWelcomeMessage(Object... args) {
@@ -128,6 +128,15 @@ public class DefaultNotificationService extends AbstractService implements Notif
 
     private void notifyNewUptdate() {
         publish(new DefaultNotification("ImageJFX : new update available !", "Restart ImageJFX to download the new modifications."));
+    }
+    
+    public Socket getSocket() {
+        return socket;
+    }
+
+    @Override
+    public void notifiyServer(String reason, NotificationData data) {
+       socket.emit(reason, data.getData());
     }
 
 }

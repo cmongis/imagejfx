@@ -18,27 +18,23 @@
  * 	Copyright 2015,2016 Cyril MONGIS, Michael Knop
  *
  */
-package ijfx.ui.notification;
+package ijfx.service.notification;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
+import net.imagej.ImageJService;
 
 /**
  *
  * @author Cyril MONGIS, 2015
  */
-public interface Notification{
+public interface NotificationService extends ImageJService{
     
     
+    public void publish(Notification notification);
+    
+    public List<Notification> getAllNotification();
+    
+    public void notifiyServer(String reason, NotificationData data);
    
-   
-    
-    public String getTitle();
-    
-    public String getText();
-    
-    public BufferedImage getIcon();
-    
-    public List<NotificationAction> getActions();
     
 }

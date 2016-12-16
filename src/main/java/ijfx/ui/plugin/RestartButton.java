@@ -24,7 +24,7 @@ import ijfx.ui.UiPlugin;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
-import ijfx.ui.notification.DefaultNotificationService;
+import ijfx.service.notification.DefaultNotificationService;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
