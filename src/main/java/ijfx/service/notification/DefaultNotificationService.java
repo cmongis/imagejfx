@@ -53,10 +53,12 @@ public class DefaultNotificationService extends AbstractService implements Notif
 
     final static private Logger logger = ImageJFX.getLogger();
 
-    private static final String updateServerAddress = "http://update.imagejfx.net/";
-
+    //private static final String updateServerAddress = "http://update.imagejfx.net/";
+    private static final String updateServerAddress = "http://localhost:3000/";
     private static final String EVENT_WELCOME = "welcome";
     private static final String EVENT_NEW_UPDATE = "new update";
+    private static final String REQUEST_SUBSCRIBE = "subscribe/update";
+    private static final String REQUEST_USER_NUMBER = "subscribe/user_number";
 
     private Socket socket;
 
@@ -91,19 +93,23 @@ public class DefaultNotificationService extends AbstractService implements Notif
                     .on(EVENT_NEW_UPDATE, this::onNewUpdate)
                     .on(Socket.EVENT_DISCONNECT, this::onSocketDisconnected);
             socket.connect();
+
         } catch (URISyntaxException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }
 
-   
     private void onSocketConnected(Object... args) {
 
         logger.info("[PushServer] Connected. Subscribing...");
-        
+
         // subscribe to the update notification push service
-        socket.emit("subscribe");
+        socket.emit(REQUEST_SUBSCRIBE);
+        socket.emit(REQUEST_USER_NUMBER);
         
+        eventService.publish(new SocketConnectedEvent().setObject(socket));
+        
+
     }
 
     private void onWelcomeMessage(Object... args) {
@@ -116,8 +122,7 @@ public class DefaultNotificationService extends AbstractService implements Notif
 
     // when a new update is pushed on the server
     private void onNewUpdate(Object... args) {
-        
-        
+
         // notify the view
         notifyNewUptdate();
 
@@ -129,14 +134,14 @@ public class DefaultNotificationService extends AbstractService implements Notif
     private void notifyNewUptdate() {
         publish(new DefaultNotification("ImageJFX : new update available !", "Restart ImageJFX to download the new modifications."));
     }
-    
+
     public Socket getSocket() {
         return socket;
     }
 
     @Override
     public void notifiyServer(String reason, NotificationData data) {
-       socket.emit(reason, data.getData());
+        socket.emit(reason, data.getData());
     }
 
 }

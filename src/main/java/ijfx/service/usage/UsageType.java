@@ -23,9 +23,12 @@ package ijfx.service.usage;
  *
  * @author cyril
  */
-public interface UsageLog {
+public enum UsageType {
     
-    UsageLog setValue(Object value);
-    UsageLog send();
+    
+    SWICTH
+    ,CLICK
+    ,SET
+    
     
 }

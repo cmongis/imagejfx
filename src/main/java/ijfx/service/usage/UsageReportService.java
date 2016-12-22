@@ -20,44 +20,18 @@
 package ijfx.service.usage;
 
 import ijfx.service.IjfxService;
-import ijfx.service.notification.DefaultNotificationService;
-import org.scijava.plugin.Parameter;
-import org.scijava.service.AbstractService;
 
 /**
- *  Service used to report usage report to the server
- * 
- *  @Parameter
- *  UsageReportService usageService;
- * 
- *  usageService
- *      .createUsage(UsageType.CLICK,"Activity",UsageLocation.SIDE_PANEL)
- *      .send();
- *  
- *  usageService.
- *      .createUsage(UsageType.SWITCH,"Threshold min/max",UsageLocation.LUT_PANEL)
- *      .setValue(true)
- *      .send();
- *  usageService.
- *      createUsage(UsageType.SET,"filter",UsageLocation.EXPLORER)
- *      .setValue("well")
- *      .send();
- * 
+ *
  * @author cyril
  */
-public class UsageReportService extends AbstractService implements IjfxService{
+public interface UsageReportService extends IjfxService{
+
+    
+    public boolean hasDecided();
+    public void setDecision(Boolean accept);
     
     
-    
-    
-    
-    @Parameter
-    DefaultNotificationService notificationService;
-    
-    
-    
-    
-    
-    
+    UsageLog createUsageLog(UsageType type, String name, UsageLocation location);
     
 }

@@ -17,15 +17,16 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-package ijfx.service.usage;
+package ijfx.service.notification;
+
+import ijfx.ui.IjfxEvent;
+import io.socket.client.Socket;
+import org.scijava.event.SciJavaEvent;
 
 /**
  *
  * @author cyril
  */
-public interface UsageLog {
-    
-    UsageLog setValue(Object value);
-    UsageLog send();
+public class SocketConnectedEvent extends IjfxEvent<Socket>{
     
 }

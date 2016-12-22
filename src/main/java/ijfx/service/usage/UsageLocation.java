@@ -23,9 +23,24 @@ package ijfx.service.usage;
  *
  * @author cyril
  */
-public interface UsageLog {
+public enum UsageLocation {
     
-    UsageLog setValue(Object value);
-    UsageLog send();
+    
+    LUTPanel("LUT Panel")
+    ,SIDE_PANEL("Side panel")
+    ,EXPLORER("Explorer")
+    ,INFO("General")
+    ;
+    
+    
+    private final String name;
+    
+    private UsageLocation(String name) {
+        this.name = name;
+    }
+    
+    public String toString() {
+        return name;
+    }
     
 }
