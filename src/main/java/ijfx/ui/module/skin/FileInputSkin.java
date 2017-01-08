@@ -20,7 +20,6 @@
  */
 package ijfx.ui.module.skin;
 
-
 import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import java.io.File;
@@ -34,6 +33,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.commons.io.FilenameUtils;
 import org.scijava.plugin.Plugin;
@@ -75,8 +75,6 @@ public class FileInputSkin extends AbstractInputSkinPlugin<File> {
         return selectedFolder;
     }
 
-    
-
     @Override
     public Node getNode() {
         return hbox;
@@ -101,25 +99,36 @@ public class FileInputSkin extends AbstractInputSkinPlugin<File> {
     public void onButtonClick(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         Input moduleItem = getSkinnable().getInput();
+        String widget = moduleItem.getWidgetType();
         boolean save = moduleItem.getLabel().toLowerCase().contains("output") || moduleItem.getName().toLowerCase().contains("output")
                 || moduleItem.getName().toLowerCase().contains("save") || moduleItem.getLabel().toLowerCase().contains("save");
 
+        boolean folder = widget.contains("folder");
+
         File selected;
-        if (save) {
-            selected = chooser.showSaveDialog(null);
+
+        if (folder) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+
+            selected = dirChooser.showDialog(null);
+
         } else {
-            selected = chooser.showOpenDialog(null);
+            if (save) {
+                selected = chooser.showSaveDialog(null);
+            } else {
+                selected = chooser.showOpenDialog(null);
+            }
         }
         if (selected != null) {
             /*
             if(selected.getName().endsWith(".csv") == false) {
                 selected = new File(selected.getParentFile(),selected.getName()+".csv");
             }
-            */
+             */
             selectedFolder.setValue(selected);
         }
     }
-    
+
     public boolean canHandle(Class<?> clazz) {
         return clazz == File.class;
     }
