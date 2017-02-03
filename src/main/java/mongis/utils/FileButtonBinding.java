@@ -25,8 +25,10 @@ import java.io.File;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -64,17 +66,23 @@ public class FileButtonBinding {
     public FileButtonBinding(Button b, File defaultFile) {
         this.button = b;
 
-        button.setOnAction(this::onClick);
+        button.setOnMouseClicked(this::onClick);
 
         fileProperty.setValue(defaultFile);
         fileProperty.addListener(this::onFileChanged);
-
+        button.setTooltip(new Tooltip("Right click to reset the parameter."));
         onFileChanged(null, null, fileProperty.getValue());
         button.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.FOLDER_ALT));
     }
 
-    protected void onClick(ActionEvent event) {
+    protected void onClick(MouseEvent event) {
 
+        if(event.getButton() != MouseButton.PRIMARY) {
+            fileProperty.setValue(null);
+            return;
+        }
+        
+        
         if (openFile) {
             FileChooser chooser = new FileChooser();
             File file = chooser.showOpenDialog(null);
