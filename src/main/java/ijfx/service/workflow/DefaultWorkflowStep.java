@@ -39,7 +39,6 @@ import net.imagej.ImageJ;
 import net.imagej.axis.AxisType;
 import net.imagej.threshold.ThresholdMethod;
 import net.imglib2.display.ColorTable8;
-import org.apache.commons.lang3.ArrayUtils;
 import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandService;
 import org.scijava.module.Module;
@@ -77,9 +76,12 @@ public class DefaultWorkflowStep implements WorkflowStep {
         short.class,
         float.class,
         boolean.class,
+        long.class,
+            
         Boolean.class,
         Float.class,
         Double.class,
+        Long.class,
         Integer.class,
         String.class,
         File.class,
