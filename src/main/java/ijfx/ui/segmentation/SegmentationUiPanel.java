@@ -62,7 +62,6 @@ import ijfx.ui.explorer.Folder;
 import ijfx.ui.explorer.FolderManagerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
-import ijfx.service.ui.ControlableProperty;
 import ijfx.ui.utils.ImageDisplayProperty;
 import java.io.File;
 import java.io.IOException;
@@ -117,6 +116,9 @@ import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.DialogPrompt.Result;
+import org.scijava.ui.UIService;
 
 /**
  *
@@ -196,6 +198,10 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @Parameter
     private UiContextService uiContextSrv;
 
+    @Parameter
+    private UIService uiService;
+    
+    
     @FXML
     private Accordion accordion;
 
@@ -211,6 +217,8 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
     @FXML
     private Button segmentMoreButton;
 
+    
+    
     Img<BitType> currentMask;
 
     private final Map<TitledPane, SegmentationUiPlugin> nodeMap = new HashMap<>();
@@ -281,7 +289,10 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         imageDisplayProperty = new SimpleObjectProperty<>();
         imageJCurrentDisplay = new ImageDisplayProperty(context);
         segmentationContext = new UiContextProperty(context, UiContexts.SEGMENT);
-
+        
+        // rever the image to grascale when changing
+        segmentationContext.addListener(this::onSegmentationContextChanged);
+        
         // when the display is changed, we want to notify only the current wrapper
         imageDisplayProperty.addListener(this::onImageDisplayChanged);
 
@@ -380,10 +391,34 @@ public class SegmentationUiPanel extends BorderPane implements UiPlugin {
         }
 
     }
+   
     
     private void onSegmentationContextChanged(Observable obs, Boolean oldValue, Boolean isSegmentation) {
         
-            setGreyScale(getCurrentImageDisplay(), isSegmentation);
+        if(!isSegmentation && !isExplorer()) {
+            
+            
+            imageDisplayService
+                    .getImageDisplays()
+                    .stream()
+                    .map(imageDisplayService::getActiveDatasetView)
+                    .filter(view->view.getColorMode() == ColorMode.GRAYSCALE)
+                    .forEach(view-> {
+                        view.setColorMode(ColorMode.COLOR);
+                        view.update();
+                    });
+            
+            // checking if there is still a mask
+            BinaryMaskOverlay currentMask = overlayUtilsService.findOverlayOfType(getCurrentImageDisplay(), BinaryMaskOverlay.class);
+            if(currentMask != null) {
+                Result result = uiService.showDialog("Delete the current mask ?", DialogPrompt.MessageType.QUESTION_MESSAGE, DialogPrompt.OptionType.YES_NO_OPTION);
+                if(result == Result.YES_OPTION) {
+                    overlayService.removeOverlay(getCurrentImageDisplay(), currentMask);
+                }
+            }
+            
+        }
+        setGreyScale(getCurrentImageDisplay(), isSegmentation);
         
     }
 

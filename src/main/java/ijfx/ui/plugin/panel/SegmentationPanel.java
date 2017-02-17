@@ -58,6 +58,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -79,6 +80,7 @@ import mongis.utils.ProgressHandler;
 import mongis.utils.SilentProgressHandler;
 import mongis.utils.TaskButtonBinding;
 import net.imagej.Dataset;
+import net.imagej.display.ColorMode;
 import net.imagej.display.DefaultImageDisplay;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -192,6 +194,8 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
 
     ReadOnlyBooleanProperty isMultidimensional;
     
+    ReadOnlyBooleanProperty isSegmentationContext;
+    
     private static final Boolean USE_ALL_PLANE = Boolean.TRUE;
 
     PopOver previewPopOver = new PopOver();
@@ -216,7 +220,9 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
         workflowPanel.addStep(Binarize.class);
 
         isExplorer = new UiContextProperty(context, UiContexts.EXPLORE);
-
+        
+        isSegmentationContext = new UiContextProperty(context, UiContexts.SEGMENT);
+        isSegmentationContext.addListener(this::onSegmetationContextChanged);
         isMultidimensional = new UiContextProperty(context, "multi-n-img");
         //startButton.visibleProperty().bind(isExplorer);
         // Bindings buttons
@@ -511,5 +517,21 @@ public class SegmentationPanel extends BorderPane implements UiPlugin {
             previewPopOver.show(whiteObjectCheckbox);
         }
 
+    }
+    
+    protected void onSegmetationContextChanged(Observable obs, Boolean oldValue, Boolean newValue) {
+        if(!newValue) {
+            
+            
+            imageDisplayService
+                    .getImageDisplays()
+                    .stream()
+                    .map(imageDisplayService::getActiveDatasetView)
+                    .filter(view->view.getColorMode() == ColorMode.GRAYSCALE)
+                    .forEach(view-> {
+                        view.setColorMode(ColorMode.COLOR);
+                    });
+            
+        }
     }
 }
