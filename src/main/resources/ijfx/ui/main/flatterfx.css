@@ -1458,7 +1458,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-spacing:0;
 }
 
-.workflow-step .button, .workflow-step .menu-button {
+.workflow-step .button, .workflow-step .menu-button,.discrete-button {
     -fx-font-size:13px;
     -fx-background-color: transparent; 
     -fx-background-insets:  0 0 0 0;
@@ -1472,13 +1472,14 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-content-display: LEFT;   
 }
 
-.workflow-step .glyph-icon  {
+.workflow-step .glyph-icon ,.discrete-button {
     -fx-cursor:hand;
 
 }
 
-.workflow-step .button:hover, .workflow-step .menu-button:hover {
+.workflow-step .button:hover, .workflow-step .menu-button:hover, .discrete-button:hover {
     -fx-background-color: derive(-dark,70%);
+    -fx-effect:none;
 }
 
 
