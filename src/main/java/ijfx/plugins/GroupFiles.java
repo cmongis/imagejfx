@@ -25,7 +25,6 @@ import io.scif.services.DatasetIOService;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,6 +123,7 @@ public class GroupFiles extends ContextCommand{
         
         Dataset[] datasets = files
                 .stream()
+                .sorted((f1,f2)->f1.getName().compareTo(f2.getName()))
                 .peek(this::logLoading)
                 .map(f->{
                     try {
@@ -135,6 +135,7 @@ public class GroupFiles extends ContextCommand{
                         return null;
                     }
                  })
+                .filter(d->d!=null)
                 .toArray(s->new Dataset[s]);
         
        return new CommandRunner(context)
