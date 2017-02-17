@@ -24,20 +24,16 @@ import ijfx.ui.module.InputSkinPlugin;
 import ijfx.ui.module.input.Input;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
-import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplayService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -109,7 +105,7 @@ public class AxisTypeInputSkin extends AbstractInputSkinPlugin<AxisType> {
     @Override
     public void init(Input<AxisType> input) {
         axisTypeComboBox.getItems().addAll(getAxisList());
-        axisTypeComboBox.getSelectionModel().select(input.getDefaultValue());
-        axisTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> axisTypeProperty.setValue(newValue));
+        axisTypeComboBox.setValue(input.getValue() == null ? input.getDefaultValue() : input.getValue());
+        axisTypeComboBox.valueProperty().addListener((obs, oldValue, newValue) -> axisTypeProperty.setValue(newValue));
     }
 }
