@@ -17,42 +17,39 @@
      Copyright 2015,2016 Cyril MONGIS, Michael Knop
 	
  */
-
 package ijfx.plugins.commands;
 
-import ijfx.service.ImagePlaneService;
-import net.imagej.Dataset;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import org.scijava.ItemIO;
+import net.imagej.axis.AxisType;
 import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author Cyril MONGIS, 2016
+ * @author cyril
  */
-@Plugin(type = Command.class, menuPath = "Image > Stacks > Extract slice",headless = false)
-public class ExtractSlice extends ContextCommand{
+@Plugin(type = Command.class)
+public class Isolate extends AbstractExtractPlugin{
+
+    @Parameter(label = "Axe")
+    AxisType axisType;
     
-    @Parameter(type = ItemIO.INPUT)
-    ImageDisplay imageDisplay;
+    @Parameter(label = "Position")
+    long position;
     
-    @Parameter (type = ItemIO.OUTPUT )
-    Dataset output;
-    
-    @Parameter
-    ImagePlaneService imagePlaneService;
-    
-    @Parameter
-    ImageDisplayService imageDisplayService;
-    
-    public void run() {
-        long[] position = new long[imageDisplay.numDimensions()];
-        imageDisplay.localize(position);
-        imagePlaneService.isolatePlane(imageDisplayService.getActiveDataset(), position);
+    @Override
+    AxisType getAxis() {
+        return axisType;
+    }
+
+    @Override
+    public long getPosition() {
+       return position;
+    }
+
+    @Override
+    public void setPosition(long position) {
+        this.position = position;
     }
     
 }
