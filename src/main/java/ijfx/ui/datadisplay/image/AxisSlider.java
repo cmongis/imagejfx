@@ -19,20 +19,28 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.plugins.commands.ExtractSlice;
+import ijfx.plugins.commands.Isolate;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.ui.ControlableProperty;
+import java.util.function.Function;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import mongis.utils.FXUtilities;
+import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.event.DataViewUpdatedEvent;
-import net.imglib2.meta.Axes;
+import org.scijava.command.CommandService;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 import rx.subjects.PublishSubject;
@@ -56,6 +64,12 @@ public class AxisSlider extends BorderPane {
     
     @FXML
     Label axisPositionLabel;
+    
+    @FXML
+    MenuButton menuButton;
+    
+    @Parameter
+    CommandService commandService;
     
     @Parameter
     ImageDisplayService imageDisplayService;
@@ -88,7 +102,7 @@ public class AxisSlider extends BorderPane {
         axisNameLabel.setText(axis.type().getLabel());
         axisPositionLabel.textProperty().bind(Bindings.createStringBinding(this::getAxisPosition, slider.valueProperty()));
         
-        
+        addActions();
        
         
     }
@@ -177,6 +191,39 @@ public class AxisSlider extends BorderPane {
         if(position == null) return;
         if(event.getView() == imageDisplayService.getActiveDatasetView(display))
         position.checkFromGetter();
+    }
+    
+    
+    private void addActions() {
+        
+        addAction(this::getIsolateAxisLabel,FontAwesomeIcon.FILES_ALT,this::isolateAxis);
+        addAction(t->"Duplicate image",FontAwesomeIcon.PICTURE_ALT,this::isolateCurrentPosition);
+        
+        
+    }
+    
+    private String getIsolateAxisLabel(AxisType t) {
+        return new StringBuilder()
+                .append("Duplicate ")
+                .append(t.getLabel().contains("Z") ? "slice" : t.getLabel().toLowerCase())
+                .toString();
+        
+    }
+    
+    private void isolateAxis() {
+        commandService.run(Isolate.class, true, "axisType",this.axis.type(),"position",position.getValue().intValue());
+    }
+    
+    private void isolateCurrentPosition() {
+        commandService.run(ExtractSlice.class, true);
+    }
+    
+    private void addAction(Function<AxisType,String> labelFunction, FontAwesomeIcon icon, Runnable action) {
+        MenuItem item = new MenuItem();
+        item.textProperty().setValue(labelFunction.apply(axis.type()));
+        item.setGraphic(GlyphsDude.createIcon(icon));
+        item.setOnAction(event->action.run());
+        menuButton.getItems().add(item);
     }
     
 }
