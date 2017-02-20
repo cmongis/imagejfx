@@ -24,7 +24,6 @@ import ijfx.ui.main.ImageJFX;
 import ijfx.ui.module.input.Input;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.scijava.ItemVisibility;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
@@ -106,6 +105,9 @@ public class ModuleInputWrapper<T extends Object> implements Input{
     public void callback() {
         try {
             moduleItem.callback(module);
+            
+            
+            
         } catch (MethodCallException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
         }
