@@ -62,7 +62,7 @@ public class Projection extends ContextCommand {
     ProjectionMethod projectionMethod = new MeanProjection();
 
     @Parameter(label = "Axe to project")
-    AxisType axisType;
+    AxisType axisType = Axes.Z;
 
     @Parameter
     ImageDisplayService imageDisplayService;
@@ -78,6 +78,11 @@ public class Projection extends ContextCommand {
 
         if (axisType == null) {
             axisType = dataset.axis(2).type();
+        }
+        
+        if(axisType.isXY()) {
+            cancel("Only the axes TIME and Z are supported ");
+            return;
         }
 
         long[] dims = new long[axeArray.length];
