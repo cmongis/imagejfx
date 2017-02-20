@@ -20,36 +20,45 @@
 package ijfx.plugins.extraction;
 
 import ijfx.plugins.LongInterval;
-import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import org.scijava.command.Command;
+import org.scijava.event.EventService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  *
- * @author Cyril MONGIS
+ * @author cyril
  */
-@Plugin(type=Command.class,label = "Extract channels", menuPath = "Image > Color > Extract channels...",initializer = "init")
-public class ExtractChannels extends ExtractCommand{
+@Plugin(type = Command.class, menuPath = "Image > Axis > Extract data")
+public class Extract extends ExtractCommand{
 
-    @Parameter(label = "To extract")
+    @Parameter(label = "Axis",callback = "updateInterval")
+    AxisType axisType;
+    
+    @Parameter(label = "To keep")
     LongInterval interval;
     
-  
-    
-    public void init() {
-        interval = getDefaultInterval();
-    }
+    @Parameter
+    EventService eventService;
     
     @Override
     protected AxisType getAxisType() {
-       return Axes.CHANNEL;
+       return axisType;
+    }
+    
+    public void updateInterval() {
+        interval = null;
+        interval = getDefaultInterval();
+        
     }
 
     @Override
     public LongInterval getInterval() {
        return interval;
     }
+    
+    
+    
     
 }

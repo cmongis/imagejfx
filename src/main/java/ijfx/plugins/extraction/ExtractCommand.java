@@ -29,11 +29,10 @@ import net.imagej.DatasetService;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.sampler.AxisSubrange;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.view.Views;
 import org.scijava.ItemIO;
-import org.scijava.command.ContextCommand;
+import org.scijava.command.InteractiveCommand;
 import org.scijava.plugin.Parameter;
 
 /**
@@ -41,7 +40,7 @@ import org.scijava.plugin.Parameter;
  * @author Cyril MONGIS, 2016
  */
 
-public abstract class ExtractCommand extends ContextCommand{
+public abstract class ExtractCommand extends InteractiveCommand{
 
     
     @Parameter(type = ItemIO.INPUT)
@@ -50,9 +49,7 @@ public abstract class ExtractCommand extends ContextCommand{
     @Parameter(type = ItemIO.OUTPUT)
     Dataset output;
     
-    
-    @Parameter
-    protected LongInterval interval;
+   
     
     @Parameter
     protected ImageDisplayService imageDisplayService;
@@ -72,7 +69,7 @@ public abstract class ExtractCommand extends ContextCommand{
         
         
         SamplingDefinition def = new SamplingDefinition(input);
-
+        LongInterval interval = getInterval();
         long[] mins = new long[input.numDimensions()];
         long[] maxs = new long[input.numDimensions()];
         input.min(mins);
@@ -84,8 +81,8 @@ public abstract class ExtractCommand extends ContextCommand{
             return;
         }
         
-        mins[axisId] = interval.getLowValue();
-        maxs[axisId] = interval.getHighValue();
+        mins[axisId] = getInterval().getLowValue();
+        maxs[axisId] = getInterval().getHighValue();
         
         output = datasetService.create(Views.interval((RandomAccessibleInterval)input, mins, maxs));
         
@@ -100,8 +97,13 @@ public abstract class ExtractCommand extends ContextCommand{
     
     protected abstract AxisType getAxisType();
     
-    public void init() {    
-        if(interval == null && imageDisplayService.getActiveDataset() == input) {
+    
+    public abstract LongInterval getInterval();
+    
+    
+    
+    public LongInterval getDefaultInterval() {    
+        if(getInterval() == null && imageDisplayService.getActiveDataset() == input) {
            AxisType axis = getAxisType();
            int axisId = input.dimensionIndex(axis);
            if(axisId == -1) axisId = 2;
@@ -109,8 +111,11 @@ public abstract class ExtractCommand extends ContextCommand{
            long max = input.max(axisId);
            long low = min;
            long high = max;
-           interval = new DefaultInterval(low,high,min,max);
+           return new DefaultInterval(low,high,min,max);
        }
+        else {
+            return getInterval();
+        }
     }
     
     
