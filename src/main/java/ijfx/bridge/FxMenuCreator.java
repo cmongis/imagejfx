@@ -20,11 +20,15 @@
  */
 package ijfx.bridge;
 
+import ijfx.service.usage.Usage;
 import ijfx.ui.main.ImageJFX;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import net.mongis.usage.UsageLocation;
+import net.mongis.usage.UsageType;
 import org.scijava.Context;
 
 import org.scijava.menu.AbstractMenuCreator;
@@ -49,6 +53,14 @@ public class FxMenuCreator extends AbstractMenuCreator<MenuBar, Menu> {
     @Override
     protected void addLeafToMenu(ShadowMenu sm, Menu m) {
         MenuItem item = new MenuItem(sm.getName());
+        
+        
+        item.addEventHandler(ActionEvent.ANY, event->{
+            Usage
+                    .factory()
+                    .createUsageLog(UsageType.CLICK, sm.getName(), Usage.MENUBAR)
+                    .send();
+        });
         
         item.setOnAction(event->{
             //ImageJFX.getThreadPool().submit(sm);

@@ -22,6 +22,7 @@ package ijfx.service.notification;
 
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.uicontext.UiContextService;
+import ijfx.service.usage.Usage;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -54,7 +55,6 @@ public class DefaultNotificationService extends AbstractService implements Notif
     final static private Logger logger = ImageJFX.getLogger();
 
     //private static final String updateServerAddress = "http://update.imagejfx.net/";
-    private static final String updateServerAddress = "http://localhost:3000/";
     private static final String EVENT_WELCOME = "welcome";
     private static final String EVENT_NEW_UPDATE = "new update";
     private static final String REQUEST_SUBSCRIBE = "subscribe/update";
@@ -85,16 +85,17 @@ public class DefaultNotificationService extends AbstractService implements Notif
 
     public void initializeSocket() {
         try {
-            socket = IO.socket(updateServerAddress);
 
-            socket
-                    .on(Socket.EVENT_CONNECT, this::onSocketConnected)
-                    .on(EVENT_WELCOME, this::onWelcomeMessage)
-                    .on(EVENT_NEW_UPDATE, this::onNewUpdate)
-                    .on(Socket.EVENT_DISCONNECT, this::onSocketDisconnected);
-            socket.connect();
+            while (getSocket() == null) {
+                socket
+                        .on(Socket.EVENT_CONNECT, this::onSocketConnected)
+                        .on(EVENT_WELCOME, this::onWelcomeMessage)
+                        .on(EVENT_NEW_UPDATE, this::onNewUpdate)
+                        .on(Socket.EVENT_DISCONNECT, this::onSocketDisconnected);
+                
+            }
 
-        } catch (URISyntaxException ex) {
+        } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }
@@ -104,11 +105,10 @@ public class DefaultNotificationService extends AbstractService implements Notif
         logger.info("[PushServer] Connected. Subscribing...");
 
         // subscribe to the update notification push service
-        socket.emit(REQUEST_SUBSCRIBE);
-        socket.emit(REQUEST_USER_NUMBER);
-        
-        eventService.publish(new SocketConnectedEvent().setObject(socket));
-        
+        getSocket().emit(REQUEST_SUBSCRIBE);
+        getSocket().emit(REQUEST_USER_NUMBER);
+
+        eventService.publish(new SocketConnectedEvent().setObject(getSocket()));
 
     }
 
@@ -136,7 +136,7 @@ public class DefaultNotificationService extends AbstractService implements Notif
     }
 
     public Socket getSocket() {
-        return socket;
+        return Usage.getSocket();
     }
 
     @Override
