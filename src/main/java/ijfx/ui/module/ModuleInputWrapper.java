@@ -20,10 +20,12 @@
  */
 package ijfx.ui.module;
 
+import ijfx.service.ui.ControlableProperty;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.module.input.Input;
 import java.util.List;
 import java.util.logging.Level;
+import javafx.beans.property.Property;
 import org.scijava.ItemVisibility;
 import org.scijava.module.MethodCallException;
 import org.scijava.module.Module;
@@ -38,14 +40,44 @@ public class ModuleInputWrapper<T extends Object> implements Input{
     private final  Module module;
     private final ModuleItem<T> moduleItem;
     
+    ControlableProperty<Module, T> valueProperty;
+    
     public ModuleInputWrapper(Module module, ModuleItem moduleItem) {
         this.module = module;
         this.moduleItem = moduleItem;
+        
+        valueProperty = new ControlableProperty<Module,T>()
+                .setBean(module)
+                .setBiSetter(this::setValue)
+                .setCaller(this::getValue);
+        
     }
+    
+   
     
     @Override
     public void setValue(Object value) {
         module.setInput(getName(), value);
+    }
+    
+    private void setValue(Module module, T value) {
+        moduleItem.setValue(module, value);
+    }
+    
+    private T getValue(Module module) {
+        
+        T t =  moduleItem.getValue(module);
+        
+        T def = moduleItem.getDefaultValue();
+        
+        
+        
+        if(t == null && def != null) {
+            moduleItem.setValue(module, def);
+            t = def;
+         }
+       return t;
+ 
     }
 
     @Override
@@ -53,15 +85,7 @@ public class ModuleInputWrapper<T extends Object> implements Input{
         return module.getInput(getName());
     }
 
-    @Override
-    public Object getDefaultValue() {
-        Object defaultValue = module.getInput(moduleItem.getName());
-        if(defaultValue == null) {
-            defaultValue = moduleItem.getDefaultValue();
-        }
-        
-        return defaultValue;
-    }
+   
 
     @Override
     public List<T> getChoices() {
@@ -106,7 +130,7 @@ public class ModuleInputWrapper<T extends Object> implements Input{
         try {
             moduleItem.callback(module);
             
-            
+            valueProperty.checkFromGetter();
             
         } catch (MethodCallException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
@@ -134,5 +158,10 @@ public class ModuleInputWrapper<T extends Object> implements Input{
     @Override
     public T getMaximumValue() {
         return moduleItem.getMaximumValue();
+    }
+
+    @Override
+    public Property<T> valueProperty() {
+       return  valueProperty;
     }
 }

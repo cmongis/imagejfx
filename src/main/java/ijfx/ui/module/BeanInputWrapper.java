@@ -20,10 +20,12 @@
 package ijfx.ui.module;
 
 import com.google.common.collect.Lists;
+import ijfx.service.ui.ControlableProperty;
 import ijfx.ui.module.input.Input;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.Property;
 
 /**
  *
@@ -41,10 +43,18 @@ public class BeanInputWrapper<T> implements Input<T>{
     
     String label;
     
+    Property<T> valueProperty;
+    
+    
     public BeanInputWrapper(Object bean, Class<T> type, String name) {
         this.bean = bean;
         this.type = type;
         this.name = name;
+        
+        valueProperty  = new ControlableProperty<Object, T>()
+            .setBiSetter(this::setValue)
+            .setCaller(this::getValue);
+        
     }
    
  
@@ -60,22 +70,15 @@ public class BeanInputWrapper<T> implements Input<T>{
     @Override
     public void setValue(T value) {
         
-        try {
-            bean.getClass().getField(name).set(bean, value);
-        } catch (NoSuchFieldException ex) {
-            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        valueProperty.setValue(value);
     }
 
     @Override
     public T getValue() {
+        return valueProperty.getValue();
+    }
+    
+    private T getValue(Object bean) {
         try {
             
             Object get = bean.getClass().getField(name).get(bean);
@@ -92,11 +95,23 @@ public class BeanInputWrapper<T> implements Input<T>{
         }
         return null;
     }
-
-    @Override
-    public T getDefaultValue() {
-        return getValue();
+    
+    private void setValue(Object bean, T value) {
+        try {
+            bean.getClass().getField(name).set(bean, value);
+        } catch (NoSuchFieldException ex) {
+            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(BeanInputWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
+
+    
 
     @Override
     public List<T> getChoices() {
@@ -153,6 +168,11 @@ public class BeanInputWrapper<T> implements Input<T>{
     @Override
     public T getMaximumValue() {
         return null;
+    }
+
+    @Override
+    public Property<T> valueProperty() {
+        return valueProperty;
     }
     
 }

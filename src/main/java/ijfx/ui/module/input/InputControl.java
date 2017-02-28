@@ -29,7 +29,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import org.scijava.module.Module;
@@ -144,14 +143,7 @@ public class InputControl<T extends Object> extends Control {
         chosenValue.setValue(value);
     }
 
-    /**
-     * Get the input default value
-     * @return the input default value
-     */
-    T getDefaultValue() {
-        return input.getDefaultValue();
-        
-    }
+    
     
     /**
      * Return the label of the input control
