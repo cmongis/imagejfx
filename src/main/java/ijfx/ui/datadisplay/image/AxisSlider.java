@@ -19,12 +19,14 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import com.google.common.collect.ImmutableMap;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.plugins.commands.ExtractSlice;
 import ijfx.plugins.commands.Isolate;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.ui.ControlableProperty;
+import java.util.Map;
 import java.util.function.Function;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -198,8 +200,8 @@ public class AxisSlider extends BorderPane {
     private void addActions() {
         
         addAction(new LabelAction("Isolate this"),FontAwesomeIcon.FILES_ALT,this::isolateAxis);
-        addAction(new LabelAction("Delete before this"),FontAwesomeIcon.STEP_BACKWARD,this::deleteBeforePosition);
-        addAction(new LabelAction("Delete after this"),FontAwesomeIcon.STEP_FORWARD,this::deleteAfterPosition);
+        //addAction(new LabelAction("Delete before this"),FontAwesomeIcon.STEP_BACKWARD,this::deleteBeforePosition);
+        //addAction(new LabelAction("Delete after this"),FontAwesomeIcon.STEP_FORWARD,this::deleteAfterPosition);
         addAction(t->"Duplicate image",FontAwesomeIcon.PICTURE_ALT,this::isolateCurrentPosition);
        
         
@@ -219,16 +221,30 @@ public class AxisSlider extends BorderPane {
     
     
     private void deleteBeforePosition() {
+        long quantity = display.getLongPosition(axisId);
+        long position = 0;
         
-        commandService.run(DeleteData.class,true,"axisName",axis.type().toString(),"position",0,"quantity",display.getLongPosition(axisId));
+        Map<String,Object> params = ImmutableMap.<String,Object>builder()
+                .put("axisName",axis.type().toString())
+                .put("position",position)
+                .put("quantity",quantity)
+                .build();
+        
+        commandService.run(DeleteData.class,true,params);
         
     }
     
     private void deleteAfterPosition() {
         
         long quantity = display.dimension(axisId) - display.getLongPosition(axisId);
+        long position = display.getLongPosition(axisId);
+         Map<String,Object> params = ImmutableMap.<String,Object>builder()
+                .put("axisName",axis.type().toString())
+                .put("position",position)
+                .put("quantity",quantity)
+                .build();
         
-        commandService.run(DeleteData.class,true,"axisName",axis.type().toString(),"position",display.getLongPosition(axisId),"quantity",quantity);
+        commandService.run(DeleteData.class,true,params);
     }
     
     private void addAction(Function<AxisType,String> labelFunction, FontAwesomeIcon icon, Runnable action) {
