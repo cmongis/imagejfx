@@ -59,6 +59,7 @@ public class FxMenuCreator extends AbstractMenuCreator<MenuBar, Menu> {
             Usage
                     .factory()
                     .createUsageLog(UsageType.CLICK, sm.getName(), Usage.MENUBAR)
+                    .setValue(sm.getName())
                     .send();
         });
         
