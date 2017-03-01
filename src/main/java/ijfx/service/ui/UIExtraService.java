@@ -32,5 +32,7 @@ public interface UIExtraService extends IjfxService{
     public <T> ChoiceDialog<T> promptChoice(Class<T> clazz);
   
     
+    public RichTextDialog createRichTextDialog();
+    
     
 }
