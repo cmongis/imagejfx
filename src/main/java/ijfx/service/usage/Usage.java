@@ -25,6 +25,7 @@ import io.socket.client.Socket;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyProperty;
@@ -158,6 +159,16 @@ public class Usage {
                     .setValue(obs.toString())
                     .send();
         });
+    }
+    
+    public static <T> Consumer<? super T> createListener(String id, UsageLocation location) {
+        return t-> {
+            Usage
+                    .factory()
+                    .createUsageLog(UsageType.SET,id,location)
+                    .setValue(t)
+                    .send();             
+        };
     }
 
     public static void listenSwitch(ReadOnlyProperty<? extends Boolean> property, String id, UsageLocation location) {
