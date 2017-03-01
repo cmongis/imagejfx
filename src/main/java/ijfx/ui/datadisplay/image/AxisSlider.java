@@ -22,13 +22,17 @@ package ijfx.ui.datadisplay.image;
 import com.google.common.collect.ImmutableMap;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.plugins.commands.DeleteDataFX;
 import ijfx.plugins.commands.ExtractSlice;
 import ijfx.plugins.commands.Isolate;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.ui.ControlableProperty;
+import ijfx.service.usage.Usage;
+import java.time.Duration;
 import java.util.Map;
 import java.util.function.Function;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -42,9 +46,11 @@ import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.event.DataViewUpdatedEvent;
-import net.imagej.plugins.commands.restructure.DeleteData;
+import net.mongis.usage.UsageLocation;
+import org.reactfx.EventStreams;
 import org.scijava.command.CommandService;
 import org.scijava.event.EventHandler;
+import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import rx.subjects.PublishSubject;
 
@@ -75,9 +81,19 @@ public class AxisSlider extends BorderPane {
     CommandService commandService;
     
     @Parameter
+    ModuleService moduleService;
+    
+    @Parameter
     ImageDisplayService imageDisplayService;
     
     PublishSubject<Runnable> updateRequest = PublishSubject.create();
+    
+    ControlableProperty<ImageDisplay,Number> minProperty = new ControlableProperty()
+            .setGetter(this::getMinSlider);
+     
+    ControlableProperty<ImageDisplay,Number> maxProperty = new ControlableProperty()
+            .setGetter(this::getMaxSlider);
+    
     
     public AxisSlider(ImageDisplay display, int id) {
         
@@ -89,8 +105,13 @@ public class AxisSlider extends BorderPane {
         this.axis = display.axis(id);
         this.display = display;
         axisId = id;
-        slider.setMin(display.min(id));
-        slider.setMax(display.max(id));
+        //slider.setMin(display.min(id));
+        //slider.setMax(display.max(id));
+        
+        
+        slider.minProperty().bind(minProperty);
+        slider.maxProperty().bind(maxProperty);
+        
         slider.setValue(display.getLongPosition(id));
         slider.setMajorTickUnit(1.0);
         slider.setMinorTickCount(0);
@@ -103,10 +124,14 @@ public class AxisSlider extends BorderPane {
                 .setSetter(this::setPosition);
         slider.valueProperty().bindBidirectional(position);
         axisNameLabel.setText(axis.type().getLabel());
-        axisPositionLabel.textProperty().bind(Bindings.createStringBinding(this::getAxisPosition, slider.valueProperty()));
+        axisPositionLabel.textProperty().bind(Bindings.createStringBinding(this::getAxisPosition, slider.valueProperty(),minProperty,maxProperty));
         
         addActions();
        
+        
+        EventStreams
+                .changesOf(slider.valueProperty()).successionEnds(Duration.ofSeconds(2))
+                .subscribe(Usage.createListener("Axis "+axis.type().toString(), UsageLocation.get("AxisSlider")));
         
     }
 
@@ -120,10 +145,12 @@ public class AxisSlider extends BorderPane {
     }
 
     private Long getMinSlider() {
+        if(display == null) return new Long(0);
         return display.min(axisId);
     }
 
     private Long getMaxSlider() {
+        if(display == null) return new Long(1);
         return display.max(axisId);
     }
 
@@ -194,14 +221,17 @@ public class AxisSlider extends BorderPane {
         if(position == null) return;
         if(event.getView() == imageDisplayService.getActiveDatasetView(display))
         position.checkFromGetter();
+        minProperty.checkFromGetter();
+        maxProperty.checkFromGetter();
     }
     
     
     private void addActions() {
         
         addAction(new LabelAction("Isolate this"),FontAwesomeIcon.FILES_ALT,this::isolateAxis);
-        //addAction(new LabelAction("Delete before this"),FontAwesomeIcon.STEP_BACKWARD,this::deleteBeforePosition);
-        //addAction(new LabelAction("Delete after this"),FontAwesomeIcon.STEP_FORWARD,this::deleteAfterPosition);
+        addAction(new LabelAction("Delete before this"),FontAwesomeIcon.STEP_BACKWARD,this::deleteBeforePosition);
+        addAction(new LabelAction("Delete this"),FontAwesomeIcon.REMOVE,this::deleteThisPosition);
+        addAction(new LabelAction("Delete after this"),FontAwesomeIcon.STEP_FORWARD,this::deleteAfterPosition);
         addAction(t->"Duplicate image",FontAwesomeIcon.PICTURE_ALT,this::isolateCurrentPosition);
        
         
@@ -220,31 +250,48 @@ public class AxisSlider extends BorderPane {
     }
     
     
-    private void deleteBeforePosition() {
-        long quantity = display.getLongPosition(axisId);
-        long position = 0;
+    private void deleteThisPosition() {
+        Long position = display.getLongPosition(axisId);
         
         Map<String,Object> params = ImmutableMap.<String,Object>builder()
-                .put("axisName",axis.type().toString())
                 .put("position",position)
-                .put("quantity",quantity)
+                .put("quantity",1)
+                .put("axisType",axis.type())
                 .build();
         
-        commandService.run(DeleteData.class,true,params);
+        commandService.run(DeleteDataFX.class,true,params);
+        
+    }
+    
+    private void deleteBeforePosition() {
+        Long quantity = display.getLongPosition(axisId);
+        Long position = new Long(1);
+        
+        Map<String,Object> params = ImmutableMap.<String,Object>builder()
+                 .put("position",position)
+                .put("quantity",quantity)
+                .put("axisType",axis.type())
+                .build();
+        
+        
+        commandService.run(DeleteDataFX.class,true,params);
         
     }
     
     private void deleteAfterPosition() {
         
-        long quantity = display.dimension(axisId) - display.getLongPosition(axisId);
-        long position = display.getLongPosition(axisId);
+        Long quantity = display.dimension(axisId) - display.getLongPosition(axisId);
+        Long position = display.getLongPosition(axisId)+1;
          Map<String,Object> params = ImmutableMap.<String,Object>builder()
-                .put("axisName",axis.type().toString())
+                .put("axisType",axis.type())
                 .put("position",position)
                 .put("quantity",quantity)
                 .build();
         
-        commandService.run(DeleteData.class,true,params);
+         
+         
+         
+        commandService.run(DeleteDataFX.class,true,params);
     }
     
     private void addAction(Function<AxisType,String> labelFunction, FontAwesomeIcon icon, Runnable action) {
@@ -277,4 +324,7 @@ public class AxisSlider extends BorderPane {
         
     }
     
+     public ReadOnlyBooleanProperty usedProperty() {
+         return menuButton.showingProperty();
+     }
 }

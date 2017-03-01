@@ -61,8 +61,11 @@ import java.util.stream.Stream;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -111,6 +114,9 @@ import net.imglib2.RandomAccess;
 import net.imglib2.display.screenimage.awt.ARGBScreenImage;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
+import org.reactfx.Change;
+import org.reactfx.EventStream;
+import org.reactfx.EventStreams;
 import org.scijava.Context;
 import org.scijava.display.DisplayService;
 import org.scijava.display.event.DisplayUpdatedEvent;
@@ -155,13 +161,13 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     @FXML
     private HBox buttonHBox;
-    
+
     @FXML
     private VBox sliderVBox;
-    
+
     @FXML
     private BorderPane bottomPane;
-    
+
     @Parameter
     private OverlayDisplayService overlayDisplayService;
 
@@ -225,7 +231,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     private final DoubleProperty pixelValueProperty = new SimpleDoubleProperty();
 
     private final Property<DatasetView> viewProperty = new SimpleObjectProperty();
-    
+
     @Parameter
     LoadingScreenService loadingScreenService;
 
@@ -267,14 +273,15 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     private AxisConfiguration axisConfig;
 
-   
+    // property indicating if one menu is showing
+    private BooleanProperty menuShowing = new SimpleBooleanProperty(false);
+
     public ImageDisplayPane() throws IOException {
 
         FXUtilities.injectFXML(this);
 
         canvas = new FxImageCanvas();
-            
-        
+
         getStyleClass().add("image-display-pane");
         stackPane.getChildren().add(canvas);
 
@@ -295,20 +302,18 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         // setting the pixel value label to a binding retrieving the value of the current pixel and displaying it
         pixelValueLabel.textProperty().bind(Bindings.createStringBinding(this::getPixelValueLabelText, pixelValueProperty));
-        
+
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(widthProperty());
         clip.heightProperty().bind(heightProperty().add(-5));
-        
+
         setClip(clip);
-        
+
         new TransitionBinding<Number>()
                 .bindOnFalse(sliderVBox.heightProperty())
                 .setOnTrue(0.0)
-                .bind(bottomPane.hoverProperty(), bottomPane.translateYProperty());
-                
-       
-        
+                .bind(menuShowing.or(bottomPane.hoverProperty()), bottomPane.translateYProperty());
+
     }
 
     public ImageDisplayPane(Context context) throws IOException {
@@ -326,14 +331,11 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         new CommandRunner(context)
                 .set("imageDisplay", imageDisplay)
                 .set("dataset", imageDisplayService.getActiveDataset(display))
-                .set("channelDependant",true)
+                .set("channelDependant", true)
                 .runAsync(AutoContrast.class, null, true);
 
         viewProperty.setValue(imageDisplayService.getActiveDatasetView(display));
-        
-        
-      
-        
+
     }
 
     public DatasetView getDatasetview() {
@@ -494,26 +496,25 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         t.elapsed("canvas repainting");
     }
 
-    
-    
-    
     private void updateImageAndOverlays(Void v) {
 
         // Timer t = timerService.getTimer(this.getClass());
         repaint();
-        
+
         checkAxis();
-        
-        
+
     }
+
     private void checkAxis() {
 
-        if(imageDisplay.size() == 0) return;
-        
+        if (imageDisplay.size() == 0) {
+            return;
+        }
+
         if (imageDisplay.getName().equals(titleProperty.getName()) == false) {
             titleProperty.setValue(imageDisplay.getName());
         }
-        
+
         // t.elapsed("canvas.repaint");
         updateInfoLabel();
 
@@ -607,37 +608,32 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         Arc Menu building
     
      */
-    
-    
-    
-    
-   
-    
     public void build() {
 
-        
         logger.info("rebuilding");
         sliderVBox.getChildren().clear();
-        
-        
-        
-        
-        for(int i = 2; i!=imageDisplay.numDimensions();i++) {
-            
+
+        for (int i = 2; i != imageDisplay.numDimensions(); i++) {
+
             AxisSlider slider = new AxisSlider(imageDisplay, i);
-            
+
             sliderVBox.getChildren().add(slider);
+
+            EventStreams.valuesOf(slider.usedProperty()).subscribe(menuShowing::setValue);
             
+            //EventStreams.valuesOf(slider.usedProperty().and(menuShowing)).subscribe(System.out::println);
         }
-        
+
         createColorButtons();
-        
-        
+
+        /*
         if (arcMenu != null) {
             anchorPane.removeEventHandler(MouseEvent.MOUSE_PRESSED, myHandler);
             arcMenu = null;
 
         }
+        
+        /*
         arcMenu = new PopArcMenu();
         myHandler = (MouseEvent event) -> {
             if (event.getButton() == MouseButton.SECONDARY) {
@@ -666,6 +662,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         }
 
         arcMenu.build();
+        * 
+         */
     }
 
     /**
@@ -702,9 +700,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                 .buffer(refreshDelay, TimeUnit.MILLISECONDS)
                 .filter(list -> !list.isEmpty())
                 .subscribe(this::deleteOverlays);
-        
-       
-        
+
     }
 
     protected void treatOverlayViewUpdatedEvent(Set<OverlayView> set) {
@@ -821,9 +817,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
             }
         } catch (Exception e) {
         }
-        
-        
-      
+
     }
 
     @EventHandler
@@ -832,7 +826,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         if (event.getDisplay() == imageDisplay) {
             bus.channel(event);
         }
-        
+
         Platform.runLater(this::checkAxis);
     }
 
@@ -919,7 +913,7 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                                 long p = position[e];
                                 long max = imageDisplay.dimension(e) - 1;
                                 String axe = axes[e].type().toString();
-                                return String.format("%s : %d / %d", axe, p, max);
+                                return String.format("%s : %d / %d", axe, p + 1, max + 1);
 
                             })
                             .collect(Collectors.joining("   -  "));
@@ -1028,7 +1022,6 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         return canvas;
     }
 
-
     public AxisConfiguration getAxisConfiguration() {
         if (axisConfig == null) {
             axisConfig = new AxisConfiguration(imageDisplay);
@@ -1054,7 +1047,6 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                 .start();
 
     }
-    
 
     private Double getPixelValue(Point2D point) {
 
@@ -1068,66 +1060,53 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
         viewProperty.getValue().localize(position);
         position[0] = x;
         position[1] = y;
-        if(x < 0 || y < 0 || x > imageDisplay.max(0) || y > imageDisplay.max(1))return 0.0;
+        if (x < 0 || y < 0 || x > imageDisplay.max(0) || y > imageDisplay.max(1)) {
+            return 0.0;
+        }
         randomAccess.setPosition(position);
         double realDouble = randomAccess.get().getRealDouble();
         return realDouble;
     }
-    
-    
+
     private final static String PIXEL_INTEGER_FORMAT = "%.0f x %.0f = %.0f";
-    
+
     private final static String PIXEL_FLOAT_FORMAT = "%.0f x %.0f = %.4f";
-    
+
     private String getPixelValueLabelText() {
         double value = pixelValueProperty.doubleValue();
         Point2D position = canvas.getCursorPositionOnImage();
         String format;
-        if(new Double(value).doubleValue() == new Long(Math.round(value)).doubleValue()) {
-            format =  PIXEL_INTEGER_FORMAT;
-        }
-        else {
+        if (new Double(value).doubleValue() == new Long(Math.round(value)).doubleValue()) {
+            format = PIXEL_INTEGER_FORMAT;
+        } else {
             format = PIXEL_INTEGER_FORMAT;
         }
-        return String.format(format,position.getX(),position.getY(),value);
+        return String.format(format, position.getX(), position.getY(), value);
     }
-    
+
     private Double getSliderTranslateY() {
         return sliderVBox.getHeight();
     }
-    
-    
+
     private void createColorButtons() {
-        
-        
+
         buttonHBox.getChildren().clear();
-        
-        if(getDatasetview().getChannelCount() > 1) {
-            
-            for(int i = 1; i!= getDatasetview().getChannelCount()+1;i++) {
+
+        if (getDatasetview().getChannelCount() > 1) {
+
+            for (int i = 1; i != getDatasetview().getChannelCount() + 1; i++) {
                 TableColorButton button = new TableColorButton();
-                context.inject(button); 
-                final int channel = i-1;
+                context.inject(button);
+                final int channel = i - 1;
                 button.datasetViewProperty().bind(viewProperty);
                 button.channelProperty().set(channel);
-               
-                
-               
-                
-                
+
                 buttonHBox.getChildren().add(button);
-                
-                
-           }
-                
+
+            }
+
         }
-        
-        
-        
-        
+
     }
-    
-    
-    
-    
+
 }
