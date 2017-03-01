@@ -88,7 +88,10 @@ import mongis.utils.MemoryUtils;
 import ijfx.ui.context.animated.Animations;
 import ijfx.ui.correction.FolderSelection;
 import ijfx.ui.explorer.ExplorerActivity;
-import ijfx.service.notification.DefaultNotification;
+import ijfx.service.ui.RichTextDialog;
+import ijfx.service.ui.RichTextDialog.Answer;
+import ijfx.service.ui.UIExtraService;
+import ijfx.service.usage.Usage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -215,6 +218,9 @@ public class MainWindowController extends AnchorPane {
     @Parameter
     private PluginService pluginSrv;
 
+    @Parameter
+    private UIExtraService uiExtraService;
+
     LoadingPopup loadingPopup = new LoadingPopup(ImageJFX.PRIMARY_STAGE);
 
     Queue<Hint> hintQueue = new LinkedList<>();
@@ -227,7 +233,7 @@ public class MainWindowController extends AnchorPane {
 
     @Parameter
     StatusService statusService;
-    
+
     private Thread memoryThread = new Thread(() -> {
 
         while (true) {
@@ -282,8 +288,6 @@ public class MainWindowController extends AnchorPane {
         loadingPopup.taskProperty().bind(taskList.foregroundTaskProperty());
 
         memoryProgressBar.addEventHandler(MouseEvent.MOUSE_CLICKED, this::onMemoryProgressBarClicked);
-
-       
 
     }
 
@@ -371,8 +375,24 @@ public class MainWindowController extends AnchorPane {
         initMenuAction();
         new Timeline(new KeyFrame(Duration.millis(300), new KeyValue(sideMenu.translateXProperty(), 0.0))).play();
         logger.info("Start over");
-        
-         new GifRecorder(this).setNotifier(statusService::showStatus);
+
+        new GifRecorder(this).setNotifier(statusService::showStatus);
+
+        if (Usage.factory().hasDecided() == false) {
+
+            // asking for usage things
+            Answer answer = uiExtraService
+                    .createRichTextDialog()
+                    .setDialogTitle("Help us improving ImageJFX")
+                    .loadContent(getClass(), "/USAGE_CONDITION.md")
+                    .setContentType(RichTextDialog.ContentType.MARKDOWN)
+                    .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "I accept, I want to help")
+                    .addAnswerButton(RichTextDialog.AnswerType.CANCEL, "I decline")
+                    .showDialog();
+            
+            Usage.factory().setDecision(answer.isPositive());
+            
+        }
 
     }
 
@@ -551,7 +571,7 @@ public class MainWindowController extends AnchorPane {
 
             ns.position(Pos.TOP_RIGHT);
             ns.hideAfter(Duration.seconds(120));
-            
+
             ns.showInformation();
 
         });
