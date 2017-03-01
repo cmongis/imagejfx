@@ -40,6 +40,7 @@ import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.event.DataViewUpdatedEvent;
+import net.imagej.plugins.commands.restructure.DeleteData;
 import org.scijava.command.CommandService;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
@@ -196,19 +197,17 @@ public class AxisSlider extends BorderPane {
     
     private void addActions() {
         
-        addAction(this::getIsolateAxisLabel,FontAwesomeIcon.FILES_ALT,this::isolateAxis);
+        addAction(new LabelAction("Isolate this"),FontAwesomeIcon.FILES_ALT,this::isolateAxis);
+        addAction(new LabelAction("Delete before this"),FontAwesomeIcon.STEP_BACKWARD,this::deleteBeforePosition);
+        addAction(new LabelAction("Delete after this"),FontAwesomeIcon.STEP_FORWARD,this::deleteAfterPosition);
         addAction(t->"Duplicate image",FontAwesomeIcon.PICTURE_ALT,this::isolateCurrentPosition);
-        
+       
         
     }
     
-    private String getIsolateAxisLabel(AxisType t) {
-        return new StringBuilder()
-                .append("Duplicate ")
-                .append(t.getLabel().contains("Z") ? "slice" : t.getLabel().toLowerCase())
-                .toString();
-        
-    }
+   
+    
+   
     
     private void isolateAxis() {
         commandService.run(Isolate.class, true, "axisType",this.axis.type(),"position",position.getValue().intValue());
@@ -218,12 +217,48 @@ public class AxisSlider extends BorderPane {
         commandService.run(ExtractSlice.class, true);
     }
     
+    
+    private void deleteBeforePosition() {
+        
+        commandService.run(DeleteData.class,true,"axisName",axis.type().toString(),"position",0,"quantity",display.getLongPosition(axisId));
+        
+    }
+    
+    private void deleteAfterPosition() {
+        
+        long quantity = display.dimension(axisId) - display.getLongPosition(axisId);
+        
+        commandService.run(DeleteData.class,true,"axisName",axis.type().toString(),"position",display.getLongPosition(axisId),"quantity",quantity);
+    }
+    
     private void addAction(Function<AxisType,String> labelFunction, FontAwesomeIcon icon, Runnable action) {
         MenuItem item = new MenuItem();
         item.textProperty().setValue(labelFunction.apply(axis.type()));
         item.setGraphic(GlyphsDude.createIcon(icon));
         item.setOnAction(event->action.run());
         menuButton.getItems().add(item);
+    }
+    
+    
+     private class LabelAction implements Function<AxisType, String> {
+
+        
+        private final String action;
+        public LabelAction(String action) {
+            
+            this.action = action;
+            
+        }
+        
+        @Override
+        public String apply(AxisType t) {
+            return new StringBuilder()
+                .append(action)
+                .append(" ")
+                .append(t.getLabel().contains("Z") ? "slice" : t.getLabel().toLowerCase())
+                .toString();
+        }
+        
     }
     
 }
