@@ -30,6 +30,8 @@ import ijfx.service.notification.NotificationService;
 import ijfx.service.ui.AppService;
 import ijfx.service.ui.HintService;
 import ijfx.service.ui.JsonPreferenceService;
+import ijfx.service.ui.RichTextDialog;
+import ijfx.service.ui.UIExtraService;
 import ijfx.service.ui.hint.DefaultHint;
 import ijfx.service.uicontext.UiContextService;
 import java.io.File;
@@ -87,6 +89,9 @@ public class DebugButton extends MenuButton implements UiPlugin {
     @Parameter
     private JsonPreferenceService jsonService;
 
+    @Parameter
+            private UIExtraService uiExtraService;
+    
     Menu reloadMenu = new Menu("Reload UiPlugin");
     Menu activityMenu = new Menu("Show activity");
 
@@ -106,6 +111,7 @@ public class DebugButton extends MenuButton implements UiPlugin {
         addItem("Play Hints",this::playHints);
         addItem("Load test activity",event->activityService.openByType(FolderSelection.class));
         addItem("Other action",this::other);
+        addItem("Test Rich dialog",this::testFXDialog);
         getItems().add(reloadMenu);
         addEventHandler(MouseEvent.MOUSE_ENTERED, this::updateReloadMenu);
         System.out.println("Added");
@@ -213,5 +219,18 @@ public class DebugButton extends MenuButton implements UiPlugin {
     
     public void other(ActionEvent event) {
         activityService.getActivity(CorrectionSelector.class).onWorkflowOver(true);
+    }
+    
+    private void  testFXDialog(ActionEvent event) {
+        uiExtraService
+                .createRichTextDialog()
+                .setDialogTitle("Do you have time to read me ?")
+                .loadContent(getClass(), "/USAGE_CONDITION.md")
+                .setContentType(RichTextDialog.ContentType.MARKDOWN)
+                .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "I accept")
+                .addAnswerButton(RichTextDialog.AnswerType.CANCEL,"I decline")
+                .showDialog();
+                
+                
     }
 }
