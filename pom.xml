@@ -298,6 +298,14 @@
             <artifactId>txtmark</artifactId>
             <version>0.13</version>
         </dependency>
+        
+        
+        <dependency>
+	    <groupId>com.github.cmongis</groupId>
+	    <artifactId>in-app-analytics-java-client</artifactId>
+	    <version>v1.2</version>
+	</dependency>
+         
     </dependencies>
     
 <build>
