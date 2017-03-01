@@ -105,7 +105,7 @@ public class AxisTypeInputSkin extends AbstractInputSkinPlugin<AxisType> {
     @Override
     public void init(Input<AxisType> input) {
         axisTypeComboBox.getItems().addAll(getAxisList());
-        axisTypeComboBox.setValue(input.getValue() == null ? input.getDefaultValue() : input.getValue());
+        axisTypeComboBox.setValue(input.getValue());
         axisTypeComboBox.valueProperty().addListener((obs, oldValue, newValue) -> axisTypeProperty.setValue(newValue));
     }
 }

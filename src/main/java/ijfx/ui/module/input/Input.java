@@ -21,6 +21,7 @@
 package ijfx.ui.module.input;
 
 import java.util.List;
+import javafx.beans.property.Property;
 
 /**
  * Interface used to modify an Input
@@ -34,7 +35,7 @@ public interface Input<T> {
     
     public T getValue();
     
-    public T getDefaultValue();
+    //public T getDefaultValue();
     
     public List<T> getChoices();
     
@@ -55,5 +56,7 @@ public interface Input<T> {
     public T getMinimumValue();
     
     public T getMaximumValue();
+    
+    Property<T> valueProperty();
     
 }
