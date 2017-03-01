@@ -24,6 +24,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -40,6 +41,7 @@ import net.mongis.usage.PreferenceDecisionStorage;
 import net.mongis.usage.UsageFactory;
 import net.mongis.usage.UsageLocation;
 import net.mongis.usage.UsageType;
+import org.reactfx.EventStreams;
 
 /**
  *
@@ -160,7 +162,18 @@ public class Usage {
                     .send();
         });
     }
-    
+    /**
+     * 
+     * @param property Property to listen to
+     * @param id ID of the SET event
+     * @param location Location of the event
+     * @param seconds number of seconds with no change before the event is emmited
+     */
+    public static void listenProperty(ReadOnlyProperty<? extends Object> property, String id, UsageLocation location, int seconds) {
+         EventStreams
+                .valuesOf(property).successionEnds(Duration.ofSeconds(2))
+                .subscribe(Usage.createListener(id,location));
+    }
     public static <T> Consumer<? super T> createListener(String id, UsageLocation location) {
         return t-> {
             Usage
