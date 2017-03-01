@@ -128,10 +128,9 @@ public class AxisSlider extends BorderPane {
         
         addActions();
        
+        Usage.listenProperty(slider.valueProperty(),"Axis Slider Position", UsageLocation.get("Axis Sldier"),2);
         
-        EventStreams
-                .changesOf(slider.valueProperty()).successionEnds(Duration.ofSeconds(2))
-                .subscribe(Usage.createListener("Axis "+axis.type().toString(), UsageLocation.get("AxisSlider")));
+       
         
     }
 
