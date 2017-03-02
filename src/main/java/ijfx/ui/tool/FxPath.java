@@ -92,7 +92,8 @@ public class FxPath {
     }
 
     public static Point2D getLast(List<Point2D> pointList) {
-        return pointList.get(pointList.size() - 2);
+        int last = pointList.size() - 2;
+        return pointList.get(last > 0 ? last : 0);
     }
 
     public static Rectangle2D toRectangle(List<Point2D> pointList) {

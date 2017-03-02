@@ -61,10 +61,10 @@ import java.util.stream.Stream;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -114,8 +114,6 @@ import net.imglib2.RandomAccess;
 import net.imglib2.display.screenimage.awt.ARGBScreenImage;
 import net.imglib2.type.numeric.RealType;
 import org.apache.commons.lang.ArrayUtils;
-import org.reactfx.Change;
-import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
 import org.scijava.Context;
 import org.scijava.display.DisplayService;
@@ -274,8 +272,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     private AxisConfiguration axisConfig;
 
     // property indicating if one menu is showing
-    private BooleanProperty menuShowing = new SimpleBooleanProperty(false);
+    private BooleanProperty anyBottomMenuShowing = new SimpleBooleanProperty(false);
 
+    private BooleanBinding showBottomPanel;
+    
     public ImageDisplayPane() throws IOException {
 
         FXUtilities.injectFXML(this);
@@ -309,10 +309,15 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         setClip(clip);
 
+        
+        // creating a binding that shows the bottom panel either if the cursor is on the
+        // bottom panel or if one of the context menu of the bottom panel is showing
+        showBottomPanel = Bindings.or(anyBottomMenuShowing, bottomPane.hoverProperty());
+        
         new TransitionBinding<Number>()
                 .bindOnFalse(sliderVBox.heightProperty())
                 .setOnTrue(0.0)
-                .bind(menuShowing.or(bottomPane.hoverProperty()), bottomPane.translateYProperty());
+                .bind(showBottomPanel, bottomPane.translateYProperty());
 
     }
 
@@ -619,11 +624,13 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
             sliderVBox.getChildren().add(slider);
 
-            EventStreams.valuesOf(slider.usedProperty()).subscribe(menuShowing::setValue);
+            EventStreams.valuesOf(slider.usedProperty()).feedTo(anyBottomMenuShowing::setValue);
             
-            //EventStreams.valuesOf(slider.usedProperty().and(menuShowing)).subscribe(System.out::println);
+            
         }
 
+        EventStreams.valuesOf(anyBottomMenuShowing).feedTo(System.out::println);
+        
         createColorButtons();
 
         /*
