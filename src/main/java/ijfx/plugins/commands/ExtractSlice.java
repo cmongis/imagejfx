@@ -52,7 +52,7 @@ public class ExtractSlice extends ContextCommand{
     public void run() {
         long[] position = new long[imageDisplay.numDimensions()];
         imageDisplay.localize(position);
-        imagePlaneService.isolatePlane(imageDisplayService.getActiveDataset(), position);
+        output = imagePlaneService.isolatePlane(imageDisplayService.getActiveDataset(), position);
     }
     
 }
