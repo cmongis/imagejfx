@@ -73,6 +73,11 @@ public class TransitionBinding<T> {
         return this;
     }
     
+    public TransitionBinding<T> bindOnFalse(Binding<T> binding) {
+        onFalseValue.bind(binding);
+        return this;
+    }
+    
     public TransitionBinding<T> bindOnFalse(ReadOnlyProperty<T> onFalseProperty) {
         onFalseValue.bind(onFalseProperty);
         return this;
