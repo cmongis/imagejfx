@@ -32,6 +32,8 @@ import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.WeakChangeListener;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
@@ -78,10 +80,9 @@ public class Usage {
 
             // create a decision storage strategy based on the preference of the user
             DecisionStorage storage = new PreferenceDecisionStorage(Usage.class, "debug-5");
-            
+
             // create the factory and wrap the storage strategy into a logging wrapper
-            factory = new DefaultUsageFactory(getSocket(),new LoggingDecisionStorageWrapper(storage));
-            
+            factory = new DefaultUsageFactory(getSocket(), new LoggingDecisionStorageWrapper(storage));
 
             factory.createUsageLog(UsageType.SET, "CPU", UsageLocation.GENERAL)
                     .setValue(Runtime.getRuntime().availableProcessors())
@@ -90,8 +91,8 @@ public class Usage {
             factory.createUsageLog(UsageType.SET, "RAM", UsageLocation.GENERAL)
                     .setValue(Runtime.getRuntime().maxMemory() / 1000 / 1000)
                     .send();
-            
-            factory.createUsageLog(UsageType.SET,"DATE",UsageLocation.GENERAL)
+
+            factory.createUsageLog(UsageType.SET, "DATE", UsageLocation.GENERAL)
                     .setValue(new SimpleDateFormat("yyyy.MM.dd").format(new Date()))
                     .send();
 
@@ -99,12 +100,12 @@ public class Usage {
         return factory;
     }
 
-    
-    private static class LoggingDecisionStorageWrapper implements DecisionStorage{
+    private static class LoggingDecisionStorageWrapper implements DecisionStorage {
+
         private final DecisionStorage decisionStorer;
 
         private Logger logger = ImageJFX.getLogger();
-        
+
         public LoggingDecisionStorageWrapper(DecisionStorage decisionStorer) {
             this.decisionStorer = decisionStorer;
         }
@@ -121,18 +122,16 @@ public class Usage {
 
         @Override
         public void setDecision(boolean bln) {
-          if(bln) {
-              logger.info("The user decided to share his usage information");
-          }
-          else {
-              logger.info("the user refused to share his usage information");
-          }
-          decisionStorer.setDecision(bln);
+            if (bln) {
+                logger.info("The user decided to share his usage information");
+            } else {
+                logger.info("the user refused to share his usage information");
+            }
+            decisionStorer.setDecision(bln);
         }
-        
-        
+
     }
-    
+
     public static void listenButton(Button button, UsageLocation location, String id) {
         button.addEventHandler(ActionEvent.ANY, event -> {
 
@@ -142,14 +141,14 @@ public class Usage {
 
         });
     }
-    
+
     public static void listenButtons(Node container, UsageLocation location) {
         container
                 .lookupAll(".button")
                 .stream()
-                .map(node->(Button)node)
-                .filter(node->node.getClass().isAssignableFrom(ToggleButton.class) == false)
-                .forEach(button->{
+                .map(node -> (Button) node)
+                .filter(node -> node.getClass().isAssignableFrom(ToggleButton.class) == false)
+                .forEach(button -> {
                     listenButton(button, location, button.getText());
                 });
     }
@@ -162,25 +161,28 @@ public class Usage {
                     .send();
         });
     }
+
     /**
-     * 
+     *
      * @param property Property to listen to
      * @param id ID of the SET event
      * @param location Location of the event
-     * @param seconds number of seconds with no change before the event is emmited
+     * @param seconds number of seconds with no change before the event is
+     * emmited
      */
     public static void listenProperty(ReadOnlyProperty<? extends Object> property, String id, UsageLocation location, int seconds) {
-         EventStreams
+        EventStreams
                 .valuesOf(property).successionEnds(Duration.ofSeconds(2))
-                .subscribe(Usage.createListener(id,location));
+                .subscribe(Usage.listener(id, location));
     }
-    public static <T> Consumer<? super T> createListener(String id, UsageLocation location) {
-        return t-> {
+
+    public static <T> Consumer<? super T> listener(String id, UsageLocation location) {
+        return t -> {
             Usage
                     .factory()
-                    .createUsageLog(UsageType.SET,id,location)
+                    .createUsageLog(UsageType.SET, id, location)
                     .setValue(t)
-                    .send();             
+                    .send();
         };
     }
 
@@ -192,8 +194,6 @@ public class Usage {
                     .send();
         }));
     }
-    
-    
 
     public final static UsageLocation MENUBAR = new UsageLocation("imagej-menu-bar");
 
