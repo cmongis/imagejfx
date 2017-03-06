@@ -43,6 +43,7 @@ import ijfx.ui.tool.FxTool;
 import ijfx.ui.tool.FxToolService;
 import ijfx.ui.tool.ToolChangeEvent;
 import ijfx.ui.tool.overlay.MoveablePoint;
+import ijfx.ui.widgets.CurrentChannelAdjuster;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -166,6 +167,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     @FXML
     private BorderPane bottomPane;
 
+    @FXML
+    private BorderPane topBorderPane;
+
     @Parameter
     private OverlayDisplayService overlayDisplayService;
 
@@ -230,6 +234,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
     private final Property<DatasetView> viewProperty = new SimpleObjectProperty();
 
+    private CurrentChannelAdjuster currentChannelAdjuster;
+
     @Parameter
     LoadingScreenService loadingScreenService;
 
@@ -275,7 +281,9 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
     private BooleanProperty anyBottomMenuShowing = new SimpleBooleanProperty(false);
 
     private BooleanBinding showBottomPanel;
-    
+
+    private BooleanBinding showTopPanel;
+
     public ImageDisplayPane() throws IOException {
 
         FXUtilities.injectFXML(this);
@@ -309,15 +317,30 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         setClip(clip);
 
-        
         // creating a binding that shows the bottom panel either if the cursor is on the
         // bottom panel or if one of the context menu of the bottom panel is showing
         showBottomPanel = Bindings.or(anyBottomMenuShowing, bottomPane.hoverProperty());
-        
+
         new TransitionBinding<Number>()
                 .bindOnFalse(sliderVBox.heightProperty())
                 .setOnTrue(0.0)
                 .bind(showBottomPanel, bottomPane.translateYProperty());
+
+        // Settings the top panel that contains the LUT informations
+        currentChannelAdjuster = new CurrentChannelAdjuster();
+
+        anchorPane.getChildren().add(1, currentChannelAdjuster);
+
+        anchorPane.setTopAnchor(currentChannelAdjuster, 0d);
+        anchorPane.setLeftAnchor(currentChannelAdjuster, 0d);
+        anchorPane.setRightAnchor(currentChannelAdjuster, 0d);
+
+        showTopPanel = Bindings.or(currentChannelAdjuster.inUseProperty(), topBorderPane.hoverProperty());
+
+        new TransitionBinding<Number>()
+                .bindOnFalse(currentChannelAdjuster.heightProperty().multiply(-1.1))
+                .setOnTrue(-2)
+                .bind(showTopPanel, currentChannelAdjuster.translateYProperty());
 
     }
 
@@ -340,6 +363,8 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
                 .runAsync(AutoContrast.class, null, true);
 
         viewProperty.setValue(imageDisplayService.getActiveDatasetView(display));
+
+        currentChannelAdjuster.imageDisplayProperty().setValue(display);
 
     }
 
@@ -625,12 +650,11 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
             sliderVBox.getChildren().add(slider);
 
             EventStreams.valuesOf(slider.usedProperty()).feedTo(anyBottomMenuShowing::setValue);
-            
-            
+
         }
 
         EventStreams.valuesOf(anyBottomMenuShowing).feedTo(System.out::println);
-        
+
         createColorButtons();
 
         /*
