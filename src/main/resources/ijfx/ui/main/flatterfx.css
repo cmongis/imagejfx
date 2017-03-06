@@ -283,7 +283,7 @@
 }
 
 .toggle-group.vertical.smaller .toggle-button{
-   -fx-font-size:12px;
+    -fx-font-size:12px;
 }
 
 .toggle-group.vertical .toggle-button.first{
@@ -484,6 +484,10 @@
     -fx-padding:0.4em 1.4em 0.2em 0.4em;
 }
 
+.combo-box-base.smaller > .label, .choice-box.smaller > label {
+    -fx-padding:0.3em 1em 0.15em 0.2em;
+}
+
 .combo-box-base > .arrow-button, 
 .choice-box > .open-button {
     -fx-padding: 1em 0.5em 1em 0.5em;
@@ -506,7 +510,7 @@
     -fx-pref-width:0;
     -fx-padding:0;
     -fx-effect:0;
-    
+
     -fx-disable:0;
 }
 #open-button{
@@ -1072,12 +1076,12 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-fill: white;
     -fx-background-radius:10px;
     -fx-background-color:derive(-bg-darker,-15%);
-    
+
 }
 
 .image-display-pane #topBorderPane {
     -fx-pref-height:30px;
-    
+    -fx-background-color:derive(-bg-darker,-15%);
 }
 
 .image-display-pane #infoLabel, .image-display-pane #pixelValueLabel{
@@ -1099,7 +1103,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-border:0;
     -fx-insets:0;
     -fx-opacity:0.5;
-    
+
     -fx-background-color:transparent;
     -fx-content-display:graphic-only;
     -fx-background-insets:0;
@@ -1107,23 +1111,49 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-translate-y:3px;
 }
 .image-display-pane .color-button:hover {
-   -fx-opacity:1.0;
-    
+    -fx-opacity:1.0;
+
 }.image-display-pane .color-button:selected {
-   -fx-opacity:1.0;
-   -fx-translate-y:0px;
-   -fx-background-color:black;
+    -fx-opacity:1.0;
+    -fx-translate-y:0px;
+    -fx-background-color:black;
 }
 .image-display-pane .color-button:hover:selected {
-    
+
     -fx-opacity:0.4;
 }
 
 .image-display-pane .color-button .rectangle {
-   
+
+}
+.image-display-pane #topBorderPane {
+
+}
+.channel-adjuster{
+    -fx-background-color:derive(-bg-darker,-15%);
+    -fx-padding:10px;
+    -fx-vgap:10px;
+    -fx-hgap:10px;
+}
+
+.channel-adjuster .range-slider {
+    -fx-margin:20px;
+    -fx-insets:30px;
+}
+
+.channel-adjuster .combo-box {
+  -fx-effect:none;
+  -fx-padding:2px;
+  -fx-margin:20px;
+  -fx-background-color:transparent;
+}
+
+.channel-adjuster .text-field{
+    -fx-pref-width:70px;
+    -fx-margin-right:10px;
 }
 .axis-name-label , .axis-position-label {
-    
+
     -fx-font-size:13px;
     -fx-translate-y:-4px;
 }
@@ -1139,8 +1169,8 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 }
 .info-label {
     -fx-padding:10px;
-    
-    
+
+
 }
 
 
@@ -1246,7 +1276,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-padding:10px;
 }
 .segmentation-accordion {
-    
+
 }
 .correction-plugin {
     -fx-background-color:-bg-darker;
@@ -1506,6 +1536,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .workflow-editor {
     -fx-padding:0;
     -fx-background:white;
+    -fx-pref-width:280px;
 }
 
 .workflow-editor .content > * {
@@ -1922,7 +1953,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 
 .side-menu-button {
 
-    
+
     -fx-background-color:-dark;
     -fx-background-radius:0;
     -fx-effect:none;
@@ -1931,7 +1962,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     -fx-label-padding: 0px 0px 0px 0px;
     -fx-graphic-text-gap:20px;
     -fx-padding: 0px 0px 0px 17px;
-    
+
 }
 .side-menu-button .label {
     -fx-min-width:0px;
@@ -1948,7 +1979,7 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 .side-menu-icon {
     -fx-font-size:20px;
     -fx-background-color:red;
-    
+
 }
 
 #overlayListView .list-cell:checked, #overlayListView .list-cell:armed, #overlayListView .list-cell:hover {
@@ -2109,9 +2140,11 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
     Number filter related classes
 */ 
 
-.text-field.number {
+.text-field.number, .text-field.smaller {
     -fx-font-size:0.7em;
-    -fx-pref-width:1em;
+}
+.text-field.number {
+     -fx-pref-width:1em;
 }
 .number-filter #valueCountLabel{
     -fx-font-size:0.7em;
@@ -2194,11 +2227,11 @@ list-cell:filled:selected:focused, .list-cell:filled:selected{
 */
 Label.chart-legend-item{
     -fx-text-fill:-flatter-blue;   
-    
+
 }
 
 .area-chart {
-    
+
 }
 
 /*
@@ -2208,13 +2241,13 @@ Label.chart-legend-item{
 .channel-selector {
     -fx-spacing:20px;
     -fx-alignment:center-left;
-    
+
 }
 
 
 .simple-pane-cell:hover {
     -fx-background-color:-flatter-primary;
-   
+
 }
 .simple-pane-cell .label {
     -fx-pref-height:10px;
