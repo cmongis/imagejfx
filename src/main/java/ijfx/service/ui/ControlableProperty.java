@@ -37,17 +37,16 @@ import org.scijava.plugin.Parameter;
  * @author cyril
  */
 public class ControlableProperty<R, T> extends ObjectPropertyBase<T> {
-    
+
     private Getter<T> getter;
     private Setter<T> setter;
     private BiConsumer<R, T> doubleSetter;
     private Callback<R, T> doubleGetter;
     private final Property<R> beanProperty = new SimpleObjectProperty<R>();
-    
-    
+
     @Parameter
     private EventService eventService;
-    
+
     public ControlableProperty() {
         beanProperty().addListener(this::onBeanChanged);
     }
@@ -65,33 +64,33 @@ public class ControlableProperty<R, T> extends ObjectPropertyBase<T> {
         beanProperty.bind(property);
         return this;
     }
-    
-    
+
     public ControlableProperty<R, T> inject(Context context) {
         context.inject(this);
         return this;
     }
-    
-   
 
     @Override
     public void setValue(T t) {
         T oldValue = super.getValue();
         // avoid loop
         if (oldValue != t) {
+            
+            if(oldValue != null && oldValue.equals(t)) return;
+            
             if (doubleSetter != null) {
-                
+
                 doubleSetter.accept(beanProperty.getValue(), t);
             } else if (setter != null) {
                 setter.set(t);
             }
-           
+
         }
         super.setValue(t);
-        
+
     }
 
-    public ControlableProperty<R,T> setSilently(T t) {
+    public ControlableProperty<R, T> setSilently(T t) {
         super.setValue(t);
         return this;
     }
@@ -140,16 +139,25 @@ public class ControlableProperty<R, T> extends ObjectPropertyBase<T> {
     }
 
     @Override
-    public String getName() {  
-       return "";
+    public String getName() {
+        return "";
     }
 
-    
-    
     public void checkFromGetter() {
-        if(getValue() != super.getValue()) {
-            Platform.runLater(()->super.setValue(getValue()));
+        
+        
+        
+        T valueFromGetter = getValue();
+        T valueFromProperty = super.getValue();
+        if (valueFromProperty == null) {
+            super.setValue(valueFromGetter);
+            return;
+        } else {
+            if (valueFromGetter != valueFromProperty || valueFromProperty.equals(valueFromGetter) == false) {
+                Platform.runLater(() -> super.setValue(getValue()));
+            }
         }
+
     }
-    
+
 }
