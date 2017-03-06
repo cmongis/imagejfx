@@ -64,5 +64,7 @@ public class LUTView {
     public ColorTable getColorTable() {
         return table;
     }
+    
+    
 
 }
