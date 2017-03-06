@@ -113,6 +113,8 @@ import mongis.utils.ProgressHandler;
 import mongis.utils.TaskList2;
 import mongis.utils.TextFileUtils;
 import mongis.utils.transition.TransitionBinding;
+import net.mongis.usage.UsageLocation;
+import net.mongis.usage.UsageType;
 import org.scijava.app.StatusService;
 import org.scijava.plugin.PluginService;
 
@@ -804,10 +806,21 @@ public class MainWindowController extends AnchorPane {
         menuActivated.setValue(false);
     }
 
+    private static final UsageLocation SIDE_MENU_BAR = UsageLocation.get("Side menu bar");
+    
     private SideMenuButton addSideMenuButton(String title, FontAwesomeIcon icon, Class<? extends Activity> actClass) {
 
         SideMenuButton sideMenuButton = new SideMenuButton(title, actClass).setIcon(icon);
 
+        // adding listening of the menu bar events
+        sideMenuButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event->{
+             Usage
+                    .factory()
+                    .createUsageLog(UsageType.CLICK, title, SIDE_MENU_BAR)
+                    .send();
+        
+        });
+        
         sideMenuTopVBox.getChildren().add(sideMenuButton);
 
         return sideMenuButton;
