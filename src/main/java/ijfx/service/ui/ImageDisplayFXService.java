@@ -270,12 +270,31 @@ public class ImageDisplayFXService extends AbstractService implements IjfxServic
     }
     
      public Number getDatasetMinimum(Dataset dataset,int channel) {
+         
+        
+         
+         if(dataset.getType().getBitsPerPixel() <= 8) {
+             return 0;
+         }
+         
+         
          System.out.printf("DatasetMinMax : Minimum : %s,%d,%s\n",dataset.toString(),channel,datasetChannelMin.get(dataset,channel,MINIMUM).id().toString());
         return datasetChannelMin.get(dataset,channel,MINIMUM).orPut(dataset.getChannelMinimum(channel));
        
     }
+     
+    
     
     public Number getDatasetMaximum(Dataset dataset, int channel) {
+        
+        if(dataset.getType().getBitsPerPixel() == 1) {
+            return 1;
+        }
+        if(dataset.getType().getBitsPerPixel() == 8) {
+            return 255;
+        }
+        
+        
         System.out.printf("DatasetMinMax : Maximum : %s,%d,%s\n",dataset.toString(),channel,datasetChannelMin.get(dataset,channel,MAXIMUM).id().toString());
         return datasetChannelMin.get(dataset,channel,MAXIMUM).orPut(dataset.getChannelMaximum(channel));
     }
