@@ -78,6 +78,7 @@ import ijfx.ui.UiPlugin;
 import ijfx.ui.UiConfiguration;
 import ijfx.ui.context.UiContextProperty;
 import ijfx.service.ui.ImageDisplayFXService;
+import ijfx.service.usage.Usage;
 import ijfx.ui.utils.ImageDisplayProperty;
 import javafx.beans.Observable;
 import mongis.utils.CallbackTask;
@@ -108,6 +109,7 @@ import net.imagej.overlay.Overlay;
 import net.imagej.overlay.ThresholdOverlay;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
+import net.mongis.usage.UsageLocation;
 import org.reactfx.EventStreams;
 
 import org.scijava.module.ModuleService;
@@ -122,8 +124,8 @@ import org.scijava.util.Colors;
  * minimum and maximum displayed values, along with the LUT.
  *
  */
-@Plugin(type = UiPlugin.class)
-@UiConfiguration(id = "lutPanel", context = "imagej+visualize+image-open -overlay-selected", localization = Localization.RIGHT, order = 0)
+//@Plugin(type = UiPlugin.class)
+//@UiConfiguration(id = "lutPanel", context = "imagej+visualize+image-open -overlay-selected", localization = Localization.RIGHT, order = 0)
 public class LUTPanel extends TitledPane implements UiPlugin {
 
     LUTComboBox lutComboBox;
@@ -234,6 +236,8 @@ public class LUTPanel extends TitledPane implements UiPlugin {
 
     private RangeSliderHelper rangeHelper;
     
+    private static UsageLocation LUT_PANEL = UsageLocation.get("LUT Panel");
+    
     //protected final Property<ColorMode> colorMode = new SimpleObjectProperty(ColorMode.COLOR);
     //protected final BooleanProperty isComposite = new SimpleBooleanProperty();
     public LUTPanel() {
@@ -291,7 +295,16 @@ public class LUTPanel extends TitledPane implements UiPlugin {
             PopoverToggleButton.bind(minMaxButton, vboxp, PopOver.ArrowLocation.RIGHT_TOP);
 
             minMaxButton.addEventHandler(ActionEvent.ACTION, event -> updateHistogramAsync());
+            
+            // adding usage statistic gathering
+ 
+            Usage.listenSwitch(mergedViewToggleButton.selectedProperty(), "Merge color button", UsageLocation.get("LUT Panel"));
+            
+            Usage.listenSwitch(minMaxButton.selectedProperty(),"MIN/MAX Button",LUT_PANEL);
 
+           
+            
+            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -356,7 +369,7 @@ public class LUTPanel extends TitledPane implements UiPlugin {
         currentDisplay.addListener(this::onDisplayChanged);
 
         mergedViewToggleButton.selectedProperty().bindBidirectional(imageDisplayFxSrv.currentColorModeProperty());
-
+        
         rangeSlider.setMinorTickCount(0);
         rangeSlider.setMajorTickUnit(1.0);
         rangeSlider.setSnapToTicks(true);
