@@ -19,14 +19,15 @@
  */
 package ijfx.plugins.commands;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -70,6 +71,7 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
     @Parameter
     private DatasetService datasetService;
 
+ 
     private long[] dims;
 
     private AxisType[] axes;
@@ -107,7 +109,7 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
     @Override
     public void run() {
         
-
+        
         inputMonoChannel = input.dimensionIndex(Axes.CHANNEL) == -1;
 
         initializeOutputDataset();
@@ -170,6 +172,8 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
     protected RealLUTConverter<T> getConverter(int channel) {
         double min = input.getChannelMinimum(channel);
         double max = input.getChannelMaximum(channel);
+        
+        
         ColorTable table = input.getColorTable(channel);
         return new RealLUTConverter<>(min, max, table);
     }
@@ -267,7 +271,10 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
         int outputChannelAxisIndex = output.dimensionIndex(Axes.CHANNEL);
         T t;
         inputCursor.reset();
-        int[] rgb = new int[3];
+        byte[] rgb = new byte[3];
+        
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        
         while (inputCursor.hasNext()) {
 
             inputCursor.fwd();
@@ -294,29 +301,24 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
 
             // we separate the rgb from the argb integer
             int value = color.get();
-
-            final int red = (value >> 16) & 0xff;
-            final int green = (value >> 8) & 0xff;
-            final int blue = value & 0xff;
+            
+            buffer.putInt(0, value);
+           
+            final byte red = buffer.get(1);
+            final byte green =  buffer.get(2);
+            final byte blue = buffer.get(3);
 
             // put it in a array
             rgb[0] = red;
             rgb[1] = green;
             rgb[2] = blue;
+            
+            // now we go from 0 to 2 (rgb) of the output and additionate
+            // the r, g and blue of the channel
             for (int c = 0; c != rgb.length; c++) {
-
-                // now we go from 0 to 2 (rgb) of the output and additionate
-                // the r, g and blue of the channel
                 outputCursor.setPosition(c, outputChannelAxisIndex);
-
-                // calculate the new value of the pixel
-                double p = outputCursor.get().getRealDouble() + rgb[c];
-
-                // make sure it's not too much
-                p = p > 255 ? 255 : p;
-
                 // set the new output
-                outputCursor.get().set(new UnsignedByteType(new Double(p).intValue()));
+                outputCursor.get().add(new UnsignedByteType(rgb[c]));
             }
         }
     }

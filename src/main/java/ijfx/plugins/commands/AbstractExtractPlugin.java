@@ -39,16 +39,16 @@ public abstract class AbstractExtractPlugin extends ContextCommand{
     protected Dataset input;
     
     @Parameter(type = ItemIO.OUTPUT)
-    Dataset output;
+    protected Dataset output;
     
     @Parameter
-    DatasetSamplerService samplerService;
+    protected DatasetSamplerService samplerService;
     
     @Parameter
-    ImageDisplayService imageDisplayService;
+    protected ImageDisplayService imageDisplayService;
     
     @Parameter
-    UIService uiService;
+    protected UIService uiService;
     
     abstract AxisType getAxis();
     

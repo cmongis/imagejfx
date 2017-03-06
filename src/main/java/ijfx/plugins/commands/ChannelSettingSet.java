@@ -19,40 +19,20 @@
  */
 package ijfx.plugins.commands;
 
-import ijfx.ui.correction.ChannelSelector;
-import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
-import org.scijava.command.Command;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+import java.util.List;
 
 /**
  *
- * @author Cyril MONGIS, 2016
+ * @author cyril
  */
-@Plugin(type = Command.class, menuPath="Image > Color > Isolate channel",initializer = "init")
-public class IsolateChannel extends AbstractExtractPlugin{
-
-    @Parameter(label = "Channel to isolate",style = ChannelSelector.STYLE)
-    int position = 1;
+public interface ChannelSettingSet {
     
     
-    @Override
-    AxisType getAxis() {
-        return Axes.CHANNEL;
-    }
-
-    @Override
-    public long getPosition() {
-        return position;
-    }
-
-    @Override
-    public void setPosition(long position) {
-        this.position = (int) position;
-    }
+    public int getChannelCount();
     
+    public List<ChannelSettings> getChannelSettings();
+    public void setChannelSettings(List<ChannelSettings> settings);
     
-    
+ 
     
 }
