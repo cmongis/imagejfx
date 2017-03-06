@@ -41,11 +41,16 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import net.imglib2.display.ColorTable;
 
 /**
  *
@@ -513,4 +518,29 @@ public class FXUtilities {
         });
 
     }
+    
+    public static Image colorTableToImage(ColorTable table, int width, int height) {
+        return colorTableToImage(table, width, height,2);
+    }
+    
+    public static Image colorTableToImage(ColorTable table, int width, int height,int border) {
+        
+        
+        WritableImage image = new WritableImage(width, height);
+        
+        PixelWriter pixelWriter = image.getPixelWriter();
+        
+        int color;
+        for(int x = border; x!= width-border; x++) {
+            color = table.lookupARGB(border, width-1-(border*2), x);
+            for (int y = border; y!= height-border;y++) {
+                pixelWriter.setArgb(x, y, color);
+            }
+        }
+        
+        return image;
+        
+        
+    }
+    
 }
