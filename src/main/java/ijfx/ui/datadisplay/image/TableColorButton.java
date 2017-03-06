@@ -19,6 +19,9 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.plugins.commands.Isolate;
 import ijfx.service.ui.ControlableProperty;
 import javafx.application.Platform;
 import javafx.beans.Observable;
@@ -27,6 +30,8 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -36,7 +41,9 @@ import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import net.imglib2.display.ColorTable;
 import net.imglib2.display.ColorTable8;
+import org.scijava.command.CommandService;
 import org.scijava.event.EventHandler;
+import org.scijava.plugin.Parameter;
 
 /**
  * Button displaying the brightest color of a color table in a rectangle
@@ -53,7 +60,12 @@ public class TableColorButton extends ToggleButton{
     
     
     private ControlableProperty<DatasetView,Boolean> channelActivatedProperty;
-            
+    
+    private ContextMenu contextMenu = new ContextMenu();
+    
+    
+    @Parameter
+    CommandService commandService;
     
     public TableColorButton() {
         super();
@@ -67,9 +79,11 @@ public class TableColorButton extends ToggleButton{
         rectangle.setWidth(20);
         rectangle.setHeight(20);
         
+        
+        
         channelProperty.addListener(this::onParameterChanged);
         datasetViewProperty.addListener(this::onParameterChanged);
-     
+        
         channelActivatedProperty = new ControlableProperty<DatasetView,Boolean>()
                 .bindBeanTo(datasetViewProperty)
             .setCaller(this::isActivated)
@@ -77,6 +91,9 @@ public class TableColorButton extends ToggleButton{
         
         selectedProperty().bindBidirectional(channelActivatedProperty);
         
+        setContextMenu(contextMenu);
+        addAction("Display on this channel",FontAwesomeIcon.EYE,this::displayOnlyThis);
+        addAction("Isolate this channel",FontAwesomeIcon.COPY,this::isolateChannel);
         
     }
     
@@ -105,6 +122,9 @@ public class TableColorButton extends ToggleButton{
     
     
     private void onParameterChanged(Observable obs, Object o1, Object o2) {
+        
+        
+        
         Platform.runLater(this::updateColor);
     }
     
@@ -173,6 +193,39 @@ public class TableColorButton extends ToggleButton{
         if (datasetViewProperty.getValue() == event.getView()) {
            updateColor();
         }
+    }
+    
+    public void addAction(String text, FontAwesomeIcon icon, Runnable action) {
+        
+        MenuItem item = new MenuItem(text, GlyphsDude.createIcon(icon));
+        item.setOnAction(event->action.run());
+        contextMenu.getItems().add(item);
+    }
+    
+    public void displayOnlyThis() {
+        
+        
+        DatasetView view = datasetViewProperty.getValue();
+        int channel = channelProperty().get();
+        
+        for(int i = 0; i!= view.getChannelCount(); i++) {
+           
+            view.getProjector().setComposite(i, i == channel);
+        }
+        view.setPosition(channel, Axes.CHANNEL);
+        view.getProjector().map();
+        view.update();
+        
+    }
+    
+    public void isolateChannel() {
+        
+        
+        if(commandService == null) {
+            datasetViewProperty().getValue().context().inject(this);
+        }
+        
+        commandService.run(Isolate.class, true,"axisType",Axes.CHANNEL,"position",channelProperty().getValue());
     }
     
 }
