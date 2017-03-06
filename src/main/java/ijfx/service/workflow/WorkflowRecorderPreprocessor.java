@@ -22,14 +22,18 @@ package ijfx.service.workflow;
 
 import ijfx.service.batch.BatchService;
 import ijfx.service.history.HistoryService;
+import ijfx.service.usage.Usage;
 import ijfx.ui.main.ImageJFX;
+import java.io.File;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import org.apache.http.concurrent.Cancellable;
+import net.mongis.usage.UsageLocation;
+import net.mongis.usage.UsageType;
 import org.scijava.Context;
 import org.scijava.Priority;
 import org.scijava.command.CommandModule;
 import org.scijava.module.Module;
+import org.scijava.module.ModuleItem;
 import org.scijava.module.process.AbstractPreprocessorPlugin;
 import org.scijava.module.process.PreprocessorPlugin;
 import org.scijava.plugin.Parameter;
@@ -69,6 +73,8 @@ public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin {
                 return;
             }
         }
+        
+       
 
         DefaultWorkflowStep step = new DefaultWorkflowStep(module);
         context.inject(step);
@@ -77,11 +83,32 @@ public class WorkflowRecorderPreprocessor extends AbstractPreprocessorPlugin {
         final StringBuilder builder = new StringBuilder();
         builder.append("Recorded parameters  : ");
         module.getInputs().forEach((key, value) -> {
-            builder.append("  ").append(key).append("=").append(value);
+            builder.append("|").append(key).append("=").append(value);
         });
 
+        
+        StringBuilder safeInfos = new StringBuilder();
+        
+        for(ModuleItem item : module.getInfo().inputs()) {
+            
+            if(item.getType() != File.class) {
+                safeInfos
+                        .append(item.getName())
+                        .append("=")
+                        .append(module.getInput(item.getName()))
+                        .append("; ");
+            }
+            
+        }
+        
         logger.info(builder.toString());
 
+        if(module.getClass().getName().contains("OpenFile") == false)
+        Usage.factory()
+               .createUsageLog(UsageType.SET, module.getInfo().getTitle(), UsageLocation.get("Executed Plugin"))
+               .setValue(safeInfos.toString())
+               .send();
+        
         step.setId(workflowService.generateStepName(editService.getStepList(), step));
 
         Platform.runLater(() -> editService.getStepList().add(step));
