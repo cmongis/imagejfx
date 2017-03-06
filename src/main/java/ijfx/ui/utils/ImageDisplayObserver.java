@@ -1,25 +1,32 @@
-
 package ijfx.ui.utils;
 
-import ijfx.service.ImagePlaneService;
-import ijfx.service.display.DisplayRangeService;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
+import ijfx.service.ui.ControlableProperty;
+import ijfx.service.ui.ImageDisplayFXService;
+import ijfx.ui.main.ImageJFX;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import net.imagej.Dataset;
+import net.imagej.axis.Axes;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 import net.imagej.display.event.AxisPositionEvent;
 import net.imagej.display.event.DataViewUpdatedEvent;
-import net.imagej.ops.OpService;
-import org.apache.commons.lang.ArrayUtils;
+import net.imagej.display.event.LUTsChangedEvent;
+import net.imagej.event.DatasetUpdatedEvent;
+import net.imagej.lut.LUTService;
+import net.imglib2.display.ColorTable;
+import org.reactfx.EventStream;
+import org.reactfx.EventStreams;
 import org.scijava.Context;
-import org.scijava.display.event.DisplayUpdatedEvent;
+import org.scijava.display.DisplayService;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
 
@@ -48,229 +55,367 @@ import org.scijava.plugin.Parameter;
  * @author Cyril MONGIS, 2016
  */
 public class ImageDisplayObserver {
-    
-    
-    
-    public Property<ImageDisplay> imageDisplayProperty = new SimpleObjectProperty(this,"imageDisplay");
-    
-    public final Property<long[]> positionProperty = new SimpleObjectProperty(this,"position");
-    
-    public final Property<long[]> dimensionsProperty = new SimpleObjectProperty<>(this,"dimension");
-    
-    public final Property<ColorMode> colorModeProperty = new SimpleObjectProperty<>(this,"colorMode");
-    
-    public final Property<DatasetView> datasetViewProperty = new SimpleObjectProperty<>(this,"datasetView");
-    
-    public final Property<Integer> currentChannelProperty = new SimpleObjectProperty<>(this,"currentChanenl");
-    
-    public final DoubleProperty currentChannelMin = new SimpleDoubleProperty(this,"currentChannelMin");
-    public final DoubleProperty currentChannelMax = new SimpleDoubleProperty(this,"currentChannelMax");
-    
+
+    private ControlableProperty<ImageDisplay, DatasetView> currentDatasetView;
+
+    private ControlableProperty<DatasetView, Boolean> isComposite;
+
+    private Property<ImageDisplay> currentImageDisplay = new SimpleObjectProperty<>();
+
+    private ControlableProperty<DatasetView, Number> minLUTValue;
+
+    private ControlableProperty<DatasetView, Number> maxLUTValue;
+
+    private ControlableProperty<DatasetView, long[]> currentPosition;
+
+    private ControlableProperty<ImageDisplay, Dataset> currentDataset;
+
+    private ControlableProperty<Dataset, Number> minDatasetValue;
+
+    private ControlableProperty<Dataset, Number> maxDatasetValue;
+
+    private ControlableProperty<DatasetView, Integer> currentChannel;
+
+    private ControlableProperty<DatasetView, ColorTable> currentLUT;
+
+    private Property<Double> possibleMinLUTValue = new SimpleObjectProperty<Double>();
+
+    private Property<Double> possibleMaxLUTValue = new SimpleObjectProperty<Double>();
+
+    private static ObservableList<ColorTable> colorTableList;
+
     @Parameter
-    Context context;
-    
+    ImageDisplayService imageDisplayService;
+
     @Parameter
-    OpService opService;
-    
+    DisplayService displayService;
+
     @Parameter
-    ImagePlaneService imagePlaneService;
-    
+    ImageDisplayFXService imageDisplayFXService;
+
     @Parameter
-    DisplayRangeService displayRangeService;
-    
-    public ImageDisplayObserver() {
-        
-        
-        
-        imageDisplayProperty.addListener(this::onDisplayChanged);    
-        
-        datasetViewProperty.addListener(this::onDatasetViewChanged);
-        
-        positionProperty.addListener(this::onPositionChanged);
-        
-        currentChannelProperty.setValue(0);
-        
-        
-    }
-    
-    
-    public ImageDisplay getDisplay() {
-        return imageDisplayProperty.getValue();
+    LUTService lutService;
+
+    Property lastChanges = new SimpleObjectProperty();
+
+    EventStream<Object> modificationStream = EventStreams.valuesOf(lastChanges);
+
+    public ImageDisplayObserver(Context context) {
+
+        context.inject(this);
+
+        currentDatasetView = new ControlableProperty<ImageDisplay, DatasetView>()
+                .bindBeanTo(currentImageDisplay)
+                .setGetter(imageDisplayService::getActiveDatasetView);
+
+        isComposite = new ControlableProperty<DatasetView, Boolean>()
+                .bindBeanTo(currentDatasetView)
+                .setCaller(this::isComposite)
+                .setBiSetter(this::setComposite);
+
+        minLUTValue = new ControlableProperty<DatasetView, Number>()
+                .setBiSetter(this::setCurrentChannelMin)
+                .setCaller(this::getCurrentChannelMin)
+                .setSilently(0.0)
+                .bindBeanTo(currentDatasetView);
+
+        maxLUTValue = new ControlableProperty<DatasetView, Number>()
+                .setBiSetter(this::setCurrentChannelMax)
+                .setCaller(this::getCurrentChannelMax)
+                .setSilently(255d)
+                .bindBeanTo(currentDatasetView);
+
+        currentPosition = new ControlableProperty<DatasetView, long[]>()
+                .setCaller(this::getCurrentPosition)
+                .bindBeanTo(currentDatasetView);
+
+        currentDataset = new ControlableProperty<ImageDisplay, Dataset>()
+                .setGetter(imageDisplayService::getActiveDataset)
+                .bindBeanTo(currentImageDisplay);
+
+        currentChannel = new ControlableProperty<DatasetView, Integer>()
+                .setCaller(this::getCurrentChannel)
+                .bindBeanTo(currentDatasetView);
+
+        minDatasetValue = new ControlableProperty<Dataset, Number>()
+                .setGetter(this::getCurrentDatasetMin)
+                .bindBeanTo(currentDataset);
+
+        maxDatasetValue = new ControlableProperty<Dataset, Number>()
+                .setGetter(this::getCurrentDatasetMax)
+                .bindBeanTo(currentDataset);
+
+        currentLUT = new ControlableProperty<DatasetView, ColorTable>()
+                .setBiSetter(this::setCurrentLUT)
+                .setCaller(this::getCurrentLUT)
+                .bindBeanTo(currentDatasetView);
+
     }
 
-    
-    /*
-        JavaFX handlers
-    */
-    
-    
-    
-    private void onDisplayChanged(Observable observable, ImageDisplay oldValue, ImageDisplay display) {
-        
-        if(display != null) {
-            
-            if(context == null) {
-                display.getContext().inject(this);
-            }
-            
-            DatasetView datasetView = display.stream()
-                    .filter(view->view instanceof DatasetView)
+    public Property<Boolean> currentColorModeProperty() {
+        return isComposite;
+    }
+
+    public Property<Number> currentLUTMinProperty() {
+        return minLUTValue;
+    }
+
+    public Property<Number> currentLUTMaxProperty() {
+        return maxLUTValue;
+    }
+
+    public Property<Double> possibeMinLUTValueProperty() {
+        return possibleMinLUTValue;
+    }
+
+    public Property<Double> possibleMaxLUTValueProperty() {
+        return possibleMaxLUTValue;
+    }
+
+    public Property<Number> currentDatasetMaximumValue() {
+        return maxDatasetValue;
+    }
+
+    public Property<Number> currentDatasetMinimumValue() {
+        return minDatasetValue;
+    }
+
+    public Property<Dataset> currentDatasetProperty() {
+        return currentDataset;
+    }
+
+    public Property<ColorTable> currentLUTProperty() {
+        return currentLUT;
+    }
+
+    public Boolean isComposite(DatasetView view) {
+        return view.getColorMode() == ColorMode.COMPOSITE;
+    }
+
+    public void setComposite(DatasetView view, Boolean composite) {
+        view.setColorMode(composite ? ColorMode.COMPOSITE : ColorMode.COLOR);
+        ImageJFX.getThreadPool().submit(view::update);
+
+    }
+
+    public ColorTable getCurrentLUT() {
+        return ImageDisplayObserver.this.getCurrentLUT(currentDatasetView.getValue());
+    }
+
+    public ColorTable getCurrentLUT(DatasetView view) {
+        ColorTable table = view.getColorTables().get(getCurrentChannel());
+        if (table == null) {
+            table = currentDataset.getValue().getColorTable(getCurrentChannel());
+        }
+
+        if (availableColorTableProperty().contains(table) == false) {
+            final ColorTable initial = table;
+            ColorTable match = availableColorTableProperty()
+                    .stream()
+                    .filter(t -> compare(t, initial))
                     .findFirst()
-                    .map(view->(DatasetView)view)
-                    .orElse(null); 
-            
-            if(datasetView != null) updateLater(datasetViewProperty,datasetView);
+                    .orElse(null);
+
+            if (match == null) {
+                availableColorTableProperty().add(initial);
+
+                return initial;
+            } else {
+                return match;
+            }
         }
-        runLaterInParallel(this::updatePosition,this::updateDimension);
+
+        return table;
     }
-    
-    
-    private void onDatasetViewChanged(Observable obs, DatasetView oldVlaue, DatasetView newValue) {
-        
-        runLaterInParallel(this::updateColorMode);
-        
+
+    public void setCurrentLUT(DatasetView view, ColorTable colorTable) {
+
+        view.setColorTable(colorTable, getCurrentChannel());
+
+        //currentDataset.getValue().setColorTable(colorTable, getCurrentChannel());
+        ImageJFX.getThreadPool().execute(new ViewUpdate(view));
+        //view.getProjector().map();
+        //view.update();
     }
-    
-    
-    private void onPositionChanged(Observable obs, long[] old, long[] position) {
-        runLaterInParallel(this::updateCurrentMinMax);
-    }
-   
-    private void updatePosition() {
-        final ImageDisplay display = getDisplay();
-        if(display == null) return;
-        final long[] localization = getDisplayArray(display,display::localize);
-        if(!arrayEquals(localization, positionProperty)) {
-           updateLater(positionProperty,localization);
-        }
-       
-    }
-    
-    
-    
-    
-    private void updateDimension() {
-        ImageDisplay display = getDisplay();
-        if(display == null) return;
-        long[] dimensions = getDisplayArray(display,display::dimensions);
-        if(!arrayEquals(dimensions, dimensionsProperty)) {
-            updateLater(dimensionsProperty,dimensions);
-        }
-    }
-    
-    private void updateColorMode() {
-        
-        final ImageDisplay display = getDisplay();
-    }
-    
-    private DatasetView datasetView() {
-        return datasetViewProperty.getValue();
-    }
-    
-    private int currentChannel() {
-        if(currentChannelProperty.getValue() == null) return 0;
-        return currentChannelProperty.getValue();
-    }
-    
-    private void updateCurrentMinMax() {
-        
-        final ImageDisplay display = getDisplay();
-        if(display == null)  {
-            updateLater(currentChannelMin,0);
-            updateLater(currentChannelMax,10);
-        }
-        else {
-            
-            double min = datasetView().getChannelMin(currentChannel());
-            double max = datasetView().getChannelMax(currentChannel());
-            
-            updateLater(currentChannelMin,min);
-            updateLater(currentChannelMax,max);     
-        }
-    }
-    
-    
-    
-    
-   /*
-        SciJavaHandlers
-    */
-    
-    
+
     @EventHandler
-    public void onDisplayUpdated(DisplayUpdatedEvent event) {
-        if(event.getDisplay() == getDisplay()) {
-            runInParallel(this::updateDimension,this::updatePosition);
+    public void onDatasetViewUpdated(DataViewUpdatedEvent event) {
+        if (currentDatasetView.getValue() == event.getView()) {
+            isComposite.checkFromGetter();
+            currentChannel.checkFromGetter();
+            currentPosition.checkFromGetter();
+
+            maxLUTValue.checkFromGetter();
+            minLUTValue.checkFromGetter();
+            minDatasetValue.checkFromGetter();
+            maxDatasetValue.checkFromGetter();
+            currentLUT.checkFromGetter();
         }
     }
-    
+
     @EventHandler
-    public void onDataviewUpdatedEvent(DataViewUpdatedEvent event) {
-        if(event.getView() == datasetView()) {
-            runLaterInParallel(this::updatePosition,this::updateCurrentMinMax);
+    public void onLutChangedEvent(LUTsChangedEvent event) {
+        if (currentDatasetView.getValue() == event.getView()) {
+            isComposite.checkFromGetter();
+            currentLUT.checkFromGetter();
         }
     }
-    
+
     @EventHandler
-    public void onAxisEvent(AxisPositionEvent position) {
-        
-        runLaterInParallel(this::updatePosition);
-        
+    public void onDatasetUpdatedEvent(DatasetUpdatedEvent event) {
+        minDatasetValue.checkFromGetter();
+        maxDatasetValue.checkFromGetter();
     }
-    
-    /*
-        Utils functions
-    */
-   
-    
-     private boolean arrayEquals(long[] arrays, Property<long[]> property) {
-        return arrayEquals(arrays,property.getValue());
+
+    @EventHandler
+    public void onAxisEvent(AxisPositionEvent event) {
+        if (event.getDisplay() == currentImageDisplay.getValue()) {
+
+            minLUTValue.checkFromGetter();
+            maxLUTValue.checkFromGetter();
+            currentLUT.checkFromGetter();
+
+        }
     }
-    
-    private boolean arrayEquals(long[] arrays, long[] Arrays) {
-        if(arrays == null || Arrays == null) return false;
-        if(arrays.length != Arrays.length) return false;
-        return ArrayUtils.isEquals(arrays, Arrays);
+
+    private Integer getCurrentChannelPosition(DatasetView view) {
+        Integer position = view.getIntPosition(Axes.CHANNEL);
+        if (position == -1) {
+            return 0;
+        } else {
+            return position;
+        }
     }
-    
-    private long[] getDisplayArray(ImageDisplay display, Consumer<long[]> getter) {
-        long[] array = new long[display.numDimensions()];
-        getter.accept(array);
-        return array;
+
+    private Double getCurrentChannelMin(DatasetView view) {
+        if (view == null) {
+            return 0d;
+        }
+
+        double value = view.getChannelMin(getCurrentChannelPosition(view));
+
+        return value;
     }
-    
-    private <T> void updateLater(Property<T> property, T value) {
-        Platform.runLater(()->property.setValue(value));
+
+    private Double getCurrentChannelMax(DatasetView view) {
+        if (view == null) {
+            return 255d;
+        }
+        double value = view.getChannelMax(getCurrentChannelPosition(view));
+        return value;
     }
-    
-    
-    private void runInParallel(Runnable... runnables) {
-        Stream.of(runnables)
-                .parallel()
-                .forEach(Runnable::run);
+
+    private Number getCurrentDatasetMax() {
+        return imageDisplayFXService.getDatasetMaximum(currentDataset.getValue(), getCurrentChannel());
     }
-    
-    private void runLaterInParallel(Runnable... runnables) {
-        updateLater(()->runInParallel(runnables));
+
+    private Number getCurrentDatasetMin() {
+        return imageDisplayFXService.getDatasetMinimum(currentDataset.getValue(), getCurrentChannel());
     }
-    
-    private void updateLater(Runnable... runnable) {
-        Platform.runLater(()->{
-            Stream.of(runnable).forEach(Runnable::run);
-        });
+
+    private void setCurrentChannelMin(DatasetView view, Number min) {
+        if (view == null) {
+            return;
+        }
+        view.setChannelRange(getCurrentChannelPosition(view), min.doubleValue(), getCurrentChannelMax(view));
+        ImageJFX.getThreadPool().execute(new ViewUpdate(view));
     }
-    
-    
-    /*
-        Property
-    */
-    
-    public Property<ImageDisplay> imageDisplayProperty() {
-        return imageDisplayProperty;
+
+    private void setCurrentChannelMax(DatasetView view, Number max) {
+        if (view == null) {
+            return;
+        }
+        view.setChannelRange(getCurrentChannelPosition(view), getCurrentChannelMin(view), max.doubleValue());
+
+        ImageJFX.getThreadPool().execute(new ViewUpdate(view));
     }
-    
-    public Property<long[]> positionProperty() {
-        return positionProperty;
+
+    public Integer getCurrentChannel(DatasetView datasetView) {
+        return datasetView.getChannelCount() == 1 ? 0 : datasetView.getIntPosition(Axes.CHANNEL);
     }
-    
+
+    public Property<long[]> currentPositionProperty() {
+        return currentPosition;
+    }
+
+    private long[] lastPosition;
+
+    private long[] getCurrentPosition(DatasetView view) {
+
+        long[] position = new long[view.numDimensions()];
+        view.localize(position);
+
+        if (lastPosition == null || Arrays.equals(lastPosition, position) == false) {
+            lastPosition = position;
+        }
+
+        return lastPosition;
+    }
+
+    public int getCurrentChannel() {
+        return currentChannel.getValue();
+    }
+
+    private static final Boolean lock = Boolean.TRUE;
+
+    private class ViewUpdate implements Runnable {
+
+        final DatasetView view;
+
+        public ViewUpdate(DatasetView view) {
+            this.view = view;
+        }
+
+        public void run() {
+            synchronized (lock) {
+                view.getProjector().map();
+                view.update();
+            }
+        }
+    }
+
+    public ObservableList<ColorTable> availableColorTableProperty() {
+        if (colorTableList == null) {
+            List<ColorTable> tables = lutService
+                    .findLUTs()
+                    .values()
+                    .parallelStream()
+                    .map(this::loadLUT)
+                    .filter(lut -> lut != null)
+                    .collect(Collectors.toList());
+
+            colorTableList = FXCollections.observableArrayList();
+            colorTableList.addAll(tables);
+        }
+        return colorTableList;
+
+    }
+
+    private boolean compare(ColorTable table1, ColorTable table2) {
+
+        if (table1.getLength() != table2.getLength()) {
+            return false;
+        }
+
+        for (int i = 0; i != table1.getLength(); i++) {
+            for (int c = 0; c != 3; c++) {
+
+                if (table1.get(c, i) != table2.get(c, i)) {
+                    return false;
+                }
+
+            }
+        }
+        return true;
+
+    }
+
+    private ColorTable loadLUT(URL url) {
+        try {
+            return lutService.loadLUT(url);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
