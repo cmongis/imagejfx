@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+
+<fx:root fx:id="topSlidingBorderPane" styleClass="channel-adjuster" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <TextField fx:id="minValueTextField" styleClass="smaller" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <TextField fx:id="maxValueTextField" maxWidth="1.7976931348623157E308" styleClass="smaller" BorderPane.alignment="CENTER" />
+   </right>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <center>
+      <BorderPane BorderPane.alignment="CENTER">
+         <center>
+            <ComboBox fx:id="comboBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" BorderPane.alignment="CENTER" />
+         </center>
+         <BorderPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </BorderPane.margin>
+      </BorderPane>
+   </center>
+</fx:root>
