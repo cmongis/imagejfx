@@ -37,6 +37,8 @@ public interface Channel {
     public void setChannelName(String name);
     public ColorTable getColorTable();
     public void setColorTable(ColorTable colorTable);
+    public boolean isActive();
+    public void setActive(boolean active);
     
     public default void apply(Dataset dataset,int channel) {
         dataset.setChannelMaximum(channel, getChannelMax());

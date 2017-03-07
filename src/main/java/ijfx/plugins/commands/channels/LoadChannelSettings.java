@@ -19,10 +19,32 @@
  */
 package ijfx.plugins.commands.channels;
 
+import java.io.File;
+import net.imagej.Dataset;
+import org.scijava.ItemIO;
+import org.scijava.command.ContextCommand;
+import org.scijava.plugin.Parameter;
+
 /**
  *
  * @author cyril
  */
-public class LoadChannelSettings {
+public class LoadChannelSettings extends ContextCommand{
+    
+    @Parameter(type=ItemIO.BOTH)
+    Dataset dataset;
+    
+    
+    @Parameter(style = "open",label="open")
+    File file;
+
+    @Override
+    public void run() {
+       
+    }
+    
+    
+    
+    
     
 }

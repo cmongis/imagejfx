@@ -19,8 +19,10 @@
  */
 package ijfx.plugins.commands.channels;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -40,6 +42,8 @@ public class DefaultChannel implements Channel {
     DoubleProperty maxProperty = new SimpleDoubleProperty();
 
     ObjectProperty<ColorTable> colorTableProperty = new SimpleObjectProperty<>();
+    
+    BooleanProperty active = new SimpleBooleanProperty();
     
     @Override
     public double getChannelMin() {
@@ -81,6 +85,13 @@ public class DefaultChannel implements Channel {
         return colorTableProperty.getValue();
     }
     
+    public boolean isActive() {
+        return active.getValue();
+    }
+    
+    public void setActive(boolean active) {
+        this.active.setValue(active);
+    }
     
     
     
