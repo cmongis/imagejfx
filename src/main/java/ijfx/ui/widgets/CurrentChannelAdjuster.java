@@ -19,12 +19,16 @@
  */
 package ijfx.ui.widgets;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import ijfx.service.usage.Usage;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.utils.ImageDisplayObserver;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -32,21 +36,35 @@ import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
 import mongis.utils.FXUtilities;
 import mongis.utils.SmartNumberStringConverter;
+import mongis.utils.transition.TransitionBinding;
 import net.imagej.display.ImageDisplay;
 import net.imglib2.display.ColorTable;
+import net.mongis.usage.UsageLocation;
 import org.controlsfx.control.RangeSlider;
-import org.reactfx.EventStreams;
+import org.scijava.command.Command;
+import org.scijava.command.CommandService;
+import org.scijava.plugin.Parameter;
 
 /**
  *
@@ -63,6 +81,15 @@ public class CurrentChannelAdjuster extends BorderPane {
     @FXML
     private ComboBox<ColorTable> comboBox;
 
+    @FXML
+    private ToolBar toolbar;
+
+    @FXML
+    private Label descriptionLabel;
+
+    @FXML
+    private MenuButton moreMenuButton;
+
     private RangeSlider rangeSlider;
 
     private Property<ImageDisplay> imageDisplayProperty = new SimpleObjectProperty<>();
@@ -70,6 +97,13 @@ public class CurrentChannelAdjuster extends BorderPane {
     private ImageDisplayObserver imageDisplayObserver;
 
     private BooleanProperty inUseProperty = new SimpleBooleanProperty(false);
+
+    private final static UsageLocation CHANNEL_ADJUSTER = UsageLocation.get("Channel Adjuster");
+    
+    @Parameter
+    CommandService commandService;
+
+    private HoverDescriptionBinding descriptionBinding;
 
     public CurrentChannelAdjuster() {
 
@@ -81,6 +115,12 @@ public class CurrentChannelAdjuster extends BorderPane {
 
         imageDisplayProperty.addListener(this::onImageDisplayChanged);
 
+        descriptionBinding = new HoverDescriptionBinding(descriptionLabel.textProperty());
+
+        new TransitionBinding<Number>(0, 25)
+                .bind(descriptionBinding.isActive(), descriptionLabel.prefHeightProperty())
+                .setDuration(Duration.millis(200));
+
     }
 
     public Property<ImageDisplay> imageDisplayProperty() {
@@ -90,6 +130,7 @@ public class CurrentChannelAdjuster extends BorderPane {
     private void onImageDisplayChanged(ObservableValue obs, ImageDisplay oldValue, ImageDisplay imageDisplay) {
         if (imageDisplayObserver == null && imageDisplay != null) {
             imageDisplayObserver = new ImageDisplayObserver(imageDisplay.getContext());
+            imageDisplay.getContext().inject(this);
             // imageDisplayObserver.currentLUTProperty().addListener(this::onLUTChanged);
             rangeSlider = new RangeSlider();
             setTop(rangeSlider);
@@ -104,22 +145,40 @@ public class CurrentChannelAdjuster extends BorderPane {
         rangeSlider.lowValueProperty().bindBidirectional(imageDisplayObserver.currentLUTMinProperty());
         rangeSlider.highValueProperty().bindBidirectional(imageDisplayObserver.currentLUTMaxProperty());
 
-        // comboBox.setPromptText("Change LUT");
+        
+        Usage.listenSwitch(rangeSlider.lowValueChangingProperty(),"Chaneing Low value",CHANNEL_ADJUSTER);
+        Usage.listenSwitch(rangeSlider.highValueChangingProperty(),"Changing high value",CHANNEL_ADJUSTER);
+        
         comboBox.setCellFactory(list -> new ColorTableCell());
         comboBox.setButtonCell(new ColorTableCell());
 
-        //minValueTextField.textProperty().bind(rangeSlider.lowValueProperty().asString());
-        //maxValueTextField.textProperty().bind(rangeSlider.highValueProperty().asString());
-
         comboBox.setItems(imageDisplayObserver.availableColorTableProperty());
-        //comboBox.setValue(imageDisplayObserver.getCurrentLUT());
 
         comboBox.valueProperty().bindBidirectional(imageDisplayObserver.currentLUTProperty());
-        // choiceBox.setButtonCell(new StaticLabelCell<>("Change LUT"));
 
-        EventStreams.valuesOf(comboBox.showingProperty()).feedTo(inUseProperty);
-        EventStreams.valuesOf(hoverProperty()).feedTo(inUseProperty);
+        Usage.listenClick(this, CHANNEL_ADJUSTER,"LUT ComboBox");
+        
+        // making the list of all properties that should account for saying that the 
+        // menu is in use
+        final ReadOnlyBooleanProperty[] properties = {
+            comboBox.showingProperty(),
+            hoverProperty(),
+            moreMenuButton.showingProperty()
 
+        };
+        // creating a binding that depends of all these properties and 
+        // and bind it to the property
+        inUseProperty.bind(Bindings.createBooleanBinding(() -> {
+            return Stream
+                    .of(properties)
+                    .map(ReadOnlyBooleanProperty::getValue)
+                    .filter(v -> v)
+                    .count() > 0;
+        }, properties));
+
+        Usage.listenProperty(inUseProperty, "Use adjuster", CHANNEL_ADJUSTER);
+        
+        
         // Initializing the text field bindings
         SmartNumberStringConverter smartNumberStringConverter = new SmartNumberStringConverter();
 
@@ -232,6 +291,105 @@ public class CurrentChannelAdjuster extends BorderPane {
 
     public ReadOnlyBooleanProperty inUseProperty() {
         return inUseProperty;
+    }
+
+    public CurrentChannelAdjuster addButton(String name, FontAwesomeIcon icon, String description, EventHandler<ActionEvent> runnable) {
+
+        Button item = new Button(name, GlyphsDude.createIcon(icon));
+
+        descriptionBinding.bind(item, description);
+
+        item.setOnAction(runnable);
+
+        toolbar.getItems().add(item);
+
+        Usage.listenButton(item, CHANNEL_ADJUSTER, name);
+        
+        
+        
+        return this;
+    }
+
+    public CurrentChannelAdjuster addButton(String name, FontAwesomeIcon icon, String description, Class<? extends Command> module, Object... parameters) {
+
+        return addButton(name, icon, description, event -> {
+            commandService.run(module, true, parameters);
+        });
+    }
+
+    public CurrentChannelAdjuster addAction(String name, FontAwesomeIcon icon, String description, Class<? extends Command> module, Object... parameters) {
+
+        // initializing the menu item
+        final MenuItem item = new MenuItem(name, GlyphsDude.createIcon(icon));
+
+        //final HoverListener hoverListener = new HoverListener(item);
+        
+        // binding the description of the item to the description displayer
+        //descriptionBinding.bind(hoverListener, description);
+        item.setOnAction(event -> {
+            commandService.run(module, true, parameters);
+        });
+        
+        // adidng usage gathering
+        Usage.listenClick(item, CHANNEL_ADJUSTER);
+       
+        
+        moreMenuButton.getItems().add(item);
+        
+        return this;
+    }
+
+    // Helper class that indicate when the mouse hovers an menu item
+    private class HoverListener extends SimpleBooleanProperty {
+        public HoverListener(MenuItem item) {
+            super(false);
+            //item.addEventHandler(MouseEvent., this::onMouseEntered);
+            //item.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, this::onMouseExited);
+        }
+
+        private void onMouseEntered(MouseEvent event) {
+            setValue(true);
+        }
+
+        private void onMouseExited(MouseEvent event) {
+            setValue(false);
+        }
+
+    }
+
+    private class HoverDescriptionBinding {
+
+        final private StringProperty target;
+
+        final private BooleanProperty isActive = new SimpleBooleanProperty();
+
+        public HoverDescriptionBinding(StringProperty target) {
+            this.target = target;
+        }
+
+        public HoverDescriptionBinding bind(Node node, String text) {
+
+            return bind(node.hoverProperty(), text);
+        }
+
+        public HoverDescriptionBinding bind(ReadOnlyBooleanProperty booleanProperty, String text) {
+
+            booleanProperty.addListener(
+                    (obs, oldValue, newValue) -> {
+                        if (newValue) {
+                            target.setValue(text);
+                            isActive.setValue(true);
+                        } else {
+                            target.setValue(null);
+                            isActive.setValue(false);
+                        }
+                    });
+            return this;
+        }
+
+        public ReadOnlyBooleanProperty isActive() {
+            return isActive;
+        }
     }
 
 }
