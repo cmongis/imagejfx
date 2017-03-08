@@ -72,6 +72,7 @@ public class DefaultChannelSettings implements ChannelSettings {
             settings.setChannelMin(min);
             settings.setChannelMax(max);
             settings.setColorTable(table);
+            settings.setActive(true);
 
             channelSettings.add(settings);
         }
@@ -93,6 +94,7 @@ public class DefaultChannelSettings implements ChannelSettings {
             settings.setChannelMin(min);
             settings.setChannelMax(max);
             settings.setColorTable(table);
+            settings.setActive(view.getProjector().isComposite(i));
             channelSettings.add(settings);
         }
         return this;
