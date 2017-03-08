@@ -19,11 +19,11 @@
  */
 package ijfx.plugins.commands;
 
-import ijfx.service.display.DisplayRangeService;
+import ijfx.plugins.commands.channels.ChannelSettings;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.lut.LUTService;
-import net.imglib2.display.ColorTable;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -40,14 +40,14 @@ public class SpreadChannelSettings extends ContextCommand{
     @Parameter(type=ItemIO.BOTH)
     ImageDisplay imageDisplay;
     
+    
+    
+    
     @Parameter
     ImageDisplayService imageDisplayService;
     
     @Parameter
-    DisplayRangeService displayRangeService;
-    
-    @Parameter(label="Spread also the LUT")
-    boolean spreadLUT = false;
+    ChannelSettings channelSettings;
     
     @Parameter
     LUTService lutService;
@@ -55,33 +55,18 @@ public class SpreadChannelSettings extends ContextCommand{
     @Override
     public void run() {
         
-        int numChannel = (int) AxisUtils.getChannelNumber(imageDisplayService.getActiveDataset(imageDisplay));
-        if(displayRangeService == null) displayRangeService = getContext().getService(DisplayRangeService.class);
-        for(int i = 0; i!= numChannel;i++) {
-            
-            final double min = displayRangeService.getChannelMinimum(imageDisplay, i);
-            final double max = displayRangeService.getChannelMaximum(imageDisplay, i);
-            final int channel = i;
-           imageDisplayService
-                   .getImageDisplays()
-                   .stream()
-                   .parallel()
-                   .forEach(display->{
-                       
-                       
-                       
-                       if(channel+1 > AxisUtils.getChannelNumber(imageDisplayService.getActiveDataset(display))) return;
-                       
-                       if(spreadLUT) {
-                           ColorTable table = imageDisplayService.getActiveDatasetView(imageDisplay).getColorTables().get(channel);
-                            //imageDisplayService.getActiveDatasetView(display).setColorTable(table, channel);
-                            //imageDisplayService.getActiveDataset(display).setColorTable(table, channel);
-                             lutService.applyLUT(table, display);
-                       }
-                       
-                       imageDisplayService.getActiveDatasetView(display).setChannelRange(channel, min, max);
-                       imageDisplayService.getActiveDatasetView(display).update();
-           });
-        }
+        imageDisplayService
+                .getImageDisplays()
+                .stream()
+                .map(imageDisplayService::getActiveDatasetView)
+                .parallel()
+                .forEach(this::apply);
+        
+    }
+    
+    private void apply(DatasetView view) {
+        channelSettings.apply(view);
+        view.getProjector().map();
+        view.update();
     }
 }

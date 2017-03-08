@@ -19,6 +19,7 @@
  */
 package ijfx.plugins.commands;
 
+import ijfx.plugins.commands.channels.ChannelSettings;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,6 @@ import net.imagej.DatasetService;
 import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
-import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplayService;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -71,7 +71,9 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
     @Parameter
     private DatasetService datasetService;
 
- 
+    @Parameter(required = false)
+    private ChannelSettings channelSettings;
+    
     private long[] dims;
 
     private AxisType[] axes;
@@ -109,13 +111,13 @@ public class ChannelMerger<T extends RealType<T>> extends ContextCommand {
     @Override
     public void run() {
         
+        ChannelSettings.applyTo(channelSettings, input);
         
         inputMonoChannel = input.dimensionIndex(Axes.CHANNEL) == -1;
 
         initializeOutputDataset();
         initializeConverter();
         if (inputMonoChannel) {
-
             processMonoChannelInput();
         }
         else processMultiChannelInput();

@@ -19,10 +19,14 @@
  */
 package ijfx.plugins.commands;
 
-import ijfx.ui.correction.ChannelSelector;
+import ijfx.service.ui.CommandRunner;
+import net.imagej.Dataset;
 import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
+import net.imagej.display.ImageDisplayService;
+import org.scijava.Context;
+import org.scijava.ItemIO;
 import org.scijava.command.Command;
+import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -30,29 +34,47 @@ import org.scijava.plugin.Plugin;
  *
  * @author Cyril MONGIS, 2016
  */
-@Plugin(type = Command.class, menuPath="Image > Color > Isolate channel",initializer = "init")
-public class IsolateChannel extends AbstractExtractPlugin{
+@Plugin(type = Command.class, menuPath = "Image > Color > Isolate channel", initializer = "findCurrentChannel")
+public class IsolateChannel extends ContextCommand {
 
-    @Parameter(label = "Channel to isolate",style = ChannelSelector.STYLE)
-    int position = 1;
-    
-    
+    @Parameter
+    Context context;
+
+    @Parameter(type = ItemIO.INPUT)
+    Dataset input;
+
+    @Parameter(type = ItemIO.OUTPUT)
+    Dataset output;
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
+
+    @Parameter(label = "Channel to isolate")
+    int channel = -1;
+
     @Override
-    AxisType getAxis() {
-        return Axes.CHANNEL;
+    public void run() {
+
+        if (input.axis(Axes.CHANNEL).isPresent() == false) {
+            cancel("the input image is not multichannel.");
+            return;
+        }
+
+        output = new CommandRunner(context)
+                .set("input", input)
+                .set("position", channel)
+                .set("axisType", Axes.CHANNEL)
+                .runSync(Isolate.class)
+                .getOutput("output");
+
     }
 
-    @Override
-    public long getPosition() {
-        return position;
+    public void findCurrentChannel() {
+
+        if (channel == -1 && imageDisplayService.getActiveDataset() == input) {
+            channel = imageDisplayService.getActiveDatasetView().getIntPosition(Axes.CHANNEL);
+        }
+        channel = channel == -1 ? 0 : channel;
     }
 
-    @Override
-    public void setPosition(long position) {
-        this.position = (int) position;
-    }
-    
-    
-    
-    
 }

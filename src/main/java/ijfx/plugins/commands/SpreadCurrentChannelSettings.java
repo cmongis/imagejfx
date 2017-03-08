@@ -19,77 +19,75 @@
  */
 package ijfx.plugins.commands;
 
+import ijfx.plugins.commands.channels.Channel;
+import ijfx.plugins.commands.channels.ChannelSettings;
 import ijfx.service.display.DisplayRangeService;
 import net.imagej.axis.Axes;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.lut.LUTService;
-import net.imglib2.display.ColorTable;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.UIService;
 
 /**
  *
  * @author Cyril MONGIS, 2016
  */
-@Plugin(type = Command.class,menuPath = "Image > Color > Spread current channel settings")
-public class SpreadCurrentChannelSettings extends ContextCommand{
+@Plugin(type = Command.class, menuPath = "Image > Color > Spread current channel settings")
+public class SpreadCurrentChannelSettings extends ContextCommand {
 
-    @Parameter(type=ItemIO.BOTH)
+    @Parameter(type = ItemIO.BOTH)
     ImageDisplay imageDisplay;
-    
+
     @Parameter
     ImageDisplayService imageDisplayService;
-    
+
     @Parameter
     DisplayRangeService displayRangeService;
-    
-    @Parameter(label = "Spread also LUT")
-    boolean spreadLUT = false;
-    
+
     @Parameter
-    LUTService lutService;
-    
+    ChannelSettings channelSettings;
+
+    @Parameter
+    UIService uiService;
+
+    private int currentChannel;
+
     @Override
     public void run() {
-        
-        int currentChannel = getCurrentChannel(imageDisplay);
-        
-        final double min = displayRangeService.getChannelMinimum(imageDisplay, currentChannel);
-        final double max = displayRangeService.getChannelMaximum(imageDisplay, currentChannel);
-        
-        imageDisplayService
-                   .getImageDisplays()
-                   .stream()
-                   .parallel()
-                   .forEach(display->{
-                       
-                       if(display == imageDisplay) return;
-                       int channel = getCurrentChannel(display);
 
-                       if(spreadLUT) {
-                           ColorTable table = imageDisplayService.getActiveDatasetView(imageDisplay).getColorTables().get(channel);
-                            //imageDisplayService.getActiveDatasetView(display).setColorTable(table, channel);
-                            //imageDisplayService.getActiveDataset(display).setColorTable(table, channel);
-                             lutService.applyLUT(table, display);
-                       }
-                      
-                      imageDisplayService.getActiveDatasetView(display).setChannelRange(channel, min, max);
-                      imageDisplayService.getActiveDatasetView(display).update();
-           });
-        
-    
+        DatasetView view = imageDisplayService.getActiveDatasetView(imageDisplay);
+
+        int channel = view.getIntPosition(Axes.CHANNEL);
+
+        imageDisplayService
+                .getImageDisplays()
+                .stream()
+                
+                .map(imageDisplayService::getActiveDatasetView)
+                .parallel()
+                .forEach(this::apply);
+
     }
-    
-    private int getCurrentChannel(ImageDisplay display) {
-        // getting the current channel
-        int currentChannel = imageDisplay.getIntPosition(Axes.CHANNEL);
-        
-        // making the sure the current channel is always greater than 0
-        currentChannel = currentChannel == -1 ? 0 : currentChannel;
-        return currentChannel;
+
+    private void apply(DatasetView view) {
+
+        try {
+            Channel channel = channelSettings.get(currentChannel);
+            channel.apply(view, currentChannel);
+            view.getProjector().map();
+            view.update();
+            
+
+        } catch (Exception e) {
+            uiService.showDialog(String.format("Error when applying channel settings to channel %d of %s."), DialogPrompt.MessageType.ERROR_MESSAGE);
+        }
+
     }
+
 }
