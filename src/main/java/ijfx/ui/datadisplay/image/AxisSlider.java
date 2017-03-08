@@ -119,7 +119,7 @@ public class AxisSlider extends BorderPane {
 
         slider.valueProperty().bindBidirectional(position);
         axisNameLabel.setText(axis.type().getLabel());
-        axisPositionLabel.textProperty().bind(Bindings.createStringBinding(this::getAxisPosition, slider.valueProperty(), minProperty, maxProperty));
+        axisPositionLabel.textProperty().bind(Bindings.createStringBinding(this::getAxisPosition, position, minProperty, maxProperty));
 
         addActions();
 
