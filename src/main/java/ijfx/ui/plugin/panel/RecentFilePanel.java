@@ -81,8 +81,8 @@ public class RecentFilePanel extends BorderPane {
     ActivityService activityService;
 
     @Parameter
-            UIService uiService;
-    
+    UIService uiService;
+
     ExplorableButton openImageButton = new ExplorableButton("Open image", "", FontAwesomeIcon.FOLDER_OPEN)
             .setAction(this::openImage);
 
@@ -143,7 +143,7 @@ public class RecentFilePanel extends BorderPane {
 
         @Override
         public Image getImage() {
-            if (file.getName().endsWith("png") || file.getName().endsWith("jpg")) {
+            if (file.getName().endsWith("png") || file.getName().toLowerCase().endsWith("jpg")) {
                 return new Image(file.getAbsolutePath());
             } else {
                 try {
@@ -196,9 +196,9 @@ public class RecentFilePanel extends BorderPane {
         Object dataset = new CommandRunner(context)
                 .runSync(OpenFile.class)
                 .getOutput("data");
-        
+
         uiService.show(dataset);
-        
+
     }
 
     private void exploreFolder() {
