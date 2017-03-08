@@ -32,11 +32,11 @@ import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.WeakChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.MouseEvent;
 import net.mongis.usage.DecisionStorage;
 import net.mongis.usage.DefaultUsageFactory;
 import net.mongis.usage.PreferenceDecisionStorage;
@@ -139,6 +139,35 @@ public class Usage {
                     .createUsageLog(UsageType.CLICK, id, location)
                     .send();
 
+        });
+    }
+    
+    public static void listenClick(MenuItem item, UsageLocation location) {
+        item.addEventHandler(ActionEvent.ANY, event->{
+            factory()
+                    .createUsageLog(UsageType.CLICK,item.getText() , location)
+                    .send();
+        });
+        
+        
+    }
+    
+    public static void listenClick(Node node, UsageLocation location, String id) {
+        node.addEventHandler(MouseEvent.MOUSE_CLICKED, event->{
+            factory()
+                    .createUsageLog(UsageType.CLICK, id, location)
+                    .setValue(event.getButton().toString())
+                    .send();
+        });
+    }
+    
+    public static void listenButton(ToggleButton button, UsageLocation location, String id) {
+        button.addEventHandler(MouseEvent.MOUSE_CLICKED, event->{
+            factory()
+                    .createUsageLog(UsageType.CLICK,id,location)
+                    .setValue(!button.isSelected())
+                    .send();
+        
         });
     }
 
