@@ -19,10 +19,12 @@
  */
 package ijfx.ui.datadisplay.image;
 
+import com.twelvemonkeys.lang.StringUtil;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import ijfx.plugins.commands.Isolate;
 import ijfx.service.ui.ControlableProperty;
+import ijfx.service.usage.Usage;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
@@ -41,6 +43,7 @@ import net.imagej.display.event.DataViewUpdatedEvent;
 import net.imagej.display.event.LUTsChangedEvent;
 import net.imglib2.display.ColorTable;
 import net.imglib2.display.ColorTable8;
+import net.mongis.usage.UsageLocation;
 import org.scijava.command.CommandService;
 import org.scijava.event.EventHandler;
 import org.scijava.plugin.Parameter;
@@ -63,6 +66,7 @@ public class TableColorButton extends ToggleButton{
     
     private ContextMenu contextMenu = new ContextMenu();
     
+    private static final UsageLocation TABLE_COLOR_BUTTON = UsageLocation.get("Channel Rectangle");
     
     @Parameter
     CommandService commandService;
@@ -79,7 +83,7 @@ public class TableColorButton extends ToggleButton{
         rectangle.setWidth(20);
         rectangle.setHeight(20);
         
-        
+        Usage.listenButton(this, TABLE_COLOR_BUTTON, "Channel switch");
         
         channelProperty.addListener(this::onParameterChanged);
         datasetViewProperty.addListener(this::onParameterChanged);
@@ -92,7 +96,8 @@ public class TableColorButton extends ToggleButton{
         selectedProperty().bindBidirectional(channelActivatedProperty);
         
         setContextMenu(contextMenu);
-        addAction("Display on this channel",FontAwesomeIcon.EYE,this::displayOnlyThis);
+        addAction("Edit this channel",FontAwesomeIcon.COG,this::editThisChannel);
+        addAction("Only display this channel",FontAwesomeIcon.EYE,this::displayOnlyThis);
         addAction("Isolate this channel",FontAwesomeIcon.COPY,this::isolateChannel);
         
     }
@@ -202,7 +207,7 @@ public class TableColorButton extends ToggleButton{
         contextMenu.getItems().add(item);
     }
     
-    public void displayOnlyThis() {
+    private void displayOnlyThis() {
         
         
         DatasetView view = datasetViewProperty.getValue();
@@ -218,7 +223,7 @@ public class TableColorButton extends ToggleButton{
         
     }
     
-    public void isolateChannel() {
+    private void isolateChannel() {
         
         
         if(commandService == null) {
@@ -226,6 +231,11 @@ public class TableColorButton extends ToggleButton{
         }
         
         commandService.run(Isolate.class, true,"axisType",Axes.CHANNEL,"position",channelProperty().getValue());
+    }
+    
+    private void editThisChannel() {
+        datasetViewProperty().getValue().setPosition(channelProperty().intValue(), Axes.CHANNEL);
+        datasetViewProperty().getValue().update();
     }
     
 }
