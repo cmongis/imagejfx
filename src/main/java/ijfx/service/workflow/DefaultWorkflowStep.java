@@ -45,6 +45,8 @@ import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 
+import ijfx.plugins.commands.channels.ChannelSettings;
+
 /**
  *
  * @author Cyril MONGIS, 2015
@@ -89,7 +91,8 @@ public class DefaultWorkflowStep implements WorkflowStep {
         LongInterval.class,
         ThresholdMethod.class,
         ProjectionMethod.class,
-        AxisType.class
+        AxisType.class,
+        ChannelSettings.class
         
     };
 
