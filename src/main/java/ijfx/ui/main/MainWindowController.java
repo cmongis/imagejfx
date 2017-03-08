@@ -388,8 +388,8 @@ public class MainWindowController extends AnchorPane {
                     .setDialogTitle("Help us improving ImageJFX")
                     .loadContent(getClass(), "/USAGE_CONDITION.md")
                     .setContentType(RichTextDialog.ContentType.MARKDOWN)
-                    .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "I accept, I want to help")
                     .addAnswerButton(RichTextDialog.AnswerType.CANCEL, "I decline")
+                    .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "I accept, I want to help")
                     .showDialog();
             
             Usage.factory().setDecision(answer.isPositive());
