@@ -21,6 +21,7 @@ package ijfx.plugins.commands.channels;
 
 import java.util.List;
 import net.imagej.Dataset;
+import net.imagej.display.DatasetView;
 
 /**
  *
@@ -46,6 +47,29 @@ public interface ChannelSettings {
             }
         }
 
+    }
+
+    public default void apply(DatasetView datasetView) {
+
+        for (int i = 0; i != datasetView.getChannelCount(); i++) {
+
+            if (i + 1 > getChannelCount()) {
+                return;
+            }
+            get(i).apply(datasetView, i);
+
+        }
+
+    }
+
+    public default void apply(Dataset dataset) {
+        for (int i = 0; i != dataset.getChannels(); i++) {
+            if (i + 1 > getChannelCount()) {
+                return;
+            }
+            get(i).apply(dataset, i);
+
+        }
     }
 
 }

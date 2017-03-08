@@ -20,7 +20,9 @@
 package ijfx.plugins.commands.channels;
 
 import net.imagej.Dataset;
+import net.imagej.display.DatasetView;
 import net.imglib2.display.ColorTable;
+import static ucar.unidata.util.Format.d;
 
 /**
  *
@@ -44,6 +46,12 @@ public interface Channel {
         dataset.setChannelMaximum(channel, getChannelMax());
         dataset.setChannelMinimum(channel, getChannelMin());
         dataset.setColorTable(getColorTable(), channel);
+       
+    }
+    public default void apply(DatasetView view, int channel){
+        view.setChannelRange(channel, getChannelMin(), getChannelMax());
+        view.setColorTable(getColorTable(), channel);
+        view.getProjector().setComposite(channel, isActive());
     }
     
    
