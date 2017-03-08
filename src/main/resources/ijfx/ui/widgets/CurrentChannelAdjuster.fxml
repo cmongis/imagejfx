@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 
 <fx:root fx:id="topSlidingBorderPane" styleClass="channel-adjuster" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
@@ -25,4 +30,35 @@
          </BorderPane.margin>
       </BorderPane>
    </center>
+   <bottom>
+      <BorderPane BorderPane.alignment="CENTER">
+         <center>
+            <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <styleClass>
+                  <String fx:value="small" />
+                  <String fx:value="discrete" />
+               </styleClass>
+            </ToolBar>
+         </center>
+         <bottom>
+            <Label fx:id="descriptionLabel" minHeight="0.0" BorderPane.alignment="CENTER">
+               <styleClass>
+                  <String fx:value="smaller" />
+                  <String fx:value="discrete" />
+               </styleClass>
+            </Label>
+         </bottom>
+         <right>
+            <MenuButton fx:id="moreMenuButton" mnemonicParsing="false" text="More actions" BorderPane.alignment="CENTER">
+               <styleClass>
+                  <String fx:value="discrete-button" />
+                  <String fx:value="small" />
+               </styleClass>
+               <graphic>
+                  <FontAwesomeIconView glyphName="PLUS" />
+               </graphic>
+            </MenuButton>
+         </right>
+      </BorderPane>
+   </bottom>
 </fx:root>
