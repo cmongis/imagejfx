@@ -75,7 +75,6 @@ public class PaneContextualView implements ContextualView<Node> {
         actual.addAll(toShow.stream().map(widget -> widget.getObject()).collect(Collectors.toList()));
         actual.sort(this::compare);
 
-
         Platform.runLater(() -> {
             pane.getChildren().clear();
             pane.getChildren().addAll(actual);
