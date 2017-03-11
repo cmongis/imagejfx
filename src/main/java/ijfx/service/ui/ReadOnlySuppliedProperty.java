@@ -32,24 +32,21 @@ import javafx.beans.value.ObservableValue;
  */
 public class ReadOnlySuppliedProperty<T> extends ReadOnlyObjectPropertyBase<T> {
 
-    
-    
     private ReadOnlyProperty bean;
-    
+
     private T currentValue;
-    
+
     private final Getter<T> getter;
 
     public ReadOnlySuppliedProperty(Getter<T> getter) {
         this.getter = getter;
     }
-    
+
     public ReadOnlySuppliedProperty bindTo(Property property) {
         property.addListener(this::onBeanChanged);
         return this;
     }
-    
-    
+
     @Override
     public T get() {
         currentValue = getter.get();
@@ -65,17 +62,17 @@ public class ReadOnlySuppliedProperty<T> extends ReadOnlyObjectPropertyBase<T> {
     public String getName() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     public void updateFromGetter() {
         T newValue = getter.get();
-        if(newValue != currentValue) {
+        if (newValue != currentValue) {
             currentValue = newValue;
         }
         fireValueChangedEvent();
     }
-    
+
     public void onBeanChanged(ObservableValue value, Object oldValue, Object newValue) {
         Platform.runLater(this::updateFromGetter);
     }
-    
+
 }
