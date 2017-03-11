@@ -21,6 +21,7 @@
 package mongis.utils;
 
 import com.github.rjeschke.txtmark.Processor;
+import com.sun.javafx.tk.Toolkit;
 import ijfx.core.listenableSystem.Listening;
 import ijfx.ui.RichMessageDisplayer;
 import ijfx.ui.main.ImageJFX;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -39,13 +41,17 @@ import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -223,6 +229,26 @@ public class FXUtilities {
                 lock.unlock();
             }
         }
+    }
+    
+    public static <T> T runAndWait(Callable<T> t) {
+        
+       
+        
+        try {
+             if(Platform.isFxApplicationThread()) return t.call();
+            return new CallableTask<T>(t)
+                    .startInFXThread()
+                    .get();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FXUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(FXUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch(Exception e) {
+            Logger.getLogger(FXUtilities.class.getName()).log(Level.SEVERE,null,e);
+        }
+        return null;
     }
 
     public static void injectFXML(Object rootAndController) throws IOException {
@@ -542,5 +568,128 @@ public class FXUtilities {
         
         
     }
+    
+    
+    public static void makeListViewMultipleSelection(ListView listView) {
+        
+        EventHandler<MouseEvent> eventHandler = (event)
+                -> {
+            if (!event.isShortcutDown()) {
+                Event.fireEvent(event.getTarget(), cloneMouseEvent(event));
+                event.consume();
+            }
+        };
+
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listView.addEventFilter(MouseEvent.MOUSE_PRESSED, eventHandler);
+        listView.addEventFilter(MouseEvent.MOUSE_RELEASED, eventHandler);
+        
+    }
+    
+    private static MouseEvent cloneMouseEvent( MouseEvent event )
+{
+    switch (Toolkit.getToolkit().getPlatformShortcutKey())
+    {
+        case SHIFT:
+            return new MouseEvent(
+                    event.getSource(),
+                    event.getTarget(),
+                    event.getEventType(),
+                    event.getX(),
+                    event.getY(),
+                    event.getScreenX(),
+                    event.getScreenY(),
+                    event.getButton(),
+                    event.getClickCount(),
+                    true,
+                    event.isControlDown(),
+                    event.isAltDown(),
+                    event.isMetaDown(),
+                    event.isPrimaryButtonDown(),
+                    event.isMiddleButtonDown(),
+                    event.isSecondaryButtonDown(),
+                    event.isSynthesized(),
+                    event.isPopupTrigger(),
+                    event.isStillSincePress(),
+                    event.getPickResult()
+            );
+
+        case CONTROL:
+            return new MouseEvent(
+                    event.getSource(),
+                    event.getTarget(),
+                    event.getEventType(),
+                    event.getX(),
+                    event.getY(),
+                    event.getScreenX(),
+                    event.getScreenY(),
+                    event.getButton(),
+                    event.getClickCount(),
+                    event.isShiftDown(),
+                    true,
+                    event.isAltDown(),
+                    event.isMetaDown(),
+                    event.isPrimaryButtonDown(),
+                    event.isMiddleButtonDown(),
+                    event.isSecondaryButtonDown(),
+                    event.isSynthesized(),
+                    event.isPopupTrigger(),
+                    event.isStillSincePress(),
+                    event.getPickResult()
+            );
+
+        case ALT:
+            return new MouseEvent(
+                    event.getSource(),
+                    event.getTarget(),
+                    event.getEventType(),
+                    event.getX(),
+                    event.getY(),
+                    event.getScreenX(),
+                    event.getScreenY(),
+                    event.getButton(),
+                    event.getClickCount(),
+                    event.isShiftDown(),
+                    event.isControlDown(),
+                    true,
+                    event.isMetaDown(),
+                    event.isPrimaryButtonDown(),
+                    event.isMiddleButtonDown(),
+                    event.isSecondaryButtonDown(),
+                    event.isSynthesized(),
+                    event.isPopupTrigger(),
+                    event.isStillSincePress(),
+                    event.getPickResult()
+            );
+
+        case META:
+            return new MouseEvent(
+                    event.getSource(),
+                    event.getTarget(),
+                    event.getEventType(),
+                    event.getX(),
+                    event.getY(),
+                    event.getScreenX(),
+                    event.getScreenY(),
+                    event.getButton(),
+                    event.getClickCount(),
+                    event.isShiftDown(),
+                    event.isControlDown(),
+                    event.isAltDown(),
+                    true,
+                    event.isPrimaryButtonDown(),
+                    event.isMiddleButtonDown(),
+                    event.isSecondaryButtonDown(),
+                    event.isSynthesized(),
+                    event.isPopupTrigger(),
+                    event.isStillSincePress(),
+                    event.getPickResult()
+            );
+
+        default: // well return itself then
+            return event;
+
+    }
+}
     
 }
