@@ -77,6 +77,10 @@ public class PreviewToolBar extends BorderPane implements UiPlugin {
     @Parameter
     TimerService stopWatchService;
 
+    
+    HBox toolbar;
+   
+    
     Logger logger = ImageJFX.getLogger();
 
     private PopOver popOver;

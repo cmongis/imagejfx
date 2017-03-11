@@ -52,6 +52,7 @@ public class LabelCategory extends Label {
         WritableImage wi = FontAwesomeIconUtils.FAItoImage(fontAwesomeIconView, (int) Double.parseDouble(fontAwesomeIconView.getSize()));
         this.setGraphic(new ImageView(wi));
         pane = new FlowPane();
+        pane.getStyleClass().add("label-category-pane");
         contextualView = new PaneContextualView(contextService, pane, this.getText());
         this.context = context;
     }
@@ -61,7 +62,7 @@ public class LabelCategory extends Label {
         return contextualView;
     }
 
-    public void setPane(Pane p) {
+    private void setPane(Pane p) {
         pane = p;
     }
 
