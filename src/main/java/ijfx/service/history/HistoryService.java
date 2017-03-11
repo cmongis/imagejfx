@@ -21,6 +21,10 @@
 package ijfx.service.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ijfx.service.batch.SegmentationService;
+import ijfx.service.ui.RichTextDialog;
+import ijfx.service.ui.UIExtraService;
+import ijfx.service.uicontext.UiContextService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.workflow.DefaultWorkflow;
 import ijfx.service.workflow.Workflow;
@@ -28,10 +32,15 @@ import ijfx.service.workflow.WorkflowIOService;
 import ijfx.service.workflow.WorkflowService;
 import ijfx.service.workflow.WorkflowStep;
 import ijfx.service.workflow.json.WorkflowMapperModule;
+import ijfx.ui.UiContexts;
+import ijfx.ui.activity.ActivityService;
+import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.widgets.FXRichTextDialog;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.Level;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -73,6 +82,18 @@ public class HistoryService extends AbstractService implements ImageJService{
 
     @Parameter
     WorkflowIOService workflowIOService;
+  
+    @Parameter
+    UIExtraService uiExtraService;
+    
+    @Parameter
+    SegmentationService segmentationService;
+    
+    @Parameter
+    ActivityService activityService;
+    
+    @Parameter
+    UiContextService uiContextService;
     
     boolean enabled;
     
@@ -190,7 +211,44 @@ public class HistoryService extends AbstractService implements ImageJService{
 
     public void repeatAll() {
         
-        new Thread(() -> workflowService.executeWorkflow(new DefaultWorkflow(stepList))).start();
+        
+        List<WorkflowStep> toExecute = uiExtraService
+                .promptChoice(stepList)
+                .selectAll()
+                .setTitle("Select the steps to repeat")
+                .showAndWait();
+                
+        
+        
+        new Thread(() -> workflowService.executeWorkflow(new DefaultWorkflow(toExecute))).start();
+    }
+    
+    public void useWorkflow() throws IOException {
+        
+        List<WorkflowStep> toExecute = uiExtraService
+                .promptChoice(stepList)
+                .selectAll()
+                .setTitle("Select the step to use")
+                .showAndWait();
+        
+        RichTextDialog.Answer answer = new FXRichTextDialog()
+                .setContentType(RichTextDialog.ContentType.HTML)
+                .setDialogTitle("What would you like to do with your workflow ?")
+                .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "Segment objects")
+                .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "Process files")
+                .addAnswerButton(RichTextDialog.AnswerType.CANCEL,"Cancel")
+                .showDialog();
+        
+        if(answer.contains("segment")) {
+            uiContextService.enter(UiContexts.SEGMENT);
+            activityService.openByType(ExplorerActivity.class);
+            
+            
+        }
+        else if(answer.contains("process")) {
+            
+        }
+        
     }
     
     public void setEnabled(boolean enabled) {
