@@ -42,9 +42,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import net.imagej.Dataset;
 import net.imagej.ImageJService;
 import org.scijava.Context;
 import org.scijava.Priority;
@@ -213,7 +215,7 @@ public class HistoryService extends AbstractService implements ImageJService{
         
         
         List<WorkflowStep> toExecute = uiExtraService
-                .promptChoice(stepList)
+                .promptChoice(filter(stepList))
                 .selectAll()
                 .setTitle("Select the steps to repeat")
                 .showAndWait();
@@ -226,7 +228,7 @@ public class HistoryService extends AbstractService implements ImageJService{
     public void useWorkflow() throws IOException {
         
         List<WorkflowStep> toExecute = uiExtraService
-                .promptChoice(stepList)
+                .promptChoice(filter(stepList))
                 .selectAll()
                 .setTitle("Select the step to use")
                 .showAndWait();
@@ -260,4 +262,30 @@ public class HistoryService extends AbstractService implements ImageJService{
         return enabled;
     }
     
+    
+    /**
+     * Filter for WorkflowStep that contain Dataset as input and output
+     * @param step
+     * @return true if the step input and output a dataset
+     */
+    private List<WorkflowStep> filter(List<WorkflowStep> stepList) {
+        return stepList.
+                stream()
+                .filter(this::isCompatible)
+                .collect(Collectors.toList());
+    }
+    
+    public boolean isCompatible(WorkflowStep step) {
+        
+        return
+                moduleService.getSingleInput(step.getModule(), Dataset.class) != null
+                &&
+                moduleService.getSingleOutput(step.getModule(), Dataset.class) != null;
+        
+                
+        
+        
+    }
+    
+
 }
