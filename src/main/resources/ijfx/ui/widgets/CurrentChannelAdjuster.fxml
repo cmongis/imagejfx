@@ -6,32 +6,36 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 
 <fx:root fx:id="topSlidingBorderPane" styleClass="channel-adjuster" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
-   <left>
-      <TextField fx:id="minValueTextField" styleClass="smaller" BorderPane.alignment="CENTER" />
-   </left>
-   <right>
-      <TextField fx:id="maxValueTextField" maxWidth="1.7976931348623157E308" styleClass="smaller" BorderPane.alignment="CENTER" />
-   </right>
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
    <center>
-      <BorderPane BorderPane.alignment="CENTER">
+      <BorderPane fx:id="contentBorderPane" BorderPane.alignment="CENTER">
          <center>
-            <ComboBox fx:id="comboBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" BorderPane.alignment="CENTER" />
+            <ComboBox fx:id="comboBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </BorderPane.margin></ComboBox>
          </center>
          <BorderPane.margin>
-            <Insets left="10.0" right="10.0" />
+            <Insets />
          </BorderPane.margin>
+         <left>
+            <TextField fx:id="minValueTextField" styleClass="smaller" BorderPane.alignment="CENTER" />
+         </left>
+         <right>
+            <TextField fx:id="maxValueTextField" maxWidth="1.7976931348623157E308" styleClass="smaller" BorderPane.alignment="CENTER" />
+         </right>
       </BorderPane>
    </center>
    <bottom>
-      <BorderPane BorderPane.alignment="CENTER">
+      <BorderPane fx:id="bottomBorderPane" BorderPane.alignment="CENTER">
          <center>
             <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <styleClass>
@@ -61,4 +65,20 @@
          </right>
       </BorderPane>
    </bottom>
+   <top>
+      <BorderPane fx:id="topBorderPane" BorderPane.alignment="CENTER">
+         <left>
+            <Label text="LUT Range" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding></Label>
+         </left>
+         <center>
+            <Label maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+         </center>
+         <right>
+            <Slider fx:id="channelSlider" BorderPane.alignment="CENTER" />
+         </right>
+      </BorderPane>
+   </top>
 </fx:root>
