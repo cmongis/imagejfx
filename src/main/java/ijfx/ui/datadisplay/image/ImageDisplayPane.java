@@ -31,7 +31,6 @@ import ijfx.service.overlay.OverlaySelectionService;
 import ijfx.service.ui.LoadingScreenService;
 import ijfx.core.Handles;
 import ijfx.plugins.commands.ChannelMerger;
-import ijfx.plugins.commands.IsolateChannel;
 import ijfx.plugins.commands.SeparateChannels;
 import ijfx.plugins.commands.SpreadChannelSettings;
 import ijfx.plugins.commands.SpreadCurrentChannelSettings;
@@ -374,8 +373,10 @@ public class ImageDisplayPane extends AnchorPane implements DisplayPanePlugin<Im
 
         currentChannelAdjuster
                 //.addButton("Isolate channel", FontAwesomeIcon.HAND_LIZARD_ALT,"Isolate the current channel to a separate image",IsolateChannel.class)
+                .addButton("Auto contrast", FontAwesomeIcon.MAGIC, "Calculate the min and max of each channel and adjust their display range accordingly", AutoContrast.class)
                 .addButton("Split channels", FontAwesomeIcon.COPY, "Split all the channels into separate images", SeparateChannels.class)
                 .addButton("Convert to RGB", FontAwesomeIcon.CIRCLE, "Use the current channels settings and create a RGB image.", ChannelMerger.class)
+                
                 .addAction("Spread the settings of this channel...",FontAwesomeIcon.UPLOAD,"Copy the color settings of this channel and apply it to all open images.",SpreadCurrentChannelSettings.class)
                 .addAction("Spread all channels settings...",FontAwesomeIcon.UPLOAD,"Take the color settings of each channels and apply it to all opened images.",SpreadChannelSettings.class);
 
