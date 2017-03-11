@@ -1,45 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.*?>
-<?import de.jensd.fx.glyphs.fontawesome.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<fx:root animated="false" styleClass="workflow-editor" text="Action History" type="TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root animated="false" maxHeight="1.7976931348623157E308" styleClass="workflow-editor" text="Action History" type="TitledPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
     <content>
         <BorderPane>
             <top>
                 <HBox alignment="TOP_RIGHT" styleClass="hbox" BorderPane.alignment="CENTER" />
             </top>
-            <bottom>
-                <ToolBar fx:id="workflowToolbar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                    <items>
-                        <Button mnemonicParsing="false" onAction="#repeatAll">
-                            <graphic>
-                                <FontAwesomeIconView glyphName="REPEAT" />
-                            </graphic>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#saveWorkflow" text="Export">
-                            <graphic>
-                                <FontAwesomeIconView glyphName="SAVE" styleClass="save-workflow-button" text="" />
-                            </graphic>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#loadWorkflow" text="Import">
-                            <graphic>
-                                <FontAwesomeIconView glyphName="FOLDER_OPEN" styleClass="open-workflow-button" />
-                            </graphic>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#deleteAll" text="All">
-                            <graphic>
-                                <FontAwesomeIconView glyphName="TRASH" />
-                            </graphic>
-                        </Button>
-                    </items>
-                </ToolBar>
-            </bottom>
          <center>
             <StackPane fx:id="stackPane" BorderPane.alignment="CENTER">
                <children>
@@ -47,6 +25,48 @@
                </children>
             </StackPane>
          </center>
+         <bottom>
+            <VBox styleClass="vbox" BorderPane.alignment="CENTER">
+               <children>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#repeatAll" styleClass="warning" text="Replay...">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="REPEAT" />
+                     </graphic>
+                  </Button>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="success" text="Make workflow from...">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="MAGIC" />
+                     </graphic>
+                  </Button>
+                  <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage history" textAlignment="CENTER">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#saveWorkflow" text="Import from file...">
+                           <graphic>
+                                      <FontAwesomeIconView glyphName="SAVE" styleClass="save-workflow-button" text="" />
+                           </graphic>
+                        </MenuItem>
+                      <MenuItem mnemonicParsing="false" onAction="#loadWorkflow" text="Export to file...">
+                           <graphic>
+                                      <FontAwesomeIconView glyphName="FOLDER_OPEN" styleClass="open-workflow-button" />
+                           </graphic>
+                        </MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#deleteAll" text="Delete all">
+                           <graphic>
+                                      <FontAwesomeIconView glyphName="TRASH" />
+                           </graphic>
+                        </MenuItem>
+                    </items>
+                     <graphic>
+                        <FontAwesomeIconView />
+                     </graphic>
+                     <styleClass>
+                        <String fx:value="discrete" />
+                        <String fx:value="normal" />
+                     </styleClass>
+                  </MenuButton>
+               </children>
+            </VBox>
+         </bottom>
         </BorderPane>
     </content>
 </fx:root>
