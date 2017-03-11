@@ -87,8 +87,7 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     private FxStatusBar fxToolbar = FxStatusBar.getInstance();
 
-    private FxPromptDialog lastDialog;
-
+  
     private File lastOpenedFile;
 
     
@@ -133,15 +132,8 @@ public class FxUserInterfaceBridge extends AbstractUserInterface {
     public DialogPrompt dialogPrompt(String string, String string1, DialogPrompt.MessageType messageType, DialogPrompt.OptionType ot) {
 
         // runs a FX Dialog in the JavaFX Thread and wait for it to be finished
-        try {
-            FXUtilities.runAndWait(() -> lastDialog = new FxPromptDialog(string, string1, messageType, ot));
-        } catch (InterruptedException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
-        } catch (ExecutionException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE, null, ex);;
-        }
-
-        return lastDialog;
+       return FXUtilities.runAndWait(() -> new FxPromptDialog(string, string1, messageType, ot));
+       
     }
 
     @Override
