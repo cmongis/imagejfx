@@ -217,6 +217,12 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
         
         // channeling all the DataViewUpdatedEvent so it updates the
         // current selected overlay
+        eventBus.getStream(OverlayUpdatedEvent.class)
+                .filter(event->event.getObject().equals(overlayProperty.getValue()))
+                .subscribe(event->Platform.runLater(this::updateStats));
+                
+        
+        
         eventBus.getStream(DataViewUpdatedEvent.class)
                 .map(event->event.getView())
                 .filter(view->view instanceof OverlayView)
@@ -233,7 +239,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
                 .cast(DatasetView.class)
                 .map(view->{
                     System.out.println(view);
-                    return view;
+                   return view;
                 })
                 .filter(view->currentDisplay().contains(view))
                 .throttleWithTimeout(100, TimeUnit.MILLISECONDS)
@@ -326,12 +332,7 @@ public class OverlayPanel extends BorderPane implements UiPlugin {
     
     @EventHandler
     public void onOverlayUpdated(OverlayUpdatedEvent event) {
-       
-
-       if(event.getObject() == overlayProperty.getValue()) {
-            updateChart(event.getObject());
-            updateTable();
-        }
+       eventBus.channel(event);
     }
 
  
