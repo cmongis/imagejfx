@@ -19,12 +19,16 @@
  */
 package ijfx.service.ui.choice;
 
+import java.util.List;
+
 /**
  *
  * @author cyril
  */
 public interface ChoiceDialogFactory {
     
-    ChoiceDialog create();
+    <T> ChoiceDialog<T>create(Class<? extends T> clazz,List<T> choices);
+    
+    
     
 }

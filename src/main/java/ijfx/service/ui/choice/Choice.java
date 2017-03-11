@@ -19,18 +19,22 @@
  */
 package ijfx.service.ui.choice;
 
-import java.util.List;
+import org.scijava.plugin.SciJavaPlugin;
 
 /**
- *
+ * The Classes implementing the Choice should act as wrapper
+ * and Choice factories.
+ * 
  * @author cyril
  */
-public interface Choice<T> {
+public interface Choice<T> extends SciJavaPlugin{
+     
+     public Choice<T> create(T t);
      public String getTitle();
      public String getDescription();
      public PixelRaster getPixelRaster();
      public T getData();
      
-     List<? extends Choice<T>> show(); 
+    
      
 }

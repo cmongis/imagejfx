@@ -32,8 +32,7 @@ public interface ChoiceDialog<T> {
     ChoiceDialog<T> setMessage(String message);
     ChoiceDialog<T> addChoice(Choice<T> choice);
     ChoiceDialog<T> addChoices(List<? extends Choice<T>> choices);
-    ChoiceDialog<T> addChoices(Stream<? extends Choice<T>> choices);
     ChoiceDialog<T> setEmptyAllowed(boolean emptyAllowed);
-    ChoiceDialog<Integer> addChoice(String title, String description,Integer value);
-    
+    ChoiceDialog<T> selectAll();
+    List<T> showAndWait();
 }

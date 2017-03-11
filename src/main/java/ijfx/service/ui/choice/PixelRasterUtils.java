@@ -23,54 +23,40 @@ import java.nio.IntBuffer;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
-import javafx.scene.image.WritablePixelFormat;
 
 /**
  *
  * @author cyril
  */
-public class ImagePixelRasterWrapper implements PixelRaster{
-
-    private final Image image;
-
-    private final int[] pixelBuffer;
+public class PixelRasterUtils {
     
-    private final int width;
-    private final int height;
-    
-    public ImagePixelRasterWrapper(Image image) {
-        this.image = image;
+    public static PixelRaster fromImage(Image image) {
         
-        while(image.getProgress() < 1);
+        if (image == null) {
+            return null;
+        }
         
-        width = new Double(image.getWidth()).intValue();
-        height = new Double(image.getHeight()).intValue();
-        
-        pixelBuffer = new int[getWidth()*getHeight()];
-        
-        image.getPixelReader().getPixels(0, 0, getWidth(), getHeight(), WritablePixelFormat.getIntArgbInstance(), pixelBuffer, 0, getWidth());
+        return new ImagePixelRasterWrapper(image);
     }
     
-    
-    public Image getImage() {
+    public static Image toImage(PixelRaster raster) {
+        
+        
+        if(raster instanceof ImagePixelRasterWrapper) {
+            return ((ImagePixelRasterWrapper)raster).getImage();
+        }
+        
+        if(raster == null) {
+            return null;
+        }
+        
+        WritableImage image = new WritableImage(raster.getWidth(), raster.getHeight());
+        
+        
+        
+        image.getPixelWriter().setPixels(0, 0, raster.getWidth(),raster.getHeight(),PixelFormat.getIntArgbInstance() , IntBuffer.wrap(raster.getPixels()), raster.getWidth());
+        
         return image;
+        
     }
-    
-    
-    
-    @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-      return height;
-    }
-
-    @Override
-    public int[] getPixels() {
-      return pixelBuffer;
-    }
-    
 }
