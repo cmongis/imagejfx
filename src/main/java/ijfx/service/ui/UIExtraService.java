@@ -21,6 +21,9 @@ package ijfx.service.ui;
 
 import ijfx.service.IjfxService;
 import ijfx.service.ui.choice.ChoiceDialog;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -29,8 +32,14 @@ import ijfx.service.ui.choice.ChoiceDialog;
 public interface UIExtraService extends IjfxService{
     
     
-    public <T> ChoiceDialog<T> promptChoice(Class<T> clazz);
+    public <T> ChoiceDialog<T> promptChoice();
+    
+    
+    default <T> ChoiceDialog<T> promptChoice(T... choices) {
+        return promptChoice(Stream.of(choices).collect(Collectors.toList()));
+    }
   
+    <T> ChoiceDialog<T> promptChoice(List<T> stream);
     
     public RichTextDialog createRichTextDialog();
     
