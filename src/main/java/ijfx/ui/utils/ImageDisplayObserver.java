@@ -2,12 +2,14 @@ package ijfx.ui.utils;
 
 import ijfx.service.ui.ControlableProperty;
 import ijfx.service.ui.ImageDisplayFXService;
+import ijfx.service.ui.ReadOnlySuppliedProperty;
 import ijfx.ui.main.ImageJFX;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -74,14 +76,20 @@ public class ImageDisplayObserver {
 
     private ControlableProperty<Dataset, Number> maxDatasetValue;
 
-    private ControlableProperty<DatasetView, Integer> currentChannel;
+    private ControlableProperty<DatasetView, Number> currentChannel;
 
+    private ControlableProperty<DatasetView, Double> currentChannelAsDouble;
+    
     private ControlableProperty<DatasetView, ColorTable> currentLUT;
 
     private Property<Double> possibleMinLUTValue = new SimpleObjectProperty<Double>();
 
     private Property<Double> possibleMaxLUTValue = new SimpleObjectProperty<Double>();
 
+    private ReadOnlyProperty<Number> channelCountProperty = new ReadOnlySuppliedProperty<Number>(this::getChannelCount);
+            
+    
+    
     private static ObservableList<ColorTable> colorTableList;
 
     @Parameter
@@ -100,6 +108,8 @@ public class ImageDisplayObserver {
 
     EventStream<Object> modificationStream = EventStreams.valuesOf(lastChanges);
 
+    
+    
     public ImageDisplayObserver(Context context) {
 
         context.inject(this);
@@ -133,10 +143,13 @@ public class ImageDisplayObserver {
                 .setGetter(imageDisplayService::getActiveDataset)
                 .bindBeanTo(currentImageDisplay);
 
-        currentChannel = new ControlableProperty<DatasetView, Integer>()
+        currentChannel = new ControlableProperty<DatasetView, Number>()
                 .setCaller(this::getCurrentChannel)
+                .setBiSetter(this::setCurrentChannel)
                 .bindBeanTo(currentDatasetView);
 
+        
+        
         minDatasetValue = new ControlableProperty<Dataset, Number>()
                 .setGetter(this::getCurrentDatasetMin)
                 .bindBeanTo(currentDataset);
@@ -150,6 +163,9 @@ public class ImageDisplayObserver {
                 .setCaller(this::getCurrentLUT)
                 .bindBeanTo(currentDatasetView);
 
+        
+       
+        
     }
 
     public Property<Boolean> currentColorModeProperty() {
@@ -186,6 +202,14 @@ public class ImageDisplayObserver {
 
     public Property<ColorTable> currentLUTProperty() {
         return currentLUT;
+    }
+    
+    public Property<Number> currentChannelProperty() {
+        return currentChannel;
+    }
+    
+    public Property<? extends Number> currentChannelPropertyAsDouble() {
+        return currentChannel;
     }
 
     public Boolean isComposite(DatasetView view) {
@@ -250,6 +274,7 @@ public class ImageDisplayObserver {
             minDatasetValue.checkFromGetter();
             maxDatasetValue.checkFromGetter();
             currentLUT.checkFromGetter();
+            currentChannel.checkFromGetter();
         }
     }
 
@@ -330,8 +355,13 @@ public class ImageDisplayObserver {
         ImageJFX.getThreadPool().execute(new ViewUpdate(view));
     }
 
-    public Integer getCurrentChannel(DatasetView datasetView) {
+    public Number getCurrentChannel(DatasetView datasetView) {
         return datasetView.getChannelCount() == 1 ? 0 : datasetView.getIntPosition(Axes.CHANNEL);
+    }
+    
+    public void setCurrentChannel(DatasetView view, Number channel) {
+        view.setPosition(channel.intValue(), Axes.CHANNEL);
+        ImageJFX.getThreadQueue().submit(new ViewUpdate(view));
     }
 
     public Property<long[]> currentPositionProperty() {
@@ -352,8 +382,8 @@ public class ImageDisplayObserver {
         return lastPosition;
     }
 
-    public int getCurrentChannel() {
-        return currentChannel.getValue();
+    public Integer getCurrentChannel() {
+        return currentChannel.getValue().intValue();
     }
 
     private static final Boolean lock = Boolean.TRUE;
@@ -416,6 +446,14 @@ public class ImageDisplayObserver {
         } catch (Exception e) {
             return null;
         }
+    }
+    
+    public Number getChannelCount() {
+       return currentDatasetView.getValue().getChannelCount();
+    }
+    
+    public ReadOnlyProperty<Number> channelCountProperty() {
+        return channelCountProperty;
     }
 
 }
