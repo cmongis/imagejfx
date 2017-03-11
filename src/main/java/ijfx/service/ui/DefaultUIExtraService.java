@@ -20,10 +20,14 @@
 package ijfx.service.ui;
 
 import ijfx.service.ui.choice.ChoiceDialog;
+import ijfx.service.ui.choice.FXChoiceDialogFactory;
+import ijfx.service.ui.choice.FXChoiceDialog;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.widgets.FXRichTextDialog;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
@@ -35,11 +39,31 @@ import org.scijava.service.Service;
 @Plugin(type = Service.class)
 public class DefaultUIExtraService extends AbstractService implements UIExtraService {
 
+    
+    
+    
     @Override
-    public <T> ChoiceDialog<T> promptChoice(Class<T> clazz) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public <T> ChoiceDialog<T> promptChoice() {
+        try {
+            return new FXChoiceDialog<>();
+        } catch (IOException ex) {
+            Logger.getLogger(DefaultUIExtraService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
+    public <T> ChoiceDialog<T> promptChoice(List<T> items) {
+        
+        if(items.size() == 0) {
+            throw new IllegalArgumentException("The item list must not be empty");
+        }
+        
+        return new FXChoiceDialogFactory(getContext()).create((Class<T>)items.get(0).getClass(),items);
+    }
+    
+    
+    
+    
     @Override
     public RichTextDialog createRichTextDialog() {
         try {
