@@ -931,5 +931,5 @@ public class MainWindowController extends AnchorPane {
                 activityService.openByType(this.activityClass);
             }
         }
-    }
-}
+    }  
+  }
