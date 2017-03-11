@@ -45,6 +45,7 @@ import mongis.utils.TimedBuffer;
 import net.imagej.Dataset;
 import net.imagej.autoscale.AutoscaleService;
 import net.imagej.autoscale.DataRange;
+import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.threshold.ThresholdMethod;
@@ -227,7 +228,8 @@ public class ThresholdSegmentation extends AbstractSegmentation {
 
         // localizing
         long[] position = new long[imageDisplay.numDimensions()];
-        imageDisplay.localize(position);
+        DatasetView activeDatasetView = imageDisplayService.getActiveDatasetView(imageDisplay);
+        activeDatasetView.localize(position);
 
         IntervalView<T> planeView = imagePlaneService.planeView(dataset, DimensionUtils.absoluteToPlanar(position));
 
