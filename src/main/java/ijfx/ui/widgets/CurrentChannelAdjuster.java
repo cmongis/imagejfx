@@ -49,6 +49,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.ImageView;
@@ -90,6 +91,12 @@ public class CurrentChannelAdjuster extends BorderPane {
     @FXML
     private MenuButton moreMenuButton;
 
+    @FXML
+    private Slider channelSlider;
+    
+    @FXML
+    private BorderPane contentBorderPane;
+    
     private RangeSlider rangeSlider;
 
     private Property<ImageDisplay> imageDisplayProperty = new SimpleObjectProperty<>();
@@ -133,7 +140,7 @@ public class CurrentChannelAdjuster extends BorderPane {
             imageDisplay.getContext().inject(this);
             // imageDisplayObserver.currentLUTProperty().addListener(this::onLUTChanged);
             rangeSlider = new RangeSlider();
-            setTop(rangeSlider);
+            contentBorderPane.setTop(rangeSlider);
             init();
         }
     }
@@ -185,6 +192,31 @@ public class CurrentChannelAdjuster extends BorderPane {
         Bindings.bindBidirectional(minValueTextField.textProperty(), rangeSlider.lowValueProperty(), smartNumberStringConverter);
         Bindings.bindBidirectional(maxValueTextField.textProperty(), rangeSlider.highValueProperty(), smartNumberStringConverter);
 
+       
+        
+        // Setting the channel slider
+        channelSlider.setBlockIncrement(1.0);
+        channelSlider.setMajorTickUnit(1.0);
+        channelSlider.setSnapToTicks(true);
+        channelSlider.setMin(0.0);
+        channelSlider.valueProperty().bindBidirectional(imageDisplayObserver.currentChannelProperty());
+        
+        channelSlider.maxProperty().bind(Bindings.createDoubleBinding(this::getMaxChannel, imageDisplayObserver.channelCountProperty()));
+        // setting the size of the slider depending on the number of channels
+        channelSlider.prefWidthProperty().bind(Bindings.createDoubleBinding(this::getChannelSliderWidth, imageDisplayObserver.channelCountProperty()));
+        
+        
+        
+    }
+    
+  
+    
+    private Double getMaxChannel() {
+        return imageDisplayObserver.getChannelCount().doubleValue()-1;
+    }
+    
+    private Double getChannelSliderWidth() {
+        return new Double(imageDisplayObserver.getChannelCount().intValue() * 30);
     }
 
     private List<LUTView> generateLUTViews() {
