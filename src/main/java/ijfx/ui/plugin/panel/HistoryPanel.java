@@ -164,6 +164,11 @@ public class HistoryPanel extends TitledPane implements UiPlugin {
     public void repeatAll() {
         editService.repeatAll();
     }
+    
+    @FXML
+    public void useWorkflow() throws IOException {
+        editService.useWorkflow();
+    }
 
     @FXML
     void deleteAll() {
