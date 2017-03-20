@@ -87,7 +87,7 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
         try {
             FXUtilities.injectFXML(this);
             
-            saveType = new SimpleObjectProperty<>();
+            saveType = new SimpleObjectProperty<>(SaveType.NEW);
             suffix = new SimpleStringProperty();
             folder = new SimpleObjectProperty<>();
             
@@ -96,8 +96,8 @@ public class DefaultSaveOptions extends VBox implements SaveOptions{
             replaceFilesBtn.setToggleGroup(toggleGroup);
             newFilesBtn.setToggleGroup(toggleGroup);
             
-            replaceFilesBtn.selectedProperty().setValue(Boolean.TRUE);
-            
+            replaceFilesBtn.selectedProperty().setValue(Boolean.FALSE);
+            newFilesBtn.selectedProperty().setValue(Boolean.TRUE);
             
             ObjectBinding<SaveType> obinding = Bindings.createObjectBinding(this::updateSaveType,
                     toggleGroup.selectedToggleProperty()
