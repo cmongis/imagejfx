@@ -93,12 +93,12 @@ public class FlatfieldCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
 
         flatfieldBinding = new FileButtonBinding(flatfieldButton);
         flatfieldBinding.setButtonDefaultText("Choose Flatfield image...");
-        flatfieldBinding.setOpenFile(true);
+        flatfieldBinding.setMode(FileButtonBinding.Mode.OPEN);
         flatfieldImage = flatfieldBinding.fileProperty();
 
         darkfieldBinding = new FileButtonBinding(darkfieldButton)
                 .setButtonDefaultText("Choose darkfield image...")
-                .setOpenFile(true);
+                .setMode(FileButtonBinding.Mode.OPEN);
         darkfieldImage = darkfieldBinding.fileProperty();
 
         //bind(datasetAssetProperty, this::createDatasetAsset, flatfieldImage);

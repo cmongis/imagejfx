@@ -60,7 +60,7 @@ public class DarkfieldCorrectionUIPlugin extends AbstractCorrectionUiPlugin{
         hbox.getChildren().add(new Label("Select flatfield image : "));
         hbox.getChildren().add(fileButton);
         setBottom(multichannelCheckBox);
-        binding.setOpenFile(true);
+        binding.setMode(FileButtonBinding.Mode.OPEN);
         bindP(workflowProperty,this::generateWorkflow,binding.fileProperty(),multichannelCheckBox.selectedProperty());
         bindP(explanationProperty,this::explain,binding.fileProperty(),multichannelCheckBox.selectedProperty());
     }

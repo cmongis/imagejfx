@@ -85,8 +85,9 @@ public class ChromaticCorrectionUiPlugin extends AbstractCorrectionUiPlugin {
         targetSelector.setAllowAllChannels(false);
         
         buttonBinding = new FileButtonBinding(landmarkFileButton)
-                .setButtonDefaultText("Select landmark file");
-        buttonBinding.setOpenFile(true);
+                .setButtonDefaultText("Select landmark file")
+                .setMode(FileButtonBinding.Mode.OPEN);
+       
                 
         
         configurator.getStyleClass().add("with-padding");
