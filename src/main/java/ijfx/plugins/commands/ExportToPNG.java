@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
 import javax.imageio.ImageIO;
+import mongis.utils.FileUtils;
 import net.imagej.DatasetService;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -39,6 +40,7 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.scijava.ItemIO;
+import org.scijava.app.StatusService;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
@@ -77,6 +79,9 @@ public class ExportToPNG extends ContextCommand {
     @Parameter
     UIService uiService;
 
+    @Parameter
+    StatusService statusService;
+
     @Override
     public void run() {
 
@@ -88,6 +93,7 @@ public class ExportToPNG extends ContextCommand {
         }
 
         try {
+            outputFile = FileUtils.ensureExtension(outputFile, ".png");
 
             ARGBScreenImage screenImage = imageDisplayService.getActiveDatasetView(imageDisplay).getScreenImage();
 
@@ -98,6 +104,7 @@ public class ExportToPNG extends ContextCommand {
             long xmax = screenImage.max(0);
             long ymax = screenImage.max(1);
 
+            statusService.showStatus(1, 3, "Retrieving pixels");
             if (overlaySelectionService.getSelectedOverlay(imageDisplay) instanceof RectangleOverlay) {
                 overlay = (RectangleOverlay) overlaySelectionService.getSelectedOverlay(imageDisplay);
 
@@ -114,6 +121,7 @@ public class ExportToPNG extends ContextCommand {
 
             Cursor<ARGBType> cursor = interval.cursor();
 
+            statusService.showStatus(2, 3, "Retrieving pixels");
             long[] position = new long[2];
 
             cursor.reset();
@@ -122,10 +130,12 @@ public class ExportToPNG extends ContextCommand {
                 cursor.localize(position);
                 image.getPixelWriter().setArgb((int) position[0], (int) position[1], cursor.get().get());
             }
-            
+
+            statusService.showStatus(2, 3, "Converting to PNG pixels");
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", outputFile);
-            uiService.showDialog("Exportation over : "+outputFile.getName());
-           
+            uiService.showDialog(String.format("%s successfully exported in folder %s", outputFile.getName(), outputFile.getParentFile().getName()));
+
+            statusService.showStatus(3, 3, "Done : " + outputFile.getName());
         } catch (IOException ex) {
             ImageJFX.getLogger().log(Level.SEVERE, null, ex);
             uiService.showDialog("Error when saving file " + outputFile.getName(), DialogPrompt.MessageType.ERROR_MESSAGE);
