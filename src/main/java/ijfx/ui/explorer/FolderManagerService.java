@@ -22,6 +22,7 @@ package ijfx.ui.explorer;
 import ijfx.service.IjfxService;
 import java.io.File;
 import java.util.List;
+import net.imagej.display.ImageDisplay;
 
 /**
  *
@@ -49,4 +50,14 @@ public interface FolderManagerService extends IjfxService {
 
     public final static String FOLDER_PREFERENCE_FILE = "folder_db.json";
 
+    /**
+     * Opens and explore the folder containing the following image.
+     * If no open folder contains the image, it will explorer
+     * the image folder
+     * @param imagePath 
+     */
+    public void openImageFolder(String imagePath);
+    
+    public void openImageFolder(ImageDisplay imageDisplay);
+    
 }
