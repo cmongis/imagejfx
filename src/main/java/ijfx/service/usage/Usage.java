@@ -87,9 +87,10 @@ public class Usage {
             factory.createUsageLog(UsageType.SET, "CPU", UsageLocation.GENERAL)
                     .setValue(Runtime.getRuntime().availableProcessors())
                     .send();
-
+            double memory = Runtime.getRuntime().maxMemory() / 1000 / 1000;
+            
             factory.createUsageLog(UsageType.SET, "RAM", UsageLocation.GENERAL)
-                    .setValue(Runtime.getRuntime().maxMemory() / 1000 / 1000)
+                    .setValue(memory)
                     .send();
 
             factory.createUsageLog(UsageType.SET, "DATE", UsageLocation.GENERAL)
@@ -99,6 +100,8 @@ public class Usage {
         }
         return factory;
     }
+    
+    
 
     private static class LoggingDecisionStorageWrapper implements DecisionStorage {
 
