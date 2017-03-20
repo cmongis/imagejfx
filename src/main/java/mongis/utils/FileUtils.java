@@ -19,6 +19,7 @@
  */
 package mongis.utils;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import org.apache.commons.io.FilenameUtils;
 
@@ -36,14 +37,40 @@ public class FileUtils {
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
-    
-    public static String changeExtensionTo(String path,String extension) {
+
+    public static String changeExtensionTo(String path, String extension) {
+
+        if(extension.startsWith(DOT)) {
+            extension = extension.substring(1);
+        }
         
         return new StringBuilder()
                 .append(FilenameUtils.removeExtension(path))
                 .append(".")
                 .append(extension)
                 .toString();
-        
+
+    }
+
+    private static String DOT = ".";
+
+    /**
+     *
+     * @param input file
+     * @param extension with or without dot
+     * @return
+     */
+    public static File ensureExtension(File file, String extension) {
+
+        if (file.getName().endsWith(extension)) {
+            return file;
+        }
+
+        if (!extension.startsWith(DOT)) {
+            extension = DOT + extension;
+        }
+
+        return new File(changeExtensionTo(file.getAbsolutePath(), extension));
+
     }
 }
