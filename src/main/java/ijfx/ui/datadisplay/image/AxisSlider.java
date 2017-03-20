@@ -28,6 +28,7 @@ import ijfx.plugins.commands.Isolate;
 import ijfx.ui.main.ImageJFX;
 import ijfx.service.ui.ControlableProperty;
 import ijfx.service.usage.Usage;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Map;
 import java.util.function.Function;
@@ -196,7 +197,7 @@ public class AxisSlider extends BorderPane {
     }
 
     Boolean lock = Boolean.TRUE;
-    
+
     private class ViewUpdate implements Runnable {
 
         final DatasetView view;
@@ -212,7 +213,7 @@ public class AxisSlider extends BorderPane {
             }
         }
     }
-    
+
     private String getAxisName() {
         return axis.type().getLabel();
     }
@@ -235,10 +236,10 @@ public class AxisSlider extends BorderPane {
 
     private void addActions() {
 
-        addAction(new LabelAction("Isolate this"), FontAwesomeIcon.FILES_ALT, this::isolateAxis);
-        addAction(new LabelAction("Delete before this"), FontAwesomeIcon.STEP_BACKWARD, this::deleteBeforePosition);
-        addAction(new LabelAction("Delete this"), FontAwesomeIcon.REMOVE, this::deleteThisPosition);
-        addAction(new LabelAction("Delete after this"), FontAwesomeIcon.STEP_FORWARD, this::deleteAfterPosition);
+        addAction(new LabelAction("Duplicate this {0}"), FontAwesomeIcon.FILES_ALT, this::isolateAxis);
+        addAction(new LabelAction("Delete all {0}s before this {0}"), FontAwesomeIcon.STEP_BACKWARD, this::deleteBeforePosition);
+        addAction(new LabelAction("Delete this {0}"), FontAwesomeIcon.REMOVE, this::deleteThisPosition);
+        addAction(new LabelAction("Delete all {0}s after this {0}"), FontAwesomeIcon.STEP_FORWARD, this::deleteAfterPosition);
         addAction(t -> "Duplicate image", FontAwesomeIcon.PICTURE_ALT, this::isolateCurrentPosition);
 
     }
@@ -252,7 +253,7 @@ public class AxisSlider extends BorderPane {
     }
 
     private void deleteThisPosition() {
-        Long position = display.getLongPosition(axisId);
+        Long position = display.getLongPosition(axisId) + 1;
 
         Map<String, Object> params = ImmutableMap.<String, Object>builder()
                 .put("position", position)
@@ -265,7 +266,7 @@ public class AxisSlider extends BorderPane {
     }
 
     private void deleteBeforePosition() {
-        Long quantity = display.getLongPosition(axisId);
+        Long quantity = display.getLongPosition(axisId) + 1;
         Long position = new Long(1);
 
         Map<String, Object> params = ImmutableMap.<String, Object>builder()
@@ -311,11 +312,8 @@ public class AxisSlider extends BorderPane {
 
         @Override
         public String apply(AxisType t) {
-            return new StringBuilder()
-                    .append(action)
-                    .append(" ")
-                    .append(t.getLabel().contains("Z") ? "slice" : t.getLabel().toLowerCase())
-                    .toString();
+            return MessageFormat.format(action,
+                    t.getLabel().contains("Z") ? "slice" : t.getLabel().toLowerCase());
         }
 
     }
