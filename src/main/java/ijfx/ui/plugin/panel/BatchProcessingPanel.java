@@ -32,9 +32,7 @@ import ijfx.ui.UiConfiguration;
 import ijfx.ui.UiPlugin;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.batch.WorkflowPanel;
-import ijfx.ui.context.UiContextProperty;
 import ijfx.ui.explorer.Explorable;
-import ijfx.ui.explorer.ExplorerSelectionChangedEvent;
 import ijfx.ui.explorer.ExplorerService;
 import ijfx.ui.main.ImageJFX;
 import ijfx.ui.main.Localization;
@@ -56,7 +54,6 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -373,5 +370,12 @@ public class BatchProcessingPanel extends BorderPane implements UiPlugin {
         }
     }
 
- 
+    @EventHandler
+    public void onWorkflowRequest(WorkflowRequest event) {
+        if(event.getGoal() == WorkflowRequest.WorkflowGoal.PROCESSING) {
+            workflowPanel.stepListProperty().clear();
+            workflowPanel.stepListProperty().addAll(event.getObject().getStepList());
+        }
+    }
+    
 }
