@@ -20,9 +20,6 @@
 package ijfx.ui.input.widgets;
 
 import ijfx.ui.utils.ConvertedProperty;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;
@@ -111,7 +108,14 @@ public class NumberWidgetFX extends AbstractFXInputWidget<Number> implements Num
 
     @Override
     public boolean supports(WidgetModel model) {
-        return super.supports(model) && model.isNumber();
+        return super.supports(model) &&
+                isOneOf(model
+                        ,Double.class
+                        ,double.class
+                        ,int.class
+                        ,Integer.class
+                        ,Long.class
+                        ,long.class);
     }
 
     private class LongSpinnerValueFactory extends SpinnerValueFactory<Long> {

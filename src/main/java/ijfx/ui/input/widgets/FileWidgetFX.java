@@ -41,7 +41,7 @@ public class FileWidgetFX extends AbstractFXInputWidget<File> implements FileWid
 
     @Override
     public void set(WidgetModel model) {
-
+        super.set(model);
         binding = new FileButtonBinding(button);
 
         if (model.isStyle(DIRECTORY_STYLE)) {
@@ -53,10 +53,16 @@ public class FileWidgetFX extends AbstractFXInputWidget<File> implements FileWid
         }
 
     }
+    
+    
 
     @Override
     public Node getComponent() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return button;
+    }
+    
+    public boolean supports(WidgetModel model) {
+        return super.supports(model) && model.isType(File.class);
     }
 
 }

@@ -22,7 +22,6 @@ package ijfx.ui.input.widgets;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WritableValue;
 import org.scijava.widget.InputWidget;
 
 /**
@@ -64,6 +63,8 @@ public class ModelBinder<T> implements ChangeListener<T>{
     }
     
     public  void refreshWidget(T t) {
+        if(property.getValue() == null 
+                || (property.getValue() != null && property.getValue().equals(t) == false))
         property.setValue(t);
     }
     

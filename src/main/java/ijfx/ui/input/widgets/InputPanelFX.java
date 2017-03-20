@@ -101,8 +101,9 @@ public class InputPanelFX implements InputPanel<Node, Node> {
 
     @Override
     public void addWidget(InputWidget<?, Node> widget) {
-
-        widgetList.put(widget.get().getItem().getName(), widget);
+        String name = widget.get().getItem().getName();
+        
+        widgetList.put(name, widget);
 
         if (widget instanceof ButtonWidget) {
             buttonHBox.getChildren().add(widget.getComponent());

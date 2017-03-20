@@ -19,6 +19,7 @@
  */
 package ijfx.ui.input.widgets;
 
+import java.io.File;
 import javafx.scene.control.Button;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -57,7 +58,12 @@ public class HarvestTest extends ContextCommand{
     @Parameter(label = "Double",min = "-1.5",max = "10",stepSize = "0.5",style=NumberWidget.SLIDER_STYLE)
     double slidedNumber = 2.5;
     
-   
+    @Parameter(label = "Long",min="-10000",max="20000",stepSize="1000")
+    long aLong = 7000;
+    
+    @Parameter(label = "Some file to open")
+    File file;
+    
     @Override
     public void run() {
       

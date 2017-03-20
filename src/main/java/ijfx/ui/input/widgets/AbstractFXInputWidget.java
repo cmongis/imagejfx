@@ -19,10 +19,12 @@
  */
 package ijfx.ui.input.widgets;
 
+import java.util.stream.Stream;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.scene.Node;
 import org.scijava.widget.AbstractInputWidget;
+import org.scijava.widget.WidgetModel;
 
 /**
  *
@@ -42,6 +44,15 @@ public abstract class AbstractFXInputWidget<T> extends AbstractInputWidget<T,Nod
     protected void bindProperty(ObjectProperty<T> property) {
         modelBinder.bind(property);
        
+    }
+    
+  
+    protected boolean isOneOf(Class<?> cl,Class<?>... classList) {
+        return Stream.of(classList).filter(c->c.equals(cl)).count() > 0;
+    }
+    
+    protected boolean isOneOf(WidgetModel model, Class<?>... classList) {
+        return isOneOf(model.getItem().getType(),classList);
     }
     
     public T getValue() {
