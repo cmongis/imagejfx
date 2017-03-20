@@ -33,12 +33,12 @@
                         <FontAwesomeIconView glyphName="REPEAT" />
                      </graphic>
                   </Button>
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="success" text="Make workflow from...">
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#useWorkflow" styleClass="success" text="Use workflow for batch...">
                      <graphic>
                         <FontAwesomeIconView glyphName="MAGIC" />
                      </graphic>
                   </Button>
-                  <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage history" textAlignment="CENTER">
+                  <MenuButton alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage history" textAlignment="CENTER">
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#saveWorkflow" text="Import from file...">
                            <graphic>
