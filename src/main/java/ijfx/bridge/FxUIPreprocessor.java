@@ -48,7 +48,7 @@ import org.scijava.plugin.PluginService;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = PreprocessorPlugin.class, priority = Priority.VERY_LOW_PRIORITY)
+//@Plugin(type = PreprocessorPlugin.class, priority = Priority.VERY_LOW_PRIORITY)
 public class FxUIPreprocessor extends AbstractPreprocessorPlugin {
 
     @Parameter

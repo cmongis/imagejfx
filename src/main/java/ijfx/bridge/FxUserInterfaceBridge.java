@@ -56,7 +56,7 @@ import org.scijava.ui.ARGBPlane;
  *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = UserInterface.class, name = "FX UI", priority = 1000)
+@Plugin(type = UserInterface.class, name = ImageJFX.UI_NAME, priority = 1000)
 public class FxUserInterfaceBridge extends AbstractUserInterface {
 
     @Parameter
