@@ -57,8 +57,16 @@ public class FileButtonBinding {
 
     private String buttonDefaultText = "Choose a directory ...";
 
-    private boolean openFile = false;
+   
 
+    private Mode mode;
+    
+    public enum Mode {
+        SAVE
+        ,OPEN
+        ,FOLDER
+    }
+    
     public FileButtonBinding(Button button) {
         this(button, null);
     }
@@ -83,13 +91,21 @@ public class FileButtonBinding {
         }
         
         
-        if (openFile) {
+        if (mode == Mode.OPEN) {
             FileChooser chooser = new FileChooser();
             File file = chooser.showOpenDialog(null);
             if (file != null) {
                 fileProperty.setValue(file);
             }
-        } else {
+        }
+        else if(mode == Mode.SAVE) {
+            FileChooser chooser = new FileChooser();
+            File file = chooser.showSaveDialog(null);
+            if(file != null) {
+                fileProperty.setValue(file);
+            }
+        }
+            else {
 
             DirectoryChooser chooser = new DirectoryChooser();
 
@@ -125,8 +141,8 @@ public class FileButtonBinding {
         return fileProperty;
     }
 
-    public FileButtonBinding setOpenFile(boolean b) {
-        openFile = b;
+    public FileButtonBinding setMode(Mode mode) {
+        this.mode = mode;
         return this;
     }
 
