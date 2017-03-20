@@ -85,6 +85,8 @@ public class ImageJFX extends Application {
 
     public static final String VBOX_CLASS = "vbox";
 
+    public static final String UI_NAME = "ImageJ-FX";
+    
     public static final String IJFX_FOLDER_NAME = ".imagejfx";
     public static final String FILE_FAVORITES = "favorites.json";
 
