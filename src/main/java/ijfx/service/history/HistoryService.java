@@ -35,6 +35,8 @@ import ijfx.service.workflow.json.WorkflowMapperModule;
 import ijfx.ui.UiContexts;
 import ijfx.ui.activity.ActivityService;
 import ijfx.ui.explorer.ExplorerActivity;
+import ijfx.ui.explorer.FolderManagerService;
+import ijfx.ui.plugin.panel.WorkflowRequest;
 import ijfx.ui.widgets.FXRichTextDialog;
 import java.io.File;
 import java.io.IOException;
@@ -48,21 +50,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.imagej.Dataset;
 import net.imagej.ImageJService;
+import net.imagej.display.ImageDisplayService;
 import org.scijava.Context;
 import org.scijava.Priority;
 import org.scijava.command.CommandService;
+import org.scijava.event.EventService;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
 
-/**  
+/**
  * TODO : move load and save operation to the WorkflowIOService
+ *
  * @author Cyril MONGIS, 2015
  */
-@Plugin(type = Service.class, priority = Priority.VERY_LOW_PRIORITY,description = "Service storing history of modules ran the user. Allow to play, replay, load or save. Uses JavaFX components.")
-public class HistoryService extends AbstractService implements ImageJService{
+@Plugin(type = Service.class, priority = Priority.VERY_LOW_PRIORITY, description = "Service storing history of modules ran the user. Allow to play, replay, load or save. Uses JavaFX components.")
+public class HistoryService extends AbstractService implements ImageJService {
 
     Workflow currentWorkflow = new DefaultWorkflow();
 
@@ -84,21 +89,30 @@ public class HistoryService extends AbstractService implements ImageJService{
 
     @Parameter
     WorkflowIOService workflowIOService;
-  
+
     @Parameter
     UIExtraService uiExtraService;
-    
+
     @Parameter
     SegmentationService segmentationService;
-    
+
     @Parameter
     ActivityService activityService;
-    
+
     @Parameter
     UiContextService uiContextService;
-    
+
+    @Parameter
+    EventService eventService;
+
+    @Parameter
+    FolderManagerService folderManagerService;
+
+    @Parameter
+    ImageDisplayService imageDisplayService;
+
     boolean enabled;
-    
+
     public HistoryService() {
         super();
 
@@ -167,7 +181,7 @@ public class HistoryService extends AbstractService implements ImageJService{
 
             return workflow;
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,"Error when loading workflow",ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, "Error when loading workflow", ex);;
         }
         return null;
     }
@@ -176,7 +190,7 @@ public class HistoryService extends AbstractService implements ImageJService{
         try {
             return loadWorkflow(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,"File not found.",ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, "File not found.", ex);;
         }
         return null;
     }
@@ -192,7 +206,7 @@ public class HistoryService extends AbstractService implements ImageJService{
             mapper.writeValue(new File(path), workflow);
             return true;
         } catch (IOException ex) {
-            ImageJFX.getLogger().log(Level.SEVERE,"Error when saving worflow. It's possible you don't have the permission.",ex);;
+            ImageJFX.getLogger().log(Level.SEVERE, "Error when saving worflow. It's possible you don't have the permission.", ex);;
         }
         return false;
     }
@@ -212,59 +226,62 @@ public class HistoryService extends AbstractService implements ImageJService{
     }
 
     public void repeatAll() {
-        
-        
+
         List<WorkflowStep> toExecute = uiExtraService
-                .promptChoice(filter(stepList))
+                .promptChoice(stepList)
                 .selectAll()
                 .setTitle("Select the steps to repeat")
                 .showAndWait();
-                
-        
-        
+
         new Thread(() -> workflowService.executeWorkflow(new DefaultWorkflow(toExecute))).start();
     }
-    
+
     public void useWorkflow() throws IOException {
-        
+
         List<WorkflowStep> toExecute = uiExtraService
                 .promptChoice(filter(stepList))
                 .selectAll()
-                .setTitle("Select the step to use")
+                .setTitle("Select the steps to use")
+                
                 .showAndWait();
-        
+
         RichTextDialog.Answer answer = new FXRichTextDialog()
                 .setContentType(RichTextDialog.ContentType.HTML)
                 .setDialogTitle("What would you like to do with your workflow ?")
+                .loadContent(this.getClass(), "/WorkflowExplanations.md")
                 .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "Segment objects")
                 .addAnswerButton(RichTextDialog.AnswerType.VALIDATE, "Process files")
-                .addAnswerButton(RichTextDialog.AnswerType.CANCEL,"Cancel")
+                .addAnswerButton(RichTextDialog.AnswerType.CANCEL, "Cancel")
                 .showDialog();
-        
-        if(answer.contains("segment")) {
+
+        if (answer.contains("segment")) {
             uiContextService.enter(UiContexts.SEGMENT);
             activityService.openByType(ExplorerActivity.class);
-            
-            
+
+        } else if (answer.contains("process")) {
+            uiContextService.enter(UiContexts.BATCH);
+            activityService.openByType(ExplorerActivity.class);
+            eventService.publish(
+                    new WorkflowRequest()
+                            .setGoal(WorkflowRequest.WorkflowGoal.PROCESSING)
+                            .setObject(new DefaultWorkflow(toExecute))
+            );
+            folderManagerService.openImageFolder(imageDisplayService.getActiveImageDisplay());
         }
-        else if(answer.contains("process")) {
-            
-        }
-        
+
     }
-    
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-    
-    
+
     public boolean isEnabled() {
         return enabled;
     }
-    
-    
+
     /**
      * Filter for WorkflowStep that contain Dataset as input and output
+     *
      * @param step
      * @return true if the step input and output a dataset
      */
@@ -274,18 +291,12 @@ public class HistoryService extends AbstractService implements ImageJService{
                 .filter(this::isCompatible)
                 .collect(Collectors.toList());
     }
-    
+
     public boolean isCompatible(WorkflowStep step) {
-        
-        return
-                moduleService.getSingleInput(step.getModule(), Dataset.class) != null
-                &&
-                moduleService.getSingleOutput(step.getModule(), Dataset.class) != null;
-        
-                
-        
-        
+
+        return moduleService.getSingleInput(step.getModule(), Dataset.class) != null
+                && moduleService.getSingleOutput(step.getModule(), Dataset.class) != null;
+
     }
-    
 
 }
