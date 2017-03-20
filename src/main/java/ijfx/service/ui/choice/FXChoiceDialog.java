@@ -208,19 +208,22 @@ public class FXChoiceDialog<T> implements ChoiceDialog<T> {
 
    
 
-    private final static Image NO_IMAGE = FontAwesomeIconUtils.FAItoImage(new FontAwesomeIconView(FontAwesomeIcon.CHECK), 64);
+    private final static Image NO_IMAGE = FontAwesomeIconUtils.FAItoImage(new FontAwesomeIconView(FontAwesomeIcon.CIRCLE), 100);
 
     private class ChoiceCell extends ListCell<Choice<T>> {
 
-        BorderPane borderPane = new BorderPane();
-        Label titleLabel = new Label();
-        Label descriptionLabel = new Label();
-        ImageView imageView = new ImageView();
+        private BorderPane borderPane = new BorderPane();
+        private Label titleLabel = new Label();
+        private Label descriptionLabel = new Label();
+        private ImageView imageView = new ImageView();
 
         BooleanProperty selectedProperty = new SimpleBooleanProperty();
 
         public ChoiceCell() {
 
+            
+            ChoiceCell cell = this;
+            
             // Adding main class
             this.getStyleClass().add("choice-cell");
 
@@ -228,9 +231,11 @@ public class FXChoiceDialog<T> implements ChoiceDialog<T> {
             titleLabel.getStyleClass().add("title");
             descriptionLabel.getStyleClass().add("description");
             imageView.getStyleClass().add("thumb");
-
-            BindingsUtils.bindNodeToClass(this, descriptionLabel.textProperty().isNull(), "no-description");
-            BindingsUtils.bindNodeToClass(this, imageView.imageProperty().isEqualTo(NO_IMAGE), "no-image");
+            imageView.setFitWidth(64);
+            imageView.setFitHeight(64);
+            imageView.setPreserveRatio(true);
+            BindingsUtils.bindNodeToClass(cell, descriptionLabel.textProperty().isNull(), "no-description");
+            BindingsUtils.bindNodeToClass(cell, imageView.imageProperty().isEqualTo(NO_IMAGE), "no-image");
 
             VBox vBox = new VBox();
             borderPane.setLeft(imageView);
