@@ -23,6 +23,7 @@ import ijfx.bridge.FxUIPreprocessor;
 import ijfx.service.batch.BatchService;
 import ijfx.service.log.DefaultLoggingService;
 import ijfx.service.workflow.WorkflowRecorderPreprocessor;
+import ijfx.ui.input.widgets.InputHarversterFX;
 import ijfx.ui.main.ImageJFX;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
@@ -32,14 +33,12 @@ import java.util.logging.Logger;
 import mongis.utils.CallbackTask;
 import org.scijava.Context;
 import org.scijava.command.Command;
-import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandModule;
 import org.scijava.command.CommandService;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleService;
 import org.scijava.module.process.InitPreprocessor;
 import org.scijava.plugin.Parameter;
-import static weka.gui.beans.BeanConnection.inputs;
 
 /**
  *
@@ -102,9 +101,9 @@ public class CommandRunner {
 
         Module module = batchService.createModule(clazz);
 
-        batchService.preProcessExceptFor(module, InitPreprocessor.class, FxUIPreprocessor.class, WorkflowRecorderPreprocessor.class);
+        //batchService.preProcessExceptFor(module, InitPreprocessor.class, FxUIPreprocessor.class, WorkflowRecorderPreprocessor.class,InputHarversterFX.class);
 
-        Future<Module> run = moduleService.run(module, false, params);
+        //Future<Module> run = moduleService.run(module, false, params);
 
         CallbackTask<Module, T> task = new CallbackTask<Module, T>()
                 .setInput(module)
@@ -126,7 +125,7 @@ public class CommandRunner {
 
         Module module = batchService.createModule(command);
 
-        batchService.preProcessExceptFor(module, InitPreprocessor.class, FxUIPreprocessor.class, WorkflowRecorderPreprocessor.class);
+        batchService.preProcessExceptFor(module, InitPreprocessor.class, FxUIPreprocessor.class, WorkflowRecorderPreprocessor.class,InputHarversterFX.class);
         Module finishedModule = moduleService.run(module, false, params).get();
         if (outputName != null) {
             return (T) finishedModule.getOutput(outputName);
