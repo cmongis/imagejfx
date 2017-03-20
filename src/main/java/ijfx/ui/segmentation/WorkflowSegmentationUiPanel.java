@@ -154,11 +154,17 @@ public class WorkflowSegmentationUiPanel extends VBox implements SegmentationUiP
 
     
     private void onTestClicked(ActionEvent event) {
-        
-        currentSegmentation.reprocess(workflowPanel.stepListProperty());
+       
+        getCurrentSegmentation().reprocess(workflowPanel.stepListProperty());
         
     }
 
+    private WorkflowSegmentation getCurrentSegmentation() {
+        if(currentSegmentation == null) {
+            currentSegmentation = createSegmentation(imageDisplay);
+        }
+        return currentSegmentation;
+    }
   
     @Override
     public WorkflowSegmentation createSegmentation(ImageDisplay imageDisplay) {
