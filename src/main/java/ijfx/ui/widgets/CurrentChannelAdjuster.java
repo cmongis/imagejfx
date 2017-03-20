@@ -192,9 +192,10 @@ public class CurrentChannelAdjuster extends BorderPane {
         Bindings.bindBidirectional(minValueTextField.textProperty(), rangeSlider.lowValueProperty(), smartNumberStringConverter);
         Bindings.bindBidirectional(maxValueTextField.textProperty(), rangeSlider.highValueProperty(), smartNumberStringConverter);
 
-       
+       channelSlider.setVisible(false);
         
         // Setting the channel slider
+        /*
         channelSlider.setBlockIncrement(1.0);
         channelSlider.setMajorTickUnit(1.0);
         channelSlider.setSnapToTicks(true);
@@ -205,7 +206,7 @@ public class CurrentChannelAdjuster extends BorderPane {
         // setting the size of the slider depending on the number of channels
         channelSlider.prefWidthProperty().bind(Bindings.createDoubleBinding(this::getChannelSliderWidth, imageDisplayObserver.channelCountProperty()));
         
-        
+        */
         
     }
     
@@ -266,10 +267,11 @@ public class CurrentChannelAdjuster extends BorderPane {
         }
 
         private void onItemChanged(Observable obs, ColorTable oldValue, ColorTable newValue) {
-            if (newValue == null) {
+            if (newValue == null || getLUTWidth() <= 0) {
                 setGraphic(null);
                 return;
             }
+             
             setGraphic(new ImageView(FXUtilities.colorTableToImage(newValue, getLUTWidth(), 24)));
         }
 
